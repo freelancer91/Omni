@@ -1,8 +1,10 @@
 package omni.impl.seq;
 import omni.util.TypeConversionUtil;
+import omni.util.TypeUtil;
 import omni.util.OmniArray;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
+import omni.api.OmniStack;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.ByteInputTestArgType;
 import omni.impl.ByteOutputTestArgType;
@@ -13,6 +15,7 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.ArrayList;
+import omni.impl.QueryCastType;
 import omni.function.ByteConsumer;
 class ByteSeqMonitor{
   static final int DEFAULT_PRE_AND_POST_ALLOC=5;
@@ -20,9 +23,17 @@ class ByteSeqMonitor{
     ARRSEQ;
   }
   static enum SequenceLocation{
-    BEGINNING,
-    MIDDLE,
-    END;
+    BEGINNING(null,true),
+    MIDDLE(null,false),
+    END(null,false),
+    IOBLO(IndexOutOfBoundsException.class,true),
+    IOBHI(IndexOutOfBoundsException.class,true);
+    final Class<? extends Throwable> expectedException;
+    final boolean validForEmpty;
+    SequenceLocation(Class<? extends Throwable> expectedException,boolean validForEmpty){
+      this.expectedException=expectedException;
+      this.validForEmpty=validForEmpty;
+    }
   }
   static enum SequenceContentsScenario{
     EMPTY(false),
@@ -296,6 +307,6188 @@ class ByteSeqMonitor{
       throw new UnsupportedOperationException();
     }
   }
+  static enum QueryTester
+  {
+  Booleannull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Boolean)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Boolean)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Boolean)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Boolean)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Boolean)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(Boolean)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Boolean)(Boolean)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Boolean)(Boolean)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Boolean)(Boolean)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Boolean)(Boolean)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Boolean)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Boolean)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Boolean)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Boolean)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Bytenull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Byte)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Byte)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Byte)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Byte)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Byte)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(Byte)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Byte)(Byte)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Byte)(Byte)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Byte)(Byte)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Byte)(Byte)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Byte)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Byte)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Byte)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Byte)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Characternull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Character)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Character)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Character)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Character)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Character)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(Character)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(Character)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(Character)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(Character)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(Character)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Shortnull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Short)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Short)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Short)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Short)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Short)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(Short)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(Short)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(Short)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(Short)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(Short)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Integernull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Integer)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Integer)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Integer)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Integer)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Integer)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(Integer)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(Integer)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(Integer)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(Integer)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(Integer)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Longnull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Long)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Long)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Long)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Long)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Long)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(Long)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(Long)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(Long)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(Long)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(Long)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Floatnull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Float)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Float)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Float)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Float)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Float)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(Float)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(Float)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(Float)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(Float)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(Float)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Doublenull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Double)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Double)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Double)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Double)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Double)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(Double)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(Double)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(Double)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(Double)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(Double)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Objectnull(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Object)(null));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Object)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Object)(null));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Object)(null));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Object)(null));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Object)(null));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(Object)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(Object)(null));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(Object)(null));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(Object)(null));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(null));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(null));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(null));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(null));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(null));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Booleanfalse(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(boolean)(false));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(boolean)(false));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(boolean)(false));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(boolean)(false));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(boolean)(false));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(boolean)(false));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Boolean)(boolean)(false));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Boolean)(boolean)(false));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Boolean)(boolean)(false));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Boolean)(boolean)(false));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((boolean)(false));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((boolean)(false));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((boolean)(false));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((boolean)(false));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((boolean)(false));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)TypeUtil.castToByte(false));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Booleantrue(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(boolean)(true));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(boolean)(true));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(boolean)(true));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(boolean)(true));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(boolean)(true));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(boolean)(true));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Boolean)(boolean)(true));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Boolean)(boolean)(true));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Boolean)(boolean)(true));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Boolean)(boolean)(true));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((boolean)(true));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((boolean)(true));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((boolean)(true));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((boolean)(true));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((boolean)(true));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)TypeUtil.castToByte(true));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Byte0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(0));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(byte)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(byte)(0));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(byte)(0));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(byte)(0));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(0));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Byte)(byte)(0));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Byte)(byte)(0));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Byte)(byte)(0));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(0));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((byte)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((byte)(0));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((byte)(0));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((byte)(0));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Bytepos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(byte)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(byte)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(byte)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(byte)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Byte)(byte)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Byte)(byte)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Byte)(byte)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((byte)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((byte)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((byte)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((byte)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Bytepos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(byte)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(byte)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(byte)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(byte)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Byte)(byte)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Byte)(byte)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Byte)(byte)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((byte)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((byte)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((byte)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((byte)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Byteneg1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(byte)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(byte)(-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(byte)(-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(byte)(-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Byte)(byte)(-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Byte)(byte)(-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Byte)(byte)(-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((byte)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((byte)(-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((byte)(-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((byte)(-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Character0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(0));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(char)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(char)(0));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(char)(0));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(char)(0));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(0));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(char)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(char)(0));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(char)(0));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(char)(0));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(0));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((char)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((char)(0));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((char)(0));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((char)(0));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Characterpos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(char)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(char)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(char)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(char)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(char)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(char)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(char)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(char)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((char)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((char)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((char)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((char)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Characterpos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(char)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(char)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(char)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(char)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(char)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(char)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(char)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(char)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((char)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((char)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((char)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((char)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  CharacterMAX_BYTE_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(char)(((char)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(char)(((char)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(char)(((char)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(((char)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((char)(((char)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((char)(((char)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((char)(((char)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((char)(((char)Byte.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((char)Byte.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  CharacterMAX_SHORT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(char)(((char)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Character)(char)(((char)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Character)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Character)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Character)(char)(((char)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(((char)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((char)(((char)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((char)(((char)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((char)(((char)Short.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((char)(((char)Short.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((char)Short.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Short0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(0));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(short)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(short)(0));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(short)(0));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(short)(0));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(0));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(short)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(short)(0));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(short)(0));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(short)(0));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(0));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((short)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((short)(0));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((short)(0));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((short)(0));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Shortpos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(short)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(short)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(short)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(short)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(short)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(short)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(short)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(short)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((short)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((short)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((short)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((short)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Shortpos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(short)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(short)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(short)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(short)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(short)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(short)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(short)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(short)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((short)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((short)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((short)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((short)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Shortneg1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(short)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(short)(-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(short)(-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(short)(-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(short)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(short)(-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(short)(-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(short)(-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((short)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((short)(-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((short)(-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((short)(-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  ShortMAX_BYTE_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(short)(((short)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(short)(((short)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(short)(((short)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(((short)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((short)(((short)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((short)(((short)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((short)(((short)Byte.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((short)Byte.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  ShortMIN_BYTE_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(short)(((short)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Short)(short)(((short)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Short)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Short)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Short)(short)(((short)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(((short)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((short)(((short)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((short)(((short)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((short)(((short)Byte.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((short)Byte.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Integer0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(0));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(0));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(0));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(0));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(0));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(0));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(0));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(0));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(0));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(0));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(0));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(0));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Integerpos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Integerpos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Integerneg1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMAX_BYTE_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(((int)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(((int)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(((int)Byte.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((int)Byte.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMIN_BYTE_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(((int)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(((int)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(((int)Byte.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((int)Byte.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMAX_SHORT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(((int)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(((int)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(((int)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(((int)Short.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(((int)Short.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((int)Short.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMIN_SHORT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(((int)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(((int)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(((int)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(((int)Short.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(((int)Short.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((int)Short.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMAX_CHAR_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(((int)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(((int)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(((int)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(((int)Character.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(((int)Character.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((int)Character.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMAX_SAFE_INT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(TypeUtil.MAX_SAFE_INT+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(TypeUtil.MAX_SAFE_INT+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(TypeUtil.MAX_SAFE_INT+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(TypeUtil.MAX_SAFE_INT+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  IntegerMIN_SAFE_INT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(int)(TypeUtil.MIN_SAFE_INT-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((int)(TypeUtil.MIN_SAFE_INT-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((int)(TypeUtil.MIN_SAFE_INT-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(TypeUtil.MIN_SAFE_INT-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Long0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(0));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(0));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(0));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(0));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(0));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(0));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(0));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(0));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(0));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(0));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(0));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(0));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(0));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Longpos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Longpos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Longneg1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMAX_BYTE_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Byte.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Byte.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMIN_BYTE_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Byte.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Byte.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMAX_SHORT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Short.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Short.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Short.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMIN_SHORT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Short.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Short.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Short.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMAX_CHAR_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Character.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Character.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Character.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMAX_SAFE_INT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MAX_SAFE_INT)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)TypeUtil.MAX_SAFE_INT)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMIN_SAFE_INT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MIN_SAFE_INT)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)TypeUtil.MIN_SAFE_INT)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMAX_INT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Integer.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Integer.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Integer.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMIN_INT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)Integer.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)Integer.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)Integer.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMAX_SAFE_LONG_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)TypeUtil.MAX_SAFE_LONG)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  LongMIN_SAFE_LONG_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((long)TypeUtil.MIN_SAFE_LONG)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Floatpos0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(0.0F));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(0.0F));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(0.0F));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(0.0F));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(0.0F));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(0.0F));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(0.0F));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(0.0F));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(0.0F));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(0.0F));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(0.0F));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(0.0F));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(0.0F));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(0.0F));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(0.0F));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0.0F));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Floatneg0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(-0.0F));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(-0.0F));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(-0.0F));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(-0.0F));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(-0.0F));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(-0.0F));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(-0.0F));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(-0.0F));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(-0.0F));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(-0.0F));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(-0.0F));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(-0.0F));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(-0.0F));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(-0.0F));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(-0.0F));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-0.0F));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Floatpos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Floatpos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Floatneg1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMAX_BYTE_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Byte.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Byte.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMIN_BYTE_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Byte.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Byte.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMAX_SHORT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Short.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Short.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Short.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMIN_SHORT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Short.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Short.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Short.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMAX_CHAR_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Character.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Character.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Character.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMAX_INT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Integer.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Integer.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Integer.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMIN_INT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Integer.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Integer.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Integer.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMAX_LONG_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Long.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Long.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Long.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Long.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Long.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Long.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Long.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Long.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Long.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMIN_LONG_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Long.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Long.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(((float)Long.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Long.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(((float)Long.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(((float)Long.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(((float)Long.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(((float)Long.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((float)Long.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMIN_FLOAT_VALUE(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.MIN_VALUE));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(Float.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(Float.MIN_VALUE));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(Float.MIN_VALUE));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(Float.MIN_VALUE));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.MIN_VALUE));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(Float.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(Float.MIN_VALUE));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(Float.MIN_VALUE));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(Float.MIN_VALUE));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.MIN_VALUE));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(Float.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(Float.MIN_VALUE));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(Float.MIN_VALUE));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(Float.MIN_VALUE));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Float.MIN_VALUE));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatMAX_FLOAT_VALUE(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.MAX_VALUE));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(Float.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(Float.MAX_VALUE));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(Float.MAX_VALUE));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(Float.MAX_VALUE));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.MAX_VALUE));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(Float.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(Float.MAX_VALUE));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(Float.MAX_VALUE));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(Float.MAX_VALUE));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.MAX_VALUE));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(Float.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(Float.MAX_VALUE));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(Float.MAX_VALUE));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(Float.MAX_VALUE));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Float.MAX_VALUE));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  FloatNaN(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.NaN));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(float)(Float.NaN));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(float)(Float.NaN));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(float)(Float.NaN));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(float)(Float.NaN));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.NaN));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Float)(float)(Float.NaN));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Float)(float)(Float.NaN));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Float)(float)(Float.NaN));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Float)(float)(Float.NaN));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.NaN));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((float)(Float.NaN));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((float)(Float.NaN));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((float)(Float.NaN));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((float)(Float.NaN));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Float.NaN));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Doublepos0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(0.0D));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(0.0D));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(0.0D));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(0.0D));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(0.0D));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(0.0D));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(0.0D));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(0.0D));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(0.0D));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(0.0D));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(0.0D));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(0.0D));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(0.0D));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(0.0D));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(0.0D));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(0.0D));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Doubleneg0(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(-0.0D));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(-0.0D));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(-0.0D));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(-0.0D));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(-0.0D));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(-0.0D));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(-0.0D));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(-0.0D));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(-0.0D));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(-0.0D));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(-0.0D));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(-0.0D));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(-0.0D));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(-0.0D));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(-0.0D));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-0.0D));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)true);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Doublepos1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Doublepos2(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(2));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(2));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(2));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(2));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(2));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(2));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(2));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(2));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(2));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(2));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(2));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(2));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(2));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(2));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  Doubleneg1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_BYTE_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Byte.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Byte.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Byte.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Byte.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Byte.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Byte.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_BYTE_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Byte.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Byte.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Byte.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Byte.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Byte.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Byte.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_SHORT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Short.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Short.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Short.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Short.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Short.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Short.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Short.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_SHORT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Short.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Short.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Short.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Short.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Short.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Short.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Short.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_CHAR_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Character.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Character.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Character.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Character.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Character.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Character.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Character.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_SAFE_INT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)TypeUtil.MAX_SAFE_INT)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)TypeUtil.MAX_SAFE_INT)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_SAFE_INT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)TypeUtil.MIN_SAFE_INT)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)TypeUtil.MIN_SAFE_INT)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_INT_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Integer.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Integer.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Integer.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Integer.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Integer.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Integer.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_INT_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Integer.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Integer.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Integer.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Integer.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Integer.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Integer.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_LONG_PLUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Long.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Long.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Long.MAX_VALUE)+1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Long.MAX_VALUE)+1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Long.MAX_VALUE)+1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Long.MAX_VALUE)+1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Long.MAX_VALUE)+1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Long.MAX_VALUE)+1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Long.MAX_VALUE)+1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_LONG_MINUS1(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Long.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Long.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(((double)Long.MIN_VALUE)-1));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Long.MIN_VALUE)-1));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(((double)Long.MIN_VALUE)-1));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(((double)Long.MIN_VALUE)-1));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(((double)Long.MIN_VALUE)-1));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(((double)Long.MIN_VALUE)-1));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(((double)Long.MIN_VALUE)-1));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_FLOAT_VALUE(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Float.MIN_VALUE));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(Float.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(Float.MIN_VALUE));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(Float.MIN_VALUE));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(Float.MIN_VALUE));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Float.MIN_VALUE));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Float.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(Float.MIN_VALUE));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(Float.MIN_VALUE));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(Float.MIN_VALUE));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Float.MIN_VALUE));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(Float.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(Float.MIN_VALUE));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(Float.MIN_VALUE));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(Float.MIN_VALUE));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Float.MIN_VALUE));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_FLOAT_VALUE(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Float.MAX_VALUE));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(Float.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(Float.MAX_VALUE));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(Float.MAX_VALUE));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(Float.MAX_VALUE));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Float.MAX_VALUE));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Float.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(Float.MAX_VALUE));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(Float.MAX_VALUE));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(Float.MAX_VALUE));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Float.MAX_VALUE));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(Float.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(Float.MAX_VALUE));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(Float.MAX_VALUE));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(Float.MAX_VALUE));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Float.MAX_VALUE));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMIN_DOUBLE_VALUE(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.MIN_VALUE));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(Double.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(Double.MIN_VALUE));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(Double.MIN_VALUE));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(Double.MIN_VALUE));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.MIN_VALUE));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Double.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(Double.MIN_VALUE));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(Double.MIN_VALUE));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(Double.MIN_VALUE));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.MIN_VALUE));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(Double.MIN_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(Double.MIN_VALUE));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(Double.MIN_VALUE));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(Double.MIN_VALUE));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Double.MIN_VALUE));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleMAX_DOUBLE_VALUE(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.MAX_VALUE));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(Double.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(Double.MAX_VALUE));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(Double.MAX_VALUE));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(Double.MAX_VALUE));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.MAX_VALUE));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Double.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(Double.MAX_VALUE));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(Double.MAX_VALUE));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(Double.MAX_VALUE));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.MAX_VALUE));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(Double.MAX_VALUE));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(Double.MAX_VALUE));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(Double.MAX_VALUE));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(Double.MAX_VALUE));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Double.MAX_VALUE));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  DoubleNaN(false){
+    @Override boolean invokecontainsObject(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.NaN));}
+    @Override boolean invokeremoveValObject(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.remove((Object)(double)(Double.NaN));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Object)(double)(Double.NaN));}
+    @Override int invokelastIndexOfObject(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Object)(double)(Double.NaN));}
+    @Override int invokesearchObject(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Object)(double)(Double.NaN));}
+    @Override boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.NaN));}
+    @Override boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Double.NaN));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((Double)(double)(Double.NaN));}
+    @Override int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((Double)(double)(Double.NaN));}
+    @Override int invokesearchBoxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((Double)(double)(Double.NaN));}
+    @Override boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.NaN));}
+    @Override boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor){
+      boolean ret=seqMonitor.seq.removeVal((double)(Double.NaN));
+      if(ret){
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        --seqMonitor.expectedSeqSize;
+        --seqMonitor.expectedParentSize;
+        --seqMonitor.expectedRootSize;
+      }
+      return ret;
+    }
+    @Override int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).indexOf((double)(Double.NaN));}
+    @Override int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor){return ((OmniList.OfByte)seqMonitor.seq).lastIndexOf((double)(Double.NaN));}
+    @Override int invokesearchUnboxed(ByteSeqMonitor seqMonitor){return ((OmniStack.OfByte)seqMonitor.seq).search((double)(Double.NaN));}
+    void addEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((byte)(Double.NaN));
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+    void addNotEqualsVal(ByteSeqMonitor seqMonitor){
+      seqMonitor.seq.add((boolean)false);
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+    }
+  },
+  ;
+    final boolean isObjectNonNull;
+    QueryTester(boolean isObjectNonNull){
+      this.isObjectNonNull=isObjectNonNull;
+    }
+    boolean invokecontains(ByteSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokecontainsUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokecontainsBoxed(seqMonitor);
+        case ToObject:
+          return invokecontainsObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    boolean invokeremoveVal(ByteSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokeremoveValUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokeremoveValBoxed(seqMonitor);
+        case ToObject:
+          return invokeremoveValObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    int invokeindexOf(ByteSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokeindexOfUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokeindexOfBoxed(seqMonitor);
+        case ToObject:
+          return invokeindexOfObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    int invokelastIndexOf(ByteSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokelastIndexOfUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokelastIndexOfBoxed(seqMonitor);
+        case ToObject:
+          return invokelastIndexOfObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    int invokesearch(ByteSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokesearchUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokesearchBoxed(seqMonitor);
+        case ToObject:
+          return invokesearchObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    abstract boolean invokecontainsObject(ByteSeqMonitor seqMonitor);
+    abstract boolean invokecontainsBoxed(ByteSeqMonitor seqMonitor);
+    abstract boolean invokecontainsUnboxed(ByteSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValObject(ByteSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValBoxed(ByteSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValUnboxed(ByteSeqMonitor seqMonitor);
+    abstract int invokeindexOfObject(ByteSeqMonitor seqMonitor);
+    abstract int invokeindexOfBoxed(ByteSeqMonitor seqMonitor);
+    abstract int invokeindexOfUnboxed(ByteSeqMonitor seqMonitor);
+    abstract int invokelastIndexOfObject(ByteSeqMonitor seqMonitor);
+    abstract int invokelastIndexOfBoxed(ByteSeqMonitor seqMonitor);
+    abstract int invokelastIndexOfUnboxed(ByteSeqMonitor seqMonitor);
+    abstract int invokesearchObject(ByteSeqMonitor seqMonitor);
+    abstract int invokesearchBoxed(ByteSeqMonitor seqMonitor);
+    abstract int invokesearchUnboxed(ByteSeqMonitor seqMonitor);
+    abstract void addEqualsVal(ByteSeqMonitor seqMonitor);
+    abstract void addNotEqualsVal(ByteSeqMonitor seqMonitor);
+    void initDoesNotContain(ByteSeqMonitor seqMonitor){
+      for(int i=0;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+    }
+    int initContainsEnd(ByteSeqMonitor seqMonitor){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0;i<99;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      return seqMonitor.expectedSeqSize-1;
+    }
+    int initContainsMiddle(ByteSeqMonitor seqMonitor){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0;i<50;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      for(int i=51;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return seqMonitor.expectedSeqSize/2;
+    }
+    int initContainsBeginning(ByteSeqMonitor seqMonitor){
+      addEqualsVal(seqMonitor);
+      for(int i=1;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return 0;
+    }
+  };
   private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,byte[] arr){
     for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
       arr[i]=TypeConversionUtil.convertTobyte(v);
@@ -703,6 +6896,7 @@ class ByteSeqMonitor{
   public static abstract class SequenceVerificationItr{
     public abstract void verifyIndexAndIterate(ByteInputTestArgType inputArgType,int val);
     public abstract SequenceVerificationItr getPositiveOffset(int i);
+    public abstract SequenceVerificationItr skip(int i);
     public abstract boolean equals(Object val);
     final ByteSeqMonitor seqMonitor;
     SequenceVerificationItr(ByteSeqMonitor seqMonitor){
@@ -737,10 +6931,10 @@ class ByteSeqMonitor{
     }
     public SequenceVerificationItr verifyMidPointInsertion(ByteInputTestArgType inputArgType,final int length){
       int i=0;
-      for(int v=0,halfLength=length/2;i<halfLength;++i,v+=2){
+      for(int v=1,halfLength=length/2;i<halfLength;++i,v+=2){
         verifyIndexAndIterate(inputArgType,v);
       }
-      for(int v=length-1;i<length;++i,v-=2){
+      for(int v=length-2;i<length;++i,v-=2){
         verifyIndexAndIterate(inputArgType,v);
       }
       return this;
@@ -789,6 +6983,13 @@ class ByteSeqMonitor{
         throw new Error("offset cannot be negative: "+i);
       }
       return new ArrSeqSequenceVerificationItr(seqMonitor,i+offset,arr);
+    }
+    @Override public SequenceVerificationItr skip(int i){
+      if(i<0){
+        throw new Error("offset cannot be negative: "+i);
+      }
+      this.offset+=i;
+      return this;
     }
     @Override public boolean equals(Object val){
       final ArrSeqSequenceVerificationItr that;
@@ -876,6 +7077,9 @@ class ByteSeqMonitor{
   }
   public void push(int val){
     push(val,ByteInputTestArgType.ARRAY_TYPE);
+  }
+  public void put(int index,int val,ByteInputTestArgType inputArgType){
+    inputArgType.callListPut(seq,index,val);
   }
   public String toString(){
     StringBuilder builder=new StringBuilder();
