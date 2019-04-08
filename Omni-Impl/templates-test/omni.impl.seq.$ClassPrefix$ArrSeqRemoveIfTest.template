@@ -761,8 +761,8 @@ static OmniList.Of$ClassPrefix$ buildROOTSTRUCTCHECKED(int seqSize,int rootPreAl
 #ENDIF
 
 
-#MACRO TestImplHelper($TypeNameModifier$Predicate)
+//#MACRO TestImplHelper($TypeNameModifier$Predicate)
 #IFNOT OfRef
-#MACRO TestImplHelper(Predicate)
+//#MACRO TestImplHelper(Predicate)
 #ENDIF
 #ENDDEF

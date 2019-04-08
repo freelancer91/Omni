@@ -34,23 +34,47 @@ import omni.impl.seq.$ClassPrefix$SeqMonitor.IterationScenario;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredComparatorGen;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredRemoveIfPredicateGen;
 #IF OfRef
 import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObjectGen;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObject;
 #ENDIF
 import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.QueryTester;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 #IF OfRef
-@SuppressWarnings({"rawtypes"})
+@SuppressWarnings({"rawtypes","unchecked"})
 #ENDIF
 @Execution(ExecutionMode.CONCURRENT)
 public class $ClassPrefix$ArrSeqTest{
+  @FunctionalInterface
+  interface ArgBuilder{
+    void buildArgs(Stream.Builder<Arguments> streamBuilder,StructType structType,NestedType nestedType,CheckedType checkedType,PreModScenario preModScenario);
+    
+    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
+      Stream.Builder<Arguments> streamBuilder=Stream.builder();
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
+              argBuilder.buildArgs(streamBuilder,StructType.ARRSEQ,nestedType,checkedType,preModScenario);
+            }
+          }
+        }
+      }
+      return streamBuilder.build();
+    }
+    
+  }
 
   #MACRO TestMethods(true)
 #MACRODEF TestMethods(PARALLEL)
   //TODO refactor RemoveIf
-  #MACRO testListset_int_val<false>()
+  #MACRO testremoveIf_Predicate<PARALLEL>()
+  #MACRO testhashCode_void<PARALLEL>()
+  #MACRO testListset_int_val<PARALLEL>()
+  #MACRO testListget_int<PARALLEL>()
   #MACRO testtoArray_ObjectArray<PARALLEL>()
   #MACRO testtoArray_IntFunction<PARALLEL>()
   #MACRO testListsubList_int_int<PARALLEL>()
@@ -1042,26 +1066,18 @@ public void testItrforEachRemaining_Consumer
 
 #MACRODEF testforEach_Consumer<PARALLEL>()
 static Stream<Arguments> getforEach_ConsumerArgs(){
-  Stream.Builder<Arguments> builder=Stream.builder();
-  for(var checkedType:CheckedType.values()){
-    for(var nestedType:NestedType.values()){
-      for(var preModScenario:PreModScenario.values()){
-        if(preModScenario!=PreModScenario.ModSeq&&(preModScenario.expectedException==null||(!nestedType.rootType&&checkedType.checked))){
-          for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
-            if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
-              for(var seqContentsScenario:SequenceContentsScenario.values()){
-                builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+      if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+        for(var seqContentsScenario:SequenceContentsScenario.values()){
+          streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
 #IFNOT OfRef
-                builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+          streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
 #ENDIF
-              }
-            }
-          }   
         }
       }
     }
-  }
-  return builder.build();
+  });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
@@ -1460,41 +1476,33 @@ public void testListput_int_val
 
 #MACRODEF testadd_val<PARALLEL>()
 static Stream<Arguments> getadd_valArgs(){
-  Stream.Builder<Arguments> builder=Stream.builder();
-  for(var nestedType:NestedType.values()){
-    for(var checkedType:CheckedType.values()){
-      for(var preModScenario:PreModScenario.values()){
-        if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
-              for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-                switch(nestedType){
-                  case LIST:
-                  case STACK:
-                    builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType,initialCapacity),inputArgType,preModScenario,seqContentsScenario));
-                    break;
-                  case SUBLIST:
-                    for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-                      for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-                        for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-                          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                            builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,preModScenario,seqContentsScenario));
-                          }
-                        }
-                      }
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    for(var seqContentsScenario:SequenceContentsScenario.values()){
+      for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          switch(nestedType){
+            case LIST:
+            case STACK:
+              streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType,initialCapacity),inputArgType,preModScenario,seqContentsScenario));
+              break;
+            case SUBLIST:
+              for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+                for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+                  for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                    for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+                      streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,preModScenario,seqContentsScenario));
                     }
-                    break;
-                  default:
-                    throw new Error("Unknown nested type "+nestedType);
+                  }
                 }
               }
-            }
+              break;
+            default:
+              throw new Error("Unknown nested type "+nestedType);
           }
         }
       }
     }
-  }
-  return builder.build();
+  });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
@@ -1759,7 +1767,7 @@ public void testStackpush_val
                           continue;
                         }
                         for(var monitoredObjectGen:MonitoredObjectGen.values()){
-                          if(nestedType.rootType && !monitoredObjectGen.appliesToRoot){
+                          if(nestedType.rootType && !monitoredObjectGen.appliesToRoot || monitoredObjectGen.expectedException==null){
                             continue;
                           }
                           builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),argType,queryCastType,seqLocation,seqContentsScenario,preModScenario,monitoredObjectGen));
@@ -2982,21 +2990,13 @@ public void testListremoveAt_int
 
 #MACRODEF testtoArray_void<PARALLEL>()
 static Stream<Arguments> gettoArray_voidArgs(){
-  Stream.Builder<Arguments> builder=Stream.builder();
-  for(var nestedType:NestedType.values()){
-    for(var checkedType:CheckedType.values()){
-      for(var preModScenario:PreModScenario.values()){
-        if(preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType && preModScenario!=PreModScenario.ModSeq)){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            for(var outputArgType:$ClassPrefix$OutputTestArgType.values()){
-              builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,seqContentsScenario,outputArgType));
-            }
-          }
-        }
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    for(var seqContentsScenario:SequenceContentsScenario.values()){
+      for(var outputArgType:$ClassPrefix$OutputTestArgType.values()){
+        streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,seqContentsScenario,outputArgType));
       }
     }
-  }
-  return builder.build();
+  });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
@@ -3027,19 +3027,11 @@ public void testtoArray_void
 }
 #ENDDEF
   static Stream<Arguments> getBasicCollectionTestArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(var nestedType:NestedType.values()){
-      for(var checkedType:CheckedType.values()){
-        for(var preModScenario:PreModScenario.values()){
-          if(preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType && preModScenario!=PreModScenario.ModSeq)){
-            for(var seqContentsScenario:SequenceContentsScenario.values()){
-              builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,seqContentsScenario));
-            }
-          }
-        }
+    return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+      for(var seqContentsScenario:SequenceContentsScenario.values()){
+        streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,seqContentsScenario));
       }
-    }
-    return builder.build();
+    });
   }
 
 #MACRODEF testclone_void<PARALLEL>()
@@ -3311,17 +3303,9 @@ public void testStackpoll_void
 
 #MACRODEF testiterator_void<PARALLEL>()
 static Stream<Arguments> getiterator_voidArgs(){
-  Stream.Builder<Arguments> builder=Stream.builder();
-  for(var nestedType:NestedType.values()){
-    for(var checkedType:CheckedType.values()){
-      for(var preModScenario:PreModScenario.values()){
-        if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
-          builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario));
-        }
-      }
-    }
-  }
-  return builder.build();
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario));
+  });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
@@ -3775,23 +3759,15 @@ public void testListsubList_int_int
 
 #MACRODEF testtoArray_IntFunction<PARALLEL>()
 static Stream<Arguments> gettoArray_IntFunctionArgs(){
-  Stream.Builder<Arguments> builder=Stream.builder();
-  for(var checkedType:CheckedType.values()){
-    for(var nestedType:NestedType.values()){
-      for(var preModScenario:PreModScenario.values()){
-        if(preModScenario!=PreModScenario.ModSeq&&(preModScenario.expectedException==null||(!nestedType.rootType&&checkedType.checked))){
-          for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
-            if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
-              for(var seqContentsScenario:SequenceContentsScenario.values()){
-                builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
-              }
-            }
-          }   
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+      if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+        for(var seqContentsScenario:SequenceContentsScenario.values()){
+          streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
         }
       }
-    }
-  }
-  return builder.build();
+    }   
+  });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
@@ -3877,21 +3853,13 @@ public void testtoArray_IntFunction
 
 #MACRODEF testtoArray_ObjectArray<PARALLEL>()
 static Stream<Arguments> gettoArray_ObjectArrayArgs(){
-  Stream.Builder<Arguments> builder=Stream.builder();
-  for(var nestedType:NestedType.values()){
-    for(var checkedType:CheckedType.values()){
-      for(var preModScenario:PreModScenario.values()){
-        if(preModScenario!=PreModScenario.ModSeq&&(preModScenario.expectedException==null||(!nestedType.rootType&&checkedType.checked))){
-          for(int seqSize=0;seqSize<=15;seqSize+=5){
-            for(int arrSize=0;arrSize<=20;arrSize+=5){
-              builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,seqSize,arrSize));
-            }
-          }
-        }
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    for(int seqSize=0;seqSize<=15;seqSize+=5){
+      for(int arrSize=0;arrSize<=20;arrSize+=5){
+        streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,seqSize,arrSize));
       }
     }
-  }
-  return builder.build();
+  });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
@@ -3959,265 +3927,554 @@ public void testtoArray_ObjectArray
 #ENDDEF
 
 #MACRODEF testListset_int_val<PARALLEL>()
-//TODO
-#ENDDEF
-
-  
-  /*
-  static Stream<Arguments> getBasicCollectionTestArguments(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(StructType structType:StructType.values()){
-      builder.accept(Arguments.of(structType,0,CMEScenario.NoMod));
-      builder.accept(Arguments.of(structType,100,CMEScenario.NoMod));
-      if(structType==StructType.CHECKEDSUBLIST){
-        builder.accept(Arguments.of(structType,0,CMEScenario.ModParent));
-        builder.accept(Arguments.of(structType,100,CMEScenario.ModParent));
-        builder.accept(Arguments.of(structType,0,CMEScenario.ModRoot));
-        builder.accept(Arguments.of(structType,100,CMEScenario.ModRoot));
+static Stream<Arguments> getListset_int_valArgs(){
+  Stream.Builder<Arguments> builder=Stream.builder();
+  for(var nestedType:NestedType.values()){
+    if(nestedType.forwardIteration){
+      for(var checkedType:CheckedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
+            for(var seqContentsScenario:SequenceContentsScenario.values()){
+              for(var seqLocation:SequenceLocation.values()){
+                if((seqLocation==SequenceLocation.BEGINNING && seqContentsScenario.nonEmpty) || (checkedType.checked && seqLocation.expectedException!=null)){
+                  builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Unboxed));
+#IFNOT OfRef
+                  builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Boxed));
+#ENDIF               
+                }
+              }
+            }
+          }
+        }
       }
     }
-    return builder.build();
   }
-  static void illegallyMod(CMEScenario modScenario,ConstructionArguments constructionArgs){
-    switch(modScenario){
-      case ModSeq:
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.seq,0);
+  return builder.build();
+}
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testListset_int_val(){
+  getListset_int_valArgs().parallel().map(Arguments::get).forEach(args->{
+      testListset_int_valHelper(($ClassPrefix$SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FunctionCallType)args[4]);
+  });
+}
+private static void testListset_int_valHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("getListset_int_valArgs")
+public void testListset_int_val
+#ENDIF
+($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FunctionCallType functionCallType){
+  int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  for(int i=0;i<numToAdd;++i){
+    seqMonitor.add(i);
+  }
+  seqMonitor.illegalAdd(preModScenario);
+  if(preModScenario.expectedException==null){
+    switch(seqLocation){
+      case IOBLO:
+        Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.verifySet(-1,-1,0,functionCallType));
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
         break;
-      case ModParent:
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.parent,0);
+      case IOBHI:
+        Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.verifySet(numToAdd,numToAdd+1,numToAdd,functionCallType));
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
         break;
-      case ModRoot:
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.root,0);
+      case BEGINNING:
+        for(int i=0;i<numToAdd;++i){
+          seqMonitor.verifySet(i,i+numToAdd,i,functionCallType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd,numToAdd).verifyPostAlloc();
         break;
       default:
+        throw new Error("Unknown seqLocation "+seqLocation);
     }
+  }else{
+    final int setIndex;
+    switch(seqLocation){
+      case IOBLO:
+        setIndex=-1;
+        break;
+      case IOBHI:
+        setIndex=numToAdd;
+        break;
+      case BEGINNING:
+        setIndex=0;
+        break;
+      default:
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+    Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.verifySet(setIndex,numToAdd+1,setIndex,functionCallType));
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
   }
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
 
-
-  static Stream<Arguments> getHashCodeTestArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(StructType structType:StructType.values()){
-      
-      switch(structType)
-      {
-        case CHECKEDSUBLIST:
-          builder.accept(Arguments.of(structType,0,ObjModScenario.NoMod,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.NoMod,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,0,ObjModScenario.NoMod,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.NoMod,CMEScenario.ModRoot));
-        #IF OfRef
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModParent,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModParent,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModRoot,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModRoot,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModParentThrow,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModParentThrow,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModRootThrow,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModRootThrow,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModSeqThrow,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModSeq,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.Throw,CMEScenario.ModParent));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModSeqThrow,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModSeq,CMEScenario.ModRoot));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.Throw,CMEScenario.ModRoot));
-        #ENDIF
-        case CHECKEDSTACK:
-        case CHECKEDLIST:
-          #IF OfRef
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModSeqThrow,CMEScenario.NoMod));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.ModSeq,CMEScenario.NoMod));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.Throw,CMEScenario.NoMod));
-          #ENDIF
-        default:
-          builder.accept(Arguments.of(structType,0,ObjModScenario.NoMod,CMEScenario.NoMod));
-          builder.accept(Arguments.of(structType,100,ObjModScenario.NoMod,CMEScenario.NoMod));
-      }
-    }
-    return builder.build();
-  }
-  private static ModCheckTestData initializeForBasicModCheckableTest(StructType structType,int numToAdd,ObjModScenario objModScenario,CMEScenario preModScenario){
-    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
-    ModCheckTestObject modCheckTestObject=null;
-    if(objModScenario==ObjModScenario.NoMod){
-       for(int i=0;i<numToAdd;++i){
-          $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.seq,i);
-        }
-    }else{
-      switch(objModScenario){
-        case ModSeq:
-          modCheckTestObject=new ModCheckTestObject.Modding((OmniCollection.OfRef<?>)constructionArgs.seq);
-          break;
-        case ModSeqThrow:
-          modCheckTestObject=new ModCheckTestObject.ModdingAndThrowing((OmniCollection.OfRef<?>)constructionArgs.seq);
-          break;
-        case ModParent:
-          modCheckTestObject=new ModCheckTestObject.Modding((OmniCollection.OfRef<?>)constructionArgs.parent);
-          break;
-        case ModParentThrow:
-          modCheckTestObject=new ModCheckTestObject.ModdingAndThrowing((OmniCollection.OfRef<?>)constructionArgs.parent);
-          break;
-        case ModRoot:
-          modCheckTestObject=new ModCheckTestObject.Modding((OmniCollection.OfRef<?>)constructionArgs.root);
-          break;
-        case ModRootThrow:
-          modCheckTestObject=new ModCheckTestObject.ModdingAndThrowing((OmniCollection.OfRef<?>)constructionArgs.root);
-          break;
-        default:
-          modCheckTestObject=new ModCheckTestObject();
-      }
-      for(int i=0;i<numToAdd;++i){
-        ((OmniCollection.OfRef)constructionArgs.seq).add(modCheckTestObject);
-      }
-    }
-    illegallyMod(preModScenario,constructionArgs);
-    return new ModCheckTestData(modCheckTestObject,constructionArgs);
-  }
-#IF OfRef
-  private static void verifyTestDidNotModify(ModCheckTestData moddingObjectData,int numAdded,ObjModScenario objModScenario,CMEScenario preModScenario)
-  {
-      ModCheckTestObject modCheckTestObject=moddingObjectData.modCheckTestObject;
-      ConstructionArguments constructionArgs=moddingObjectData.constructionArgs;
-      int numCalls=modCheckTestObject.numCalls;
-      int offset=constructionArgs.verifyPreAlloc();
-      offset+=numAdded;
-      switch(preModScenario){
-        case ModRoot:
-          if(objModScenario!=ObjModScenario.ModRoot && objModScenario!=ObjModScenario.ModRootThrow){
-            numCalls=0;
-          }
-          constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1);
-          offset=constructionArgs.verifyParentPostAlloc(offset);
-          offset=constructionArgs.verifyRootPostAlloc(offset);
-          offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
-          break;
-        case ModParent:
-          switch(objModScenario){
-            case ModRootThrow:
-            case ModRoot:
-              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+numCalls+1,numAdded+numCalls+1);
-              offset=constructionArgs.verifyParentPostAlloc(offset);
-              break;
-            case ModParentThrow:
-            case ModParent:
-              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1);
-              offset=constructionArgs.verifyParentPostAlloc(offset);
-              for(int i=0;i<numCalls;++i)
-              {
-                offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+#MACRODEF testListget_int<PARALLEL>()
+static Stream<Arguments> getListget_intArgs(){
+  Stream.Builder<Arguments> builder=Stream.builder();
+  for(var nestedType:NestedType.values()){
+    if(nestedType.forwardIteration){
+      for(var checkedType:CheckedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
+            for(var seqContentsScenario:SequenceContentsScenario.values()){
+              for(var seqLocation:SequenceLocation.values()){
+                if((seqLocation==SequenceLocation.BEGINNING && seqContentsScenario.nonEmpty) || (checkedType.checked && seqLocation.expectedException!=null)){
+                  for(var outputArgType:$ClassPrefix$OutputTestArgType.values()){
+                    builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,outputArgType));
+                  }
+                }
               }
-              break;
-            case ModSeqThrow:
-            case ModSeq:
-            case Throw:
-               constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+1,numAdded+1);
-               offset=constructionArgs.verifyParentPostAlloc(offset);
-               break;
             }
-            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
-            offset=constructionArgs.verifyRootPostAlloc(offset);
-            break;
-        default:
-            switch(objModScenario){
-              case ModRoot:
-                constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls,numAdded+numCalls);
-                offset=constructionArgs.verifyParentPostAlloc(offset);
-                offset=constructionArgs.verifyRootPostAlloc(offset);
-                for(int i=0;i<numCalls;++i){
-                  offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
-                }
-                break;
-              case ModParentThrow:
-              case ModParent:
-                constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls);
-                offset=constructionArgs.verifyParentPostAlloc(offset);
-                for(int i=0;i<numCalls;++i)
-                {
-                  offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
-                }
-                offset=constructionArgs.verifyRootPostAlloc(offset);
-                break;
-              case ModSeqThrow:
-              case ModSeq:
-                for(int i=0;i<numCalls;++i)
-                {
-                  offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
-                }
-                constructionArgs.verifyStructuralIntegrity(numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls); 
-                offset=constructionArgs.verifyParentPostAlloc(offset);
-                offset=constructionArgs.verifyRootPostAlloc(offset);
-                break;
-              default:
-                constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded,numAdded);
-                offset=constructionArgs.verifyParentPostAlloc(offset);
-                offset=constructionArgs.verifyRootPostAlloc(offset);
-            }
+          }
+        }
       }
+    }
   }
+  return builder.build();
+}
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testListget_int(){
+  getListget_intArgs().parallel().map(Arguments::get).forEach(args->{
+      testListget_intHelper(($ClassPrefix$SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],($ClassPrefix$OutputTestArgType)args[4]);
+  });
+}
+private static void testListget_intHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("getListget_intArgs")
+public void testListget_int
 #ENDIF
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getHashCodeTestArgs")
-  public void testhashCode_void(StructType structType,int numToAdd,ObjModScenario objModScenario,CMEScenario preModScenario){
-    ModCheckTestData modCheckTestData=initializeForBasicModCheckableTest(structType,numToAdd,objModScenario,preModScenario);
-    ConstructionArguments constructionArgs=modCheckTestData.constructionArgs;
-    #IF OfRef
-    ModCheckTestObject modCheckTestObject=modCheckTestData.modCheckTestObject;
-    if(modCheckTestObject==null)
-    {
-    #ENDIF
-      if(preModScenario==CMEScenario.NoMod){
-        int expectedHash=1;
-        switch(structType){
-          case CHECKEDSTACK:
-          case UNCHECKEDSTACK:
-            for(int i=numToAdd;--i>=0;)
-            {
-              expectedHash=(expectedHash*31)+Objects.hashCode(TypeConversionUtil.convertTo$ArrayType$(i));
-            }
-            break;
-          default:
-            for(int i=0;i<numToAdd;++i)
-            {
-              expectedHash=(expectedHash*31)+Objects.hashCode(TypeConversionUtil.convertTo$ArrayType$(i));
-            }
+($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,$ClassPrefix$OutputTestArgType outputArgType){
+  int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  for(int i=0;i<numToAdd;++i){
+    seqMonitor.add(i);
+  }
+  seqMonitor.illegalAdd(preModScenario);
+  if(preModScenario.expectedException==null){
+    switch(seqLocation){
+      case IOBLO:
+        Assertions.assertThrows(seqLocation.expectedException,()->outputArgType.verifyListGet(seqMonitor.seq,-1,0));
+        break;
+      case IOBHI:
+        Assertions.assertThrows(seqLocation.expectedException,()->outputArgType.verifyListGet(seqMonitor.seq,numToAdd,0));
+        break;
+      case BEGINNING:
+        for(int i=0;i<numToAdd;++i){
+          outputArgType.verifyListGet(seqMonitor.seq,i,i);
+          seqMonitor.verifyStructuralIntegrity();
         }
-        Assertions.assertEquals(expectedHash,constructionArgs.seq.hashCode());
-        constructionArgs.verifyStructuralIntegrity(numToAdd,numToAdd);
-        
+        break;
+      default:
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+  }else{
+    final int getIndex;
+    switch(seqLocation){
+      case IOBLO:
+        getIndex=-1;
+        break;
+      case IOBHI:
+        getIndex=numToAdd;
+        break;
+      case BEGINNING:
+        getIndex=0;
+        break;
+      default:
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+    Assertions.assertThrows(preModScenario.expectedException,()->outputArgType.verifyListGet(seqMonitor.seq,getIndex,0));
+  }
+  seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
+
+
+
+
+#MACRODEF testhashCode_void<PARALLEL>()
+static Stream<Arguments> gethashCode_voidArgs(){
+ return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+   for(var seqContentsScenario:SequenceContentsScenario.values()){
+#IF OfRef
+     for(var monitoredObjectGen:MonitoredObjectGen.values()){
+       if(monitoredObjectGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredObjectGen.appliesToRoot))){
+         streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,seqContentsScenario,monitoredObjectGen));
+       }
+     }
+#ELSE
+     streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,seqContentsScenario));
+#ENDIF
+   }
+ });
+}
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testhashCode_void(){
+  gethashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
+    testhashCode_voidHelper(($ClassPrefix$SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+#IF OfRef
+    ,(MonitoredObjectGen)args[3]
+#ENDIF
+    );
+  });
+}
+private static void testhashCode_voidHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("gethashCode_voidArgs")
+public void testhashCode_void
+#ENDIF
+($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+#IF OfRef
+,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+){
+
+  int numToAdd=seqContentsScenario.nonEmpty?100:0;
+#IF OfRef
+  int numExpectedCalls=numToAdd;
+  MonitoredObject monitoredObject=null;
+  if(numToAdd!=0 && monitoredObjectGen.expectedException!=null){
+    monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.seq.add(monitoredObject);
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+    }
+  }else
+#ENDIF
+  {
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+  }
+  seqMonitor.illegalAdd(preModScenario);
+  SequenceVerificationItr verifyItr;
+  if(preModScenario.expectedException==null){
+#IF OfRef
+    if(monitoredObject!=null){
+      Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.hashCode());
+      verifyItr=seqMonitor.verifyPreAlloc();
+      for(int i=0;i<numToAdd;++i){
+        verifyItr.verifyIndexAndIterate(monitoredObject);
       }
-      else
-      {
-        Assertions.assertThrows(ConcurrentModificationException.class,()->constructionArgs.seq.hashCode());
-        if(preModScenario==CMEScenario.ModParent)
-        {
-          constructionArgs.verifyStructuralIntegrity(numToAdd,numToAdd,numToAdd+1,numToAdd+1);
-        }
-        else
-        {
-          constructionArgs.verifyStructuralIntegrity(numToAdd,numToAdd,numToAdd,numToAdd,numToAdd+1,numToAdd+1);
-        }
+      switch(monitoredObjectGen){
+        case Throw:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc();
+          break;
+        case ThrowModSeq:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(PreModScenario.ModSeq);
+          break;
+        case ThrowModParent:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+          break;
+        case ThrowModRoot:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(PreModScenario.ModRoot);
+          break;
+        case ModSeq:
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          verifyItr.verifyPostAlloc();
+          break;
+        case ModParent:
+          verifyItr.verifyParentPostAlloc();
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          verifyItr.verifyRootPostAlloc();
+          break;
+        case ModRoot:
+          verifyItr.verifyPostAlloc();
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        default:
+          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
       }
-      int offset=constructionArgs.verifyPreAlloc();
-      offset=constructionArgs.verifyAscending(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,numToAdd);
-      offset=constructionArgs.verifyParentPostAlloc(offset);
-      if(preModScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);}
-      offset=constructionArgs.verifyRootPostAlloc(offset);
-      if(preModScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);}
-    #IF OfRef
     }
     else
+#ENDIF
     {
-      Class<? extends Throwable> expectedException=objModScenario==ObjModScenario.Throw&&preModScenario==CMEScenario.NoMod?IndexOutOfBoundsException.class:ConcurrentModificationException.class;
-      Assertions.assertThrows(expectedException,()->constructionArgs.seq.hashCode());
-      for(int i=0;i<numToAdd;++i)
-      {
-        Assertions.assertSame(modCheckTestObject,constructionArgs.root.arr[constructionArgs.rootPreAlloc+constructionArgs.parentPreAlloc+i]);
+      int resultHash=seqMonitor.seq.hashCode();
+      verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+      var itr=seqMonitor.seq.iterator();
+      int expectedHash=1;
+      for(int i=0;i<numToAdd;++i){
+        expectedHash=(expectedHash*31)+itr.next().hashCode();
       }
-      verifyTestDidNotModify(modCheckTestData,numToAdd,objModScenario,preModScenario);
+      Assertions.assertEquals(expectedHash,resultHash);
+      verifyItr.verifyPostAlloc();
     }
-    #ENDIF
+  }else{
+    Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.hashCode());
+    verifyItr=seqMonitor.verifyPreAlloc();
+#IF OfRef
+    if(monitoredObject!=null){
+      for(int i=0;i<numToAdd;++i){
+        verifyItr.verifyIndexAndIterate(monitoredObject);
+      }
+      switch(monitoredObjectGen){
+        case ThrowModSeq:
+        case ModSeq:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case ThrowModParent:
+          numExpectedCalls=1;
+        case ModParent:
+          if(preModScenario==PreModScenario.ModRoot){
+            numExpectedCalls=1;
+          }
+          verifyItr.verifyParentPostAlloc();
+          if(preModScenario!=PreModScenario.ModRoot){
+            for(int i=0;i<numExpectedCalls;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+          }
+          if(preModScenario==PreModScenario.ModParent){
+            verifyItr.verifyIllegalAdd();
+          }
+          verifyItr.verifyRootPostAlloc();
+          if(preModScenario==PreModScenario.ModRoot){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case ThrowModRoot:
+          numExpectedCalls=1;
+        case ModRoot:
+          verifyItr.verifyPostAlloc(preModScenario);
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case Throw:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        default:
+          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
+      }
+    }else
+#ENDIF
+    {
+      verifyItr.verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+    }
+  }
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
+
+#MACRODEF testremoveIf_Predicate<PARALLEL>()
+static Stream<Arguments> getremoveIf_PredicateArgs(){
+  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+    for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
+      if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredRemoveIfPredicateGen.appliesToRoot))){
+        for(var functionCallType:FunctionCallType.values()){
+#IF OfRef
+          if(functionCallType==FunctionCallType.Boxed){
+            continue;
+          }
+#ENDIF
+#IF OfBoolean
+          for(int seqSize=0;seqSize<=10;++seqSize){
+            long randSeedBound;
+            if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+              randSeedBound=0;
+            }else{
+              randSeedBound=100;
+            }
+            for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
+              for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
+                for(int initVal=0;initVal<=1;++initVal){
+                  streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,initVal,period));
+                }
+                if(period>=seqSize){
+                  break;
+                }
+              }
+            }
+          }
+#ELSE
+          
+          for(int seqSize=0;seqSize<=100;seqSize+=10){
+            double[] thresholdArr;
+            long randSeedBound;
+            if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+              thresholdArr=new double[]{0.5};
+              randSeedBound=0;
+            }else{
+              thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
+              randSeedBound=100;
+            }
+            for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
+              for(double threshold:thresholdArr)
+              {
+                streamBuilder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(structType,nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+              }
+            }
+          }
+#ENDIF
+        }
+      }
+    }
+ });
+}
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testremoveIf_Predicate(){
+  getremoveIf_PredicateArgs().parallel().map(Arguments::get).forEach(args->{
+    testremoveIf_PredicateHelper(($ClassPrefix$SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredRemoveIfPredicateGen)args[2],(double)args[3],(long)args[4],(FunctionCallType)args[5],(int)args[6]
+#IF OfBoolean
+    ,(int)args[7],(int)args[8]
+#ENDIF
+    );
+  });
+}
+private static void testremoveIf_PredicateHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("getremoveIf_PredicateArgs")
+public void testremoveIf_Predicate
+#ENDIF
+($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
+#IF OfBoolean
+,int initVal,int period
+#ENDIF
+){
+#IF OfBoolean
+int trueCount=0;
+for(int i=0;i<seqSize;){
+  seqMonitor.add(initVal);
+  if((initVal&1)!=0)
+  {
+    ++trueCount;
+  }
+  if((++i)%period==0)
+  {
+    ++initVal;
+  }
+}
+#ELSE
+  for(int i=0;i<seqSize;++i)
+  {
+    seqMonitor.add(i);
+  }
+#ENDIF
+  final var clone=(OmniCollection.Of$ClassPrefix$)seqMonitor.seq.clone();
+#IF OfBoolean
+  final int numExpectedCalls=seqMonitor.seq.contains(true)?seqMonitor.seq.contains(false)?2:1:seqMonitor.seq.contains(false)?1:0;
+#ELSE
+  final int numExpectedCalls=seqSize;
+#ENDIF
+  final int numExpectedRemoved;
+  switch(monitoredRemoveIfPredicateGen){
+#IF OfBoolean
+    case RemoveTrue:
+      numExpectedRemoved=trueCount;
+      break;
+    case RemoveFalse:
+      numExpectedRemoved=seqSize-trueCount;
+      break;
+#ENDIF
+    case RemoveAll:
+      numExpectedRemoved=seqSize;
+      break;
+    case Random:
+      numExpectedRemoved=-1;
+      break;
+    case RemoveNone:
+    case Throw:
+    case ModSeq:
+    case ModParent:
+    case ModRoot:
+    case ThrowModSeq:
+    case ThrowModParent:
+    case ThrowModRoot:
+      numExpectedRemoved=0;
+      break;
+    default:
+      throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+  }
+  seqMonitor.illegalAdd(preModScenario);
+  final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
+  if(preModScenario.expectedException==null)
+  {
+    if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0)
+    {
+      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
+      seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
+      return;
+    }else{
+      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+      
+    }
+  }else{
+    Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
   }
   
+  var verifyItr=seqMonitor.verifyPreAlloc();
+  if(seqMonitor.nestedType.forwardIteration){
+    var cloneItr=clone.iterator();
+    while(cloneItr.hasNext()){
+      verifyItr.verifyLiteralIndexAndIterate(cloneItr.next$TypeNameModifier$());
+    }
+  }else{
+    var arr=clone.to$TypeNameModifier$Array();
+    for(int i=arr.length;--i>=0;){
+       verifyItr.verifyLiteralIndexAndIterate(arr[i]);
+    }
+  }
+  switch(monitoredRemoveIfPredicateGen){
+    case ModRoot:
+    case ThrowModRoot:
+      //The nature of concurrent modification makes verifying the contents of the array tricky due to array reallocations
+      //skip it in this scenario
+    case Random:
+    case RemoveAll:
+    case RemoveNone:
+#IF OfBoolean
+    case RemoveTrue:
+    case RemoveFalse:
+#ENDIF
+    case Throw:
+      verifyItr.verifyPostAlloc(preModScenario);
+      break;
+    case ModParent:
+    case ThrowModParent:
+      verifyItr.verifyParentPostAlloc();
+      if(preModScenario==PreModScenario.ModRoot)
+      {
+        verifyItr.verifyRootPostAlloc();
+        verifyItr.verifyIllegalAdd();
+      }
+    case ModSeq:
+    case ThrowModSeq:
+      //The nature of concurrent modification makes verifying the contents of the array tricky due to array reallocations
+      //skip it in this scenario
+      break;
+    default:
+      throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+  }
  
   
-  */
+  
+}
+#ENDDEF
+
 }

@@ -17,6 +17,8 @@ import java.util.function.Consumer;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.function.IntFunction;
+import java.util.HashSet;
+import java.util.Random;
 import java.util.function.IntPredicate;
 import java.util.function.UnaryOperator;
 import java.util.function.IntUnaryOperator;
@@ -143,6 +145,146 @@ class IntSeqMonitor{
       this.preModScenario=preModScenario;
       this.validWithEmptySeq=validWithEmptySeq;
     }
+  }
+  static enum MonitoredRemoveIfPredicateGen{
+    RemoveAll(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          @Override boolean testImpl(int val){
+            return true;
+          }
+        };
+      }
+    },
+    RemoveNone(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          @Override boolean testImpl(int val){
+            return false;
+          }
+        };
+      }
+    },
+    Random(null,true,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            return rand.nextDouble()>=threshold;
+          }
+        };
+      }
+    },
+    Throw(IndexOutOfBoundsException.class,true,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              throw new IndexOutOfBoundsException();
+            }
+            return rand.nextDouble()>=threshold;
+          }
+        };
+      }
+    },
+    ModSeq(ConcurrentModificationException.class,true,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            }
+            return rand.nextBoolean();
+          }
+        };
+      }
+    },
+    ModParent(ConcurrentModificationException.class,false,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              seqMonitor.illegalAdd(PreModScenario.ModParent);
+            }
+            return rand.nextBoolean();
+          }
+        };
+      }
+    },
+    ModRoot(ConcurrentModificationException.class,false,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            }
+            return rand.nextBoolean();
+          }
+        };
+      }
+    },
+    ThrowModSeq(ConcurrentModificationException.class,true,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              seqMonitor.illegalAdd(PreModScenario.ModSeq);
+              throw new IndexOutOfBoundsException();
+            }
+            return rand.nextBoolean();
+          }
+        };
+      }
+    },
+    ThrowModParent(ConcurrentModificationException.class,false,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              seqMonitor.illegalAdd(PreModScenario.ModParent);
+              throw new IndexOutOfBoundsException();
+            }
+            return rand.nextBoolean();
+          }
+        };
+      }
+    },
+    ThrowModRoot(ConcurrentModificationException.class,false,true){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          final Random rand=new Random(randSeed);
+          @Override boolean testImpl(int val){
+            if(callCounter>rand.nextInt(numExpectedCalls))
+            {
+              seqMonitor.illegalAdd(PreModScenario.ModRoot);
+              throw new IndexOutOfBoundsException();
+            }
+            return rand.nextBoolean();
+          }
+        };
+      }
+    };
+    final Class<? extends Throwable> expectedException;
+    final boolean appliesToRoot;
+    final boolean isRandomized;
+    MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean isRandomized){
+      this.expectedException=expectedException;
+      this.appliesToRoot=appliesToRoot;
+      this.isRandomized=isRandomized;
+    }
+    abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(IntSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold);
   }
   static enum MonitoredComparatorGen{
     NoThrowAscending(null,true,true,false,false){
@@ -7137,6 +7279,39 @@ class IntSeqMonitor{
       return 0;
     }
   };
+  static abstract class MonitoredRemoveIfPredicate implements IntPredicate
+    ,Predicate<Integer>
+  {
+    final HashSet removedVals=new HashSet();
+    int callCounter;
+    int numRemoved;
+    abstract boolean testImpl(int val);
+    @Override public MonitoredRemoveIfPredicate negate()
+    {
+      //not worth implementing but must declare
+      return null;
+    }
+    @Override public boolean test(int val)
+    {
+      ++callCounter;
+      if(removedVals.contains(val))
+      {
+        ++numRemoved;
+        return true;
+      }
+      if(testImpl(val))
+      {
+        ++numRemoved;
+        removedVals.add(val);
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean test(Integer val)
+    {
+      return test((int)val);
+    }
+  }
   private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,int[] arr){
     for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
       arr[i]=TypeConversionUtil.convertToint(v);
@@ -7571,6 +7746,7 @@ class IntSeqMonitor{
     }
   }
   public static abstract class SequenceVerificationItr{
+    public abstract void verifyLiteralIndexAndIterate(int val);
     public abstract void verifyIndexAndIterate(IntInputTestArgType inputArgType,int val);
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
@@ -7654,6 +7830,9 @@ class IntSeqMonitor{
       super(seqMonitor);
       this.arr=arr;
       this.offset=offset;
+    }
+    @Override public void verifyLiteralIndexAndIterate(int val){
+      Assertions.assertEquals(val,arr[offset++]);
     }
     @Override public void verifyIndexAndIterate(IntInputTestArgType inputArgType,int val){
       inputArgType.verifyVal(val,arr[offset++]);
@@ -7949,5 +8128,52 @@ class IntSeqMonitor{
       ++expectedParentModCount;
       ++expectedRootModCount;
     }
+  }
+  public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
+    if(functionCallType==FunctionCallType.Boxed)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedRet),((OmniList.OfInt)seq).set(index,TypeConversionUtil.convertToInteger(val)));
+    }
+    else
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToint(expectedRet),((OmniList.OfInt)seq).set(index,TypeConversionUtil.convertToint(val)));
+    }
+  }
+  public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfInt clone){
+    boolean retVal;
+    if(functionCallType==FunctionCallType.Boxed)
+    {
+      retVal=seq.removeIf((Predicate)pred);
+    }
+    else
+    {
+      retVal=seq.removeIf((IntPredicate)pred);
+    }
+    if(retVal)
+    {
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+      int numRemoved;
+      numRemoved=pred.numRemoved;
+      for(var removedVal:pred.removedVals)
+      {
+        Assertions.assertFalse(seq.contains(removedVal));
+      }
+      expectedSeqSize-=numRemoved;
+      expectedParentSize-=numRemoved;
+      expectedRootSize-=numRemoved;
+      if(expectedNumRemoved!=-1){
+        Assertions.assertEquals(expectedNumRemoved,numRemoved);
+      }
+    }else{
+      Assertions.assertEquals(expectedSeqSize,clone.size());
+      var seqItr=seq.iterator();
+      var cloneItr=clone.iterator();
+      for(int i=0;i<expectedSeqSize;++i){
+        Assertions.assertEquals(seqItr.nextInt(),cloneItr.nextInt());
+      }
+    }
+    verifyStructuralIntegrity();
   }
 }
