@@ -4,8 +4,7 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.util.TypeUtil;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+@SuppressWarnings({"rawtypes","unchecked"})
 public enum QueryTestInputType{
   #MACRO QueryTestInputTypeImpl<null,Boolean,Boolean>(null,false)
   #MACRO QueryTestInputTypeImpl<null,Byte,Byte>(null,false)
@@ -100,11 +99,9 @@ public enum QueryTestInputType{
   ;
   public final Class<?> primitiveClass;
   public final Class<?> boxedClass;
-  private boolean notEqualsVal;
-  private QueryTestInputType(Class<?> primitiveClass,Class<?> boxedClass,boolean notEqualsVal){
+  private QueryTestInputType(Class<?> primitiveClass,Class<?> boxedClass){
     this.primitiveClass=primitiveClass;
     this.boxedClass=boxedClass;
-    this.notEqualsVal=notEqualsVal;
   }
   
   
@@ -128,7 +125,7 @@ public enum QueryTestInputType{
 }
 
 #MACRODEF QueryTestInputTypeImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
-BOXED_TYPEVALUE_NAME(PRIMITIVE_TYPE.class,BOXED_TYPE.class,NOT_EQUALS_VAL){
+BOXED_TYPEVALUE_NAME(PRIMITIVE_TYPE.class,BOXED_TYPE.class){
   @Override public boolean invokecontains(OmniCollection col){return col.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   #IFSWITCH PRIMITIVE_TYPE==Object
   @Override public boolean invokeremoveVal(OmniCollection col){return col.remove((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
@@ -172,7 +169,11 @@ BOXED_TYPEVALUE_NAME(PRIMITIVE_TYPE.class,BOXED_TYPE.class,NOT_EQUALS_VAL){
     if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(PRIMITIVE_VAL));}
     if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(PRIMITIVE_VAL));}
     if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(PRIMITIVE_VAL));}
+    #IFSWITCH VALUE_NAME==pos1
+    return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
+    #ELSE
     return ((OmniCollection.OfPrimitive)col).add((boolean)((PRIMITIVE_VAL)==1));
+    #ENDIF
   #ENDIF 
 #ENDIF 
   }

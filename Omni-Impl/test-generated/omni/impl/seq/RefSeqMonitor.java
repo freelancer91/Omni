@@ -15,7 +15,12 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.ArrayList;
+import java.util.function.Predicate;
+import java.util.function.IntFunction;
+import java.util.function.UnaryOperator;
 import omni.impl.QueryCastType;
+import java.util.Comparator;
+@SuppressWarnings({"rawtypes","unchecked"})
 class RefSeqMonitor{
   static final int DEFAULT_PRE_AND_POST_ALLOC=5;
   static void verifyRangeIsNull(Object[] arr,int offset,int bound){
@@ -138,13 +143,1078 @@ class RefSeqMonitor{
       this.validWithEmptySeq=validWithEmptySeq;
     }
   }
-  static enum MonitoredConsumerGen{
+  static enum MonitoredComparatorGen{
+    NullComparatorThrowAIOB(IllegalArgumentException.class,true,true,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(3));
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(2));
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorThrowIOB(IndexOutOfBoundsException.class,true,true,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(3));
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(2));
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModSeq(ConcurrentModificationException.class,true,true,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+         switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+         switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModParent(ConcurrentModificationException.class,false,true,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    NullComparatorModRoot(ConcurrentModificationException.class,false,true,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    NullComparatorModSeqThrowAIOB(ConcurrentModificationException.class,true,false,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModSeqThrowIOB(ConcurrentModificationException.class,true,false,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModParentThrowAIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    NullComparatorModParentThrowIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    NullComparatorModRootThrowAIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    NullComparatorModRootThrowIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    NoThrowAscending(null,true,true,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            return Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NoThrowDescending(null,true,false,true,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            return -Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparator(null,true,true,false,true){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void initReverseHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ThrowAIOB(IllegalArgumentException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ThrowIOB(IndexOutOfBoundsException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModSeqAscending(ConcurrentModificationException.class,true,true,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            return Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModSeqDescending(ConcurrentModificationException.class,true,false,true,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            return -Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModParentAscending(ConcurrentModificationException.class,false,true,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            return Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModParentDescending(ConcurrentModificationException.class,false,false,true,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            return -Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModRootAscending(ConcurrentModificationException.class,false,true,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            return Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    ModRootDescending(ConcurrentModificationException.class,false,false,true,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            return -Integer.compare((int)val1,(int)val2);
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    ModSeqThrowAIOB(ConcurrentModificationException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModSeqThrowIOB(ConcurrentModificationException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+          verifyItr.verifyIndexAndIterate(2);
+          verifyItr.verifyIndexAndIterate(3);
+          switch(preModScenario){
+            case NoMod:
+            case ModSeq:
+              verifyItr.verifyIllegalAdd();
+            case ModParent:
+            case ModRoot:
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModParentThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModParentThrowIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModRootThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    ModRootThrowIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int compare(Object val1,Object val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper(RefSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    };
+    final Class<? extends Throwable> expectedException;
+    final boolean appliesToRoot;
+    final boolean ascending;
+    final boolean descending;
+    final boolean nullComparator;
+    MonitoredComparatorGen(Class<? extends Throwable> expectedException,final boolean appliesToRoot,final boolean ascending,final boolean descending,boolean nullComparator){
+      this.expectedException=expectedException;
+      this.appliesToRoot=appliesToRoot;
+      this.ascending=ascending;
+      this.descending=descending;
+      this.nullComparator=nullComparator;
+    }
+    abstract void initHelper(RefSeqMonitor seqMonitor);
+    void initReverseHelper(RefSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void init(RefSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      Assertions.assertEquals(0,seqMonitor.expectedSeqModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedParentSize);
+      Assertions.assertEquals(0,seqMonitor.expectedParentModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedRootSize);
+      Assertions.assertEquals(0,seqMonitor.expectedRootModCount);
+      if(seqContentsScenario.nonEmpty){
+        initHelper(seqMonitor);
+      }else{
+        seqMonitor.add(1);
+      }
+      seqMonitor.illegalAdd(preModScenario);
+    }
+    void initReverse(RefSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      Assertions.assertEquals(0,seqMonitor.expectedSeqModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedParentSize);
+      Assertions.assertEquals(0,seqMonitor.expectedParentModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedRootSize);
+      Assertions.assertEquals(0,seqMonitor.expectedRootModCount);
+      if(seqContentsScenario.nonEmpty){
+        initReverseHelper(seqMonitor);
+      }else{
+        seqMonitor.add(1);
+      }
+      seqMonitor.illegalAdd(preModScenario);
+    }
+    void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
+    void assertSorted(RefSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqContentsScenario.nonEmpty){
+        assertSortedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    }
+    void assertReverseSorted(RefSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqContentsScenario.nonEmpty){
+        assertReverseSortedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    }
+    abstract MonitoredComparator getMonitoredComparator(RefSeqMonitor seqMonitor);
+  }
+  static enum MonitoredFunctionGen{
     NoThrow(null,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(RefSeqMonitor seqMonitor){
         return new MonitoredConsumer();
       }
       @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
         return new MonitoredConsumer();
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator();
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor();
       }
     },
     Throw(IndexOutOfBoundsException.class,true,true,true){
@@ -153,6 +1223,22 @@ class RefSeqMonitor{
       }
       @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
         return new ThrowingMonitoredConsumer();
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            super.apply(val);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            throw new IndexOutOfBoundsException();
+          }
+        };
       }
     },
     //TODO add this test scenario
@@ -183,6 +1269,24 @@ class RefSeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            var ret=super.apply(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            return new Integer[arrSize];
+          }
+        };
+      }
     },
     ModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(RefSeqMonitor seqMonitor){
@@ -201,6 +1305,24 @@ class RefSeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            var ret=super.apply(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            return new Integer[arrSize];
+          }
+        };
+      }
     },
     ModRoot(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(RefSeqMonitor seqMonitor){
@@ -216,6 +1338,24 @@ class RefSeqMonitor{
           public void accept(Object val){
             super.accept(val);
             itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            var ret=super.apply(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            return new Integer[arrSize];
           }
         };
       }
@@ -251,6 +1391,24 @@ class RefSeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            super.apply(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     },
     ThrowModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(RefSeqMonitor seqMonitor){
@@ -267,6 +1425,24 @@ class RefSeqMonitor{
           public void accept(Object val){
             super.accept(val);
             itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            super.apply(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
             throw new IndexOutOfBoundsException();
           }
         };
@@ -291,23 +1467,41 @@ class RefSeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public Object apply(Object val){
+            super.apply(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          @Override public Integer[] apply(int arrSize){
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     };
     final Class<? extends Throwable> expectedException;
     final boolean appliesToRoot;
     final boolean appliesToSubList;
     final boolean appliesToRootItr;
-    MonitoredConsumerGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean appliesToSubList,boolean appliesToRootItr){
+    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean appliesToSubList,boolean appliesToRootItr){
       this.expectedException=expectedException;
       this.appliesToRoot=appliesToRoot;
       this.appliesToSubList=appliesToSubList;
       this.appliesToRootItr=appliesToRootItr;
     }
+    abstract MonitoredUnaryOperator getMonitoredUnaryOperator(RefSeqMonitor seqMonitor);
     MonitoredConsumer getMonitoredConsumer(RefSeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
     }
-    MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-      throw new UnsupportedOperationException();
-    }
+    abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
+    abstract MonitoredArrayConstructor getMonitoredArrayConstructor(RefSeqMonitor seqMonitor);
   }
   static enum MonitoredObjectGen{
     Throw(IndexOutOfBoundsException.class,true){
@@ -502,6 +1696,9 @@ class RefSeqMonitor{
           --seqMonitor.expectedSeqSize;
           --seqMonitor.expectedParentSize;
           --seqMonitor.expectedRootSize;
+          if(seqMonitor.structType==StructType.ARRSEQ){
+            Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+          }
         }
         return ret;
       }
@@ -571,6 +1768,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -587,6 +1787,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -603,6 +1806,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -639,6 +1845,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -655,6 +1864,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -671,6 +1883,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -707,6 +1922,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -723,6 +1941,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -739,6 +1960,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -775,6 +1999,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -791,6 +2018,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -807,6 +2037,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -843,6 +2076,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -859,6 +2095,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -875,6 +2114,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -911,6 +2153,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -927,6 +2172,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -943,6 +2191,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -979,6 +2230,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -995,6 +2249,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1011,6 +2268,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1047,6 +2307,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1063,6 +2326,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1079,6 +2345,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1115,6 +2384,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1131,6 +2403,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1147,6 +2422,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1183,6 +2461,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1199,6 +2480,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1215,6 +2499,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1251,6 +2538,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1267,6 +2557,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1283,6 +2576,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1319,6 +2615,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1335,6 +2634,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1351,6 +2653,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1387,6 +2692,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1403,6 +2711,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1419,6 +2730,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1455,6 +2769,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1471,6 +2788,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1487,6 +2807,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1523,6 +2846,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1539,6 +2865,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1555,6 +2884,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1591,6 +2923,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1607,6 +2942,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1623,6 +2961,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1659,6 +3000,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1675,6 +3019,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1691,6 +3038,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1727,6 +3077,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1743,6 +3096,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1759,6 +3115,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1795,6 +3154,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1811,6 +3173,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1827,6 +3192,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1863,6 +3231,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1879,6 +3250,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1895,6 +3269,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1931,6 +3308,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1947,6 +3327,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1963,6 +3346,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -1999,6 +3385,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2015,6 +3404,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2031,6 +3423,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2067,6 +3462,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2083,6 +3481,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2099,6 +3500,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2135,6 +3539,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2151,6 +3558,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2167,6 +3577,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2203,6 +3616,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2219,6 +3635,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2235,6 +3654,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2271,6 +3693,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2287,6 +3712,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2303,6 +3731,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2339,6 +3770,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2355,6 +3789,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2371,6 +3808,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2407,6 +3847,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2423,6 +3866,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2439,6 +3885,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2475,6 +3924,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2491,6 +3943,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2507,6 +3962,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2543,6 +4001,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2559,6 +4020,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2575,6 +4039,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2611,6 +4078,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2627,6 +4097,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2643,6 +4116,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2679,6 +4155,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2695,6 +4174,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2711,6 +4193,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2747,6 +4232,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2763,6 +4251,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2779,6 +4270,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2815,6 +4309,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2831,6 +4328,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2847,6 +4347,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2883,6 +4386,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2899,6 +4405,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2915,6 +4424,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2951,6 +4463,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2967,6 +4482,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -2983,6 +4501,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3019,6 +4540,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3035,6 +4559,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3051,6 +4578,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3087,6 +4617,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3103,6 +4636,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3119,6 +4655,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3155,6 +4694,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3171,6 +4713,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3187,6 +4732,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3223,6 +4771,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3239,6 +4790,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3255,6 +4809,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3291,6 +4848,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3307,6 +4867,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3323,6 +4886,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3359,6 +4925,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3375,6 +4944,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3391,6 +4963,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3427,6 +5002,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3443,6 +5021,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3459,6 +5040,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3495,6 +5079,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3511,6 +5098,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3527,6 +5117,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3563,6 +5156,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3579,6 +5175,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3595,6 +5194,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3631,6 +5233,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3647,6 +5252,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3663,6 +5271,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3699,6 +5310,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3715,6 +5329,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3731,6 +5348,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3767,6 +5387,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3783,6 +5406,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3799,6 +5425,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3835,6 +5464,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3851,6 +5483,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3867,6 +5502,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3903,6 +5541,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3919,6 +5560,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3935,6 +5579,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3971,6 +5618,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -3987,6 +5637,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4003,6 +5656,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4039,6 +5695,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4055,6 +5714,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4071,6 +5733,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4107,6 +5772,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4123,6 +5791,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4139,6 +5810,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4175,6 +5849,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4191,6 +5868,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4207,6 +5887,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4243,6 +5926,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4259,6 +5945,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4275,6 +5964,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4311,6 +6003,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4327,6 +6022,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4343,6 +6041,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4379,6 +6080,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4395,6 +6099,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4411,6 +6118,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4447,6 +6157,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4463,6 +6176,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4479,6 +6195,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4515,6 +6234,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4531,6 +6253,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4547,6 +6272,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4583,6 +6311,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4599,6 +6330,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4615,6 +6349,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4651,6 +6388,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4667,6 +6407,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4683,6 +6426,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4719,6 +6465,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4735,6 +6484,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4751,6 +6503,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4787,6 +6542,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4803,6 +6561,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4819,6 +6580,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4855,6 +6619,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4871,6 +6638,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4887,6 +6657,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4923,6 +6696,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4939,6 +6715,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4955,6 +6734,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -4991,6 +6773,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5007,6 +6792,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5023,6 +6811,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5059,6 +6850,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5075,6 +6869,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5091,6 +6888,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5127,6 +6927,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5143,6 +6946,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5159,6 +6965,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5195,6 +7004,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5211,6 +7023,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5227,6 +7042,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5263,6 +7081,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5279,6 +7100,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5295,6 +7119,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5331,6 +7158,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5347,6 +7177,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5363,6 +7196,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5399,6 +7235,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5415,6 +7254,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5431,6 +7273,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5467,6 +7312,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5483,6 +7331,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5499,6 +7350,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5535,6 +7389,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5551,6 +7408,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5567,6 +7427,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5603,6 +7466,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5619,6 +7485,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5635,6 +7504,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5671,6 +7543,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5687,6 +7562,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5703,6 +7581,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5739,6 +7620,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5755,6 +7639,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5771,6 +7658,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5807,6 +7697,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5823,6 +7716,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5839,6 +7735,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5875,6 +7774,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5891,6 +7793,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5907,6 +7812,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5943,6 +7851,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5959,6 +7870,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -5975,6 +7889,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6011,6 +7928,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6027,6 +7947,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6043,6 +7966,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6079,6 +8005,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6095,6 +8024,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6111,6 +8043,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6147,6 +8082,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6163,6 +8101,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6179,6 +8120,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6215,6 +8159,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6231,6 +8178,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6247,6 +8197,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6283,6 +8236,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6299,6 +8255,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6315,6 +8274,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6351,6 +8313,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6367,6 +8332,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6383,6 +8351,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6419,6 +8390,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6435,6 +8409,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6451,6 +8428,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6487,6 +8467,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6503,6 +8486,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6519,6 +8505,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6555,6 +8544,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6571,6 +8563,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6587,6 +8582,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6623,6 +8621,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6639,6 +8640,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6655,6 +8659,9 @@ class RefSeqMonitor{
         --seqMonitor.expectedSeqSize;
         --seqMonitor.expectedParentSize;
         --seqMonitor.expectedRootSize;
+        if(seqMonitor.structType==StructType.ARRSEQ){
+          Assertions.assertNull(((RefArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+        }
       }
       return ret;
     }
@@ -6938,10 +8945,146 @@ class RefSeqMonitor{
         throw new Error("Unknown nestedType "+nestedType);
     }
   }
-  static class MonitoredObject{
+  static class ModParentMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModParentMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class AIOBThrowingMonitoredObject extends MonitoredObject{
+    AIOBThrowingMonitoredObject(int compareVal){
+      super(compareVal);
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class IOBThrowingMonitoredObject extends MonitoredObject{
+    IOBThrowingMonitoredObject(int compareVal){
+      super(compareVal);
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModSeqMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class ModParentIOBThrowingMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModParentIOBThrowingMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModParentAIOBThrowingMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModParentAIOBThrowingMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqIOBThrowingMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModSeqIOBThrowingMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqAIOBThrowingMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModSeqAIOBThrowingMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class ModRootMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModRootMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class ModRootIOBThrowingMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModRootIOBThrowingMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModRootAIOBThrowingMonitoredObject extends MonitoredObject{
+    final RefSeqMonitor seqMonitor;
+    ModRootAIOBThrowingMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class MonitoredObject implements Comparable<MonitoredObject>{
     int numEqualsCalls;
     int numHashCodeCalls;
     int numToStringCalls;
+    int numCompareToCalls;
+    int compareVal;
+    MonitoredObject(){
+    }
+    MonitoredObject(int compareVal){
+      this.compareVal=compareVal;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      return Integer.compare(compareVal,that.compareVal);
+    }
     @Override public boolean equals(Object obj){
       ++numEqualsCalls;
       return super.equals(this);
@@ -6953,6 +9096,27 @@ class RefSeqMonitor{
     @Override public String toString(){
       ++numToStringCalls;
       return super.toString();
+    }
+  }
+  static abstract class MonitoredComparator implements Comparator
+  {
+    public abstract int compare(Object val1, Object val2);
+  }
+  static class MonitoredUnaryOperator implements UnaryOperator
+  {
+    ArrayList encounteredValues=new ArrayList();
+    public Object apply(Object val){
+      encounteredValues.add(val);
+      return Integer.valueOf((Integer)val)+1;
+    }
+  }
+  static class MonitoredArrayConstructor
+    implements IntFunction<Integer[]>
+  {
+    int numCalls;
+    @Override public Integer[] apply(int arrSize){
+      ++numCalls;
+      return new Integer[arrSize];
     }
   }
   static class MonitoredConsumer implements Consumer
@@ -7220,6 +9384,7 @@ class RefSeqMonitor{
     }
   }
   public static abstract class SequenceVerificationItr{
+    public abstract void verifyIndexAndIterate(MonitoredObject monitoredObject);
     public abstract void verifyIndexAndIterate(RefInputTestArgType inputArgType,int val);
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
@@ -7233,6 +9398,9 @@ class RefSeqMonitor{
         verifyIndexAndIterate(inputArgType,v);
       }
       return this;
+    }
+    public void verifyIndexAndIterate(int val){
+      verifyIndexAndIterate(RefInputTestArgType.ARRAY_TYPE,val);
     }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,RefInputTestArgType.ARRAY_TYPE,length);
@@ -7300,6 +9468,14 @@ class RefSeqMonitor{
       super(seqMonitor);
       this.arr=arr;
       this.offset=offset;
+    }
+    @Override public void verifyIndexAndIterate(MonitoredObject monitoredObject){
+      Object v;
+      if((v=arr[offset++]) instanceof MonitoredObject){
+        Assertions.assertEquals(monitoredObject.compareVal,((MonitoredObject)v).compareVal);
+      }else{
+        Assertions.assertEquals(monitoredObject.compareVal,(Object)v);
+      }
     }
     @Override public void verifyIndexAndIterate(RefInputTestArgType inputArgType,int val){
       inputArgType.verifyVal(val,arr[offset++]);
@@ -7492,6 +9668,131 @@ class RefSeqMonitor{
   public void forEach(MonitoredConsumer action,FunctionCallType functionCallType){
     {
       seq.forEach((Consumer)action);
+    }
+  }
+  public void unstableSort(MonitoredComparator sorter){
+    int seqSize=expectedSeqSize;
+    ((OmniList.OfRef)seq).unstableSort((Comparator)sorter);
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
+    int seqSize=expectedSeqSize;
+    {
+      ((OmniList.OfRef)seq).replaceAll((UnaryOperator)operator);
+    }
+    if(seqSize!=0){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
+    int seqSize=expectedSeqSize;
+    {
+      ((OmniList.OfRef)seq).sort((Comparator)sorter);
+    }
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void stableAscendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.OfRef)seq).stableAscendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void stableDescendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.OfRef)seq).stableDescendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void unstableAscendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.OfRef)seq).unstableAscendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void unstableDescendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.OfRef)seq).unstableDescendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void removeAt(int expectedVal,RefOutputTestArgType outputType,int index){
+    outputType.verifyListRemoveAt(seq,index,expectedVal);
+    --expectedSeqSize;
+    --expectedParentSize;
+    --expectedRootSize;
+    ++expectedSeqModCount;
+    ++expectedParentModCount;
+    ++expectedRootModCount;
+      if(structType==StructType.ARRSEQ){
+        Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      }
+  }
+  public void get(int expectedVal,RefOutputTestArgType outputType,int index){
+    outputType.verifyListGet(seq,index,expectedVal);
+  }
+  public void clear(){
+    int seqSize=expectedSeqSize;
+    seq.clear();
+    if(seqSize!=0){
+      expectedSeqSize=0;
+      expectedParentSize=0;
+      expectedRootSize=0;
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+      if(structType==StructType.ARRSEQ){
+        int newBound=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
+        int oldBound=newBound+seqSize;
+        verifyRangeIsNull(((RefArrSeq)root).arr,newBound,oldBound);
+      }
+    }
+  }
+  public void pop(int expectedVal,RefOutputTestArgType outputType){
+    outputType.verifyStackPop(seq,expectedVal);
+    --expectedSeqSize;
+    --expectedParentSize;
+    --expectedRootSize;
+    ++expectedSeqModCount;
+    ++expectedParentModCount;
+    ++expectedRootModCount;
+    if(structType==StructType.ARRSEQ){
+      Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+    }
+  }
+  public void poll(int expectedVal,RefOutputTestArgType outputType){
+    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      --expectedSeqSize;
+      --expectedParentSize;
+      --expectedRootSize;
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+      if(structType==StructType.ARRSEQ){
+        Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      }
     }
   }
 }

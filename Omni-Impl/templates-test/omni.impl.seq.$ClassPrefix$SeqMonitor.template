@@ -24,12 +24,32 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.ArrayList;
+import java.util.function.Predicate;
+import java.util.function.IntFunction;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Predicate;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Predicate;
+#ENDIF
+import java.util.function.UnaryOperator;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$UnaryOperator$;
+#ELSEIFNOT OfRef,OfBoolean
+import omni.function.$UnaryOperator$;
+#ENDIF
 import omni.impl.QueryCastType;
+import java.util.Comparator;
+#IF OfInt
+import java.util.function.$Comparator$;
+#ELSEIFNOT OfRef
+import omni.function.$Comparator$;
+#ENDIF
 #IF OfDouble,OfLong,OfInt
 import java.util.function.$TypeNameModifier$Consumer;
 #ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Consumer;
 #ENDIF
+@SuppressWarnings({"rawtypes","unchecked"})
 class $ClassPrefix$SeqMonitor{
   static final int DEFAULT_PRE_AND_POST_ALLOC=5;
 #IF OfRef
@@ -40,12 +60,6 @@ class $ClassPrefix$SeqMonitor{
   static enum StructType{
     ARRSEQ;
   }
-  
-  
-  
-
-  
-  
   static enum SequenceLocation{
     BEGINNING(null,true),
     MIDDLE(null,false),
@@ -160,14 +174,1112 @@ class $ClassPrefix$SeqMonitor{
       this.validWithEmptySeq=validWithEmptySeq;
     }
   }
-  
-  static enum MonitoredConsumerGen{
+  static enum MonitoredComparatorGen{
+#IF OfRef
+    NullComparatorThrowAIOB(IllegalArgumentException.class,true,true,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(3));
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(2));
+        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorThrowIOB(IndexOutOfBoundsException.class,true,true,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(3));
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(2));
+        seqMonitor.seq.add(new IOBThrowingMonitoredObject(3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModSeq(ConcurrentModificationException.class,true,true,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+         switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+         switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModParent(ConcurrentModificationException.class,false,true,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    NullComparatorModRoot(ConcurrentModificationException.class,false,true,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    NullComparatorModSeqThrowAIOB(ConcurrentModificationException.class,true,false,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModSeqThrowIOB(ConcurrentModificationException.class,true,false,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparatorModParentThrowAIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    NullComparatorModParentThrowIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    NullComparatorModRootThrowAIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    NullComparatorModRootThrowIOB(ConcurrentModificationException.class,false,false,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.expectedSeqSize+=2;
+        seqMonitor.expectedParentSize+=2;
+        seqMonitor.expectedRootSize+=2;
+        seqMonitor.expectedSeqModCount+=2;
+        seqMonitor.expectedParentModCount+=2;
+        seqMonitor.expectedRootModCount+=2;
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+#ENDIF
+    NoThrowAscending(null,true,true,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            #IF OfRef
+            return Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return $BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NoThrowDescending(null,true,false,true,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            #IF OfRef
+            return -Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return -$BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    NullComparator(null,true,true,false,true){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return null;
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ThrowAIOB(IllegalArgumentException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ThrowIOB(IndexOutOfBoundsException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModSeqAscending(ConcurrentModificationException.class,true,true,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            #IF OfRef
+            return Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return $BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModSeqDescending(ConcurrentModificationException.class,true,false,true,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            #IF OfRef
+            return -Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return -$BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModParentAscending(ConcurrentModificationException.class,false,true,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            #IF OfRef
+            return Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return $BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModParentDescending(ConcurrentModificationException.class,false,false,true,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            #IF OfRef
+            return -Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return -$BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModRootAscending(ConcurrentModificationException.class,false,true,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            #IF OfRef
+            return Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return $BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(3);
+        seqMonitor.add(2);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    ModRootDescending(ConcurrentModificationException.class,false,false,true,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            #IF OfRef
+            return -Integer.compare((int)val1,(int)val2);
+            #ELSE
+            return -$BoxedType$.compare(val1,val2);
+            #ENDIF
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    ModSeqThrowAIOB(ConcurrentModificationException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModSeqThrowIOB(ConcurrentModificationException.class,true,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+          verifyItr.verifyIndexAndIterate(2);
+          verifyItr.verifyIndexAndIterate(3);
+          switch(preModScenario){
+            case NoMod:
+            case ModSeq:
+              verifyItr.verifyIllegalAdd();
+            case ModParent:
+            case ModRoot:
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          verifyItr.verifyPostAlloc(preModScenario);
+      }
+    },
+    ModParentThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModParentThrowIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+    },
+    ModRootThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new ArrayIndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    },
+    ModRootThrowIOB(ConcurrentModificationException.class,false,false,false,false){
+      MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredComparator(){
+          @Override public int $compareMethod$($ArrayType$ val1,$ArrayType$ val2){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+    };
+    final Class<? extends Throwable> expectedException;
+    final boolean appliesToRoot;
+    final boolean ascending;
+    final boolean descending;
+    final boolean nullComparator;
+    MonitoredComparatorGen(Class<? extends Throwable> expectedException,final boolean appliesToRoot,final boolean ascending,final boolean descending,boolean nullComparator){
+      this.expectedException=expectedException;
+      this.appliesToRoot=appliesToRoot;
+      this.ascending=ascending;
+      this.descending=descending;
+      this.nullComparator=nullComparator;
+    }
+    abstract void initHelper($ClassPrefix$SeqMonitor seqMonitor);
+    void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    void init($ClassPrefix$SeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      Assertions.assertEquals(0,seqMonitor.expectedSeqModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedParentSize);
+      Assertions.assertEquals(0,seqMonitor.expectedParentModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedRootSize);
+      Assertions.assertEquals(0,seqMonitor.expectedRootModCount);
+      if(seqContentsScenario.nonEmpty){
+        initHelper(seqMonitor);
+      }else{
+        seqMonitor.add(1);
+      }
+      seqMonitor.illegalAdd(preModScenario);
+    }
+    void initReverse($ClassPrefix$SeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      Assertions.assertEquals(0,seqMonitor.expectedSeqModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedParentSize);
+      Assertions.assertEquals(0,seqMonitor.expectedParentModCount);
+      Assertions.assertEquals(0,seqMonitor.expectedRootSize);
+      Assertions.assertEquals(0,seqMonitor.expectedRootModCount);
+      if(seqContentsScenario.nonEmpty){
+        initReverseHelper(seqMonitor);
+      }else{
+        seqMonitor.add(1);
+      }
+      seqMonitor.illegalAdd(preModScenario);
+    }
+    void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
+    void assertSorted($ClassPrefix$SeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqContentsScenario.nonEmpty){
+        assertSortedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    }
+    void assertReverseSorted($ClassPrefix$SeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqContentsScenario.nonEmpty){
+        assertReverseSortedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    }
+    abstract MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor);
+  }
+  static enum MonitoredFunctionGen{
     NoThrow(null,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
         return new MonitoredConsumer();
       }
       @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
         return new MonitoredConsumer();
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator();
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor();
       }
     },
     Throw(IndexOutOfBoundsException.class,true,true,true){
@@ -176,6 +1288,26 @@ class $ClassPrefix$SeqMonitor{
       }
       @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
         return new ThrowingMonitoredConsumer();
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            throw new IndexOutOfBoundsException();
+          }
+        };
       }
     },
     //TODO add this test scenario
@@ -206,6 +1338,32 @@ class $ClassPrefix$SeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            var ret=super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          #IF OfRef
+            return new Integer[arrSize];
+          #ELSE
+            return new $BoxedType$[arrSize];
+          #ENDIF
+          }
+        };
+      }
     },
     ModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
@@ -224,6 +1382,32 @@ class $ClassPrefix$SeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            var ret=super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          #IF OfRef
+            return new Integer[arrSize];
+          #ELSE
+            return new $BoxedType$[arrSize];
+          #ENDIF
+          }
+        };
+      }
     },
     ModRoot(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
@@ -239,6 +1423,32 @@ class $ClassPrefix$SeqMonitor{
           public void accept($ArrayType$ val){
             super.accept(val);
             itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            var ret=super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          #IF OfRef
+            return new Integer[arrSize];
+          #ELSE
+            return new $BoxedType$[arrSize];
+          #ENDIF
           }
         };
       }
@@ -274,6 +1484,28 @@ class $ClassPrefix$SeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     },
     ThrowModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
@@ -290,6 +1522,28 @@ class $ClassPrefix$SeqMonitor{
           public void accept($ArrayType$ val){
             super.accept(val);
             itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
             throw new IndexOutOfBoundsException();
           }
         };
@@ -314,23 +1568,46 @@ class $ClassPrefix$SeqMonitor{
           }
         };
       }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     };
     final Class<? extends Throwable> expectedException;
     final boolean appliesToRoot;
     final boolean appliesToSubList;
     final boolean appliesToRootItr;
-    MonitoredConsumerGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean appliesToSubList,boolean appliesToRootItr){
+    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean appliesToSubList,boolean appliesToRootItr){
       this.expectedException=expectedException;
       this.appliesToRoot=appliesToRoot;
       this.appliesToSubList=appliesToSubList;
       this.appliesToRootItr=appliesToRootItr;
     }
+    abstract MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor);
     MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
     }
-    MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-      throw new UnsupportedOperationException();
-    }
+    abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
+    abstract MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor);
+    
   }
 #IF OfRef
   static enum MonitoredObjectGen{
@@ -487,8 +1764,6 @@ class $ClassPrefix$SeqMonitor{
     abstract MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor);
   }
 #ENDIF
-    
-    
   static enum QueryTester
   {
 #IF OfRef
@@ -530,6 +1805,11 @@ class $ClassPrefix$SeqMonitor{
           --seqMonitor.expectedSeqSize;
           --seqMonitor.expectedParentSize;
           --seqMonitor.expectedRootSize;
+#IF OfRef
+          if(seqMonitor.structType==StructType.ARRSEQ){
+            Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+          }
+#ENDIF
         }
         return ret;
       }
@@ -693,6 +1973,11 @@ BOXED_TYPEVALUE_NAME(false){
       --seqMonitor.expectedSeqSize;
       --seqMonitor.expectedParentSize;
       --seqMonitor.expectedRootSize;
+#IF OfRef
+      if(seqMonitor.structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+      }
+#ENDIF
     }
     return ret;
   }
@@ -710,6 +1995,11 @@ BOXED_TYPEVALUE_NAME(false){
       --seqMonitor.expectedSeqSize;
       --seqMonitor.expectedParentSize;
       --seqMonitor.expectedRootSize;
+  #IF OfRef
+      if(seqMonitor.structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+      }
+  #ENDIF
     }
     return ret;
   }
@@ -723,6 +2013,11 @@ BOXED_TYPEVALUE_NAME(false){
       --seqMonitor.expectedSeqSize;
       --seqMonitor.expectedParentSize;
       --seqMonitor.expectedRootSize;
+  #IF OfRef
+      if(seqMonitor.structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+      }
+  #ENDIF
     }
     return ret;
   }
@@ -741,6 +2036,11 @@ BOXED_TYPEVALUE_NAME(false){
       --seqMonitor.expectedSeqSize;
       --seqMonitor.expectedParentSize;
       --seqMonitor.expectedRootSize;
+  #IF OfRef
+      if(seqMonitor.structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+      }
+  #ENDIF
     }
     return ret;
   }
@@ -754,6 +2054,11 @@ BOXED_TYPEVALUE_NAME(false){
       --seqMonitor.expectedSeqSize;
       --seqMonitor.expectedParentSize;
       --seqMonitor.expectedRootSize;
+  #IF OfRef
+      if(seqMonitor.structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+      }
+  #ENDIF
     }
     return ret;
   }
@@ -778,7 +2083,11 @@ BOXED_TYPEVALUE_NAME(false){
       #IFSWITCH PRIMITIVE_TYPE==boolean
     seqMonitor.seq.add((boolean)(PRIMITIVE_VAL));
       #ELSE
+        #IFSWITCH VALUE_NAME==pos1
+    seqMonitor.seq.add((boolean)(true));
+        #ELSE
     seqMonitor.seq.add((boolean)((PRIMITIVE_VAL)==1));
+        #ENDIF
       #ENDIF
     #ELSE
       #IFSWITCH PRIMITIVE_TYPE==boolean
@@ -1075,10 +2384,146 @@ BOXED_TYPEVALUE_NAME(false){
     }
   }
 #IF OfRef
-  static class MonitoredObject{
+  static class ModParentMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModParentMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class AIOBThrowingMonitoredObject extends MonitoredObject{
+    AIOBThrowingMonitoredObject(int compareVal){
+      super(compareVal);
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class IOBThrowingMonitoredObject extends MonitoredObject{
+    IOBThrowingMonitoredObject(int compareVal){
+      super(compareVal);
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModSeqMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class ModParentIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModParentIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModParentAIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModParentAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModSeqIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqAIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModSeqAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class ModRootMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModRootMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class ModRootIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModRootIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModRootAIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModRootAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class MonitoredObject implements Comparable<MonitoredObject>{
     int numEqualsCalls;
     int numHashCodeCalls;
     int numToStringCalls;
+    int numCompareToCalls;
+    int compareVal;
+    MonitoredObject(){
+    }
+    MonitoredObject(int compareVal){
+      this.compareVal=compareVal;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      return Integer.compare(compareVal,that.compareVal);
+    }
     @Override public boolean equals(Object obj){
       ++numEqualsCalls;
       return super.equals(this);
@@ -1093,9 +2538,63 @@ BOXED_TYPEVALUE_NAME(false){
     }
   }
 #ENDIF
+  static abstract class MonitoredComparator implements $Comparator$
+#IFNOT OfRef
+   ,Comparator
+#ENDIF
+  {
+    public abstract int $compareMethod$($ArrayType$ val1, $ArrayType$ val2);
+#IFNOT OfRef
+    public int compare(Object val1,Object val2){
+      return $compareMethod$(($ArrayType$)val1,($ArrayType$)val2);
+    }
+#ENDIF
+  }
+  static class MonitoredUnaryOperator implements $UnaryOperator$
+#IFNOT OfRef
+    ,UnaryOperator
+#ENDIF
+  {
+    ArrayList encounteredValues=new ArrayList();
+    public $ArrayType$ $applyMethod$($ArrayType$ val){
+      encounteredValues.add(val);
+      #IF OfRef
+      return Integer.valueOf((Integer)val)+1;
+      #ELSEIF OfBoolean
+      return !val;
+      #ELSE
+      return ($ArrayType$)(val+1);
+      #ENDIF
+    }
+#IFNOT OfRef
+    public Object apply(Object val){
+      return $applyMethod$(($ArrayType$)val);
+    }
+#ENDIF
+  }
+  static class MonitoredArrayConstructor
+#IF OfRef
+    implements IntFunction<Integer[]>
+#ELSE
+    implements IntFunction<$BoxedType$[]>
+#ENDIF
+  {
+    int numCalls;
+#IF OfRef
+    @Override public Integer[] apply(int arrSize){
+      ++numCalls;
+      return new Integer[arrSize];
+    }
+#ELSE
+    @Override public $BoxedType$[] apply(int arrSize){
+      ++numCalls;
+      return new $BoxedType$[arrSize];
+    }
+#ENDIF
+  }
   static class MonitoredConsumer implements $TypeNameModifier$Consumer
 #IFNOT OfRef
-    ,Consumer$<E>$
+    ,Consumer
 #ENDIF
   {
     ArrayList encounteredValues=new ArrayList();
@@ -1373,6 +2872,9 @@ BOXED_TYPEVALUE_NAME(false){
     }
   }
   public static abstract class SequenceVerificationItr{
+#IF OfRef
+    public abstract void verifyIndexAndIterate(MonitoredObject monitoredObject);
+#ENDIF
     public abstract void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val);
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
@@ -1386,6 +2888,9 @@ BOXED_TYPEVALUE_NAME(false){
         verifyIndexAndIterate(inputArgType,v);
       }
       return this;
+    }
+    public void verifyIndexAndIterate(int val){
+      verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,val);
     }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,$ClassPrefix$InputTestArgType.ARRAY_TYPE,length);
@@ -1454,6 +2959,17 @@ BOXED_TYPEVALUE_NAME(false){
       this.arr=arr;
       this.offset=offset;
     }
+#IF OfRef
+    @Override public void verifyIndexAndIterate(MonitoredObject monitoredObject){
+      Object v;
+      if((v=arr[offset++]) instanceof MonitoredObject){
+        Assertions.assertEquals(monitoredObject.compareVal,((MonitoredObject)v).compareVal);
+      }else{
+        Assertions.assertEquals(monitoredObject.compareVal,(Object)v);
+      }
+    }
+
+#ENDIF
     @Override public void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val){
       inputArgType.verifyVal(val,arr[offset++]);
     }
@@ -1651,5 +3167,154 @@ BOXED_TYPEVALUE_NAME(false){
     {
       seq.forEach(($TypeNameModifier$Consumer)action);
     }
+  }
+#IFNOT OfBoolean
+  public void unstableSort(MonitoredComparator sorter){
+    int seqSize=expectedSeqSize;
+    ((OmniList.Of$ClassPrefix$)seq).unstableSort(($Comparator$)sorter);
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+#ENDIF
+  public void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
+    int seqSize=expectedSeqSize;
+  #IFNOT OfRef
+    if(functionCallType==FunctionCallType.Boxed){
+      ((OmniList.Of$ClassPrefix$)seq).replaceAll((UnaryOperator)operator);
+    }else
+  #ENDIF
+    {
+      ((OmniList.Of$ClassPrefix$)seq).replaceAll(($UnaryOperator$)operator);
+    }
+    if(seqSize!=0){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+
+  public void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
+    int seqSize=expectedSeqSize;
+  #IFNOT OfRef
+    if(functionCallType==FunctionCallType.Boxed){
+      ((OmniList.Of$ClassPrefix$)seq).sort((Comparator)sorter);
+    }else
+  #ENDIF
+    {
+      ((OmniList.Of$ClassPrefix$)seq).sort(($Comparator$)sorter);
+    }
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void stableAscendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.Of$ClassPrefix$)seq).stableAscendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void stableDescendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.Of$ClassPrefix$)seq).stableDescendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+#IF OfRef
+  public void unstableAscendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.Of$ClassPrefix$)seq).unstableAscendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+  public void unstableDescendingSort(){
+    int seqSize=expectedSeqSize;
+    ((OmniList.Of$ClassPrefix$)seq).unstableDescendingSort();
+    if(seqSize>1){
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+    }
+  }
+#ENDIF
+  public void removeAt(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
+    outputType.verifyListRemoveAt(seq,index,expectedVal);
+    --expectedSeqSize;
+    --expectedParentSize;
+    --expectedRootSize;
+    ++expectedSeqModCount;
+    ++expectedParentModCount;
+    ++expectedRootModCount;
+#IF OfRef
+      if(structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      }
+#ENDIF
+  }
+  public void get(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
+    outputType.verifyListGet(seq,index,expectedVal);
+  }
+  public void clear(){
+    int seqSize=expectedSeqSize;
+    seq.clear();
+    if(seqSize!=0){
+      expectedSeqSize=0;
+      expectedParentSize=0;
+      expectedRootSize=0;
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+#IF OfRef
+      if(structType==StructType.ARRSEQ){
+        int newBound=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
+        int oldBound=newBound+seqSize;
+        verifyRangeIsNull((($ClassPrefix$ArrSeq)root).arr,newBound,oldBound);
+      }
+#ENDIF
+    }
+  }
+  public void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyStackPop(seq,expectedVal);
+    --expectedSeqSize;
+    --expectedParentSize;
+    --expectedRootSize;
+    ++expectedSeqModCount;
+    ++expectedParentModCount;
+    ++expectedRootModCount;
+#IF OfRef
+    if(structType==StructType.ARRSEQ){
+      Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+    }
+#ENDIF
+  }
+  public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      --expectedSeqSize;
+      --expectedParentSize;
+      --expectedRootSize;
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+  #IF OfRef
+      if(structType==StructType.ARRSEQ){
+        Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      }
+  #ENDIF
+    }
+
   }
 }

@@ -14,9 +14,10 @@ import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
+import omni.util.OmniArray;
 import org.junit.jupiter.api.Assertions;
 #IF OfRef
-@SuppressWarnings({"rawtypes","unchecked"}) 
+@SuppressWarnings({"rawtypes"}) 
 #ENDIF
 public enum $ClassPrefix$OutputTestArgType{
   #MACRO OutputTestArgTypeImpl<ARRAY_TYPE>($ArrayType$,$TypeNameModifier$,$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
@@ -75,9 +76,103 @@ VALUE_NAME{
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),itr.nextTYPENAMEMODIFIER());
 #ENDIF
   }
+  @Override public void verifyListRemoveAt(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert){
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).removeTYPENAMEMODIFIERAt(index));
+  #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).remove(index));
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),((OmniList.Of$ClassPrefix$)col).removeTYPENAMEMODIFIERAt(index));
+  #ENDIF
+#ELSEIF OfRef
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).remove(index));
+#ELSE
+  #IFSWITCH VALUE_NAME==BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).remove(index));
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).removeTYPENAMEMODIFIERAt(index));
+  #ENDIF
+#ENDIF
+  }
+  @Override public void verifyListGet(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert){
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
+#ENDIF
+  }
+  @Override public void verifyToArray(OmniCollection.Of$ClassPrefix$ col,int expectedSize){
+    var arr=col.toTYPENAMEMODIFIERArray();
+    if(expectedSize==0){
+      Assertions.assertSame(DEFAULTARR,arr);
+    }else{
+      Assertions.assertEquals(expectedSize,arr.length);
+      var itr=col.iterator();
+      for(int i=0;i<expectedSize;++i){
+#IF OfRef
+        Assertions.assertSame(itr.next(),arr[i]);
+#ELSE
+        Assertions.assertEquals(itr.nextTYPENAMEMODIFIER(),arr[i]);
+#ENDIF
+      }
+    }
+  }
+  @Override public void verifyStackPoll(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal){
+    if(expectedSize==0){
+      Assertions.assertEquals(DEFAULT_VAL,((OmniStack.Of$ClassPrefix$)col).pollTYPENAMEMODIFIER());
+    }else{
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).pollTYPENAMEMODIFIER());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((OmniStack.Of$ClassPrefix$)col).pollTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).pollTYPENAMEMODIFIER());
+#ENDIF
+    }
+  }
+  @Override public void verifyStackPeek(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal){
+    if(expectedSize==0){
+      Assertions.assertEquals(DEFAULT_VAL,((OmniStack.Of$ClassPrefix$)col).peekTYPENAMEMODIFIER());
+    }else{
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).peekTYPENAMEMODIFIER());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((OmniStack.Of$ClassPrefix$)col).peekTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).peekTYPENAMEMODIFIER());
+#ENDIF
+    }
+  }
+  @Override public void verifyStackPop(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
+#ENDIF
+
+  }
 }
 #ENDDEF
   public abstract void verifyItrPrevious(OmniIterator.Of$ClassPrefix$ itr,int valToConvert);
   public abstract void verifyItrNext(OmniIterator.Of$ClassPrefix$ itr,int valToConvert);
+  public abstract void verifyListRemoveAt(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert);
+  public abstract void verifyListGet(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert);
+  public abstract void verifyToArray(OmniCollection.Of$ClassPrefix$ col,int expectedSize);
+  public abstract void verifyStackPoll(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
+  public abstract void verifyStackPop(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
+  public abstract void verifyStackPeek(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
   //TODO other method tests
 }

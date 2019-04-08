@@ -3,10 +3,9 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.util.TypeUtil;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+@SuppressWarnings({"rawtypes","unchecked"})
 public enum QueryTestInputType{
-  Booleannull(Boolean.class,Boolean.class,false){
+  Booleannull(Boolean.class,Boolean.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Boolean)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Boolean)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Boolean)(null));}
@@ -31,7 +30,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Bytenull(Byte.class,Byte.class,false){
+  Bytenull(Byte.class,Byte.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Byte)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Byte)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Byte)(null));}
@@ -56,7 +55,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Characternull(Character.class,Character.class,false){
+  Characternull(Character.class,Character.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Character)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Character)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Character)(null));}
@@ -81,7 +80,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Shortnull(Short.class,Short.class,false){
+  Shortnull(Short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Short)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Short)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Short)(null));}
@@ -106,7 +105,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Integernull(Integer.class,Integer.class,false){
+  Integernull(Integer.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Integer)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Integer)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Integer)(null));}
@@ -131,7 +130,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Longnull(Long.class,Long.class,false){
+  Longnull(Long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Long)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Long)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Long)(null));}
@@ -156,7 +155,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Floatnull(Float.class,Float.class,false){
+  Floatnull(Float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Float)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Float)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Float)(null));}
@@ -181,7 +180,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Doublenull(Double.class,Double.class,false){
+  Doublenull(Double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Double)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Double)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Double)(null));}
@@ -206,7 +205,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Objectnull(Object.class,Object.class,false){
+  Objectnull(Object.class,Object.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((Object)(null));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.remove((Object)(null));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(null));}
@@ -231,7 +230,7 @@ public enum QueryTestInputType{
       return false;
     }
   },
-  Booleanfalse(boolean.class,Boolean.class,true){
+  Booleanfalse(boolean.class,Boolean.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((boolean)(false));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((boolean)(false));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((boolean)(false));}
@@ -256,7 +255,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)(false));
     }
   },
-  Booleantrue(boolean.class,Boolean.class,false){
+  Booleantrue(boolean.class,Boolean.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((boolean)(true));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((boolean)(true));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((boolean)(true));}
@@ -281,7 +280,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Byte0(byte.class,Byte.class,true){
+  Byte0(byte.class,Byte.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(0));}
@@ -313,7 +312,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Bytepos1(byte.class,Byte.class,false){
+  Bytepos1(byte.class,Byte.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(1));}
@@ -342,10 +341,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Bytepos2(byte.class,Byte.class,false){
+  Bytepos2(byte.class,Byte.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(2));}
@@ -377,7 +376,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Byteneg1(byte.class,Byte.class,false){
+  Byteneg1(byte.class,Byte.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(-1));}
@@ -409,7 +408,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  Character0(char.class,Character.class,true){
+  Character0(char.class,Character.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(0));}
@@ -441,7 +440,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Characterpos1(char.class,Character.class,false){
+  Characterpos1(char.class,Character.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(1));}
@@ -470,10 +469,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Characterpos2(char.class,Character.class,false){
+  Characterpos2(char.class,Character.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(2));}
@@ -505,7 +504,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  CharacterMAX_BYTE_PLUS1(char.class,Character.class,false){
+  CharacterMAX_BYTE_PLUS1(char.class,Character.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(((char)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(((char)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(((char)Byte.MAX_VALUE)+1));}
@@ -537,7 +536,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((char)Byte.MAX_VALUE)+1)==1));
     }
   },
-  CharacterMAX_SHORT_PLUS1(char.class,Character.class,false){
+  CharacterMAX_SHORT_PLUS1(char.class,Character.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(((char)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(((char)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(((char)Short.MAX_VALUE)+1));}
@@ -569,7 +568,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((char)Short.MAX_VALUE)+1)==1));
     }
   },
-  Short0(short.class,Short.class,true){
+  Short0(short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(0));}
@@ -601,7 +600,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Shortpos1(short.class,Short.class,false){
+  Shortpos1(short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(1));}
@@ -630,10 +629,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Shortpos2(short.class,Short.class,false){
+  Shortpos2(short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(2));}
@@ -665,7 +664,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Shortneg1(short.class,Short.class,false){
+  Shortneg1(short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(-1));}
@@ -697,7 +696,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  ShortMAX_BYTE_PLUS1(short.class,Short.class,false){
+  ShortMAX_BYTE_PLUS1(short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(((short)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(((short)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(((short)Byte.MAX_VALUE)+1));}
@@ -729,7 +728,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((short)Byte.MAX_VALUE)+1)==1));
     }
   },
-  ShortMIN_BYTE_MINUS1(short.class,Short.class,false){
+  ShortMIN_BYTE_MINUS1(short.class,Short.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(((short)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(((short)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(((short)Byte.MIN_VALUE)-1));}
@@ -761,7 +760,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((short)Byte.MIN_VALUE)-1)==1));
     }
   },
-  Integer0(int.class,Integer.class,true){
+  Integer0(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(0));}
@@ -793,7 +792,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Integerpos1(int.class,Integer.class,false){
+  Integerpos1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(1));}
@@ -822,10 +821,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Integerpos2(int.class,Integer.class,false){
+  Integerpos2(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(2));}
@@ -857,7 +856,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Integerneg1(int.class,Integer.class,false){
+  Integerneg1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(-1));}
@@ -889,7 +888,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  IntegerMAX_BYTE_PLUS1(int.class,Integer.class,false){
+  IntegerMAX_BYTE_PLUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Byte.MAX_VALUE)+1));}
@@ -921,7 +920,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Byte.MAX_VALUE)+1)==1));
     }
   },
-  IntegerMIN_BYTE_MINUS1(int.class,Integer.class,false){
+  IntegerMIN_BYTE_MINUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Byte.MIN_VALUE)-1));}
@@ -953,7 +952,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Byte.MIN_VALUE)-1)==1));
     }
   },
-  IntegerMAX_SHORT_PLUS1(int.class,Integer.class,false){
+  IntegerMAX_SHORT_PLUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Short.MAX_VALUE)+1));}
@@ -985,7 +984,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Short.MAX_VALUE)+1)==1));
     }
   },
-  IntegerMIN_SHORT_MINUS1(int.class,Integer.class,false){
+  IntegerMIN_SHORT_MINUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Short.MIN_VALUE)-1));}
@@ -1017,7 +1016,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Short.MIN_VALUE)-1)==1));
     }
   },
-  IntegerMAX_CHAR_PLUS1(int.class,Integer.class,false){
+  IntegerMAX_CHAR_PLUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Character.MAX_VALUE)+1));}
@@ -1049,7 +1048,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Character.MAX_VALUE)+1)==1));
     }
   },
-  IntegerMAX_SAFE_INT_PLUS1(int.class,Integer.class,false){
+  IntegerMAX_SAFE_INT_PLUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(TypeUtil.MAX_SAFE_INT+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(TypeUtil.MAX_SAFE_INT+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
@@ -1081,7 +1080,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((TypeUtil.MAX_SAFE_INT+1)==1));
     }
   },
-  IntegerMIN_SAFE_INT_MINUS1(int.class,Integer.class,false){
+  IntegerMIN_SAFE_INT_MINUS1(int.class,Integer.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(TypeUtil.MIN_SAFE_INT-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(TypeUtil.MIN_SAFE_INT-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
@@ -1113,7 +1112,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((TypeUtil.MIN_SAFE_INT-1)==1));
     }
   },
-  Long0(long.class,Long.class,true){
+  Long0(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(0));}
@@ -1145,7 +1144,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Longpos1(long.class,Long.class,false){
+  Longpos1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(1));}
@@ -1174,10 +1173,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Longpos2(long.class,Long.class,false){
+  Longpos2(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(2));}
@@ -1209,7 +1208,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Longneg1(long.class,Long.class,false){
+  Longneg1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(-1));}
@@ -1241,7 +1240,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  LongMAX_BYTE_PLUS1(long.class,Long.class,false){
+  LongMAX_BYTE_PLUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Byte.MAX_VALUE)+1));}
@@ -1273,7 +1272,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Byte.MAX_VALUE)+1)==1));
     }
   },
-  LongMIN_BYTE_MINUS1(long.class,Long.class,false){
+  LongMIN_BYTE_MINUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Byte.MIN_VALUE)-1));}
@@ -1305,7 +1304,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Byte.MIN_VALUE)-1)==1));
     }
   },
-  LongMAX_SHORT_PLUS1(long.class,Long.class,false){
+  LongMAX_SHORT_PLUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Short.MAX_VALUE)+1));}
@@ -1337,7 +1336,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Short.MAX_VALUE)+1)==1));
     }
   },
-  LongMIN_SHORT_MINUS1(long.class,Long.class,false){
+  LongMIN_SHORT_MINUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Short.MIN_VALUE)-1));}
@@ -1369,7 +1368,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Short.MIN_VALUE)-1)==1));
     }
   },
-  LongMAX_CHAR_PLUS1(long.class,Long.class,false){
+  LongMAX_CHAR_PLUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Character.MAX_VALUE)+1));}
@@ -1401,7 +1400,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Character.MAX_VALUE)+1)==1));
     }
   },
-  LongMAX_SAFE_INT_PLUS1(long.class,Long.class,false){
+  LongMAX_SAFE_INT_PLUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
@@ -1433,7 +1432,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MAX_SAFE_INT)+1)==1));
     }
   },
-  LongMIN_SAFE_INT_MINUS1(long.class,Long.class,false){
+  LongMIN_SAFE_INT_MINUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
@@ -1465,7 +1464,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MIN_SAFE_INT)-1)==1));
     }
   },
-  LongMAX_INT_PLUS1(long.class,Long.class,false){
+  LongMAX_INT_PLUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Integer.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Integer.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Integer.MAX_VALUE)+1));}
@@ -1497,7 +1496,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Integer.MAX_VALUE)+1)==1));
     }
   },
-  LongMIN_INT_MINUS1(long.class,Long.class,false){
+  LongMIN_INT_MINUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Integer.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Integer.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Integer.MIN_VALUE)-1));}
@@ -1529,7 +1528,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Integer.MIN_VALUE)-1)==1));
     }
   },
-  LongMAX_SAFE_LONG_PLUS1(long.class,Long.class,false){
+  LongMAX_SAFE_LONG_PLUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
@@ -1561,7 +1560,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MAX_SAFE_LONG)+1)==1));
     }
   },
-  LongMIN_SAFE_LONG_MINUS1(long.class,Long.class,false){
+  LongMIN_SAFE_LONG_MINUS1(long.class,Long.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
@@ -1593,7 +1592,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MIN_SAFE_LONG)-1)==1));
     }
   },
-  Floatpos0(float.class,Float.class,true){
+  Floatpos0(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(0.0F));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(0.0F));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(0.0F));}
@@ -1625,7 +1624,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0.0F)==1));
     }
   },
-  Floatneg0(float.class,Float.class,true){
+  Floatneg0(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(-0.0F));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(-0.0F));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(-0.0F));}
@@ -1657,7 +1656,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-0.0F)==1));
     }
   },
-  Floatpos1(float.class,Float.class,false){
+  Floatpos1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(1));}
@@ -1686,10 +1685,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Floatpos2(float.class,Float.class,false){
+  Floatpos2(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(2));}
@@ -1721,7 +1720,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Floatneg1(float.class,Float.class,false){
+  Floatneg1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(-1));}
@@ -1753,7 +1752,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  FloatMAX_BYTE_PLUS1(float.class,Float.class,false){
+  FloatMAX_BYTE_PLUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Byte.MAX_VALUE)+1));}
@@ -1785,7 +1784,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Byte.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_BYTE_MINUS1(float.class,Float.class,false){
+  FloatMIN_BYTE_MINUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Byte.MIN_VALUE)-1));}
@@ -1817,7 +1816,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Byte.MIN_VALUE)-1)==1));
     }
   },
-  FloatMAX_SHORT_PLUS1(float.class,Float.class,false){
+  FloatMAX_SHORT_PLUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Short.MAX_VALUE)+1));}
@@ -1849,7 +1848,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Short.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_SHORT_MINUS1(float.class,Float.class,false){
+  FloatMIN_SHORT_MINUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Short.MIN_VALUE)-1));}
@@ -1881,7 +1880,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Short.MIN_VALUE)-1)==1));
     }
   },
-  FloatMAX_CHAR_PLUS1(float.class,Float.class,false){
+  FloatMAX_CHAR_PLUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Character.MAX_VALUE)+1));}
@@ -1913,7 +1912,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Character.MAX_VALUE)+1)==1));
     }
   },
-  FloatMAX_INT_PLUS1(float.class,Float.class,false){
+  FloatMAX_INT_PLUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Integer.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Integer.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Integer.MAX_VALUE)+1));}
@@ -1945,7 +1944,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Integer.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_INT_MINUS1(float.class,Float.class,false){
+  FloatMIN_INT_MINUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Integer.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Integer.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Integer.MIN_VALUE)-1));}
@@ -1977,7 +1976,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Integer.MIN_VALUE)-1)==1));
     }
   },
-  FloatMAX_LONG_PLUS1(float.class,Float.class,false){
+  FloatMAX_LONG_PLUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Long.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Long.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Long.MAX_VALUE)+1));}
@@ -2009,7 +2008,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Long.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_LONG_MINUS1(float.class,Float.class,false){
+  FloatMIN_LONG_MINUS1(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Long.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Long.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Long.MIN_VALUE)-1));}
@@ -2041,7 +2040,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Long.MIN_VALUE)-1)==1));
     }
   },
-  FloatMIN_FLOAT_VALUE(float.class,Float.class,false){
+  FloatMIN_FLOAT_VALUE(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(Float.MIN_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(Float.MIN_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(Float.MIN_VALUE));}
@@ -2073,7 +2072,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MIN_VALUE)==1));
     }
   },
-  FloatMAX_FLOAT_VALUE(float.class,Float.class,false){
+  FloatMAX_FLOAT_VALUE(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(Float.MAX_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(Float.MAX_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(Float.MAX_VALUE));}
@@ -2105,7 +2104,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MAX_VALUE)==1));
     }
   },
-  FloatNaN(float.class,Float.class,false){
+  FloatNaN(float.class,Float.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(Float.NaN));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(Float.NaN));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(Float.NaN));}
@@ -2137,7 +2136,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.NaN)==1));
     }
   },
-  Doublepos0(double.class,Double.class,true){
+  Doublepos0(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(0.0D));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(0.0D));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(0.0D));}
@@ -2169,7 +2168,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((0.0D)==1));
     }
   },
-  Doubleneg0(double.class,Double.class,true){
+  Doubleneg0(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(-0.0D));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(-0.0D));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(-0.0D));}
@@ -2201,7 +2200,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-0.0D)==1));
     }
   },
-  Doublepos1(double.class,Double.class,false){
+  Doublepos1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(1));}
@@ -2230,10 +2229,10 @@ public enum QueryTestInputType{
       if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
       if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
       if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
-      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Doublepos2(double.class,Double.class,false){
+  Doublepos2(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(2));}
@@ -2265,7 +2264,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Doubleneg1(double.class,Double.class,false){
+  Doubleneg1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(-1));}
@@ -2297,7 +2296,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  DoubleMAX_BYTE_PLUS1(double.class,Double.class,false){
+  DoubleMAX_BYTE_PLUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Byte.MAX_VALUE)+1));}
@@ -2329,7 +2328,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Byte.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_BYTE_MINUS1(double.class,Double.class,false){
+  DoubleMIN_BYTE_MINUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Byte.MIN_VALUE)-1));}
@@ -2361,7 +2360,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Byte.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMAX_SHORT_PLUS1(double.class,Double.class,false){
+  DoubleMAX_SHORT_PLUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Short.MAX_VALUE)+1));}
@@ -2393,7 +2392,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Short.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_SHORT_MINUS1(double.class,Double.class,false){
+  DoubleMIN_SHORT_MINUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Short.MIN_VALUE)-1));}
@@ -2425,7 +2424,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Short.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMAX_CHAR_PLUS1(double.class,Double.class,false){
+  DoubleMAX_CHAR_PLUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Character.MAX_VALUE)+1));}
@@ -2457,7 +2456,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Character.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMAX_SAFE_INT_PLUS1(double.class,Double.class,false){
+  DoubleMAX_SAFE_INT_PLUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
@@ -2489,7 +2488,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)TypeUtil.MAX_SAFE_INT)+1)==1));
     }
   },
-  DoubleMIN_SAFE_INT_MINUS1(double.class,Double.class,false){
+  DoubleMIN_SAFE_INT_MINUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
@@ -2521,7 +2520,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)TypeUtil.MIN_SAFE_INT)-1)==1));
     }
   },
-  DoubleMAX_INT_PLUS1(double.class,Double.class,false){
+  DoubleMAX_INT_PLUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Integer.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Integer.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Integer.MAX_VALUE)+1));}
@@ -2553,7 +2552,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Integer.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_INT_MINUS1(double.class,Double.class,false){
+  DoubleMIN_INT_MINUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Integer.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Integer.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Integer.MIN_VALUE)-1));}
@@ -2585,7 +2584,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Integer.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMAX_LONG_PLUS1(double.class,Double.class,false){
+  DoubleMAX_LONG_PLUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Long.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Long.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Long.MAX_VALUE)+1));}
@@ -2617,7 +2616,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Long.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_LONG_MINUS1(double.class,Double.class,false){
+  DoubleMIN_LONG_MINUS1(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Long.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Long.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Long.MIN_VALUE)-1));}
@@ -2649,7 +2648,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Long.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMIN_FLOAT_VALUE(double.class,Double.class,false){
+  DoubleMIN_FLOAT_VALUE(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Float.MIN_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Float.MIN_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Float.MIN_VALUE));}
@@ -2681,7 +2680,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MIN_VALUE)==1));
     }
   },
-  DoubleMAX_FLOAT_VALUE(double.class,Double.class,false){
+  DoubleMAX_FLOAT_VALUE(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Float.MAX_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Float.MAX_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Float.MAX_VALUE));}
@@ -2713,7 +2712,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MAX_VALUE)==1));
     }
   },
-  DoubleMIN_DOUBLE_VALUE(double.class,Double.class,false){
+  DoubleMIN_DOUBLE_VALUE(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Double.MIN_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Double.MIN_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Double.MIN_VALUE));}
@@ -2745,7 +2744,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Double.MIN_VALUE)==1));
     }
   },
-  DoubleMAX_DOUBLE_VALUE(double.class,Double.class,false){
+  DoubleMAX_DOUBLE_VALUE(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Double.MAX_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Double.MAX_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Double.MAX_VALUE));}
@@ -2777,7 +2776,7 @@ public enum QueryTestInputType{
       return ((OmniCollection.OfPrimitive)col).add((boolean)((Double.MAX_VALUE)==1));
     }
   },
-  DoubleNaN(double.class,Double.class,false){
+  DoubleNaN(double.class,Double.class){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Double.NaN));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Double.NaN));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Double.NaN));}
@@ -2812,11 +2811,9 @@ public enum QueryTestInputType{
   ;
   public final Class<?> primitiveClass;
   public final Class<?> boxedClass;
-  private boolean notEqualsVal;
-  private QueryTestInputType(Class<?> primitiveClass,Class<?> boxedClass,boolean notEqualsVal){
+  private QueryTestInputType(Class<?> primitiveClass,Class<?> boxedClass){
     this.primitiveClass=primitiveClass;
     this.boxedClass=boxedClass;
-    this.notEqualsVal=notEqualsVal;
   }
   public abstract boolean invokecontains(OmniCollection col);
   public abstract boolean invokeremoveVal(OmniCollection col);

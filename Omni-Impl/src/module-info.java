@@ -10,5 +10,4 @@ module omni.impl{
     requires org.junit.jupiter.params;
     requires org.junit.platform.runner;
     requires org.junit.platform.suite.api;
-    requires junit;
 }
