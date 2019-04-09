@@ -1474,16 +1474,17 @@ class $ClassPrefix$SeqMonitor{
       }
     },
     //TODO add this test scenario
-    //ModItr(ConcurrentModificationException.class,false,false,true){
-    //  @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-    //    return new MonitoredConsumer(){
-    //      public void accept($ArrayType$ val){
-    //        super.accept(val);
-    //        itrMonitor.add(0);
-    //      }
-    //    };
-    //  }
-    //},
+    ModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+          }
+        };
+      }
+    },
     ModSeq(ConcurrentModificationException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
         return new MonitoredConsumer(){
@@ -1617,17 +1618,18 @@ class $ClassPrefix$SeqMonitor{
       }
     },
     //TODO add this test scenario
-    //ThrowModItr(ConcurrentModificationException.class,false,false,true){
-    //  @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-    //    return new MonitoredConsumer(){
-    //      public void accept($ArrayType$ val){
-    //        super.accept(val);
-    //        itrMonitor.add(0);
-    //        throw new IndexOutOfBoundsException();
-    //      }
-    //    };
-    //  }
-    //},
+    ThrowModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
     ThrowModSeq(ConcurrentModificationException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
         return new MonitoredConsumer(){
@@ -1764,12 +1766,16 @@ class $ClassPrefix$SeqMonitor{
       this.appliesToSubList=appliesToSubList;
       this.appliesToRootItr=appliesToRootItr;
     }
-    abstract MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor);
+    MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
     MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
     }
     abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
-    abstract MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor);
+    MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
     
   }
 #IF OfRef
@@ -2489,6 +2495,45 @@ BOXED_TYPEVALUE_NAME(false){
   int expectedRootModCount;
   int expectedParentModCount;
   int expectedSeqModCount;
+  
+  $ClassPrefix$SeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,$ArrayType$[] arr){
+    this.structType=StructType.ARRSEQ;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedRootSize=seqLength;
+    this.expectedParentSize=seqLength;
+    this.expectedSeqSize=seqLength;
+    this.initialCapacity=(arr==null)?0:(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR?OmniArray.DEFAULT_ARR_SEQ_CAP:arr.length);
+    switch(nestedType){
+      case SUBLIST:
+        seqLength+=(4*DEFAULT_PRE_AND_POST_ALLOC);
+      case LIST:
+        this.root=checkedType.checked?new $ClassPrefix$ArrSeq.CheckedList(seqLength,arr):new $ClassPrefix$ArrSeq.UncheckedList(seqLength,arr);
+        break;
+      case STACK:
+        this.root=checkedType.checked?new $ClassPrefix$ArrSeq.CheckedStack(seqLength,arr):new $ClassPrefix$ArrSeq.UncheckedStack(seqLength,arr);
+        break;
+      default:
+        throw new Error("Unknown nestedType "+nestedType);
+    }
+    if(nestedType.rootType){
+      this.rootPreAlloc=0;
+      this.parentPreAlloc=0;
+      this.parentPostAlloc=0;
+      this.rootPostAlloc=0;
+      this.parent=root;
+      this.seq=root;
+    }else{
+      Assertions.assertTrue(arr!=null && seqLength<=arr.length);
+      this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parent=((OmniList.Of$ClassPrefix$)root).subList(rootPreAlloc,seqLength-rootPostAlloc);
+      this.seq=((OmniList.Of$ClassPrefix$)parent).subList(parentPreAlloc,seqLength-rootPreAlloc-parentPostAlloc-rootPostAlloc);
+    }
+  }
+  
   $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
     this.structType=structType;
     this.nestedType=nestedType;
@@ -3154,6 +3199,13 @@ BOXED_TYPEVALUE_NAME(false){
     public SequenceVerificationItr verifyPostAlloc(){
       return verifyPostAlloc(PreModScenario.NoMod);
     }
+    public SequenceVerificationItr verifyPostAlloc(int expectedVal){
+      for(int i=0,bound=seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc;i<bound;++i){
+        verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,expectedVal);
+      }
+      return this;
+    }
+    
     public SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
       if(preModScenario==PreModScenario.ModSeq){verifyIllegalAdd();}
       verifyParentPostAlloc();
@@ -3209,6 +3261,20 @@ BOXED_TYPEVALUE_NAME(false){
     @Override public boolean equals(Object val){
       final ArrSeqSequenceVerificationItr that;
       return val==this || (val instanceof ArrSeqSequenceVerificationItr && (that=(ArrSeqSequenceVerificationItr)val).arr==this.arr && that.offset==this.offset);
+    }
+  }
+  public SequenceVerificationItr verifyPreAlloc(int expectedVal){
+    switch(structType){
+      case ARRSEQ:{
+        var arr=(($ClassPrefix$ArrSeq)root).arr;
+        int offset=0;
+        for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+          $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+        }
+        return new ArrSeqSequenceVerificationItr(this,offset,arr);
+      }
+      default:
+        throw new Error("Unknown structType "+structType);
     }
   }
   public SequenceVerificationItr verifyPreAlloc(){

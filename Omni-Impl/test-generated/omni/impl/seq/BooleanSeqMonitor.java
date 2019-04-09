@@ -853,16 +853,17 @@ class BooleanSeqMonitor{
       }
     },
     //TODO add this test scenario
-    //ModItr(ConcurrentModificationException.class,false,false,true){
-    //  @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-    //    return new MonitoredConsumer(){
-    //      public void accept(boolean val){
-    //        super.accept(val);
-    //        itrMonitor.add(0);
-    //      }
-    //    };
-    //  }
-    //},
+    ModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept(boolean val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+          }
+        };
+      }
+    },
     ModSeq(ConcurrentModificationException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
         return new MonitoredConsumer(){
@@ -972,17 +973,18 @@ class BooleanSeqMonitor{
       }
     },
     //TODO add this test scenario
-    //ThrowModItr(ConcurrentModificationException.class,false,false,true){
-    //  @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-    //    return new MonitoredConsumer(){
-    //      public void accept(boolean val){
-    //        super.accept(val);
-    //        itrMonitor.add(0);
-    //        throw new IndexOutOfBoundsException();
-    //      }
-    //    };
-    //  }
-    //},
+    ThrowModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept(boolean val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
     ThrowModSeq(ConcurrentModificationException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
         return new MonitoredConsumer(){
@@ -1107,12 +1109,16 @@ class BooleanSeqMonitor{
       this.appliesToSubList=appliesToSubList;
       this.appliesToRootItr=appliesToRootItr;
     }
-    abstract MonitoredUnaryOperator getMonitoredUnaryOperator(BooleanSeqMonitor seqMonitor);
+    MonitoredUnaryOperator getMonitoredUnaryOperator(BooleanSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
     MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
     }
     abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
-    abstract MonitoredArrayConstructor getMonitoredArrayConstructor(BooleanSeqMonitor seqMonitor);
+    MonitoredArrayConstructor getMonitoredArrayConstructor(BooleanSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
   }
   static enum QueryTester
   {
@@ -7357,6 +7363,43 @@ class BooleanSeqMonitor{
   int expectedRootModCount;
   int expectedParentModCount;
   int expectedSeqModCount;
+  BooleanSeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,boolean[] arr){
+    this.structType=StructType.ARRSEQ;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedRootSize=seqLength;
+    this.expectedParentSize=seqLength;
+    this.expectedSeqSize=seqLength;
+    this.initialCapacity=(arr==null)?0:(arr==OmniArray.OfBoolean.DEFAULT_ARR?OmniArray.DEFAULT_ARR_SEQ_CAP:arr.length);
+    switch(nestedType){
+      case SUBLIST:
+        seqLength+=(4*DEFAULT_PRE_AND_POST_ALLOC);
+      case LIST:
+        this.root=checkedType.checked?new BooleanArrSeq.CheckedList(seqLength,arr):new BooleanArrSeq.UncheckedList(seqLength,arr);
+        break;
+      case STACK:
+        this.root=checkedType.checked?new BooleanArrSeq.CheckedStack(seqLength,arr):new BooleanArrSeq.UncheckedStack(seqLength,arr);
+        break;
+      default:
+        throw new Error("Unknown nestedType "+nestedType);
+    }
+    if(nestedType.rootType){
+      this.rootPreAlloc=0;
+      this.parentPreAlloc=0;
+      this.parentPostAlloc=0;
+      this.rootPostAlloc=0;
+      this.parent=root;
+      this.seq=root;
+    }else{
+      Assertions.assertTrue(arr!=null && seqLength<=arr.length);
+      this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parent=((OmniList.OfBoolean)root).subList(rootPreAlloc,seqLength-rootPostAlloc);
+      this.seq=((OmniList.OfBoolean)parent).subList(parentPreAlloc,seqLength-rootPreAlloc-parentPostAlloc-rootPostAlloc);
+    }
+  }
   BooleanSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
     this.structType=structType;
     this.nestedType=nestedType;
@@ -7828,6 +7871,12 @@ class BooleanSeqMonitor{
     public SequenceVerificationItr verifyPostAlloc(){
       return verifyPostAlloc(PreModScenario.NoMod);
     }
+    public SequenceVerificationItr verifyPostAlloc(int expectedVal){
+      for(int i=0,bound=seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc;i<bound;++i){
+        verifyIndexAndIterate(BooleanInputTestArgType.ARRAY_TYPE,expectedVal);
+      }
+      return this;
+    }
     public SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
       if(preModScenario==PreModScenario.ModSeq){verifyIllegalAdd();}
       verifyParentPostAlloc();
@@ -7867,6 +7916,20 @@ class BooleanSeqMonitor{
     @Override public boolean equals(Object val){
       final ArrSeqSequenceVerificationItr that;
       return val==this || (val instanceof ArrSeqSequenceVerificationItr && (that=(ArrSeqSequenceVerificationItr)val).arr==this.arr && that.offset==this.offset);
+    }
+  }
+  public SequenceVerificationItr verifyPreAlloc(int expectedVal){
+    switch(structType){
+      case ARRSEQ:{
+        var arr=((BooleanArrSeq)root).arr;
+        int offset=0;
+        for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+          BooleanInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+        }
+        return new ArrSeqSequenceVerificationItr(this,offset,arr);
+      }
+      default:
+        throw new Error("Unknown structType "+structType);
     }
   }
   public SequenceVerificationItr verifyPreAlloc(){

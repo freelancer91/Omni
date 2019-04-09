@@ -1,0 +1,183 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import omni.api.OmniCollection;
+
+public abstract $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Cloneable
+{
+  static class Node$<E>${
+    transient $exposedType$ val;
+    transient Node$<E>$ next;
+    Node($exposedType$ val){
+      this.val=val;
+    }
+    Node($exposedType$ val,$Node$<E>$ next){
+      this.val=val;
+      this.next=next;
+    }
+    private int uncheckedHashCode(){
+      int hash=31+$hashCodeMethod$(val);
+      for(var curr=next:curr!=null;curr=curr.next){
+        hash=(hash*31)+$hashCodeMethod$(curr.val);
+      }
+      return hash;
+    }
+#IF OfRef,OfDouble
+    private void uncheckedToString(StringBuilder builder){
+      for(var curr=this;;builder.append(',').append(' ')){
+        builder.append(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+#ELSEIF OfChar
+    private void uncheckedToString(char[] buffer){
+      int bufferOffset=1;
+      for(var curr=this;;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
+        buffer[bufferOffset]=curr.val;
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+#ELSE
+    private int uncheckedToString(byte[] buffer){
+      int bufferOffset=1;
+      for(var curr=this;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+#IF OfByte
+        bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+#ELSE
+        bufferOffset=ToStringUtil.getString$ClassPrefix$(curr.val,buffer,bufferOffset);
+#ENDIF
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+    private void uncheckedToString(ToStringUtil.OmniStringBuilderByte builder){
+      //TODO
+      for(var curr=this;;builder.uncheckedAppendCommaAndSpace()){
+  #IFSWITCH CLASSPREFIX==Byte
+        builder.uncheckedAppendShort(curr.val);
+  #ELSE
+        builder.uncheckedAppendCLASSPREFIX(curr.val);
+  #ENDIF
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+#ENDIF
+    private void uncheckedForEach($TypeNameModifier$Consumer$<? super E>$ action){
+      for(var curr=this;;){
+        action.accept(curr.val);
+        if((curr=curr.next)==null){
+          return;
+        }
+      }
+    }
+  }
+
+  transient int size;
+  transient Node$<E>$ head;
+
+  private $ClassPrefix$SnglLnkSeq(){
+  }
+  private $ClassPrefix$SnglLnkSeq(int size,Node$<E>$ head){
+    this.size=size;
+    this.head=head;
+  }
+  @Override public abstract Object clone();
+  @Override public int size(){
+    return this.size;
+  }
+  @Override public boolean isEmpty(){
+    return this.size==0;
+  }
+  @Override public void clear(){
+    this.head=null;
+    this.size=0;
+  }
+  @Override public int hashCode(){
+    final Node$<E>$ head;
+    if((head=this.head)!=null){
+      return head.uncheckedHashCode();
+    }
+    return 1;
+  }
+  @Override public String toString(){
+    final Node$<E>$ head;
+    if((head=this.head)!=null){
+#IF OfDouble,OfRef
+      final StringBuilder builder=new StringBuilder("[");
+      head.uncheckedToString(builder);
+      return builder.append(']').toString();
+#ELSE
+      int size;
+  #IF OfChar
+      final char[] buffer;
+      head.uncheckedToString(buffer=new char[size=this.size*3]);
+      buffer[0]='[';
+      buffer[size-1]=']';
+      return new String(buffer,0,size);
+  #ELSE
+      final byte[] buffer;
+    #IF OfBoolean
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
+    #ELSEIF OfByte
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+    #ELSEIF OfShort
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
+    #ELSEIF OfInt
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
+    #ELSEIF OfLong
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
+    #ELSEIF OfFloat
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
+    #ENDIF
+        [size=head.uncheckedToString(buffer)]=(byte)']';
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
+      }else{
+        final ToStringUtil.OmniStringBuilderByte builder;
+        head.uncheckedToString(builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        builder.uncheckedAppendChar((byte)']');
+        buffer=builder.buffer;
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
+      }
+  #ENDIF 
+#ENDIF
+    }
+    return "[]";
+  }
+  
+  //TODO contains
+  //TODO removeVal
+  @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+    final Node$<E>$ head;
+    if((head=this.head)!=null){
+      head.uncheckedForEach(action);
+    }
+  }
+#IFNOT OfRef
+  @Override public void forEach(Consumer<? super $BoxedType$ action){
+    final Node$<E>$ head;
+    if((head=this.head)!=null){
+      head.uncheckedForEach(action::accept);
+    }
+  }
+#ENDIF
+  //TODO push methods
+  //TODO toArray methods
+  //TODO removeIf methods
+  //TODO etc
+}

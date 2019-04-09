@@ -43,6 +43,7 @@ import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.QueryTester;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
+import java.util.ArrayList;
 #IF OfRef
 @SuppressWarnings({"rawtypes","unchecked"})
 #ENDIF
@@ -119,6 +120,7 @@ public class $ClassPrefix$ArrSeqTest{
   #MACRO testItrnext_void<PARALLEL>()
   #MACRO testListItrset_val<PARALLEL>()
   #MACRO testListItradd_val<PARALLEL>()
+  #MACRO testtoString_void<PARALLEL>()
 #ENDDEF
 
 #MACRODEF testConstructor_int<PARALLEL>()
@@ -884,21 +886,28 @@ public void testItrforEachRemaining_Consumer
     }else{
       Assertions.assertThrows(monitoredFunctionGen.expectedException,()->itrMonitor.forEachRemaining(monitoredConsumer,functionCallType));
       seqMonitor.verifyStructuralIntegrity();
-      //if(monitoredFunctionGen==MonitoredFunctionGen.ModItr || monitoredFunctionGen==MonitoredFunctionGen.ThrowModItr)
-      //{
-      //  //TODO figured out these special cases
-      //  System.out.println("testItrforEachRemaining_Consumer("+seqMonitor+","+monitoredFunctionGen+","+seqContentsScenario+","+preModScenario+","+itrType+","+functionCallType+")");
-      //  return;
-      //}
       itrMonitor.verifyIteratorState();
-      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+      
       switch(monitoredFunctionGen){
+        case ThrowModItr:
+          numExpectedIteratedValues=1;
+          if(seqMonitor.nestedType.forwardIteration){
+            seqMonitor.verifyPreAlloc().verifyAscending(1,numToAdd-1).verifyPostAlloc();
+          }else{
+            seqMonitor.verifyPreAlloc().verifyAscending(numToAdd-1).verifyPostAlloc();
+          }
+          break;
+        case ModItr:
+          numExpectedIteratedValues=numToAdd;
+          seqMonitor.verifyPreAlloc().verifyPostAlloc();
+          break;
         case Throw:
           numExpectedIteratedValues=1;
-          verifyItr.verifyPostAlloc();
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
           break;
         case ModSeq:
           numExpectedIteratedValues=numToAdd;
+          var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
           for(int i=0;i<numToAdd;++i){
             verifyItr.verifyIllegalAdd();
           }
@@ -906,7 +915,7 @@ public void testItrforEachRemaining_Consumer
           break;
         case ModParent:
           numExpectedIteratedValues=numToAdd;
-          verifyItr.verifyParentPostAlloc();
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyParentPostAlloc();
           for(int i=0;i<numToAdd;++i){
             verifyItr.verifyIllegalAdd();
           }
@@ -914,22 +923,22 @@ public void testItrforEachRemaining_Consumer
           break;
         case ModRoot:
           numExpectedIteratedValues=numToAdd;
-          verifyItr.verifyPostAlloc();
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
           for(int i=0;i<numToAdd;++i){
             verifyItr.verifyIllegalAdd();
           }
           break;
         case ThrowModSeq:
           numExpectedIteratedValues=1;
-          verifyItr.verifyPostAlloc(PreModScenario.ModSeq);
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(PreModScenario.ModSeq);
           break;
         case ThrowModParent:
           numExpectedIteratedValues=1;
-          verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(PreModScenario.ModParent);
           break;
         case ThrowModRoot:
           numExpectedIteratedValues=1;
-          verifyItr.verifyPostAlloc(PreModScenario.ModRoot);
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(PreModScenario.ModRoot);
           break;
         default:
           throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
@@ -938,27 +947,29 @@ public void testItrforEachRemaining_Consumer
   }else{
     Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.forEachRemaining(monitoredConsumer,functionCallType));
     seqMonitor.verifyStructuralIntegrity();
-    //if(monitoredFunctionGen==MonitoredFunctionGen.ModItr || monitoredFunctionGen==MonitoredFunctionGen.ThrowModItr)
-    //{
-    //  //TODO figured out these special cases
-    //  System.out.println("testItrforEachRemaining_Consumer("+seqMonitor+","+monitoredFunctionGen+","+seqContentsScenario+","+preModScenario+","+itrType+","+functionCallType+")");
-    //  return;
-    //}
     itrMonitor.verifyIteratorState();
-    var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
     switch(monitoredFunctionGen){
+        case ThrowModItr:
+          numExpectedIteratedValues=1;
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          break;
+        case ModItr:
+          numExpectedIteratedValues=1;
+          //verification in tis situation is tricky. Just skip it
+          break;
         case NoThrow:
           numExpectedIteratedValues=numToAdd;
           if(preModScenario==PreModScenario.ModSeq && seqMonitor.nestedType.forwardIteration){
             ++numExpectedIteratedValues;
           }
-          verifyItr.verifyPostAlloc(preModScenario);
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
           break;
         case Throw:
           numExpectedIteratedValues=1;
-          verifyItr.verifyPostAlloc(preModScenario);
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
           break;
         case ModSeq:
+          var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
           if(preModScenario==PreModScenario.ModSeq){
             numExpectedIteratedValues=numToAdd;
             if(seqMonitor.nestedType.forwardIteration){
@@ -976,11 +987,11 @@ public void testItrforEachRemaining_Consumer
           switch(preModScenario){
             case ModRoot:
               numExpectedIteratedValues=1;
-              verifyItr.verifyPostAlloc(preModScenario);
+              seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
               break;
             case ModParent:
               numExpectedIteratedValues=numToAdd;
-              verifyItr.verifyParentPostAlloc();
+              verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyParentPostAlloc();
               for(int i=0;i<numExpectedIteratedValues+1;++i){
                 verifyItr.verifyIllegalAdd();
               }
@@ -988,7 +999,7 @@ public void testItrforEachRemaining_Consumer
               break;
             case ModSeq:
               numExpectedIteratedValues=numToAdd+1;
-              verifyItr.verifyIllegalAdd().verifyParentPostAlloc();
+              verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyIllegalAdd().verifyParentPostAlloc();
               for(int i=0;i<numExpectedIteratedValues;++i){
                 verifyItr.verifyIllegalAdd();
               }
@@ -1003,12 +1014,13 @@ public void testItrforEachRemaining_Consumer
           if(preModScenario==PreModScenario.ModSeq){
             ++numExpectedIteratedValues;
           }
-          verifyItr.verifyPostAlloc(preModScenario);
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
           for(int i=0;i<numExpectedIteratedValues;++i){
             verifyItr.verifyIllegalAdd();
           }
           break;
         case ThrowModSeq:
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
           if(preModScenario==PreModScenario.ModSeq){
             verifyItr.verifyIllegalAdd();
           }
@@ -1018,13 +1030,13 @@ public void testItrforEachRemaining_Consumer
         case ThrowModParent:
           switch(preModScenario){
             case ModSeq:
-              verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+              seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
               break;
             case ModParent:
-              verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+              seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
               break;
             case ModRoot:
-              verifyItr.verifyPostAlloc(preModScenario);
+              seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
               break;
             default:
               throw new Error("Unknown preModScenario "+preModScenario);
@@ -1032,8 +1044,7 @@ public void testItrforEachRemaining_Consumer
           numExpectedIteratedValues=1;
           break;
         case ThrowModRoot:
-          verifyItr.verifyPostAlloc(preModScenario);
-          verifyItr.verifyIllegalAdd();
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario).verifyIllegalAdd();
           numExpectedIteratedValues=1;
           break;
         default:
@@ -1041,26 +1052,42 @@ public void testItrforEachRemaining_Consumer
     }
   }
   Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
-  var arr=(($ClassPrefix$ArrSeq)seqMonitor.root).arr;
-  if(seqMonitor.nestedType.forwardIteration){
-    int i=seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc;
-    for(var encounteredValue:monitoredConsumer.encounteredValues){
-#IF OfRef
-      Assertions.assertSame(encounteredValue,arr[i++]);
-#ELSE
-      Assertions.assertEquals(encounteredValue,(Object)arr[i++]);
-#ENDIF
+  switch(monitoredFunctionGen)
+  {
+    case ModItr:
+    case ThrowModItr:
+    {
+      if(preModScenario==PreModScenario.NoMod && numToAdd!=0){
+        break;
+      }
+      //those scenarios are kinda tricky.
+      //just skip this step of verification
     }
-  }else{
-    int i=seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+numToAdd;
-    for(var encounteredValue:monitoredConsumer.encounteredValues){
-#IF OfRef
-      Assertions.assertSame(encounteredValue,arr[--i]);
-#ELSE
-      Assertions.assertEquals(encounteredValue,(Object)arr[--i]);
-#ENDIF
+    default:
+    {
+      var arr=(($ClassPrefix$ArrSeq)seqMonitor.root).arr;
+      if(seqMonitor.nestedType.forwardIteration){
+        int i=seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc;
+        for(var encounteredValue:monitoredConsumer.encounteredValues){
+    #IF OfRef
+          Assertions.assertSame(encounteredValue,arr[i++]);
+    #ELSE
+          Assertions.assertEquals(encounteredValue,(Object)arr[i++]);
+    #ENDIF
+        }
+      }else{
+        int i=seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+numToAdd;
+        for(var encounteredValue:monitoredConsumer.encounteredValues){
+    #IF OfRef
+          Assertions.assertSame(encounteredValue,arr[--i]);
+    #ELSE
+          Assertions.assertEquals(encounteredValue,(Object)arr[--i]);
+    #ENDIF
+        }
+      }
     }
   }
+
 }
 #ENDDEF
 
@@ -4094,11 +4121,7 @@ public void testListget_int
 }
 #ENDDEF
 
-
-
-
-#MACRODEF testhashCode_void<PARALLEL>()
-static Stream<Arguments> gethashCode_voidArgs(){
+static Stream<Arguments> gettoStringAndhashCode_voidArgs(){
  return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
    for(var seqContentsScenario:SequenceContentsScenario.values()){
 #IF OfRef
@@ -4113,10 +4136,14 @@ static Stream<Arguments> gethashCode_voidArgs(){
    }
  });
 }
+
+
+#MACRODEF testhashCode_void<PARALLEL>()
+
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
 public void testhashCode_void(){
-  gethashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
+  gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
     testhashCode_voidHelper(($ClassPrefix$SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
 #IF OfRef
     ,(MonitoredObjectGen)args[3]
@@ -4127,7 +4154,7 @@ public void testhashCode_void(){
 private static void testhashCode_voidHelper
 #ELSE
 @org.junit.jupiter.params.ParameterizedTest
-@org.junit.jupiter.params.provider.MethodSource("gethashCode_voidArgs")
+@org.junit.jupiter.params.provider.MethodSource("gettoStringAndhashCode_voidArgs")
 public void testhashCode_void
 #ENDIF
 ($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
@@ -4135,10 +4162,8 @@ public void testhashCode_void
 ,MonitoredObjectGen monitoredObjectGen
 #ENDIF
 ){
-
   int numToAdd=seqContentsScenario.nonEmpty?100:0;
 #IF OfRef
-  int numExpectedCalls=numToAdd;
   MonitoredObject monitoredObject=null;
   if(numToAdd!=0 && monitoredObjectGen.expectedException!=null){
     monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
@@ -4159,122 +4184,31 @@ public void testhashCode_void
     }
   }
   seqMonitor.illegalAdd(preModScenario);
-  SequenceVerificationItr verifyItr;
   if(preModScenario.expectedException==null){
 #IF OfRef
     if(monitoredObject!=null){
       Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.hashCode());
-      verifyItr=seqMonitor.verifyPreAlloc();
-      for(int i=0;i<numToAdd;++i){
-        verifyItr.verifyIndexAndIterate(monitoredObject);
-      }
-      switch(monitoredObjectGen){
-        case Throw:
-          numExpectedCalls=1;
-          verifyItr.verifyPostAlloc();
-          break;
-        case ThrowModSeq:
-          numExpectedCalls=1;
-          verifyItr.verifyPostAlloc(PreModScenario.ModSeq);
-          break;
-        case ThrowModParent:
-          numExpectedCalls=1;
-          verifyItr.verifyPostAlloc(PreModScenario.ModParent);
-          break;
-        case ThrowModRoot:
-          numExpectedCalls=1;
-          verifyItr.verifyPostAlloc(PreModScenario.ModRoot);
-          break;
-        case ModSeq:
-          for(int i=0;i<numExpectedCalls;++i){
-            verifyItr.verifyIllegalAdd();
-          }
-          verifyItr.verifyPostAlloc();
-          break;
-        case ModParent:
-          verifyItr.verifyParentPostAlloc();
-          for(int i=0;i<numExpectedCalls;++i){
-            verifyItr.verifyIllegalAdd();
-          }
-          verifyItr.verifyRootPostAlloc();
-          break;
-        case ModRoot:
-          verifyItr.verifyPostAlloc();
-          for(int i=0;i<numExpectedCalls;++i){
-            verifyItr.verifyIllegalAdd();
-          }
-          break;
-        default:
-          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
-      }
+      Assertions.assertEquals(verifyThrowCondition(seqMonitor,numToAdd,monitoredObject,monitoredObjectGen),monitoredObject.numHashCodeCalls);
     }
     else
 #ENDIF
     {
       int resultHash=seqMonitor.seq.hashCode();
-      verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+      seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
       var itr=seqMonitor.seq.iterator();
       int expectedHash=1;
       for(int i=0;i<numToAdd;++i){
         expectedHash=(expectedHash*31)+itr.next().hashCode();
       }
       Assertions.assertEquals(expectedHash,resultHash);
-      verifyItr.verifyPostAlloc();
     }
   }else{
     Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.hashCode());
-    verifyItr=seqMonitor.verifyPreAlloc();
+    verifyThrowCondition(seqMonitor,numToAdd,preModScenario
 #IF OfRef
-    if(monitoredObject!=null){
-      for(int i=0;i<numToAdd;++i){
-        verifyItr.verifyIndexAndIterate(monitoredObject);
-      }
-      switch(monitoredObjectGen){
-        case ThrowModSeq:
-        case ModSeq:
-          numExpectedCalls=1;
-          verifyItr.verifyPostAlloc(preModScenario);
-          break;
-        case ThrowModParent:
-          numExpectedCalls=1;
-        case ModParent:
-          if(preModScenario==PreModScenario.ModRoot){
-            numExpectedCalls=1;
-          }
-          verifyItr.verifyParentPostAlloc();
-          if(preModScenario!=PreModScenario.ModRoot){
-            for(int i=0;i<numExpectedCalls;++i){
-              verifyItr.verifyIllegalAdd();
-            }
-          }
-          if(preModScenario==PreModScenario.ModParent){
-            verifyItr.verifyIllegalAdd();
-          }
-          verifyItr.verifyRootPostAlloc();
-          if(preModScenario==PreModScenario.ModRoot){
-            verifyItr.verifyIllegalAdd();
-          }
-          break;
-        case ThrowModRoot:
-          numExpectedCalls=1;
-        case ModRoot:
-          verifyItr.verifyPostAlloc(preModScenario);
-          for(int i=0;i<numExpectedCalls;++i){
-            verifyItr.verifyIllegalAdd();
-          }
-          break;
-        case Throw:
-          numExpectedCalls=1;
-          verifyItr.verifyPostAlloc(preModScenario);
-          break;
-        default:
-          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
-      }
-    }else
+      ,monitoredObject,monitoredObjectGen
 #ENDIF
-    {
-      verifyItr.verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
-    }
+    );
   }
   seqMonitor.verifyStructuralIntegrity();
 }
@@ -4471,9 +4405,293 @@ for(int i=0;i<seqSize;){
     default:
       throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
   }
- 
-  
-  
+}
+#ENDDEF
+#IF OfRef
+  private static int verifyThrowCondition($ClassPrefix$SeqMonitor seqMonitor,int numToAdd,MonitoredObject monitoredObject,MonitoredObjectGen monitoredObjectGen){
+    int numExpectedCalls=numToAdd;
+    var verifyItr=seqMonitor.verifyPreAlloc();
+    for(int i=0;i<numToAdd;++i){
+      verifyItr.verifyIndexAndIterate(monitoredObject);
+    }
+    switch(monitoredObjectGen){
+      case Throw:
+        numExpectedCalls=1;
+        verifyItr.verifyPostAlloc();
+        break;
+      case ThrowModSeq:
+        numExpectedCalls=1;
+        verifyItr.verifyPostAlloc(PreModScenario.ModSeq);
+        break;
+      case ThrowModParent:
+        numExpectedCalls=1;
+        verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+        break;
+      case ThrowModRoot:
+        numExpectedCalls=1;
+        verifyItr.verifyPostAlloc(PreModScenario.ModRoot);
+        break;
+      case ModSeq:
+        for(int i=0;i<numExpectedCalls;++i){
+          verifyItr.verifyIllegalAdd();
+        }
+        verifyItr.verifyPostAlloc();
+        break;
+      case ModParent:
+        verifyItr.verifyParentPostAlloc();
+        for(int i=0;i<numExpectedCalls;++i){
+          verifyItr.verifyIllegalAdd();
+        }
+        verifyItr.verifyRootPostAlloc();
+        break;
+      case ModRoot:
+        verifyItr.verifyPostAlloc();
+        for(int i=0;i<numExpectedCalls;++i){
+          verifyItr.verifyIllegalAdd();
+        }
+        break;
+      default:
+        throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
+    }
+    return numExpectedCalls;
+  }
+#ENDIF
+  private static void verifyThrowCondition($ClassPrefix$SeqMonitor seqMonitor,int numToAdd,PreModScenario preModScenario
+#IF OfRef
+    ,MonitoredObject monitoredObject,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+  ){
+     var verifyItr=seqMonitor.verifyPreAlloc();
+#IF OfRef
+    int numExpectedCalls=numToAdd;
+    if(monitoredObject!=null){
+      for(int i=0;i<numToAdd;++i){
+        verifyItr.verifyIndexAndIterate(monitoredObject);
+      }
+      switch(monitoredObjectGen){
+        case ThrowModSeq:
+        case ModSeq:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case ThrowModParent:
+          numExpectedCalls=1;
+        case ModParent:
+          if(preModScenario==PreModScenario.ModRoot){
+            numExpectedCalls=1;
+          }
+          verifyItr.verifyParentPostAlloc();
+          if(preModScenario!=PreModScenario.ModRoot){
+            for(int i=0;i<numExpectedCalls;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+          }
+          if(preModScenario==PreModScenario.ModParent){
+            verifyItr.verifyIllegalAdd();
+          }
+          verifyItr.verifyRootPostAlloc();
+          if(preModScenario==PreModScenario.ModRoot){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case ThrowModRoot:
+          numExpectedCalls=1;
+        case ModRoot:
+          verifyItr.verifyPostAlloc(preModScenario);
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case Throw:
+          numExpectedCalls=1;
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        default:
+          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
+      }
+    }else
+#ENDIF
+    {
+      verifyItr.verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+    }
+  }
+
+
+#MACRODEF testtoString_void<PARALLEL>()
+#IF OfBoolean
+  private static final int MAX_TOSTRING_LENGTH=5;
+#ELSEIF OfByte
+  private static final int MAX_TOSTRING_LENGTH=4;
+#ELSEIF OfShort
+  private static final int MAX_TOSTRING_LENGTH=6;
+#ELSEIF OfInt
+  private static final int MAX_TOSTRING_LENGTH=11;
+#ELSEIF OfLong
+  private static final int MAX_TOSTRING_LENGTH=20;
+#ELSEIF OfFloat
+  private static final int MAX_TOSTRING_LENGTH=15;
+#ENDIF
+#IF OfBoolean,OfByte,OfShort,OfInt,OfLong,OfFloat
+static Stream<Arguments> getMASSIVEtoString_voidArgs(){
+  Stream.Builder<Arguments> builder=Stream.builder();
+  final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
+  final int arrLength=seqLength+20;
+  $ArrayType$[] arr=new $ArrayType$[arrLength];
+  for(int i=0;i<arrLength;++i){
+    arr[i]=TypeConversionUtil.convertTo$ArrayType$(1);
+  }
+  for(var nestedType:NestedType.values()){
+    for(var checkedType:CheckedType.values()){
+      builder.accept(Arguments.of(new $ClassPrefix$SeqMonitor(nestedType,checkedType,seqLength,arr)));
+    }
+  }
+  return builder.build();
+}
+private static int verifySingleStrElement(String str,int strOffset)
+{
+#IF OfBoolean
+  Assertions.assertTrue(str.charAt(strOffset)=='t' && str.charAt(++strOffset)=='r' && str.charAt(++strOffset)=='u' && str.charAt(++strOffset)=='e',"String fails at index "+strOffset);
+#ELSEIF OfFloat
+  Assertions.assertTrue(str.charAt(strOffset)=='1' && str.charAt(++strOffset)=='.' && str.charAt(++strOffset)=='0',"String fails at index "+strOffset);
+#ELSE
+  Assertions.assertTrue(str.charAt(strOffset)=='1',"String fails at index "+strOffset);
+#ENDIF
+  return strOffset;
+}
+private static void verifyLargeStr(String str,int offset,int bound,SequenceVerificationItr verifyItr){
+  if(offset>=bound){
+    return;
+  }
+  int strOffset;
+  if(offset==0){
+    strOffset=verifySingleStrElement(str,1);
+  }else{
+#IF OfBoolean
+    strOffset=(6*offset)-2;
+#ELSEIF OfFloat
+    strOffset=(5*offset)-2;
+#ELSE
+    strOffset=(3*offset)-2;
+#ENDIF
+  }
+  for(;;){
+    verifyItr.verifyIndexAndIterate(1);
+    if(++offset==bound){
+      return;
+    }
+    if(str.charAt(++strOffset)!=',' || str.charAt(++strOffset)!=' '){
+      break;
+    }
+    strOffset=verifySingleStrElement(str,++strOffset);
+  }
+  Assertions.fail("string fails at index "+strOffset);
+}
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("getMASSIVEtoString_voidArgs")
+public void testMASSIVEtoString_void
+($ClassPrefix$SeqMonitor seqMonitor){
+  final var resultStr=seqMonitor.seq.toString();
+  seqMonitor.verifyStructuralIntegrity();
+  var verifyItr=seqMonitor.verifyPreAlloc(1);
+  Assertions.assertEquals('[',resultStr.charAt(0));
+  Assertions.assertEquals(']',resultStr.charAt(resultStr.length()-1));
+  int numThreads=Runtime.getRuntime().availableProcessors();
+  int seqSize=seqMonitor.seq.size();
+  int threadOffset=0;
+  int threadSpan=seqSize/numThreads;
+  Thread[] threads=new Thread[numThreads-1];
+  for(int i=0;i<numThreads-1;++i)
+  {
+    final int thisThreadOffset=threadOffset;
+    final int thisThreadBound=thisThreadOffset+threadSpan;
+    final var thisThreadVerifyItr=verifyItr.getPositiveOffset(thisThreadOffset);
+    threadOffset=thisThreadBound;
+    (threads[i]=new Thread(()->verifyLargeStr(resultStr,thisThreadOffset,thisThreadBound,thisThreadVerifyItr))).start();
+  }
+  verifyLargeStr(resultStr,threadOffset,threadOffset+threadSpan,verifyItr.getPositiveOffset(threadOffset));
+  try{
+    for(int i=0;i<numThreads-1;++i)
+    {
+      threads[i].join();
+    }
+  }catch(InterruptedException e){
+    Assertions.fail(e);
+  }
+  verifyItr.skip(seqSize).verifyPostAlloc(1);
+}
+#ENDIF
+
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testtoString_void(){
+  gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
+    testtoString_voidHelper(($ClassPrefix$SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+#IF OfRef
+    ,(MonitoredObjectGen)args[3]
+#ENDIF
+    );
+  });
+}
+private static void testtoString_voidHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("gettoStringAndhashCode_voidArgs")
+public void testtoString_void
+#ENDIF
+($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+#IF OfRef
+,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+){
+  int numToAdd=seqContentsScenario.nonEmpty?100:0;
+#IF OfRef
+  MonitoredObject monitoredObject=null;
+  if(numToAdd!=0 && monitoredObjectGen.expectedException!=null){
+    monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.seq.add(monitoredObject);
+      ++seqMonitor.expectedSeqSize;
+      ++seqMonitor.expectedParentSize;
+      ++seqMonitor.expectedRootSize;
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+    }
+  }else
+#ENDIF
+  {
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+  }
+  seqMonitor.illegalAdd(preModScenario);
+  if(preModScenario.expectedException==null){
+#IF OfRef
+    if(monitoredObject!=null){
+      Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.toString());
+      Assertions.assertEquals(verifyThrowCondition(seqMonitor,numToAdd,monitoredObject,monitoredObjectGen),monitoredObject.numToStringCalls);
+    }
+    else
+#ENDIF
+    {
+      var resultStr=seqMonitor.seq.toString();
+      seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+      var itr=seqMonitor.seq.iterator();
+      var arrList=new ArrayList<Object>();
+      for(int i=0;i<numToAdd;++i){
+        arrList.add(itr.next());
+      }
+      Assertions.assertEquals(arrList.toString(),resultStr);
+    }
+  }else{
+    Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toString());
+    verifyThrowCondition(seqMonitor,numToAdd,preModScenario
+#IF OfRef
+      ,monitoredObject,monitoredObjectGen
+#ENDIF
+    );
+  }
+  seqMonitor.verifyStructuralIntegrity();
 }
 #ENDDEF
 

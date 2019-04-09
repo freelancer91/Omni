@@ -836,16 +836,17 @@ class DoubleSeqMonitor{
       }
     },
     //TODO add this test scenario
-    //ModItr(ConcurrentModificationException.class,false,false,true){
-    //  @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-    //    return new MonitoredConsumer(){
-    //      public void accept(double val){
-    //        super.accept(val);
-    //        itrMonitor.add(0);
-    //      }
-    //    };
-    //  }
-    //},
+    ModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept(double val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+          }
+        };
+      }
+    },
     ModSeq(ConcurrentModificationException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(DoubleSeqMonitor seqMonitor){
         return new MonitoredConsumer(){
@@ -955,17 +956,18 @@ class DoubleSeqMonitor{
       }
     },
     //TODO add this test scenario
-    //ThrowModItr(ConcurrentModificationException.class,false,false,true){
-    //  @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-    //    return new MonitoredConsumer(){
-    //      public void accept(double val){
-    //        super.accept(val);
-    //        itrMonitor.add(0);
-    //        throw new IndexOutOfBoundsException();
-    //      }
-    //    };
-    //  }
-    //},
+    ThrowModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept(double val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
     ThrowModSeq(ConcurrentModificationException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(DoubleSeqMonitor seqMonitor){
         return new MonitoredConsumer(){
@@ -1090,12 +1092,16 @@ class DoubleSeqMonitor{
       this.appliesToSubList=appliesToSubList;
       this.appliesToRootItr=appliesToRootItr;
     }
-    abstract MonitoredUnaryOperator getMonitoredUnaryOperator(DoubleSeqMonitor seqMonitor);
+    MonitoredUnaryOperator getMonitoredUnaryOperator(DoubleSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
     MonitoredConsumer getMonitoredConsumer(DoubleSeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
     }
     abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
-    abstract MonitoredArrayConstructor getMonitoredArrayConstructor(DoubleSeqMonitor seqMonitor);
+    MonitoredArrayConstructor getMonitoredArrayConstructor(DoubleSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
   }
   static enum QueryTester
   {
@@ -7343,6 +7349,43 @@ class DoubleSeqMonitor{
   int expectedRootModCount;
   int expectedParentModCount;
   int expectedSeqModCount;
+  DoubleSeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,double[] arr){
+    this.structType=StructType.ARRSEQ;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedRootSize=seqLength;
+    this.expectedParentSize=seqLength;
+    this.expectedSeqSize=seqLength;
+    this.initialCapacity=(arr==null)?0:(arr==OmniArray.OfDouble.DEFAULT_ARR?OmniArray.DEFAULT_ARR_SEQ_CAP:arr.length);
+    switch(nestedType){
+      case SUBLIST:
+        seqLength+=(4*DEFAULT_PRE_AND_POST_ALLOC);
+      case LIST:
+        this.root=checkedType.checked?new DoubleArrSeq.CheckedList(seqLength,arr):new DoubleArrSeq.UncheckedList(seqLength,arr);
+        break;
+      case STACK:
+        this.root=checkedType.checked?new DoubleArrSeq.CheckedStack(seqLength,arr):new DoubleArrSeq.UncheckedStack(seqLength,arr);
+        break;
+      default:
+        throw new Error("Unknown nestedType "+nestedType);
+    }
+    if(nestedType.rootType){
+      this.rootPreAlloc=0;
+      this.parentPreAlloc=0;
+      this.parentPostAlloc=0;
+      this.rootPostAlloc=0;
+      this.parent=root;
+      this.seq=root;
+    }else{
+      Assertions.assertTrue(arr!=null && seqLength<=arr.length);
+      this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+      this.parent=((OmniList.OfDouble)root).subList(rootPreAlloc,seqLength-rootPostAlloc);
+      this.seq=((OmniList.OfDouble)parent).subList(parentPreAlloc,seqLength-rootPreAlloc-parentPostAlloc-rootPostAlloc);
+    }
+  }
   DoubleSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
     this.structType=structType;
     this.nestedType=nestedType;
@@ -7814,6 +7857,12 @@ class DoubleSeqMonitor{
     public SequenceVerificationItr verifyPostAlloc(){
       return verifyPostAlloc(PreModScenario.NoMod);
     }
+    public SequenceVerificationItr verifyPostAlloc(int expectedVal){
+      for(int i=0,bound=seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc;i<bound;++i){
+        verifyIndexAndIterate(DoubleInputTestArgType.ARRAY_TYPE,expectedVal);
+      }
+      return this;
+    }
     public SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
       if(preModScenario==PreModScenario.ModSeq){verifyIllegalAdd();}
       verifyParentPostAlloc();
@@ -7853,6 +7902,20 @@ class DoubleSeqMonitor{
     @Override public boolean equals(Object val){
       final ArrSeqSequenceVerificationItr that;
       return val==this || (val instanceof ArrSeqSequenceVerificationItr && (that=(ArrSeqSequenceVerificationItr)val).arr==this.arr && that.offset==this.offset);
+    }
+  }
+  public SequenceVerificationItr verifyPreAlloc(int expectedVal){
+    switch(structType){
+      case ARRSEQ:{
+        var arr=((DoubleArrSeq)root).arr;
+        int offset=0;
+        for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+          DoubleInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+        }
+        return new ArrSeqSequenceVerificationItr(this,offset,arr);
+      }
+      default:
+        throw new Error("Unknown structType "+structType);
     }
   }
   public SequenceVerificationItr verifyPreAlloc(){
