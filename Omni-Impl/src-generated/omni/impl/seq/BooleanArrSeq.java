@@ -101,396 +101,386 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
   abstract int uncheckedHashCode(int size);
   abstract int uncheckedToString(int size,byte[] buffer);
   abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
-  @Override
-  public boolean contains(boolean val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(boolean val){
     {
-      return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,(val));
-    }
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean contains(int val)
-  {
+  @Override public boolean contains(int val){
     {
-      final int size;
-      if((size=this.size)!=0)
       {
-        returnFalse:for(;;)
+        final int size;
+        if((size=this.size)!=0)
         {
-          final boolean v;
-          switch(val)
+          returnFalse:for(;;)
           {
-          default:
-            break returnFalse;
-          case 0:
-            v=false;
-            break;
-          case 1:
-            v=true;
-          }
-          return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
-        }
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(long val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      returnFalse:for(;;)
-      {
-        final boolean v;
-        if(val==0L)
-        {
-          v=false;
-        }else if(val==1L)
-        {
-          v=true;
-        }
-        else
-        {
-          break returnFalse;
-        }
-        return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(float val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      returnFalse:for(;;)
-      {
-        final boolean v;
-        switch(Float.floatToRawIntBits(val))
-        {
-          default:
-            break returnFalse;
-          case 0:
-          case Integer.MIN_VALUE:
-            v=false;
-            break;
-          case TypeUtil.FLT_TRUE_BITS:
-            v=true;
-        }
-        return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(double val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      returnFalse:for(;;)
-      {
-        final boolean v;
-        long bits;
-        if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-        {
-          v=false;
-        }
-        else if(bits==TypeUtil.DBL_TRUE_BITS)
-        {
-          v=true;
-        }
-        else
-        {
-          break returnFalse;
-        }
-        return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(Object val)
-  {
-    //TODO refactor this to reduce the calls to check mod count
-    final int size;
-    if((size=this.size)!=0){
-     //TODO a pattern-matching switch statement would be great here
-      returnFalse:for(;;){
-        final boolean b;
-        if(val instanceof Boolean){
-          b=(boolean)val;
-        }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-          switch(((Number)val).intValue()){
+            final boolean v;
+            switch(val)
+            {
             default:
               break returnFalse;
             case 0:
-              b=false;
+              v=false;
               break;
             case 1:
-              b=true;
+              v=true;
+            }
+            return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
           }
-        }else if(val instanceof Float){
-          switch(Float.floatToRawIntBits((float)val)){
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              b=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              b=true;
-          }
-        }else if(val instanceof Double){
-          final long bits;
-          if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-            b=false;
-          }else if(bits==TypeUtil.DBL_TRUE_BITS){
-            b=true;
-          }else{
-            break returnFalse;
-          }
-        }else if(val instanceof Long){
-          final long v;
-          if((v=(long)val)==0L){
-            b=false;
-          }else if(v==1L){
-            b=true;
-          }else{
-           break returnFalse;
-          }
-        }else if(val instanceof Character){
-          switch(((Character)val).charValue()){
-            default:
-              break returnFalse;
-            case 0:
-              b=false;
-              break;
-            case 1:
-              b=true;
-          }
-        }else{
-          break returnFalse;
-        }
-        return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,b);
-      }
-  //#ELSE
-  //    if(val instanceof Boolean)
-  //    {
-  //  #IF OfDouble,OfFloat
-  //      final boolean v;
-  //      if((v=(boolean)val)==v)
-  //      {
-  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-  //      }
-  //      #MACRO ReturnUncheckedQueryNaN()
-  //  #ELSE
-  //      #MACRO ReturnUncheckedQuery((boolean)(val))
-  //  #ENDIF
-  //    }
-  //#ENDIF
-    }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(boolean val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(long val){
     {
-      return this.uncheckedremoveVal(size,(val));
-    }
-    return false;
-  }
-  @Override
-  public boolean removeVal(int val)
-  {
-    {
-      final int size;
-      if((size=this.size)!=0)
       {
-        returnFalse:for(;;)
+        final int size;
+        if((size=this.size)!=0)
         {
-          final boolean v;
-          switch(val)
+          returnFalse:for(;;)
           {
-          default:
-            break returnFalse;
-          case 0:
-            v=false;
-            break;
-          case 1:
-            v=true;
+            final boolean v;
+            if(val==0L)
+            {
+              v=false;
+            }else if(val==1L)
+            {
+              v=true;
+            }
+            else
+            {
+              break returnFalse;
+            }
+            return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
           }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-    }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(long val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(float val){
     {
-      returnFalse:for(;;)
       {
-        final boolean v;
-        if(val==0L)
+        final int size;
+        if((size=this.size)!=0)
         {
-          v=false;
-        }else if(val==1L)
-        {
-          v=true;
-        }
-        else
-        {
-          break returnFalse;
-        }
-        return this.uncheckedremoveVal(size,v);
-      }
-    }
+          returnFalse:for(;;)
+          {
+            final boolean v;
+            switch(Float.floatToRawIntBits(val))
+            {
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                v=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                v=true;
+            }
+            return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(float val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(double val){
     {
-      returnFalse:for(;;)
       {
-        final boolean v;
-        switch(Float.floatToRawIntBits(val))
+        final int size;
+        if((size=this.size)!=0)
         {
-          default:
-            break returnFalse;
-          case 0:
-          case Integer.MIN_VALUE:
-            v=false;
-            break;
-          case TypeUtil.FLT_TRUE_BITS:
-            v=true;
-        }
-        return this.uncheckedremoveVal(size,v);
-      }
-    }
+          returnFalse:for(;;)
+          {
+            final boolean v;
+            long bits;
+            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+            {
+              v=false;
+            }
+            else if(bits==TypeUtil.DBL_TRUE_BITS)
+            {
+              v=true;
+            }
+            else
+            {
+              break returnFalse;
+            }
+            return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(double val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(Object val){
     {
-      returnFalse:for(;;)
       {
-        final boolean v;
-        long bits;
-        if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+        final int size;
+        if((size=this.size)!=0)
         {
-          v=false;
-        }
-        else if(bits==TypeUtil.DBL_TRUE_BITS)
-        {
-          v=true;
-        }
-        else
-        {
-          break returnFalse;
-        }
-        return this.uncheckedremoveVal(size,v);
-      }
-    }
+          //TODO a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            final boolean b;
+            if(val instanceof Boolean){
+              b=(boolean)val;
+            }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+              switch(((Number)val).intValue()){
+                default:
+                  break returnFalse;
+                case 0:
+                  b=false;
+                  break;
+                case 1:
+                  b=true;
+              }
+            }else if(val instanceof Float){
+              switch(Float.floatToRawIntBits((float)val)){
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  b=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  b=true;
+              }
+            }else if(val instanceof Double){
+              final long bits;
+              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                b=false;
+              }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                b=true;
+              }else{
+                break returnFalse;
+              }
+            }else if(val instanceof Long){
+              final long v;
+              if((v=(long)val)==0L){
+                b=false;
+              }else if(v==1L){
+                b=true;
+              }else{
+               break returnFalse;
+              }
+            }else if(val instanceof Character){
+              switch(((Character)val).charValue()){
+                default:
+                  break returnFalse;
+                case 0:
+                  b=false;
+                  break;
+                case 1:
+                  b=true;
+              }
+            }else{
+              break returnFalse;
+            }
+            return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,b);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean remove(Object val)
-  {
-    //TODO refactor this to reduce the calls to check mod count
-    final int size;
-    if((size=this.size)!=0){
-     //TODO a pattern-matching switch statement would be great here
-      returnFalse:for(;;){
-        final boolean b;
-        if(val instanceof Boolean){
-          b=(boolean)val;
-        }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-          switch(((Number)val).intValue()){
+  @Override public boolean removeVal(boolean val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          return this.uncheckedremoveVal(size,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(int val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          returnFalse:for(;;)
+          {
+            final boolean v;
+            switch(val)
+            {
             default:
               break returnFalse;
             case 0:
-              b=false;
+              v=false;
               break;
             case 1:
-              b=true;
+              v=true;
+            }
+            return this.uncheckedremoveVal(size,v);
           }
-        }else if(val instanceof Float){
-          switch(Float.floatToRawIntBits((float)val)){
-            default:
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(long val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          returnFalse:for(;;)
+          {
+            final boolean v;
+            if(val==0L)
+            {
+              v=false;
+            }else if(val==1L)
+            {
+              v=true;
+            }
+            else
+            {
               break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              b=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              b=true;
+            }
+            return this.uncheckedremoveVal(size,v);
           }
-        }else if(val instanceof Double){
-          final long bits;
-          if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-            b=false;
-          }else if(bits==TypeUtil.DBL_TRUE_BITS){
-            b=true;
-          }else{
-            break returnFalse;
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(float val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          returnFalse:for(;;)
+          {
+            final boolean v;
+            switch(Float.floatToRawIntBits(val))
+            {
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                v=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                v=true;
+            }
+            return this.uncheckedremoveVal(size,v);
           }
-        }else if(val instanceof Long){
-          final long v;
-          if((v=(long)val)==0L){
-            b=false;
-          }else if(v==1L){
-            b=true;
-          }else{
-           break returnFalse;
-          }
-        }else if(val instanceof Character){
-          switch(((Character)val).charValue()){
-            default:
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(double val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          returnFalse:for(;;)
+          {
+            final boolean v;
+            long bits;
+            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+            {
+              v=false;
+            }
+            else if(bits==TypeUtil.DBL_TRUE_BITS)
+            {
+              v=true;
+            }
+            else
+            {
               break returnFalse;
-            case 0:
-              b=false;
-              break;
-            case 1:
-              b=true;
+            }
+            return this.uncheckedremoveVal(size,v);
           }
-        }else{
-          break returnFalse;
-        }
-        return this.uncheckedremoveVal(size,b);
-      }
-  //#ELSE
-  //    if(val instanceof Boolean)
-  //    {
-  //  #IF OfDouble,OfFloat
-  //      final boolean v;
-  //      if((v=(boolean)val)==v)
-  //      {
-  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-  //      }
-  //      #MACRO ReturnUncheckedQueryNaN()
-  //  #ELSE
-  //      #MACRO ReturnUncheckedQuery((boolean)(val))
-  //  #ENDIF
-  //    }
-  //#ENDIF
-    }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean remove(Object val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          //TODO a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            final boolean b;
+            if(val instanceof Boolean){
+              b=(boolean)val;
+            }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+              switch(((Number)val).intValue()){
+                default:
+                  break returnFalse;
+                case 0:
+                  b=false;
+                  break;
+                case 1:
+                  b=true;
+              }
+            }else if(val instanceof Float){
+              switch(Float.floatToRawIntBits((float)val)){
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  b=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  b=true;
+              }
+            }else if(val instanceof Double){
+              final long bits;
+              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                b=false;
+              }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                b=true;
+              }else{
+                break returnFalse;
+              }
+            }else if(val instanceof Long){
+              final long v;
+              if((v=(long)val)==0L){
+                b=false;
+              }else if(v==1L){
+                b=true;
+              }else{
+               break returnFalse;
+              }
+            }else if(val instanceof Character){
+              switch(((Character)val).charValue()){
+                default:
+                  break returnFalse;
+                case 0:
+                  b=false;
+                  break;
+                case 1:
+                  b=true;
+              }
+            }else{
+              break returnFalse;
+            }
+            return this.uncheckedremoveVal(size,b);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
   abstract boolean uncheckedremoveVal(int size,boolean val);
@@ -865,200 +855,195 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     {
       return OmniArray.OfBoolean.descendingSeqHashCode(this.arr,0,size-1);
     }
-    @Override
-    public int search(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int search(boolean val){
       {
-        return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,(val));
-      }
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int search(int val)
-    {
+    @Override public int search(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
-            }
-            return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
-          }
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          if(val==0L)
-          {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
-          {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
                 break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
+              }
+              return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
             }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
             }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
                 break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
+              }
+              return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,v);
             }
-          }else{
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
     @Override
@@ -1457,396 +1442,386 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     {
       return OmniArray.OfBoolean.ascendingSeqHashCode(this.arr,0,size-1);
     }
-    @Override
-    public int indexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(boolean val){
       {
-        return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,(val));
-      }
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(int val)
-    {
+    @Override public int indexOf(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
-            }
-            return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
-          }
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          if(val==0L)
-          {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
-          {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(long val){
       {
-        return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,(val));
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
             }
-            return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
-          }
-        }
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(float val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          if(val==0L)
+          final int size;
+          if((size=this.size)!=0)
           {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
-        }
-      }
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(double val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
+          final int size;
+          if((size=this.size)!=0)
           {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
-        }
-      }
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(Object val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+          final int size;
+          if((size=this.size)!=0)
           {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
-        }
-      }
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+    @Override public int lastIndexOf(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(int val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
                 break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
             }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
             }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
                 break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,v);
             }
-          }else{
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
     @Override
@@ -2325,794 +2300,774 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
         this.size=0;
       }
     }
-    @Override
-    public boolean removeVal(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean removeVal(boolean val){
       {
-        return this.uncheckedremoveVal(size,(val));
-      }
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            return this.uncheckedremoveVal(size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return false;
     }
-    @Override
-    public boolean removeVal(int val)
-    {
+    @Override public boolean removeVal(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
-            }
-            return this.uncheckedremoveVal(size,v);
-          }
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          if(val==0L)
-          {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
-          {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean remove(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return this.uncheckedremoveVal(size,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return this.uncheckedremoveVal(size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean removeVal(long val){
       {
-        final int rootOffset;
-        return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(val));
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return this.uncheckedremoveVal(size,v);
             }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return this.uncheckedremoveVal(size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return this.uncheckedremoveVal(size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return this.uncheckedremoveVal(size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
             final int rootOffset;
-            return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-          }
-        }
-      }
+            return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean contains(int val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          if(val==0L)
+          final int size;
+          if((size=this.size)!=0)
           {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          final int rootOffset;
-          return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
-          {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          final int rootOffset;
-          return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          final int rootOffset;
-          return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          final int rootOffset;
-          return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
-      return false;
-    }
-    @Override
-    public int indexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,(val));
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
-            }
-            return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          if(val==0L)
-          {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
-          {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              final int rootOffset;
+              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
-      return -1;
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
     }
-    @Override
-    public int lastIndexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean contains(long val){
       {
-        return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(val));
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              final int rootOffset;
+              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
             }
-            return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }
-      return -1;
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
     }
-    @Override
-    public int lastIndexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean contains(float val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          if(val==0L)
+          final int size;
+          if((size=this.size)!=0)
           {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-        }
-      }
-      return -1;
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              final int rootOffset;
+              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
     }
-    @Override
-    public int lastIndexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean contains(double val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
+          final int size;
+          if((size=this.size)!=0)
           {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-        }
-      }
-      return -1;
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              final int rootOffset;
+              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
     }
-    @Override
-    public int lastIndexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean contains(Object val){
       {
-        returnFalse:for(;;)
         {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+          final int size;
+          if((size=this.size)!=0)
           {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              final int rootOffset;
+              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public int indexOf(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
           {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-        }
-      }
+            return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+    @Override public int indexOf(int val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(int val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
             }
-          }else{
-            break returnFalse;
-          }
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
     private boolean uncheckedremoveVal (int size
@@ -4623,232 +4578,229 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
         this.size=0;
       }
     }
-    @Override
-    public boolean removeVal(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean removeVal(boolean val){
       {
-        return this.uncheckedremoveVal(size,(val));
-      }
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            return this.uncheckedremoveVal(size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean removeVal(int val)
-    {
+    @Override public boolean removeVal(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            switch(val)
+            returnFalse:for(;;)
             {
-            default:
-              break returnFalse;
-            case 0:
-              v=false;
-              break;
-            case 1:
-              v=true;
-            }
-            return this.uncheckedremoveVal(size,v);
-          }
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          if(val==0L)
-          {
-            v=false;
-          }else if(val==1L)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          switch(Float.floatToRawIntBits(val))
-          {
-            default:
-              break returnFalse;
-            case 0:
-            case Integer.MIN_VALUE:
-              v=false;
-              break;
-            case TypeUtil.FLT_TRUE_BITS:
-              v=true;
-          }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        returnFalse:for(;;)
-        {
-          final boolean v;
-          long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
-            v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
-            v=true;
-          }
-          else
-          {
-            break returnFalse;
-          }
-          return this.uncheckedremoveVal(size,v);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean remove(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          final boolean b;
-          if(val instanceof Boolean){
-            b=(boolean)val;
-          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-            switch(((Number)val).intValue()){
+              final boolean v;
+              switch(val)
+              {
               default:
                 break returnFalse;
               case 0:
-                b=false;
+                v=false;
                 break;
               case 1:
-                b=true;
+                v=true;
+              }
+              return this.uncheckedremoveVal(size,v);
             }
-          }else if(val instanceof Float){
-            switch(Float.floatToRawIntBits((float)val)){
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
-                b=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
-                b=true;
-            }
-          }else if(val instanceof Double){
-            final long bits;
-            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-              b=false;
-            }else if(bits==TypeUtil.DBL_TRUE_BITS){
-              b=true;
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Long){
-            final long v;
-            if((v=(long)val)==0L){
-              b=false;
-            }else if(v==1L){
-              b=true;
-            }else{
-             break returnFalse;
-            }
-          }else if(val instanceof Character){
-            switch(((Character)val).charValue()){
-              default:
-                break returnFalse;
-              case 0:
-                b=false;
-                break;
-              case 1:
-                b=true;
-            }
-          }else{
-            break returnFalse;
-          }
-          return this.uncheckedremoveVal(size,b);
-        }
-    //#ELSE
-    //    if(val instanceof Boolean)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final boolean v;
-    //      if((v=(boolean)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((boolean)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean contains(boolean val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public boolean removeVal(long val){
+      {
         {
-            final int rootOffset;
-            return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(val));
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              if(val==0L)
+              {
+                v=false;
+              }else if(val==1L)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return this.uncheckedremoveVal(size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean contains(int val)
-    {
+    @Override public boolean removeVal(float val){
       {
-        final int modCount=this.modCount;
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
+                default:
+                  break returnFalse;
+                case 0:
+                case Integer.MIN_VALUE:
+                  v=false;
+                  break;
+                case TypeUtil.FLT_TRUE_BITS:
+                  v=true;
+              }
+              return this.uncheckedremoveVal(size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+              return this.uncheckedremoveVal(size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else{
+                break returnFalse;
+              }
+              return this.uncheckedremoveVal(size,b);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean contains(boolean val){
+      {
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+              final int rootOffset;
+              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(val));
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(int val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -4868,224 +4820,225 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
                 final int rootOffset;
                 return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
             }
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(long val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public boolean contains(long val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            if(val==0L)
+            returnFalse:for(;;)
             {
-              v=false;
-            }else if(val==1L)
-            {
-              v=true;
-            }
-            else
-            {
-              break returnFalse;
-            }
-              final int rootOffset;
-              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(float val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
+              final boolean v;
+              if(val==0L)
+              {
                 v=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
+              }else if(val==1L)
+              {
                 v=true;
-            }
-              final int rootOffset;
-              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(double val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
-              v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
-              v=true;
-            }
-            else
-            {
-              break returnFalse;
-            }
-              final int rootOffset;
-              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(Object val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        //TODO refactor this to reduce the calls to check mod count
-        final int size;
-        if((size=this.size)!=0){
-         //TODO a pattern-matching switch statement would be great here
-          returnFalse:for(;;){
-            final boolean b;
-            if(val instanceof Boolean){
-              b=(boolean)val;
-            }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-              switch(((Number)val).intValue()){
-                default:
-                  break returnFalse;
-                case 0:
-                  b=false;
-                  break;
-                case 1:
-                  b=true;
               }
-            }else if(val instanceof Float){
-              switch(Float.floatToRawIntBits((float)val)){
+              else
+              {
+                break returnFalse;
+              }
+                final int rootOffset;
+                return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(float val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
                 default:
                   break returnFalse;
                 case 0:
                 case Integer.MIN_VALUE:
-                  b=false;
+                  v=false;
                   break;
                 case TypeUtil.FLT_TRUE_BITS:
-                  b=true;
+                  v=true;
               }
-            }else if(val instanceof Double){
-              final long bits;
-              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-                b=false;
-              }else if(bits==TypeUtil.DBL_TRUE_BITS){
-                b=true;
+                final int rootOffset;
+                return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(double val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+                final int rootOffset;
+                return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(Object val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
               }else{
                 break returnFalse;
               }
-            }else if(val instanceof Long){
-              final long v;
-              if((v=(long)val)==0L){
-                b=false;
-              }else if(v==1L){
-                b=true;
-              }else{
-               break returnFalse;
-              }
-            }else if(val instanceof Character){
-              switch(((Character)val).charValue()){
-                default:
-                  break returnFalse;
-                case 0:
-                  b=false;
-                  break;
-                case 1:
-                  b=true;
-              }
-            }else{
-              break returnFalse;
+                final int rootOffset;
+                return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,b);
             }
-              final int rootOffset;
-              return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,b);
-          }
-      //#ELSE
-      //    if(val instanceof Boolean)
-      //    {
-      //  #IF OfDouble,OfFloat
-      //      final boolean v;
-      //      if((v=(boolean)val)==v)
-      //      {
-      //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-      //      }
-      //      #MACRO ReturnUncheckedQueryNaN()
-      //  #ELSE
-      //      #MACRO ReturnUncheckedQuery((boolean)(val))
-      //  #ENDIF
-      //    }
-      //#ENDIF
-        }
-      }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+      }//end val check
       return false;
     }
-    @Override
-    public int indexOf(boolean val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public int indexOf(boolean val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-            return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,(val));
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(int val)
-    {
+    @Override public int indexOf(int val){
       {
-        final int modCount=this.modCount;
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -5104,220 +5057,221 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
               }
                 return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
             }
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(long val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public int indexOf(long val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            if(val==0L)
+            returnFalse:for(;;)
             {
-              v=false;
-            }else if(val==1L)
-            {
-              v=true;
-            }
-            else
-            {
-              break returnFalse;
-            }
-              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(float val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
+              final boolean v;
+              if(val==0L)
+              {
                 v=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
+              }else if(val==1L)
+              {
                 v=true;
-            }
-              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(double val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
-              v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
-              v=true;
-            }
-            else
-            {
-              break returnFalse;
-            }
-              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(Object val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        //TODO refactor this to reduce the calls to check mod count
-        final int size;
-        if((size=this.size)!=0){
-         //TODO a pattern-matching switch statement would be great here
-          returnFalse:for(;;){
-            final boolean b;
-            if(val instanceof Boolean){
-              b=(boolean)val;
-            }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-              switch(((Number)val).intValue()){
-                default:
-                  break returnFalse;
-                case 0:
-                  b=false;
-                  break;
-                case 1:
-                  b=true;
               }
-            }else if(val instanceof Float){
-              switch(Float.floatToRawIntBits((float)val)){
+              else
+              {
+                break returnFalse;
+              }
+                return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(float val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
                 default:
                   break returnFalse;
                 case 0:
                 case Integer.MIN_VALUE:
-                  b=false;
+                  v=false;
                   break;
                 case TypeUtil.FLT_TRUE_BITS:
-                  b=true;
+                  v=true;
               }
-            }else if(val instanceof Double){
-              final long bits;
-              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-                b=false;
-              }else if(bits==TypeUtil.DBL_TRUE_BITS){
-                b=true;
+                return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(double val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+                return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(Object val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
               }else{
                 break returnFalse;
               }
-            }else if(val instanceof Long){
-              final long v;
-              if((v=(long)val)==0L){
-                b=false;
-              }else if(v==1L){
-                b=true;
-              }else{
-               break returnFalse;
-              }
-            }else if(val instanceof Character){
-              switch(((Character)val).charValue()){
-                default:
-                  break returnFalse;
-                case 0:
-                  b=false;
-                  break;
-                case 1:
-                  b=true;
-              }
-            }else{
-              break returnFalse;
+                return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,b);
             }
-              return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,b);
-          }
-      //#ELSE
-      //    if(val instanceof Boolean)
-      //    {
-      //  #IF OfDouble,OfFloat
-      //      final boolean v;
-      //      if((v=(boolean)val)==v)
-      //      {
-      //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-      //      }
-      //      #MACRO ReturnUncheckedQueryNaN()
-      //  #ELSE
-      //      #MACRO ReturnUncheckedQuery((boolean)(val))
-      //  #ENDIF
-      //    }
-      //#ENDIF
-        }
-      }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(boolean val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-            return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(val));
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(int val)
-    {
+    @Override public int lastIndexOf(boolean val){
       {
-        final int modCount=this.modCount;
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(val));
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(int val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -5336,195 +5290,194 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
               }
                 return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
             }
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(long val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public int lastIndexOf(long val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-          returnFalse:for(;;)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final boolean v;
-            if(val==0L)
+            returnFalse:for(;;)
             {
-              v=false;
-            }else if(val==1L)
-            {
-              v=true;
-            }
-            else
-            {
-              break returnFalse;
-            }
-              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(float val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
-              default:
-                break returnFalse;
-              case 0:
-              case Integer.MIN_VALUE:
+              final boolean v;
+              if(val==0L)
+              {
                 v=false;
-                break;
-              case TypeUtil.FLT_TRUE_BITS:
+              }else if(val==1L)
+              {
                 v=true;
-            }
-              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(double val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          returnFalse:for(;;)
-          {
-            final boolean v;
-            long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
-              v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
-              v=true;
-            }
-            else
-            {
-              break returnFalse;
-            }
-              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Object val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        //TODO refactor this to reduce the calls to check mod count
-        final int size;
-        if((size=this.size)!=0){
-         //TODO a pattern-matching switch statement would be great here
-          returnFalse:for(;;){
-            final boolean b;
-            if(val instanceof Boolean){
-              b=(boolean)val;
-            }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
-              switch(((Number)val).intValue()){
-                default:
-                  break returnFalse;
-                case 0:
-                  b=false;
-                  break;
-                case 1:
-                  b=true;
               }
-            }else if(val instanceof Float){
-              switch(Float.floatToRawIntBits((float)val)){
+              else
+              {
+                break returnFalse;
+              }
+                return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              switch(Float.floatToRawIntBits(val))
+              {
                 default:
                   break returnFalse;
                 case 0:
                 case Integer.MIN_VALUE:
-                  b=false;
+                  v=false;
                   break;
                 case TypeUtil.FLT_TRUE_BITS:
-                  b=true;
+                  v=true;
               }
-            }else if(val instanceof Double){
-              final long bits;
-              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
-                b=false;
-              }else if(bits==TypeUtil.DBL_TRUE_BITS){
-                b=true;
+                return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(double val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            returnFalse:for(;;)
+            {
+              final boolean v;
+              long bits;
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+              {
+                v=false;
+              }
+              else if(bits==TypeUtil.DBL_TRUE_BITS)
+              {
+                v=true;
+              }
+              else
+              {
+                break returnFalse;
+              }
+                return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final boolean b;
+              if(val instanceof Boolean){
+                b=(boolean)val;
+              }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+                switch(((Number)val).intValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
+              }else if(val instanceof Float){
+                switch(Float.floatToRawIntBits((float)val)){
+                  default:
+                    break returnFalse;
+                  case 0:
+                  case Integer.MIN_VALUE:
+                    b=false;
+                    break;
+                  case TypeUtil.FLT_TRUE_BITS:
+                    b=true;
+                }
+              }else if(val instanceof Double){
+                final long bits;
+                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                  b=false;
+                }else if(bits==TypeUtil.DBL_TRUE_BITS){
+                  b=true;
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Long){
+                final long v;
+                if((v=(long)val)==0L){
+                  b=false;
+                }else if(v==1L){
+                  b=true;
+                }else{
+                 break returnFalse;
+                }
+              }else if(val instanceof Character){
+                switch(((Character)val).charValue()){
+                  default:
+                    break returnFalse;
+                  case 0:
+                    b=false;
+                    break;
+                  case 1:
+                    b=true;
+                }
               }else{
                 break returnFalse;
               }
-            }else if(val instanceof Long){
-              final long v;
-              if((v=(long)val)==0L){
-                b=false;
-              }else if(v==1L){
-                b=true;
-              }else{
-               break returnFalse;
-              }
-            }else if(val instanceof Character){
-              switch(((Character)val).charValue()){
-                default:
-                  break returnFalse;
-                case 0:
-                  b=false;
-                  break;
-                case 1:
-                  b=true;
-              }
-            }else{
-              break returnFalse;
+                return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,b);
             }
-              return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,b);
-          }
-      //#ELSE
-      //    if(val instanceof Boolean)
-      //    {
-      //  #IF OfDouble,OfFloat
-      //      final boolean v;
-      //      if((v=(boolean)val)==v)
-      //      {
-      //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-      //      }
-      //      #MACRO ReturnUncheckedQueryNaN()
-      //  #ELSE
-      //      #MACRO ReturnUncheckedQuery((boolean)(val))
-      //  #ENDIF
-      //    }
-      //#ENDIF
-        }
-      }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+      }//end val check
       return -1;
     }
     private boolean uncheckedremoveVal (int size

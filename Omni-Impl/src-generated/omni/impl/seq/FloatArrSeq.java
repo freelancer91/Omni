@@ -103,438 +103,428 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
   abstract int uncheckedHashCode(int size);
   abstract int uncheckedToString(int size,byte[] buffer);
   abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
-  @Override
-  public boolean contains(boolean val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(boolean val){
     {
-      if(val)
       {
-        return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
-      }
-      return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(int val)
-  {
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
+        final int size;
+        if((size=this.size)!=0)
         {
-          if(TypeUtil.checkCastToFloat(val))
+          if(val)
           {
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        }
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(long val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val!=0)
-      {
-        if(TypeUtil.checkCastToFloat(val))
-        {
-          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-        }
-      }
-      else
-      {
-        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(float val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val==val)
-      {
-        return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-      }
-      return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(double val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      final float v;
-      if(val==(v=(float)val))
-      {
-        return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-      }
-      else if(v!=v)
-      {
-        return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(Object val)
-  {
-    //TODO refactor this to reduce the calls to check mod count
-    final int size;
-    if((size=this.size)!=0){
-     //TODO a pattern-matching switch statement would be great here
-      returnFalse:for(;;){
-        if(val instanceof Float){
-          final float f;
-          if((f=(float)val)==f){
-             return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(f));
-          }
-          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-        }else if(val instanceof Double){
-          final double d;
-          final float f;
-          if((d=(double)val)==(f=(float)d)){
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(f));
-          }else if(f!=f){
-            return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-          }else{
-            break returnFalse;
-          }
-        }else if(val instanceof Integer){
-          final int i;
-          if((i=(int)val)!=0){
-            if(!TypeUtil.checkCastToFloat(i)){
-              break returnFalse;
-            }
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(i));
-          }
-          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        }else if(val instanceof Long){
-          final long l;
-          if((l=(long)val)!=0){
-            if(!TypeUtil.checkCastToFloat(l)){
-              break returnFalse;
-            }
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(l));
-          }
-          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        }else if(val instanceof Short||val instanceof Byte){
-          final int i;
-          if((i=((Number)val).shortValue())!=0){
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(i));
-          }
-          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        }else if(val instanceof Character){
-          final int i;
-          if((i=(char)val)!=0){
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(i));
-          }
-          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        }else if(val instanceof Boolean){
-          if((boolean)val){
             return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
           }
           return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        }else{
-          break returnFalse;
-        }
-      }
-  //#ELSE
-  //    if(val instanceof Float)
-  //    {
-  //  #IF OfDouble,OfFloat
-  //      final float v;
-  //      if((v=(float)val)==v)
-  //      {
-  //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-  //      }
-  //      #MACRO ReturnUncheckedQueryNaN()
-  //  #ELSE
-  //      #MACRO ReturnUncheckedQuery((float)(val))
-  //  #ENDIF
-  //    }
-  //#ENDIF
-    }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean contains(byte val)
-  {
+  @Override public boolean contains(int val){
     {
-      final int size;
-      if((size=this.size)!=0)
       {
-        if(val!=0)
+        final int size;
+        if((size=this.size)!=0)
         {
-          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(char val)
-  {
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean contains(short val)
-  {
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean removeVal(boolean val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val)
-      {
-        return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
-      }
-      return this.uncheckedremoveVal0(size);
-    }
-    return false;
-  }
-  @Override
-  public boolean removeVal(int val)
-  {
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastToFloat(val))
+          if(val!=0)
           {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            if(TypeUtil.checkCastToFloat(val))
+            {
+              return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+            }
           }
-        }
-        else
+          else
+          {
+            return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(long val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
         {
-          return this.uncheckedremoveVal0(size);
-        }
-      }
-    }
+          if(val!=0)
+          {
+            if(TypeUtil.checkCastToFloat(val))
+            {
+              return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+            }
+          }
+          else
+          {
+            return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(long val)
-  {
-    final int size;
-    if((size=this.size)!=0)
+  @Override public boolean contains(float val){
     {
-      if(val!=0)
       {
-        if(TypeUtil.checkCastToFloat(val))
+        final int size;
+        if((size=this.size)!=0)
         {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-        }
-      }
-      else
-      {
-        return this.uncheckedremoveVal0(size);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean removeVal(float val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val==val)
-      {
-        return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-      }
-      return this.uncheckedremoveValNaN(size);
-    }
-    return false;
-  }
-  @Override
-  public boolean removeVal(double val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      final float v;
-      if(val==(v=(float)val))
-      {
-        return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(v));
-      }
-      else if(v!=v)
-      {
-        return this.uncheckedremoveValNaN(size);
-      }
-    }
-    return false;
-  }
-  @Override
-  public boolean remove(Object val)
-  {
-    //TODO refactor this to reduce the calls to check mod count
-    final int size;
-    if((size=this.size)!=0){
-     //TODO a pattern-matching switch statement would be great here
-      returnFalse:for(;;){
-        if(val instanceof Float){
-          final float f;
-          if((f=(float)val)==f){
-             return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+          if(val==val)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
           }
-          return this.uncheckedremoveValNaN(size);
-        }else if(val instanceof Double){
-          final double d;
-          final float f;
-          if((d=(double)val)==(f=(float)d)){
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
-          }else if(f!=f){
-            return this.uncheckedremoveValNaN(size);
-          }else{
-            break returnFalse;
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(double val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          final float v;
+          if(val==(v=(float)val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
           }
-        }else if(val instanceof Integer){
-          final int i;
-          if((i=(int)val)!=0){
-            if(!TypeUtil.checkCastToFloat(i)){
+          else if(v!=v)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(Object val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          //TODO a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            if(val instanceof Float){
+              final float f;
+              if((f=(float)val)==f){
+                 return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(f));
+              }
+              return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+            }else if(val instanceof Double){
+              final double d;
+              final float f;
+              if((d=(double)val)==(f=(float)d)){
+                return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(f));
+              }else if(f!=f){
+                return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+              }else{
+                break returnFalse;
+              }
+            }else if(val instanceof Integer){
+              final int i;
+              if((i=(int)val)!=0){
+                if(!TypeUtil.checkCastToFloat(i)){
+                  break returnFalse;
+                }
+                return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(i));
+              }
+              return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=0){
+                if(!TypeUtil.checkCastToFloat(l)){
+                  break returnFalse;
+                }
+                return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(l));
+              }
+              return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+            }else if(val instanceof Short||val instanceof Byte){
+              final int i;
+              if((i=((Number)val).shortValue())!=0){
+                return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(i));
+              }
+              return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+            }else if(val instanceof Character){
+              final int i;
+              if((i=(char)val)!=0){
+                return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(i));
+              }
+              return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+            }else if(val instanceof Boolean){
+              if((boolean)val){
+                return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+              }
+              return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+            }else{
               break returnFalse;
             }
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
           }
-          return this.uncheckedremoveVal0(size);
-        }else if(val instanceof Long){
-          final long l;
-          if((l=(long)val)!=0){
-            if(!TypeUtil.checkCastToFloat(l)){
-              break returnFalse;
-            }
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(l));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(byte val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val!=0)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
           }
-          return this.uncheckedremoveVal0(size);
-        }else if(val instanceof Short||val instanceof Byte){
-          final int i;
-          if((i=((Number)val).shortValue())!=0){
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(char val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val!=0)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
           }
-          return this.uncheckedremoveVal0(size);
-        }else if(val instanceof Character){
-          final int i;
-          if((i=(char)val)!=0){
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(short val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val!=0)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
           }
-          return this.uncheckedremoveVal0(size);
-        }else if(val instanceof Boolean){
-          if((boolean)val){
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(boolean val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val)
+          {
             return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
           }
           return this.uncheckedremoveVal0(size);
-        }else{
-          break returnFalse;
-        }
-      }
-  //#ELSE
-  //    if(val instanceof Float)
-  //    {
-  //  #IF OfDouble,OfFloat
-  //      final float v;
-  //      if((v=(float)val)==v)
-  //      {
-  //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-  //      }
-  //      #MACRO ReturnUncheckedQueryNaN()
-  //  #ELSE
-  //      #MACRO ReturnUncheckedQuery((float)(val))
-  //  #ENDIF
-  //    }
-  //#ENDIF
-    }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(byte val)
-  {
+  @Override public boolean removeVal(int val){
     {
-      final int size;
-      if((size=this.size)!=0)
       {
-        if(val!=0)
+        final int size;
+        if((size=this.size)!=0)
         {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-        }
-        return this.uncheckedremoveVal0(size);
-      }
-    }
+          if(val!=0)
+          {
+            if(TypeUtil.checkCastToFloat(val))
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            }
+          }
+          else
+          {
+            return this.uncheckedremoveVal0(size);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(char val)
-  {
+  @Override public boolean removeVal(long val){
     {
-      final int size;
-      if((size=this.size)!=0)
       {
-        if(val!=0)
+        final int size;
+        if((size=this.size)!=0)
         {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-        }
-        return this.uncheckedremoveVal0(size);
-      }
-    }
+          if(val!=0)
+          {
+            if(TypeUtil.checkCastToFloat(val))
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            }
+          }
+          else
+          {
+            return this.uncheckedremoveVal0(size);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
-  @Override
-  public boolean removeVal(short val)
-  {
+  @Override public boolean removeVal(float val){
     {
-      final int size;
-      if((size=this.size)!=0)
       {
-        if(val!=0)
+        final int size;
+        if((size=this.size)!=0)
         {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-        }
-        return this.uncheckedremoveVal0(size);
-      }
-    }
+          if(val==val)
+          {
+            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+          }
+          return this.uncheckedremoveValNaN(size);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(double val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          final float v;
+          if(val==(v=(float)val))
+          {
+            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(v));
+          }
+          else if(v!=v)
+          {
+            return this.uncheckedremoveValNaN(size);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean remove(Object val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          //TODO a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            if(val instanceof Float){
+              final float f;
+              if((f=(float)val)==f){
+                 return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+              }
+              return this.uncheckedremoveValNaN(size);
+            }else if(val instanceof Double){
+              final double d;
+              final float f;
+              if((d=(double)val)==(f=(float)d)){
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+              }else if(f!=f){
+                return this.uncheckedremoveValNaN(size);
+              }else{
+                break returnFalse;
+              }
+            }else if(val instanceof Integer){
+              final int i;
+              if((i=(int)val)!=0){
+                if(!TypeUtil.checkCastToFloat(i)){
+                  break returnFalse;
+                }
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+              }
+              return this.uncheckedremoveVal0(size);
+            }else if(val instanceof Long){
+              final long l;
+              if((l=(long)val)!=0){
+                if(!TypeUtil.checkCastToFloat(l)){
+                  break returnFalse;
+                }
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(l));
+              }
+              return this.uncheckedremoveVal0(size);
+            }else if(val instanceof Short||val instanceof Byte){
+              final int i;
+              if((i=((Number)val).shortValue())!=0){
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+              }
+              return this.uncheckedremoveVal0(size);
+            }else if(val instanceof Character){
+              final int i;
+              if((i=(char)val)!=0){
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+              }
+              return this.uncheckedremoveVal0(size);
+            }else if(val instanceof Boolean){
+              if((boolean)val){
+                return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+              }
+              return this.uncheckedremoveVal0(size);
+            }else{
+              break returnFalse;
+            }
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(byte val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val!=0)
+          {
+            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+          }
+          return this.uncheckedremoveVal0(size);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(char val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val!=0)
+          {
+            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+          }
+          return this.uncheckedremoveVal0(size);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean removeVal(short val){
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          if(val!=0)
+          {
+            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+          }
+          return this.uncheckedremoveVal0(size);
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
     return false;
   }
   abstract boolean uncheckedremoveValBits(int size,int bits);
@@ -889,205 +879,200 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     {
       return OmniArray.OfFloat.descendingSeqHashCode(this.arr,0,size-1);
     }
-    @Override
-    public int search(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int search(boolean val){
       {
-        if(val)
         {
-          return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-      }
-      return -1;
-    }
-    @Override
-    public int search(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val)
             {
-              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
-            }
-          }
-          else
-          {
-            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-          }
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastToFloat(val))
-          {
-            return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
-      }
-      return -1;
-    }
-    @Override
-    public int search(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int search(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(f));
-            }
-            return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(l));
-            }
-            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
               return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
             }
             return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int search(char val)
-    {
+    @Override public int search(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int search(short val)
-    {
+    @Override public int search(long val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val==val)
+            {
+              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
+              return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(f));
+                }
+                return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedsearchNaN(this.arr,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+              }else{
+                break returnFalse;
+              }
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int search(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedsearchBits(this.arr,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedsearch0(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
     @Override
@@ -1366,406 +1351,396 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     {
       return OmniArray.OfFloat.ascendingSeqHashCode(this.arr,0,size-1);
     }
-    @Override
-    public int indexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(boolean val){
       {
-        if(val)
         {
-          return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val)
             {
-              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-            }
-          }
-          else
-          {
-            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-          }
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastToFloat(val))
-          {
-            return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(f));
-            }
-            return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(l));
-            }
-            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
               return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
             }
             return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(char val)
-    {
+    @Override public int indexOf(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(short val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val)
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
             {
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+              }
             }
-          }
-          else
+            else
+            {
+              return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-          }
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(float val){
       {
-        if(val!=0)
         {
-          if(TypeUtil.checkCastToFloat(val))
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(f));
+            if(val==val)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
-            }else{
-              break returnFalse;
+            return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(v));
             }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
+            else if(v!=v)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(f));
+                }
+                return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedindexOfNaN(this.arr,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+              }else{
                 break returnFalse;
               }
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(i));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(l));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(this.arr,size,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
+            return OmniArray.OfFloat.uncheckedindexOf0(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
               return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
             }
             return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(char val)
-    {
+    @Override public int lastIndexOf(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(short val)
-    {
+    @Override public int lastIndexOf(long val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val==val)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(f));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfNaN(this.arr,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+              }else{
+                break returnFalse;
+              }
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(this.arr,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(this.arr,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
     @Override
@@ -2272,870 +2247,850 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         this.size=0;
       }
     }
-    @Override
-    public boolean removeVal(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean removeVal(boolean val){
       {
-        if(val)
         {
-          return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return this.uncheckedremoveVal0(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val)
             {
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-            }
-          }
-          else
-          {
-            return this.uncheckedremoveVal0(size);
-          }
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastToFloat(val))
-          {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return this.uncheckedremoveVal0(size);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-        }
-        return this.uncheckedremoveValNaN(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return this.uncheckedremoveValNaN(size);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean remove(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
-            }
-            return this.uncheckedremoveValNaN(size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return this.uncheckedremoveValNaN(size);
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
-                break returnFalse;
-              }
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(l));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
               return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
             }
             return this.uncheckedremoveVal0(size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return false;
     }
-    @Override
-    public boolean removeVal(byte val)
-    {
+    @Override public boolean removeVal(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(char val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(short val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val)
-        {
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
-        }
-        final int rootOffset;
-        return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
             {
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+              }
             }
-          }
-          else
+            else
+            {
+              return this.uncheckedremoveVal0(size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
           {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return this.uncheckedremoveVal0(size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean removeVal(float val){
       {
-        if(val!=0)
         {
-          if(TypeUtil.checkCastToFloat(val))
+          final int size;
+          if((size=this.size)!=0)
           {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-        }
-        final int rootOffset;
-        return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               final int rootOffset;
-               return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
+            if(val==val)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
             }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else{
-              break returnFalse;
+            return this.uncheckedremoveValNaN(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(v));
             }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
+            else if(v!=v)
+            {
+              return this.uncheckedremoveValNaN(size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+                }
+                return this.uncheckedremoveValNaN(size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return this.uncheckedremoveValNaN(size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(l));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return this.uncheckedremoveVal0(size);
+              }else{
                 break returnFalse;
               }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
             }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(l));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
             }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+            return this.uncheckedremoveVal0(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
             }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+            return this.uncheckedremoveVal0(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
             }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
+            return this.uncheckedremoveVal0(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
               final int rootOffset;
               return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
             }
             final int rootOffset;
             return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(byte val)
-    {
+    @Override public boolean contains(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-          }
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(char val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-          }
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(short val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-          }
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }
-      return false;
-    }
-    @Override
-    public int indexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val)
-        {
-          return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
             {
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+              }
             }
-          }
-          else
+            else
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }
-        }
-      }
-      return -1;
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
     }
-    @Override
-    public int indexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean contains(float val){
       {
-        if(val!=0)
         {
-          if(TypeUtil.checkCastToFloat(val))
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+            if(val==val)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-            }else{
-              break returnFalse;
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(v));
             }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
+            else if(v!=v)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   final int rootOffset;
+                   return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(l));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else{
                 break returnFalse;
               }
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(byte val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public int indexOf(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
               return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
             }
             return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(char val)
-    {
+    @Override public int indexOf(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(short val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val)
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
             {
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              }
             }
-          }
-          else
+            else
+            {
+              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(long val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public int indexOf(float val){
       {
-        if(val!=0)
         {
-          if(TypeUtil.checkCastToFloat(val))
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-        }
-        return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+            if(val==val)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-            }else{
-              break returnFalse;
+            return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
             }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
+            else if(v!=v)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }
+                return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else{
                 break returnFalse;
               }
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-            }
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(boolean val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
               return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
             }
             return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(char val)
-    {
+    @Override public int lastIndexOf(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(short val)
-    {
+    @Override public int lastIndexOf(long val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val==val)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(double val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else{
+                break returnFalse;
+              }
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       return -1;
     }
     private boolean uncheckedremoveValBits(int size
@@ -4676,261 +4631,258 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         this.size=0;
       }
     }
-    @Override
-    public boolean removeVal(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
+    @Override public boolean removeVal(boolean val){
       {
-        if(val)
         {
-          return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
-        }
-        return this.uncheckedremoveVal0(size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val)
             {
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-            }
-          }
-          else
-          {
-            return this.uncheckedremoveVal0(size);
-          }
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastToFloat(val))
-          {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-        }
-        else
-        {
-          return this.uncheckedremoveVal0(size);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val==val)
-        {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-        }
-        return this.uncheckedremoveValNaN(size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean removeVal(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final float v;
-        if(val==(v=(float)val))
-        {
-          return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(v));
-        }
-        else if(v!=v)
-        {
-          return this.uncheckedremoveValNaN(size);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean remove(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-       //TODO a pattern-matching switch statement would be great here
-        returnFalse:for(;;){
-          if(val instanceof Float){
-            final float f;
-            if((f=(float)val)==f){
-               return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
-            }
-            return this.uncheckedremoveValNaN(size);
-          }else if(val instanceof Double){
-            final double d;
-            final float f;
-            if((d=(double)val)==(f=(float)d)){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
-            }else if(f!=f){
-              return this.uncheckedremoveValNaN(size);
-            }else{
-              break returnFalse;
-            }
-          }else if(val instanceof Integer){
-            final int i;
-            if((i=(int)val)!=0){
-              if(!TypeUtil.checkCastToFloat(i)){
-                break returnFalse;
-              }
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Long){
-            final long l;
-            if((l=(long)val)!=0){
-              if(!TypeUtil.checkCastToFloat(l)){
-                break returnFalse;
-              }
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(l));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Short||val instanceof Byte){
-            final int i;
-            if((i=((Number)val).shortValue())!=0){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Character){
-            final int i;
-            if((i=(char)val)!=0){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
-            }
-            return this.uncheckedremoveVal0(size);
-          }else if(val instanceof Boolean){
-            if((boolean)val){
               return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
             }
             return this.uncheckedremoveVal0(size);
-          }else{
-            break returnFalse;
-          }
-        }
-    //#ELSE
-    //    if(val instanceof Float)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final float v;
-    //      if((v=(float)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery((float)(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean removeVal(byte val)
-    {
+    @Override public boolean removeVal(int val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return this.uncheckedremoveVal0(size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean removeVal(char val)
-    {
+    @Override public boolean removeVal(long val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        }
-      }
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return this.uncheckedremoveVal0(size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean removeVal(short val)
-    {
+    @Override public boolean removeVal(float val){
       {
-        final int size;
-        if((size=this.size)!=0)
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        }
-      }
+            if(val==val)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            }
+            return this.uncheckedremoveValNaN(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean contains(boolean val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public boolean removeVal(double val){
+      {
         {
-          if(val)
+          final int size;
+          if((size=this.size)!=0)
           {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
-          }
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
+              return this.uncheckedremoveValNaN(size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public boolean contains(int val)
-    {
+    @Override public boolean remove(Object val){
       {
-        final int modCount=this.modCount;
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+                }
+                return this.uncheckedremoveValNaN(size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return this.uncheckedremoveValNaN(size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(l));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(i));
+                }
+                return this.uncheckedremoveVal0(size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return this.uncheckedremoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return this.uncheckedremoveVal0(size);
+              }else{
+                break returnFalse;
+              }
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            }
+            return this.uncheckedremoveVal0(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            }
+            return this.uncheckedremoveVal0(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(short val){
+      {
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
+            }
+            return this.uncheckedremoveVal0(size);
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean contains(boolean val){
+      {
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
+            }
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(int val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -4947,290 +4899,293 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
               final int rootOffset;
               return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
             }
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(long val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public boolean contains(long val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(float val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val==val)
             {
               final int rootOffset;
               return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(float val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val==val)
-          {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-          }
-          final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(double val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final float v;
-          if(val==(v=(float)val))
-          {
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
             final int rootOffset;
             return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+      }//end val check
       return false;
     }
-    @Override
-    public boolean contains(Object val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        //TODO refactor this to reduce the calls to check mod count
-        final int size;
-        if((size=this.size)!=0){
-         //TODO a pattern-matching switch statement would be great here
-          returnFalse:for(;;){
-            if(val instanceof Float){
-              final float f;
-              if((f=(float)val)==f){
-                 final int rootOffset;
-                 return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
-              }
+    @Override public boolean contains(double val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
               final int rootOffset;
               return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else if(val instanceof Double){
-              final double d;
-              final float f;
-              if((d=(double)val)==(f=(float)d)){
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
-              }else if(f!=f){
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(Object val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   final int rootOffset;
+                   return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
+                }
                 final int rootOffset;
                 return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(l));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  final int rootOffset;
+                  return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
+                }
+                final int rootOffset;
+                return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               }else{
                 break returnFalse;
               }
-            }else if(val instanceof Integer){
-              final int i;
-              if((i=(int)val)!=0){
-                if(!TypeUtil.checkCastToFloat(i)){
-                  break returnFalse;
-                }
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
-              }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=0){
-                if(!TypeUtil.checkCastToFloat(l)){
-                  break returnFalse;
-                }
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(l));
-              }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else if(val instanceof Short||val instanceof Byte){
-              final int i;
-              if((i=((Number)val).shortValue())!=0){
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
-              }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else if(val instanceof Character){
-              final int i;
-              if((i=(char)val)!=0){
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
-              }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else if(val instanceof Boolean){
-              if((boolean)val){
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
-              }
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }else{
-              break returnFalse;
             }
-          }
-      //#ELSE
-      //    if(val instanceof Float)
-      //    {
-      //  #IF OfDouble,OfFloat
-      //      final float v;
-      //      if((v=(float)val)==v)
-      //      {
-      //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-      //      }
-      //      #MACRO ReturnUncheckedQueryNaN()
-      //  #ELSE
-      //      #MACRO ReturnUncheckedQuery((float)(val))
-      //  #ENDIF
-      //    }
-      //#ENDIF
-        }
-      }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      return false;
-    }
-    @Override
-    public boolean contains(byte val)
-    {
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0)
-            {
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(char val)
-    {
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0)
-            {
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }
-        }
-        finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean contains(short val)
-    {
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0)
-            {
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      return false;
-    }
-    @Override
-    public int indexOf(boolean val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+          } //end size check
+        } //end checked sublist try modcount
+        finally
         {
-          if(val)
-          {
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-          }
-          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(byte val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+            }
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(char val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+            }
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(short val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
+            }
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return false;
+    }
+    @Override public int indexOf(boolean val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
+            }
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(int val)
-    {
+    @Override public int indexOf(int val){
       {
-        final int modCount=this.modCount;
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -5245,242 +5200,244 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
             {
               return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
             }
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(long val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public int indexOf(long val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(float val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val==val)
             {
               return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(float val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val==val)
-          {
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(double val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final float v;
-          if(val==(v=(float)val))
-          {
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
             return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-          }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int indexOf(Object val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        //TODO refactor this to reduce the calls to check mod count
-        final int size;
-        if((size=this.size)!=0){
-         //TODO a pattern-matching switch statement would be great here
-          returnFalse:for(;;){
-            if(val instanceof Float){
-              final float f;
-              if((f=(float)val)==f){
-                 return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-              }
+    @Override public int indexOf(double val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
               return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-            }else if(val instanceof Double){
-              final double d;
-              final float f;
-              if((d=(double)val)==(f=(float)d)){
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-              }else if(f!=f){
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(Object val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }
                 return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
               }else{
                 break returnFalse;
               }
-            }else if(val instanceof Integer){
-              final int i;
-              if((i=(int)val)!=0){
-                if(!TypeUtil.checkCastToFloat(i)){
-                  break returnFalse;
-                }
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=0){
-                if(!TypeUtil.checkCastToFloat(l)){
-                  break returnFalse;
-                }
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
-              }
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Short||val instanceof Byte){
-              final int i;
-              if((i=((Number)val).shortValue())!=0){
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Character){
-              final int i;
-              if((i=(char)val)!=0){
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Boolean){
-              if((boolean)val){
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-              }
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }else{
-              break returnFalse;
             }
-          }
-      //#ELSE
-      //    if(val instanceof Float)
-      //    {
-      //  #IF OfDouble,OfFloat
-      //      final float v;
-      //      if((v=(float)val)==v)
-      //      {
-      //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-      //      }
-      //      #MACRO ReturnUncheckedQueryNaN()
-      //  #ELSE
-      //      #MACRO ReturnUncheckedQuery((float)(val))
-      //  #ENDIF
-      //    }
-      //#ENDIF
-        }
-      }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      return -1;
-    }
-    @Override
-    public int indexOf(char val)
-    {
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0)
-            {
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }
-        }
-        finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int indexOf(short val)
-    {
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0)
-            {
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(boolean val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+          } //end size check
+        } //end checked sublist try modcount
+        finally
         {
-          if(val)
-          {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-          }
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(int val)
-    {
+    @Override public int indexOf(char val){
       {
-        final int modCount=this.modCount;
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(short val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val!=0)
+            {
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+            }
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(boolean val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val)
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
+            }
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(int val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -5495,177 +5452,175 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
             {
               return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
             }
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(long val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
+    @Override public int lastIndexOf(long val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
         {
-          if(val!=0)
+          final int size;
+          if((size=this.size)!=0)
           {
-            if(TypeUtil.checkCastToFloat(val))
+            if(val!=0)
+            {
+              if(TypeUtil.checkCastToFloat(val))
+              {
+                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
+              }
+            }
+            else
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            if(val==val)
             {
               return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(float val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val==val)
-          {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-        }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(double val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final float v;
-          if(val==(v=(float)val))
-          {
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
             return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-          }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(Object val)
-    {
-      final int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        //TODO refactor this to reduce the calls to check mod count
-        final int size;
-        if((size=this.size)!=0){
-         //TODO a pattern-matching switch statement would be great here
-          returnFalse:for(;;){
-            if(val instanceof Float){
-              final float f;
-              if((f=(float)val)==f){
-                 return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-              }
+    @Override public int lastIndexOf(double val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            final float v;
+            if(val==(v=(float)val))
+            {
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
+            }
+            else if(v!=v)
+            {
               return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-            }else if(val instanceof Double){
-              final double d;
-              final float f;
-              if((d=(double)val)==(f=(float)d)){
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-              }else if(f!=f){
+            }
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        final var root=this.root;
+        final int modCount=this.modCount;
+        try
+        {
+          final int size;
+          if((size=this.size)!=0)
+          {
+            //TODO a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              if(val instanceof Float){
+                final float f;
+                if((f=(float)val)==f){
+                   return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }
                 return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
+              }else if(val instanceof Double){
+                final double d;
+                final float f;
+                if((d=(double)val)==(f=(float)d)){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
+                }else if(f!=f){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
+                }else{
+                  break returnFalse;
+                }
+              }else if(val instanceof Integer){
+                final int i;
+                if((i=(int)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(i)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Long){
+                final long l;
+                if((l=(long)val)!=0){
+                  if(!TypeUtil.checkCastToFloat(l)){
+                    break returnFalse;
+                  }
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Short||val instanceof Byte){
+                final int i;
+                if((i=((Number)val).shortValue())!=0){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Character){
+                final int i;
+                if((i=(char)val)!=0){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
+              }else if(val instanceof Boolean){
+                if((boolean)val){
+                  return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
+                }
+                return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
               }else{
                 break returnFalse;
               }
-            }else if(val instanceof Integer){
-              final int i;
-              if((i=(int)val)!=0){
-                if(!TypeUtil.checkCastToFloat(i)){
-                  break returnFalse;
-                }
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Long){
-              final long l;
-              if((l=(long)val)!=0){
-                if(!TypeUtil.checkCastToFloat(l)){
-                  break returnFalse;
-                }
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Short||val instanceof Byte){
-              final int i;
-              if((i=((Number)val).shortValue())!=0){
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Character){
-              final int i;
-              if((i=(char)val)!=0){
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }else if(val instanceof Boolean){
-              if((boolean)val){
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-              }
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }else{
-              break returnFalse;
             }
-          }
-      //#ELSE
-      //    if(val instanceof Float)
-      //    {
-      //  #IF OfDouble,OfFloat
-      //      final float v;
-      //      if((v=(float)val)==v)
-      //      {
-      //        #MACRO ReturnUncheckedQueryBits(Float.floatToRawIntBits(v))
-      //      }
-      //      #MACRO ReturnUncheckedQueryNaN()
-      //  #ELSE
-      //      #MACRO ReturnUncheckedQuery((float)(val))
-      //  #ENDIF
-      //    }
-      //#ENDIF
-        }
-      }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(char val)
-    {
+    @Override public int lastIndexOf(char val){
       {
-        final int modCount=this.modCount;
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -5674,21 +5629,21 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
               return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
             return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }
-        }
-        finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return -1;
     }
-    @Override
-    public int lastIndexOf(short val)
-    {
+    @Override public int lastIndexOf(short val){
       {
-        final int modCount=this.modCount;
         final var root=this.root;
-        try{
+        final int modCount=this.modCount;
+        try
+        {
           final int size;
           if((size=this.size)!=0)
           {
@@ -5697,11 +5652,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
               return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
             return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }
-        }finally{
+          } //end size check
+        } //end checked sublist try modcount
+        finally
+        {
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
-      }
+      }//end val check
       return -1;
     }
     private boolean uncheckedremoveValBits(int size
