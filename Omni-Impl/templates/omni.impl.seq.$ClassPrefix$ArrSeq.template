@@ -215,7 +215,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     }
   }
 #ENDIF
-
   private void uncheckedAppend(int size,$exposedType$ val)
   {
     $ArrayType$[] arr;
@@ -227,7 +226,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     arr[size]=val;
     this.size=size+1;
   }
-  
   private void uncheckedInit($exposedType$ val)
   {
     $ArrayType$[] arr;
@@ -257,7 +255,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
       uncheckedInit(val);
     }
   }
-  
   @Override
   public boolean add($exposedType$ val)
   {
@@ -709,11 +706,18 @@ public
   #MACRO Size()
   #MACRO IsEmpty()
   #MACRO Clear()
-  #MACRO QueryMethods<contains>()
+  
   #MACRO QueryMethods<removeVal>()
+#IFSWITCH STRUCTNAME==CheckedSubList
+  #MACRO CheckedSubListQueryMethods<contains>()
+  #MACRO CheckedSubListQueryMethods<indexOf>()
+  #MACRO CheckedSubListQueryMethods<lastIndexOf>()
+#ELSE
+  #MACRO QueryMethods<contains>()
   #MACRO QueryMethods<indexOf>()
   #MACRO QueryMethods<lastIndexOf>()
   #MACRO QueryMethods<search>()
+#ENDIF
   #MACRO UncheckedRemoveValMethods()
   #MACRO ForEach()
   #MACRO IteratorImpl()  
@@ -1701,6 +1705,55 @@ public void add(int index,$exposedType$ val)
 }
 #ENDIF
 #ENDDEF
+
+
+
+
+#MACRODEF CheckedSubListQueryMethods<METHODNAME>()
+#MACRO CheckedSubListQueryBoolean()
+#MACRO CheckedSubListQueryInt()
+#MACRO CheckedSubListQueryLong()
+#MACRO CheckedSubListQueryFloat()
+#MACRO CheckedSubListQueryDouble()
+#MACRO CheckedSubListQueryObject()
+  #IF OfRef
+#MACRO CheckedSubListQueryBoxed(Boolean,(boolean))
+#MACRO CheckedSubListQueryBoxed(Byte,(byte))
+#MACRO CheckedSubListQueryBoxed(Character,(char))
+#MACRO CheckedSubListQueryBoxed(Short,(short))
+#MACRO CheckedSubListQueryBoxed(Integer,(int))
+#MACRO CheckedSubListQueryBoxed(Long,(long))
+#MACRO CheckedSubListQueryBoxed(Float,(float))
+#MACRO CheckedSubListQueryBoxed(Double,(double))
+  #ENDIF
+#IFSWITCH METHODNAME==contains
+  #IF OfByte,OfInt,OfLong
+#MACRO CheckedSubListQueryByte()
+#MACRO CheckedSubListQueryChar()
+  #ENDIF
+  #IF OfChar,OfDouble,OfFloat,OfRef,OfShort
+#MACRO CheckedSubListQueryByte()
+#MACRO CheckedSubListQueryChar()
+#MACRO CheckedSubListQueryShort()
+  #ENDIF
+#ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+  #IF OfByte
+#MACRO CheckedSubListQueryByte()
+#MACRO CheckedSubListQueryChar()
+  #ENDIF
+  #IF OfChar,OfFloat,OfShort
+#MACRO CheckedSubListQueryChar()
+#MACRO CheckedSubListQueryShort()
+  #ENDIF
+  #IF OfRef
+#MACRO CheckedSubListQueryByte()
+#MACRO CheckedSubListQueryChar()
+#MACRO CheckedSubListQueryShort()
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+
 #MACRODEF RootQueryMethods<STRUCTNAME,METHODNAME>()
 #MACRO QueryBoolean()
 #MACRO QueryInt()
@@ -1863,6 +1916,38 @@ public void add(int index,$exposedType$ val)
   #ENDIF
 #ENDIF
 #ENDDEF
+
+#MACRODEF CheckedSubListQueryBoxed(INPUTTYPE,CAST)
+@Override
+#IFSWITCH METHODNAME==contains
+public boolean METHODNAME(INPUTTYPE val)
+#ELSE
+public int METHODNAME(INPUTTYPE val)
+#ENDIF
+{
+#IFNOT OfRef
+ERROR CheckedSubListQueryBoxed<METHODNAME,STRUCTNAME>(INPUTTYPE,CAST) is only allowed for OfRef
+#ENDIF
+#IFNOTSWITCH METHODNAME==contains,indexOf,lastIndexOf
+ERROR CheckedSubListQueryBoxed<METHODNAME,STRUCTNAME>(INPUTTYPE,CAST) invalid method name METHODNAME
+#ENDIF
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try{
+    final int size;
+    if((size=this.size)!=0){
+      if(val!=null)
+      {
+        #MACRO ReturnUncheckedQuery($queryCastRef$(CAST(val)))
+      }
+      #MACRO ReturnUncheckedQueryNull()
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
 #MACRODEF QueryBoxed(INPUTTYPE,CAST)
 @Override
 #IFSWITCH METHODNAME==contains,removeVal
@@ -1887,23 +1972,90 @@ ERROR QueryBoxed<METHODNAME,STRUCTNAME>(INPUTTYPE,CAST) is only allowed for OfRe
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
+
+#MACRODEF CheckedSubListQueryBoolean()
+#MACRO QuerySignature<boolean>()
+{
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try{
+    final int size;
+    if((size=this.size)!=0)
+    {
+    #IF OfDouble,OfFloat
+      if(val)
+      {
+        #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
+      }
+      #MACRO ReturnUncheckedQuery0()
+    #ELSE
+      #MACRO ReturnUncheckedQuery($queryCastBoolean$(val))
+    #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+
+
 #MACRODEF QueryBoolean()
 #MACRO QuerySignature<boolean>()
 {
   final int size;
   if((size=this.size)!=0)
   {
-#IF OfDouble,OfFloat
+  #IF OfDouble,OfFloat
     if(val)
     {
       #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
     }
     #MACRO ReturnUncheckedQuery0()
-#ELSE
+  #ELSE
     #MACRO ReturnUncheckedQuery($queryCastBoolean$(val))
-#ENDIF
+  #ENDIF
   }
   #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+#MACRODEF CheckedSubListQueryByte()
+#MACRO QuerySignature<byte>()
+{
+#IF OfBoolean
+ERROR QueryByte<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
+#ENDIF
+#IFSWITCH METHODNAME==indexOf,lastIndexOf,search
+  #IF OfChar,OfDouble,OfFloat,OfInt,OfLong,OfShort
+ERROR QueryByte<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
+  #ENDIF
+#ENDIF
+#IF OfChar
+  if(val>=0)
+#ENDIF
+  {
+    final int modCount=this.modCount;
+    final var root=this.root;
+    try{
+      final int size;
+      if((size=this.size)!=0)
+      {
+  #IF OfDouble,OfFloat
+        if(val!=0)
+        {
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+        }
+        #MACRO ReturnUncheckedQuery0()
+  #ELSE
+        #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+  #ENDIF
+      }
+    }finally{
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+  }
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
@@ -1937,6 +2089,45 @@ ERROR QueryByte<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
     }
   }
   #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+#MACRODEF CheckedSubListQueryChar()
+#MACRO QuerySignature<char>()
+{
+#IF OfBoolean
+ERROR QueryChar<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
+#ENDIF
+#IFSWITCH METHODNAME==indexOf,lastIndexOf,search
+  #IF OfDouble,OfInt,OfLong
+ERROR QueryChar<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
+  #ENDIF
+#ENDIF
+#IF OfByte,OfShort
+  if(val<=$BoxedType$.MAX_VALUE)
+#ENDIF
+  {
+    final int modCount=this.modCount;
+    final var root=this.root;
+    try{
+      final int size;
+      if((size=this.size)!=0)
+      {
+  #IF OfDouble,OfFloat
+        if(val!=0)
+        {
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+        }
+        #MACRO ReturnUncheckedQuery0()
+  #ELSE
+        #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+  #ENDIF
+      }
+    }
+    finally{
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+  }
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
@@ -1974,6 +2165,46 @@ ERROR QueryChar<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
+
+
+#MACRODEF CheckedSubListQueryShort()
+#MACRO QuerySignature<short>()
+{
+#IF OfByte,OfBoolean,OfInt,OfLong
+ERROR QueryShort<STRUCTNAME,METHODNAME> not allowed for $ClassPrefix$
+#ENDIF
+#IFSWITCH METHODNAME==indexOf,lastIndexOf,search
+  #IF OfDouble
+ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
+  #ENDIF
+#ENDIF
+#IF OfChar
+  if(val>=0)
+#ENDIF
+  {
+    final int modCount=this.modCount;
+    final var root=this.root;
+    try{
+      final int size;
+      if((size=this.size)!=0)
+      {
+  #IF OfDouble,OfFloat
+        if(val!=0)
+        {
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+        }
+        #MACRO ReturnUncheckedQuery0()
+  #ELSE
+        #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+  #ENDIF
+      }
+    }finally{
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+  }
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
 #MACRODEF QueryShort()
 #MACRO QuerySignature<short>()
 {
@@ -2004,6 +2235,60 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
     }
   }
   #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+#MACRODEF CheckedSubListQueryInt()
+#MACRO QuerySignature<int>()
+{
+#IF OfByte,OfChar,OfShort
+  if(val==($ArrayType$)val)
+#ENDIF
+  {
+    final int modCount=this.modCount;
+    final var root=this.root;
+    try{
+      final int size;
+      if((size=this.size)!=0)
+      {
+  #IF OfBoolean
+        returnFalse:for(;;)
+        {
+          final $ArrayType$ v;
+          switch(val)
+          {
+          default:
+            break returnFalse;
+          case 0:
+            v=false;
+            break;
+          case 1:
+            v=true;
+          }
+          #MACRO ReturnUncheckedQuery(v)
+        }
+  #ELSEIF OfFloat,OfDouble
+        if(val!=0)
+        {
+          #IF OfFloat
+          if(TypeUtil.checkCastTo$ClassPrefix$(val))
+          #ENDIF
+          {
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+          }
+        }
+        else
+        {
+          #MACRO ReturnUncheckedQuery0()
+        }
+  #ELSE
+        #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+  #ENDIF
+      }
+    }finally{
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+  }
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
@@ -2056,6 +2341,60 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
+#MACRODEF CheckedSubListQueryLong()
+#MACRO QuerySignature<long>()
+{
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try{
+    final int size;
+    if((size=this.size)!=0)
+    {
+      #IF OfBoolean
+      returnFalse:for(;;)
+      {
+        final $ArrayType$ v;
+        if(val==0L)
+        {
+          v=false;
+        }else if(val==1L)
+        {
+          v=true;
+        }
+        else
+        {
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(v)
+      }
+      #ELSEIF OfFloat,OfDouble
+      if(val!=0)
+      {
+        if(TypeUtil.checkCastTo$ClassPrefix$(val))
+        {
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+        }
+      }
+      else
+      {
+        #MACRO ReturnUncheckedQuery0()
+      }
+      #ELSEIF OfByte,OfChar,OfShort,OfInt
+      final $ArrayType$ v;
+      if((v=($ArrayType$)val)==val)
+      {
+        #MACRO ReturnUncheckedQuery(v)
+      }
+      #ELSE
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+      #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
 #MACRODEF QueryLong()
 #MACRO QuerySignature<long>()
 {
@@ -2105,6 +2444,62 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
+
+
+#MACRODEF CheckedSubListQueryFloat()
+#MACRO QuerySignature<float>()
+{
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try{
+    final int size;
+    if((size=this.size)!=0)
+    {
+      #IF OfBoolean
+      returnFalse:for(;;)
+      {
+        final $ArrayType$ v;
+        switch(Float.floatToRawIntBits(val))
+        {
+          default:
+            break returnFalse;
+          case 0:
+          case Integer.MIN_VALUE:
+            v=false;
+            break;
+          case TypeUtil.FLT_TRUE_BITS:
+            v=true;
+        }
+        #MACRO ReturnUncheckedQuery(v)
+      }
+      #ELSEIF OfFloat,OfDouble
+      if(val==val)
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+      }
+      #MACRO ReturnUncheckedQueryNaN()
+      #ELSEIF OfRef
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+      #ELSE
+      final $ArrayType$ v;
+        #IF OfLong
+      if(TypeUtil.floatEquals(val,v=($ArrayType$)val))
+        #ELSEIF OfInt
+      if((double)val==(double)(v=($ArrayType$)val))
+        #ELSE
+      if(val==(v=($ArrayType$)val))
+        #ENDIF
+      {
+        #MACRO ReturnUncheckedQuery(v)
+      }
+      #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
 #MACRODEF QueryFloat()
 #MACRO QuerySignature<float>()
 {
@@ -2151,6 +2546,74 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
     #ENDIF
   }
   #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+
+
+
+#MACRODEF CheckedSubListQueryDouble()
+#MACRO QuerySignature<double>()
+{
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try{
+    final int size;
+    if((size=this.size)!=0)
+    {
+      #IF OfBoolean
+      returnFalse:for(;;)
+      {
+        final $ArrayType$ v;
+        long bits;
+        if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+        {
+          v=false;
+        }
+        else if(bits==TypeUtil.DBL_TRUE_BITS)
+        {
+          v=true;
+        }
+        else
+        {
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(v)
+      }
+      #ELSEIF OfFloat
+      final $ArrayType$ v;
+      if(val==(v=($ArrayType$)val))
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+      }
+      else if(v!=v)
+      {
+        #MACRO ReturnUncheckedQueryNaN()
+      }
+      #ELSEIF OfDouble
+      if(val==val)
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+      }
+      #MACRO ReturnUncheckedQueryNaN()
+      #ELSEIF OfRef
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+      #ELSE
+      final $ArrayType$ v;
+        #IF OfLong
+      if(TypeUtil.doubleEquals(val,v=($ArrayType$)val))
+        #ELSE
+      if(val==(v=($ArrayType$)val))
+        #ENDIF
+      {
+        #MACRO ReturnUncheckedQuery(v)
+      }
+      #ENDIF
+    }
+  }finally{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
@@ -2210,6 +2673,356 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
     #ENDIF
   }
   #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+#MACRODEF CheckedSubListQueryObject()
+#MACRO QuerySignature<Object>()
+{
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try{
+    //TODO refactor this to reduce the calls to check mod count
+    final int size;
+    if((size=this.size)!=0){
+  #IF OfRef
+      if(val!=null){
+        #MACRO ReturnUncheckedQueryNonNull(val)
+      }
+      #MACRO ReturnUncheckedQueryNull()
+  #ELSE
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+    #IF OfBoolean
+        final boolean b;
+        if(val instanceof Boolean){
+          b=(boolean)val;
+        }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+          switch(((Number)val).intValue()){
+            default:
+              break returnFalse;
+            case 0:
+              b=false;
+              break;
+            case 1:
+              b=true;
+          }
+        }else if(val instanceof Float){
+          switch(Float.floatToRawIntBits((float)val)){
+            default:
+              break returnFalse;
+            case 0:
+            case Integer.MIN_VALUE:
+              b=false;
+              break;
+            case TypeUtil.FLT_TRUE_BITS:
+              b=true;
+          }
+        }else if(val instanceof Double){
+          final long bits;
+          if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+            b=false;
+          }else if(bits==TypeUtil.DBL_TRUE_BITS){
+            b=true;
+          }else{
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long v;
+          if((v=(long)val)==0L){
+            b=false;
+          }else if(v==1L){
+            b=true;
+          }else{
+           break returnFalse;
+          }
+        }else if(val instanceof Character){
+          switch(((Character)val).charValue()){
+            default:
+              break returnFalse;
+            case 0:
+              b=false;
+              break;
+            case 1:
+              b=true;
+          }
+        }else{
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(b)
+    #ELSEIF OfByte
+        final int i;
+        if(val instanceof Byte){
+          i=(byte)val;
+        }else if(val instanceof Integer||val instanceof Short){
+          if((i=((Number)val).intValue())!=(byte)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(byte)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(byte)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(byte)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          if((i=(char)val)>Byte.MAX_VALUE){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(i);
+    #ELSEIF OfChar
+        final int i;
+        if(val instanceof Character){
+          i=(char)val;
+        }else if(val instanceof Integer){
+          if((i=(int)val)!=(char)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Byte||val instanceof Short){
+          if((i=((Number)val).shortValue())<0){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(char)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(char)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(char)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(i);
+    #ELSEIF OfShort
+        final int i;
+        if(val instanceof Short||val instanceof Byte){
+          i=((Number)val).shortValue();
+        }else if(val instanceof Integer){
+          if((i=(int)val)!=(short)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(short)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(short)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(short)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          if((i=(char)val)>Short.MAX_VALUE){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(i);
+    #ELSEIF OfInt
+        final int i;
+        if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+          i=((Number)val).intValue();
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(int)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((double)(f=(float)val)!=(double)(i=(int)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(int)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          i=(char)val;
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(i);
+    #ELSEIF OfLong
+        final long l;
+        if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+          l=((Number)val).longValue();
+        }else if(val instanceof Float){
+          final float f;
+          if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          l=(char)val;
+        }else if(val instanceof Boolean){
+          l=TypeUtil.castToLong((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        #MACRO ReturnUncheckedQuery(l);
+    #ELSEIF OfFloat
+        if(val instanceof Float){
+          final float f;
+          if((f=(float)val)==f){
+             #MACRO ReturnUncheckedQueryBits($convertToBits$(f))
+          }
+          #MACRO ReturnUncheckedQueryNaN()
+        }else if(val instanceof Double){
+          final double d;
+          final float f;
+          if((d=(double)val)==(f=(float)d)){
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(f))
+          }else if(f!=f){
+            #MACRO ReturnUncheckedQueryNaN()
+          }else{
+            break returnFalse;
+          }
+        }else if(val instanceof Integer){
+          final int i;
+          if((i=(int)val)!=0){
+            if(!TypeUtil.checkCastToFloat(i)){
+              break returnFalse;
+            }
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=0){
+            if(!TypeUtil.checkCastToFloat(l)){
+              break returnFalse;
+            }
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(l))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Short||val instanceof Byte){
+          final int i;
+          if((i=((Number)val).shortValue())!=0){
+   
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Character){
+          final int i;
+          if((i=(char)val)!=0){
+   
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Boolean){
+          if((boolean)val){
+            #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else{
+          break returnFalse;
+        }
+    #ELSE
+        if(val instanceof Double){
+          final double d;
+          if((d=(double)val)==d){
+             #MACRO ReturnUncheckedQueryBits($convertToBits$(d))
+          }
+          #MACRO ReturnUncheckedQueryNaN()
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)==f){
+             #MACRO ReturnUncheckedQueryBits($convertToBits$(f))
+          }
+          #MACRO ReturnUncheckedQueryNaN()
+        }else if(val instanceof Integer|| val instanceof Short||val instanceof Byte){
+          final int i;
+          if((i=((Number)val).intValue())!=0){
+   
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=0){
+            if(!TypeUtil.checkCastToDouble(l)){
+              break returnFalse;
+            }
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(l))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Character){
+          final int i;
+          if((i=(char)val)!=0){
+   
+            #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else if(val instanceof Boolean){
+          if((boolean)val){
+            #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
+          }
+          #MACRO ReturnUncheckedQuery0()
+        }else{
+          break returnFalse;
+        }
+    #ENDIF
+      }
+  #ENDIF
+  
+  //#ELSE
+  //    if(val instanceof $BoxedType$)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final $ArrayType$ v;
+  //      if((v=($ArrayType$)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery($queryCastRef$(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
+    
+    }
+  }finally{
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
   #MACRO QueryReturnNegative()
 }
 #ENDDEF
@@ -2648,20 +3461,14 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryNonNull<METHODNAME,STRUC
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMENonNull(size,VAL);
   #ELSE
-final int modCount=this.modCount;
-final var root=this.root;
-try{
     #IFSWITCH METHODNAME==contains
-  final int rootOffset;
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
     #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf,
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(root.arr,this.rootOffset,size,VAL);
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(root.arr,this.rootOffset,size,VAL);
     #ELSE
 ERROR unknown method METHODNAME for ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL)
     #ENDIF
-}finally{
-  CheckedCollection.checkModCount(modCount,root.modCount);
-}
   #ENDIF
 #ELSE
 ERROR unknown struct STRUCTNAME for ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL)
@@ -2734,8 +3541,6 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryNull<METHODNAME,STRUCTNA
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMENull(size);
   #ELSE
-final CheckedList$<E>$ root;
-CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
 final int rootOffset;
 return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
@@ -2789,8 +3594,6 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAM
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMENaN(size);
   #ELSE
-final CheckedList$<E>$ root;
-CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
 final int rootOffset;
 return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
@@ -2844,8 +3647,6 @@ ERROR unknown method METHODNAME for ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAME0(size);
   #ELSE
-final CheckedList$<E>$ root;
-CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
 final int rootOffset;
 return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
@@ -2899,8 +3700,6 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryBits<METHODNAME,STRUCTNA
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMEBits(size,VAL);
   #ELSE
-final CheckedList$<E>$ root;
-CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
 final int rootOffset;
 return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
@@ -2954,9 +3753,7 @@ ERROR unknown method METHODNAME for ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAME(size,VAL);
   #ELSE
-final int modCount=this.modCount;
-final var root=this.root;
-try{
+
     #IFSWITCH METHODNAME==contains
   final int rootOffset;
   return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
@@ -2965,9 +3762,7 @@ try{
     #ELSE
 ERROR unknown method METHODNAME for ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL)
     #ENDIF
-}finally{
-  CheckedCollection.checkModCount(modCount,root.modCount);
-}
+
   #ENDIF
 #ELSE
 ERROR unknown struct STRUCTNAME for ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL)

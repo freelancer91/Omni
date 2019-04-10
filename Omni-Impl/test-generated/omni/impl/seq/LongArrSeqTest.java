@@ -2922,6 +2922,41 @@ public class LongArrSeqTest{
       }
       verifyItr.verifyPostAlloc(preModScenario);
     }
+    @org.junit.jupiter.api.Test
+    public void testtoString_void(){
+      gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoString_voidHelper((LongSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+        );
+      });
+    }
+    private static void testtoString_voidHelper
+    (LongSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+    ){
+      int numToAdd=seqContentsScenario.nonEmpty?100:0;
+      {
+        for(int i=0;i<numToAdd;++i){
+          seqMonitor.add(i);
+        }
+      }
+      seqMonitor.illegalAdd(preModScenario);
+      if(preModScenario.expectedException==null){
+        {
+          var resultStr=seqMonitor.seq.toString();
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+          var itr=seqMonitor.seq.iterator();
+          var arrList=new ArrayList<Object>();
+          for(int i=0;i<numToAdd;++i){
+            arrList.add(itr.next());
+          }
+          Assertions.assertEquals(arrList.toString(),resultStr);
+        }
+      }else{
+        Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toString());
+        verifyThrowCondition(seqMonitor,numToAdd,preModScenario
+        );
+      }
+      seqMonitor.verifyStructuralIntegrity();
+    }
       private static final int MAX_TOSTRING_LENGTH=20;
     static Stream<Arguments> getMASSIVEtoString_voidArgs(){
       Stream.Builder<Arguments> builder=Stream.builder();
@@ -2997,41 +3032,6 @@ public class LongArrSeqTest{
         Assertions.fail(e);
       }
       verifyItr.skip(seqSize).verifyPostAlloc(1);
-    }
-    @org.junit.jupiter.api.Test
-    public void testtoString_void(){
-      gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoString_voidHelper((LongSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
-        );
-      });
-    }
-    private static void testtoString_voidHelper
-    (LongSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
-    ){
-      int numToAdd=seqContentsScenario.nonEmpty?100:0;
-      {
-        for(int i=0;i<numToAdd;++i){
-          seqMonitor.add(i);
-        }
-      }
-      seqMonitor.illegalAdd(preModScenario);
-      if(preModScenario.expectedException==null){
-        {
-          var resultStr=seqMonitor.seq.toString();
-          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
-          var itr=seqMonitor.seq.iterator();
-          var arrList=new ArrayList<Object>();
-          for(int i=0;i<numToAdd;++i){
-            arrList.add(itr.next());
-          }
-          Assertions.assertEquals(arrList.toString(),resultStr);
-        }
-      }else{
-        Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toString());
-        verifyThrowCondition(seqMonitor,numToAdd,preModScenario
-        );
-      }
-      seqMonitor.verifyStructuralIntegrity();
     }
   static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
     for(var checkedType:CheckedType.values()){

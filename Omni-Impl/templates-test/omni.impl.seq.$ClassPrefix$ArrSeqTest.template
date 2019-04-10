@@ -121,6 +121,7 @@ public class $ClassPrefix$ArrSeqTest{
   #MACRO testListItrset_val<PARALLEL>()
   #MACRO testListItradd_val<PARALLEL>()
   #MACRO testtoString_void<PARALLEL>()
+  #MACRO testMASSIVEtoString_void<PARALLEL>()
 #ENDDEF
 
 #MACRODEF testConstructor_int<PARALLEL>()
@@ -1992,6 +1993,36 @@ public void testcontains_val
 #ENDIF
     {
 #IFNOT OfRef
+  #IF OfByte,OfChar,OfShort
+    #IF OfChar
+      case Byteneg1:
+      case Shortneg1:
+      case Integerneg1:
+      case ShortMIN_BYTE_MINUS1:
+      case IntegerMIN_BYTE_MINUS1:
+    #ENDIF      
+    #IF OfByte
+      case CharacterMAX_BYTE_PLUS1:
+      case CharacterMAX_SHORT_PLUS1:
+      case ShortMAX_BYTE_PLUS1:
+      case ShortMIN_BYTE_MINUS1:
+      case IntegerMAX_BYTE_PLUS1:
+      case IntegerMIN_BYTE_MINUS1:
+      case IntegerMAX_SHORT_PLUS1:
+    #ENDIF
+    #IF OfShort
+      case CharacterMAX_SHORT_PLUS1:
+      case IntegerMAX_SHORT_PLUS1:
+    #ENDIF
+      case IntegerMIN_SHORT_MINUS1:
+      case IntegerMAX_CHAR_PLUS1:
+      case IntegerMAX_SAFE_INT_PLUS1:
+      case IntegerMIN_SAFE_INT_MINUS1:
+      if(preModScenario.expectedException!=null && queryCastType==QueryCastType.ToObject){
+        Assertions.assertThrows(preModScenario.expectedException,()->argType.invokecontains(seqMonitor,queryCastType));
+        break;
+      }
+  #ENDIF
       case Booleannull:
       case Bytenull:
       case Characternull:
@@ -2171,6 +2202,36 @@ public void testindexOf_val
 #ENDIF
     {
 #IFNOT OfRef
+  #IF OfByte,OfChar,OfShort
+    #IF OfChar
+      case Byteneg1:
+      case Shortneg1:
+      case Integerneg1:
+      case ShortMIN_BYTE_MINUS1:
+      case IntegerMIN_BYTE_MINUS1:
+    #ENDIF      
+    #IF OfByte
+      case CharacterMAX_BYTE_PLUS1:
+      case CharacterMAX_SHORT_PLUS1:
+      case ShortMAX_BYTE_PLUS1:
+      case ShortMIN_BYTE_MINUS1:
+      case IntegerMAX_BYTE_PLUS1:
+      case IntegerMIN_BYTE_MINUS1:
+      case IntegerMAX_SHORT_PLUS1:
+    #ENDIF
+    #IF OfShort
+      case CharacterMAX_SHORT_PLUS1:
+      case IntegerMAX_SHORT_PLUS1:
+    #ENDIF
+      case IntegerMIN_SHORT_MINUS1:
+      case IntegerMAX_CHAR_PLUS1:
+      case IntegerMAX_SAFE_INT_PLUS1:
+      case IntegerMIN_SAFE_INT_MINUS1:
+      if(preModScenario.expectedException!=null && queryCastType==QueryCastType.ToObject){
+        Assertions.assertThrows(preModScenario.expectedException,()->argType.invokecontains(seqMonitor,queryCastType));
+        break;
+      }
+  #ENDIF
       case Booleannull:
       case Bytenull:
       case Characternull:
@@ -2353,6 +2414,36 @@ public void testlastIndexOf_val
 #ENDIF
     {
 #IFNOT OfRef
+  #IF OfByte,OfChar,OfShort
+    #IF OfChar
+      case Byteneg1:
+      case Shortneg1:
+      case Integerneg1:
+      case ShortMIN_BYTE_MINUS1:
+      case IntegerMIN_BYTE_MINUS1:
+    #ENDIF      
+    #IF OfByte
+      case CharacterMAX_BYTE_PLUS1:
+      case CharacterMAX_SHORT_PLUS1:
+      case ShortMAX_BYTE_PLUS1:
+      case ShortMIN_BYTE_MINUS1:
+      case IntegerMAX_BYTE_PLUS1:
+      case IntegerMIN_BYTE_MINUS1:
+      case IntegerMAX_SHORT_PLUS1:
+    #ENDIF
+    #IF OfShort
+      case CharacterMAX_SHORT_PLUS1:
+      case IntegerMAX_SHORT_PLUS1:
+    #ENDIF
+      case IntegerMIN_SHORT_MINUS1:
+      case IntegerMAX_CHAR_PLUS1:
+      case IntegerMAX_SAFE_INT_PLUS1:
+      case IntegerMIN_SAFE_INT_MINUS1:
+      if(preModScenario.expectedException!=null && queryCastType==QueryCastType.ToObject){
+        Assertions.assertThrows(preModScenario.expectedException,()->argType.invokecontains(seqMonitor,queryCastType));
+        break;
+      }
+  #ENDIF
       case Booleannull:
       case Bytenull:
       case Characternull:
@@ -4515,9 +4606,7 @@ for(int i=0;i<seqSize;){
       verifyItr.verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
     }
   }
-
-
-#MACRODEF testtoString_void<PARALLEL>()
+#MACRODEF testMASSIVEtoString_void<PARALLEL>()
 #IF OfBoolean
   private static final int MAX_TOSTRING_LENGTH=5;
 #ELSEIF OfByte
@@ -4621,6 +4710,9 @@ public void testMASSIVEtoString_void
 }
 #ENDIF
 
+#ENDDEF
+
+#MACRODEF testtoString_void<PARALLEL>()
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
 public void testtoString_void(){

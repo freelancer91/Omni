@@ -2169,6 +2169,234 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable
       }
     }
     @Override
+    public boolean removeVal(boolean val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(int val)
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(long val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(float val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(double val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+      }
+      return false;
+    }
+    @Override
+    public boolean remove(Object val)
+    {
+      //TODO refactor this to reduce the calls to check mod count
+      final int size;
+      if((size=this.size)!=0){
+        if(val!=null){
+          return this.uncheckedremoveValNonNull(size,val);
+        }
+        return this.uncheckedremoveValNull(size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(byte val)
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(char val)
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(short val)
+    {
+      {
+        final int size;
+        if((size=this.size)!=0)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Boolean val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Byte val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((byte)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Character val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((char)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Short val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((short)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Integer val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((int)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Long val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((long)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Float val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((float)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
+    public boolean removeVal(Double val)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=null)
+        {
+          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((double)(val)));
+        }
+        return this.uncheckedremoveValNull(size);
+      }
+      return false;
+    }
+    @Override
     public boolean contains(boolean val)
     {
       final int size;
@@ -2419,234 +2647,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable
         }
         final int rootOffset;
         return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-      }
-      return false;
-    }
-    @Override
-    public boolean remove(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-        if(val!=null){
-          return this.uncheckedremoveValNonNull(size,val);
-        }
-        return this.uncheckedremoveValNull(size);
-    //#ELSE
-    //    if(val instanceof E)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final Object v;
-    //      if((v=(Object)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(byte val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(char val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(short val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred(val));
-        }
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Byte val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((byte)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Character val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((char)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Short val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((short)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Integer val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((int)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((long)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((float)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
-      }
-      return false;
-    }
-    @Override
-    public boolean removeVal(Double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((double)(val)));
-        }
-        return this.uncheckedremoveValNull(size);
       }
       return false;
     }
@@ -4769,397 +4769,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable
       }
     }
     @Override
-    public boolean contains(boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int rootOffset;
-          return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(int val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int rootOffset;
-          return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int rootOffset;
-          return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          final int rootOffset;
-          return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Object val)
-    {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-        if(val!=null){
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontainsNonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-    //#ELSE
-    //    if(val instanceof E)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final Object v;
-    //      if((v=(Object)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(byte val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(char val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(short val)
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((boolean)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Byte val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((byte)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Character val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((char)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Short val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((short)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Integer val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((int)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((long)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((float)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
-    public boolean contains(Double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((double)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        final int rootOffset;
-        return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override
     public boolean removeVal(boolean val)
     {
       final int size;
@@ -5405,733 +5014,998 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable
       return false;
     }
     @Override
-    public int indexOf(boolean val)
+    public boolean contains(boolean val)
     {
-      final int size;
-      if((size=this.size)!=0)
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            final int rootOffset;
+            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(int val)
+    {
       {
         final int modCount=this.modCount;
         final var root=this.root;
         try{
-          return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
+          final int size;
+          if((size=this.size)!=0)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+          }
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public boolean contains(long val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            final int rootOffset;
+            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(float val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            final int rootOffset;
+            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(double val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            final int rootOffset;
+            return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Object val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        //TODO refactor this to reduce the calls to check mod count
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null){
+            final int rootOffset;
+            return OmniArray.OfRef.uncheckedcontainsNonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,val);
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+      //#ELSE
+      //    if(val instanceof E)
+      //    {
+      //  #IF OfDouble,OfFloat
+      //      final Object v;
+      //      if((v=(Object)val)==v)
+      //      {
+      //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+      //      }
+      //      #MACRO ReturnUncheckedQueryNaN()
+      //  #ELSE
+      //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+      //  #ENDIF
+      //    }
+      //#ENDIF
+        }
+      }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      return false;
+    }
+    @Override
+    public boolean contains(Boolean val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((boolean)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Byte val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((byte)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Character val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((char)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Short val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((short)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Integer val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((int)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Long val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((long)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Float val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((float)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(Double val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((double)(val)));
+          }
+          final int rootOffset;
+          return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(byte val)
+    {
+      {
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(char val)
+    {
+      {
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+          }
+        }
+        finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean contains(short val)
+    {
+      {
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              final int rootOffset;
+              return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
+          }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }
+      return false;
+    }
+    @Override
+    public int indexOf(boolean val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
       return -1;
     }
     @Override
     public int indexOf(int val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int indexOf(long val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int indexOf(float val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int indexOf(double val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int indexOf(Object val)
     {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-        if(val!=null){
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        //TODO refactor this to reduce the calls to check mod count
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null){
             return OmniArray.OfRef.uncheckedindexOfNonNull(root.arr,this.rootOffset,size,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
           }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+      //#ELSE
+      //    if(val instanceof E)
+      //    {
+      //  #IF OfDouble,OfFloat
+      //      final Object v;
+      //      if((v=(Object)val)==v)
+      //      {
+      //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+      //      }
+      //      #MACRO ReturnUncheckedQueryNaN()
+      //  #ELSE
+      //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+      //  #ENDIF
+      //    }
+      //#ENDIF
         }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-    //#ELSE
-    //    if(val instanceof E)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final Object v;
-    //      if((v=(Object)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
+      }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      return -1;
+    }
+    @Override
+    public int indexOf(Boolean val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
+      return -1;
+    }
+    @Override
+    public int indexOf(Byte val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int indexOf(Character val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int indexOf(Short val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int indexOf(Integer val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int indexOf(Long val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int indexOf(Float val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int indexOf(Double val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
+          }
+          return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
       return -1;
     }
     @Override
     public int indexOf(byte val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int indexOf(char val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
         }
+        finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int indexOf(short val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Byte val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Character val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Short val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Integer val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int indexOf(Double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(boolean val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(int val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(long val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(float val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(double val)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0)
+        {
+            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
         }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(Object val)
     {
-      //TODO refactor this to reduce the calls to check mod count
-      final int size;
-      if((size=this.size)!=0){
-        if(val!=null){
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        //TODO refactor this to reduce the calls to check mod count
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null){
             return OmniArray.OfRef.uncheckedlastIndexOfNonNull(root.arr,this.rootOffset,size,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
           }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+      //#ELSE
+      //    if(val instanceof E)
+      //    {
+      //  #IF OfDouble,OfFloat
+      //      final Object v;
+      //      if((v=(Object)val)==v)
+      //      {
+      //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+      //      }
+      //      #MACRO ReturnUncheckedQueryNaN()
+      //  #ELSE
+      //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+      //  #ENDIF
+      //    }
+      //#ENDIF
         }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-    //#ELSE
-    //    if(val instanceof E)
-    //    {
-    //  #IF OfDouble,OfFloat
-    //      final Object v;
-    //      if((v=(Object)val)==v)
-    //      {
-    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-    //      }
-    //      #MACRO ReturnUncheckedQueryNaN()
-    //  #ELSE
-    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
-    //  #ENDIF
-    //    }
-    //#ENDIF
+      }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Boolean val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Byte val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Character val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Short val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Integer val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Long val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Float val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return -1;
+    }
+    @Override
+    public int lastIndexOf(Double val)
+    {
+      final int modCount=this.modCount;
+      final var root=this.root;
+      try{
+        final int size;
+        if((size=this.size)!=0){
+          if(val!=null)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
+          }
+          return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+        }
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
       return -1;
     }
     @Override
     public int lastIndexOf(byte val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(char val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
         }
+        finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     @Override
     public int lastIndexOf(short val)
     {
       {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          final int size;
+          if((size=this.size)!=0)
+          {
+              return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           }
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Boolean val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Byte val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Character val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Short val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Integer val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Long val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Float val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return -1;
-    }
-    @Override
-    public int lastIndexOf(Double val)
-    {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final CheckedList<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
     }
     private boolean uncheckedremoveValNonNull(int size,Object nonNull)

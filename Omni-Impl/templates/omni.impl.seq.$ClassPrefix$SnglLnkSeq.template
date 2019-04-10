@@ -9,22 +9,38 @@
 #TYPEDEF OfRef
 package omni.impl.seq;
 import omni.api.OmniCollection;
-
-public abstract $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Cloneable
-{
+#IFNOT OfRef,OfDouble,OfChar
+import omni.util.ToStringUtil;
+#ENDIF
+import omni.util.OmniArray;
+import java.util.function.Consumer;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Consumer;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Consumer;
+#ENDIF
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
+#IF OfRef
+import java.util.Objects;
+#ELSE
+import omni.util.TypeUtil;
+#ENDIF
+public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Cloneable{
   static class Node$<E>${
     transient $exposedType$ val;
     transient Node$<E>$ next;
     Node($exposedType$ val){
       this.val=val;
     }
-    Node($exposedType$ val,$Node$<E>$ next){
+    Node($exposedType$ val,Node$<E>$ next){
       this.val=val;
       this.next=next;
     }
     private int uncheckedHashCode(){
       int hash=31+$hashCodeMethod$(val);
-      for(var curr=next:curr!=null;curr=curr.next){
+      for(var curr=next;curr!=null;curr=curr.next){
         hash=(hash*31)+$hashCodeMethod$(curr.val);
       }
       return hash;
@@ -52,23 +68,23 @@ public abstract $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassP
     private int uncheckedToString(byte[] buffer){
       int bufferOffset=1;
       for(var curr=this;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
-#IF OfByte
+  #IF OfByte
         bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
-#ELSE
-        bufferOffset=ToStringUtil.getString$ClassPrefix$(curr.val,buffer,bufferOffset);
-#ENDIF
+  #ELSE
+        bufferOffset=ToStringUtil.getString$TypeNameModifier$(curr.val,buffer,bufferOffset);
+  #ENDIF
         if((curr=curr.next)==null){
-          return;
+          return bufferOffset;
         }
       }
     }
     private void uncheckedToString(ToStringUtil.OmniStringBuilderByte builder){
       //TODO
       for(var curr=this;;builder.uncheckedAppendCommaAndSpace()){
-  #IFSWITCH CLASSPREFIX==Byte
+  #IF OfByte
         builder.uncheckedAppendShort(curr.val);
   #ELSE
-        builder.uncheckedAppendCLASSPREFIX(curr.val);
+        builder.uncheckedAppend$TypeNameModifier$(curr.val);
   #ENDIF
         if((curr=curr.next)==null){
           return;
@@ -84,11 +100,33 @@ public abstract $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassP
         }
       }
     }
+    #MACRO UncheckedToArrayImpl($ArrayType$,)
+#IFNOT OfRef
+    #MACRO UncheckedToArrayImpl(Object,)
+    #MACRO UncheckedToArrayImpl($BoxedType$,)
+  #IFNOT OfDouble
+    #MACRO UncheckedToArrayImpl(double,$castToDouble$)
+    #IFNOT OfFloat
+    #MACRO UncheckedToArrayImpl(float,$castToFloat$)
+      #IFNOT OfLong
+    #MACRO UncheckedToArrayImpl(long,$castToLong$)
+        #IFNOT OfInt
+    #MACRO UncheckedToArrayImpl(int,$castToInt$)
+          #IFNOT OfShort,OfChar
+    #MACRO UncheckedToArrayImpl(short,$castToShort$)
+            #IFNOT OfByte
+    #MACRO UncheckedToArrayImpl(byte,$castToByte$)
+    #MACRO UncheckedToArrayImpl(char,$castToChar$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
   }
-
   transient int size;
   transient Node$<E>$ head;
-
   private $ClassPrefix$SnglLnkSeq(){
   }
   private $ClassPrefix$SnglLnkSeq(int size,Node$<E>$ head){
@@ -159,9 +197,6 @@ public abstract $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassP
     }
     return "[]";
   }
-  
-  //TODO contains
-  //TODO removeVal
   @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
     final Node$<E>$ head;
     if((head=this.head)!=null){
@@ -169,15 +204,129 @@ public abstract $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassP
     }
   }
 #IFNOT OfRef
-  @Override public void forEach(Consumer<? super $BoxedType$ action){
+  @Override public void forEach(Consumer<? super $BoxedType$> action){
     final Node$<E>$ head;
     if((head=this.head)!=null){
       head.uncheckedForEach(action::accept);
     }
   }
 #ENDIF
-  //TODO push methods
-  //TODO toArray methods
+  public void push($exposedType$ val){
+    this.head=new Node$<E>$(val,this.head);
+    ++this.size;
+  }
+  @Override public boolean add($exposedType$ val){
+    push(val);
+    return true;
+  }
+#IFNOT OfRef
+  @Override
+  public boolean add($BoxedType$ val)
+  {
+    push(($exposedType$)val);
+    return true;
+  }
+  #IFNOT OfBoolean
+  @Override
+  public boolean add(boolean val)
+  {
+    push(($exposedType$)$queryCastBoolean$(val));
+    return true;
+  }
+  #ENDIF
+#ENDIF
+#IF OfDouble,OfFloat,OfLong
+  @Override
+  public boolean add(int val)
+  {
+    push(($exposedType$)val);
+    return true;
+  }
+  #IFNOT OfLong
+  @Override
+  public boolean add(char val)
+  {
+    push(($exposedType$)val);
+    return true;
+  }
+  @Override
+  public boolean add(short val)
+  {
+    push(($exposedType$)val);
+    return true;
+  }
+  @Override
+  public boolean add(long val)
+  {
+    push(($exposedType$)val);
+    return true;
+  }
+    #IFNOT OfFloat
+  @Override
+  public boolean add(float val)
+  {
+    push(($exposedType$)val);
+    return true;
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
+  @Override public <T> T[] toArray(T[] arr){
+    final Node$<E>$ head;
+    if((head=this.head)!=null){
+      head.uncheckedCopyInto(arr=OmniArray.uncheckedArrResize(size,arr));
+    }else{
+      arr[0]=null;
+    }
+    return arr;
+  }
+  #MACRO ToArrayImpl($ArrayType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
+#IFNOT OfRef
+  #MACRO ToArrayImpl($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
+  #IFNOT OfDouble
+  #MACRO ToArrayImpl(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
+    #IFNOT OfFloat
+  #MACRO ToArrayImpl(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
+      #IFNOT OfLong
+  #MACRO ToArrayImpl(long,OmniArray.OfLong.DEFAULT_ARR,Long)
+        #IFNOT OfInt
+  #MACRO ToArrayImpl(int,OmniArray.OfInt.DEFAULT_ARR,Int)
+          #IFNOT OfShort,OfChar
+  #MACRO ToArrayImpl(short,OmniArray.OfShort.DEFAULT_ARR,Short)
+            #IFNOT OfByte
+  #MACRO ToArrayImpl(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
+  #MACRO ToArrayImpl(char,OmniArray.OfChar.DEFAULT_ARR,Char)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  //TODO contains
+  //TODO removeVal
   //TODO removeIf methods
   //TODO etc
 }
+#MACRODEF ToArrayImpl(DSTARR,DEFAULTARR,CLASSPREFIX)
+@Override public DSTARR[] toCLASSPREFIXArray(){
+  final Node$<E>$ head;
+  if((head=this.head)!=null){
+    final DSTARR[] dst;
+    head.uncheckedCopyInto(dst=new DSTARR[this.size]);
+    return dst;
+  }
+  return DEFAULTARR;
+}
+#ENDDEF
+#MACRODEF UncheckedToArrayImpl(DSTARR,CAST)
+private void uncheckedCopyInto(DSTARR[] dst){
+  int dstOffset=0;
+  for(var curr=this;;++dstOffset){
+    dst[dstOffset]=CAST(curr.val);
+    if((curr=curr.next)==null){
+      return;
+    }
+  }
+}
+#ENDDEF

@@ -1499,6 +1499,19 @@ public class CharArrSeqTest{
       }else{
         switch(argType)
         {
+          case Byteneg1:
+          case Shortneg1:
+          case Integerneg1:
+          case ShortMIN_BYTE_MINUS1:
+          case IntegerMIN_BYTE_MINUS1:
+          case IntegerMIN_SHORT_MINUS1:
+          case IntegerMAX_CHAR_PLUS1:
+          case IntegerMAX_SAFE_INT_PLUS1:
+          case IntegerMIN_SAFE_INT_MINUS1:
+          if(preModScenario.expectedException!=null && queryCastType==QueryCastType.ToObject){
+            Assertions.assertThrows(preModScenario.expectedException,()->argType.invokecontains(seqMonitor,queryCastType));
+            break;
+          }
           case Booleannull:
           case Bytenull:
           case Characternull:
@@ -1557,6 +1570,19 @@ public class CharArrSeqTest{
       }else{
         switch(argType)
         {
+          case Byteneg1:
+          case Shortneg1:
+          case Integerneg1:
+          case ShortMIN_BYTE_MINUS1:
+          case IntegerMIN_BYTE_MINUS1:
+          case IntegerMIN_SHORT_MINUS1:
+          case IntegerMAX_CHAR_PLUS1:
+          case IntegerMAX_SAFE_INT_PLUS1:
+          case IntegerMIN_SAFE_INT_MINUS1:
+          if(preModScenario.expectedException!=null && queryCastType==QueryCastType.ToObject){
+            Assertions.assertThrows(preModScenario.expectedException,()->argType.invokecontains(seqMonitor,queryCastType));
+            break;
+          }
           case Booleannull:
           case Bytenull:
           case Characternull:
@@ -1611,6 +1637,19 @@ public class CharArrSeqTest{
       }else{
         switch(argType)
         {
+          case Byteneg1:
+          case Shortneg1:
+          case Integerneg1:
+          case ShortMIN_BYTE_MINUS1:
+          case IntegerMIN_BYTE_MINUS1:
+          case IntegerMIN_SHORT_MINUS1:
+          case IntegerMAX_CHAR_PLUS1:
+          case IntegerMAX_SAFE_INT_PLUS1:
+          case IntegerMIN_SAFE_INT_MINUS1:
+          if(preModScenario.expectedException!=null && queryCastType==QueryCastType.ToObject){
+            Assertions.assertThrows(preModScenario.expectedException,()->argType.invokecontains(seqMonitor,queryCastType));
+            break;
+          }
           case Booleannull:
           case Bytenull:
           case Characternull:
