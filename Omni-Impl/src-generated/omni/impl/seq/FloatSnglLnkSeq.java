@@ -11,19 +11,39 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
-import omni.util.HashUtil;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.impl.AbstractFloatItr;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.util.FloatSnglLnkNode;
-public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneable{
+import java.io.Externalizable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.IOException;
+public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneable,Externalizable{
+  private static final long serialVersionUID=1L;
   transient int size;
   transient FloatSnglLnkNode head;
   private FloatSnglLnkSeq(){
   }
-  private FloatSnglLnkSeq(int size,FloatSnglLnkNode head){
+  private FloatSnglLnkSeq(FloatSnglLnkNode head,int size){
     this.size=size;
     this.head=head;
+  }
+  @Override public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int size;
+    out.writeInt(size=this.size);
+    if(size!=0)
+    {
+      var curr=this.head;
+      do
+      {
+        out.writeFloat(curr.val);
+      }
+      while((curr=curr.next)!=null);
+    }
   }
   @Override public abstract Object clone();
   @Override public int size(){
@@ -599,13 +619,43 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     }
     return false;
   }
+  public float peekFloat(){
+    final FloatSnglLnkNode head;
+    if((head=this.head)!=null){
+      return (float)(head.val);
+    }
+    return Float.NaN;
+  }
+  public Float peek(){
+    final FloatSnglLnkNode head;
+    if((head=this.head)!=null){
+      return (Float)(head.val);
+    }
+    return null;
+  }
+  public double peekDouble(){
+    final FloatSnglLnkNode head;
+    if((head=this.head)!=null){
+      return (double)(head.val);
+    }
+    return Double.NaN;
+  }
   abstract boolean uncheckedremoveIf(FloatSnglLnkNode head,FloatPredicate filter);
   public static class CheckedStack extends UncheckedStack{
+    private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedStack(){
     }
-    private CheckedStack(int size,FloatSnglLnkNode head){
-      super(size,head);
+    CheckedStack(FloatSnglLnkNode head,int size){
+      super(head,size);
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      int modCount=this.modCount;
+      try{
+        super.writeExternal(out);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
     }
     @Override public void push(float val){
       ++this.modCount;
@@ -627,7 +677,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       if((head=this.head)!=null){
         final CheckedStack clone;
         FloatSnglLnkNode newHead;
-        for(clone=new CheckedStack(this.size,newHead=new FloatSnglLnkNode(head.val));(head=head.next)!=null;newHead=newHead.next=new FloatSnglLnkNode(head.val)){}
+        for(clone=new CheckedStack(newHead=new FloatSnglLnkNode(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new FloatSnglLnkNode(head.val)){}
         return clone;
       }
       return new CheckedStack();
@@ -636,20 +686,11 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       FloatSnglLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        var ret=head.val;
         this.head=head.next;
         --this.size;
-        return ret;
+        return head.val;
       }
       throw new NoSuchElementException();
-    }
-    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
-      ModCountChecker(int modCount){
-        super(modCount);
-      }
-      @Override protected int getActualModCount(){
-        return CheckedStack.this.modCount;
-      }
     }
     @Override public void forEach(FloatConsumer action){
       final FloatSnglLnkNode head;
@@ -683,17 +724,43 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         }
       });
     }
+    private int removeIfHelper(FloatSnglLnkNode prev,FloatPredicate filter,int numLeft,int modCount)
+    {
+      if(numLeft!=0)
+      {
+        int numSurvivors;
+        if(numLeft>64)
+        {
+          long[] survivorSet;
+          numSurvivors=FloatSnglLnkNode.markSurvivors(prev.next,filter,survivorSet=BitSetUtil.getBitSet(numLeft));
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=numSurvivors)!=0)
+          {
+            FloatSnglLnkNode.pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+          }
+        }
+        else
+        {
+          long survivorWord=FloatSnglLnkNode.markSurvivors(prev.next,filter);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
+          {
+            FloatSnglLnkNode.pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
+          }
+        }
+        return numSurvivors;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return 0;
+    }
     @Override boolean uncheckedremoveIf(FloatSnglLnkNode head,FloatPredicate filter){
       final int modCount=this.modCount;
-      try
-      {
-        int numLeft=this.size-1;
+      try{
+        int numLeft=this.size;
         if(filter.test(head.val)){
-          while((head=head.next)!=null){
-            --numLeft;
-            if(!filter.test(head.val)){
-              //TODO
-              //this.size=FloatSnglLnkNode.retainSurvivors(head,filter,new ModCountChecker(modCount),numLeft);
+          while(--numLeft!=0){
+            if(!filter.test((head=head.next).val)){
+              this.size=1+removeIfHelper(head,filter,--numLeft,modCount);
               this.modCount=modCount+1;
               this.head=head;
               return true;
@@ -705,27 +772,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
           this.size=0;
           return true;
         }else{
-          FloatSnglLnkNode prev;
-          for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
-            --numLeft;
-            if(filter.test(head.val)){
-              //TODO
-              //this.size=numSurvivors+FloatSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter,new ModCountChecker(modCount),numLeft);
-              this.modCount=modCount+1;
-              return true;
-            }
+          int numSurvivors;
+          if(--numLeft!=(numSurvivors=removeIfHelper(head,filter,numLeft,modCount))){
+            this.modCount=modCount+1;
+            this.size=1+numSurvivors;
+            return true;
           }
         }
-      }
-      catch(ConcurrentModificationException e)
-      {
+      }catch(ConcurrentModificationException e){
         throw e;
-      }
-      catch(RuntimeException e)
-      {
+      }catch(RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
-      CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
     @Override public float pollFloat(){
@@ -763,76 +821,74 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     }
     @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
       ,int bits
-      ){
-        if(bits==Float.floatToRawIntBits(head.val)){
-          this.head=head.next;
-        }else{
-          FloatSnglLnkNode prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(bits!=Float.floatToRawIntBits(head.val));
-          }
-          prev.next=head.next;
+    )
+    {
+      if(bits==Float.floatToRawIntBits(head.val)){
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(bits!=Float.floatToRawIntBits(head.val));
         }
-        this.modCount=modCount+1;
-        --this.size;
-        return true;
+        prev.next=head.next;
       }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
     @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
-      ){
-        if(0==(head.val)){
-          this.head=head.next;
-        }else{
-          FloatSnglLnkNode prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(0!=(head.val));
-          }
-          prev.next=head.next;
+    )
+    {
+      if(0==(head.val)){
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(0!=(head.val));
         }
-        this.modCount=modCount+1;
-        --this.size;
-        return true;
+        prev.next=head.next;
       }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
     @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
-      ){
-        if(Float.isNaN(head.val)){
-          this.head=head.next;
-        }else{
-          FloatSnglLnkNode prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(!Float.isNaN(head.val));
-          }
-          prev.next=head.next;
+    )
+    {
+      if(Float.isNaN(head.val)){
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(!Float.isNaN(head.val));
         }
-        this.modCount=modCount+1;
-        --this.size;
-        return true;
+        prev.next=head.next;
       }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
     @Override public OmniIterator.OfFloat iterator(){
       return new Itr(this);
     }
-    private static class Itr
-      extends AbstractFloatItr
-    {
-      transient final CheckedStack parent;
+    private static class Itr extends AbstractItr{
+      final CheckedStack parent;
       transient int modCount;
-      transient FloatSnglLnkNode prev;
-      transient FloatSnglLnkNode curr;
-      transient FloatSnglLnkNode next;
       Itr(CheckedStack parent){
+        super(parent.head);
         this.parent=parent;
-        this.next=parent.head;
         this.modCount=parent.modCount;
       }
       @Override public float nextFloat(){
@@ -846,10 +902,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         }
         throw new NoSuchElementException();
       }
-      @Override public boolean hasNext(){
-        return next!=null;
-      }
-      private void uncheckedForEachRemaining(FloatSnglLnkNode next,FloatConsumer action){
+      @Override void uncheckedForEachRemaining(FloatSnglLnkNode next,FloatConsumer action){
         final int modCount=this.modCount;
         FloatSnglLnkNode prev,curr;
         try{
@@ -859,23 +912,11 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
             prev=curr;
           }while((next=(curr=next).next)!=null);
         }finally{
-          CheckedCollection.checkModCount(modCount,parent.modCount);
+          CheckedCollection.checkModCount(modCount,this.parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
         this.next=null;
-      }
-      @Override public void forEachRemaining(FloatConsumer action){
-        final FloatSnglLnkNode next;
-        if((next=this.next)!=null){
-          uncheckedForEachRemaining(next,action);
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Float> action){
-        final FloatSnglLnkNode next;
-        if((next=this.next)!=null){
-          uncheckedForEachRemaining(next,action::accept);
-        }
       }
       @Override public void remove(){
         final FloatSnglLnkNode prev;
@@ -885,6 +926,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
+          --parent.size;
           if(prev==null){
             parent.head=next;
           }else{
@@ -898,10 +940,21 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     }
   }
   public static class UncheckedStack extends FloatSnglLnkSeq implements OmniStack.OfFloat{
+    private static final long serialVersionUID=1L;
     public UncheckedStack(){
     }
-    private UncheckedStack(int size,FloatSnglLnkNode head){
-      super(size,head);
+    UncheckedStack(FloatSnglLnkNode head,int size){
+      super(head,size);
+    }
+    @Override public void readExternal(ObjectInput in) throws IOException
+    {
+      int size;
+      this.size=size=in.readInt();
+      if(size!=0)
+      {
+        FloatSnglLnkNode curr;
+        for(this.head=curr=new FloatSnglLnkNode((float)in.readFloat());--size!=0;curr=curr.next=new FloatSnglLnkNode((float)in.readFloat())){}
+      }
     }
     @Override public void push(float val){
       this.head=new FloatSnglLnkNode(val,this.head);
@@ -916,150 +969,17 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       if((head=this.head)!=null){
         final UncheckedStack clone;
         FloatSnglLnkNode newHead;
-        for(clone=new UncheckedStack(this.size,newHead=new FloatSnglLnkNode(head.val));(head=head.next)!=null;newHead=newHead.next=new FloatSnglLnkNode(head.val)){}
+        for(clone=new UncheckedStack(newHead=new FloatSnglLnkNode(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new FloatSnglLnkNode(head.val)){}
         return clone;
       }
       return new UncheckedStack();
     }
     @Override public float popFloat(){
       FloatSnglLnkNode head;
-      var ret=(head=this.head).val;
-      this.head=head.next;
+      this.head=(head=this.head).next;
       --this.size;
-      return ret;
+      return head.val;
     }
-    @Override boolean uncheckedremoveIf(FloatSnglLnkNode head,FloatPredicate filter){
-      if(filter.test(head.val)){
-        while((head=head.next)!=null){
-          if(!filter.test(head.val)){
-            this.size=FloatSnglLnkNode.retainSurvivors(head,filter);
-            this.head=head;
-            return true;
-          }
-        }
-        this.head=null;
-        this.size=0;
-        return true;
-      }else{
-        FloatSnglLnkNode prev;
-        for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
-          if(filter.test(head.val)){
-            this.size=numSurvivors+FloatSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter);
-            return true;
-          }
-        }
-        return false;
-      }
-    }
-    @Override public Float pop(){
-      return popFloat();
-    }
-    @Override public float peekFloat(){
-      final FloatSnglLnkNode head;
-      if((head=this.head)!=null){
-        return (head.val);
-      }
-      return Float.NaN;
-    }
-    @Override public float pollFloat(){
-      final FloatSnglLnkNode head;
-      if((head=this.head)!=null){
-        final var ret=(head.val);
-        this.head=head.next;
-        --this.size;
-        return ret;
-      }
-      return Float.NaN;
-    }
-    @Override public Float peek(){
-      final FloatSnglLnkNode head;
-      if((head=this.head)!=null){
-        return (Float)(head.val);
-      }
-      return null;
-    }
-    @Override public Float poll(){
-      final FloatSnglLnkNode head;
-      if((head=this.head)!=null){
-        final var ret=(Float)(head.val);
-        this.head=head.next;
-        --this.size;
-        return ret;
-      }
-      return null;
-    }
-    @Override public double peekDouble(){
-      final FloatSnglLnkNode head;
-      if((head=this.head)!=null){
-        return (double)(head.val);
-      }
-      return Double.NaN;
-    }
-    @Override public double pollDouble(){
-      final FloatSnglLnkNode head;
-      if((head=this.head)!=null){
-        final var ret=(double)(head.val);
-        this.head=head.next;
-        --this.size;
-        return ret;
-      }
-      return Double.NaN;
-    }
-    @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
-      ,int bits
-      ){
-        if(bits==Float.floatToRawIntBits(head.val)){
-          this.head=head.next;
-        }else{
-          FloatSnglLnkNode prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(bits!=Float.floatToRawIntBits(head.val));
-          }
-          prev.next=head.next;
-        }
-        --this.size;
-        return true;
-      }
-    @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
-      ){
-        if(0==(head.val)){
-          this.head=head.next;
-        }else{
-          FloatSnglLnkNode prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(0!=(head.val));
-          }
-          prev.next=head.next;
-        }
-        --this.size;
-        return true;
-      }
-    @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
-      ){
-        if(Float.isNaN(head.val)){
-          this.head=head.next;
-        }else{
-          FloatSnglLnkNode prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(!Float.isNaN(head.val));
-          }
-          prev.next=head.next;
-        }
-        --this.size;
-        return true;
-      }
     @Override public int search(boolean val){
       {
         {
@@ -1256,55 +1176,131 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       }//end val check
       return -1;
     }
-    @Override public OmniIterator.OfFloat iterator(){
-      return new Itr(this);
+    @Override public float pollFloat(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(head.val);
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return Float.NaN;
     }
-    private static class Itr
-      extends AbstractFloatItr
+    @Override public Float pop(){
+      return popFloat();
+    }
+    @Override public Float poll(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(Float)(head.val);
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return null;
+    }
+    @Override public double pollDouble(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(double)(head.val);
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override boolean uncheckedremoveIf(FloatSnglLnkNode head,FloatPredicate filter){
+      if(filter.test(head.val)){
+        while((head=head.next)!=null){
+          if(!filter.test(head.val)){
+            this.size=FloatSnglLnkNode.retainSurvivors(head,filter);
+            this.head=head;
+            return true;
+          }
+        }
+        this.head=null;
+        this.size=0;
+        return true;
+      }else{
+        FloatSnglLnkNode prev;
+        for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
+          if(filter.test(head.val)){
+            this.size=numSurvivors+FloatSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter);
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+    @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
+      ,int bits
+    )
     {
-      transient final FloatSnglLnkSeq parent;
-      transient FloatSnglLnkNode prev;
-      transient FloatSnglLnkNode curr;
-      transient FloatSnglLnkNode next;
-      Itr(FloatSnglLnkSeq parent){
-        this.parent=parent;
-        this.next=parent.head;
-      }
-      @Override public float nextFloat(){
-        final FloatSnglLnkNode next;
-        this.next=(next=this.next).next;
-        this.prev=this.curr;
-        this.curr=next;
-        return next.val;
-      }
-      @Override public boolean hasNext(){
-        return next!=null;
-      }
-      private void uncheckedForEachRemaining(FloatSnglLnkNode next,FloatConsumer action){
-        FloatSnglLnkNode prev,curr=this.curr;
-        do{
-          action.accept(next.val);
-          prev=curr;
-        }while((next=(curr=next).next)!=null);
-        this.prev=prev;
-        this.curr=curr;
-        this.next=null;
-      }
-      @Override public void forEachRemaining(FloatConsumer action){
-        final FloatSnglLnkNode next;
-        if((next=this.next)!=null){
-          uncheckedForEachRemaining(next,action);
+      if(bits==Float.floatToRawIntBits(head.val)){
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(bits!=Float.floatToRawIntBits(head.val));
         }
+        prev.next=head.next;
       }
-      @Override public void forEachRemaining(Consumer<? super Float> action){
-        final FloatSnglLnkNode next;
-        if((next=this.next)!=null){
-          uncheckedForEachRemaining(next,action::accept);
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
+    )
+    {
+      if(0==(head.val)){
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(0!=(head.val));
         }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
+    )
+    {
+      if(Float.isNaN(head.val)){
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(!Float.isNaN(head.val));
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override public OmniIterator.OfFloat iterator(){
+      return new Itr();
+    }
+    private class Itr extends AbstractItr
+    {
+      Itr(){
+        super(UncheckedStack.this.head);
       }
       @Override public void remove(){
-        final FloatSnglLnkSeq parent;
-        --(parent=this.parent).size;
+        final UncheckedStack parent;
+        --(parent=UncheckedStack.this).size;
         final FloatSnglLnkNode prev;
         if((prev=this.prev)==null){
           parent.head=next;
@@ -1314,5 +1310,757 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         this.curr=prev;
       }
     }
-  } 
+  }
+  public static class CheckedQueue extends UncheckedQueue
+  {
+    private static final long serialVersionUID=1L;
+    transient int modCount;
+    public CheckedQueue(){
+      super();
+    }
+    CheckedQueue(FloatSnglLnkNode head,int size,FloatSnglLnkNode tail){
+      super(head,size,tail);
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      int modCount=this.modCount;
+      try{
+        super.writeExternal(out);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    @Override public void forEach(FloatConsumer action){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          FloatSnglLnkNode.uncheckedForEach(head,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override public void forEach(Consumer<? super Float> action){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          FloatSnglLnkNode.uncheckedForEach(head,action::accept);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      return super.toArray((arrSize)->{
+        final int modCount=this.modCount;
+        try{
+          return arrConstructor.apply(arrSize);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      });
+    }
+    @Override public void clear(){
+      if(size!=0)
+      {
+        ++this.modCount;
+        this.head=null;
+        this.tail=null;
+      }
+    }
+    @Override public Object clone(){
+      FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        FloatSnglLnkNode newHead=new FloatSnglLnkNode(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new FloatSnglLnkNode((head=head.next).val)){}
+        return new CheckedQueue(newHead,this.size,newTail);
+      }
+      return new CheckedQueue();
+    }
+    @Override void push(float val){
+      ++this.modCount;
+      super.push(val);
+    }
+    @Override public float removeFloat(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        ++this.modCount;
+        if(head==tail){
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        return head.val;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public float pollFloat(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        ++this.modCount;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override public Float poll(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(Float)(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        ++this.modCount;
+        return ret;
+      }
+      return null;
+    }
+    @Override public double pollDouble(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(double)(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        ++this.modCount;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    private void pullSurvivorsDown(FloatSnglLnkNode prev,FloatPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved)
+    {
+      int wordOffset;
+      for(long word=survivorSet[wordOffset=0],marker=1L;;){
+        var curr=prev.next;
+        if((marker&word)==0){
+          do{
+            if(--numRemoved==0){
+              prev.next=null;
+              if(curr==tail)
+              {
+                this.tail=prev;
+              }
+              return;
+            }
+            if((marker<<=1)==0){
+              word=survivorSet[++wordOffset];
+              marker=1L;
+            }
+            curr=curr.next;
+          }while((marker&word)==0);
+          prev.next=curr;
+        }
+        if(--numSurvivors==0){
+          return;
+        }
+        if((marker<<=1)==0){
+           word=survivorSet[++wordOffset];
+           marker=1L;
+        }
+        prev=curr;
+      }
+    }
+    private void pullSurvivorsDown(FloatSnglLnkNode prev,long word,int numSurvivors,int numRemoved){
+      for(long marker=1L;;marker<<=1){
+        var curr=prev.next;
+        if((marker&word)==0){
+          do{
+            if(--numRemoved==0){
+              prev.next=null;
+              if(curr==tail)
+              {
+                this.tail=prev;
+              }
+              return;
+            }
+            curr=curr.next;
+          }while(((marker<<=1)&word)==0);
+          prev.next=curr;
+        }
+        if(--numSurvivors==0){
+          return;
+        }
+        prev=curr;
+      }
+    }
+    private int removeIfHelper(FloatSnglLnkNode prev,FloatPredicate filter,int numLeft,int modCount){
+      if(numLeft!=0){
+        int numSurvivors;
+        if(numLeft>64)
+        {
+          long[] survivorSet;
+          numSurvivors=FloatSnglLnkNode.markSurvivors(prev.next,filter,survivorSet=BitSetUtil.getBitSet(numLeft));
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=numSurvivors)!=0)
+          {
+            pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+          }
+        }
+        else
+        {
+          long survivorWord=FloatSnglLnkNode.markSurvivors(prev.next,filter);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
+          {
+            pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
+          }
+        }
+        return numSurvivors;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return 0;
+    }
+    @Override boolean uncheckedremoveIf(FloatSnglLnkNode head,FloatPredicate filter){
+      final int modCount=this.modCount;
+      try{
+        int numLeft=this.size;
+        if(filter.test(head.val)){
+          while(--numLeft!=0){
+            if(!filter.test((head=head.next).val)){
+              this.size=1+removeIfHelper(head,filter,--numLeft,modCount);
+              this.modCount=modCount+1;
+              this.head=head;
+              return true;
+            }
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.head=null;
+          this.tail=null;
+          this.size=0;
+          return true;
+        }else{
+          int numSurvivors;
+          if(--numLeft!=(numSurvivors=removeIfHelper(head,filter,numLeft,modCount))){
+            this.modCount=modCount+1;
+            this.size=1+numSurvivors;
+            return true;
+          }
+        }
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+      return false;
+    }
+    @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
+    ,int bits
+    ){
+      if(bits==Float.floatToRawIntBits(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(bits!=Float.floatToRawIntBits((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
+    ){
+      if(0==(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(0!=((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
+    ){
+      if(Float.isNaN(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(!Float.isNaN((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
+    @Override public OmniIterator.OfFloat iterator(){
+      return new Itr(this);
+    }
+    private static class Itr extends AbstractItr
+    {
+      transient final CheckedQueue parent;
+      transient int modCount;
+      Itr(CheckedQueue parent){
+        super(parent.head);
+        this.parent=parent;
+        this.modCount=parent.modCount;
+      }
+      @Override public float nextFloat(){
+        CheckedCollection.checkModCount(modCount,parent.modCount);
+        final FloatSnglLnkNode next;
+        if((next=this.next)!=null){
+          this.next=next.next;
+          this.prev=this.curr;
+          this.curr=next;
+          return next.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override void uncheckedForEachRemaining(FloatSnglLnkNode next,FloatConsumer action){
+        final int modCount=this.modCount;
+        FloatSnglLnkNode prev,curr;
+        try{
+          curr=this.curr;
+          do{
+            action.accept(next.val);
+            prev=curr;
+          }while((next=(curr=next).next)!=null);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+        }
+        this.prev=prev;
+        this.curr=curr;
+        this.next=null;
+      }
+      @Override public void remove(){
+        final FloatSnglLnkNode prev;
+        if(this.curr!=(prev=this.prev)){
+          final CheckedQueue parent;
+          int modCount;
+          CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
+          parent.modCount=++modCount;
+          this.modCount=modCount;
+          --parent.size;
+          if(prev==null){
+            parent.head=next;
+          }else{
+            prev.next=next;
+          }
+          if(curr==parent.tail)
+          {
+            parent.tail=prev;
+          }
+          this.curr=prev;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+    }
+  }
+  public static class UncheckedQueue extends FloatSnglLnkSeq implements OmniQueue.OfFloat{
+    private static final long serialVersionUID=1L;
+    transient FloatSnglLnkNode tail;
+    public UncheckedQueue(){
+      super();
+    }
+    UncheckedQueue(FloatSnglLnkNode head,int size,FloatSnglLnkNode tail){
+      super(head,size);
+      this.tail=tail;
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @Override public void readExternal(ObjectInput in) throws IOException
+    {
+      int size;
+      this.size=size=in.readInt();
+      if(size!=0)
+      {
+        FloatSnglLnkNode curr;
+        for(this.head=curr=new FloatSnglLnkNode((float)in.readFloat());--size!=0;curr=curr.next=new FloatSnglLnkNode((float)in.readFloat())){}
+        this.tail=curr;
+      }
+    }
+    @Override public void clear(){
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    @Override public Object clone(){
+      FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        FloatSnglLnkNode newHead=new FloatSnglLnkNode(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new FloatSnglLnkNode((head=head.next).val)){}
+        return new UncheckedQueue(newHead,this.size,newTail);
+      }
+      return new UncheckedQueue();
+    }
+    @Override void push(float val){
+      FloatSnglLnkNode newNode;
+      this.tail.next=(newNode=new FloatSnglLnkNode(val));
+      this.tail=newNode;
+      ++this.size;
+    }
+    @Override public float floatElement(){
+      return head.val;
+    }
+    @Override public boolean offer(float val){
+      push(val);
+      return true;
+    }
+    @Override public float removeFloat(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)==tail){
+        this.tail=null;
+      }
+      this.head=head.next;
+      --this.size;
+      return head.val;
+    }
+    @Override public float pollFloat(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override public Float remove(){
+      return removeFloat();
+    }
+    @Override public Float element(){
+      return floatElement();
+    }
+    @Override public boolean offer(Float val){
+      push((float)val);
+      return true;
+    }
+    @Override public Float poll(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(Float)(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return null;
+    }
+    @Override public double pollDouble(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        final var ret=(double)(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    private int removeIfHelper(FloatSnglLnkNode prev,FloatSnglLnkNode tail,FloatPredicate filter)
+    {
+      int numSurvivors=1;
+      outer:for(FloatSnglLnkNode next;prev!=tail;++numSurvivors,prev=next){
+        if(filter.test((next=prev.next).val)){
+          do{
+            if(next==tail){
+              this.tail=prev;
+              prev.next=null;
+              break outer;
+            }
+          }
+          while(filter.test((next=next.next).val));
+          prev.next=next;
+        }
+      }
+      return numSurvivors;
+    }
+    private int removeIfHelper(FloatSnglLnkNode prev,FloatSnglLnkNode curr,FloatSnglLnkNode tail,FloatPredicate filter)
+    {
+      int numSurvivors=0;
+      while(curr!=tail) {
+        if(!filter.test((curr=curr.next).val)){
+          prev.next=curr;
+          do{
+            ++numSurvivors;
+            if(curr==tail){
+              return numSurvivors;
+            }
+          }while(!filter.test((curr=(prev=curr).next).val));
+        }
+      }
+      prev.next=null;
+      this.tail=prev;
+      return numSurvivors;
+    }
+    @Override boolean uncheckedremoveIf(FloatSnglLnkNode head,FloatPredicate filter){
+      if(filter.test(head.val)){
+        for(var tail=this.tail;head!=tail;)
+        {
+          if(!filter.test((head=head.next).val))
+          {
+            this.size=removeIfHelper(head,tail,filter);
+            this.head=head;
+            return true;  
+          }
+        }
+        this.head=null;
+        this.tail=null;
+        this.size=0;
+        return true;
+      }else{
+        int numSurvivors=1;
+        for(final var tail=this.tail;head!=tail;++numSurvivors)
+        {
+          final FloatSnglLnkNode prev;
+          if(filter.test((head=(prev=head).next).val))
+          {
+            this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+    @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
+    ,int bits
+    ){
+      if(bits==Float.floatToRawIntBits(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(bits!=Float.floatToRawIntBits((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
+    ){
+      if(0==(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(0!=((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
+    ){
+      if(Float.isNaN(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        FloatSnglLnkNode prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(!Float.isNaN((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override public OmniIterator.OfFloat iterator(){
+      return new Itr();
+    }
+    private class Itr extends AbstractItr
+    {
+      Itr(){
+        super(UncheckedQueue.this.head);
+      }
+      @Override public void remove(){
+        final UncheckedQueue parent;
+        --(parent=UncheckedQueue.this).size;
+        final FloatSnglLnkNode prev;
+        if((prev=this.prev)==null)
+        {
+          parent.head=next;
+        }else{
+          prev.next=null;
+        }
+        if(this.curr==parent.tail)
+        {
+          parent.tail=prev;
+        }
+        this.curr=prev;
+      }
+    }
+  }
+  private static class AbstractItr
+      extends AbstractFloatItr
+  {
+    transient FloatSnglLnkNode prev;
+    transient FloatSnglLnkNode curr;
+    transient FloatSnglLnkNode next;
+    AbstractItr(FloatSnglLnkNode next)
+    {
+      this.next=next; 
+    }
+    @Override public float nextFloat(){
+      final FloatSnglLnkNode next;
+      this.next=(next=this.next).next;
+      this.prev=this.curr;
+      this.curr=next;
+      return next.val;
+    }
+    @Override public boolean hasNext(){
+      return next!=null;
+    }
+    void uncheckedForEachRemaining(FloatSnglLnkNode next,FloatConsumer action){
+      FloatSnglLnkNode prev,curr=this.curr;
+      do{
+        action.accept(next.val);
+        prev=curr;
+      }while((next=(curr=next).next)!=null);
+      this.prev=prev;
+      this.curr=curr;
+      this.next=null;
+    }
+    @Override public void forEachRemaining(FloatConsumer action){
+      final FloatSnglLnkNode next;
+      if((next=this.next)!=null){
+        uncheckedForEachRemaining(next,action);
+      }
+    }
+    @Override public void forEachRemaining(Consumer<? super Float> action){
+      final FloatSnglLnkNode next;
+      if((next=this.next)!=null){
+        uncheckedForEachRemaining(next,action::accept);
+      }
+    }
+  }
 }

@@ -8,18 +8,38 @@ import java.util.NoSuchElementException;
 import omni.util.OmniArray;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.Objects;
+import omni.util.BitSetUtil;
 import omni.util.OmniPred;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.util.RefSnglLnkNode;
-public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Cloneable{
+import java.io.Externalizable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.IOException;
+public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Cloneable,Externalizable{
+  private static final long serialVersionUID=1L;
   transient int size;
   transient RefSnglLnkNode<E> head;
   private RefSnglLnkSeq(){
   }
-  private RefSnglLnkSeq(int size,RefSnglLnkNode<E> head){
+  private RefSnglLnkSeq(RefSnglLnkNode<E> head,int size){
     this.size=size;
     this.head=head;
+  }
+  @Override public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int size;
+    out.writeInt(size=this.size);
+    if(size!=0)
+    {
+      var curr=this.head;
+      do
+      {
+        out.writeObject(curr.val);
+      }
+      while((curr=curr.next)!=null);
+    }
   }
   @Override public abstract Object clone();
   @Override public int size(){
@@ -576,13 +596,29 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     }
     return false;
   }
+  public E peek(){
+    final RefSnglLnkNode<E> head;
+    if((head=this.head)!=null){
+      return (E)(head.val);
+    }
+    return null;
+  }
   abstract boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter);
   public static class CheckedStack<E> extends UncheckedStack<E>{
+    private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedStack(){
     }
-    private CheckedStack(int size,RefSnglLnkNode<E> head){
-      super(size,head);
+    CheckedStack(RefSnglLnkNode<E> head,int size){
+      super(head,size);
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      int modCount=this.modCount;
+      try{
+        super.writeExternal(out);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
     }
     @Override public void push(E val){
       ++this.modCount;
@@ -604,7 +640,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       if((head=this.head)!=null){
         final CheckedStack<E> clone;
         RefSnglLnkNode<E> newHead;
-        for(clone=new CheckedStack<E>(this.size,newHead=new RefSnglLnkNode<E>(head.val));(head=head.next)!=null;newHead=newHead.next=new RefSnglLnkNode<E>(head.val)){}
+        for(clone=new CheckedStack<E>(newHead=new RefSnglLnkNode<E>(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new RefSnglLnkNode<E>(head.val)){}
         return clone;
       }
       return new CheckedStack<E>();
@@ -613,10 +649,9 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       RefSnglLnkNode<E> head;
       if((head=this.head)!=null){
         ++this.modCount;
-        var ret=head.val;
         this.head=head.next;
         --this.size;
-        return ret;
+        return head.val;
       }
       throw new NoSuchElementException();
     }
@@ -646,14 +681,6 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     }
     return "[]";
   }
-    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
-      ModCountChecker(int modCount){
-        super(modCount);
-      }
-      @Override protected int getActualModCount(){
-        return CheckedStack.this.modCount;
-      }
-    }
     @Override public void forEach(Consumer<? super E> action){
       final RefSnglLnkNode<E> head;
       if((head=this.head)!=null){
@@ -675,17 +702,43 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         }
       });
     }
+    private int removeIfHelper(RefSnglLnkNode<E> prev,Predicate<? super E> filter,int numLeft,int modCount)
+    {
+      if(numLeft!=0)
+      {
+        int numSurvivors;
+        if(numLeft>64)
+        {
+          long[] survivorSet;
+          numSurvivors=RefSnglLnkNode.markSurvivors(prev.next,filter,survivorSet=BitSetUtil.getBitSet(numLeft));
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=numSurvivors)!=0)
+          {
+            RefSnglLnkNode.pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+          }
+        }
+        else
+        {
+          long survivorWord=RefSnglLnkNode.markSurvivors(prev.next,filter);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
+          {
+            RefSnglLnkNode.pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
+          }
+        }
+        return numSurvivors;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return 0;
+    }
     @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
       final int modCount=this.modCount;
-      try
-      {
-        int numLeft=this.size-1;
+      try{
+        int numLeft=this.size;
         if(filter.test(head.val)){
-          while((head=head.next)!=null){
-            --numLeft;
-            if(!filter.test(head.val)){
-              //TODO
-              //this.size=RefSnglLnkNode.retainSurvivors(head,filter,new ModCountChecker(modCount),numLeft);
+          while(--numLeft!=0){
+            if(!filter.test((head=head.next).val)){
+              this.size=1+removeIfHelper(head,filter,--numLeft,modCount);
               this.modCount=modCount+1;
               this.head=head;
               return true;
@@ -697,27 +750,18 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
           this.size=0;
           return true;
         }else{
-          RefSnglLnkNode<E> prev;
-          for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
-            --numLeft;
-            if(filter.test(head.val)){
-              //TODO
-              //this.size=numSurvivors+RefSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter,new ModCountChecker(modCount),numLeft);
-              this.modCount=modCount+1;
-              return true;
-            }
+          int numSurvivors;
+          if(--numLeft!=(numSurvivors=removeIfHelper(head,filter,numLeft,modCount))){
+            this.modCount=modCount+1;
+            this.size=1+numSurvivors;
+            return true;
           }
         }
-      }
-      catch(ConcurrentModificationException e)
-      {
+      }catch(ConcurrentModificationException e){
         throw e;
-      }
-      catch(RuntimeException e)
-      {
+      }catch(RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
-      CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
     @Override public E poll(){
@@ -733,69 +777,72 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     }
     @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
       ,Object nonNull
-      ){
-        final int modCount=this.modCount;
-        if(nonNull.equals(head.val)){
+    )
+    {
+      final int modCount=this.modCount;
+      if(nonNull.equals(head.val)){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        try
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(!nonNull.equals(head.val));
+        }
+        finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.head=head.next;
-        }else{
-          RefSnglLnkNode<E> prev;
-          try
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(!nonNull.equals(head.val));
-          }
-          finally{
-            CheckedCollection.checkModCount(modCount,this.modCount);
-          }
-          prev.next=head.next;
         }
-        this.modCount=modCount+1;
-        --this.size;
-        return true;
+        prev.next=head.next;
       }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
     @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
-      ){
-        if(null==(head.val)){
-          this.head=head.next;
-        }else{
-          RefSnglLnkNode<E> prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(null!=(head.val));
-          }
-          prev.next=head.next;
+    )
+    {
+      if(null==(head.val)){
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(null!=(head.val));
         }
-        this.modCount=modCount+1;
-        --this.size;
-        return true;
+        prev.next=head.next;
       }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
     @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
       ,Predicate<? super E> pred
-      ){
-        if(pred.test(head.val)){
-          this.head=head.next;
-        }else{
-          RefSnglLnkNode<E> prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(!pred.test(head.val));
-          }
-          prev.next=head.next;
+    )
+    {
+      if(pred.test(head.val)){
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(!pred.test(head.val));
         }
-        this.modCount=modCount+1;
-        --this.size;
-        return true;
+        prev.next=head.next;
       }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
     @Override
     public int search(Object val){
       final RefSnglLnkNode<E> head;
@@ -831,17 +878,12 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);
     }
-    private static class Itr<E>
-      implements OmniIterator.OfRef<E>
-    {
-      transient final CheckedStack<E> parent;
+    private static class Itr<E> extends AbstractItr<E>{
+      final CheckedStack<E> parent;
       transient int modCount;
-      transient RefSnglLnkNode<E> prev;
-      transient RefSnglLnkNode<E> curr;
-      transient RefSnglLnkNode<E> next;
       Itr(CheckedStack<E> parent){
+        super(parent.head);
         this.parent=parent;
-        this.next=parent.head;
         this.modCount=parent.modCount;
       }
       @Override public E next(){
@@ -855,10 +897,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         }
         throw new NoSuchElementException();
       }
-      @Override public boolean hasNext(){
-        return next!=null;
-      }
-      private void uncheckedForEachRemaining(RefSnglLnkNode<E> next,Consumer<? super E> action){
+      @Override void uncheckedForEachRemaining(RefSnglLnkNode<E> next,Consumer<? super E> action){
         final int modCount=this.modCount;
         RefSnglLnkNode<E> prev,curr;
         try{
@@ -868,17 +907,11 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
             prev=curr;
           }while((next=(curr=next).next)!=null);
         }finally{
-          CheckedCollection.checkModCount(modCount,parent.modCount);
+          CheckedCollection.checkModCount(modCount,this.parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
         this.next=null;
-      }
-      @Override public void forEachRemaining(Consumer<? super E> action){
-        final RefSnglLnkNode<E> next;
-        if((next=this.next)!=null){
-          uncheckedForEachRemaining(next,action);
-        }
       }
       @Override public void remove(){
         final RefSnglLnkNode<E> prev;
@@ -888,6 +921,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
+          --parent.size;
           if(prev==null){
             parent.head=next;
           }else{
@@ -901,10 +935,23 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     }
   }
   public static class UncheckedStack<E> extends RefSnglLnkSeq<E> implements OmniStack.OfRef<E>{
+    private static final long serialVersionUID=1L;
     public UncheckedStack(){
     }
-    private UncheckedStack(int size,RefSnglLnkNode<E> head){
-      super(size,head);
+    UncheckedStack(RefSnglLnkNode<E> head,int size){
+      super(head,size);
+    }
+    @SuppressWarnings("unchecked")
+    @Override public void readExternal(ObjectInput in) throws IOException
+      ,ClassNotFoundException
+    {
+      int size;
+      this.size=size=in.readInt();
+      if(size!=0)
+      {
+        RefSnglLnkNode<E> curr;
+        for(this.head=curr=new RefSnglLnkNode<E>((E)in.readObject());--size!=0;curr=curr.next=new RefSnglLnkNode<E>((E)in.readObject())){}
+      }
     }
     @Override public void push(E val){
       this.head=new RefSnglLnkNode<E>(val,this.head);
@@ -919,114 +966,17 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       if((head=this.head)!=null){
         final UncheckedStack<E> clone;
         RefSnglLnkNode<E> newHead;
-        for(clone=new UncheckedStack<E>(this.size,newHead=new RefSnglLnkNode<E>(head.val));(head=head.next)!=null;newHead=newHead.next=new RefSnglLnkNode<E>(head.val)){}
+        for(clone=new UncheckedStack<E>(newHead=new RefSnglLnkNode<E>(head.val),this.size);(head=head.next)!=null;newHead=newHead.next=new RefSnglLnkNode<E>(head.val)){}
         return clone;
       }
       return new UncheckedStack<E>();
     }
     @Override public E pop(){
       RefSnglLnkNode<E> head;
-      var ret=(head=this.head).val;
-      this.head=head.next;
+      this.head=(head=this.head).next;
       --this.size;
-      return ret;
+      return head.val;
     }
-    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
-      if(filter.test(head.val)){
-        while((head=head.next)!=null){
-          if(!filter.test(head.val)){
-            this.size=RefSnglLnkNode.retainSurvivors(head,filter);
-            this.head=head;
-            return true;
-          }
-        }
-        this.head=null;
-        this.size=0;
-        return true;
-      }else{
-        RefSnglLnkNode<E> prev;
-        for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
-          if(filter.test(head.val)){
-            this.size=numSurvivors+RefSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter);
-            return true;
-          }
-        }
-        return false;
-      }
-    }
-    @Override public E peek(){
-      final RefSnglLnkNode<E> head;
-      if((head=this.head)!=null){
-        return (head.val);
-      }
-      return null;
-    }
-    @Override public E poll(){
-      final RefSnglLnkNode<E> head;
-      if((head=this.head)!=null){
-        final var ret=(head.val);
-        this.head=head.next;
-        --this.size;
-        return ret;
-      }
-      return null;
-    }
-    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
-      ,Object nonNull
-      ){
-        if(nonNull.equals(head.val)){
-          this.head=head.next;
-        }else{
-          RefSnglLnkNode<E> prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(!nonNull.equals(head.val));
-          }
-          prev.next=head.next;
-        }
-        --this.size;
-        return true;
-      }
-    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
-      ){
-        if(null==(head.val)){
-          this.head=head.next;
-        }else{
-          RefSnglLnkNode<E> prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(null!=(head.val));
-          }
-          prev.next=head.next;
-        }
-        --this.size;
-        return true;
-      }
-    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
-      ,Predicate<? super E> pred
-      ){
-        if(pred.test(head.val)){
-          this.head=head.next;
-        }else{
-          RefSnglLnkNode<E> prev;
-          {
-            do{
-              if((head=(prev=head).next)==null){
-                return false;
-              }
-            }while(!pred.test(head.val));
-          }
-          prev.next=head.next;
-        }
-        --this.size;
-        return true;
-      }
     @Override public int search(boolean val){
       {
         {
@@ -1267,49 +1217,109 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       }//end val check
       return -1;
     }
-    @Override public OmniIterator.OfRef<E> iterator(){
-      return new Itr<E>(this);
+    @Override public E poll(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        final var ret=(head.val);
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return null;
     }
-    private static class Itr<E>
-      implements OmniIterator.OfRef<E>
-    {
-      transient final RefSnglLnkSeq<E> parent;
-      transient RefSnglLnkNode<E> prev;
-      transient RefSnglLnkNode<E> curr;
-      transient RefSnglLnkNode<E> next;
-      Itr(RefSnglLnkSeq<E> parent){
-        this.parent=parent;
-        this.next=parent.head;
-      }
-      @Override public E next(){
-        final RefSnglLnkNode<E> next;
-        this.next=(next=this.next).next;
-        this.prev=this.curr;
-        this.curr=next;
-        return next.val;
-      }
-      @Override public boolean hasNext(){
-        return next!=null;
-      }
-      private void uncheckedForEachRemaining(RefSnglLnkNode<E> next,Consumer<? super E> action){
-        RefSnglLnkNode<E> prev,curr=this.curr;
-        do{
-          action.accept(next.val);
-          prev=curr;
-        }while((next=(curr=next).next)!=null);
-        this.prev=prev;
-        this.curr=curr;
-        this.next=null;
-      }
-      @Override public void forEachRemaining(Consumer<? super E> action){
-        final RefSnglLnkNode<E> next;
-        if((next=this.next)!=null){
-          uncheckedForEachRemaining(next,action);
+    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+      if(filter.test(head.val)){
+        while((head=head.next)!=null){
+          if(!filter.test(head.val)){
+            this.size=RefSnglLnkNode.retainSurvivors(head,filter);
+            this.head=head;
+            return true;
+          }
         }
+        this.head=null;
+        this.size=0;
+        return true;
+      }else{
+        RefSnglLnkNode<E> prev;
+        for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
+          if(filter.test(head.val)){
+            this.size=numSurvivors+RefSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter);
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+      ,Object nonNull
+    )
+    {
+      if(nonNull.equals(head.val)){
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(!nonNull.equals(head.val));
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    )
+    {
+      if(null==(head.val)){
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(null!=(head.val));
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+      ,Predicate<? super E> pred
+    )
+    {
+      if(pred.test(head.val)){
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if((head=(prev=head).next)==null){
+              return false;
+            }
+          }while(!pred.test(head.val));
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      return new Itr();
+    }
+    private class Itr extends AbstractItr<E>
+    {
+      Itr(){
+        super(UncheckedStack.this.head);
       }
       @Override public void remove(){
-        final RefSnglLnkSeq<E> parent;
-        --(parent=this.parent).size;
+        final UncheckedStack<E> parent;
+        --(parent=UncheckedStack.this).size;
         final RefSnglLnkNode<E> prev;
         if((prev=this.prev)==null){
           parent.head=next;
@@ -1319,5 +1329,724 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         this.curr=prev;
       }
     }
-  } 
+  }
+  public static class CheckedQueue<E> extends UncheckedQueue<E>
+  {
+    private static final long serialVersionUID=1L;
+    transient int modCount;
+    public CheckedQueue(){
+      super();
+    }
+    CheckedQueue(RefSnglLnkNode<E> head,int size,RefSnglLnkNode<E> tail){
+      super(head,size,tail);
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      int modCount=this.modCount;
+      try{
+        super.writeExternal(out);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    @Override public int hashCode(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          return RefSnglLnkNode.uncheckedHashCode(head);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      return 1;
+    }
+    @Override public String toString(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        final StringBuilder builder=new StringBuilder("[");
+        final int modCount=this.modCount;
+        try{
+          RefSnglLnkNode.uncheckedToString(head,builder);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        return builder.append(']').toString();
+      }
+      return "[]";
+    }
+    @Override public void forEach(Consumer<? super E> action){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          RefSnglLnkNode.uncheckedForEach(head,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      return super.toArray((arrSize)->{
+        final int modCount=this.modCount;
+        try{
+          return arrConstructor.apply(arrSize);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      });
+    }
+    @Override public void clear(){
+      if(size!=0)
+      {
+        ++this.modCount;
+        this.head=null;
+        this.tail=null;
+      }
+    }
+    @Override public Object clone(){
+      RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        RefSnglLnkNode<E> newHead=new RefSnglLnkNode<E>(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new RefSnglLnkNode<E>((head=head.next).val)){}
+        return new CheckedQueue<E>(newHead,this.size,newTail);
+      }
+      return new CheckedQueue<E>();
+    }
+    @Override void push(E val){
+      ++this.modCount;
+      super.push(val);
+    }
+    @Override public E remove(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        ++this.modCount;
+        if(head==tail){
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        return head.val;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public E poll(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        final var ret=(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        ++this.modCount;
+        return ret;
+      }
+      return null;
+    }
+    private void pullSurvivorsDown(RefSnglLnkNode<E> prev,Predicate<? super E> filter,long[] survivorSet,int numSurvivors,int numRemoved)
+    {
+      int wordOffset;
+      for(long word=survivorSet[wordOffset=0],marker=1L;;){
+        var curr=prev.next;
+        if((marker&word)==0){
+          do{
+            if(--numRemoved==0){
+              prev.next=null;
+              if(curr==tail)
+              {
+                this.tail=prev;
+              }
+              return;
+            }
+            if((marker<<=1)==0){
+              word=survivorSet[++wordOffset];
+              marker=1L;
+            }
+            curr=curr.next;
+          }while((marker&word)==0);
+          prev.next=curr;
+        }
+        if(--numSurvivors==0){
+          return;
+        }
+        if((marker<<=1)==0){
+           word=survivorSet[++wordOffset];
+           marker=1L;
+        }
+        prev=curr;
+      }
+    }
+    private void pullSurvivorsDown(RefSnglLnkNode<E> prev,long word,int numSurvivors,int numRemoved){
+      for(long marker=1L;;marker<<=1){
+        var curr=prev.next;
+        if((marker&word)==0){
+          do{
+            if(--numRemoved==0){
+              prev.next=null;
+              if(curr==tail)
+              {
+                this.tail=prev;
+              }
+              return;
+            }
+            curr=curr.next;
+          }while(((marker<<=1)&word)==0);
+          prev.next=curr;
+        }
+        if(--numSurvivors==0){
+          return;
+        }
+        prev=curr;
+      }
+    }
+    private int removeIfHelper(RefSnglLnkNode<E> prev,Predicate<? super E> filter,int numLeft,int modCount){
+      if(numLeft!=0){
+        int numSurvivors;
+        if(numLeft>64)
+        {
+          long[] survivorSet;
+          numSurvivors=RefSnglLnkNode.markSurvivors(prev.next,filter,survivorSet=BitSetUtil.getBitSet(numLeft));
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=numSurvivors)!=0)
+          {
+            pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+          }
+        }
+        else
+        {
+          long survivorWord=RefSnglLnkNode.markSurvivors(prev.next,filter);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
+          {
+            pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
+          }
+        }
+        return numSurvivors;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return 0;
+    }
+    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+      final int modCount=this.modCount;
+      try{
+        int numLeft=this.size;
+        if(filter.test(head.val)){
+          while(--numLeft!=0){
+            if(!filter.test((head=head.next).val)){
+              this.size=1+removeIfHelper(head,filter,--numLeft,modCount);
+              this.modCount=modCount+1;
+              this.head=head;
+              return true;
+            }
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.head=null;
+          this.tail=null;
+          this.size=0;
+          return true;
+        }else{
+          int numSurvivors;
+          if(--numLeft!=(numSurvivors=removeIfHelper(head,filter,numLeft,modCount))){
+            this.modCount=modCount+1;
+            this.size=1+numSurvivors;
+            return true;
+          }
+        }
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+      return false;
+    }
+    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+    ,Object nonNull
+    ){
+      final int modCount=this.modCount;
+      if(nonNull.equals(head.val))
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        try
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(!nonNull.equals((head=(prev=head).next).val));
+        }
+        finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    ){
+      if(null==(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(null!=((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+    ,Predicate<? super E> pred
+    ){
+      if(pred.test(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(!pred.test((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      this.modCount=modCount+1;
+      --this.size;
+      return true;
+    }
+    @Override
+    public boolean contains(Object val){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        if(val!=null){
+          final int modCount=this.modCount;
+          try{
+            return RefSnglLnkNode.uncheckedcontainsNonNull(head,val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+        return RefSnglLnkNode.uncheckedcontainsNull(head);
+      }
+      return false;
+    }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      return new Itr<E>(this);
+    }
+    private static class Itr<E> extends AbstractItr<E>
+    {
+      transient final CheckedQueue<E> parent;
+      transient int modCount;
+      Itr(CheckedQueue<E> parent){
+        super(parent.head);
+        this.parent=parent;
+        this.modCount=parent.modCount;
+      }
+      @Override public E next(){
+        CheckedCollection.checkModCount(modCount,parent.modCount);
+        final RefSnglLnkNode<E> next;
+        if((next=this.next)!=null){
+          this.next=next.next;
+          this.prev=this.curr;
+          this.curr=next;
+          return next.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override void uncheckedForEachRemaining(RefSnglLnkNode<E> next,Consumer<? super E> action){
+        final int modCount=this.modCount;
+        RefSnglLnkNode<E> prev,curr;
+        try{
+          curr=this.curr;
+          do{
+            action.accept(next.val);
+            prev=curr;
+          }while((next=(curr=next).next)!=null);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+        }
+        this.prev=prev;
+        this.curr=curr;
+        this.next=null;
+      }
+      @Override public void remove(){
+        final RefSnglLnkNode<E> prev;
+        if(this.curr!=(prev=this.prev)){
+          final CheckedQueue<E> parent;
+          int modCount;
+          CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
+          parent.modCount=++modCount;
+          this.modCount=modCount;
+          --parent.size;
+          if(prev==null){
+            parent.head=next;
+          }else{
+            prev.next=next;
+          }
+          if(curr==parent.tail)
+          {
+            parent.tail=prev;
+          }
+          this.curr=prev;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+    }
+  }
+  public static class UncheckedQueue<E> extends RefSnglLnkSeq<E> implements OmniQueue.OfRef<E>{
+    private static final long serialVersionUID=1L;
+    transient RefSnglLnkNode<E> tail;
+    public UncheckedQueue(){
+      super();
+    }
+    UncheckedQueue(RefSnglLnkNode<E> head,int size,RefSnglLnkNode<E> tail){
+      super(head,size);
+      this.tail=tail;
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @SuppressWarnings("unchecked")
+    @Override public void readExternal(ObjectInput in) throws IOException
+      ,ClassNotFoundException
+    {
+      int size;
+      this.size=size=in.readInt();
+      if(size!=0)
+      {
+        RefSnglLnkNode<E> curr;
+        for(this.head=curr=new RefSnglLnkNode<E>((E)in.readObject());--size!=0;curr=curr.next=new RefSnglLnkNode<E>((E)in.readObject())){}
+        this.tail=curr;
+      }
+    }
+    @Override public void clear(){
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    @Override public Object clone(){
+      RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        RefSnglLnkNode<E> newHead=new RefSnglLnkNode<E>(head.val),newTail=newHead;
+        for(final var tail=this.tail;head!=tail;newTail=newTail.next=new RefSnglLnkNode<E>((head=head.next).val)){}
+        return new UncheckedQueue<E>(newHead,this.size,newTail);
+      }
+      return new UncheckedQueue<E>();
+    }
+    @Override void push(E val){
+      RefSnglLnkNode<E> newNode;
+      this.tail.next=(newNode=new RefSnglLnkNode<E>(val));
+      this.tail=newNode;
+      ++this.size;
+    }
+    @Override public E element(){
+      return head.val;
+    }
+    @Override public boolean offer(E val){
+      push(val);
+      return true;
+    }
+    @Override public E remove(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)==tail){
+        this.tail=null;
+      }
+      this.head=head.next;
+      --this.size;
+      return head.val;
+    }
+    @Override public E poll(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        final var ret=(head.val);
+        if(head==this.tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+        --this.size;
+        return ret;
+      }
+      return null;
+    }
+    private int removeIfHelper(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> tail,Predicate<? super E> filter)
+    {
+      int numSurvivors=1;
+      outer:for(RefSnglLnkNode<E> next;prev!=tail;++numSurvivors,prev=next){
+        if(filter.test((next=prev.next).val)){
+          do{
+            if(next==tail){
+              this.tail=prev;
+              prev.next=null;
+              break outer;
+            }
+          }
+          while(filter.test((next=next.next).val));
+          prev.next=next;
+        }
+      }
+      return numSurvivors;
+    }
+    private int removeIfHelper(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> curr,RefSnglLnkNode<E> tail,Predicate<? super E> filter)
+    {
+      int numSurvivors=0;
+      while(curr!=tail) {
+        if(!filter.test((curr=curr.next).val)){
+          prev.next=curr;
+          do{
+            ++numSurvivors;
+            if(curr==tail){
+              return numSurvivors;
+            }
+          }while(!filter.test((curr=(prev=curr).next).val));
+        }
+      }
+      prev.next=null;
+      this.tail=prev;
+      return numSurvivors;
+    }
+    @Override boolean uncheckedremoveIf(RefSnglLnkNode<E> head,Predicate<? super E> filter){
+      if(filter.test(head.val)){
+        for(var tail=this.tail;head!=tail;)
+        {
+          if(!filter.test((head=head.next).val))
+          {
+            this.size=removeIfHelper(head,tail,filter);
+            this.head=head;
+            return true;  
+          }
+        }
+        this.head=null;
+        this.tail=null;
+        this.size=0;
+        return true;
+      }else{
+        int numSurvivors=1;
+        for(final var tail=this.tail;head!=tail;++numSurvivors)
+        {
+          final RefSnglLnkNode<E> prev;
+          if(filter.test((head=(prev=head).next).val))
+          {
+            this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+    @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
+    ,Object nonNull
+    ){
+      if(nonNull.equals(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(!nonNull.equals((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
+    ){
+      if(null==(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(null!=((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
+    ,Predicate<? super E> pred
+    ){
+      if(pred.test(head.val))
+      {
+        if(head==tail)
+        {
+          this.tail=null;
+        }
+        this.head=head.next;
+      }else{
+        RefSnglLnkNode<E> prev;
+        {
+          do{
+            if(head==tail)
+            {
+              return false;
+            }
+            //if((head=(prev=head).next)==null){
+            //  return false;
+            //}
+          }while(!pred.test((head=(prev=head).next).val));
+        }
+        if(head==tail)
+        {
+          this.tail=prev;
+        }
+        prev.next=head.next;
+      }
+      --this.size;
+      return true;
+    }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      return new Itr();
+    }
+    private class Itr extends AbstractItr<E>
+    {
+      Itr(){
+        super(UncheckedQueue.this.head);
+      }
+      @Override public void remove(){
+        final UncheckedQueue<E> parent;
+        --(parent=UncheckedQueue.this).size;
+        final RefSnglLnkNode<E> prev;
+        if((prev=this.prev)==null)
+        {
+          parent.head=next;
+        }else{
+          prev.next=null;
+        }
+        if(this.curr==parent.tail)
+        {
+          parent.tail=prev;
+        }
+        this.curr=prev;
+      }
+    }
+  }
+  private static class AbstractItr<E>
+      implements OmniIterator.OfRef<E>
+  {
+    transient RefSnglLnkNode<E> prev;
+    transient RefSnglLnkNode<E> curr;
+    transient RefSnglLnkNode<E> next;
+    AbstractItr(RefSnglLnkNode<E> next)
+    {
+      this.next=next; 
+    }
+    @Override public E next(){
+      final RefSnglLnkNode<E> next;
+      this.next=(next=this.next).next;
+      this.prev=this.curr;
+      this.curr=next;
+      return next.val;
+    }
+    @Override public boolean hasNext(){
+      return next!=null;
+    }
+    void uncheckedForEachRemaining(RefSnglLnkNode<E> next,Consumer<? super E> action){
+      RefSnglLnkNode<E> prev,curr=this.curr;
+      do{
+        action.accept(next.val);
+        prev=curr;
+      }while((next=(curr=next).next)!=null);
+      this.prev=prev;
+      this.curr=curr;
+      this.next=null;
+    }
+    @Override public void forEachRemaining(Consumer<? super E> action){
+      final RefSnglLnkNode<E> next;
+      if((next=this.next)!=null){
+        uncheckedForEachRemaining(next,action);
+      }
+    }
+  }
 }

@@ -119,27 +119,35 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
     return numSurvivors;
   }
 #ELSE
-  public static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors){
-    $SNode$$<E>$ curr;
-    for(int wordOffset=0;;){
-      /*
-      int numTail0s;
-      for(long word=survivorSet[wordOffset];(numTail0s=Long.numberOfTrailingZeros(word))!=64;prev=curr){
-        curr=prev.next;
-        //numTail0s = numToSkip
-        if(numTail0s!=0){
-          word>>>=numTail0s;
-          do{
-            curr=curr.next
-          }while(--numTail0s!=0);
-          prev.next=curr;
-        }
-        //numTail0s = numToRetain
-        for(word>>>=(numTail0s=Long.numberOfTrailingZeros(~word));numTail0s!=1;curr=curr.next,--numTail0s){}
+  
+
+
+  public static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    int wordOffset;
+    for(long word=survivorSet[wordOffset=0],marker=1L;;){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          if((marker<<=1)==0){
+            word=survivorSet[++wordOffset];
+            marker=1L;
+          }
+          curr=curr.next;
+        }while((marker&word)==0);
+        prev.next=curr;
       }
-      */
-      //TODO
-      
+      if(--numSurvivors==0){
+        return;
+      }
+      if((marker<<=1)==0){
+         word=survivorSet[++wordOffset];
+         marker=1L;
+      }
+      prev=curr;
     }
   }
   public static $<E>$ int markSurvivors($SNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
@@ -159,22 +167,24 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
       survivorSet[wordOffset++]=word;
     }
   }
-  public static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,long word){
-    int numTail0s;
-    for($SNode$$<E>$ curr;(numTail0s=Long.numberOfTrailingZeros(word))!=64;prev=curr){
-      curr=prev.next;
-      //numTail0s = numToSkip
-      if(numTail0s!=0){
-        word>>>=numTail0s;
+  public static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+    for(long marker=1L;;marker<<=1){
+      var curr=prev.next;
+      if((marker&word)==0){
         do{
-          curr=curr.next
-        }while(--numTail0s!=0);
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          curr=curr.next;
+        }while(((marker<<=1)&word)==0);
         prev.next=curr;
       }
-      //numTail0s = numToRetain
-      for(word>>>=(numTail0s=Long.numberOfTrailingZeros(~word));numTail0s!=1;curr=curr.next,--numTail0s){}
+      if(--numSurvivors==0){
+        return;
+      }
+      prev=curr;
     }
-    prev.next=null;
   }
   public static $<E>$ long markSurvivors($SNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter){
     for(long word=0L,marker=1L;;marker<<=1){
@@ -187,15 +197,6 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
     }
   }
 
-
-  //public static $<E>$ int retainSurvivors($SNode$$<E>$ prev, final $TypeNameModifier$Predicate$<? super E>$ filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
-  //  //TODO
-  //  return 0;
-  //}
-  //public static $<E>$ int retainTrailingSurvivors($SNode$$<E>$ prev,$SNode$$<E>$ curr,final $TypeNameModifier$Predicate$<? super E>$ filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
-  //  //TODO
-  //  return 0;
-  //}
   static $<E>$ $SNode$$<E>$ uncheckedSkip($SNode$$<E>$ curr,int numToSkip){
     while(--numToSkip!=0){
       curr=curr.next;
@@ -343,37 +344,29 @@ public static $<E>$ void uncheckedCopyInto($SNode$$<E>$ curr,DSTARR[] dst){
   }
 }
 #ENDDEF
-#MACRODEF NodeQuery<SUFFIX>(TEST)
-public static $<E>$ boolean uncheckedcontainsSUFFIX($SNode$$<E>$ curr
+#MACRODEF UncheckedQueryParam()
 #IFSWITCH SUFFIX==NonNull
-  ,Object nonNull
+,Object nonNull
 #ELSEIFSWITCH SUFFIX==Bits
-  ,$queryParameterType$ bits
+,$queryParameterType$ bits
 #ELSEIFSWITCH SUFFIX==Null,0,NaN
 #ELSE
   #IF OfRef
-  ,$TypeNameModifier$Predicate$<? super E>$ pred
+,$TypeNameModifier$Predicate$<? super E>$ pred
   #ELSE
-  ,$queryParameterType$ val
+,$queryParameterType$ val
   #ENDIF
 #ENDIF
+#ENDDEF
+#MACRODEF NodeQuery<SUFFIX>(TEST)
+public static $<E>$ boolean uncheckedcontainsSUFFIX($SNode$$<E>$ curr
+#MACRO UncheckedQueryParam()
 ){
   for(;TEST(curr.val);){if((curr=curr.next)==null){return false;}}
   return true;
 }
 public static $<E>$ int uncheckedsearchSUFFIX($SNode$$<E>$ curr
-#IFSWITCH SUFFIX==NonNull
-  ,Object nonNull
-#ELSEIFSWITCH SUFFIX==Bits
-  ,$queryParameterType$ bits
-#ELSEIFSWITCH SUFFIX==Null,0,NaN
-#ELSE
-  #IF OfRef
-  ,$TypeNameModifier$Predicate$<? super E>$ pred
-  #ELSE
-  ,$queryParameterType$ val
-  #ENDIF
-#ENDIF
+#MACRO UncheckedQueryParam()
 ){
   int index=1;
   for(;TEST(curr.val);++index){if((curr=curr.next)==null){return -1;}}

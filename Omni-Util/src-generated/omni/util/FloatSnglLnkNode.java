@@ -31,14 +31,80 @@ public class FloatSnglLnkNode implements Comparable<FloatSnglLnkNode>
       }
     }
   }
-  //public static  int retainSurvivors(FloatSnglLnkNode prev, final FloatPredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
-  //  //TODO
-  //  return 0;
-  //}
-  //public static  int retainTrailingSurvivors(FloatSnglLnkNode prev,FloatSnglLnkNode curr,final FloatPredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
-  //  //TODO
-  //  return 0;
-  //}
+  public static  void pullSurvivorsDown(FloatSnglLnkNode prev,FloatPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    int wordOffset;
+    for(long word=survivorSet[wordOffset=0],marker=1L;;){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          if((marker<<=1)==0){
+            word=survivorSet[++wordOffset];
+            marker=1L;
+          }
+          curr=curr.next;
+        }while((marker&word)==0);
+        prev.next=curr;
+      }
+      if(--numSurvivors==0){
+        return;
+      }
+      if((marker<<=1)==0){
+         word=survivorSet[++wordOffset];
+         marker=1L;
+      }
+      prev=curr;
+    }
+  }
+  public static  int markSurvivors(FloatSnglLnkNode curr,FloatPredicate filter,long[] survivorSet){
+    for(int numSurvivors=0,wordOffset=0;;){
+      long word=0L,marker=1L;
+      do{
+        if(!filter.test(curr.val)){
+          word|=marker;
+          ++numSurvivors;
+        }
+        if((curr=curr.next)==null){
+          survivorSet[wordOffset]=word;
+          return numSurvivors;
+        }
+      }
+      while((marker<<=1)!=0L);
+      survivorSet[wordOffset++]=word;
+    }
+  }
+  public static  void pullSurvivorsDown(FloatSnglLnkNode prev,long word,int numSurvivors,int numRemoved){
+    for(long marker=1L;;marker<<=1){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          curr=curr.next;
+        }while(((marker<<=1)&word)==0);
+        prev.next=curr;
+      }
+      if(--numSurvivors==0){
+        return;
+      }
+      prev=curr;
+    }
+  }
+  public static  long markSurvivors(FloatSnglLnkNode curr,FloatPredicate filter){
+    for(long word=0L,marker=1L;;marker<<=1){
+      if(!filter.test(curr.val)){
+        word|=marker;
+      }
+      if((curr=curr.next)==null){
+        return word;
+      }
+    }
+  }
   static  FloatSnglLnkNode uncheckedSkip(FloatSnglLnkNode curr,int numToSkip){
     while(--numToSkip!=0){
       curr=curr.next;
@@ -97,13 +163,13 @@ public class FloatSnglLnkNode implements Comparable<FloatSnglLnkNode>
     }while((curr=curr.next)!=null);
   }
   public static  boolean uncheckedcontainsBits(FloatSnglLnkNode curr
-    ,int bits
+  ,int bits
   ){
     for(;bits!=Float.floatToRawIntBits(curr.val);){if((curr=curr.next)==null){return false;}}
     return true;
   }
   public static  int uncheckedsearchBits(FloatSnglLnkNode curr
-    ,int bits
+  ,int bits
   ){
     int index=1;
     for(;bits!=Float.floatToRawIntBits(curr.val);++index){if((curr=curr.next)==null){return -1;}}

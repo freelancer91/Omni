@@ -23,10 +23,18 @@ import java.util.function.LongConsumer;
 import omni.util.ToStringUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractLongItr;
-public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
+import java.io.Externalizable;
+import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectInput;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable,Externalizable
 {
+  private static final long serialVersionUID=1L;
   transient int size;
-  transient long[] arr;
+  transient long[] arr; 
   private LongArrSeq()
   {
     super();
@@ -50,6 +58,24 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     super();
     this.size=size;
     this.arr=arr;
+  }
+  @Override public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int size;
+    out.writeInt(size=this.size);
+    if(size!=0)
+    {
+      OmniArray.OfLong.writeArray(arr,0,size-1,out);
+    }
+  }
+  @Override public void readExternal(ObjectInput in) throws IOException
+  {
+    int size;
+    this.size=size=in.readInt();
+    if(size!=0)
+    {
+      OmniArray.OfLong.readArray(this.arr=new long[size],0,size-1,in);
+    }
   }
   @Override
   public abstract Object clone();
@@ -656,6 +682,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       extends LongArrSeq
       implements OmniStack.OfLong,Cloneable
   {
+    private static final long serialVersionUID=1L;
     public UncheckedStack()
     {
       super();
@@ -697,11 +724,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     {
       OmniArray.OfLong.descendingToString(this.arr,0,size-1,builder);
     }
-    @Override
-    int uncheckedHashCode(int size)
-    {
-      return OmniArray.OfLong.descendingSeqHashCode(this.arr,0,size-1);
-    }
+  @Override
+  int uncheckedHashCode(int size)
+  {
+    return OmniArray.OfLong.descendingSeqHashCode(this.arr,0,size-1);
+  }
     @Override public int search(boolean val){
       {
         {
@@ -1020,6 +1047,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       extends LongArrSeq
       implements LongListDefault,Cloneable
   {
+    private static final long serialVersionUID=1L;
     public UncheckedList()
     {
       super();
@@ -1061,11 +1089,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     {
       OmniArray.OfLong.ascendingToString(this.arr,0,size-1,builder);
     }
-    @Override
-    int uncheckedHashCode(int size)
-    {
-      return OmniArray.OfLong.ascendingSeqHashCode(this.arr,0,size-1);
-    }
+  @Override
+  int uncheckedHashCode(int size)
+  {
+    return OmniArray.OfLong.ascendingSeqHashCode(this.arr,0,size-1);
+  }
     @Override public int indexOf(boolean val){
       {
         {
@@ -1526,14 +1554,14 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       ArrCopy.uncheckedCopy(this.arr,0,dst,0,length);
     }
     @Override
-    public long getLong(int index)
-    {
-      return (long)this.arr[index];
-    }
-    @Override
     public void put(int index,long val)
     {
       this.arr[index]=val;
+    }
+    @Override
+    public long getLong(int index)
+    {
+      return (long)this.arr[index];
     }
     @Override
     public long set(int index,long val)
@@ -1642,7 +1670,9 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
   public
     static class UncheckedSubList
       implements LongSubListDefault,Cloneable
+        ,Serializable
   {
+    private static final long serialVersionUID=1L;
     transient final int rootOffset;
     transient int size;
     transient final UncheckedList root;
@@ -1662,6 +1692,47 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       this.parent=parent;
       this.rootOffset=rootOffset;
       this.size=size;
+    }
+    private static class SerializableSubList implements Serializable
+    {
+      private static final long serialVersionUID=1L;
+      private transient long[] arr;
+      private transient int size;
+      private transient final int rootOffset;
+      private SerializableSubList(long[] arr,int size,int rootOffset
+      )
+      {
+        this.arr=arr;
+        this.size=size;
+        this.rootOffset=rootOffset;
+      }
+      private Object readResolve(){
+        return new UncheckedList(size,arr);
+      }
+      private void readObject(ObjectInputStream ois) throws IOException
+      {
+        int size;
+        this.size=size=ois.readInt();
+        if(size!=0)
+        {
+          OmniArray.OfLong.readArray(this.arr=new long[size],0,size-1,ois);
+        }
+      }
+      private void writeObject(ObjectOutputStream oos) throws IOException
+      {
+        {
+          int size;
+          oos.writeInt(size=this.size);
+          if(size!=0)
+          {
+            final int rootOffset;
+            OmniArray.OfLong.writeArray(arr,rootOffset=this.rootOffset,rootOffset+size-1,oos);
+          }
+        }
+      }
+    }
+    private Object writeReplace(){
+      return new SerializableSubList(root.arr,this.size,this.rootOffset);
     }
     @Override
     public boolean equals(Object val)
@@ -1706,17 +1777,17 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       }
       return "[]";
     }
-    @Override
-    public int hashCode()
+  @Override
+  public int hashCode()
+  {
+    final int size;
+    if((size=this.size)!=0)
     {
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int rootOffset;
-        return OmniArray.OfLong.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      return 1;
+      final int rootOffset;
+      return OmniArray.OfLong.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
     }
+    return 1;
+  }
     @Override
     public int size()
     {
@@ -2535,14 +2606,14 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       return OmniArray.OfFloat.DEFAULT_ARR;
     }
     @Override
-    public long getLong(int index)
-    {
-      return (long)root.arr[index+this.rootOffset];
-    }
-    @Override
     public void put(int index,long val)
     {
       root.arr[index+this.rootOffset]=val;
+    }
+    @Override
+    public long getLong(int index)
+    {
+      return (long)root.arr[index+this.rootOffset];
     }
     @Override
     public long set(int index,long val)
@@ -2704,6 +2775,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     static class CheckedStack
       extends UncheckedStack
   {
+    private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedStack()
     {
@@ -2716,6 +2788,27 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     CheckedStack(int size,long[] arr)
     {
       super(size,arr);
+    }
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
+    {
+      ModCountChecker(int modCount){
+        super(modCount);
+      }
+      @Override protected int getActualModCount(){
+        return CheckedStack.this.modCount;
+      }
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException
+    {
+      int modCount=this.modCount;
+      try
+      {
+        super.writeExternal(out);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
     }
     @Override
     public boolean equals(Object val)
@@ -2973,11 +3066,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       try
       {
         if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
-            @Override protected int getActualModCount(){
-            return CheckedStack.this.modCount;
-            }
-          }))
+          ,0,size,filter,new ModCountChecker(modCount)))
           ){
           this.modCount=modCount+1;
           this.size=size;
@@ -3000,6 +3089,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     static class CheckedList
       extends UncheckedList
   {
+    private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedList()
     {
@@ -3012,6 +3102,27 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
     CheckedList(int size,long[] arr)
     {
       super(size,arr);
+    }
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
+    {
+      ModCountChecker(int modCount){
+        super(modCount);
+      }
+      @Override protected int getActualModCount(){
+        return CheckedList.this.modCount;
+      }
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException
+    {
+      int modCount=this.modCount;
+      try
+      {
+        super.writeExternal(out);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
     }
     @Override
     public boolean equals(Object val)
@@ -3305,18 +3416,18 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       });
     }
     @Override
-    public long getLong(int index)
-    {
-      CheckedCollection.checkLo(index);
-      CheckedCollection.checkReadHi(index,this.size);
-      return (long)this.arr[index];
-    }
-    @Override
     public void put(int index,long val)
     {
       CheckedCollection.checkLo(index);
       CheckedCollection.checkReadHi(index,this.size);
       this.arr[index]=val;
+    }
+    @Override
+    public long getLong(int index)
+    {
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
+      return (long)this.arr[index];
     }
     @Override
     public long set(int index,long val)
@@ -3348,11 +3459,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       try
       {
         if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
-            @Override protected int getActualModCount(){
-            return CheckedList.this.modCount;
-            }
-          }))
+          ,0,size,filter,new ModCountChecker(modCount)))
           ){
           this.modCount=modCount+1;
           this.size=size;
@@ -3526,7 +3633,9 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
   private
     static class CheckedSubList
       implements LongSubListDefault,Cloneable
+        ,Serializable
   {
+    private static final long serialVersionUID=1L;
     transient int modCount;
     transient final int rootOffset;
     transient int size;
@@ -3549,6 +3658,56 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       this.rootOffset=rootOffset;
       this.size=size;
       this.modCount=parent.modCount;
+    }
+    private static class SerializableSubList implements Serializable
+    {
+      private static final long serialVersionUID=1L;
+      private transient long[] arr;
+      private transient int size;
+      private transient final int rootOffset;
+      private transient final CheckedList.ModCountChecker modCountChecker;
+      private SerializableSubList(long[] arr,int size,int rootOffset
+        ,CheckedList.ModCountChecker modCountChecker
+      )
+      {
+        this.arr=arr;
+        this.size=size;
+        this.rootOffset=rootOffset;
+        this.modCountChecker=modCountChecker;
+      }
+      private Object readResolve(){
+        return new CheckedList(size,arr);
+      }
+      private void readObject(ObjectInputStream ois) throws IOException
+      {
+        int size;
+        this.size=size=ois.readInt();
+        if(size!=0)
+        {
+          OmniArray.OfLong.readArray(this.arr=new long[size],0,size-1,ois);
+        }
+      }
+      private void writeObject(ObjectOutputStream oos) throws IOException
+      {
+        try
+        {
+          int size;
+          oos.writeInt(size=this.size);
+          if(size!=0)
+          {
+            final int rootOffset;
+            OmniArray.OfLong.writeArray(arr,rootOffset=this.rootOffset,rootOffset+size-1,oos);
+          }
+        }
+        finally
+        {
+          modCountChecker.checkModCount();
+        }
+      }
+    }
+    private Object writeReplace(){
+      final CheckedList root;
+      return new SerializableSubList((root=this.root).arr,this.size,this.rootOffset,root.new ModCountChecker(this.modCount));
     }
     @Override
     public boolean equals(Object val)
@@ -3597,19 +3756,19 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       }
       return "[]";
     }
-    @Override
-    public int hashCode()
+  @Override
+  public int hashCode()
+  {
+    final CheckedList root;
+    CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+    final int size;
+    if((size=this.size)!=0)
     {
-      final CheckedList root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      final int size;
-      if((size=this.size)!=0)
-      {
-        final int rootOffset;
-        return OmniArray.OfLong.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-      }
-      return 1;
+      final int rootOffset;
+      return OmniArray.OfLong.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
     }
+    return 1;
+  }
     @Override
     public int size()
     {
@@ -4658,15 +4817,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       return OmniArray.OfFloat.DEFAULT_ARR;
     }
     @Override
-    public long getLong(int index)
-    {
-      final CheckedList root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      CheckedCollection.checkLo(index);
-      CheckedCollection.checkReadHi(index,this.size);
-      return (long)root.arr[index+this.rootOffset];
-    }
-    @Override
     public void put(int index,long val)
     {
       final CheckedList root;
@@ -4674,6 +4824,15 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
       CheckedCollection.checkLo(index);
       CheckedCollection.checkReadHi(index,this.size);
       root.arr[index+this.rootOffset]=val;
+    }
+    @Override
+    public long getLong(int index)
+    {
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
+      return (long)root.arr[index+this.rootOffset];
     }
     @Override
     public long set(int index,long val)
@@ -4718,11 +4877,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
           final long[] arr;
           final int numRemoved;
           int rootOffset;
-          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
-            @Override protected int getActualModCount(){
-              return root.modCount;
-            }
-          }))!=0){
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter,root.new ModCountChecker(modCount)))!=0){
             root.modCount=++modCount;
             this.modCount=modCount;
             for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
@@ -4756,11 +4911,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
           final long[] arr;
           final int numRemoved;
           int rootOffset;
-          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test,new CheckedCollection.AbstractModCountChecker(modCount){
-            @Override protected int getActualModCount(){
-              return root.modCount;
-            }
-          }))!=0){
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test,root.new ModCountChecker(modCount)))!=0){
             root.modCount=++modCount;
             this.modCount=modCount;
             for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}

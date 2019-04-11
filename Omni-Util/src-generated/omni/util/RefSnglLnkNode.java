@@ -23,14 +23,80 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
       }
     }
   }
-  //public static <E> int retainSurvivors(RefSnglLnkNode<E> prev, final Predicate<? super E> filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
-  //  //TODO
-  //  return 0;
-  //}
-  //public static <E> int retainTrailingSurvivors(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> curr,final Predicate<? super E> filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
-  //  //TODO
-  //  return 0;
-  //}
+  public static <E> void pullSurvivorsDown(RefSnglLnkNode<E> prev,Predicate<? super E> filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    int wordOffset;
+    for(long word=survivorSet[wordOffset=0],marker=1L;;){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          if((marker<<=1)==0){
+            word=survivorSet[++wordOffset];
+            marker=1L;
+          }
+          curr=curr.next;
+        }while((marker&word)==0);
+        prev.next=curr;
+      }
+      if(--numSurvivors==0){
+        return;
+      }
+      if((marker<<=1)==0){
+         word=survivorSet[++wordOffset];
+         marker=1L;
+      }
+      prev=curr;
+    }
+  }
+  public static <E> int markSurvivors(RefSnglLnkNode<E> curr,Predicate<? super E> filter,long[] survivorSet){
+    for(int numSurvivors=0,wordOffset=0;;){
+      long word=0L,marker=1L;
+      do{
+        if(!filter.test(curr.val)){
+          word|=marker;
+          ++numSurvivors;
+        }
+        if((curr=curr.next)==null){
+          survivorSet[wordOffset]=word;
+          return numSurvivors;
+        }
+      }
+      while((marker<<=1)!=0L);
+      survivorSet[wordOffset++]=word;
+    }
+  }
+  public static <E> void pullSurvivorsDown(RefSnglLnkNode<E> prev,long word,int numSurvivors,int numRemoved){
+    for(long marker=1L;;marker<<=1){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          curr=curr.next;
+        }while(((marker<<=1)&word)==0);
+        prev.next=curr;
+      }
+      if(--numSurvivors==0){
+        return;
+      }
+      prev=curr;
+    }
+  }
+  public static <E> long markSurvivors(RefSnglLnkNode<E> curr,Predicate<? super E> filter){
+    for(long word=0L,marker=1L;;marker<<=1){
+      if(!filter.test(curr.val)){
+        word|=marker;
+      }
+      if((curr=curr.next)==null){
+        return word;
+      }
+    }
+  }
   static <E> RefSnglLnkNode<E> uncheckedSkip(RefSnglLnkNode<E> curr,int numToSkip){
     while(--numToSkip!=0){
       curr=curr.next;
@@ -89,13 +155,13 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
     }while((curr=curr.next)!=null);
   }
   public static <E> boolean uncheckedcontainsNonNull(RefSnglLnkNode<E> curr
-    ,Object nonNull
+  ,Object nonNull
   ){
     for(;!nonNull.equals(curr.val);){if((curr=curr.next)==null){return false;}}
     return true;
   }
   public static <E> int uncheckedsearchNonNull(RefSnglLnkNode<E> curr
-    ,Object nonNull
+  ,Object nonNull
   ){
     int index=1;
     for(;!nonNull.equals(curr.val);++index){if((curr=curr.next)==null){return -1;}}
@@ -113,13 +179,13 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
     return index;
   }
   public static <E> boolean uncheckedcontains (RefSnglLnkNode<E> curr
-    ,Predicate<? super E> pred
+  ,Predicate<? super E> pred
   ){
     for(;!pred.test(curr.val);){if((curr=curr.next)==null){return false;}}
     return true;
   }
   public static <E> int uncheckedsearch (RefSnglLnkNode<E> curr
-    ,Predicate<? super E> pred
+  ,Predicate<? super E> pred
   ){
     int index=1;
     for(;!pred.test(curr.val);++index){if((curr=curr.next)==null){return -1;}}

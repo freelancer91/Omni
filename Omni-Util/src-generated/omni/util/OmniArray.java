@@ -26,6 +26,11 @@ import java.util.function.LongUnaryOperator;
 import omni.function.FloatUnaryOperator;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
+import java.io.ObjectInput;
+import java.io.DataInput;
+import java.io.ObjectOutput;
+import java.io.DataOutput;
+import java.io.IOException;
 public final class OmniArray
 {
   private OmniArray()
@@ -106,6 +111,36 @@ public final class OmniArray
   {
     public static final boolean[] DEFAULT_ARR=new boolean[]{};
     public static final Boolean[] DEFAULT_BOXED_ARR=new Boolean[]{};
+    public static void writeArray(boolean[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(int word=TypeUtil.castToByte(arr[begin]),marker=1;;){
+        if(begin==end){
+          out.writeByte(word);
+          return;
+        }
+        if((marker<<=1)==(1<<8)){
+          out.writeByte(word);
+          word=0;
+          marker=1;
+        }
+        if(arr[++begin]){
+          word|=marker;
+        }
+      }
+    }
+    public static void readArray(boolean[] arr,int begin,int end,DataInput in) throws IOException{
+      for(int word=in.readUnsignedByte(),marker=1;;++begin){
+        if((marker&word)!=0){
+          arr[begin]=true;
+        }
+        if(begin==end){
+          return;
+        }
+        if((marker<<=1)==(1<<8)){
+          word=in.readUnsignedByte();
+          marker=1;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(boolean[] arr,int offset,int bound,BooleanPredicate operator)
     {
       for(;;)
@@ -610,6 +645,22 @@ public final class OmniArray
   {
     public static final char[] DEFAULT_ARR=new char[]{};
     public static final Character[] DEFAULT_BOXED_ARR=new Character[]{};
+    public static void writeArray(char[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(;;++begin){
+        out.writeChar(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(char[] arr,int begin,int end,DataInput in) throws IOException{
+      for(;;++begin){
+        arr[begin]=in.readChar();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(char[] arr,int offset,int bound,CharUnaryOperator operator)
     {
       for(;;)
@@ -842,6 +893,22 @@ public final class OmniArray
   {
     public static final short[] DEFAULT_ARR=new short[]{};
     public static final Short[] DEFAULT_BOXED_ARR=new Short[]{};
+    public static void writeArray(short[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(;;++begin){
+        out.writeShort(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(short[] arr,int begin,int end,DataInput in) throws IOException{
+      for(;;++begin){
+        arr[begin]=in.readShort();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(short[] arr,int offset,int bound,ShortUnaryOperator operator)
     {
       for(;;)
@@ -1098,6 +1165,22 @@ public final class OmniArray
   {
     public static final int[] DEFAULT_ARR=new int[]{};
     public static final Integer[] DEFAULT_BOXED_ARR=new Integer[]{};
+    public static void writeArray(int[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(;;++begin){
+        out.writeInt(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(int[] arr,int begin,int end,DataInput in) throws IOException{
+      for(;;++begin){
+        arr[begin]=in.readInt();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(int[] arr,int offset,int bound,IntUnaryOperator operator)
     {
       for(;;)
@@ -1354,6 +1437,22 @@ public final class OmniArray
   {
     public static final long[] DEFAULT_ARR=new long[]{};
     public static final Long[] DEFAULT_BOXED_ARR=new Long[]{};
+    public static void writeArray(long[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(;;++begin){
+        out.writeLong(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(long[] arr,int begin,int end,DataInput in) throws IOException{
+      for(;;++begin){
+        arr[begin]=in.readLong();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(long[] arr,int offset,int bound,LongUnaryOperator operator)
     {
       for(;;)
@@ -1610,6 +1709,22 @@ public final class OmniArray
   {
     public static final float[] DEFAULT_ARR=new float[]{};
     public static final Float[] DEFAULT_BOXED_ARR=new Float[]{};
+    public static void writeArray(float[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(;;++begin){
+        out.writeFloat(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(float[] arr,int begin,int end,DataInput in) throws IOException{
+      for(;;++begin){
+        arr[begin]=in.readFloat();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(float[] arr,int offset,int bound,FloatUnaryOperator operator)
     {
       for(;;)
@@ -2088,6 +2203,22 @@ public final class OmniArray
   {
     public static final double[] DEFAULT_ARR=new double[]{};
     public static final Double[] DEFAULT_BOXED_ARR=new Double[]{};
+    public static void writeArray(double[] arr,int begin,int end,DataOutput out) throws IOException{
+      for(;;++begin){
+        out.writeDouble(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(double[] arr,int begin,int end,DataInput in) throws IOException{
+      for(;;++begin){
+        arr[begin]=in.readDouble();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     public static   void uncheckedReplaceAll(double[] arr,int offset,int bound,DoubleUnaryOperator operator)
     {
       for(;;)
@@ -2539,6 +2670,22 @@ public final class OmniArray
   public interface OfRef
   {
     public static final Object[] DEFAULT_ARR=new Object[]{};
+    public static void writeArray(Object[] arr,int begin,int end,ObjectOutput out) throws IOException{
+      for(;;++begin){
+        out.writeObject(arr[begin]);
+        if(begin==end){
+          return;
+        }
+      }
+    }
+    public static void readArray(Object[] arr,int begin,int end,ObjectInput in) throws IOException,ClassNotFoundException{
+      for(;;++begin){
+        arr[begin]=in.readObject();
+        if(begin==end){
+          return;
+        }
+      }
+    }
     @SuppressWarnings("unchecked")
     public static <E> void uncheckedReplaceAll(Object[] arr,int offset,int bound,UnaryOperator<E> operator)
     {

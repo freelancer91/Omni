@@ -27,6 +27,11 @@ import java.util.function.LongUnaryOperator;
 import omni.function.FloatUnaryOperator;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
+import java.io.ObjectInput;
+import java.io.DataInput;
+import java.io.ObjectOutput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class OmniArray
 {
@@ -291,6 +296,76 @@ public interface OfCLASSPREFIX
   public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
+#ENDIF
+
+#IFNOTSWITCH CLASSPREFIX==Byte
+#IFSWITCH CLASSPREFIX==Ref
+  public static void writeArray(PRIMITIVETYPE[] arr,int begin,int end,ObjectOutput out) throws IOException{
+#ELSE
+  public static void writeArray(PRIMITIVETYPE[] arr,int begin,int end,DataOutput out) throws IOException{
+#ENDIF
+  #IFSWITCH CLASSPREFIX==Boolean
+    for(int word=TypeUtil.castToByte(arr[begin]),marker=1;;){
+      if(begin==end){
+        out.writeByte(word);
+        return;
+      }
+      if((marker<<=1)==(1<<8)){
+        out.writeByte(word);
+        word=0;
+        marker=1;
+      }
+      if(arr[++begin]){
+        word|=marker;
+      }
+    }
+  #ELSE
+    for(;;++begin){
+    #IFSWITCH CLASSPREFIX==Ref
+      out.writeObject(arr[begin]);
+    #ELSE
+      out.writeCLASSPREFIX(arr[begin]);
+    #ENDIF
+      if(begin==end){
+        return;
+      }
+    }
+  #ENDIF
+  }
+#IFSWITCH CLASSPREFIX==Ref
+  public static void readArray(PRIMITIVETYPE[] arr,int begin,int end,ObjectInput in) throws IOException,ClassNotFoundException{
+#ELSE
+  public static void readArray(PRIMITIVETYPE[] arr,int begin,int end,DataInput in) throws IOException{
+#ENDIF
+#IFSWITCH CLASSPREFIX==Boolean
+    for(int word=in.readUnsignedByte(),marker=1;;++begin){
+      if((marker&word)!=0){
+        arr[begin]=true;
+      }
+      if(begin==end){
+        return;
+      }
+      if((marker<<=1)==(1<<8)){
+        word=in.readUnsignedByte();
+        marker=1;
+      }
+    }
+#ELSE
+    for(;;++begin){
+#IFSWITCH CLASSPREFIX==Ref
+      arr[begin]=in.readObject();
+#ELSE
+      arr[begin]=in.readCLASSPREFIX();
+#ENDIF
+      if(begin==end){
+        return;
+      }
+    }
+#ENDIF
+  }
+  
+  
+  
 #ENDIF
 
 #IFSWITCH CLASSPREFIX==Ref

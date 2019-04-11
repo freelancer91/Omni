@@ -76,13 +76,13 @@ public class BooleanSnglLnkNode implements Comparable<BooleanSnglLnkNode>
     }while((curr=curr.next)!=null);
   }
   public static  boolean uncheckedcontains (BooleanSnglLnkNode curr
-    ,boolean val
+  ,boolean val
   ){
     for(;val!=(curr.val);){if((curr=curr.next)==null){return false;}}
     return true;
   }
   public static  int uncheckedsearch (BooleanSnglLnkNode curr
-    ,boolean val
+  ,boolean val
   ){
     int index=1;
     for(;val!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
