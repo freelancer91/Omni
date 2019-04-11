@@ -31,68 +31,8 @@ public class $SNode$Test$<E>$
     Assertions.assertTrue(node1.next==null);
     Assertions.assertTrue(node2.next==node1);
   }
-  @Test
-  public void testToString()
-  {
-#IF OfRef
-    var val=TypeConversionUtil.convertToInteger(100);
-    var expected=val.toString();
-    var node=new $SNode$<Integer>(val);
-#ELSE
-    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(100);
-    var expected=$BoxedType$.toString(val);
-    var node=new $SNode$(val);
-#ENDIF
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-#IF OfRef
-    var val=TypeConversionUtil.convertToInteger(100);
-    var equalsVal=TypeConversionUtil.convertToInteger(100);
-    var notEqualsVal=TypeConversionUtil.convertToInteger(101);
-    var node=new $SNode$<Integer>(val);
-    var equalsNode=new $SNode$<Integer>(equalsVal);
-    var notEqualsNode=new $SNode$<Integer>(notEqualsVal);
-#ELSE
-    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(100);
-    $exposedType$ equalsVal=TypeConversionUtil.convertTo$exposedType$(100);
-    $exposedType$ notEqualsVal=TypeConversionUtil.convertTo$exposedType$(101);
-    var node=new $SNode$(val);
-    var equalsNode=new $SNode$(equalsVal);
-    var notEqualsNode=new $SNode$(notEqualsVal);
-#ENDIF
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-#IF OfRef
-    var val=TypeConversionUtil.convertToInteger(100);
-    var expected=val.hashCode();
-    var node=new $SNode$<Integer>(val);
-#ELSEIF OfBoolean
-    var val=true;
-    var expected=Boolean.hashCode(val);
-    var node=new $SNode$(val);
-#ELSE
-    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(100);
-    var expected=$BoxedType$.hashCode(val);
-    var node=new $SNode$(val);
-#ENDIF
-    Assertions.assertEquals(expected,node.hashCode());
-#IF OfBoolean
-    val=false;
-    expected=Boolean.hashCode(val);
-    node=new $SNode$(val);
-    Assertions.assertEquals(expected,node.hashCode());
-#ENDIF
-  }
+
+
   @Test
   public void testCompareTo()
   {

@@ -16,37 +16,6 @@ public class RefSnglLnkNodeTest<E>
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    var val=TypeConversionUtil.convertToInteger(100);
-    var expected=val.toString();
-    var node=new RefSnglLnkNode<Integer>(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    var val=TypeConversionUtil.convertToInteger(100);
-    var equalsVal=TypeConversionUtil.convertToInteger(100);
-    var notEqualsVal=TypeConversionUtil.convertToInteger(101);
-    var node=new RefSnglLnkNode<Integer>(val);
-    var equalsNode=new RefSnglLnkNode<Integer>(equalsVal);
-    var notEqualsNode=new RefSnglLnkNode<Integer>(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    var val=TypeConversionUtil.convertToInteger(100);
-    var expected=val.hashCode();
-    var node=new RefSnglLnkNode<Integer>(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     var lessVal=TypeConversionUtil.convertToInteger(100);

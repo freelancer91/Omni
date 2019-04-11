@@ -16,37 +16,6 @@ public class CharSnglLnkNodeTest
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    char val=TypeConversionUtil.convertTochar(100);
-    var expected=Character.toString(val);
-    var node=new CharSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    char val=TypeConversionUtil.convertTochar(100);
-    char equalsVal=TypeConversionUtil.convertTochar(100);
-    char notEqualsVal=TypeConversionUtil.convertTochar(101);
-    var node=new CharSnglLnkNode(val);
-    var equalsNode=new CharSnglLnkNode(equalsVal);
-    var notEqualsNode=new CharSnglLnkNode(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    char val=TypeConversionUtil.convertTochar(100);
-    var expected=Character.hashCode(val);
-    var node=new CharSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     char lessVal=0;

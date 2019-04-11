@@ -16,41 +16,6 @@ public class BooleanSnglLnkNodeTest
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    boolean val=TypeConversionUtil.convertToboolean(100);
-    var expected=Boolean.toString(val);
-    var node=new BooleanSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    boolean val=TypeConversionUtil.convertToboolean(100);
-    boolean equalsVal=TypeConversionUtil.convertToboolean(100);
-    boolean notEqualsVal=TypeConversionUtil.convertToboolean(101);
-    var node=new BooleanSnglLnkNode(val);
-    var equalsNode=new BooleanSnglLnkNode(equalsVal);
-    var notEqualsNode=new BooleanSnglLnkNode(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    var val=true;
-    var expected=Boolean.hashCode(val);
-    var node=new BooleanSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-    val=false;
-    expected=Boolean.hashCode(val);
-    node=new BooleanSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     var lessVal=false;

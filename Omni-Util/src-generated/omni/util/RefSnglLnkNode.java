@@ -1,5 +1,7 @@
 package omni.util;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
 {
   public transient E val;
@@ -13,25 +15,123 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
     this.val=val;
     this.next=next;
   }
-  @Override
-  public String toString()
-  {
-    return Objects.toString(val);
-  }
-  @Override
-  public boolean equals(Object val)
-  {
-    if(val==this){return true;}
-    if(val instanceof RefSnglLnkNode)
-    {
-      return Objects.equals(this.val,((RefSnglLnkNode<?>)val).val);
+  public static <E> void uncheckedToString(RefSnglLnkNode<E> curr,StringBuilder builder){
+    for(;;builder.append(',').append(' ')){
+      builder.append(curr.val);
+      if((curr=curr.next)==null){
+        return;
+      }
     }
-    return false;
   }
-  @Override
-  public int hashCode()
-  {
-    return Objects.hashCode(this.val);
+  //public static <E> int retainSurvivors(RefSnglLnkNode<E> prev, final Predicate<? super E> filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
+  //  //TODO
+  //  return 0;
+  //}
+  //public static <E> int retainTrailingSurvivors(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> curr,final Predicate<? super E> filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
+  //  //TODO
+  //  return 0;
+  //}
+  static <E> RefSnglLnkNode<E> uncheckedSkip(RefSnglLnkNode<E> curr,int numToSkip){
+    while(--numToSkip!=0){
+      curr=curr.next;
+    }
+    return curr;
+  }
+  static <E> RefSnglLnkNode<E> skip(RefSnglLnkNode<E> curr,int numToSkip){
+    if(numToSkip!=0){
+      return uncheckedSkip(curr,numToSkip);
+    }
+    return curr;
+  }
+  public static <E> int retainSurvivors(RefSnglLnkNode<E> prev, final Predicate<? super E> filter){
+    int numSurvivors=1;
+    outer:for(RefSnglLnkNode<E> next;(next=prev.next)!=null;++numSurvivors,prev=next){
+      if(filter.test(next.val)){
+        do{
+          if((next=next.next)==null){
+            prev.next=null;
+            break outer;
+          }
+        }while(filter.test(next.val));
+        prev.next=next;
+      }
+    }
+    return numSurvivors;
+  }
+  public static <E> int retainTrailingSurvivors(RefSnglLnkNode<E> prev,RefSnglLnkNode<E> curr,final Predicate<? super E> filter){
+    int numSurvivors=0;
+    outer:for(;;curr=curr.next){
+      if(curr==null){
+        prev.next=null;
+        break;
+      }
+      if(!filter.test(curr.val)){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if((curr=(prev=curr).next)==null){
+            break outer;
+          }
+        }
+        while(!filter.test(curr.val));
+      }
+    }
+    return numSurvivors;
+  }
+  public static <E> int uncheckedHashCode(RefSnglLnkNode<E> curr){
+    int hash=31+Objects.hashCode(curr.val);
+    for(;(curr=curr.next)!=null;hash=(hash*31)+Objects.hashCode(curr.val)){}
+    return hash;
+  }
+  public static <E> void uncheckedForEach(RefSnglLnkNode<E> curr,Consumer<? super E> action){
+    do{
+      action.accept(curr.val);
+    }while((curr=curr.next)!=null);
+  }
+  public static <E> boolean uncheckedcontainsNonNull(RefSnglLnkNode<E> curr
+    ,Object nonNull
+  ){
+    for(;!nonNull.equals(curr.val);){if((curr=curr.next)==null){return false;}}
+    return true;
+  }
+  public static <E> int uncheckedsearchNonNull(RefSnglLnkNode<E> curr
+    ,Object nonNull
+  ){
+    int index=1;
+    for(;!nonNull.equals(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+    return index;
+  }
+  public static <E> boolean uncheckedcontainsNull(RefSnglLnkNode<E> curr
+  ){
+    for(;null!=(curr.val);){if((curr=curr.next)==null){return false;}}
+    return true;
+  }
+  public static <E> int uncheckedsearchNull(RefSnglLnkNode<E> curr
+  ){
+    int index=1;
+    for(;null!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+    return index;
+  }
+  public static <E> boolean uncheckedcontains (RefSnglLnkNode<E> curr
+    ,Predicate<? super E> pred
+  ){
+    for(;!pred.test(curr.val);){if((curr=curr.next)==null){return false;}}
+    return true;
+  }
+  public static <E> int uncheckedsearch (RefSnglLnkNode<E> curr
+    ,Predicate<? super E> pred
+  ){
+    int index=1;
+    for(;!pred.test(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+    return index;
+  }
+  public static <E> void uncheckedCopyInto(RefSnglLnkNode<E> curr,Object[] dst){
+    for(int dstOffset=0;;++dstOffset){
+      dst[dstOffset]=(curr.val);
+      if((curr=curr.next)==null){
+        return;
+      }
+    }
   }
   @SuppressWarnings("unchecked")
   @Override

@@ -16,37 +16,6 @@ public class DoubleSnglLnkNodeTest
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    double val=TypeConversionUtil.convertTodouble(100);
-    var expected=Double.toString(val);
-    var node=new DoubleSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    double val=TypeConversionUtil.convertTodouble(100);
-    double equalsVal=TypeConversionUtil.convertTodouble(100);
-    double notEqualsVal=TypeConversionUtil.convertTodouble(101);
-    var node=new DoubleSnglLnkNode(val);
-    var equalsNode=new DoubleSnglLnkNode(equalsVal);
-    var notEqualsNode=new DoubleSnglLnkNode(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    double val=TypeConversionUtil.convertTodouble(100);
-    var expected=Double.hashCode(val);
-    var node=new DoubleSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     double lessVal=0;

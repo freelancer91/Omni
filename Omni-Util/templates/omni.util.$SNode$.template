@@ -11,6 +11,15 @@ package omni.util;
 #IF OfRef
 import java.util.Objects;
 #ENDIF
+#IF OfRef,OfDouble,OfLong,OfInt
+import java.util.function.$TypeNameModifier$Consumer;
+import java.util.function.$TypeNameModifier$Predicate;
+#ELSE
+import omni.function.$TypeNameModifier$Consumer;
+  #IFNOT OfBoolean
+import omni.function.$TypeNameModifier$Predicate;
+  #ENDIF
+#ENDIF
 public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
 {
   public transient $exposedType$ val;
@@ -24,57 +33,275 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
     this.val=val;
     this.next=next;
   }
-  @Override
-  public String toString()
-  {
-#IF OfRef
-    return Objects.toString(val);
-#ELSEIF OfDouble,OfChar
-    return $BoxedType$.toString(val);
-#ELSE
-    return ToStringUtil.getString(val);
-#ENDIF
-  }
-  @Override
-  public boolean equals(Object val)
-  {
-    if(val==this){return true;}
-    if(val instanceof $SNode$)
-    {
-      #IF OfRef
-      return Objects.equals(this.val,(($SNode$<?>)val).val);
-      #ELSEIF OfFloat,OfDouble
-      return TypeUtil.$exposedType$Equals(this.val,(($SNode$)val).val);
-      #ELSE
-      return this.val==(($SNode$)val).val;
-      #ENDIF
+#IF OfRef,OfDouble
+  public static $<E>$ void uncheckedToString($SNode$$<E>$ curr,StringBuilder builder){
+    for(;;builder.append(',').append(' ')){
+      builder.append(curr.val);
+      if((curr=curr.next)==null){
+        return;
+      }
     }
-    return false;
   }
-  @Override
-  public int hashCode()
-  {
-    #IF OfRef
-    return Objects.hashCode(this.val);
-    #ELSEIF OfDouble,OfFloat
-    return HashUtil.hash$ClassPrefix$(this.val);
-    #ELSEIF OfLong
-    return $BoxedType$.hashCode(this.val);
-    #ELSEIF OfBoolean
-    return val?1231:1237;
-    #ELSE
-    return val;
+#ELSEIF OfChar
+  public static $<E>$ void uncheckedToString($SNode$$<E>$ curr,char[] buffer){
+    int bufferOffset=1;
+    for(;;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
+      buffer[bufferOffset]=curr.val;
+      if((curr=curr.next)==null){
+        return;
+      }
+    }
+  }
+#ELSE
+  public static $<E>$ int uncheckedToString($SNode$$<E>$ curr,byte[] buffer){
+    int bufferOffset=1;
+    for(;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+#IF OfByte
+      bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+#ELSE
+      bufferOffset=ToStringUtil.getString$TypeNameModifier$(curr.val,buffer,bufferOffset);
+#ENDIF
+      if((curr=curr.next)==null){
+        return bufferOffset;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedToString($SNode$$<E>$ curr,ToStringUtil.OmniStringBuilderByte builder){
+    for(;;builder.uncheckedAppendCommaAndSpace()){
+#IF OfByte
+      builder.uncheckedAppendShort(curr.val);
+#ELSE
+      builder.uncheckedAppend$TypeNameModifier$(curr.val);
+#ENDIF
+      if((curr=curr.next)==null){
+        return;
+      }
+    }
+  }
+#ENDIF
+
+
+
+#IF OfBoolean
+  public static $<E>$ int retainSurvivors($SNode$$<E>$ prev,final boolean retainThis){
+    int numSurvivors=1;
+    outer:for($SNode$$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
+      if(next.val^retainThis){
+        do{
+          if((next=next.next)==null){
+            prev.next=null;
+            break outer;
+          }
+        }while(next.val^retainThis);
+        prev.next=next;
+      }
+    }
+    return numSurvivors;
+  }
+  public static $<E>$ int retainTrailingSurvivors($SNode$$<E>$ prev,$SNode$$<E>$ curr,final boolean retainThis){
+    int numSurvivors=0;
+    outer:for(;;curr=curr.next){
+      if(curr==null){
+        prev.next=null;
+        break;
+      }
+      if(curr.val==retainThis){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if((curr=(prev=curr).next)==null){
+            break outer;
+          }
+        }
+        while(curr.val==retainThis);
+      }
+    }
+    return numSurvivors;
+  }
+#ELSE
+  public static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors){
+    $SNode$$<E>$ curr;
+    for(int wordOffset=0;;){
+      /*
+      int numTail0s;
+      for(long word=survivorSet[wordOffset];(numTail0s=Long.numberOfTrailingZeros(word))!=64;prev=curr){
+        curr=prev.next;
+        //numTail0s = numToSkip
+        if(numTail0s!=0){
+          word>>>=numTail0s;
+          do{
+            curr=curr.next
+          }while(--numTail0s!=0);
+          prev.next=curr;
+        }
+        //numTail0s = numToRetain
+        for(word>>>=(numTail0s=Long.numberOfTrailingZeros(~word));numTail0s!=1;curr=curr.next,--numTail0s){}
+      }
+      */
+      //TODO
+      
+    }
+  }
+  public static $<E>$ int markSurvivors($SNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
+    for(int numSurvivors=0,wordOffset=0;;){
+      long word=0L,marker=1L;
+      do{
+        if(!filter.test(curr.val)){
+          word|=marker;
+          ++numSurvivors;
+        }
+        if((curr=curr.next)==null){
+          survivorSet[wordOffset]=word;
+          return numSurvivors;
+        }
+      }
+      while((marker<<=1)!=0L);
+      survivorSet[wordOffset++]=word;
+    }
+  }
+  public static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,long word){
+    int numTail0s;
+    for($SNode$$<E>$ curr;(numTail0s=Long.numberOfTrailingZeros(word))!=64;prev=curr){
+      curr=prev.next;
+      //numTail0s = numToSkip
+      if(numTail0s!=0){
+        word>>>=numTail0s;
+        do{
+          curr=curr.next
+        }while(--numTail0s!=0);
+        prev.next=curr;
+      }
+      //numTail0s = numToRetain
+      for(word>>>=(numTail0s=Long.numberOfTrailingZeros(~word));numTail0s!=1;curr=curr.next,--numTail0s){}
+    }
+    prev.next=null;
+  }
+  public static $<E>$ long markSurvivors($SNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter){
+    for(long word=0L,marker=1L;;marker<<=1){
+      if(!filter.test(curr.val)){
+        word|=marker;
+      }
+      if((curr=curr.next)==null){
+        return word;
+      }
+    }
+  }
+
+
+  //public static $<E>$ int retainSurvivors($SNode$$<E>$ prev, final $TypeNameModifier$Predicate$<? super E>$ filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
+  //  //TODO
+  //  return 0;
+  //}
+  //public static $<E>$ int retainTrailingSurvivors($SNode$$<E>$ prev,$SNode$$<E>$ curr,final $TypeNameModifier$Predicate$<? super E>$ filter,CheckedCollection.AbstractModCountChecker modCountChecker,int numLeft){
+  //  //TODO
+  //  return 0;
+  //}
+  static $<E>$ $SNode$$<E>$ uncheckedSkip($SNode$$<E>$ curr,int numToSkip){
+    while(--numToSkip!=0){
+      curr=curr.next;
+    }
+    return curr;
+  }
+  static $<E>$ $SNode$$<E>$ skip($SNode$$<E>$ curr,int numToSkip){
+    if(numToSkip!=0){
+      return uncheckedSkip(curr,numToSkip);
+    }
+    return curr;
+  }
+
+  public static $<E>$ int retainSurvivors($SNode$$<E>$ prev, final $TypeNameModifier$Predicate$<? super E>$ filter){
+    int numSurvivors=1;
+    outer:for($SNode$$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
+      if(filter.test(next.val)){
+        do{
+          if((next=next.next)==null){
+            prev.next=null;
+            break outer;
+          }
+        }while(filter.test(next.val));
+        prev.next=next;
+      }
+    }
+    return numSurvivors;
+  }
+  public static $<E>$ int retainTrailingSurvivors($SNode$$<E>$ prev,$SNode$$<E>$ curr,final $TypeNameModifier$Predicate$<? super E>$ filter){
+    int numSurvivors=0;
+    outer:for(;;curr=curr.next){
+      if(curr==null){
+        prev.next=null;
+        break;
+      }
+      if(!filter.test(curr.val)){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if((curr=(prev=curr).next)==null){
+            break outer;
+          }
+        }
+        while(!filter.test(curr.val));
+      }
+    }
+    return numSurvivors;
+  }
+#ENDIF
+
+
+
+  public static $<E>$ int uncheckedHashCode($SNode$$<E>$ curr){
+    int hash=31+$hashCodeMethod$(curr.val);
+    for(;(curr=curr.next)!=null;hash=(hash*31)+$hashCodeMethod$(curr.val)){}
+    return hash;
+  }
+  public static $<E>$ void uncheckedForEach($SNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+    do{
+      action.accept(curr.val);
+    }while((curr=curr.next)!=null);
+  }
+#IF OfRef
+  #MACRO NodeQuery<NonNull>(!nonNull.equals)
+  #MACRO NodeQuery<Null>(null!=)
+  #MACRO NodeQuery< >(!pred.test)
+#ELSEIF OfDouble,OfFloat
+  #MACRO NodeQuery<Bits>(bits!=$convertToBits$)
+  #MACRO NodeQuery<0>(!$BoxedType$.isNaN)
+  #MACRO NodeQuery<NaN>(0!=)
+#ELSE
+  #MACRO NodeQuery< >(val!=)
+#ENDIF
+  #MACRO UncheckedToArrayImpl($ArrayType$,)
+#IFNOT OfRef
+  #MACRO UncheckedToArrayImpl(Object,)
+  #MACRO UncheckedToArrayImpl($BoxedType$,)
+  #IFNOT OfDouble
+  #MACRO UncheckedToArrayImpl(double,$castToDouble$)
+    #IFNOT OfFloat
+  #MACRO UncheckedToArrayImpl(float,$castToFloat$)
+      #IFNOT OfLong
+  #MACRO UncheckedToArrayImpl(long,$castToLong$)
+        #IFNOT OfInt
+  #MACRO UncheckedToArrayImpl(int,$castToInt$)
+          #IFNOT OfShort,OfChar
+  #MACRO UncheckedToArrayImpl(short,$castToShort$)
+            #IFNOT OfByte
+  #MACRO UncheckedToArrayImpl(byte,$castToByte$)
+  #MACRO UncheckedToArrayImpl(char,$castToChar$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
     #ENDIF
-  }
-  #IF OfRef
-  @SuppressWarnings("unchecked")
   #ENDIF
+#ENDIF
+#IF OfRef
+  @SuppressWarnings("unchecked")
+#ENDIF
   @Override
   public int compareTo($SNode$$<E>$ that)
   {
     if(this!=that)
     {
-      #IF OfBoolean
+#IF OfBoolean
       if(this.val)
       {
         if(!that.val)
@@ -85,9 +312,9 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
       {
         return -1;
       }
-      #ELSEIF OfByte,OfShort,OfChar
+#ELSEIF OfByte,OfShort,OfChar
       return this.val-that.val;
-      #ELSEIF OfInt,OfLong
+#ELSEIF OfInt,OfLong
       $exposedType$ thisVal,thatVal;
       if((thisVal=this.val)<(thatVal=that.val))
       {
@@ -97,12 +324,59 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
       {
         return 1;
       }
-      #ELSEIF OfFloat,OfDouble
+#ELSEIF OfFloat,OfDouble
       return $BoxedType$.compare(this.val,that.val);
-      #ELSE
+#ELSE
       return ((Comparable$<E>$)this.val).compareTo(that.val);
-      #ENDIF
+#ENDIF
     }
     return 0;
   }
 }
+#MACRODEF UncheckedToArrayImpl(DSTARR,CAST)
+public static $<E>$ void uncheckedCopyInto($SNode$$<E>$ curr,DSTARR[] dst){
+  for(int dstOffset=0;;++dstOffset){
+    dst[dstOffset]=CAST(curr.val);
+    if((curr=curr.next)==null){
+      return;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF NodeQuery<SUFFIX>(TEST)
+public static $<E>$ boolean uncheckedcontainsSUFFIX($SNode$$<E>$ curr
+#IFSWITCH SUFFIX==NonNull
+  ,Object nonNull
+#ELSEIFSWITCH SUFFIX==Bits
+  ,$queryParameterType$ bits
+#ELSEIFSWITCH SUFFIX==Null,0,NaN
+#ELSE
+  #IF OfRef
+  ,$TypeNameModifier$Predicate$<? super E>$ pred
+  #ELSE
+  ,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+){
+  for(;TEST(curr.val);){if((curr=curr.next)==null){return false;}}
+  return true;
+}
+public static $<E>$ int uncheckedsearchSUFFIX($SNode$$<E>$ curr
+#IFSWITCH SUFFIX==NonNull
+  ,Object nonNull
+#ELSEIFSWITCH SUFFIX==Bits
+  ,$queryParameterType$ bits
+#ELSEIFSWITCH SUFFIX==Null,0,NaN
+#ELSE
+  #IF OfRef
+  ,$TypeNameModifier$Predicate$<? super E>$ pred
+  #ELSE
+  ,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+){
+  int index=1;
+  for(;TEST(curr.val);++index){if((curr=curr.next)==null){return -1;}}
+  return index;
+}
+#ENDDEF

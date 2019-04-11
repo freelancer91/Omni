@@ -16,37 +16,6 @@ public class LongSnglLnkNodeTest
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    long val=TypeConversionUtil.convertTolong(100);
-    var expected=Long.toString(val);
-    var node=new LongSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    long val=TypeConversionUtil.convertTolong(100);
-    long equalsVal=TypeConversionUtil.convertTolong(100);
-    long notEqualsVal=TypeConversionUtil.convertTolong(101);
-    var node=new LongSnglLnkNode(val);
-    var equalsNode=new LongSnglLnkNode(equalsVal);
-    var notEqualsNode=new LongSnglLnkNode(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    long val=TypeConversionUtil.convertTolong(100);
-    var expected=Long.hashCode(val);
-    var node=new LongSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     long lessVal=0;

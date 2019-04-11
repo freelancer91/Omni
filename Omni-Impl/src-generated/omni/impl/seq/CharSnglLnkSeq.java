@@ -13,156 +13,13 @@ import omni.function.CharPredicate;
 import omni.util.TypeUtil;
 import omni.impl.AbstractCharItr;
 import omni.api.OmniStack;
+import omni.util.CharSnglLnkNode;
 public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
-  static class Node{
-    transient char val;
-    transient Node next;
-    Node(char val){
-      this.val=val;
-    }
-    Node(char val,Node next){
-      this.val=val;
-      this.next=next;
-    }
-    private int uncheckedHashCode(){
-      int hash=31+(val);
-      for(var curr=next;curr!=null;curr=curr.next){
-        hash=(hash*31)+(curr.val);
-      }
-      return hash;
-    }
-    private void uncheckedToString(char[] buffer){
-      int bufferOffset=1;
-      for(var curr=this;;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
-        buffer[bufferOffset]=curr.val;
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedForEach(CharConsumer action){
-      for(var curr=this;;){
-        action.accept(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(char[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(Object[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(Character[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(double[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(double)(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(float[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(float)(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(long[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(long)(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(int[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(int)(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private boolean uncheckedcontains(int val){
-      for(var curr=this;val!=(curr.val);){if((curr=curr.next)==null){return false;}}
-      return true;
-    }
-    private int uncheckedsearch(int val){
-      int index=1;
-      for(var curr=this;val!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
-      return index;
-    }
-    private int retainSurvivors(final CharPredicate filter){
-      int numSurvivors=1;
-      Node prev,next;
-      outer:for(next=(prev=this).next;next!=null;++numSurvivors,next=(prev=next).next){
-        if(filter.test(next.val)){
-          do{
-            if((next=next.next)==null){
-              prev.next=null;
-              break outer;
-            }
-          }while(filter.test(next.val));
-          prev.next=next;
-        }
-      }
-      return numSurvivors;
-    }
-    private int retainTrailingSurvivors(final CharPredicate filter){
-      int numSurvivors=0;
-      Node prev,curr;
-      outer:for(prev=this;;prev=curr){
-        if((curr=prev.next)==null){
-          prev.next=null;
-          break;
-        }
-        if(!filter.test(curr.val)){
-          prev.next=curr;
-          do{
-            ++numSurvivors;
-            if((curr=(prev=curr).next)==null){
-              break outer;
-            }
-          }
-          while(!filter.test(curr.val));
-        }
-      }
-      return numSurvivors;
-    }
-  }
   transient int size;
-  transient Node head;
+  transient CharSnglLnkNode head;
   private CharSnglLnkSeq(){
   }
-  private CharSnglLnkSeq(int size,Node head){
+  private CharSnglLnkSeq(int size,CharSnglLnkNode head){
     this.size=size;
     this.head=head;
   }
@@ -178,18 +35,18 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     this.size=0;
   }
   @Override public int hashCode(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
-      return head.uncheckedHashCode();
+      return CharSnglLnkNode.uncheckedHashCode(head);
     }
     return 1;
   }
   @Override public String toString(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       int size;
       final char[] buffer;
-      head.uncheckedToString(buffer=new char[size=this.size*3]);
+      CharSnglLnkNode.uncheckedToString(head,buffer=new char[size=this.size*3]);
       buffer[0]='[';
       buffer[size-1]=']';
       return new String(buffer,0,size);
@@ -197,22 +54,22 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     return "[]";
   }
   @Override public void forEach(CharConsumer action){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
-      head.uncheckedForEach(action);
+      CharSnglLnkNode.uncheckedForEach(head,action);
     }
   }
   @Override public void forEach(Consumer<? super Character> action){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
-      head.uncheckedForEach(action::accept);
+      CharSnglLnkNode.uncheckedForEach(head,action::accept);
     }
   }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final int size;
     T[] arr=arrConstructor.apply(size=this.size);
     if(size!=0){
-      head.uncheckedCopyInto(arr);
+      CharSnglLnkNode.uncheckedCopyInto(head,arr);
     }
     return arr;
   }
@@ -236,64 +93,64 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     return true;
   }
   @Override public <T> T[] toArray(T[] arr){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
-      head.uncheckedCopyInto(arr=OmniArray.uncheckedArrResize(size,arr));
+      CharSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
     }else{
       arr[0]=null;
     }
     return arr;
   }
   @Override public char[] toCharArray(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       final char[] dst;
-      head.uncheckedCopyInto(dst=new char[this.size]);
+      CharSnglLnkNode.uncheckedCopyInto(head,dst=new char[this.size]);
       return dst;
     }
     return OmniArray.OfChar.DEFAULT_ARR;
   }
   @Override public Character[] toArray(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       final Character[] dst;
-      head.uncheckedCopyInto(dst=new Character[this.size]);
+      CharSnglLnkNode.uncheckedCopyInto(head,dst=new Character[this.size]);
       return dst;
     }
     return OmniArray.OfChar.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       final double[] dst;
-      head.uncheckedCopyInto(dst=new double[this.size]);
+      CharSnglLnkNode.uncheckedCopyInto(head,dst=new double[this.size]);
       return dst;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public float[] toFloatArray(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       final float[] dst;
-      head.uncheckedCopyInto(dst=new float[this.size]);
+      CharSnglLnkNode.uncheckedCopyInto(head,dst=new float[this.size]);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
   @Override public long[] toLongArray(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       final long[] dst;
-      head.uncheckedCopyInto(dst=new long[this.size]);
+      CharSnglLnkNode.uncheckedCopyInto(head,dst=new long[this.size]);
       return dst;
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
   @Override public int[] toIntArray(){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       final int[] dst;
-      head.uncheckedCopyInto(dst=new int[this.size]);
+      CharSnglLnkNode.uncheckedCopyInto(head,dst=new int[this.size]);
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
@@ -301,10 +158,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean contains(boolean val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedcontains(TypeUtil.castToChar(val));
+            return CharSnglLnkNode.uncheckedcontains(head,TypeUtil.castToChar(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -314,10 +171,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val==(char)val)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedcontains((val));
+            return CharSnglLnkNode.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -326,13 +183,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean contains(long val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
             if((v=(char)val)==val)
             {
-              return head.uncheckedcontains(v);
+              return CharSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -342,13 +199,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean contains(float val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
             if(val==(v=(char)val))
             {
-              return head.uncheckedcontains(v);
+              return CharSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -358,13 +215,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean contains(double val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
             if(val==(v=(char)val))
             {
-              return head.uncheckedcontains(v);
+              return CharSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -374,7 +231,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean contains(Object val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -410,7 +267,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
               }else{
                 break returnFalse;
               }
-              return head.uncheckedcontains(i);
+              return CharSnglLnkNode.uncheckedcontains(head,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -421,10 +278,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val>=0)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedcontains((val));
+            return CharSnglLnkNode.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -433,10 +290,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean contains(char val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedcontains((val));
+            return CharSnglLnkNode.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -446,10 +303,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val>=0)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedcontains((val));
+            return CharSnglLnkNode.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -458,7 +315,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean removeVal(boolean val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,TypeUtil.castToChar(val));
@@ -471,7 +328,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val==(char)val)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -483,7 +340,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean removeVal(long val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
@@ -499,7 +356,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean removeVal(float val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
@@ -515,7 +372,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean removeVal(double val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
@@ -531,7 +388,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean remove(Object val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -578,7 +435,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val>=0)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -590,7 +447,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public boolean removeVal(char val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -603,7 +460,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val>=0)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -612,27 +469,27 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       }//end val check
       return false;
     }
-  abstract boolean uncheckedremoveVal(Node head,int val);
+  abstract boolean uncheckedremoveVal(CharSnglLnkNode head,int val);
   @Override public boolean removeIf(CharPredicate filter){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter);
     }
     return false;
   }
   @Override public boolean removeIf(Predicate<? super Character> filter){
-    final Node head;
+    final CharSnglLnkNode head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter::test);
     }
     return false;
   }
-  abstract boolean uncheckedremoveIf(Node head,CharPredicate filter);
+  abstract boolean uncheckedremoveIf(CharSnglLnkNode head,CharPredicate filter);
   public static class CheckedStack extends UncheckedStack{
     transient int modCount;
     public CheckedStack(){
     }
-    private CheckedStack(int size,Node head){
+    private CheckedStack(int size,CharSnglLnkNode head){
       super(size,head);
     }
     @Override public void push(char val){
@@ -651,17 +508,17 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
      }
     }
     @Override public Object clone(){
-      Node head;
+      CharSnglLnkNode head;
       if((head=this.head)!=null){
         final CheckedStack clone;
-        Node newHead;
-        for(clone=new CheckedStack(this.size,newHead=new Node(head.val));(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
+        CharSnglLnkNode newHead;
+        for(clone=new CheckedStack(this.size,newHead=new CharSnglLnkNode(head.val));(head=head.next)!=null;newHead=newHead.next=new CharSnglLnkNode(head.val)){}
         return clone;
       }
       return new CheckedStack();
     }
     @Override public char popChar(){
-      Node head;
+      CharSnglLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
         var ret=head.val;
@@ -680,22 +537,22 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       }
     }
     @Override public void forEach(CharConsumer action){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          head.uncheckedForEach(action);
+          CharSnglLnkNode.uncheckedForEach(head,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void forEach(Consumer<? super Character> action){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          head.uncheckedForEach(action::accept);
+          CharSnglLnkNode.uncheckedForEach(head,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -711,14 +568,17 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
         }
       });
     }
-    @Override boolean uncheckedremoveIf(Node head,CharPredicate filter){
+    @Override boolean uncheckedremoveIf(CharSnglLnkNode head,CharPredicate filter){
       final int modCount=this.modCount;
       try
       {
+        int numLeft=this.size-1;
         if(filter.test(head.val)){
           while((head=head.next)!=null){
+            --numLeft;
             if(!filter.test(head.val)){
-              this.size=head.retainSurvivors(filter,new ModCountChecker(modCount));
+              //TODO
+              //this.size=CharSnglLnkNode.retainSurvivors(head,filter,new ModCountChecker(modCount),numLeft);
               this.modCount=modCount+1;
               this.head=head;
               return true;
@@ -730,9 +590,12 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
           this.size=0;
           return true;
         }else{
-          for(int numSurvivors=1;(head=head.next)!=null;++numSurvivors){
+          CharSnglLnkNode prev;
+          for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
+            --numLeft;
             if(filter.test(head.val)){
-              this.size=numSurvivors+head.retainTrailingSurvivors(filter,new ModCountChecker(modCount));
+              //TODO
+              //this.size=numSurvivors+CharSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter,new ModCountChecker(modCount),numLeft);
               this.modCount=modCount+1;
               return true;
             }
@@ -751,7 +614,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return false;
     }
     @Override public char pollChar(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -762,7 +625,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Character.MIN_VALUE;
     }
     @Override public Character poll(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Character)(head.val);
         this.head=head.next;
@@ -773,7 +636,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return null;
     }
     @Override public double pollDouble(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         this.head=head.next;
@@ -784,7 +647,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         this.head=head.next;
@@ -795,7 +658,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         this.head=head.next;
@@ -806,7 +669,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         this.head=head.next;
@@ -816,13 +679,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       }
       return Integer.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveVal(Node head
+    @Override boolean uncheckedremoveVal(CharSnglLnkNode head
       ,int val
       ){
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          Node prev;
+          CharSnglLnkNode prev;
           {
             do{
               if((head=(prev=head).next)==null){
@@ -844,9 +707,9 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     {
       transient final CheckedStack parent;
       transient int modCount;
-      transient Node prev;
-      transient Node curr;
-      transient Node next;
+      transient CharSnglLnkNode prev;
+      transient CharSnglLnkNode curr;
+      transient CharSnglLnkNode next;
       Itr(CheckedStack parent){
         this.parent=parent;
         this.next=parent.head;
@@ -854,7 +717,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       }
       @Override public char nextChar(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final Node next;
+        final CharSnglLnkNode next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -866,9 +729,9 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       @Override public boolean hasNext(){
         return next!=null;
       }
-      private void uncheckedForEachRemaining(Node next,CharConsumer action){
+      private void uncheckedForEachRemaining(CharSnglLnkNode next,CharConsumer action){
         final int modCount=this.modCount;
-        Node prev,curr;
+        CharSnglLnkNode prev,curr;
         try{
           curr=this.curr;
           do{
@@ -883,19 +746,19 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
         this.next=null;
       }
       @Override public void forEachRemaining(CharConsumer action){
-        final Node next;
+        final CharSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Character> action){
-        final Node next;
+        final CharSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action::accept);
         }
       }
       @Override public void remove(){
-        final Node prev;
+        final CharSnglLnkNode prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedStack parent;
           int modCount;
@@ -917,11 +780,11 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
   public static class UncheckedStack extends CharSnglLnkSeq implements OmniStack.OfChar{
     public UncheckedStack(){
     }
-    private UncheckedStack(int size,Node head){
+    private UncheckedStack(int size,CharSnglLnkNode head){
       super(size,head);
     }
     @Override public void push(char val){
-      this.head=new Node(val,this.head);
+      this.head=new CharSnglLnkNode(val,this.head);
       ++this.size;
     }
     @Override public boolean equals(Object val){
@@ -929,27 +792,27 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return false;
     }
     @Override public Object clone(){
-      Node head;
+      CharSnglLnkNode head;
       if((head=this.head)!=null){
         final UncheckedStack clone;
-        Node newHead;
-        for(clone=new UncheckedStack(this.size,newHead=new Node(head.val));(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
+        CharSnglLnkNode newHead;
+        for(clone=new UncheckedStack(this.size,newHead=new CharSnglLnkNode(head.val));(head=head.next)!=null;newHead=newHead.next=new CharSnglLnkNode(head.val)){}
         return clone;
       }
       return new UncheckedStack();
     }
     @Override public char popChar(){
-      Node head;
+      CharSnglLnkNode head;
       var ret=(head=this.head).val;
       this.head=head.next;
       --this.size;
       return ret;
     }
-    @Override boolean uncheckedremoveIf(Node head,CharPredicate filter){
+    @Override boolean uncheckedremoveIf(CharSnglLnkNode head,CharPredicate filter){
       if(filter.test(head.val)){
         while((head=head.next)!=null){
           if(!filter.test(head.val)){
-            this.size=head.retainSurvivors(filter);
+            this.size=CharSnglLnkNode.retainSurvivors(head,filter);
             this.head=head;
             return true;
           }
@@ -958,9 +821,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
         this.size=0;
         return true;
       }else{
-        for(int numSurvivors=1;(head=head.next)!=null;++numSurvivors){
+        CharSnglLnkNode prev;
+        for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(filter.test(head.val)){
-            this.size=numSurvivors+head.retainTrailingSurvivors(filter);
+            this.size=numSurvivors+CharSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter);
             return true;
           }
         }
@@ -971,14 +835,14 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return popChar();
     }
     @Override public char peekChar(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         return (head.val);
       }
       return Character.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -988,14 +852,14 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Character.MIN_VALUE;
     }
     @Override public Character peek(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         return (Character)(head.val);
       }
       return null;
     }
     @Override public Character poll(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Character)(head.val);
         this.head=head.next;
@@ -1005,14 +869,14 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return null;
     }
     @Override public double peekDouble(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         return (double)(head.val);
       }
       return Double.NaN;
     }
     @Override public double pollDouble(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
         this.head=head.next;
@@ -1022,14 +886,14 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Double.NaN;
     }
     @Override public float peekFloat(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         return (float)(head.val);
       }
       return Float.NaN;
     }
     @Override public float pollFloat(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
         this.head=head.next;
@@ -1039,14 +903,14 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Float.NaN;
     }
     @Override public long peekLong(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         return (long)(head.val);
       }
       return Long.MIN_VALUE;
     }
     @Override public long pollLong(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
         this.head=head.next;
@@ -1056,14 +920,14 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       return Long.MIN_VALUE;
     }
     @Override public int peekInt(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         return (int)(head.val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final Node head;
+      final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
         this.head=head.next;
@@ -1072,13 +936,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       }
       return Integer.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveVal(Node head
+    @Override boolean uncheckedremoveVal(CharSnglLnkNode head
       ,int val
       ){
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          Node prev;
+          CharSnglLnkNode prev;
           {
             do{
               if((head=(prev=head).next)==null){
@@ -1094,10 +958,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public int search(boolean val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedsearch(TypeUtil.castToChar(val));
+            return CharSnglLnkNode.uncheckedsearch(head,TypeUtil.castToChar(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1107,10 +971,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val==(char)val)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedsearch((val));
+            return CharSnglLnkNode.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1119,13 +983,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public int search(long val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
             if((v=(char)val)==val)
             {
-              return head.uncheckedsearch(v);
+              return CharSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1135,13 +999,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public int search(float val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
             if(val==(v=(char)val))
             {
-              return head.uncheckedsearch(v);
+              return CharSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1151,13 +1015,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public int search(double val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             final char v;
             if(val==(v=(char)val))
             {
-              return head.uncheckedsearch(v);
+              return CharSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1167,7 +1031,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public int search(Object val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -1203,7 +1067,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
               }else{
                 break returnFalse;
               }
-              return head.uncheckedsearch(i);
+              return CharSnglLnkNode.uncheckedsearch(head,i);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1213,10 +1077,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
     @Override public int search(char val){
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedsearch((val));
+            return CharSnglLnkNode.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1226,10 +1090,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       if(val>=0)
       {
         {
-          final Node head;
+          final CharSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedsearch((val));
+            return CharSnglLnkNode.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1242,15 +1106,15 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       extends AbstractCharItr
     {
       transient final CharSnglLnkSeq parent;
-      transient Node prev;
-      transient Node curr;
-      transient Node next;
+      transient CharSnglLnkNode prev;
+      transient CharSnglLnkNode curr;
+      transient CharSnglLnkNode next;
       Itr(CharSnglLnkSeq parent){
         this.parent=parent;
         this.next=parent.head;
       }
       @Override public char nextChar(){
-        final Node next;
+        final CharSnglLnkNode next;
         this.next=(next=this.next).next;
         this.prev=this.curr;
         this.curr=next;
@@ -1259,8 +1123,8 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       @Override public boolean hasNext(){
         return next!=null;
       }
-      private void uncheckedForEachRemaining(Node next,CharConsumer action){
-        Node prev,curr=this.curr;
+      private void uncheckedForEachRemaining(CharSnglLnkNode next,CharConsumer action){
+        CharSnglLnkNode prev,curr=this.curr;
         do{
           action.accept(next.val);
           prev=curr;
@@ -1270,13 +1134,13 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
         this.next=null;
       }
       @Override public void forEachRemaining(CharConsumer action){
-        final Node next;
+        final CharSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Character> action){
-        final Node next;
+        final CharSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action::accept);
         }
@@ -1284,7 +1148,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable{
       @Override public void remove(){
         final CharSnglLnkSeq parent;
         --(parent=this.parent).size;
-        final Node prev;
+        final CharSnglLnkNode prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{

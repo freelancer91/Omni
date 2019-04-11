@@ -16,37 +16,6 @@ public class FloatSnglLnkNodeTest
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    float val=TypeConversionUtil.convertTofloat(100);
-    var expected=Float.toString(val);
-    var node=new FloatSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    float val=TypeConversionUtil.convertTofloat(100);
-    float equalsVal=TypeConversionUtil.convertTofloat(100);
-    float notEqualsVal=TypeConversionUtil.convertTofloat(101);
-    var node=new FloatSnglLnkNode(val);
-    var equalsNode=new FloatSnglLnkNode(equalsVal);
-    var notEqualsNode=new FloatSnglLnkNode(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    float val=TypeConversionUtil.convertTofloat(100);
-    var expected=Float.hashCode(val);
-    var node=new FloatSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     float lessVal=0;

@@ -16,37 +16,6 @@ public class ByteSnglLnkNodeTest
     Assertions.assertTrue(node2.next==node1);
   }
   @Test
-  public void testToString()
-  {
-    byte val=TypeConversionUtil.convertTobyte(100);
-    var expected=Byte.toString(val);
-    var node=new ByteSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.toString());
-  }
-  @Test
-  public void testEquals()
-  {
-    byte val=TypeConversionUtil.convertTobyte(100);
-    byte equalsVal=TypeConversionUtil.convertTobyte(100);
-    byte notEqualsVal=TypeConversionUtil.convertTobyte(101);
-    var node=new ByteSnglLnkNode(val);
-    var equalsNode=new ByteSnglLnkNode(equalsVal);
-    var notEqualsNode=new ByteSnglLnkNode(notEqualsVal);
-    Assertions.assertTrue(node.equals(node));
-    Assertions.assertFalse(node.equals(null));
-    Assertions.assertFalse(node.equals(new Object()));
-    Assertions.assertTrue(node.equals(equalsNode));
-    Assertions.assertFalse(node.equals(notEqualsNode));
-  }
-  @Test
-  public void testHashCode()
-  {
-    byte val=TypeConversionUtil.convertTobyte(100);
-    var expected=Byte.hashCode(val);
-    var node=new ByteSnglLnkNode(val);
-    Assertions.assertEquals(expected,node.hashCode());
-  }
-  @Test
   public void testCompareTo()
   {
     byte lessVal=0;

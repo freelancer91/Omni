@@ -14,191 +14,13 @@ import omni.function.BooleanPredicate;
 import omni.util.TypeUtil;
 import omni.impl.AbstractBooleanItr;
 import omni.api.OmniStack;
+import omni.util.BooleanSnglLnkNode;
 public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Cloneable{
-  static class Node{
-    transient boolean val;
-    transient Node next;
-    Node(boolean val){
-      this.val=val;
-    }
-    Node(boolean val,Node next){
-      this.val=val;
-      this.next=next;
-    }
-    private int uncheckedHashCode(){
-      int hash=31+Boolean.hashCode(val);
-      for(var curr=next;curr!=null;curr=curr.next){
-        hash=(hash*31)+Boolean.hashCode(curr.val);
-      }
-      return hash;
-    }
-    private int uncheckedToString(byte[] buffer){
-      int bufferOffset=1;
-      for(var curr=this;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
-        bufferOffset=ToStringUtil.getStringBoolean(curr.val,buffer,bufferOffset);
-        if((curr=curr.next)==null){
-          return bufferOffset;
-        }
-      }
-    }
-    private void uncheckedToString(ToStringUtil.OmniStringBuilderByte builder){
-      for(var curr=this;;builder.uncheckedAppendCommaAndSpace()){
-        builder.uncheckedAppendBoolean(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedForEach(BooleanConsumer action){
-      for(var curr=this;;){
-        action.accept(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(boolean[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(Object[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(Boolean[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(double[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=TypeUtil.castToDouble(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(float[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=TypeUtil.castToFloat(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(long[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=TypeUtil.castToLong(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(int[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(int)TypeUtil.castToByte(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(short[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=(short)TypeUtil.castToByte(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(byte[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=TypeUtil.castToByte(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private void uncheckedCopyInto(char[] dst){
-      int dstOffset=0;
-      for(var curr=this;;++dstOffset){
-        dst[dstOffset]=TypeUtil.castToChar(curr.val);
-        if((curr=curr.next)==null){
-          return;
-        }
-      }
-    }
-    private boolean uncheckedcontains(boolean val){
-      for(var curr=this;val!=(curr.val);){if((curr=curr.next)==null){return false;}}
-      return true;
-    }
-    private int uncheckedsearch(boolean val){
-      int index=1;
-      for(var curr=this;val!=(curr.val);++index){if((curr=curr.next)==null){return -1;}}
-      return index;
-    }
-    private int retainSurvivors(final boolean retainThis){
-      int numSurvivors=1;
-      Node prev,next;
-      outer:for(next=(prev=this).next;next!=null;++numSurvivors,next=(prev=next).next){
-        if(next.val^retainThis){
-          do{
-            if((next=next.next)==null){
-              prev.next=null;
-              break outer;
-            }
-          }while(next.val^retainThis);
-          prev.next=next;
-        }
-      }
-      return numSurvivors;
-    }
-    private int retainTrailingSurvivors(final boolean retainThis){
-      int numSurvivors=0;
-      Node prev,curr;
-      outer:for(prev=this;;prev=curr){
-        if((curr=prev.next)==null){
-          prev.next=null;
-          break;
-        }
-        if(curr.val==retainThis){
-          prev.next=curr;
-          do{
-            ++numSurvivors;
-            if((curr=(prev=curr).next)==null){
-              break outer;
-            }
-          }
-          while(curr.val==retainThis);
-        }
-      }
-      return numSurvivors;
-    }
-  }
   transient int size;
-  transient Node head;
+  transient BooleanSnglLnkNode head;
   private BooleanSnglLnkSeq(){
   }
-  private BooleanSnglLnkSeq(int size,Node head){
+  private BooleanSnglLnkSeq(int size,BooleanSnglLnkNode head){
     this.size=size;
     this.head=head;
   }
@@ -214,24 +36,24 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     this.size=0;
   }
   @Override public int hashCode(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
-      return head.uncheckedHashCode();
+      return BooleanSnglLnkNode.uncheckedHashCode(head);
     }
     return 1;
   }
   @Override public String toString(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
       if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
-        [size=head.uncheckedToString(buffer)]=(byte)']';
+        [size=BooleanSnglLnkNode.uncheckedToString(head,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
         final ToStringUtil.OmniStringBuilderByte builder;
-        head.uncheckedToString(builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        BooleanSnglLnkNode.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
         buffer=builder.buffer;
         buffer[0]=(byte)'[';
@@ -241,22 +63,22 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     return "[]";
   }
   @Override public void forEach(BooleanConsumer action){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
-      head.uncheckedForEach(action);
+      BooleanSnglLnkNode.uncheckedForEach(head,action);
     }
   }
   @Override public void forEach(Consumer<? super Boolean> action){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
-      head.uncheckedForEach(action::accept);
+      BooleanSnglLnkNode.uncheckedForEach(head,action::accept);
     }
   }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final int size;
     T[] arr=arrConstructor.apply(size=this.size);
     if(size!=0){
-      head.uncheckedCopyInto(arr);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,arr);
     }
     return arr;
   }
@@ -275,91 +97,91 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     return true;
   }
   @Override public <T> T[] toArray(T[] arr){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
-      head.uncheckedCopyInto(arr=OmniArray.uncheckedArrResize(size,arr));
+      BooleanSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
     }else{
       arr[0]=null;
     }
     return arr;
   }
   @Override public boolean[] toBooleanArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final boolean[] dst;
-      head.uncheckedCopyInto(dst=new boolean[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new boolean[this.size]);
       return dst;
     }
     return OmniArray.OfBoolean.DEFAULT_ARR;
   }
   @Override public Boolean[] toArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final Boolean[] dst;
-      head.uncheckedCopyInto(dst=new Boolean[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new Boolean[this.size]);
       return dst;
     }
     return OmniArray.OfBoolean.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final double[] dst;
-      head.uncheckedCopyInto(dst=new double[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new double[this.size]);
       return dst;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
   @Override public float[] toFloatArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final float[] dst;
-      head.uncheckedCopyInto(dst=new float[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new float[this.size]);
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
   @Override public long[] toLongArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final long[] dst;
-      head.uncheckedCopyInto(dst=new long[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new long[this.size]);
       return dst;
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
   @Override public int[] toIntArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final int[] dst;
-      head.uncheckedCopyInto(dst=new int[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new int[this.size]);
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
   }
   @Override public short[] toShortArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final short[] dst;
-      head.uncheckedCopyInto(dst=new short[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new short[this.size]);
       return dst;
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
   @Override public byte[] toByteArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final byte[] dst;
-      head.uncheckedCopyInto(dst=new byte[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new byte[this.size]);
       return dst;
     }
     return OmniArray.OfByte.DEFAULT_ARR;
   }
   @Override public char[] toCharArray(){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       final char[] dst;
-      head.uncheckedCopyInto(dst=new char[this.size]);
+      BooleanSnglLnkNode.uncheckedCopyInto(head,dst=new char[this.size]);
       return dst;
     }
     return OmniArray.OfChar.DEFAULT_ARR;
@@ -367,10 +189,10 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean contains(boolean val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedcontains((val));
+            return BooleanSnglLnkNode.uncheckedcontains(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -379,7 +201,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean contains(int val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -395,7 +217,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               case 1:
                 v=true;
               }
-              return head.uncheckedcontains(v);
+              return BooleanSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -405,7 +227,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean contains(long val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -422,7 +244,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               {
                 break returnFalse;
               }
-              return head.uncheckedcontains(v);
+              return BooleanSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -432,7 +254,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean contains(float val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -449,7 +271,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
                 case TypeUtil.FLT_TRUE_BITS:
                   v=true;
               }
-              return head.uncheckedcontains(v);
+              return BooleanSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -459,7 +281,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean contains(double val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -478,7 +300,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               {
                 break returnFalse;
               }
-              return head.uncheckedcontains(v);
+              return BooleanSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -488,7 +310,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean contains(Object val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -548,7 +370,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               }else{
                 break returnFalse;
               }
-              return head.uncheckedcontains(b);
+              return BooleanSnglLnkNode.uncheckedcontains(head,b);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -558,7 +380,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean removeVal(boolean val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             return uncheckedremoveVal(head,(val));
@@ -570,7 +392,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean removeVal(int val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -596,7 +418,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean removeVal(long val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -623,7 +445,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean removeVal(float val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -650,7 +472,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean removeVal(double val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -679,7 +501,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public boolean remove(Object val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -746,27 +568,27 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       }//end val check
       return false;
     }
-  abstract boolean uncheckedremoveVal(Node head,boolean val);
+  abstract boolean uncheckedremoveVal(BooleanSnglLnkNode head,boolean val);
   @Override public boolean removeIf(BooleanPredicate filter){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter);
     }
     return false;
   }
   @Override public boolean removeIf(Predicate<? super Boolean> filter){
-    final Node head;
+    final BooleanSnglLnkNode head;
     if((head=this.head)!=null){
       return uncheckedremoveIf(head,filter::test);
     }
     return false;
   }
-  abstract boolean uncheckedremoveIf(Node head,BooleanPredicate filter);
+  abstract boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter);
   public static class CheckedStack extends UncheckedStack{
     transient int modCount;
     public CheckedStack(){
     }
-    private CheckedStack(int size,Node head){
+    private CheckedStack(int size,BooleanSnglLnkNode head){
       super(size,head);
     }
     @Override public void push(boolean val){
@@ -785,17 +607,17 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
      }
     }
     @Override public Object clone(){
-      Node head;
+      BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final CheckedStack clone;
-        Node newHead;
-        for(clone=new CheckedStack(this.size,newHead=new Node(head.val));(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
+        BooleanSnglLnkNode newHead;
+        for(clone=new CheckedStack(this.size,newHead=new BooleanSnglLnkNode(head.val));(head=head.next)!=null;newHead=newHead.next=new BooleanSnglLnkNode(head.val)){}
         return clone;
       }
       return new CheckedStack();
     }
     @Override public boolean popBoolean(){
-      Node head;
+      BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
         var ret=head.val;
@@ -806,22 +628,22 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       throw new NoSuchElementException();
     }
     @Override public void forEach(BooleanConsumer action){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          head.uncheckedForEach(action);
+          BooleanSnglLnkNode.uncheckedForEach(head,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       }
     }
     @Override public void forEach(Consumer<? super Boolean> action){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          head.uncheckedForEach(action::accept);
+          BooleanSnglLnkNode.uncheckedForEach(head,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -837,7 +659,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
         }
       });
     }
-    @Override boolean uncheckedremoveIf(Node head,BooleanPredicate filter){
+    @Override boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter){
       final int modCount=this.modCount;
       try
       {
@@ -851,7 +673,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               CheckedCollection.checkModCount(modCount,this.modCount);
               this.modCount=modCount+1;
               this.head=head;
-              this.size=head.retainSurvivors(firstVal);
+              this.size=BooleanSnglLnkNode.retainSurvivors(head,firstVal);
               return true;
             }
           }
@@ -861,12 +683,13 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
           this.size=0;
           return true;
         }else{
-          for(int numSurvivors=1;(head=head.next)!=null;++numSurvivors){
+          BooleanSnglLnkNode prev;
+          for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
             if(head.val^firstVal){
               if(filter.test(!firstVal)){
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 this.modCount=modCount+1;
-                this.size=numSurvivors+head.retainTrailingSurvivors(firstVal);
+                this.size=numSurvivors+BooleanSnglLnkNode.retainTrailingSurvivors(prev,head.next,firstVal);
                 return true;
               }
               break;
@@ -886,7 +709,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return false;
     }
     @Override public boolean pollBoolean(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -897,7 +720,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return false;
     }
     @Override public Boolean poll(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Boolean)(head.val);
         this.head=head.next;
@@ -908,7 +731,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return null;
     }
     @Override public double pollDouble(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToDouble(head.val);
         this.head=head.next;
@@ -919,7 +742,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Double.NaN;
     }
     @Override public float pollFloat(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToFloat(head.val);
         this.head=head.next;
@@ -930,7 +753,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Float.NaN;
     }
     @Override public long pollLong(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToLong(head.val);
         this.head=head.next;
@@ -941,7 +764,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Long.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -952,7 +775,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Integer.MIN_VALUE;
     }
     @Override public short pollShort(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(short)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -963,7 +786,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Short.MIN_VALUE;
     }
     @Override public byte pollByte(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -974,7 +797,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Byte.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToChar(head.val);
         this.head=head.next;
@@ -984,13 +807,13 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       }
       return Character.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveVal(Node head
+    @Override boolean uncheckedremoveVal(BooleanSnglLnkNode head
       ,boolean val
       ){
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          Node prev;
+          BooleanSnglLnkNode prev;
           {
             do{
               if((head=(prev=head).next)==null){
@@ -1012,9 +835,9 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     {
       transient final CheckedStack parent;
       transient int modCount;
-      transient Node prev;
-      transient Node curr;
-      transient Node next;
+      transient BooleanSnglLnkNode prev;
+      transient BooleanSnglLnkNode curr;
+      transient BooleanSnglLnkNode next;
       Itr(CheckedStack parent){
         this.parent=parent;
         this.next=parent.head;
@@ -1022,7 +845,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       }
       @Override public boolean nextBoolean(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
-        final Node next;
+        final BooleanSnglLnkNode next;
         if((next=this.next)!=null){
           this.next=next.next;
           this.prev=this.curr;
@@ -1034,9 +857,9 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       @Override public boolean hasNext(){
         return next!=null;
       }
-      private void uncheckedForEachRemaining(Node next,BooleanConsumer action){
+      private void uncheckedForEachRemaining(BooleanSnglLnkNode next,BooleanConsumer action){
         final int modCount=this.modCount;
-        Node prev,curr;
+        BooleanSnglLnkNode prev,curr;
         try{
           curr=this.curr;
           do{
@@ -1051,19 +874,19 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
         this.next=null;
       }
       @Override public void forEachRemaining(BooleanConsumer action){
-        final Node next;
+        final BooleanSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
-        final Node next;
+        final BooleanSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action::accept);
         }
       }
       @Override public void remove(){
-        final Node prev;
+        final BooleanSnglLnkNode prev;
         if(this.curr!=(prev=this.prev)){
           final CheckedStack parent;
           int modCount;
@@ -1085,11 +908,11 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
   public static class UncheckedStack extends BooleanSnglLnkSeq implements OmniStack.OfBoolean{
     public UncheckedStack(){
     }
-    private UncheckedStack(int size,Node head){
+    private UncheckedStack(int size,BooleanSnglLnkNode head){
       super(size,head);
     }
     @Override public void push(boolean val){
-      this.head=new Node(val,this.head);
+      this.head=new BooleanSnglLnkNode(val,this.head);
       ++this.size;
     }
     @Override public boolean equals(Object val){
@@ -1097,23 +920,23 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return false;
     }
     @Override public Object clone(){
-      Node head;
+      BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final UncheckedStack clone;
-        Node newHead;
-        for(clone=new UncheckedStack(this.size,newHead=new Node(head.val));(head=head.next)!=null;newHead=newHead.next=new Node(head.val)){}
+        BooleanSnglLnkNode newHead;
+        for(clone=new UncheckedStack(this.size,newHead=new BooleanSnglLnkNode(head.val));(head=head.next)!=null;newHead=newHead.next=new BooleanSnglLnkNode(head.val)){}
         return clone;
       }
       return new UncheckedStack();
     }
     @Override public boolean popBoolean(){
-      Node head;
+      BooleanSnglLnkNode head;
       var ret=(head=this.head).val;
       this.head=head.next;
       --this.size;
       return ret;
     }
-    @Override boolean uncheckedremoveIf(Node head,BooleanPredicate filter){
+    @Override boolean uncheckedremoveIf(BooleanSnglLnkNode head,BooleanPredicate filter){
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
         while((head=head.next)!=null){
@@ -1122,7 +945,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               break;
             }
             this.head=head;
-            this.size=head.retainSurvivors(firstVal);
+            this.size=BooleanSnglLnkNode.retainSurvivors(head,firstVal);
             return true;
           }
         }
@@ -1130,10 +953,11 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
         this.size=0;
         return true;
       }else{
-        for(int numSurvivors=1;(head=head.next)!=null;++numSurvivors){
+        BooleanSnglLnkNode prev;
+        for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(head.val^firstVal){
             if(filter.test(!firstVal)){
-              this.size=numSurvivors+head.retainTrailingSurvivors(firstVal);
+              this.size=numSurvivors+BooleanSnglLnkNode.retainTrailingSurvivors(prev,head.next,firstVal);
               return true;
             }
             break;
@@ -1146,14 +970,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return popBoolean();
     }
     @Override public boolean peekBoolean(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return (head.val);
       }
       return false;
     }
     @Override public boolean pollBoolean(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
         this.head=head.next;
@@ -1163,14 +987,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return false;
     }
     @Override public Boolean peek(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return (Boolean)(head.val);
       }
       return null;
     }
     @Override public Boolean poll(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Boolean)(head.val);
         this.head=head.next;
@@ -1180,14 +1004,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return null;
     }
     @Override public double peekDouble(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return TypeUtil.castToDouble(head.val);
       }
       return Double.NaN;
     }
     @Override public double pollDouble(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToDouble(head.val);
         this.head=head.next;
@@ -1197,14 +1021,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Double.NaN;
     }
     @Override public float peekFloat(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return TypeUtil.castToFloat(head.val);
       }
       return Float.NaN;
     }
     @Override public float pollFloat(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToFloat(head.val);
         this.head=head.next;
@@ -1214,14 +1038,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Float.NaN;
     }
     @Override public long peekLong(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return TypeUtil.castToLong(head.val);
       }
       return Long.MIN_VALUE;
     }
     @Override public long pollLong(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToLong(head.val);
         this.head=head.next;
@@ -1231,14 +1055,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Long.MIN_VALUE;
     }
     @Override public int peekInt(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return (int)TypeUtil.castToByte(head.val);
       }
       return Integer.MIN_VALUE;
     }
     @Override public int pollInt(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -1248,14 +1072,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Integer.MIN_VALUE;
     }
     @Override public short peekShort(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return (short)TypeUtil.castToByte(head.val);
       }
       return Short.MIN_VALUE;
     }
     @Override public short pollShort(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(short)TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -1265,14 +1089,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Short.MIN_VALUE;
     }
     @Override public byte peekByte(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return TypeUtil.castToByte(head.val);
       }
       return Byte.MIN_VALUE;
     }
     @Override public byte pollByte(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToByte(head.val);
         this.head=head.next;
@@ -1282,14 +1106,14 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return Byte.MIN_VALUE;
     }
     @Override public char peekChar(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         return TypeUtil.castToChar(head.val);
       }
       return Character.MIN_VALUE;
     }
     @Override public char pollChar(){
-      final Node head;
+      final BooleanSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=TypeUtil.castToChar(head.val);
         this.head=head.next;
@@ -1298,13 +1122,13 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       }
       return Character.MIN_VALUE;
     }
-    @Override boolean uncheckedremoveVal(Node head
+    @Override boolean uncheckedremoveVal(BooleanSnglLnkNode head
       ,boolean val
       ){
         if(val==(head.val)){
           this.head=head.next;
         }else{
-          Node prev;
+          BooleanSnglLnkNode prev;
           {
             do{
               if((head=(prev=head).next)==null){
@@ -1320,10 +1144,10 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public int search(boolean val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            return head.uncheckedsearch((val));
+            return BooleanSnglLnkNode.uncheckedsearch(head,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1332,7 +1156,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public int search(int val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -1348,7 +1172,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               case 1:
                 v=true;
               }
-              return head.uncheckedsearch(v);
+              return BooleanSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1358,7 +1182,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public int search(long val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -1375,7 +1199,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               {
                 break returnFalse;
               }
-              return head.uncheckedsearch(v);
+              return BooleanSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1385,7 +1209,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public int search(float val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -1402,7 +1226,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
                 case TypeUtil.FLT_TRUE_BITS:
                   v=true;
               }
-              return head.uncheckedsearch(v);
+              return BooleanSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1412,7 +1236,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public int search(double val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             returnFalse:for(;;)
@@ -1431,7 +1255,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               {
                 break returnFalse;
               }
-              return head.uncheckedsearch(v);
+              return BooleanSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1441,7 +1265,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
     @Override public int search(Object val){
       {
         {
-          final Node head;
+          final BooleanSnglLnkNode head;
           if((head=this.head)!=null)
           {
             //TODO a pattern-matching switch statement would be great here
@@ -1501,7 +1325,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               }else{
                 break returnFalse;
               }
-              return head.uncheckedsearch(b);
+              return BooleanSnglLnkNode.uncheckedsearch(head,b);
             }
           } //end size check
         } //end checked sublist try modcount
@@ -1515,15 +1339,15 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       extends AbstractBooleanItr
     {
       transient final BooleanSnglLnkSeq parent;
-      transient Node prev;
-      transient Node curr;
-      transient Node next;
+      transient BooleanSnglLnkNode prev;
+      transient BooleanSnglLnkNode curr;
+      transient BooleanSnglLnkNode next;
       Itr(BooleanSnglLnkSeq parent){
         this.parent=parent;
         this.next=parent.head;
       }
       @Override public boolean nextBoolean(){
-        final Node next;
+        final BooleanSnglLnkNode next;
         this.next=(next=this.next).next;
         this.prev=this.curr;
         this.curr=next;
@@ -1532,8 +1356,8 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       @Override public boolean hasNext(){
         return next!=null;
       }
-      private void uncheckedForEachRemaining(Node next,BooleanConsumer action){
-        Node prev,curr=this.curr;
+      private void uncheckedForEachRemaining(BooleanSnglLnkNode next,BooleanConsumer action){
+        BooleanSnglLnkNode prev,curr=this.curr;
         do{
           action.accept(next.val);
           prev=curr;
@@ -1543,13 +1367,13 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
         this.next=null;
       }
       @Override public void forEachRemaining(BooleanConsumer action){
-        final Node next;
+        final BooleanSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
-        final Node next;
+        final BooleanSnglLnkNode next;
         if((next=this.next)!=null){
           uncheckedForEachRemaining(next,action::accept);
         }
@@ -1557,7 +1381,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       @Override public void remove(){
         final BooleanSnglLnkSeq parent;
         --(parent=this.parent).size;
-        final Node prev;
+        final BooleanSnglLnkNode prev;
         if((prev=this.prev)==null){
           parent.head=next;
         }else{
