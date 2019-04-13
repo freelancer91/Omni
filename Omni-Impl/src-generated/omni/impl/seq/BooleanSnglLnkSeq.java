@@ -15,7 +15,7 @@ import omni.util.TypeUtil;
 import omni.impl.AbstractBooleanItr;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
-import omni.util.BooleanSnglLnkNode;
+import omni.impl.BooleanSnglLnkNode;
 import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -29,6 +29,41 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
   private BooleanSnglLnkSeq(BooleanSnglLnkNode head,int size){
     this.size=size;
     this.head=head;
+  }
+  private static  int retainSurvivors(BooleanSnglLnkNode prev,final boolean retainThis){
+    int numSurvivors=1;
+    outer:for(BooleanSnglLnkNode next;(next=prev.next)!=null;++numSurvivors,prev=next){
+      if(next.val^retainThis){
+        do{
+          if((next=next.next)==null){
+            prev.next=null;
+            break outer;
+          }
+        }while(next.val^retainThis);
+        prev.next=next;
+      }
+    }
+    return numSurvivors;
+  }
+  private static  int retainTrailingSurvivors(BooleanSnglLnkNode prev,BooleanSnglLnkNode curr,final boolean retainThis){
+    int numSurvivors=0;
+    outer:for(;;curr=curr.next){
+      if(curr==null){
+        prev.next=null;
+        break;
+      }
+      if(curr.val==retainThis){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if((curr=(prev=curr).next)==null){
+            break outer;
+          }
+        }
+        while(curr.val==retainThis);
+      }
+    }
+    return numSurvivors;
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException
   {
@@ -776,7 +811,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               CheckedCollection.checkModCount(modCount,this.modCount);
               this.modCount=modCount+1;
               this.head=head;
-              this.size=BooleanSnglLnkNode.retainSurvivors(head,firstVal);
+              this.size=retainSurvivors(head,firstVal);
               return true;
             }
           }
@@ -792,7 +827,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               if(filter.test(!firstVal)){
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 this.modCount=modCount+1;
-                this.size=numSurvivors+BooleanSnglLnkNode.retainTrailingSurvivors(prev,head.next,firstVal);
+                this.size=numSurvivors+retainTrailingSurvivors(prev,head.next,firstVal);
                 return true;
               }
               break;
@@ -1328,7 +1363,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
               break;
             }
             this.head=head;
-            this.size=BooleanSnglLnkNode.retainSurvivors(head,firstVal);
+            this.size=retainSurvivors(head,firstVal);
             return true;
           }
         }
@@ -1340,7 +1375,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(head.val^firstVal){
             if(filter.test(!firstVal)){
-              this.size=numSurvivors+BooleanSnglLnkNode.retainTrailingSurvivors(prev,head.next,firstVal);
+              this.size=numSurvivors+retainTrailingSurvivors(prev,head.next,firstVal);
               return true;
             }
             break;

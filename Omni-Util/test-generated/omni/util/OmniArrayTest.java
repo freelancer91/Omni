@@ -29,6 +29,10 @@ import omni.function.FloatConsumer;
 import omni.function.ShortConsumer;
 import omni.function.ByteConsumer;
 import omni.function.BooleanConsumer;
+import java.util.ArrayDeque;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 public class OmniArrayTest
 {
   private void testGrowBy100PctHelper(int currCapacityBaseLine){
@@ -190,6 +194,226 @@ public class OmniArrayTest
       Assertions.assertTrue(OmniArray.OfLong.DEFAULT_BOXED_ARR.length==0);
       Assertions.assertTrue(OmniArray.OfFloat.DEFAULT_BOXED_ARR.length==0);
       Assertions.assertTrue(OmniArray.OfDouble.DEFAULT_BOXED_ARR.length==0);
+  }
+  private static class TestIO implements ObjectOutput,ObjectInput
+  {
+    ArrayDeque<Object> deque=new ArrayDeque<>();
+    @Override public void close(){}
+    @Override public void flush(){}
+    @Override public void write(byte[] b){}
+    @Override public void write(byte[] b,int off,int len){}
+    @Override public void write(int b){}
+    @Override public void writeBoolean(boolean v){}
+    @Override public void writeBytes(String s){}
+    @Override public void writeChars(String s){}
+    @Override public void writeUTF(String s){}
+    @Override public boolean readBoolean(){return false;}
+    @Override public void readFully(byte[] b){}
+    @Override public void readFully(byte[] b,int off,int len){}
+    @Override public String readLine(){return null;}
+    @Override public int readUnsignedShort(){return 0;}
+    @Override public String readUTF(){return null;}
+    @Override public int skipBytes(int n){return 0;}
+    @Override public long skip(long n){return 0L;}
+    @Override public int available(){return 0;}
+    @Override public int read(){return 0;}
+    @Override public int read(byte[] b){return 0;}
+    @Override public int read(byte[] b,int off,int len){return 0;}
+    @Override public byte readByte(){
+      return (byte)deque.remove();
+    }
+    @Override public char readChar(){
+      return (char)deque.remove();
+    }
+    @Override public double readDouble(){
+      return (double)deque.remove();
+    }
+    @Override public float readFloat(){
+      return (float)deque.remove();
+    }
+    @Override public int readInt(){
+      return (int)deque.remove();
+    }
+    @Override public long readLong(){
+      return (long)deque.remove();
+    }
+    @Override public short readShort(){
+      return (short)deque.remove();
+    }
+    @Override public int readUnsignedByte(){
+      return ((0xff)&(int)(byte)deque.remove());
+    }
+    @Override public Object readObject(){
+      return deque.remove();
+    }
+    @Override public void writeObject(Object obj)
+    {
+      deque.add(obj);
+    }
+    @Override public void writeByte(int v)
+    {
+      deque.add((byte)v);
+    }
+    @Override public void writeChar(int v)
+    {
+      deque.add((char)v);
+    }
+    @Override public void writeShort(int v)
+    {
+      deque.add((short)v);
+    }
+    @Override public void writeInt(int v)
+    {
+      deque.add(v);
+    }
+    @Override public void writeLong(long v)
+    {
+      deque.add(v);
+    }
+    @Override public void writeFloat(float v)
+    {
+      deque.add(v);
+    }
+    @Override public void writeDouble(double v)
+    {
+      deque.add(v);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_ObjectArray() throws IOException,ClassNotFoundException
+  {
+    Object[] inArr=new Object[100];
+    Object[] outArr=new Object[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertToObject(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfRef.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfRef.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertSame(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_booleanArray() throws IOException
+  {
+    boolean[] inArr=new boolean[100];
+    boolean[] outArr=new boolean[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertToboolean(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfBoolean.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfBoolean.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_charArray() throws IOException
+  {
+    char[] inArr=new char[100];
+    char[] outArr=new char[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertTochar(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfChar.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfChar.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_shortArray() throws IOException
+  {
+    short[] inArr=new short[100];
+    short[] outArr=new short[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertToshort(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfShort.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfShort.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_intArray() throws IOException
+  {
+    int[] inArr=new int[100];
+    int[] outArr=new int[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertToint(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfInt.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfInt.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_longArray() throws IOException
+  {
+    long[] inArr=new long[100];
+    long[] outArr=new long[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertTolong(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfLong.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfLong.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_floatArray() throws IOException
+  {
+    float[] inArr=new float[100];
+    float[] outArr=new float[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertTofloat(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfFloat.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfFloat.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
+  }
+  @Test
+  public void testwriteAndReadArray_doubleArray() throws IOException
+  {
+    double[] inArr=new double[100];
+    double[] outArr=new double[100];
+    for(int i=0;i<100;++i)
+    {
+      inArr[i]=TypeConversionUtil.convertTodouble(i);
+    }
+    var inAndOut=new TestIO();
+    OmniArray.OfDouble.writeArray(inArr,0,inArr.length-1,inAndOut);
+    OmniArray.OfDouble.readArray(outArr,0,outArr.length-1,inAndOut);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(inArr[i],outArr[i]);
+    }
   }
   @Test
   public void testGetIndexPredicateChar()

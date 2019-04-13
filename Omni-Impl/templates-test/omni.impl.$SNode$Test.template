@@ -1,0 +1,527 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import omni.util.TypeConversionUtil;
+#IF OfRef
+import java.util.Objects;
+#ENDIF
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
+#IFNOT OfRef,OfDouble,OfChar
+import omni.util.ToStringUtil;
+#ENDIF
+import java.util.ArrayList;
+#IF OfRef
+@SuppressWarnings({"unchecked","rawtypes"})
+#ENDIF
+public class $SNode$Test$<E>$
+{
+  
+  @Test
+  public void testConstructor_val()
+  {
+    for(int i=0;i<10;++i)
+    {
+      var val=TypeConversionUtil.convertTo$ArrayType$(i);
+#IF OfRef
+      var node=new $SNode$<>(val);
+      Assertions.assertSame(val,node.val);
+#ELSE
+      var node=new $SNode$(val);
+      Assertions.assertEquals(val,node.val);
+#ENDIF
+      Assertions.assertNull(node.next);
+    }
+  }
+  private static $SNode$ buildAscendingSequence(int length,int initVal,$SNode$ initNode)
+  {
+    var node=new $SNode$(TypeConversionUtil.convertTo$ArrayType$(++initVal),initNode);
+    for(int i=1;i<length;++i)
+    {
+      node=new $SNode$(TypeConversionUtil.convertTo$ArrayType$(++initVal),node); 
+    }
+    return node;
+  }
+  
+  @Test void testConstructor_val_$SNode$()
+  {
+    var next=new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0));
+
+    for(int i=0;i<10;++i)
+    {
+      var val=TypeConversionUtil.convertTo$ArrayType$(i);
+#IF OfRef
+      var node=new $SNode$<>(val,next);
+      Assertions.assertSame(val,node.val);
+#ELSE
+      var node=new $SNode$(val,next);
+      Assertions.assertEquals(val,node.val);
+#ENDIF 
+      Assertions.assertSame(node.next,next);
+      next=node;
+    }
+  }
+  private static String buildExpectedString()
+  {
+    StringBuilder expectedBuilder=new StringBuilder("[");
+    for(int i=11;;)
+    {
+      expectedBuilder.append(TypeConversionUtil.convertTo$ArrayType$(--i));
+      if(i==0)
+      {
+        return expectedBuilder.append(']').toString();
+      }
+      expectedBuilder.append(',').append(' ');
+    }
+  }
+  
+#IF OfRef,OfDouble
+  @Test
+  public void testuncheckedToString_$SNode$_StringBuilder()
+  {
+    var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+    StringBuilder actualBuilder=new StringBuilder("[");
+    $SNode$.uncheckedToString(beginNode,actualBuilder);
+    Assertions.assertEquals(buildExpectedString(),actualBuilder.append(']').toString());
+  }
+#ELSEIF OfChar
+  @Test
+  public void testuncheckedToString_$SNode$_charArray()
+  {
+    var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+    
+    char[] actualBuffer=new char[11*3];
+    actualBuffer[0]='[';
+    $SNode$.uncheckedToString(beginNode,actualBuffer);
+    actualBuffer[actualBuffer.length-1]=']';
+    Assertions.assertEquals(buildExpectedString(),new String(actualBuffer));
+  }
+#ELSE
+  @Test
+  public void testuncheckedToString_$SNode$_byteArray()
+  {
+    var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+    
+    byte[] actualBuffer=new byte[22*11];
+    actualBuffer[0]=(byte)'[';
+    int bufferOffset=$SNode$.uncheckedToString(beginNode,actualBuffer);
+    actualBuffer[bufferOffset]=(byte)']';
+    Assertions.assertEquals(buildExpectedString(),new String(actualBuffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet));
+  }
+  @Test
+  public void testuncheckedToString_$SNode$_OmniStringBuilderByte()
+  {
+     var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+     ToStringUtil.OmniStringBuilderByte actualBuilder=new ToStringUtil.OmniStringBuilderByte(0,new byte[22*11]);
+     actualBuilder.uncheckedAppendChar((byte)'[');
+     $SNode$.uncheckedToString(beginNode,actualBuilder);
+     actualBuilder.uncheckedAppendChar((byte)']');
+     Assertions.assertEquals(buildExpectedString(),actualBuilder.toString());
+  }
+#ENDIF
+
+  @Test
+  public void testuncheckedHashCode_$SNode$()
+  {
+    var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+    
+    int expectedHash=31+$hashCodeMethod$(beginNode.val);
+    for(var currNode=beginNode.next;currNode!=null;currNode=currNode.next)
+    {
+      expectedHash=(expectedHash*31)+$hashCodeMethod$(currNode.val);
+    }
+    Assertions.assertEquals(expectedHash,$SNode$.uncheckedHashCode(beginNode));
+  }
+  @Test
+  public void testuncheckedForEach_$SNode$_$TypeNameModifier$Consumer()
+  {
+    ArrayList<Object> consumer=new ArrayList<>();
+    
+    var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+    
+    $SNode$.uncheckedForEach(beginNode,consumer::add);
+    
+    var itr=consumer.iterator();
+    for(;;)
+    {
+      Assertions.assertTrue(itr.hasNext());
+      var itrVal=itr.next();
+      var currVal=beginNode.val;
+#IF OfRef
+      Assertions.assertSame(itrVal,currVal);
+#ELSE
+      Assertions.assertEquals(itrVal,(Object)currVal);
+#ENDIF
+      if((beginNode=beginNode.next)==null)
+      {
+        Assertions.assertFalse(itr.hasNext());
+        return;
+      }
+    }
+  }
+#IF OfRef
+  @Test
+  public void testuncheckedcontainsNonNull_$SNode$_Object()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertTrue($SNode$.uncheckedcontainsNonNull(beginNode,TypeConversionUtil.convertTo$ArrayType$(7)));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertFalse($SNode$.uncheckedcontainsNonNull(beginNode,Long.valueOf(7)));
+    }
+  }
+  @Test
+  public void testuncheckedcontainsNull_$SNode$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(5,0,new $SNode$(null,buildAscendingSequence(5,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)))));
+      Assertions.assertTrue($SNode$.uncheckedcontainsNull(beginNode));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertFalse($SNode$.uncheckedcontainsNull(beginNode));
+    }
+  }
+  @Test
+  public void testuncheckedcontains_$SNode$_Predicate()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertTrue($SNode$.uncheckedcontains(beginNode,TypeConversionUtil.convertTo$ArrayType$(7)::equals));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertFalse($SNode$.uncheckedcontains(beginNode,Long.valueOf(7)::equals));
+    }
+  }
+  @Test
+  public void testuncheckedsearchNonNull_$SNode$_Object()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(4,$SNode$.uncheckedsearchNonNull(beginNode,TypeConversionUtil.convertTo$ArrayType$(7)));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearchNonNull(beginNode,Long.valueOf(7)));
+    }
+  }
+  @Test
+  public void testuncheckedsearchNull_$SNode$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(5,0,new $SNode$(null,buildAscendingSequence(5,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)))));
+      Assertions.assertEquals(6,$SNode$.uncheckedsearchNull(beginNode));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearchNull(beginNode));
+    }
+  }
+  @Test
+  public void testuncheckedsearch_$SNode$_Predicate()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(4,$SNode$.uncheckedsearch(beginNode,TypeConversionUtil.convertTo$ArrayType$(7)::equals));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearch(beginNode,Long.valueOf(7)::equals));
+    }
+  }
+#ELSEIF OfDouble,OfFloat
+  @Test
+  public void testuncheckedcontainsBits_$SNode$_$queryParameterType$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertTrue($SNode$.uncheckedcontainsBits(beginNode,$convertToBits$(TypeConversionUtil.convertTo$ArrayType$(7))));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertFalse($SNode$.uncheckedcontainsBits(beginNode,$convertToBits$(TypeConversionUtil.convertTo$ArrayType$(100))));
+    }
+  }
+  @Test
+  public void testuncheckedcontainsNaN_$SNode$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(5,0,new $SNode$($BoxedType$.NaN,buildAscendingSequence(5,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)))));
+      Assertions.assertTrue($SNode$.uncheckedcontainsNaN(beginNode));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertFalse($SNode$.uncheckedcontainsNaN(beginNode));
+    }
+  }
+  @Test
+  public void testuncheckedcontains0_$SNode$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(5,5,new $SNode$(0,buildAscendingSequence(5,5,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(5)))));
+      Assertions.assertTrue($SNode$.uncheckedcontains0(beginNode));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,10,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(10)));
+      Assertions.assertFalse($SNode$.uncheckedcontains0(beginNode));
+    }
+  }
+  @Test
+  public void testuncheckedsearchBits_$SNode$_$queryParameterType$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(4,$SNode$.uncheckedsearchBits(beginNode,$convertToBits$(TypeConversionUtil.convertTo$ArrayType$(7))));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearchBits(beginNode,$convertToBits$(TypeConversionUtil.convertTo$ArrayType$(100))));
+    }
+  }
+  @Test
+  public void testuncheckedsearchNaN_$SNode$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(5,0,new $SNode$($BoxedType$.NaN,buildAscendingSequence(5,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)))));
+      Assertions.assertEquals(6,$SNode$.uncheckedsearchNaN(beginNode));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearchNaN(beginNode));
+    }
+  }
+  @Test
+  public void testuncheckedsearch0_$SNode$()
+  {
+    //positive return
+    {
+      var beginNode=buildAscendingSequence(5,5,new $SNode$(0,buildAscendingSequence(5,5,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(5)))));
+      Assertions.assertEquals(6,$SNode$.uncheckedsearch0(beginNode));
+    }
+    //negative return
+    {
+      var beginNode=buildAscendingSequence(10,10,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(10)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearch0(beginNode));
+    }
+  }
+#ELSE
+  @Test
+  public void testuncheckedcontains_$SNode$_$queryParameterType$()
+  {
+    //positive return
+    {
+#IF OfBoolean
+      var node=new $SNode$(false);
+      for(int i=0;i<5;++i)
+      {
+        node=new $SNode$(false,node);
+      }
+      node=new $SNode$(true,node);
+      for(int i=0;i<5;++i)
+      {
+        node=new $SNode$(false,node);
+      }
+      Assertions.assertTrue($SNode$.uncheckedcontains(node,true));
+#ELSE
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertTrue($SNode$.uncheckedcontains(beginNode,TypeConversionUtil.convertTo$ArrayType$(7)));
+#ENDIF
+    }
+    //negative return
+    {
+#IF OfBoolean
+      var node=new $SNode$(false);
+      for(int i=0;i<10;++i)
+      {
+        node=new $SNode$(false,node);
+      }
+      Assertions.assertFalse($SNode$.uncheckedcontains(node,true));
+#ELSE
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertFalse($SNode$.uncheckedcontains(beginNode,TypeConversionUtil.convertTo$ArrayType$(100)));
+#ENDIF
+    }
+  }
+  @Test
+  public void testuncheckedsearch_$SNode$_$queryParameterType$()
+  {
+    //positive return
+    {
+#IF OfBoolean
+      var node=new $SNode$(false);
+      for(int i=0;i<5;++i)
+      {
+        node=new $SNode$(false,node);
+      }
+      node=new $SNode$(true,node);
+      for(int i=0;i<5;++i)
+      {
+        node=new $SNode$(false,node);
+      }
+      Assertions.assertEquals(6,$SNode$.uncheckedsearch(node,true));
+#ELSE
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(4,$SNode$.uncheckedsearch(beginNode,TypeConversionUtil.convertTo$ArrayType$(7)));
+#ENDIF
+    }
+    //negative return
+    {
+#IF OfBoolean
+      var node=new $SNode$(false);
+      for(int i=0;i<10;++i)
+      {
+        node=new $SNode$(false,node);
+      }
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearch(node,true));
+#ELSE
+      var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+      Assertions.assertEquals(-1,$SNode$.uncheckedsearch(beginNode,TypeConversionUtil.convertTo$ArrayType$(100)));
+#ENDIF
+    }
+  }
+#ENDIF
+
+  @Test
+  public void testuncheckedCopyInto_$SNode$_$ArrayType$Array()
+  {
+     var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+     $ArrayType$[] dst=new $ArrayType$[11];
+     $SNode$.uncheckedCopyInto(beginNode,dst);
+     for(int i=10;i>=0;--i)
+     {
+       Assertions.assertEquals((Object)TypeConversionUtil.convertTo$ArrayType$(i),(Object)dst[10-i]);
+     }
+  }
+
+#IFNOT OfRef
+  @Test
+  public void testuncheckedCopyInto_$SNode$_$BoxedType$Array()
+  {
+     var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+     $BoxedType$[] dst=new $BoxedType$[11];
+     $SNode$.uncheckedCopyInto(beginNode,dst);
+     for(int i=10;i>=0;--i)
+     {
+       Assertions.assertEquals((Object)TypeConversionUtil.convertTo$BoxedType$(i),(Object)dst[10-i]);
+     }
+  }
+  #MACRO TestUncheckedCopyInto<Object>()
+  #IFNOT OfDouble
+  #MACRO TestUncheckedCopyInto<double>()
+    #IFNOT OfFloat
+  #MACRO TestUncheckedCopyInto<float>()
+      #IFNOT OfLong
+  #MACRO TestUncheckedCopyInto<long>()
+        #IFNOT OfInt
+  #MACRO TestUncheckedCopyInto<int>()
+          #IFNOT OfShort,OfChar
+  #MACRO TestUncheckedCopyInto<short>()
+            #IFNOT OfByte
+  #MACRO TestUncheckedCopyInto<byte>()
+  #MACRO TestUncheckedCopyInto<char>()
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF 
+  
+
+#MACRODEF TestUncheckedCopyInto<DSTTYPE>()
+@Test
+public void testuncheckedCopyInto_$SNode$_DSTTYPEArray()
+{
+   var beginNode=buildAscendingSequence(10,0,new $SNode$(TypeConversionUtil.convertTo$ArrayType$(0)));
+   DSTTYPE[] dst=new DSTTYPE[11];
+   $SNode$.uncheckedCopyInto(beginNode,dst);
+   for(int i=10;i>=0;--i)
+   {
+#IFSWITCH DSTTYPE==Object
+     Assertions.assertEquals((Object)TypeConversionUtil.convertTo$BoxedType$(i),(Object)dst[10-i]);
+#ELSE
+  #IF OfBoolean
+     Assertions.assertEquals((Object)TypeConversionUtil.convertToDSTTYPEboolean(i),(Object)dst[10-i]);
+  #ELSE
+     Assertions.assertEquals((Object)TypeConversionUtil.convertToDSTTYPE(i),(Object)dst[10-i]);
+  #ENDIF
+#ENDIF
+   }
+}
+#ENDDEF
+
+
+
+
+  @Test
+  public void testCompareTo()
+  {
+#IF OfRef
+    var lessVal=TypeConversionUtil.convertToInteger(100);
+    var lessEqualsVal=TypeConversionUtil.convertToInteger(100);
+    var greaterVal=TypeConversionUtil.convertToInteger(101);
+    var greaterEqualsVal=TypeConversionUtil.convertToInteger(101);
+    var lessNode=new $SNode$<Integer>(lessVal);
+    var lessEqualsNode=new $SNode$<Integer>(lessEqualsVal);
+    var greaterNode=new $SNode$<Integer>(greaterVal);
+    var greaterEqualsNode=new $SNode$<Integer>(greaterEqualsVal);
+#ELSE
+  #IF OfBoolean
+    var lessVal=false;
+    var lessEqualsVal=false;
+    var greaterVal=true;
+    var greaterEqualsVal=true;
+  #ELSE
+    $exposedType$ lessVal=0;
+    $exposedType$ lessEqualsVal=0;
+    $exposedType$ greaterVal=1;
+    $exposedType$ greaterEqualsVal=1;
+  #ENDIF
+    var lessNode=new $SNode$(lessVal);
+    var lessEqualsNode=new $SNode$(lessEqualsVal);
+    var greaterNode=new $SNode$(greaterVal);
+    var greaterEqualsNode=new $SNode$(greaterEqualsVal);
+#ENDIF
+    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
+    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
+    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
+    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
+    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
+    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
+  }
+}

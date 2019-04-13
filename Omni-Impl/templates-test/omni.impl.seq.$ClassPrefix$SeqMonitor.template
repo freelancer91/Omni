@@ -2766,6 +2766,7 @@ BOXED_TYPEVALUE_NAME(false){
       throw new ArrayIndexOutOfBoundsException();
     }
   }
+ 
   static class MonitoredObject implements Comparable<MonitoredObject>{
     int numEqualsCalls;
     int numHashCodeCalls;

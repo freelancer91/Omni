@@ -30,6 +30,10 @@ import omni.function.FloatConsumer;
 import omni.function.ShortConsumer;
 import omni.function.ByteConsumer;
 import omni.function.BooleanConsumer;
+import java.util.ArrayDeque;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 public class OmniArrayTest
 {
   private void testGrowBy100PctHelper(int currCapacityBaseLine){
@@ -194,6 +198,135 @@ public class OmniArrayTest
       Assertions.assertTrue(OmniArray.OfFloat.DEFAULT_BOXED_ARR.length==0);
       Assertions.assertTrue(OmniArray.OfDouble.DEFAULT_BOXED_ARR.length==0);
   }
+  private static class TestIO implements ObjectOutput,ObjectInput
+  {
+    ArrayDeque<Object> deque=new ArrayDeque<>();
+    @Override public void close(){}
+    @Override public void flush(){}
+    @Override public void write(byte[] b){}
+    @Override public void write(byte[] b,int off,int len){}
+    @Override public void write(int b){}
+    @Override public void writeBoolean(boolean v){}
+    @Override public void writeBytes(String s){}
+    @Override public void writeChars(String s){}
+    @Override public void writeUTF(String s){}
+    @Override public boolean readBoolean(){return false;}
+    @Override public void readFully(byte[] b){}
+    @Override public void readFully(byte[] b,int off,int len){}
+    @Override public String readLine(){return null;}
+    
+    @Override public int readUnsignedShort(){return 0;}
+    @Override public String readUTF(){return null;}
+    @Override public int skipBytes(int n){return 0;}
+    @Override public long skip(long n){return 0L;}
+    @Override public int available(){return 0;}
+    @Override public int read(){return 0;}
+    @Override public int read(byte[] b){return 0;}
+    @Override public int read(byte[] b,int off,int len){return 0;}
+    
+    
+    @Override public byte readByte(){
+      return (byte)deque.remove();
+    }
+    @Override public char readChar(){
+      return (char)deque.remove();
+    }
+    @Override public double readDouble(){
+      return (double)deque.remove();
+    }
+    @Override public float readFloat(){
+      return (float)deque.remove();
+    }
+    @Override public int readInt(){
+      return (int)deque.remove();
+    }
+    @Override public long readLong(){
+      return (long)deque.remove();
+    }
+    @Override public short readShort(){
+      return (short)deque.remove();
+    }
+    @Override public int readUnsignedByte(){
+      return ((0xff)&(int)(byte)deque.remove());
+    }
+    @Override public Object readObject(){
+      return deque.remove();
+    }
+    
+    
+    
+    
+    @Override public void writeObject(Object obj)
+    {
+      deque.add(obj);
+    }
+    @Override public void writeByte(int v)
+    {
+      deque.add((byte)v);
+    }
+    @Override public void writeChar(int v)
+    {
+      deque.add((char)v);
+    }
+    @Override public void writeShort(int v)
+    {
+      deque.add((short)v);
+    }
+    @Override public void writeInt(int v)
+    {
+      deque.add(v);
+    }
+    @Override public void writeLong(long v)
+    {
+      deque.add(v);
+    }
+    @Override public void writeFloat(float v)
+    {
+      deque.add(v);
+    }
+    @Override public void writeDouble(double v)
+    {
+      deque.add(v);
+    }
+  }
+  
+  #MACRO TestReadWriteArray<Object,Ref>()
+  #MACRO TestReadWriteArray<boolean,Boolean>()
+  #MACRO TestReadWriteArray<char,Char>()
+  #MACRO TestReadWriteArray<short,Short>()
+  #MACRO TestReadWriteArray<int,Int>()
+  #MACRO TestReadWriteArray<long,Long>()
+  #MACRO TestReadWriteArray<float,Float>()
+  #MACRO TestReadWriteArray<double,Double>()
+  
+#MACRODEF TestReadWriteArray<ARRTYPE,CLASSPREFIX>()
+@Test
+#IFSWITCH ARRTYPE==Object
+public void testwriteAndReadArray_ARRTYPEArray() throws IOException,ClassNotFoundException
+#ELSE
+public void testwriteAndReadArray_ARRTYPEArray() throws IOException
+#ENDIF
+{
+  ARRTYPE[] inArr=new ARRTYPE[100];
+  ARRTYPE[] outArr=new ARRTYPE[100];
+  for(int i=0;i<100;++i)
+  {
+    inArr[i]=TypeConversionUtil.convertToARRTYPE(i);
+  }
+  var inAndOut=new TestIO();
+  OmniArray.OfCLASSPREFIX.writeArray(inArr,0,inArr.length-1,inAndOut);
+  OmniArray.OfCLASSPREFIX.readArray(outArr,0,outArr.length-1,inAndOut);
+  
+  for(int i=0;i<100;++i)
+  {
+#IFSWITCH ARRTYPE==Object
+    Assertions.assertSame(inArr[i],outArr[i]);
+#ELSE
+    Assertions.assertEquals(inArr[i],outArr[i]);
+#ENDIF
+  }
+}
+#ENDDEF
   
   
   #MACRO TestIndexPredicate<char>(Char,CharPredicate,)

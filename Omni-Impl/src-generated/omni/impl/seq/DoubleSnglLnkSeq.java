@@ -10,12 +10,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
-import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.impl.AbstractDoubleItr;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
-import omni.util.DoubleSnglLnkNode;
+import omni.impl.DoubleSnglLnkNode;
 import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -29,6 +28,115 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
   private DoubleSnglLnkSeq(DoubleSnglLnkNode head,int size){
     this.size=size;
     this.head=head;
+  }
+  private static  void pullSurvivorsDown(DoubleSnglLnkNode prev,DoublePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    int wordOffset;
+    for(long word=survivorSet[wordOffset=0],marker=1L;;){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          if((marker<<=1)==0){
+            word=survivorSet[++wordOffset];
+            marker=1L;
+          }
+          curr=curr.next;
+        }while((marker&word)==0);
+        prev.next=curr;
+      }
+      if(--numSurvivors==0){
+        return;
+      }
+      if((marker<<=1)==0){
+         word=survivorSet[++wordOffset];
+         marker=1L;
+      }
+      prev=curr;
+    }
+  }
+  private static  int markSurvivors(DoubleSnglLnkNode curr,DoublePredicate filter,long[] survivorSet){
+    for(int numSurvivors=0,wordOffset=0;;){
+      long word=0L,marker=1L;
+      do{
+        if(!filter.test(curr.val)){
+          word|=marker;
+          ++numSurvivors;
+        }
+        if((curr=curr.next)==null){
+          survivorSet[wordOffset]=word;
+          return numSurvivors;
+        }
+      }
+      while((marker<<=1)!=0L);
+      survivorSet[wordOffset++]=word;
+    }
+  }
+  private static  void pullSurvivorsDown(DoubleSnglLnkNode prev,long word,int numSurvivors,int numRemoved){
+    for(long marker=1L;;marker<<=1){
+      var curr=prev.next;
+      if((marker&word)==0){
+        do{
+          if(--numRemoved==0){
+            prev.next=null;
+            return;
+          }
+          curr=curr.next;
+        }while(((marker<<=1)&word)==0);
+        prev.next=curr;
+      }
+      if(--numSurvivors==0){
+        return;
+      }
+      prev=curr;
+    }
+  }
+  private static  long markSurvivors(DoubleSnglLnkNode curr,DoublePredicate filter){
+    for(long word=0L,marker=1L;;marker<<=1){
+      if(!filter.test(curr.val)){
+        word|=marker;
+      }
+      if((curr=curr.next)==null){
+        return word;
+      }
+    }
+  }
+  private static  int retainSurvivors(DoubleSnglLnkNode prev, final DoublePredicate filter){
+    int numSurvivors=1;
+    outer:for(DoubleSnglLnkNode next;(next=prev.next)!=null;++numSurvivors,prev=next){
+      if(filter.test(next.val)){
+        do{
+          if((next=next.next)==null){
+            prev.next=null;
+            break outer;
+          }
+        }while(filter.test(next.val));
+        prev.next=next;
+      }
+    }
+    return numSurvivors;
+  }
+  private static  int retainTrailingSurvivors(DoubleSnglLnkNode prev,DoubleSnglLnkNode curr,final DoublePredicate filter){
+    int numSurvivors=0;
+    outer:for(;;curr=curr.next){
+      if(curr==null){
+        prev.next=null;
+        break;
+      }
+      if(!filter.test(curr.val)){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if((curr=(prev=curr).next)==null){
+            break outer;
+          }
+        }
+        while(!filter.test(curr.val));
+      }
+    }
+    return numSurvivors;
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException
   {
@@ -673,20 +781,20 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         if(numLeft>64)
         {
           long[] survivorSet;
-          numSurvivors=DoubleSnglLnkNode.markSurvivors(prev.next,filter,survivorSet=BitSetUtil.getBitSet(numLeft));
+          numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=numSurvivors)!=0)
           {
-            DoubleSnglLnkNode.pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+            pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
         }
         else
         {
-          long survivorWord=DoubleSnglLnkNode.markSurvivors(prev.next,filter);
+          long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
           {
-            DoubleSnglLnkNode.pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
+            pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
         return numSurvivors;
@@ -1083,7 +1191,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       if(filter.test(head.val)){
         while((head=head.next)!=null){
           if(!filter.test(head.val)){
-            this.size=DoubleSnglLnkNode.retainSurvivors(head,filter);
+            this.size=retainSurvivors(head,filter);
             this.head=head;
             return true;
           }
@@ -1095,7 +1203,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         DoubleSnglLnkNode prev;
         for(int numSurvivors=1;(head=(prev=head).next)!=null;++numSurvivors){
           if(filter.test(head.val)){
-            this.size=numSurvivors+DoubleSnglLnkNode.retainTrailingSurvivors(prev,head.next,filter);
+            this.size=numSurvivors+retainTrailingSurvivors(prev,head.next,filter);
             return true;
           }
         }
@@ -1361,7 +1469,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         if(numLeft>64)
         {
           long[] survivorSet;
-          numSurvivors=DoubleSnglLnkNode.markSurvivors(prev.next,filter,survivorSet=BitSetUtil.getBitSet(numLeft));
+          numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=numSurvivors)!=0)
           {
@@ -1370,7 +1478,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         }
         else
         {
-          long survivorWord=DoubleSnglLnkNode.markSurvivors(prev.next,filter);
+          long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
           {

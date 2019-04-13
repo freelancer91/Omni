@@ -30,6 +30,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneable,Externalizable
 {
+  //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient int size;
   transient boolean[] arr; 

@@ -21,7 +21,6 @@ import omni.function.FloatComparator;
 import omni.function.FloatPredicate;
 import omni.function.FloatConsumer;
 import omni.util.ToStringUtil;
-import omni.util.BitSetUtil;
 import omni.impl.AbstractFloatItr;
 import java.io.Externalizable;
 import java.io.Serializable;
@@ -32,6 +31,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable,Externalizable
 {
+  //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient int size;
   transient float[] arr; 
@@ -75,6 +75,80 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable,Ex
     if(size!=0)
     {
       OmniArray.OfFloat.readArray(this.arr=new float[size],0,size-1,in);
+    }
+  }
+  private static  long markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter)
+  {
+    for(long word=0L,marker=1L;;marker<<=1)
+    {
+      if(!filter.test((float)arr[srcOffset]))
+      {
+        word|=marker;
+      }
+      if(++srcOffset==srcBound)
+      {
+        return word;
+      }
+    }
+  }
+  private static  int markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter,long[] survivorSet)
+  {
+    for(int numSurvivors=0,wordOffset=0;;)
+    {
+      long word=0L,marker=1L;
+      do
+      {
+        if(!filter.test((float)arr[srcOffset]))
+        {
+          word|=marker;
+          ++numSurvivors;
+        }
+        if(++srcOffset==srcBound)
+        {
+          survivorSet[wordOffset]=word;
+          return numSurvivors;
+        }
+      }
+      while((marker<<=1)!=0L);
+      survivorSet[wordOffset++]=word;
+    }
+  }
+  private static void pullSurvivorsDown(float[] arr,int srcOffset,int dstOffset,int dstBound,long word)
+  {
+    int numTail0s=Long.numberOfTrailingZeros(word);
+    do{
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      srcOffset+=numTail0s;
+      dstOffset+=numTail0s;
+    }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
+  }
+  private static void pullSurvivorsDown(float[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  {
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
     }
   }
   @Override
@@ -797,7 +871,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable,Ex
                   if(n>64)
                   {
                     long[] survivorSet;
-                    int numSurvivors=BitSetUtil.markSurvivors(arr,srcOffset,i,filter,survivorSet=BitSetUtil.getBitSet(n));
+                    int numSurvivors=markSurvivors(arr,srcOffset,i,filter,survivorSet=new long[(n-1>>6)+1]);
                     modCountChecker.checkModCount();
                     if(numSurvivors!=0)
                     {
@@ -809,7 +883,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable,Ex
                       else
                       {
                         arr[dstOffset]=before;
-                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorSet);
+                        pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorSet);
                         arr[dstOffset++]=after;
                       }
                       break outer;
@@ -817,7 +891,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable,Ex
                   }
                   else
                   {
-                    long survivorWord=BitSetUtil.markSurvivors(arr,srcOffset,i,filter);
+                    long survivorWord=markSurvivors(arr,srcOffset,i,filter);
                     modCountChecker.checkModCount();
                     int numSurvivors;
                     if((numSurvivors=Long.bitCount(survivorWord))!=0)
@@ -830,7 +904,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable,Ex
                       else
                       {
                         arr[dstOffset]=before;
-                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
+                        pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
                         arr[dstOffset++]=after;
                       }
                       break outer;
