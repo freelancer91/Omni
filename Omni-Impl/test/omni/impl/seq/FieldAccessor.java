@@ -1,6 +1,10 @@
 package omni.impl.seq;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import omni.api.OmniList;
 final class FieldAccessor{
@@ -19,12 +23,29 @@ final class FieldAccessor{
     static Field prepareFieldForObj(Object obj,String fieldName){
         return prepareFieldForClass(obj.getClass(),fieldName);
     }
+    static Method prepareMethodForObj(Object obj,String methodName,Class<?>...argTypes){
+      return prepareMethodForClass(obj.getClass(),methodName,argTypes);
+    }
     static Field prepareFieldForClassName(String className,String fieldName){
         try{
             return prepareFieldForClass(Class.forName(className),fieldName);
         }catch(ClassNotFoundException e){
             throw new ExceptionInInitializerError(e);
         }
+    }
+    static Method prepareMethodForClassName(String className,String methodName,Class<?>...argTypes){
+      try{
+          return prepareMethodForClass(Class.forName(className),methodName,argTypes);
+      }catch(ClassNotFoundException e){
+          throw new ExceptionInInitializerError(e);
+      }
+    }
+    static Object invokeMethod(Method method,Object obj,Object...args) {
+      try{
+        return method.invoke(obj,args);
+      }catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
+        throw new RuntimeException(e);
+      }
     }
     static Object getValue(Field field,Object obj){
         try{
@@ -39,6 +60,15 @@ final class FieldAccessor{
         }catch(IllegalArgumentException | IllegalAccessException e){
             throw new RuntimeException(e);
         }
+    }
+    static Method prepareMethodForClass(Class<?> clazz,String methodName,Class<?>...argTypes) {
+      try {
+        Method method=clazz.getDeclaredMethod(methodName,argTypes);
+        method.setAccessible(true);
+        return method;
+      }catch(NoSuchMethodException | SecurityException | IllegalArgumentException e){
+        throw new ExceptionInInitializerError(e);
+      }
     }
     static Field prepareFieldForClass(Class<?> clazz,String fieldName){
         try{
@@ -200,6 +230,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.RefArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.RefArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.RefArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -260,6 +298,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.RefArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.RefArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.RefArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.RefArrSeq.UncheckedList<?> root(Object obj){
                 return (omni.impl.seq.RefArrSeq.UncheckedList<?>)getValue(rootField,obj);
             }
@@ -449,6 +495,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.BooleanArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.BooleanArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -510,6 +564,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.BooleanArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.BooleanArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.BooleanArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.BooleanArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -698,6 +760,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.ByteArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.ByteArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -758,6 +828,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.ByteArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.ByteArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.ByteArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.ByteArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -946,6 +1024,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.CharArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.CharArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.CharArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -1006,6 +1092,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.CharArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.CharArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.CharArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.CharArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.CharArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -1195,6 +1289,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.ShortArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.ShortArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -1255,6 +1357,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.ShortArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.ShortArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.ShortArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.ShortArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -1443,6 +1553,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.IntArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.IntArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.IntArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -1503,6 +1621,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.IntArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.IntArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.IntArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.IntArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.IntArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -1691,6 +1817,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.LongArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.LongArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.LongArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -1751,6 +1885,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.LongArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.LongArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.LongArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.LongArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.LongArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -1940,6 +2082,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.FloatArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.FloatArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -2000,6 +2150,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.FloatArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.FloatArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.FloatArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.FloatArrSeq.UncheckedList)getValue(rootField,obj);
             }
@@ -2189,6 +2347,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq$CheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.DoubleArrSeq$CheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.DoubleArrSeq$CheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static int modCount(Object obj){
                 return getIntValue(modCountField,obj);
             }
@@ -2249,6 +2415,14 @@ final class FieldAccessor{
                     "rootOffset");
             static final Field sizeField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq$UncheckedSubList",
                     "size");
+            static final Method readObject_ObjectInputStreamMethod=prepareMethodForClassName("omni.impl.seq.DoubleArrSeq$UncheckedSubList","readObject",ObjectInputStream.class);
+            static final Method writeObject_ObjectOutputStreamMethod=prepareMethodForClassName("omni.impl.seq.DoubleArrSeq$UncheckedSubList","writeObject",ObjectOutputStream.class);
+            static void readObject(Object obj,ObjectInputStream ois) {
+              invokeMethod(readObject_ObjectInputStreamMethod,obj,ois);
+            }
+            static void writeObject(Object obj,ObjectOutputStream oos) {
+              invokeMethod(writeObject_ObjectOutputStreamMethod,obj,oos);
+            }
             static omni.impl.seq.DoubleArrSeq.UncheckedList root(Object obj){
                 return (omni.impl.seq.DoubleArrSeq.UncheckedList)getValue(rootField,obj);
             }

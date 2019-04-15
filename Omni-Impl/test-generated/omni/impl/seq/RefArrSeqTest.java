@@ -3462,6 +3462,82 @@ public class RefArrSeqTest{
       }
       seqMonitor.verifyStructuralIntegrity();
     }
+    static Stream<Arguments> gettestreadAndwriteObject_ObjectInputStreamArgs(){
+      return ArgBuilder.buildSeqArgs((streamBuilder,structType,nestedType,checkedType,preModScenario)->{
+        for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+          if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+            for(var seqContentsScenario:SequenceContentsScenario.values()){
+              streamBuilder.accept(Arguments.of(new RefSeqMonitor(structType,nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
+            }
+          }
+        }
+      });
+    }
+    @org.junit.jupiter.api.Test
+    public void testreadAndwriteObject_ObjectInputStream(){
+      gettestreadAndwriteObject_ObjectInputStreamArgs().parallel().map(Arguments::get).forEach(args->{
+          testreadAndwriteObject_ObjectInputStreamHelper((RefSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+      });
+    }
+    private static void testreadAndwriteObject_ObjectInputStreamHelper
+    (RefSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
+    {
+      int numToAdd=seqContentsScenario.nonEmpty?100:0;
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
+      seqMonitor.illegalAdd(preModScenario);
+      File file=null;
+      MonitoredObjectOutputStream=null;
+      try
+      {
+        file=Files.createTempFile(null,null).toFile();
+        monitoredObjectOutputStream=monitoredFunctionGen.getMonitoredObjectOutputStream(file,seqMonitor);
+      }
+      catch(Exception e)
+      {
+        Assertions.fail(e);
+        return;
+      }
+      if(preModScenario.expectedException==null){
+        if(monitoredFunctionGen.expectedException==null || !seqContentsScenario.nonEmpty){
+          try
+          {
+            monitoredObjectOutputStream.writeObject(seqMonitor.seq);
+            //seqMonitor.writeObject(monitoredObjectOutputStream);
+          }
+          catch(Exception e)
+          {
+            Assertions.fail(e);
+            return;
+          }
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          MonitoredObjectInputStream monitoredObjectInputStream=null;
+          OmniCollection.OfRef readCol=null;
+          try
+          {
+            monitoredObjectInputStream=monitoredFunctionGen.getMonitoredObjectInputStream(file,seqMonitor);
+            readCol=(OmniCollection.OfRef)monitoredObjectInputStream.readObject();
+          }
+          catch(Exception e)
+          {
+            Assertions.fail(e);
+            return;
+          }
+          var itr=readCol.iterator();
+          for(int i=0;i<numToAdd;++i)
+          {
+            Assertions.assertEquals(TypeConversionUtil.convertToObject(i),itr.next());
+          }
+          Assertions.assertFalse(itr.hasNext());
+        }else{
+          Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.writeObject(monitoredObjectOutputStream));
+        }
+      }else{
+        Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.writeObject(monitoredObjectOutputStream));
+      }
+      seqMonitor.verifyStructuralIntegrity();
+    }
   static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
     for(var checkedType:CheckedType.values()){
       for(var preModScenario:PreModScenario.values()){

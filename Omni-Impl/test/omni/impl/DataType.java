@@ -1,62 +1,101 @@
 package omni.impl;
 
 import java.util.Set;
+
 public enum DataType{
-    BooleanType(IOType.PrimitivebooleanType,IOType.BoxedDoubleType,
-            new IOType[]{IOType.PrimitivebooleanType,IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitivebooleanType,IOType.PrimitivebyteType,IOType.PrimitivecharType,
-                    IOType.PrimitiveshortType,IOType.PrimitiveintType,IOType.PrimitivelongType,
-                    IOType.PrimitivefloatType,IOType.PrimitivedoubleType,IOType.BoxedBooleanType}),
-    ByteType(IOType.PrimitivebyteType,IOType.BoxedByteType,
-            new IOType[]{IOType.PrimitivebyteType,IOType.BoxedByteType,IOType.PrimitivebooleanType,
-                    IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitivebyteType,IOType.PrimitiveshortType,IOType.PrimitiveintType,
-                    IOType.PrimitivelongType,IOType.PrimitivefloatType,IOType.PrimitivedoubleType,
-                    IOType.BoxedByteType}),
-    CharType(IOType.PrimitivecharType,IOType.BoxedCharacterType,
-            new IOType[]{IOType.PrimitivecharType,IOType.BoxedCharacterType,IOType.PrimitivebooleanType,
-                    IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitivecharType,IOType.PrimitiveintType,IOType.PrimitivelongType,
-                    IOType.PrimitivefloatType,IOType.PrimitivedoubleType,IOType.BoxedCharacterType}),
-    ShortType(IOType.PrimitiveshortType,IOType.BoxedShortType,
-            new IOType[]{IOType.PrimitiveshortType,IOType.BoxedShortType,IOType.PrimitivebyteType,IOType.BoxedByteType,
-                    IOType.PrimitivebooleanType,IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitiveshortType,IOType.PrimitiveintType,IOType.PrimitivelongType,
-                    IOType.PrimitivefloatType,IOType.PrimitivedoubleType,IOType.BoxedShortType}),
-    IntType(IOType.PrimitiveintType,IOType.BoxedIntegerType,
-            new IOType[]{IOType.PrimitiveintType,IOType.BoxedIntegerType,IOType.PrimitiveshortType,
-                    IOType.BoxedShortType,IOType.PrimitivecharType,IOType.BoxedCharacterType,IOType.PrimitivebyteType,
-                    IOType.BoxedByteType,IOType.PrimitivebooleanType,IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitiveintType,IOType.PrimitivelongType,IOType.PrimitivefloatType,
-                    IOType.PrimitivedoubleType,IOType.BoxedIntegerType}),
-    LongType(IOType.PrimitivelongType,IOType.BoxedLongType,
-            new IOType[]{IOType.PrimitivelongType,IOType.BoxedLongType,IOType.PrimitiveintType,IOType.BoxedIntegerType,
-                    IOType.PrimitiveshortType,IOType.BoxedShortType,IOType.PrimitivecharType,IOType.BoxedCharacterType,
-                    IOType.PrimitivebyteType,IOType.BoxedByteType,IOType.PrimitivebooleanType,IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitivelongType,IOType.PrimitivefloatType,IOType.PrimitivedoubleType,
-                    IOType.BoxedLongType}),
-    FloatType(IOType.PrimitivefloatType,IOType.BoxedFloatType,
-            new IOType[]{IOType.PrimitivefloatType,IOType.BoxedFloatType,IOType.PrimitivelongType,IOType.BoxedLongType,
-                    IOType.PrimitiveintType,IOType.BoxedIntegerType,IOType.PrimitiveshortType,IOType.BoxedShortType,
-                    IOType.PrimitivecharType,IOType.BoxedCharacterType,IOType.PrimitivebyteType,IOType.BoxedByteType,
-                    IOType.PrimitivebooleanType,IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitivefloatType,IOType.PrimitivedoubleType,IOType.BoxedFloatType}),
-    DoubleType(IOType.PrimitivedoubleType,IOType.BoxedDoubleType,
-            new IOType[]{IOType.PrimitivedoubleType,IOType.BoxedDoubleType,IOType.PrimitivefloatType,
-                    IOType.BoxedFloatType,IOType.PrimitivelongType,IOType.BoxedLongType,IOType.PrimitiveintType,
-                    IOType.BoxedIntegerType,IOType.PrimitiveshortType,IOType.BoxedShortType,IOType.PrimitivecharType,
-                    IOType.BoxedCharacterType,IOType.PrimitivebyteType,IOType.BoxedByteType,IOType.PrimitivebooleanType,
-                    IOType.BoxedBooleanType},
-            new IOType[]{IOType.PrimitivedoubleType,IOType.BoxedDoubleType}),
-    RefType(IOType.ObjectType,null,new IOType[]{IOType.ObjectType},new IOType[]{IOType.ObjectType});
-    public final IOType preferredIOType;
-    public final IOType preferredBoxedType;
-    public final Set<IOType> inputTypes;
-    public final Set<IOType> outputTypes;
-    DataType(IOType preferredIOType,IOType preferredBoxedType,IOType[] inputTypes,IOType[] outputTypes){
-        this.preferredIOType=preferredIOType;
-        this.preferredBoxedType=preferredBoxedType;
-        this.inputTypes=Set.of(inputTypes);
-        this.outputTypes=Set.of(outputTypes);
+  Boolean {
+    
+  },
+  Byte {
+    
+
+  },
+  Char {
+    
+
+    
+  },
+  Short {
+    
+
+  },
+  Int {
+    
+    
+  },
+  Long {
+    
+
+
+  },
+  Float {
+    
+
+  },
+  Double {
+    
+  },
+  Object {
+    
+
+  };
+  
+  public final Set<DataType> mayBeCastTo;
+  public final Set<DataType> mayBeCastFrom;
+    
+  DataType(){
+    this.mayBeCastTo=initMayBeCastTo(this);
+    this.mayBeCastFrom=initMayBeCastFrom(this);
+  }
+
+  
+
+  private static Set<DataType> initMayBeCastFrom(DataType dataType){
+    switch(dataType) {
+    case Boolean:
+      return Set.of(DataType.Boolean);
+    case Byte:
+      return Set.of(DataType.Byte,DataType.Boolean);
+    case Char:
+      return Set.of(DataType.Char,DataType.Boolean);
+    case Short:
+      return Set.of(DataType.Short,DataType.Byte,DataType.Boolean);
+    case Int:
+      return Set.of(DataType.Int,DataType.Short,DataType.Char,DataType.Byte,DataType.Boolean);
+    case Long:
+      return Set.of(DataType.Long,DataType.Int,DataType.Short,DataType.Char,DataType.Byte,DataType.Boolean);
+    case Float:
+      return Set.of(DataType.Float,DataType.Long,DataType.Int,DataType.Short,DataType.Char,DataType.Byte,DataType.Boolean);
+    case Double:
+      return Set.of(DataType.Double,DataType.Float,DataType.Long,DataType.Int,DataType.Short,DataType.Char,DataType.Byte,DataType.Boolean);
+    case Object:
+      return Set.of(DataType.Object);
+    default:
+      throw new Error("Unknown dataType "+dataType);
     }
+  }
+  private static Set<DataType> initMayBeCastTo(DataType dataType){
+    switch(dataType) {
+    case Boolean:
+      return Set.of(DataType.values());
+    case Byte:
+      return Set.of(DataType.Byte,DataType.Short,DataType.Int,DataType.Long,DataType.Float,DataType.Double,DataType.Object);
+    case Char:
+      return Set.of(DataType.Char,DataType.Int,DataType.Long,DataType.Float,DataType.Double,DataType.Object);
+    case Short:
+      return Set.of(DataType.Short,DataType.Int,DataType.Long,DataType.Float,DataType.Double,DataType.Object);
+    case Int:
+      return Set.of(DataType.Int,DataType.Long,DataType.Float,DataType.Double,DataType.Object);
+    case Long:
+      return Set.of(DataType.Long,DataType.Float,DataType.Double,DataType.Object);
+    case Float:
+      return Set.of(DataType.Float,DataType.Double,DataType.Object);
+    case Double:
+      return Set.of(DataType.Double,DataType.Object);
+    case Object:
+      return Set.of(DataType.Object);
+    default:
+      throw new Error("Unknown dataType "+dataType);
+    }
+  }
 }

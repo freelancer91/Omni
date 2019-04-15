@@ -19,6 +19,13 @@ import java.util.function.Predicate;
 import java.util.function.IntFunction;
 import java.util.HashSet;
 import java.util.Random;
+import java.io.IOException;
+import omni.impl.MonitoredObjectInputStream;
+import omni.impl.MonitoredObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Externalizable;
+import java.io.File;
 import omni.function.BooleanPredicate;
 import java.util.function.UnaryOperator;
 import omni.impl.QueryCastType;
@@ -827,6 +834,12 @@ class BooleanSeqMonitor{
       @Override MonitoredArrayConstructor getMonitoredArrayConstructor(BooleanSeqMonitor seqMonitor){
         return new MonitoredArrayConstructor();
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file);
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file);
+      }
     },
     Throw(IndexOutOfBoundsException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
@@ -847,6 +860,20 @@ class BooleanSeqMonitor{
         return new MonitoredArrayConstructor(){
           @Override public Boolean[] apply(int arrSize){
             ++numCalls;
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
             throw new IndexOutOfBoundsException();
           }
         };
@@ -899,6 +926,20 @@ class BooleanSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
     },
     ModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
@@ -935,6 +976,20 @@ class BooleanSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
     },
     ModRoot(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
@@ -968,6 +1023,20 @@ class BooleanSeqMonitor{
             ++numCalls;
             seqMonitor.illegalAdd(PreModScenario.ModRoot);
             return new Boolean[arrSize];
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
           }
         };
       }
@@ -1022,6 +1091,22 @@ class BooleanSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     },
     ThrowModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(BooleanSeqMonitor seqMonitor){
@@ -1055,6 +1140,22 @@ class BooleanSeqMonitor{
         return new MonitoredArrayConstructor(){
           @Override public Boolean[] apply(int arrSize){
             ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
             seqMonitor.illegalAdd(PreModScenario.ModParent);
             throw new IndexOutOfBoundsException();
           }
@@ -1098,6 +1199,22 @@ class BooleanSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     };
     final Class<? extends Throwable> expectedException;
     final boolean appliesToRoot;
@@ -1117,6 +1234,12 @@ class BooleanSeqMonitor{
     }
     abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
     MonitoredArrayConstructor getMonitoredArrayConstructor(BooleanSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    MonitoredObjectInputStream getMonitoredObjectInputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
+      throw new UnsupportedOperationException();
+    }
+    MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,BooleanSeqMonitor seqMonitor) throws IOException{
       throw new UnsupportedOperationException();
     }
   }
@@ -8266,5 +8389,59 @@ class BooleanSeqMonitor{
       }
     }
     verifyStructuralIntegrity();
+  }
+  public void readObject(ObjectInputStream ois){
+    switch(structType)
+    {
+      case ARRSEQ:
+        switch(nestedType){
+          case LIST:
+          case STACK:
+            ((java.io.Externalizable)seq).readExternal(ois);
+            break;
+          case SUBLIST:
+            if(checkedType.checked)
+            {
+              FieldAccessor.BooleanArrSeq.CheckedSubList.readObject(seq,ois);
+            }
+            else
+            {
+              FieldAccessor.BooleanArrSeq.UncheckedSubList.readObject(seq,ois);
+            }
+            break;
+          default:
+            throw new Error("Unknown nestedType "+nestedType);
+        }
+        break;
+      default:
+        throw new Error("unknown struct type "+structType);
+    }
+  }
+  public void writeObject(ObjectOutputStream oos){
+    switch(structType)
+    {
+      case ARRSEQ:
+        switch(nestedType){
+          case LIST:
+          case STACK:
+            ((java.io.Externalizable)seq).writeExternal(oos);
+            break;
+          case SUBLIST:
+            if(checkedType.checked)
+            {
+              FieldAccessor.BooleanArrSeq.CheckedSubList.writeObject(seq,oos);
+            }
+            else
+            {
+              FieldAccessor.BooleanArrSeq.UncheckedSubList.writeObject(seq,oos);
+            }
+            break;
+          default:
+            throw new Error("Unknown nestedType "+nestedType);
+        }
+        break;
+      default:
+        throw new Error("unknown struct type "+structType);
+    }
   }
 }

@@ -19,6 +19,13 @@ import java.util.function.Predicate;
 import java.util.function.IntFunction;
 import java.util.HashSet;
 import java.util.Random;
+import java.io.IOException;
+import omni.impl.MonitoredObjectInputStream;
+import omni.impl.MonitoredObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Externalizable;
+import java.io.File;
 import omni.function.CharPredicate;
 import java.util.function.UnaryOperator;
 import omni.function.CharUnaryOperator;
@@ -810,6 +817,12 @@ class CharSeqMonitor{
       @Override MonitoredArrayConstructor getMonitoredArrayConstructor(CharSeqMonitor seqMonitor){
         return new MonitoredArrayConstructor();
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file);
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file);
+      }
     },
     Throw(IndexOutOfBoundsException.class,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(CharSeqMonitor seqMonitor){
@@ -830,6 +843,20 @@ class CharSeqMonitor{
         return new MonitoredArrayConstructor(){
           @Override public Character[] apply(int arrSize){
             ++numCalls;
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
             throw new IndexOutOfBoundsException();
           }
         };
@@ -882,6 +909,20 @@ class CharSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
     },
     ModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(CharSeqMonitor seqMonitor){
@@ -918,6 +959,20 @@ class CharSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
     },
     ModRoot(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(CharSeqMonitor seqMonitor){
@@ -951,6 +1006,20 @@ class CharSeqMonitor{
             ++numCalls;
             seqMonitor.illegalAdd(PreModScenario.ModRoot);
             return new Character[arrSize];
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
           }
         };
       }
@@ -1005,6 +1074,22 @@ class CharSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     },
     ThrowModParent(ConcurrentModificationException.class,false,true,false){
       @Override MonitoredConsumer getMonitoredConsumer(CharSeqMonitor seqMonitor){
@@ -1038,6 +1123,22 @@ class CharSeqMonitor{
         return new MonitoredArrayConstructor(){
           @Override public Character[] apply(int arrSize){
             ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
             seqMonitor.illegalAdd(PreModScenario.ModParent);
             throw new IndexOutOfBoundsException();
           }
@@ -1081,6 +1182,22 @@ class CharSeqMonitor{
           }
         };
       }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectInputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+        return MonitoredObjectOutputStream(file){
+          @Override protected void preModCalls(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
     };
     final Class<? extends Throwable> expectedException;
     final boolean appliesToRoot;
@@ -1100,6 +1217,12 @@ class CharSeqMonitor{
     }
     abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
     MonitoredArrayConstructor getMonitoredArrayConstructor(CharSeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    MonitoredObjectInputStream getMonitoredObjectInputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
+      throw new UnsupportedOperationException();
+    }
+    MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,CharSeqMonitor seqMonitor) throws IOException{
       throw new UnsupportedOperationException();
     }
   }
@@ -8238,5 +8361,59 @@ class CharSeqMonitor{
       }
     }
     verifyStructuralIntegrity();
+  }
+  public void readObject(ObjectInputStream ois){
+    switch(structType)
+    {
+      case ARRSEQ:
+        switch(nestedType){
+          case LIST:
+          case STACK:
+            ((java.io.Externalizable)seq).readExternal(ois);
+            break;
+          case SUBLIST:
+            if(checkedType.checked)
+            {
+              FieldAccessor.CharArrSeq.CheckedSubList.readObject(seq,ois);
+            }
+            else
+            {
+              FieldAccessor.CharArrSeq.UncheckedSubList.readObject(seq,ois);
+            }
+            break;
+          default:
+            throw new Error("Unknown nestedType "+nestedType);
+        }
+        break;
+      default:
+        throw new Error("unknown struct type "+structType);
+    }
+  }
+  public void writeObject(ObjectOutputStream oos){
+    switch(structType)
+    {
+      case ARRSEQ:
+        switch(nestedType){
+          case LIST:
+          case STACK:
+            ((java.io.Externalizable)seq).writeExternal(oos);
+            break;
+          case SUBLIST:
+            if(checkedType.checked)
+            {
+              FieldAccessor.CharArrSeq.CheckedSubList.writeObject(seq,oos);
+            }
+            else
+            {
+              FieldAccessor.CharArrSeq.UncheckedSubList.writeObject(seq,oos);
+            }
+            break;
+          default:
+            throw new Error("Unknown nestedType "+nestedType);
+        }
+        break;
+      default:
+        throw new Error("unknown struct type "+structType);
+    }
   }
 }
