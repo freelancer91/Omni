@@ -1,0 +1,283 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import org.junit.jupiter.api.Assertions;
+#IF OfDouble,OfLong,OfInt
+import java.util.function.$TypeNameModifier$Consumer;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Consumer;
+#ENDIF
+import omni.impl.$ClassPrefix$InputTestArgType;
+import omni.impl.$ClassPrefix$OutputTestArgType;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Predicate;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Predicate;
+#ENDIF
+import java.util.function.Consumer;
+import omni.impl.FunctionCallType;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import omni.api.OmniCollection;
+import java.util.function.Predicate;
+import omni.impl.$SNode$;
+@SuppressWarnings({"rawtypes","unchecked"})
+class $ClassPrefix$SnglLnkSeqMonitor implements $ClassPrefix$SeqMonitor
+{
+  static enum NestedType
+  {
+    QUEUE,
+    STACK;
+  }
+  NestedType nestedType;
+  CheckedType checkedType;
+  final OmniCollection.Of$ClassPrefix$ seq;
+  int expectedSeqSize;
+  int expectedSeqModCount;
+  
+  $ClassPrefix$SnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType)
+  {
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    switch(nestedType)
+    {
+      case QUEUE:
+        this.seq=checkedType.checked?new $ClassPrefix$SnglLnkSeq.CheckedQueue():new $ClassPrefix$SnglLnkSeq.UncheckedQueue();
+        break;
+      case STACK:
+        this.seq=checkedType.checked?new $ClassPrefix$SnglLnkSeq.CheckedStack():new $ClassPrefix$SnglLnkSeq.UncheckedStack();
+        break;
+      default:
+        throw new Error("unknown nested type "+nestedType);
+    }
+  }
+  public int getExpectedSeqSize(){
+    return this.expectedSeqSize;
+  }
+  public void illegalAdd(PreModScenario preModScenario)
+  {
+    switch(preModScenario){
+      case ModSeq:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
+        ++expectedSeqModCount;
+        ++expectedSeqSize;
+        break;
+      case NoMod:
+        break;
+      default:
+        throw new Error("Unknown preModScenario "+preModScenario);
+    }
+  }
+#IF OfRef
+  public boolean add(Object obj)
+  {
+    boolean ret=seq.add(obj);
+    if(ret)
+    {
+      ++expectedSeqSize;
+      ++expectedSeqModCount;
+    }
+    return ret;
+  }
+#ENDIF
+  public boolean add(int val,$ClassPrefix$InputTestArgType inputArgType){
+    boolean ret=inputArgType.callCollectionAdd(seq,val);
+    if(ret){
+      ++expectedSeqSize;
+      ++expectedSeqModCount;
+    }
+    return ret;
+  }
+  public void push(int val,$ClassPrefix$InputTestArgType inputArgType){
+    inputArgType.callStackPush(seq,val);
+    ++expectedSeqSize;
+    ++expectedSeqModCount;
+  }
+  public String toString(){
+    StringBuilder builder=new StringBuilder();
+
+    builder.append("$ClassPrefix$SnglLnkSeq.").append(checkedType.checked?"Checked":"Unchecked");
+    switch(nestedType){
+      case STACK:
+        builder.append("Stack");
+        break;
+      case QUEUE:
+        builder.append("Queue");
+        break;
+      default:
+        throw new Error("Unknown nestedType "+nestedType);
+    }
+    return builder.toString();
+  }
+  
+  public boolean isEmpty()
+  {
+    return seq.isEmpty();
+  }
+  public void forEach(MonitoredConsumer action,FunctionCallType functionCallType){
+#IFNOT OfRef
+    if(functionCallType==FunctionCallType.Boxed){
+      seq.forEach((Consumer)action);
+    }else
+#ENDIF
+    {
+      seq.forEach(($TypeNameModifier$Consumer)action);
+    }
+  }
+  public void clear(){
+    int seqSize=expectedSeqSize;
+    seq.clear();
+    if(seqSize!=0){
+      expectedSeqSize=0;
+      ++expectedSeqModCount;
+    }
+  }
+  public void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyStackPop(seq,expectedVal);
+    --expectedSeqSize;
+    ++expectedSeqModCount;
+  }
+  public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      --expectedSeqSize;
+      ++expectedSeqModCount;
+    }
+
+  }
+  public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
+#IF OfBoolean
+    int seqSize=expectedSeqSize;
+#ENDIF
+
+    boolean retVal;
+#IFNOT OfRef
+    if(functionCallType==FunctionCallType.Boxed)
+    {
+      retVal=seq.removeIf((Predicate)pred);
+    }
+    else
+#ENDIF
+    {
+      retVal=seq.removeIf(($TypeNameModifier$Predicate)pred);
+    }
+    if(retVal)
+    {
+      ++expectedSeqModCount;
+      int numRemoved;
+#IF OfBoolean
+      int numTrue=0,numFalse=0;
+      var cloneItr=clone.iterator();
+      while(cloneItr.hasNext()){
+        if(cloneItr.next$TypeNameModifier$()){
+          ++numTrue;
+        }else{
+          ++numFalse;
+        }
+      }
+      if(pred.removedVals.contains(true))
+      {
+        if(pred.removedVals.contains(false))
+        {
+          numRemoved=seqSize;
+          Assertions.assertTrue(seq.isEmpty());
+        }
+        else
+        {
+          numRemoved=numTrue;
+          Assertions.assertFalse(seq.contains(true));
+        }
+      }
+      else
+      {
+        numRemoved=numFalse;
+        Assertions.assertFalse(seq.contains(false));
+      }
+#ELSE
+      numRemoved=pred.numRemoved;
+      for(var removedVal:pred.removedVals)
+      {
+        Assertions.assertFalse(seq.contains(removedVal));
+      }
+#ENDIF
+      expectedSeqSize-=numRemoved;
+      if(expectedNumRemoved!=-1){
+        Assertions.assertEquals(expectedNumRemoved,numRemoved);
+      }
+    }else{
+      Assertions.assertEquals(expectedSeqSize,clone.size());
+      var seqItr=seq.iterator();
+      var cloneItr=clone.iterator();
+      for(int i=0;i<expectedSeqSize;++i){
+#IF OfRef
+        Assertions.assertSame(seqItr.next(),cloneItr.next());
+#ELSE
+        Assertions.assertEquals(seqItr.next$TypeNameModifier$(),cloneItr.next$TypeNameModifier$());
+#ENDIF
+      }
+    }
+    verifyStructuralIntegrity();
+  }
+  public void writeObject(ObjectOutputStream oos) throws IOException
+  {
+    oos.writeObject(seq);
+  }
+  
+  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException
+  {
+    return ois.readObject();
+  }
+  public void verifyStructuralIntegrity()
+  {
+    Assertions.assertEquals(expectedSeqSize,(($ClassPrefix$SnglLnkSeq)seq).size);
+    if(checkedType.checked)
+    {
+      switch(nestedType)
+      {
+        case QUEUE:
+          Assertions.assertEquals(expectedSeqModCount,(($ClassPrefix$SnglLnkSeq.CheckedQueue)seq).modCount);
+          break;
+        case STACK:
+          Assertions.assertEquals(expectedSeqModCount,(($ClassPrefix$SnglLnkSeq.CheckedStack)seq).modCount);
+          break;
+        default:
+          throw new Error("Unknown nested type "+nestedType);
+      }
+    }
+    if(expectedSeqSize==0)
+    {
+      Assertions.assertNull((($ClassPrefix$SnglLnkSeq)seq).head);
+    }
+    else
+    {
+      $SNode$ node;
+      Assertions.assertNotNull(node=(($ClassPrefix$SnglLnkSeq)seq).head);
+      while(--expectedSeqSize!=0)
+      {
+        Assertions.assertNotNull(node=node.next);
+      }
+      Assertions.assertNull(node.next);
+    }
+  }
+  public ItrMonitor getItrMonitor(){
+    //TODO
+    return null;
+  }
+  public SequenceVerificationItr verifyPreAlloc(){
+    //TODO
+    return null;
+  }
+  public SequenceVerificationItr verifyPreAlloc(int expectedVal){
+    //TODO
+    return null;
+  }
+  
+}

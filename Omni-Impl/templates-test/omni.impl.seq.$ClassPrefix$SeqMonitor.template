@@ -8,33 +8,21 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
-import omni.util.TypeConversionUtil;
-import omni.util.TypeUtil;
-import omni.util.OmniArray;
-import omni.api.OmniCollection;
-import omni.api.OmniList;
-import omni.api.OmniStack;
-import org.junit.jupiter.api.Assertions;
-import omni.impl.$ClassPrefix$InputTestArgType;
-import omni.impl.$ClassPrefix$OutputTestArgType;
 import omni.impl.FunctionCallType;
-import omni.api.OmniIterator;
-import omni.api.OmniListIterator;
+import omni.impl.$ClassPrefix$OutputTestArgType;
+import omni.impl.$ClassPrefix$InputTestArgType;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import java.util.ArrayList;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import java.util.HashSet;
-import java.util.Random;
-import java.io.IOException;
 import omni.impl.MonitoredObjectInputStream;
 import omni.impl.MonitoredObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Externalizable;
 import java.io.File;
+import java.io.IOException;
+import java.util.Comparator;
+#IF OfInt
+import java.util.function.$Comparator$;
+#ELSEIFNOT OfRef
+import omni.function.$Comparator$;
+#ENDIF
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 #ELSEIFNOT OfRef
@@ -46,73 +34,61 @@ import java.util.function.$UnaryOperator$;
 #ELSEIFNOT OfRef,OfBoolean
 import omni.function.$UnaryOperator$;
 #ENDIF
-import omni.impl.QueryCastType;
-import java.util.Comparator;
-#IF OfInt
-import java.util.function.$Comparator$;
-#ELSEIFNOT OfRef
-import omni.function.$Comparator$;
-#ENDIF
 #IF OfDouble,OfLong,OfInt
 import java.util.function.$TypeNameModifier$Consumer;
 #ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Consumer;
 #ENDIF
+import java.util.ArrayList;
+import java.util.function.IntFunction;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.HashSet;
+import omni.api.OmniCollection;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Random;
 @SuppressWarnings({"rawtypes","unchecked"})
-class $ClassPrefix$SeqMonitor{
-  static final int DEFAULT_PRE_AND_POST_ALLOC=5;
-#IF OfRef
-  static void verifyRangeIsNull($ArrayType$[] arr,int offset,int bound){
-    for(int i=offset;i<bound;++i){Assertions.assertNull(arr[i]);}
-  }
-#ENDIF
-  static enum StructType{
-    ARRSEQ;
-  }
-  static enum SequenceLocation{
-    BEGINNING(null,true),
-    MIDDLE(null,false),
-    END(null,false),
-    IOBLO(IndexOutOfBoundsException.class,true),
-    IOBHI(IndexOutOfBoundsException.class,true);
-    final Class<? extends Throwable> expectedException;
-    final boolean validForEmpty;
-    SequenceLocation(Class<? extends Throwable> expectedException,boolean validForEmpty){
-      this.expectedException=expectedException;
-      this.validForEmpty=validForEmpty;
+interface $ClassPrefix$SeqMonitor
+{
+  interface ItrMonitor
+  {
+    void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType);
+    default void iterateReverse(){
+      throw new UnsupportedOperationException();
+    }
+    $ClassPrefix$SeqMonitor getSeqMonitor();
+    void verifyNext(int expectedVal,$ClassPrefix$OutputTestArgType outputType);
+    default void verifyPrevious(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+      throw new UnsupportedOperationException();
+    }
+    void verifyIteratorState();
+    default void set(int v,$ClassPrefix$InputTestArgType inputArgType){
+      throw new UnsupportedOperationException();
+    }
+    default void set(int v){
+      set(v,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+    }
+    default void add(int v,$ClassPrefix$InputTestArgType inputArgType){
+      throw new UnsupportedOperationException();
+    }
+    default void add(int v){
+      add(v,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+    }
+    void iterateForward();
+    void remove();
+    boolean hasNext();
+    default boolean hasPrevious(){
+      throw new UnsupportedOperationException();
+    }
+    default int nextIndex(){
+      throw new UnsupportedOperationException();
+    }
+    default int previousIndex(){
+      throw new UnsupportedOperationException();
     }
   }
-  static enum SequenceContentsScenario{
-    EMPTY(false),
-    NONEMPTY(true);
-    final boolean nonEmpty;
-    SequenceContentsScenario(boolean nonEmpty){
-      this.nonEmpty=nonEmpty;
-    }
-  }
-  static enum CheckedType{
-    CHECKED(true),
-    UNCHECKED(false);
-    final boolean checked;
-    CheckedType(boolean checked){
-      this.checked=checked;
-    }
-  }
-  static enum NestedType{
-    LIST(true,true),
-    STACK(true,false),
-    SUBLIST(false,true);
-    final boolean rootType;
-    final boolean forwardIteration;
-    NestedType(boolean rootType,boolean forwardIteration){
-      this.rootType=rootType;
-      this.forwardIteration=forwardIteration;
-    }
-  }
-  static enum ItrType{
-    Itr,
-    ListItr;
-  }
+ 
   static enum PreModScenario{
     ModSeq(ConcurrentModificationException.class,false,true),
     ModParent(ConcurrentModificationException.class,true,false),
@@ -125,6 +101,23 @@ class $ClassPrefix$SeqMonitor{
       this.expectedException=expectedException;
       this.appliesToSubList=appliesToSubList;
       this.appliesToRootItr=appliesToRootItr;
+    }
+  }
+  static enum ItrType{
+    Itr,
+    ListItr;
+  }
+  static enum SequenceLocation{
+    BEGINNING(null,true),
+    MIDDLE(null,false),
+    END(null,false),
+    IOBLO(IndexOutOfBoundsException.class,true),
+    IOBHI(IndexOutOfBoundsException.class,true);
+    final Class<? extends Throwable> expectedException;
+    final boolean validForEmpty;
+    SequenceLocation(Class<? extends Throwable> expectedException,boolean validForEmpty){
+      this.expectedException=expectedException;
+      this.validForEmpty=validForEmpty;
     }
   }
   static enum ListItrSetScenario{
@@ -183,7 +176,25 @@ class $ClassPrefix$SeqMonitor{
       this.validWithEmptySeq=validWithEmptySeq;
     }
   }
-  static enum MonitoredRemoveIfPredicateGen{
+  static enum CheckedType{
+    CHECKED(true),
+    UNCHECKED(false);
+    final boolean checked;
+    CheckedType(boolean checked){
+      this.checked=checked;
+    }
+  }
+  static enum SequenceContentsScenario{
+    EMPTY(false),
+    NONEMPTY(true);
+    final boolean nonEmpty;
+    SequenceContentsScenario(boolean nonEmpty){
+      this.nonEmpty=nonEmpty;
+    }
+  }
+  
+  static enum MonitoredRemoveIfPredicateGen
+  {
 #IF OfBoolean
     RemoveTrue(null,true,false){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate($ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
@@ -343,7 +354,903 @@ class $ClassPrefix$SeqMonitor{
     }
     abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate($ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold);
   }
-  
+  static enum MonitoredFunctionGen{
+    NoThrow(null,true,true,true){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer();
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer();
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator();
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor();
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file);
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file);
+      }
+    },
+    Throw(IndexOutOfBoundsException.class,true,true,true){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new ThrowingMonitoredConsumer();
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new ThrowingMonitoredConsumer();
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
+    ModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+          }
+        };
+      }
+    },
+    ModSeq(ConcurrentModificationException.class,true,true,true){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            var ret=super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          #IF OfRef
+            return new Integer[arrSize];
+          #ELSE
+            return new $BoxedType$[arrSize];
+          #ENDIF
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+        };
+      }
+    },
+    ModParent(ConcurrentModificationException.class,false,true,false){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            var ret=super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          #IF OfRef
+            return new Integer[arrSize];
+          #ELSE
+            return new $BoxedType$[arrSize];
+          #ENDIF
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+        };
+      }
+    },
+    ModRoot(ConcurrentModificationException.class,false,true,false){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            var ret=super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            return ret;
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          #IF OfRef
+            return new Integer[arrSize];
+          #ELSE
+            return new $BoxedType$[arrSize];
+          #ENDIF
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+        };
+      }
+    },
+    ThrowModItr(ConcurrentModificationException.class,false,false,true){
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      
+    },
+    ThrowModSeq(ConcurrentModificationException.class,true,true,true){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
+    ThrowModParent(ConcurrentModificationException.class,false,true,false){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
+    ThrowModRoot(ConcurrentModificationException.class,false,true,false){
+      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
+        return new MonitoredConsumer(){
+          public void accept($ArrayType$ val){
+            super.accept(val);
+            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredUnaryOperator(){
+          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
+            super.$applyMethod$(val);
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+        return new MonitoredArrayConstructor(){
+          #IF OfRef
+          @Override public Integer[] apply(int arrSize){
+          #ELSE
+          @Override public $BoxedType$[] apply(int arrSize){
+          #ENDIF
+            ++numCalls;
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectInputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void preModCall(){
+            seqMonitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    };
+    final Class<? extends Throwable> expectedException;
+    final boolean appliesToRoot;
+    final boolean appliesToSubList;
+    final boolean appliesToRootItr;
+    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean appliesToSubList,boolean appliesToRootItr){
+      this.expectedException=expectedException;
+      this.appliesToRoot=appliesToRoot;
+      this.appliesToSubList=appliesToSubList;
+      this.appliesToRootItr=appliesToRootItr;
+    }
+    MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
+    MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
+      throw new UnsupportedOperationException();
+    }
+    MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+      throw new UnsupportedOperationException();
+    }
+    MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
+      throw new UnsupportedOperationException();
+    }
+  }
+#IF OfRef
+  static class ModParentMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModParentMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class AIOBThrowingMonitoredObject extends MonitoredObject{
+    AIOBThrowingMonitoredObject(int compareVal){
+      super(compareVal);
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class IOBThrowingMonitoredObject extends MonitoredObject{
+    IOBThrowingMonitoredObject(int compareVal){
+      super(compareVal);
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModArrSeqMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModArrSeqMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class ModParentIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModParentIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModParentAIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModParentAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModParent);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModSeqIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModSeqAIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModSeqAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModSeq);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+  static class ModRootMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModRootMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      return Integer.compare(compareVal,that.compareVal);
+    }
+  }
+  static class ModRootIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModRootIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static class ModRootAIOBThrowingMonitoredObject extends MonitoredObject{
+    final $ClassPrefix$SeqMonitor seqMonitor;
+    ModRootAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+      super(compareVal);
+      this.seqMonitor=seqMonitor;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      ++numCompareToCalls;
+      seqMonitor.illegalAdd(PreModScenario.ModRoot);
+      throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+ 
+  static class MonitoredObject implements Comparable<MonitoredObject>{
+    int numEqualsCalls;
+    int numHashCodeCalls;
+    int numToStringCalls;
+    int numCompareToCalls;
+    int compareVal;
+    MonitoredObject(){
+    }
+    MonitoredObject(int compareVal){
+      this.compareVal=compareVal;
+    }
+    @Override public int compareTo(MonitoredObject that){
+      return Integer.compare(compareVal,that.compareVal);
+    }
+    @Override public boolean equals(Object obj){
+      ++numEqualsCalls;
+      return super.equals(this);
+    }
+    @Override public int hashCode(){
+      ++numHashCodeCalls;
+      return super.hashCode();
+    }
+    @Override public String toString(){
+      ++numToStringCalls;
+      return super.toString();
+    }
+  }
+#ENDIF
+
+  static abstract class MonitoredComparator implements $Comparator$
+#IFNOT OfRef
+   ,Comparator
+#ENDIF
+  {
+    public abstract int $compareMethod$($ArrayType$ val1, $ArrayType$ val2);
+#IFNOT OfRef
+    public int compare(Object val1,Object val2){
+      return $compareMethod$(($ArrayType$)val1,($ArrayType$)val2);
+    }
+#ENDIF
+  }
+  static class MonitoredUnaryOperator implements $UnaryOperator$
+#IFNOT OfRef
+    ,UnaryOperator
+#ENDIF
+  {
+    ArrayList encounteredValues=new ArrayList();
+    public $ArrayType$ $applyMethod$($ArrayType$ val){
+      encounteredValues.add(val);
+      #IF OfRef
+      return Integer.valueOf((Integer)val)+1;
+      #ELSEIF OfBoolean
+      return !val;
+      #ELSE
+      return ($ArrayType$)(val+1);
+      #ENDIF
+    }
+#IFNOT OfRef
+    public Object apply(Object val){
+      return $applyMethod$(($ArrayType$)val);
+    }
+#ENDIF
+  }
+  static class MonitoredArrayConstructor
+#IF OfRef
+    implements IntFunction<Integer[]>
+#ELSE
+    implements IntFunction<$BoxedType$[]>
+#ENDIF
+  {
+    int numCalls;
+#IF OfRef
+    @Override public Integer[] apply(int arrSize){
+      ++numCalls;
+      return new Integer[arrSize];
+    }
+#ELSE
+    @Override public $BoxedType$[] apply(int arrSize){
+      ++numCalls;
+      return new $BoxedType$[arrSize];
+    }
+#ENDIF
+  }
+  static class MonitoredConsumer implements $TypeNameModifier$Consumer
+#IFNOT OfRef
+    ,Consumer
+#ENDIF
+  {
+    ArrayList encounteredValues=new ArrayList();
+    public void accept($ArrayType$ val){
+      encounteredValues.add(val);
+    }
+#IFNOT OfRef
+    public void accept(Object val){
+      accept(($exposedType$)val);
+    }
+#ENDIF
+  }
+  public static class ThrowingMonitoredConsumer extends MonitoredConsumer{
+    public void accept($ArrayType$ val){
+      super.accept(val);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  static abstract class MonitoredRemoveIfPredicate implements $TypeNameModifier$Predicate
+#IFNOT OfRef
+    ,Predicate<$BoxedType$>
+#ENDIF
+  {
+    final HashSet removedVals=new HashSet();
+    int callCounter;
+#IFNOT OfBoolean
+    int numRemoved;
+#ENDIF
+    abstract boolean testImpl($ArrayType$ val);
+    @Override public MonitoredRemoveIfPredicate negate()
+    {
+      //not worth implementing but must declare
+      return null;
+    }
+    @Override public boolean test($ArrayType$ val)
+    {
+      ++callCounter;
+      if(removedVals.contains(val))
+      {
+#IFNOT OfBoolean
+        ++numRemoved;
+#ENDIF
+        return true;
+      }
+      if(testImpl(val))
+      {
+#IFNOT OfBoolean
+        ++numRemoved;
+#ENDIF
+        removedVals.add(val);
+        return true;
+      }
+      return false;
+    }
+#IFNOT OfRef
+    @Override public boolean test($BoxedType$ val)
+    {
+      return test(($ArrayType$)val);
+    }
+#ENDIF
+  }
+#IF OfRef
+  static enum MonitoredObjectGen{
+    NoThrow(null,true){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject();
+      }
+    },
+    Throw(IndexOutOfBoundsException.class,true){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
+    ModSeq(ConcurrentModificationException.class,true){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            monitor.illegalAdd(PreModScenario.ModSeq);
+            return obj==this;
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            monitor.illegalAdd(PreModScenario.ModSeq);
+            return System.identityHashCode(this);
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            monitor.illegalAdd(PreModScenario.ModSeq);
+            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
+          }
+        };
+      }
+    },
+    ModParent(ConcurrentModificationException.class,false){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            monitor.illegalAdd(PreModScenario.ModParent);
+            return obj==this;
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            monitor.illegalAdd(PreModScenario.ModParent);
+            return System.identityHashCode(this);
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            monitor.illegalAdd(PreModScenario.ModParent);
+            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
+          }
+        };
+      }
+    },
+    ModRoot(ConcurrentModificationException.class,false){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            monitor.illegalAdd(PreModScenario.ModRoot);
+            return obj==this;
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            monitor.illegalAdd(PreModScenario.ModRoot);
+            return System.identityHashCode(this);
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            monitor.illegalAdd(PreModScenario.ModRoot);
+            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
+          }
+        };
+      }
+    },
+    ThrowModSeq(ConcurrentModificationException.class,true){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            monitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            monitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            monitor.illegalAdd(PreModScenario.ModSeq);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
+    ThrowModParent(ConcurrentModificationException.class,false){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            monitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            monitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            monitor.illegalAdd(PreModScenario.ModParent);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    },
+    ThrowModRoot(ConcurrentModificationException.class,false){
+      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+        return new MonitoredObject(){
+          @Override public boolean equals(Object obj){
+            ++numEqualsCalls;
+            monitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public int hashCode(){
+            ++numHashCodeCalls;
+            monitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+          @Override public String toString(){
+            ++numToStringCalls;
+            monitor.illegalAdd(PreModScenario.ModRoot);
+            throw new IndexOutOfBoundsException();
+          }
+        };
+      }
+    };
+    final Class<? extends Throwable> expectedException;
+    final boolean appliesToRoot;
+    MonitoredObjectGen(Class<? extends Throwable> expectedException,boolean appliesToRoot){
+      this.expectedException=expectedException;
+      this.appliesToRoot=appliesToRoot;
+    }
+    abstract MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor);
+  }
+#ENDIF
   static enum MonitoredComparatorGen{
 #IF OfRef
     NullComparatorThrowAIOB(IllegalArgumentException.class,true,true,false,true){
@@ -351,24 +1258,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(3));
-        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new AIOBThrowingMonitoredObject(3));
+        seqMonitor.add(new AIOBThrowingMonitoredObject(2));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(2));
-        seqMonitor.seq.add(new AIOBThrowingMonitoredObject(3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new AIOBThrowingMonitoredObject(2));
+        seqMonitor.add(new AIOBThrowingMonitoredObject(3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
@@ -386,24 +1281,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new IOBThrowingMonitoredObject(3));
-        seqMonitor.seq.add(new IOBThrowingMonitoredObject(2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new IOBThrowingMonitoredObject(3));
+        seqMonitor.add(new IOBThrowingMonitoredObject(2));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new IOBThrowingMonitoredObject(2));
-        seqMonitor.seq.add(new IOBThrowingMonitoredObject(3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new IOBThrowingMonitoredObject(2));
+        seqMonitor.add(new IOBThrowingMonitoredObject(3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
@@ -421,24 +1304,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,2));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModSeqMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
          switch(preModScenario){
@@ -482,24 +1353,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModParentMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModParentMonitoredObject(seqMonitor,2));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModParentMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModParentMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModParentMonitoredObject(seqMonitor,3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         switch(preModScenario){
@@ -559,24 +1418,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModRootMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModRootMonitoredObject(seqMonitor,2));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModRootMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModRootMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModRootMonitoredObject(seqMonitor,3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -594,24 +1441,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -649,24 +1484,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -704,24 +1527,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -767,24 +1578,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -830,24 +1629,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -865,24 +1652,12 @@ class $ClassPrefix$SeqMonitor{
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.seq.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
-        seqMonitor.expectedSeqSize+=2;
-        seqMonitor.expectedParentSize+=2;
-        seqMonitor.expectedRootSize+=2;
-        seqMonitor.expectedSeqModCount+=2;
-        seqMonitor.expectedParentModCount+=2;
-        seqMonitor.expectedRootModCount+=2;
+        seqMonitor.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
@@ -1384,12 +2159,6 @@ class $ClassPrefix$SeqMonitor{
       throw new UnsupportedOperationException();
     }
     void init($ClassPrefix$SeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      Assertions.assertEquals(0,seqMonitor.expectedSeqModCount);
-      Assertions.assertEquals(0,seqMonitor.expectedParentSize);
-      Assertions.assertEquals(0,seqMonitor.expectedParentModCount);
-      Assertions.assertEquals(0,seqMonitor.expectedRootSize);
-      Assertions.assertEquals(0,seqMonitor.expectedRootModCount);
       if(seqContentsScenario.nonEmpty){
         initHelper(seqMonitor);
       }else{
@@ -1398,12 +2167,6 @@ class $ClassPrefix$SeqMonitor{
       seqMonitor.illegalAdd(preModScenario);
     }
     void initReverse($ClassPrefix$SeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      Assertions.assertEquals(0,seqMonitor.expectedSeqModCount);
-      Assertions.assertEquals(0,seqMonitor.expectedParentSize);
-      Assertions.assertEquals(0,seqMonitor.expectedParentModCount);
-      Assertions.assertEquals(0,seqMonitor.expectedRootSize);
-      Assertions.assertEquals(0,seqMonitor.expectedRootModCount);
       if(seqContentsScenario.nonEmpty){
         initReverseHelper(seqMonitor);
       }else{
@@ -1437,1827 +2200,8 @@ class $ClassPrefix$SeqMonitor{
     }
     abstract MonitoredComparator getMonitoredComparator($ClassPrefix$SeqMonitor seqMonitor);
   }
-  static enum MonitoredFunctionGen{
-    NoThrow(null,true,true,true){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer();
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer();
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator();
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor();
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file);
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file);
-      }
-    },
-    Throw(IndexOutOfBoundsException.class,true,true,true){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new ThrowingMonitoredConsumer();
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new ThrowingMonitoredConsumer();
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            super.$applyMethod$(val);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    },
-    //TODO add this test scenario
-    ModItr(ConcurrentModificationException.class,false,false,true){
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.iterateForward();
-            itrMonitor.remove();
-          }
-        };
-      }
-    },
-    ModSeq(ConcurrentModificationException.class,true,true,true){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-          }
-        };
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModSeq);
-          }
-        };
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            var ret=super.$applyMethod$(val);
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-            return ret;
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-          #IF OfRef
-            return new Integer[arrSize];
-          #ELSE
-            return new $BoxedType$[arrSize];
-          #ENDIF
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-          }
-        };
-      }
-    },
-    ModParent(ConcurrentModificationException.class,false,true,false){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-          }
-        };
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModParent);
-          }
-        };
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            var ret=super.$applyMethod$(val);
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-            return ret;
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-          #IF OfRef
-            return new Integer[arrSize];
-          #ELSE
-            return new $BoxedType$[arrSize];
-          #ENDIF
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-          }
-        };
-      }
-    },
-    ModRoot(ConcurrentModificationException.class,false,true,false){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-          }
-        };
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModRoot);
-          }
-        };
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            var ret=super.$applyMethod$(val);
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-            return ret;
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-          #IF OfRef
-            return new Integer[arrSize];
-          #ELSE
-            return new $BoxedType$[arrSize];
-          #ENDIF
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-          }
-        };
-      }
-    },
-    //TODO add this test scenario
-    ThrowModItr(ConcurrentModificationException.class,false,false,true){
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.iterateForward();
-            itrMonitor.remove();
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      
-    },
-    ThrowModSeq(ConcurrentModificationException.class,true,true,true){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            super.$applyMethod$(val);
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    },
-    ThrowModParent(ConcurrentModificationException.class,false,true,false){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            super.$applyMethod$(val);
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    },
-    ThrowModRoot(ConcurrentModificationException.class,false,true,false){
-      @Override MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor){
-        return new MonitoredConsumer(){
-          public void accept($ArrayType$ val){
-            super.accept(val);
-            itrMonitor.getSeqMonitor().illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredUnaryOperator(){
-          @Override public $ArrayType$ $applyMethod$($ArrayType$ val){
-            super.$applyMethod$(val);
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-        return new MonitoredArrayConstructor(){
-          #IF OfRef
-          @Override public Integer[] apply(int arrSize){
-          #ELSE
-          @Override public $BoxedType$[] apply(int arrSize){
-          #ENDIF
-            ++numCalls;
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectInputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-      @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-        return MonitoredObjectOutputStream(file){
-          @Override protected void preModCalls(){
-            seqMonitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    };
-    final Class<? extends Throwable> expectedException;
-    final boolean appliesToRoot;
-    final boolean appliesToSubList;
-    final boolean appliesToRootItr;
-    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean appliesToRoot,boolean appliesToSubList,boolean appliesToRootItr){
-      this.expectedException=expectedException;
-      this.appliesToRoot=appliesToRoot;
-      this.appliesToSubList=appliesToSubList;
-      this.appliesToRootItr=appliesToRootItr;
-    }
-    MonitoredUnaryOperator getMonitoredUnaryOperator($ClassPrefix$SeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    MonitoredConsumer getMonitoredConsumer($ClassPrefix$SeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    abstract MonitoredConsumer getMonitoredConsumer(ItrMonitor itrMonitor);
-    MonitoredArrayConstructor getMonitoredArrayConstructor($ClassPrefix$SeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    MonitoredObjectInputStream getMonitoredObjectInputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-      throw new UnsupportedOperationException();
-    }
-    MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,$ClassPrefix$SeqMonitor seqMonitor) throws IOException{
-      throw new UnsupportedOperationException();
-    }
-  }
- 
-  
- 
-  
-  
-  
-  
-#IF OfRef
-  static enum MonitoredObjectGen{
-    NoThrow(null,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject();
-      }
-    },
-    Throw(IndexOutOfBoundsException.class,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    },
-    ModSeq(ConcurrentModificationException.class,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            monitor.illegalAdd(PreModScenario.ModSeq);
-            return obj==this;
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            monitor.illegalAdd(PreModScenario.ModSeq);
-            return System.identityHashCode(this);
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            monitor.illegalAdd(PreModScenario.ModSeq);
-            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
-          }
-        };
-      }
-    },
-    ModParent(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            monitor.illegalAdd(PreModScenario.ModParent);
-            return obj==this;
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            monitor.illegalAdd(PreModScenario.ModParent);
-            return System.identityHashCode(this);
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            monitor.illegalAdd(PreModScenario.ModParent);
-            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
-          }
-        };
-      }
-    },
-    ModRoot(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            monitor.illegalAdd(PreModScenario.ModRoot);
-            return obj==this;
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            monitor.illegalAdd(PreModScenario.ModRoot);
-            return System.identityHashCode(this);
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            monitor.illegalAdd(PreModScenario.ModRoot);
-            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
-          }
-        };
-      }
-    },
-    ThrowModSeq(ConcurrentModificationException.class,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            monitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            monitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            monitor.illegalAdd(PreModScenario.ModSeq);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    },
-    ThrowModParent(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            monitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            monitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            monitor.illegalAdd(PreModScenario.ModParent);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    },
-    ThrowModRoot(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
-        return new MonitoredObject(){
-          @Override public boolean equals(Object obj){
-            ++numEqualsCalls;
-            monitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public int hashCode(){
-            ++numHashCodeCalls;
-            monitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-          @Override public String toString(){
-            ++numToStringCalls;
-            monitor.illegalAdd(PreModScenario.ModRoot);
-            throw new IndexOutOfBoundsException();
-          }
-        };
-      }
-    };
-    final Class<? extends Throwable> expectedException;
-    final boolean appliesToRoot;
-    MonitoredObjectGen(Class<? extends Throwable> expectedException,boolean appliesToRoot){
-      this.expectedException=expectedException;
-      this.appliesToRoot=appliesToRoot;
-    }
-    abstract MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor);
-  }
-#ENDIF
-  static enum QueryTester
-  {
-#IF OfRef
-    ObjectNonNull(true){
-      @Override boolean invokecontainsObject($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokecontainsBoxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokecontainsUnboxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValObject($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValBoxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValUnboxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokeindexOfObject($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokeindexOfBoxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokeindexOfUnboxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokelastIndexOfObject($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokelastIndexOfBoxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokelastIndexOfUnboxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchObject($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchBoxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchUnboxed($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override void addEqualsVal($ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override void addNotEqualsVal($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.seq.add(new Object());
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        ++seqMonitor.expectedSeqSize;
-        ++seqMonitor.expectedParentSize;
-        ++seqMonitor.expectedRootSize;
-      }
-      @Override boolean invokecontainsMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        return seqMonitor.seq.contains(monitoredObject);
-      }
-      @Override boolean invokeremoveValMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        boolean ret=seqMonitor.seq.remove(monitoredObject);
-        if(ret){
-          ++seqMonitor.expectedSeqModCount;
-          ++seqMonitor.expectedParentModCount;
-          ++seqMonitor.expectedRootModCount;
-          --seqMonitor.expectedSeqSize;
-          --seqMonitor.expectedParentSize;
-          --seqMonitor.expectedRootSize;
-#IF OfRef
-          if(seqMonitor.structType==StructType.ARRSEQ){
-            Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-          }
-#ENDIF
-        }
-        return ret;
-      }
-      @Override int invokeindexOfMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf(monitoredObject);
-      }
-      @Override int invokelastIndexOfMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf(monitoredObject);
-      }
-      @Override int invokesearchMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search(monitoredObject);
-      }
-      @Override int initContainsEnd($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0;i<99;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.seq.add(monitoredObject);
-        seqMonitor.expectedSeqModCount+=100;
-        seqMonitor.expectedParentModCount+=100;
-        seqMonitor.expectedRootModCount+=100;
-        seqMonitor.expectedSeqSize+=100;
-        seqMonitor.expectedParentSize+=100;
-        seqMonitor.expectedRootSize+=100;
-        return seqMonitor.expectedSeqSize-1;
-      }
-      @Override int initContainsMiddle($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0;i<50;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.seq.add(monitoredObject);
-        for(int i=51;i<100;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.expectedSeqModCount+=100;
-        seqMonitor.expectedParentModCount+=100;
-        seqMonitor.expectedRootModCount+=100;
-        seqMonitor.expectedSeqSize+=100;
-        seqMonitor.expectedParentSize+=100;
-        seqMonitor.expectedRootSize+=100;
-        return seqMonitor.expectedSeqSize/2;
-      }
-      @Override int initContainsBeginning($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        seqMonitor.seq.add(monitoredObject);
-        for(int i=1;i<100;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.expectedSeqModCount+=100;
-        seqMonitor.expectedParentModCount+=100;
-        seqMonitor.expectedRootModCount+=100;
-        seqMonitor.expectedSeqSize+=100;
-        seqMonitor.expectedParentSize+=100;
-        seqMonitor.expectedRootSize+=100;
-        return 0;
-      }
-    },
-#ENDIF
-  #MACRO QueryTesterImpl<null,Boolean,Boolean>(null,false)
-  #MACRO QueryTesterImpl<null,Byte,Byte>(null,false)
-  #MACRO QueryTesterImpl<null,Character,Character>(null,false)
-  #MACRO QueryTesterImpl<null,Short,Short>(null,false)
-  #MACRO QueryTesterImpl<null,Integer,Integer>(null,false)
-  #MACRO QueryTesterImpl<null,Long,Long>(null,false)
-  #MACRO QueryTesterImpl<null,Float,Float>(null,false)
-  #MACRO QueryTesterImpl<null,Double,Double>(null,false)
-  #MACRO QueryTesterImpl<null,Object,Object>(null,false)
-  #MACRO QueryTesterImpl<false,Boolean,boolean>(false,true)
-  #MACRO QueryTesterImpl<true,Boolean,boolean>(true,false)
-  #MACRO QueryTesterImpl<0,Byte,byte>(0,true)
-  #MACRO QueryTesterImpl<pos1,Byte,byte>(1,false)
-  #MACRO QueryTesterImpl<pos2,Byte,byte>(2,false)
-  #MACRO QueryTesterImpl<neg1,Byte,byte>(-1,false)
-  #MACRO QueryTesterImpl<0,Character,char>(0,true)
-  #MACRO QueryTesterImpl<pos1,Character,char>(1,false)
-  #MACRO QueryTesterImpl<pos2,Character,char>(2,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Character,char>(((char)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Character,char>(((char)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<0,Short,short>(0,true)
-  #MACRO QueryTesterImpl<pos1,Short,short>(1,false)
-  #MACRO QueryTesterImpl<pos2,Short,short>(2,false)
-  #MACRO QueryTesterImpl<neg1,Short,short>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Short,short>(((short)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Short,short>(((short)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<0,Integer,int>(0,true)
-  #MACRO QueryTesterImpl<pos1,Integer,int>(1,false)
-  #MACRO QueryTesterImpl<pos2,Integer,int>(2,false)
-  #MACRO QueryTesterImpl<neg1,Integer,int>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Integer,int>(((int)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Integer,int>(((int)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Integer,int>(((int)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Integer,int>(((int)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Integer,int>(((int)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Integer,int>(TypeUtil.MAX_SAFE_INT+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Integer,int>(TypeUtil.MIN_SAFE_INT-1,false)
-  #MACRO QueryTesterImpl<0,Long,long>(0,true)
-  #MACRO QueryTesterImpl<pos1,Long,long>(1,false)
-  #MACRO QueryTesterImpl<pos2,Long,long>(2,false)
-  #MACRO QueryTesterImpl<neg1,Long,long>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Long,long>(((long)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Long,long>(((long)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Long,long>(((long)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Long,long>(((long)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Long,long>(((long)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_INT)+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_INT)-1,false)
-  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Long,long>(((long)Integer.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Long,long>(((long)Integer.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_LONG_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_LONG)+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_LONG_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_LONG)-1,false)
-  #MACRO QueryTesterImpl<pos0,Float,float>(0.0F,true)
-  #MACRO QueryTesterImpl<neg0,Float,float>(-0.0F,true)
-  #MACRO QueryTesterImpl<pos1,Float,float>(1,false)
-  #MACRO QueryTesterImpl<pos2,Float,float>(2,false)
-  #MACRO QueryTesterImpl<neg1,Float,float>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Float,float>(((float)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Float,float>(((float)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Float,float>(((float)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Float,float>(((float)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Float,float>(((float)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Float,float>(((float)Integer.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Float,float>(((float)Integer.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_LONG_PLUS1,Float,float>(((float)Long.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_LONG_MINUS1,Float,float>(((float)Long.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MIN_FLOAT_VALUE,Float,float>(Float.MIN_VALUE,false)
-  #MACRO QueryTesterImpl<MAX_FLOAT_VALUE,Float,float>(Float.MAX_VALUE,false)
-  #MACRO QueryTesterImpl<NaN,Float,float>(Float.NaN,false)
-  #MACRO QueryTesterImpl<pos0,Double,double>(0.0D,true)
-  #MACRO QueryTesterImpl<neg0,Double,double>(-0.0D,true)
-  #MACRO QueryTesterImpl<pos1,Double,double>(1,false)
-  #MACRO QueryTesterImpl<pos2,Double,double>(2,false)
-  #MACRO QueryTesterImpl<neg1,Double,double>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Double,double>(((double)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Double,double>(((double)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Double,double>(((double)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Double,double>(((double)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Double,double>(((double)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Double,double>(((double)TypeUtil.MAX_SAFE_INT)+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Double,double>(((double)TypeUtil.MIN_SAFE_INT)-1,false)
-  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Double,double>(((double)Integer.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Double,double>(((double)Integer.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_LONG_PLUS1,Double,double>(((double)Long.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_LONG_MINUS1,Double,double>(((double)Long.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MIN_FLOAT_VALUE,Double,double>(Float.MIN_VALUE,false)
-  #MACRO QueryTesterImpl<MAX_FLOAT_VALUE,Double,double>(Float.MAX_VALUE,false)
-  #MACRO QueryTesterImpl<MIN_DOUBLE_VALUE,Double,double>(Double.MIN_VALUE,false)
-  #MACRO QueryTesterImpl<MAX_DOUBLE_VALUE,Double,double>(Double.MAX_VALUE,false)
-  #MACRO QueryTesterImpl<NaN,Double,double>(Double.NaN,false)
-  ;
 
-#MACRODEF QueryTesterImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
-BOXED_TYPEVALUE_NAME(false){
-  @Override boolean invokecontainsObject($ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokeremoveValObject($ClassPrefix$SeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.remove((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      --seqMonitor.expectedSeqSize;
-      --seqMonitor.expectedParentSize;
-      --seqMonitor.expectedRootSize;
-#IF OfRef
-      if(seqMonitor.structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-      }
-#ENDIF
-    }
-    return ret;
-  }
-  @Override int invokeindexOfObject($ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override int invokelastIndexOfObject($ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override int invokesearchObject($ClassPrefix$SeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokecontainsBoxed($ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.seq.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-#IFSWITCH BOXED_TYPE==Object
-  @Override boolean invokeremoveValBoxed($ClassPrefix$SeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.remove((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      --seqMonitor.expectedSeqSize;
-      --seqMonitor.expectedParentSize;
-      --seqMonitor.expectedRootSize;
-  #IF OfRef
-      if(seqMonitor.structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-      }
-  #ENDIF
-    }
-    return ret;
-  }
-#ELSE
-  @Override boolean invokeremoveValBoxed($ClassPrefix$SeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.removeVal((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      --seqMonitor.expectedSeqSize;
-      --seqMonitor.expectedParentSize;
-      --seqMonitor.expectedRootSize;
-  #IF OfRef
-      if(seqMonitor.structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-      }
-  #ENDIF
-    }
-    return ret;
-  }
-#ENDIF
-  @Override int invokeindexOfBoxed($ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override int invokelastIndexOfBoxed($ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override int invokesearchBoxed($ClassPrefix$SeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokecontainsUnboxed($ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.seq.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-#IFSWITCH PRIMITIVE_TYPE==Object
-  @Override boolean invokeremoveValUnboxed($ClassPrefix$SeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.remove((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      --seqMonitor.expectedSeqSize;
-      --seqMonitor.expectedParentSize;
-      --seqMonitor.expectedRootSize;
-  #IF OfRef
-      if(seqMonitor.structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-      }
-  #ENDIF
-    }
-    return ret;
-  }
-#ELSE
-  @Override boolean invokeremoveValUnboxed($ClassPrefix$SeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.removeVal((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      --seqMonitor.expectedSeqSize;
-      --seqMonitor.expectedParentSize;
-      --seqMonitor.expectedRootSize;
-  #IF OfRef
-      if(seqMonitor.structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-      }
-  #ENDIF
-    }
-    return ret;
-  }
-#ENDIF
-  @Override int invokeindexOfUnboxed($ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override int invokelastIndexOfUnboxed($ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override int invokesearchUnboxed($ClassPrefix$SeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  void addEqualsVal($ClassPrefix$SeqMonitor seqMonitor){
-#IF OfRef
-    seqMonitor.seq.add((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    ++seqMonitor.expectedSeqModCount;
-    ++seqMonitor.expectedParentModCount;
-    ++seqMonitor.expectedRootModCount;
-    ++seqMonitor.expectedSeqSize;
-    ++seqMonitor.expectedParentSize;
-    ++seqMonitor.expectedRootSize;
-#ELSE
-  #IFSWITCH VALUE_NAME==null
-    throw new UnsupportedOperationException();
-  #ELSE
-    #IF OfBoolean
-      #IFSWITCH PRIMITIVE_TYPE==boolean
-    seqMonitor.seq.add((boolean)(PRIMITIVE_VAL));
-      #ELSE
-        #IFSWITCH VALUE_NAME==pos1
-    seqMonitor.seq.add((boolean)(true));
-        #ELSE
-    seqMonitor.seq.add((boolean)((PRIMITIVE_VAL)==1));
-        #ENDIF
-      #ENDIF
-    #ELSE
-      #IFSWITCH PRIMITIVE_TYPE==boolean
-    seqMonitor.seq.add(($exposedType$)$queryCastBoolean$(PRIMITIVE_VAL));
-      #ELSE
-    seqMonitor.seq.add(($exposedType$)(PRIMITIVE_VAL));
-      #ENDIF
-    #ENDIF
-    ++seqMonitor.expectedSeqModCount;
-    ++seqMonitor.expectedParentModCount;
-    ++seqMonitor.expectedRootModCount;
-    ++seqMonitor.expectedSeqSize;
-    ++seqMonitor.expectedParentSize;
-    ++seqMonitor.expectedRootSize;
-  #ENDIF
-  
-#ENDIF
-    
-  }
-  void addNotEqualsVal($ClassPrefix$SeqMonitor seqMonitor){
-    #IF OfRef
-    seqMonitor.seq.add((Object)(boolean)NOT_EQUALS_VAL);
-    #ELSE
-    seqMonitor.seq.add((boolean)NOT_EQUALS_VAL);
-    #ENDIF
-    ++seqMonitor.expectedSeqModCount;
-    ++seqMonitor.expectedParentModCount;
-    ++seqMonitor.expectedRootModCount;
-    ++seqMonitor.expectedSeqSize;
-    ++seqMonitor.expectedParentSize;
-    ++seqMonitor.expectedRootSize;
-  }
-},
-#ENDDEF
-    
-    final boolean isObjectNonNull;
-    QueryTester(boolean isObjectNonNull){
-      this.isObjectNonNull=isObjectNonNull;
-    }
-    boolean invokecontains($ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokecontainsUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokecontainsBoxed(seqMonitor);
-        case ToObject:
-          return invokecontainsObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    boolean invokeremoveVal($ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokeremoveValUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokeremoveValBoxed(seqMonitor);
-        case ToObject:
-          return invokeremoveValObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokeindexOf($ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokeindexOfUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokeindexOfBoxed(seqMonitor);
-        case ToObject:
-          return invokeindexOfObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokelastIndexOf($ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokelastIndexOfUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokelastIndexOfBoxed(seqMonitor);
-        case ToObject:
-          return invokelastIndexOfObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokesearch($ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokesearchUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokesearchBoxed(seqMonitor);
-        case ToObject:
-          return invokesearchObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    
-    abstract boolean invokecontainsObject($ClassPrefix$SeqMonitor seqMonitor);
-    abstract boolean invokecontainsBoxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract boolean invokecontainsUnboxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract boolean invokeremoveValObject($ClassPrefix$SeqMonitor seqMonitor);
-    abstract boolean invokeremoveValBoxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract boolean invokeremoveValUnboxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokeindexOfObject($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokeindexOfBoxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokeindexOfUnboxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokelastIndexOfObject($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokelastIndexOfBoxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokelastIndexOfUnboxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokesearchObject($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokesearchBoxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract int invokesearchUnboxed($ClassPrefix$SeqMonitor seqMonitor);
-    abstract void addEqualsVal($ClassPrefix$SeqMonitor seqMonitor);
-    abstract void addNotEqualsVal($ClassPrefix$SeqMonitor seqMonitor);
-    void initDoesNotContain($ClassPrefix$SeqMonitor seqMonitor){
-      for(int i=0;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-    }
-    int initContainsEnd($ClassPrefix$SeqMonitor seqMonitor){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<99;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      return seqMonitor.expectedSeqSize-1;
-    }
-    int initContainsMiddle($ClassPrefix$SeqMonitor seqMonitor){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<50;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=51;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return seqMonitor.expectedSeqSize/2;
-    }
-    int initContainsBeginning($ClassPrefix$SeqMonitor seqMonitor){
-      addEqualsVal(seqMonitor);
-      for(int i=1;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return 0;
-    }
-#IF OfRef
-    boolean invokecontainsMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    boolean invokeremoveValMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int invokeindexOfMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int invokelastIndexOfMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int invokesearchMonitored($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsEnd($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsMiddle($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsBeginning($ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-#ENDIF
-  };
-  static abstract class MonitoredRemoveIfPredicate implements $TypeNameModifier$Predicate
-#IFNOT OfRef
-    ,Predicate<$BoxedType$>
-#ENDIF
-  {
-    final HashSet removedVals=new HashSet();
-    int callCounter;
-#IFNOT OfBoolean
-    int numRemoved;
-#ENDIF
-    abstract boolean testImpl($ArrayType$ val);
-    @Override public MonitoredRemoveIfPredicate negate()
-    {
-      //not worth implementing but must declare
-      return null;
-    }
-    @Override public boolean test($ArrayType$ val)
-    {
-      ++callCounter;
-      if(removedVals.contains(val))
-      {
-#IFNOT OfBoolean
-        ++numRemoved;
-#ENDIF
-        return true;
-      }
-      if(testImpl(val))
-      {
-#IFNOT OfBoolean
-        ++numRemoved;
-#ENDIF
-        removedVals.add(val);
-        return true;
-      }
-      return false;
-    }
-#IFNOT OfRef
-    @Override public boolean test($BoxedType$ val)
-    {
-      return test(($ArrayType$)val);
-    }
-#ENDIF
-  }
-  private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,$ArrayType$[] arr){
-    for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
-    }
-    for(int i=rootPreAlloc,v=Integer.MIN_VALUE+rootPreAlloc,bound=i+parentPreAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
-    }
-    for(int i=rootPreAlloc+parentPreAlloc,v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc,bound=i+parentPostAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
-    }
-    for(int i=rootPreAlloc+parentPreAlloc+parentPostAlloc,v=Integer.MAX_VALUE-rootPostAlloc,bound=i+rootPostAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
-    }
-  }
-  final StructType structType;
-  final NestedType nestedType;
-  final CheckedType checkedType;
-  final int initialCapacity;
-  final int rootPreAlloc;
-  final int parentPreAlloc;
-  final int parentPostAlloc;
-  final int rootPostAlloc;
-  final OmniCollection.Of$ClassPrefix$ root;
-  final OmniCollection.Of$ClassPrefix$ parent;
-  final OmniCollection.Of$ClassPrefix$ seq;
-  int expectedRootSize;
-  int expectedParentSize;
-  int expectedSeqSize;
-  int expectedRootModCount;
-  int expectedParentModCount;
-  int expectedSeqModCount;
-  
-  $ClassPrefix$SeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,$ArrayType$[] arr){
-    this.structType=StructType.ARRSEQ;
-    this.nestedType=nestedType;
-    this.checkedType=checkedType;
-    this.expectedRootSize=seqLength;
-    this.expectedParentSize=seqLength;
-    this.expectedSeqSize=seqLength;
-    this.initialCapacity=(arr==null)?0:(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR?OmniArray.DEFAULT_ARR_SEQ_CAP:arr.length);
-    switch(nestedType){
-      case SUBLIST:
-        seqLength+=(4*DEFAULT_PRE_AND_POST_ALLOC);
-      case LIST:
-        this.root=checkedType.checked?new $ClassPrefix$ArrSeq.CheckedList(seqLength,arr):new $ClassPrefix$ArrSeq.UncheckedList(seqLength,arr);
-        break;
-      case STACK:
-        this.root=checkedType.checked?new $ClassPrefix$ArrSeq.CheckedStack(seqLength,arr):new $ClassPrefix$ArrSeq.UncheckedStack(seqLength,arr);
-        break;
-      default:
-        throw new Error("Unknown nestedType "+nestedType);
-    }
-    if(nestedType.rootType){
-      this.rootPreAlloc=0;
-      this.parentPreAlloc=0;
-      this.parentPostAlloc=0;
-      this.rootPostAlloc=0;
-      this.parent=root;
-      this.seq=root;
-    }else{
-      Assertions.assertTrue(arr!=null && seqLength<=arr.length);
-      this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-      this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-      this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-      this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-      this.parent=((OmniList.Of$ClassPrefix$)root).subList(rootPreAlloc,seqLength-rootPostAlloc);
-      this.seq=((OmniList.Of$ClassPrefix$)parent).subList(parentPreAlloc,seqLength-rootPreAlloc-parentPostAlloc-rootPostAlloc);
-    }
-  }
-  
-  $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
-    this.structType=structType;
-    this.nestedType=nestedType;
-    this.checkedType=checkedType;
-    this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
-    switch(structType){
-      case ARRSEQ:
-        if(nestedType==NestedType.SUBLIST){
-          this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          int rootSize;
-          $ArrayType$[] arr=new $ArrayType$[rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc];
-          initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
-          this.root=checkedType.checked
-            ?new $ClassPrefix$ArrSeq.CheckedList(rootSize,arr)
-            :new $ClassPrefix$ArrSeq.UncheckedList(rootSize,arr);
-          this.parent=((OmniList.Of$ClassPrefix$)root).subList(rootPreAlloc,rootSize-rootPostAlloc);
-          this.seq=((OmniList.Of$ClassPrefix$)parent).subList(parentPreAlloc,parentPreAlloc);
-        }else{
-          this.rootPreAlloc=0;
-          this.parentPreAlloc=0;
-          this.parentPostAlloc=0;
-          this.rootPostAlloc=0;
-          switch(nestedType){
-            default:
-              throw new Error("Unknown nestedType "+nestedType);
-            case STACK:
-              this.root=checkedType.checked
-                ?new $ClassPrefix$ArrSeq.CheckedStack()
-                :new $ClassPrefix$ArrSeq.UncheckedStack();
-              break;
-            case LIST:
-              this.root=checkedType.checked
-                ?new $ClassPrefix$ArrSeq.CheckedList()
-                :new $ClassPrefix$ArrSeq.UncheckedList();
-          }
-          this.parent=root;
-          this.seq=root;
-        }
-        break;
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-  }
-  $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity){
-    this(structType,nestedType,checkedType,initialCapacity,0,0,0,0);
-  }
-  $ClassPrefix$SeqMonitor(final StructType structType, final CheckedType checkedType,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
-    this(structType,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
-  }
-  $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
-    this.structType=structType;
-    this.nestedType=nestedType;
-    this.checkedType=checkedType;
-    this.initialCapacity=initialCapacity;
-    this.rootPreAlloc=rootPreAlloc;
-    this.parentPreAlloc=parentPreAlloc;
-    this.parentPostAlloc=parentPostAlloc;
-    this.rootPostAlloc=rootPostAlloc;
-    switch(structType){
-      case ARRSEQ:
-        int rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
-        $ArrayType$[] arr;
-        if(rootSize==0){
-          switch(initialCapacity){
-            case 0:
-              arr=null;
-              break;
-            case OmniArray.DEFAULT_ARR_SEQ_CAP:
-              arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
-              break;
-            default:
-              arr=new $ArrayType$[initialCapacity];
-          }
-        }else{
-          arr=new $ArrayType$[Math.max(initialCapacity,rootSize)];
-        }
-        initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
-        this.root=nestedType==NestedType.STACK
-          ?checkedType.checked
-            ?new $ClassPrefix$ArrSeq.CheckedStack(rootSize,arr)
-            :new $ClassPrefix$ArrSeq.UncheckedStack(rootSize,arr)
-          :checkedType.checked
-            ?new $ClassPrefix$ArrSeq.CheckedList(rootSize,arr)
-            :new $ClassPrefix$ArrSeq.UncheckedList(rootSize,arr);
-        break;
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-    switch(nestedType){
-      case SUBLIST:
-        this.parent=((OmniList.Of$ClassPrefix$)root).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+parentPostAlloc);
-        this.seq=((OmniList.Of$ClassPrefix$)parent).subList(parentPreAlloc,parentPreAlloc);
-        break;
-      case LIST:
-      case STACK:
-        this.parent=root;
-        this.seq=root;
-        break;
-      default:
-        throw new Error("Unknown nestedType "+nestedType);
-    }
-  }
-#IF OfRef
-  static class ModParentMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModParentMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModParent);
-      return Integer.compare(compareVal,that.compareVal);
-    }
-  }
-  static class AIOBThrowingMonitoredObject extends MonitoredObject{
-    AIOBThrowingMonitoredObject(int compareVal){
-      super(compareVal);
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      throw new ArrayIndexOutOfBoundsException();
-    }
-  }
-  static class IOBThrowingMonitoredObject extends MonitoredObject{
-    IOBThrowingMonitoredObject(int compareVal){
-      super(compareVal);
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class ModSeqMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModSeqMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModSeq);
-      return Integer.compare(compareVal,that.compareVal);
-    }
-  }
-  static class ModParentIOBThrowingMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModParentIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModParent);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class ModParentAIOBThrowingMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModParentAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModParent);
-      throw new ArrayIndexOutOfBoundsException();
-    }
-  }
-  static class ModSeqIOBThrowingMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModSeqIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModSeq);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class ModSeqAIOBThrowingMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModSeqAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModSeq);
-      throw new ArrayIndexOutOfBoundsException();
-    }
-  }
-  static class ModRootMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModRootMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModRoot);
-      return Integer.compare(compareVal,that.compareVal);
-    }
-  }
-  static class ModRootIOBThrowingMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModRootIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModRoot);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class ModRootAIOBThrowingMonitoredObject extends MonitoredObject{
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    ModRootAIOBThrowingMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
-      super(compareVal);
-      this.seqMonitor=seqMonitor;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      ++numCompareToCalls;
-      seqMonitor.illegalAdd(PreModScenario.ModRoot);
-      throw new ArrayIndexOutOfBoundsException();
-    }
-  }
- 
-  static class MonitoredObject implements Comparable<MonitoredObject>{
-    int numEqualsCalls;
-    int numHashCodeCalls;
-    int numToStringCalls;
-    int numCompareToCalls;
-    int compareVal;
-    MonitoredObject(){
-    }
-    MonitoredObject(int compareVal){
-      this.compareVal=compareVal;
-    }
-    @Override public int compareTo(MonitoredObject that){
-      return Integer.compare(compareVal,that.compareVal);
-    }
-    @Override public boolean equals(Object obj){
-      ++numEqualsCalls;
-      return super.equals(this);
-    }
-    @Override public int hashCode(){
-      ++numHashCodeCalls;
-      return super.hashCode();
-    }
-    @Override public String toString(){
-      ++numToStringCalls;
-      return super.toString();
-    }
-  }
-#ENDIF
-  static abstract class MonitoredComparator implements $Comparator$
-#IFNOT OfRef
-   ,Comparator
-#ENDIF
-  {
-    public abstract int $compareMethod$($ArrayType$ val1, $ArrayType$ val2);
-#IFNOT OfRef
-    public int compare(Object val1,Object val2){
-      return $compareMethod$(($ArrayType$)val1,($ArrayType$)val2);
-    }
-#ENDIF
-  }
-  static class MonitoredUnaryOperator implements $UnaryOperator$
-#IFNOT OfRef
-    ,UnaryOperator
-#ENDIF
-  {
-    ArrayList encounteredValues=new ArrayList();
-    public $ArrayType$ $applyMethod$($ArrayType$ val){
-      encounteredValues.add(val);
-      #IF OfRef
-      return Integer.valueOf((Integer)val)+1;
-      #ELSEIF OfBoolean
-      return !val;
-      #ELSE
-      return ($ArrayType$)(val+1);
-      #ENDIF
-    }
-#IFNOT OfRef
-    public Object apply(Object val){
-      return $applyMethod$(($ArrayType$)val);
-    }
-#ENDIF
-  }
-  static class MonitoredArrayConstructor
-#IF OfRef
-    implements IntFunction<Integer[]>
-#ELSE
-    implements IntFunction<$BoxedType$[]>
-#ENDIF
-  {
-    int numCalls;
-#IF OfRef
-    @Override public Integer[] apply(int arrSize){
-      ++numCalls;
-      return new Integer[arrSize];
-    }
-#ELSE
-    @Override public $BoxedType$[] apply(int arrSize){
-      ++numCalls;
-      return new $BoxedType$[arrSize];
-    }
-#ENDIF
-  }
-  static class MonitoredConsumer implements $TypeNameModifier$Consumer
-#IFNOT OfRef
-    ,Consumer
-#ENDIF
-  {
-    ArrayList encounteredValues=new ArrayList();
-    public void accept($ArrayType$ val){
-      encounteredValues.add(val);
-    }
-#IFNOT OfRef
-    public void accept(Object val){
-      accept(($exposedType$)val);
-    }
-#ENDIF
-  }
-  public static class ThrowingMonitoredConsumer extends MonitoredConsumer{
-    public void accept($ArrayType$ val){
-      super.accept(val);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  abstract class ItrMonitor{
-    final OmniIterator.Of$ClassPrefix$ itr;
-    int expectedCursor;
-    int expectedLastRet;
-    public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
-      int expectedBound=nestedType.forwardIteration?expectedSeqSize:0;
-#IFNOT OfRef
-      if(functionCallType==FunctionCallType.Boxed){
-        itr.forEachRemaining((Consumer)action);
-      }else
-#ENDIF
-      {
-        itr.forEachRemaining(($TypeNameModifier$Consumer)action);
-      }
-      if(nestedType.forwardIteration){
-        if(expectedCursor<expectedBound){
-          expectedCursor=expectedBound;
-          expectedLastRet=expectedCursor-1;
-        }
-      }else{
-        if(expectedCursor>expectedBound){
-          expectedCursor=expectedBound;
-          expectedLastRet=expectedCursor;
-        }
-      }
-    }
-    ItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor){
-      this.itr=itr;
-      this.expectedCursor=expectedCursor;
-      this.expectedLastRet=-1;
-    }
-    public void iterateReverse(){
-      ((OmniListIterator.Of$ClassPrefix$)itr).previous$TypeNameModifier$();
-      expectedLastRet=--expectedCursor;
-    }
-    public $ClassPrefix$SeqMonitor getSeqMonitor(){
-      return $ClassPrefix$SeqMonitor.this;
-    }
-    public abstract void verifyNext(int expectedVal,$ClassPrefix$OutputTestArgType outputType);
-    public void verifyPrevious(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-      throw new UnsupportedOperationException();
-    }
-    public abstract void verifyIteratorState();
-    public void set(int v,$ClassPrefix$InputTestArgType inputArgType){
-       inputArgType.callListItrSet((OmniListIterator.Of$ClassPrefix$)itr,v);
-    }
-    public void set(int v){
-      set(v,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
-    }
-    public void add(int v,$ClassPrefix$InputTestArgType inputArgType){
-      throw new UnsupportedOperationException();
-    }
-    public void add(int v){
-      add(v,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
-    }
-    public abstract void iterateForward();
-    public abstract void remove();
-    public boolean hasNext(){
-      return itr.hasNext();
-    }
-    public boolean hasPrevious(){
-      return ((OmniListIterator.Of$ClassPrefix$)itr).hasPrevious();
-    }
-    public int nextIndex(){
-      return ((OmniListIterator.Of$ClassPrefix$)itr).nextIndex();
-    }
-    public int previousIndex(){
-      return ((OmniListIterator.Of$ClassPrefix$)itr).previousIndex();
-    }
-  }
-  private class UncheckedArrSeqItrMonitor extends ItrMonitor{
-    private UncheckedArrSeqItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor){
-      super(itr,expectedCursor);
-    }
-    @Override public void verifyIteratorState(){
-      int actualCursor;
-      Object actualParent;
-      switch(nestedType){
-        case LIST:
-          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.Itr.cursor(itr);
-          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.Itr.parent(itr);
-          break;
-        case STACK:
-          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedStack.Itr.cursor(itr);
-          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedStack.Itr.parent(itr);
-          break;
-        case SUBLIST:
-          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.Itr.cursor(itr);
-          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.Itr.parent(itr);
-          break;
-        default:
-          throw new Error("Unknown nestedType "+nestedType);
-      }
-      Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
-      Assertions.assertSame(seq,actualParent);
-    }
-    @Override public void add(int v,$ClassPrefix$InputTestArgType inputArgType){
-      inputArgType.callListItrAdd((OmniListIterator.Of$ClassPrefix$)itr,v);
-      ++expectedCursor;
-      ++expectedRootModCount;
-      ++expectedParentModCount;
-      ++expectedSeqModCount;
-      ++expectedRootSize;
-      ++expectedParentSize;
-      ++expectedSeqSize;
-      expectedLastRet=-1;
-    }
-    @Override public void iterateForward(){
-      itr.next$TypeNameModifier$();
-      expectedLastRet=nestedType==NestedType.STACK
-        ?--expectedCursor
-        :expectedCursor++;
-    }
-    @Override public void verifyNext(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-      outputType.verifyItrNext(itr,expectedVal);
-      expectedLastRet=nestedType==NestedType.STACK
-        ?--expectedCursor
-        :expectedCursor++;
-    }
-    @Override public void verifyPrevious(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-      outputType.verifyItrPrevious(itr,expectedVal);
-      expectedLastRet=--expectedCursor;
-    }
-    @Override public void remove(){
-      itr.remove();
-      --expectedRootSize;
-      ++expectedRootModCount;
-      --expectedParentSize;
-      ++expectedParentModCount;
-      --expectedSeqSize;
-      ++expectedSeqModCount;
-      expectedCursor=expectedLastRet;
-      expectedLastRet=-1;
-#IF OfRef
-      if(structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
-      }
-#ENDIF
-    }
-  }
-  private class CheckedArrSeqItrMonitor extends UncheckedArrSeqItrMonitor{
-    int expectedItrModCount;
-    private CheckedArrSeqItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor){
-      super(itr,expectedCursor);
-      this.expectedItrModCount=expectedRootModCount;
-    }
-    @Override public void verifyIteratorState(){
-      int actualCursor;
-      Object actualParent;
-      switch(nestedType){
-        case LIST:
-          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.cursor(itr);
-          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.parent(itr);
-          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.modCount(itr));
-          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.lastRet(itr));
-          break;
-        case STACK:
-          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.cursor(itr);
-          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.parent(itr);
-          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.modCount(itr));
-          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.lastRet(itr));
-          break;
-        case SUBLIST:
-          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.cursor(itr);
-          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.parent(itr);
-          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.modCount(itr));
-          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.lastRet(itr));
-          break;
-        default:
-          throw new Error("Unknown nestedType "+nestedType);
-      }
-      Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
-      Assertions.assertSame(seq,actualParent);
-    }
-    @Override public void add(int v,$ClassPrefix$InputTestArgType inputArgType){
-      super.add(v,inputArgType);
-      ++expectedItrModCount;
-    }
-    @Override public void remove(){
-      super.remove();
-      ++expectedItrModCount;
-    }
-  }
-  public ItrMonitor getItrMonitor(){
-    var itr=seq.iterator();
-    switch(structType){
-      case ARRSEQ:
-        int expectedCursor=nestedType==NestedType.STACK?(($ClassPrefix$ArrSeq)root).size:0;
-        return checkedType.checked
-          ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
-          :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-  }
-  public ItrMonitor getListItrMonitor(){
-    var itr=((OmniList.Of$ClassPrefix$)seq).listIterator();
-    switch(structType){
-      case ARRSEQ:
-        return checkedType.checked
-          ?new CheckedArrSeqItrMonitor(itr,0)
-          :new UncheckedArrSeqItrMonitor(itr,0);
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-  }
-  public ItrMonitor getListItrMonitor(int index){
-    var itr=((OmniList.Of$ClassPrefix$)seq).listIterator(index);
-    switch(structType){
-      case ARRSEQ:
-        return checkedType.checked
-          ?new CheckedArrSeqItrMonitor(itr,index)
-          :new UncheckedArrSeqItrMonitor(itr,index);
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-  }
-  public ItrMonitor getItrMonitor(ItrType itrType){
-    switch(itrType){
-      case Itr:
-        return getItrMonitor();
-      case ListItr:
-        return getListItrMonitor();
-      default:
-        throw new Error("unknown itr type "+itrType);
-    }
-  }
-  public ItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
-    switch(seqLocation){
-      case BEGINNING:
-        switch(itrType){
-          case ListItr:
-            return getListItrMonitor();
-          case Itr:
-            return getItrMonitor();
-          default:
-            throw new Error("Unknown itr type "+itrType);
-        }
-      case MIDDLE:
-        return getListItrMonitor(expectedSeqSize/2);
-      case END:
-        return getListItrMonitor(expectedSeqSize);
-      default:
-        throw new Error("Unknown sequence location "+seqLocation);
-    } 
-  }
-  public ItrMonitor getListItrMonitor(SequenceLocation seqLocation){
-    switch(seqLocation){
-      case BEGINNING:
-        return getListItrMonitor();
-      case MIDDLE:
-        return getListItrMonitor(expectedSeqSize/2);
-      case END:
-        return getListItrMonitor(expectedSeqSize);
-      default:
-        throw new Error("Unknown sequence location "+seqLocation);
-    }
-  }
+
   public static abstract class SequenceVerificationItr{
     public abstract void verifyLiteralIndexAndIterate($ArrayType$ val);
 #IF OfRef
@@ -3267,10 +2211,7 @@ BOXED_TYPEVALUE_NAME(false){
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
     public abstract boolean equals(Object val);
-    final $ClassPrefix$SeqMonitor seqMonitor;
-    SequenceVerificationItr($ClassPrefix$SeqMonitor seqMonitor){
-      this.seqMonitor=seqMonitor;
-    }
+    
     public SequenceVerificationItr verifyAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length){
       for(int i=0;i<length;++i,++v){
         verifyIndexAndIterate(inputArgType,v);
@@ -3311,18 +2252,10 @@ BOXED_TYPEVALUE_NAME(false){
       }
       return this;
     }
-    public SequenceVerificationItr verifyParentPostAlloc(){
-      for(int i=0,v=Integer.MAX_VALUE-seqMonitor.rootPostAlloc-seqMonitor.parentPostAlloc;i<seqMonitor.parentPostAlloc;++i,++v){
-        verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,v);
-      }
-      return this;
-    }
-    public SequenceVerificationItr verifyRootPostAlloc(){
-      for(int i=0,v=Integer.MAX_VALUE-seqMonitor.rootPostAlloc;i<seqMonitor.rootPostAlloc;++i,++v){
-        verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,v);
-      }
-      return this;
-    }
+    public abstract SequenceVerificationItr verifyParentPostAlloc();
+    
+    public abstract SequenceVerificationItr verifyRootPostAlloc();
+    
     public SequenceVerificationItr verifyIllegalAdd(){
       verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
       return this;
@@ -3330,13 +2263,8 @@ BOXED_TYPEVALUE_NAME(false){
     public SequenceVerificationItr verifyPostAlloc(){
       return verifyPostAlloc(PreModScenario.NoMod);
     }
-    public SequenceVerificationItr verifyPostAlloc(int expectedVal){
-      for(int i=0,bound=seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc;i<bound;++i){
-        verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,expectedVal);
-      }
-      return this;
-    }
-    
+    public abstract SequenceVerificationItr verifyPostAlloc(int expectedVal);
+
     public SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
       if(preModScenario==PreModScenario.ModSeq){verifyIllegalAdd();}
       verifyParentPostAlloc();
@@ -3346,547 +2274,132 @@ BOXED_TYPEVALUE_NAME(false){
       return this;
     }
   }
-  private static class ArrSeqSequenceVerificationItr extends SequenceVerificationItr{
-    final $ArrayType$[] arr;
-    int offset;
-    private ArrSeqSequenceVerificationItr($ClassPrefix$SeqMonitor seqMonitor,int offset,$ArrayType$[] arr){
-      super(seqMonitor);
-      this.arr=arr;
-      this.offset=offset;
-    }
-    @Override public void verifyLiteralIndexAndIterate($ArrayType$ val){
-#IF OfRef
-      Assertions.assertSame(val,arr[offset++]);
-#ELSE
-      Assertions.assertEquals(val,arr[offset++]);
-#ENDIF
-      
-    }
-#IF OfRef
-    @Override public void verifyIndexAndIterate(MonitoredObject monitoredObject){
-      Object v;
-      if((v=arr[offset++]) instanceof MonitoredObject){
-        Assertions.assertEquals(monitoredObject.compareVal,((MonitoredObject)v).compareVal);
-      }else{
-        Assertions.assertEquals(monitoredObject.compareVal,(Object)v);
-      }
-    }
-
-#ENDIF
-    @Override public void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val){
-      inputArgType.verifyVal(val,arr[offset++]);
-    }
-    @Override public SequenceVerificationItr getPositiveOffset(int i){
-      if(i<0){
-        throw new Error("offset cannot be negative: "+i);
-      }
-      return new ArrSeqSequenceVerificationItr(seqMonitor,i+offset,arr);
-    }
-    @Override public SequenceVerificationItr skip(int i){
-      if(i<0){
-        throw new Error("offset cannot be negative: "+i);
-      }
-      this.offset+=i;
-      return this;
-    }
-    @Override public boolean equals(Object val){
-      final ArrSeqSequenceVerificationItr that;
-      return val==this || (val instanceof ArrSeqSequenceVerificationItr && (that=(ArrSeqSequenceVerificationItr)val).arr==this.arr && that.offset==this.offset);
+  ItrMonitor getItrMonitor();
+  default ItrMonitor getListItrMonitor(){
+    throw new UnsupportedOperationException();
+  }
+  default ItrMonitor getListItrMonitor(int index){
+    throw new UnsupportedOperationException();
+  }
+  default ItrMonitor getItrMonitor(ItrType itrType){
+    switch(itrType){
+      case Itr:
+        return getItrMonitor();
+      case ListItr:
+        return getListItrMonitor();
+      default:
+        throw new Error("unknown itr type "+itrType);
     }
   }
-  public SequenceVerificationItr verifyPreAlloc(int expectedVal){
-    switch(structType){
-      case ARRSEQ:{
-        var arr=(($ClassPrefix$ArrSeq)root).arr;
-        int offset=0;
-        for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
-          $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+  default ItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
+    switch(seqLocation){
+      case BEGINNING:
+        switch(itrType){
+          case ListItr:
+            return getListItrMonitor();
+          case Itr:
+            return getItrMonitor();
+          default:
+            throw new Error("Unknown itr type "+itrType);
         }
-        return new ArrSeqSequenceVerificationItr(this,offset,arr);
-      }
+      case MIDDLE:
+        return getListItrMonitor(getExpectedSeqSize()/2);
+      case END:
+        return getListItrMonitor(getExpectedSeqSize());
       default:
-        throw new Error("Unknown structType "+structType);
+        throw new Error("Unknown sequence location "+seqLocation);
+    } 
+  }
+  default ItrMonitor getListItrMonitor(SequenceLocation seqLocation){
+    switch(seqLocation){
+      case BEGINNING:
+        return getListItrMonitor();
+      case MIDDLE:
+        return getListItrMonitor(getExpectedSeqSize()/2);
+      case END:
+        return getListItrMonitor(getExpectedSeqSize());
+      default:
+        throw new Error("Unknown sequence location "+seqLocation);
     }
   }
-  public SequenceVerificationItr verifyPreAlloc(){
-    switch(structType){
-      case ARRSEQ:{
-        var arr=(($ClassPrefix$ArrSeq)root).arr;
-        int offset=0;
-        for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
-          $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
-        }
-        return new ArrSeqSequenceVerificationItr(this,offset,arr);
-      }
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
+  SequenceVerificationItr verifyPreAlloc(int expectedVal);
+  SequenceVerificationItr verifyPreAlloc();
+  int getExpectedSeqSize();
+  void illegalAdd(PreModScenario preModScenario);
+#IF OfRef
+  boolean add(Object obj);
+#ENDIF
+  
+  default void add(int index,int val,$ClassPrefix$InputTestArgType inputArgType)
+  {
+    throw new UnsupportedOperationException();
   }
-  public void illegalAdd(PreModScenario preModScenario){
-    switch(preModScenario){
-      case ModSeq:
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
-        ++expectedRootModCount;
-        ++expectedRootSize;
-        ++expectedParentModCount;
-        ++expectedParentSize;
-        ++expectedSeqModCount;
-        ++expectedSeqSize;
-        break;
-      case ModParent:
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(parent,0);
-        ++expectedRootModCount;
-        ++expectedRootSize;
-        ++expectedParentModCount;
-        ++expectedParentSize;
-        break;
-      case ModRoot:
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(root,0);
-        ++expectedRootModCount;
-        ++expectedRootSize;
-        break;
-      case NoMod:
-        break;
-      default:
-        throw new Error("Unknown preModScenario "+preModScenario);
-    }
-  }
-  public void add(int index,int val,$ClassPrefix$InputTestArgType inputArgType){
-    inputArgType.callListAdd(seq,index,val);
-    ++expectedRootSize;
-    ++expectedParentSize;
-    ++expectedSeqSize;
-    ++expectedRootModCount;
-    ++expectedParentModCount;
-    ++expectedSeqModCount;
-  }
-  public void add(int index,int val){
+  default void add(int index,int val){
     add(index,val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
   }
-  public boolean add(int val,$ClassPrefix$InputTestArgType inputArgType){
-    boolean ret=inputArgType.callCollectionAdd(seq,val);
-    if(ret){
-      ++expectedRootSize;
-      ++expectedParentSize;
-      ++expectedSeqSize;
-      ++expectedRootModCount;
-      ++expectedParentModCount;
-      ++expectedSeqModCount;
-    }
-    return ret;
-  }
-  public boolean add(int val){
+  boolean add(int val,$ClassPrefix$InputTestArgType inputArgType);
+  default boolean add(int val){
     return add(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
   }
-  public void push(int val,$ClassPrefix$InputTestArgType inputArgType){
-    inputArgType.callStackPush(seq,val);
-    ++expectedRootSize;
-    ++expectedParentSize;
-    ++expectedSeqSize;
-    ++expectedRootModCount;
-    ++expectedParentModCount;
-    ++expectedSeqModCount;
+  default void push(int val,$ClassPrefix$InputTestArgType inputArgType)
+  {
+    throw new UnsupportedOperationException();
   }
-  public void push(int val){
+  default void push(int val){
     push(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
   }
-  public void put(int index,int val,$ClassPrefix$InputTestArgType inputArgType){
-    inputArgType.callListPut(seq,index,val);
+  default void put(int index,int val,$ClassPrefix$InputTestArgType inputArgType)
+  {
+    throw new UnsupportedOperationException();
   }
-  public String toString(){
-    StringBuilder builder=new StringBuilder();
-    switch(structType){
-      case ARRSEQ:
-        builder.append("$ClassPrefix$ArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
-        switch(nestedType){
-          case STACK:
-            builder.append("Stack{").append(initialCapacity);
-            break;
-          case LIST:
-            builder.append("List{").append(initialCapacity);
-            break;
-          case SUBLIST:
-            builder.append("SubList{").append(rootPreAlloc).append(',').append(parentPreAlloc).append(',').append(parentPostAlloc).append(',').append(rootPostAlloc);
-            break;
-          default:
-            throw new Error("Unknown nestedType "+nestedType);
-        }
-        break;
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-    return builder.append('}').toString();
-  }
-  public void verifyStructuralIntegrity(){
-    switch(structType){
-      case ARRSEQ:
-        switch(nestedType){
-          case STACK:
-            if(checkedType.checked){
-              Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.modCount(root));
-            }
-            break;
-          case LIST:
-            if(checkedType.checked){
-              Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(root));
-            }
-            break;
-          case SUBLIST:
-            OmniList.Of$ClassPrefix$ actualSeqParent;
-            $ClassPrefix$ArrSeq actualSeqRoot;
-            int actualSeqSize;
-            OmniList.Of$ClassPrefix$ actualParentParent;
-            $ClassPrefix$ArrSeq  actualParentRoot;
-            int actualParentSize;
-            if(checkedType.checked){
-              actualSeqParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.parent(seq);
-              actualSeqRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.root(seq);
-              actualSeqSize=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.size(seq);
-              actualParentParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.parent(parent);
-              actualParentRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.root(parent);
-              actualParentSize=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.size(parent);
-              Assertions.assertEquals(expectedSeqModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.modCount(seq));
-              Assertions.assertEquals(expectedParentModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.modCount(parent));
-              Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(root));
-            }else{
-              actualSeqParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.parent(seq);
-              actualSeqRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.root(seq);
-              actualSeqSize=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.size(seq);
-              actualParentParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.parent(parent);
-              actualParentRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.root(parent);
-              actualParentSize=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.size(parent);
-            }
-            Assertions.assertSame(root,actualSeqRoot);
-            Assertions.assertSame(root,actualParentRoot);
-            Assertions.assertSame(parent,actualSeqParent);
-            Assertions.assertNull(actualParentParent);
-            Assertions.assertEquals(expectedSeqSize,actualSeqSize);
-            Assertions.assertEquals(expectedParentSize+parentPreAlloc+parentPostAlloc,actualParentSize);
-            break;
-          default:
-            throw new Error("Unknown structType "+structType);
-        }
-        Assertions.assertEquals(expectedRootSize+parentPreAlloc+parentPostAlloc+rootPreAlloc+rootPostAlloc,FieldAccessor.$ClassPrefix$ArrSeq.size(root));
-        break;
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-  }
-  public boolean isEmpty(){
-    return seq.isEmpty();
-  }
-  public void forEach(MonitoredConsumer action,FunctionCallType functionCallType){
-#IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed){
-      seq.forEach((Consumer)action);
-    }else
-#ENDIF
-    {
-      seq.forEach(($TypeNameModifier$Consumer)action);
-    }
-  }
+  void verifyStructuralIntegrity();
+  boolean isEmpty();
+  void forEach(MonitoredConsumer action,FunctionCallType functionCallType);
 #IFNOT OfBoolean
-  public void unstableSort(MonitoredComparator sorter){
-    int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).unstableSort(($Comparator$)sorter);
-    if(seqSize>1){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void unstableSort(MonitoredComparator sorter){
+    throw new UnsupportedOperationException();
   }
 #ENDIF
-  public void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
-    int seqSize=expectedSeqSize;
-  #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed){
-      ((OmniList.Of$ClassPrefix$)seq).replaceAll((UnaryOperator)operator);
-    }else
-  #ENDIF
-    {
-      ((OmniList.Of$ClassPrefix$)seq).replaceAll(($UnaryOperator$)operator);
-    }
-    if(seqSize!=0){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
+    throw new UnsupportedOperationException();
   }
 
-  public void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
-    int seqSize=expectedSeqSize;
-  #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed){
-      ((OmniList.Of$ClassPrefix$)seq).sort((Comparator)sorter);
-    }else
-  #ENDIF
-    {
-      ((OmniList.Of$ClassPrefix$)seq).sort(($Comparator$)sorter);
-    }
-    if(seqSize>1){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
+    throw new UnsupportedOperationException();
   }
-  public void stableAscendingSort(){
-    int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).stableAscendingSort();
-    if(seqSize>1){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void stableAscendingSort(){
+    throw new UnsupportedOperationException();
   }
-  public void stableDescendingSort(){
-    int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).stableDescendingSort();
-    if(seqSize>1){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void stableDescendingSort(){
+    throw new UnsupportedOperationException();
   }
 #IF OfRef
-  public void unstableAscendingSort(){
-    int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).unstableAscendingSort();
-    if(seqSize>1){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void unstableAscendingSort(){
+    throw new UnsupportedOperationException();
   }
-  public void unstableDescendingSort(){
-    int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).unstableDescendingSort();
-    if(seqSize>1){
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
+  default void unstableDescendingSort(){
+    throw new UnsupportedOperationException();
   }
 #ENDIF
-  public void removeAt(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
-    outputType.verifyListRemoveAt(seq,index,expectedVal);
-    --expectedSeqSize;
-    --expectedParentSize;
-    --expectedRootSize;
-    ++expectedSeqModCount;
-    ++expectedParentModCount;
-    ++expectedRootModCount;
-#IF OfRef
-      if(structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
-      }
-#ENDIF
+  default void removeAt(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
+    throw new UnsupportedOperationException();
   }
-  public void get(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
-    outputType.verifyListGet(seq,index,expectedVal);
+  default void get(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
+    throw new UnsupportedOperationException();
   }
-  public void clear(){
-    int seqSize=expectedSeqSize;
-    seq.clear();
-    if(seqSize!=0){
-      expectedSeqSize=0;
-      expectedParentSize=0;
-      expectedRootSize=0;
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-#IF OfRef
-      if(structType==StructType.ARRSEQ){
-        int newBound=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
-        int oldBound=newBound+seqSize;
-        verifyRangeIsNull((($ClassPrefix$ArrSeq)root).arr,newBound,oldBound);
-      }
-#ENDIF
-    }
+  void clear();
+  default void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType)
+  {
+    throw new UnsupportedOperationException();
   }
-  public void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyStackPop(seq,expectedVal);
-    --expectedSeqSize;
-    --expectedParentSize;
-    --expectedRootSize;
-    ++expectedSeqModCount;
-    ++expectedParentModCount;
-    ++expectedRootModCount;
-#IF OfRef
-    if(structType==StructType.ARRSEQ){
-      Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
-    }
-#ENDIF
+  default void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType)
+  {
+    throw new UnsupportedOperationException();
   }
-  public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
-    if(expectedSeqSize!=0){
-      --expectedSeqSize;
-      --expectedParentSize;
-      --expectedRootSize;
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-  #IF OfRef
-      if(structType==StructType.ARRSEQ){
-        Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
-      }
-  #ENDIF
-    }
-
+  default void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
+     throw new UnsupportedOperationException();
   }
-  
-  public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
-  #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTo$BoxedType$(expectedRet),((OmniList.Of$ClassPrefix$)seq).set(index,TypeConversionUtil.convertTo$BoxedType$(val)));
-    }
-    else
-  #ENDIF
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(expectedRet),((OmniList.Of$ClassPrefix$)seq).set(index,TypeConversionUtil.convertTo$ArrayType$(val)));
-    }
-  }
-  
-  public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
-#IF OfRef,OfBoolean
-    int seqSize=expectedSeqSize;
-#ENDIF
-
-    boolean retVal;
-#IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed)
-    {
-      retVal=seq.removeIf((Predicate)pred);
-    }
-    else
-#ENDIF
-    {
-      retVal=seq.removeIf(($TypeNameModifier$Predicate)pred);
-    }
-    if(retVal)
-    {
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-      int numRemoved;
-#IF OfBoolean
-      int numTrue=0,numFalse=0;
-      var cloneItr=clone.iterator();
-      while(cloneItr.hasNext()){
-        if(cloneItr.next$TypeNameModifier$()){
-          ++numTrue;
-        }else{
-          ++numFalse;
-        }
-      }
-      if(pred.removedVals.contains(true))
-      {
-        if(pred.removedVals.contains(false))
-        {
-          numRemoved=seqSize;
-          Assertions.assertTrue(seq.isEmpty());
-        }
-        else
-        {
-          numRemoved=numTrue;
-          Assertions.assertFalse(seq.contains(true));
-        }
-      }
-      else
-      {
-        numRemoved=numFalse;
-        Assertions.assertFalse(seq.contains(false));
-      }
-#ELSE
-      numRemoved=pred.numRemoved;
-  #IF OfRef
-      if(structType==StructType.ARRSEQ)
-      {
-        verifyRangeIsNull((($ClassPrefix$ArrSeq)root).arr,(seqSize-numRemoved)+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc,seqSize+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc);
-      }
-  #ENDIF
-      for(var removedVal:pred.removedVals)
-      {
-        Assertions.assertFalse(seq.contains(removedVal));
-      }
-#ENDIF
-      expectedSeqSize-=numRemoved;
-      expectedParentSize-=numRemoved;
-      expectedRootSize-=numRemoved;
-      if(expectedNumRemoved!=-1){
-        Assertions.assertEquals(expectedNumRemoved,numRemoved);
-      }
-    }else{
-      Assertions.assertEquals(expectedSeqSize,clone.size());
-      var seqItr=seq.iterator();
-      var cloneItr=clone.iterator();
-      for(int i=0;i<expectedSeqSize;++i){
-#IF OfRef
-        Assertions.assertSame(seqItr.next(),cloneItr.next());
-#ELSE
-        Assertions.assertEquals(seqItr.next$TypeNameModifier$(),cloneItr.next$TypeNameModifier$());
-#ENDIF
-      }
-    }
-    verifyStructuralIntegrity();
-  }
-  
-  public void readObject(ObjectInputStream ois){
-    switch(structType)
-    {
-      case ARRSEQ:
-        switch(nestedType){
-          case LIST:
-          case STACK:
-            ((java.io.Externalizable)seq).readExternal(ois);
-            break;
-          case SUBLIST:
-            if(checkedType.checked)
-            {
-              FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.readObject(seq,ois);
-            }
-            else
-            {
-              FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.readObject(seq,ois);
-            }
-            break;
-          default:
-            throw new Error("Unknown nestedType "+nestedType);
-        }
-        break;
-      default:
-        throw new Error("unknown struct type "+structType);
-    }
-  }
-  public void writeObject(ObjectOutputStream oos){
-    switch(structType)
-    {
-      case ARRSEQ:
-        switch(nestedType){
-          case LIST:
-          case STACK:
-            ((java.io.Externalizable)seq).writeExternal(oos);
-            break;
-          case SUBLIST:
-            if(checkedType.checked)
-            {
-              FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.writeObject(seq,oos);
-            }
-            else
-            {
-              FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.writeObject(seq,oos);
-            }
-            break;
-          default:
-            throw new Error("Unknown nestedType "+nestedType);
-        }
-        break;
-      default:
-        throw new Error("unknown struct type "+structType);
-    }
-  }
-  
-  
-  
+  void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone);
+  void writeObject(ObjectOutputStream oos) throws IOException;
+  Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException;
 }
