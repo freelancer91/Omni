@@ -3048,9 +3048,13 @@ public class IntArrSeqTest{
         }
       });
     }
-    @org.junit.jupiter.params.ParameterizedTest
-    @org.junit.jupiter.params.provider.MethodSource("gettestreadAndwriteObject_ObjectInputStreamArgs")
-    public void testreadAndwriteObject_ObjectInputStream
+    @org.junit.jupiter.api.Test
+    public void testreadAndwriteObject_ObjectInputStream(){
+      gettestreadAndwriteObject_ObjectInputStreamArgs().parallel().map(Arguments::get).forEach(args->{
+          testreadAndwriteObject_ObjectInputStreamHelper((IntArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+      });
+    }
+    private static void testreadAndwriteObject_ObjectInputStreamHelper
     (IntArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
     {
       int numToAdd=seqContentsScenario.nonEmpty?100:0;

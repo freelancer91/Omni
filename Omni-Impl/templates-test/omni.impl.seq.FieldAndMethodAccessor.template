@@ -10,6 +10,15 @@ import java.lang.reflect.Method;
 import omni.api.OmniList;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import omni.impl.BooleanSnglLnkNode;
+import omni.impl.ByteSnglLnkNode;
+import omni.impl.CharSnglLnkNode;
+import omni.impl.ShortSnglLnkNode;
+import omni.impl.IntSnglLnkNode;
+import omni.impl.LongSnglLnkNode;
+import omni.impl.FloatSnglLnkNode;
+import omni.impl.DoubleSnglLnkNode;
+import omni.impl.RefSnglLnkNode;
 final class FieldAndMethodAccessor
 {
   private FieldAndMethodAccessor(){
@@ -98,6 +107,145 @@ final class FieldAndMethodAccessor
     #MACRO TypeImpl<Double>(,double)
     
 #MACRODEF TypeImpl<CLASSPREFIX>(TYPEPARAMETER,ARRTYPE)
+static interface CLASSPREFIXSnglLnkSeq{
+    public static int size(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
+    }
+    public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
+    }
+    interface UncheckedStack extends CLASSPREFIXSnglLnkSeq{
+      public static int size(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
+      }
+      public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
+      }
+      interface Itr extends AbstractItr
+      {
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+        static omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedStackTYPEPARAMETER parent(Object obj){
+          return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedStackTYPEPARAMETER)getValue(parentField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+        }
+      }
+    }
+    interface UncheckedQueue extends CLASSPREFIXSnglLnkSeq{
+      public static int size(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
+      }
+      public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
+      }
+      public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER tail(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedQueueTYPEPARAMETER)obj).tail;
+      }
+      interface Itr extends AbstractItr
+      {
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+        static omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedQueueTYPEPARAMETER parent(Object obj){
+          return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.UncheckedQueueTYPEPARAMETER)getValue(parentField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+        }
+      }
+    }
+    interface CheckedStack extends UncheckedStack{
+      public static int size(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
+      }
+      public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedStackTYPEPARAMETER)obj).modCount;
+      }
+      interface Itr extends AbstractItr
+      {
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        static omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedStackTYPEPARAMETER parent(Object obj){
+          return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedStackTYPEPARAMETER)getValue(parentField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+        }
+      }
+    }
+    interface CheckedQueue extends UncheckedQueue{
+      public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER tail(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER)obj).tail;
+      }
+      public static int size(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).size;
+      }
+      public static CLASSPREFIXSnglLnkNodeTYPEPARAMETER head(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeqTYPEPARAMETER)obj).head;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER)obj).modCount;
+      }
+      interface Itr extends AbstractItr
+      {
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        static omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER parent(Object obj){
+          return (omni.impl.seq.CLASSPREFIXSnglLnkSeq.CheckedQueueTYPEPARAMETER)getValue(parentField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+        }
+        static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
+           return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+        }
+      }
+    }
+    interface AbstractItr
+    {
+      static final Field prevField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+      static final Field currField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+      static final Field nextField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER prev(Object obj){
+         return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(prevField,obj);
+      }
+      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER curr(Object obj){
+         return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(currField,obj);
+      }
+      static CLASSPREFIXSnglLnkNodeTYPEPARAMETER next(Object obj){
+         return (CLASSPREFIXSnglLnkNodeTYPEPARAMETER)getValue(nextField,obj);
+      }
+    }
+}
 static interface CLASSPREFIXArrSeq{
     public static int size(Object obj){
         return ((omni.impl.seq.CLASSPREFIXArrSeqTYPEPARAMETER)obj).size;

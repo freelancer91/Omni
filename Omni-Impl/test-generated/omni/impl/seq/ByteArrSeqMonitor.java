@@ -6240,7 +6240,7 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
   final int parentPreAlloc;
   final int parentPostAlloc;
   final int rootPostAlloc;
-  final OmniCollection.OfByte root;
+  final ByteArrSeq root;
   final OmniCollection.OfByte parent;
   final OmniCollection.OfByte seq;
   int expectedRootSize;
@@ -6376,10 +6376,15 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
         throw new Error("Unknown nestedType "+nestedType);
     }
   }
-  abstract class AbstractItrMonitor implements ItrMonitor{
+  class UncheckedArrSeqItrMonitor implements ItrMonitor{
     final OmniIterator.OfByte itr;
     int expectedCursor;
     int expectedLastRet;
+    private UncheckedArrSeqItrMonitor(OmniIterator.OfByte itr,int expectedCursor){
+      this.itr=itr;
+      this.expectedCursor=expectedCursor;
+      this.expectedLastRet=-1;
+    }
     public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
       int expectedBound=nestedType.forwardIteration?expectedSeqSize:0;
       if(functionCallType==FunctionCallType.Boxed){
@@ -6400,11 +6405,6 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
         }
       }
     }
-    AbstractItrMonitor(OmniIterator.OfByte itr,int expectedCursor){
-      this.itr=itr;
-      this.expectedCursor=expectedCursor;
-      this.expectedLastRet=-1;
-    }
     public void iterateReverse(){
       ((OmniListIterator.OfByte)itr).previousByte();
       expectedLastRet=--expectedCursor;
@@ -6412,7 +6412,6 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     public ByteSeqMonitor getSeqMonitor(){
       return ByteArrSeqMonitor.this;
     }
-    public abstract void verifyNext(int expectedVal,ByteOutputTestArgType outputType);
     public void set(int v,ByteInputTestArgType inputArgType){
        inputArgType.callListItrSet((OmniListIterator.OfByte)itr,v);
     }
@@ -6427,11 +6426,6 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     }
     public int previousIndex(){
       return ((OmniListIterator.OfByte)itr).previousIndex();
-    }
-  }
-   class UncheckedArrSeqItrMonitor extends AbstractItrMonitor{
-    private UncheckedArrSeqItrMonitor(OmniIterator.OfByte itr,int expectedCursor){
-      super(itr,expectedCursor);
     }
     @Override public void verifyIteratorState(){
       int actualCursor;
@@ -6539,7 +6533,7 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
   }
   public UncheckedArrSeqItrMonitor getItrMonitor(){
     var itr=seq.iterator();
-    int expectedCursor=nestedType==NestedType.STACK?((ByteArrSeq)root).size:0;
+    int expectedCursor=nestedType==NestedType.STACK?root.size:0;
     return checkedType.checked
       ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
       :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
@@ -6611,15 +6605,15 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     return this.expectedSeqSize;
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
-      var arr=((ByteArrSeq)root).arr;
-      int offset=0;
-      for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
-        ByteInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
-      }
-      return new ArrSeqSequenceVerificationItr(this,offset,arr);
+    var arr=root.arr;
+    int offset=0;
+    for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+      ByteInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+    }
+    return new ArrSeqSequenceVerificationItr(this,offset,arr);
   }
   public SequenceVerificationItr verifyPreAlloc(){
-    var arr=((ByteArrSeq)root).arr;
+    var arr=root.arr;
     int offset=0;
     for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
       ByteInputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
@@ -6689,8 +6683,7 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     inputArgType.callListPut(seq,index,val);
   }
   public String toString(){
-    StringBuilder builder=new StringBuilder();
-    builder.append("ByteArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
+    var builder=new StringBuilder("ByteArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
     switch(nestedType){
       case STACK:
         builder.append("Stack{").append(initialCapacity);
@@ -6866,8 +6859,7 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     }
   }
   public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
-    if(functionCallType==FunctionCallType.Boxed)
-    {
+    if(functionCallType==FunctionCallType.Boxed){
       Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedRet),((OmniList.OfByte)seq).set(index,TypeConversionUtil.convertToByte(val)));
     }
     else
@@ -6877,23 +6869,20 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
   }
   public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfByte clone){
     boolean retVal;
-    if(functionCallType==FunctionCallType.Boxed)
-    {
+    if(functionCallType==FunctionCallType.Boxed){
       retVal=seq.removeIf((Predicate)pred);
     }
     else
     {
       retVal=seq.removeIf((BytePredicate)pred);
     }
-    if(retVal)
-    {
+    if(retVal){
       ++expectedSeqModCount;
       ++expectedParentModCount;
       ++expectedRootModCount;
       int numRemoved;
       numRemoved=pred.numRemoved;
-      for(var removedVal:pred.removedVals)
-      {
+      for(var removedVal:pred.removedVals){
         Assertions.assertFalse(seq.contains(removedVal));
       }
       expectedSeqSize-=numRemoved;
@@ -6912,37 +6901,26 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     }
     verifyStructuralIntegrity();
   }
-  public void writeObject(ObjectOutputStream oos) throws IOException
-  {
-    switch(nestedType)
-    {
+  public void writeObject(ObjectOutputStream oos) throws IOException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.ByteArrSeq.CheckedList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.ByteArrSeq.UncheckedList.writeObject(seq,oos);
         }
         break;
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.ByteArrSeq.CheckedStack.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.ByteArrSeq.UncheckedStack.writeObject(seq,oos);
         }
         break;
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.ByteArrSeq.UncheckedSubList.writeObject(seq,oos);
         }
         break;
@@ -6950,35 +6928,24 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
-  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException
-  {
-    switch(nestedType)
-    {
+  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.ByteArrSeq.CheckedList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.ByteArrSeq.UncheckedList.readObject(seq,ois);
         }
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.ByteArrSeq.CheckedStack.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.ByteArrSeq.UncheckedStack.readObject(seq,ois);
         }
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.ByteArrSeq.UncheckedSubList.readObject(seq,ois);
         }
       default:

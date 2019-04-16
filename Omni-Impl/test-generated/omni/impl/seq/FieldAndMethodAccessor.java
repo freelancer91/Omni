@@ -8,6 +8,15 @@ import java.lang.reflect.Method;
 import omni.api.OmniList;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import omni.impl.BooleanSnglLnkNode;
+import omni.impl.ByteSnglLnkNode;
+import omni.impl.CharSnglLnkNode;
+import omni.impl.ShortSnglLnkNode;
+import omni.impl.IntSnglLnkNode;
+import omni.impl.LongSnglLnkNode;
+import omni.impl.FloatSnglLnkNode;
+import omni.impl.DoubleSnglLnkNode;
+import omni.impl.RefSnglLnkNode;
 final class FieldAndMethodAccessor
 {
   private FieldAndMethodAccessor(){
@@ -79,6 +88,145 @@ final class FieldAndMethodAccessor
         }
     }
     private static final char DOLLARSIGN=(char)36;
+    static interface RefSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
+        }
+        public static RefSnglLnkNode<?> head(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
+        }
+        interface UncheckedStack extends RefSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
+          }
+          public static RefSnglLnkNode<?> head(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.RefSnglLnkSeq.UncheckedStack<?> parent(Object obj){
+              return (omni.impl.seq.RefSnglLnkSeq.UncheckedStack<?>)getValue(parentField,obj);
+            }
+            static RefSnglLnkNode<?> prev(Object obj){
+               return (RefSnglLnkNode<?>)getValue(prevField,obj);
+            }
+            static RefSnglLnkNode<?> curr(Object obj){
+               return (RefSnglLnkNode<?>)getValue(currField,obj);
+            }
+            static RefSnglLnkNode<?> next(Object obj){
+               return (RefSnglLnkNode<?>)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends RefSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
+          }
+          public static RefSnglLnkNode<?> head(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
+          }
+          public static RefSnglLnkNode<?> tail(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq.UncheckedQueue<?>)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.RefSnglLnkSeq.UncheckedQueue<?> parent(Object obj){
+              return (omni.impl.seq.RefSnglLnkSeq.UncheckedQueue<?>)getValue(parentField,obj);
+            }
+            static RefSnglLnkNode<?> prev(Object obj){
+               return (RefSnglLnkNode<?>)getValue(prevField,obj);
+            }
+            static RefSnglLnkNode<?> curr(Object obj){
+               return (RefSnglLnkNode<?>)getValue(currField,obj);
+            }
+            static RefSnglLnkNode<?> next(Object obj){
+               return (RefSnglLnkNode<?>)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
+          }
+          public static RefSnglLnkNode<?> head(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq.CheckedStack<?>)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.RefSnglLnkSeq.CheckedStack<?> parent(Object obj){
+              return (omni.impl.seq.RefSnglLnkSeq.CheckedStack<?>)getValue(parentField,obj);
+            }
+            static RefSnglLnkNode<?> prev(Object obj){
+               return (RefSnglLnkNode<?>)getValue(prevField,obj);
+            }
+            static RefSnglLnkNode<?> curr(Object obj){
+               return (RefSnglLnkNode<?>)getValue(currField,obj);
+            }
+            static RefSnglLnkNode<?> next(Object obj){
+               return (RefSnglLnkNode<?>)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static RefSnglLnkNode<?> tail(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?>)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
+          }
+          public static RefSnglLnkNode<?> head(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?>)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?> parent(Object obj){
+              return (omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?>)getValue(parentField,obj);
+            }
+            static RefSnglLnkNode<?> prev(Object obj){
+               return (RefSnglLnkNode<?>)getValue(prevField,obj);
+            }
+            static RefSnglLnkNode<?> curr(Object obj){
+               return (RefSnglLnkNode<?>)getValue(currField,obj);
+            }
+            static RefSnglLnkNode<?> next(Object obj){
+               return (RefSnglLnkNode<?>)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.RefSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static RefSnglLnkNode<?> prev(Object obj){
+             return (RefSnglLnkNode<?>)getValue(prevField,obj);
+          }
+          static RefSnglLnkNode<?> curr(Object obj){
+             return (RefSnglLnkNode<?>)getValue(currField,obj);
+          }
+          static RefSnglLnkNode<?> next(Object obj){
+             return (RefSnglLnkNode<?>)getValue(nextField,obj);
+          }
+        }
+    }
     static interface RefArrSeq{
         public static int size(Object obj){
             return ((omni.impl.seq.RefArrSeq<?>)obj).size;
@@ -518,6 +666,145 @@ final class FieldAndMethodAccessor
                     return (OmniList.OfRef<?>)getValue(parentField,obj);
                 }
             }
+        }
+    }
+    static interface BooleanSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
+        }
+        public static BooleanSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends BooleanSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
+          }
+          public static BooleanSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.BooleanSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.BooleanSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static BooleanSnglLnkNode prev(Object obj){
+               return (BooleanSnglLnkNode)getValue(prevField,obj);
+            }
+            static BooleanSnglLnkNode curr(Object obj){
+               return (BooleanSnglLnkNode)getValue(currField,obj);
+            }
+            static BooleanSnglLnkNode next(Object obj){
+               return (BooleanSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends BooleanSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
+          }
+          public static BooleanSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
+          }
+          public static BooleanSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.BooleanSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.BooleanSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static BooleanSnglLnkNode prev(Object obj){
+               return (BooleanSnglLnkNode)getValue(prevField,obj);
+            }
+            static BooleanSnglLnkNode curr(Object obj){
+               return (BooleanSnglLnkNode)getValue(currField,obj);
+            }
+            static BooleanSnglLnkNode next(Object obj){
+               return (BooleanSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
+          }
+          public static BooleanSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.BooleanSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.BooleanSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static BooleanSnglLnkNode prev(Object obj){
+               return (BooleanSnglLnkNode)getValue(prevField,obj);
+            }
+            static BooleanSnglLnkNode curr(Object obj){
+               return (BooleanSnglLnkNode)getValue(currField,obj);
+            }
+            static BooleanSnglLnkNode next(Object obj){
+               return (BooleanSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static BooleanSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
+          }
+          public static BooleanSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static BooleanSnglLnkNode prev(Object obj){
+               return (BooleanSnglLnkNode)getValue(prevField,obj);
+            }
+            static BooleanSnglLnkNode curr(Object obj){
+               return (BooleanSnglLnkNode)getValue(currField,obj);
+            }
+            static BooleanSnglLnkNode next(Object obj){
+               return (BooleanSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.BooleanSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static BooleanSnglLnkNode prev(Object obj){
+             return (BooleanSnglLnkNode)getValue(prevField,obj);
+          }
+          static BooleanSnglLnkNode curr(Object obj){
+             return (BooleanSnglLnkNode)getValue(currField,obj);
+          }
+          static BooleanSnglLnkNode next(Object obj){
+             return (BooleanSnglLnkNode)getValue(nextField,obj);
+          }
         }
     }
     static interface BooleanArrSeq{
@@ -961,6 +1248,145 @@ final class FieldAndMethodAccessor
             }
         }
     }
+    static interface ByteSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
+        }
+        public static ByteSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends ByteSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
+          }
+          public static ByteSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.ByteSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.ByteSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static ByteSnglLnkNode prev(Object obj){
+               return (ByteSnglLnkNode)getValue(prevField,obj);
+            }
+            static ByteSnglLnkNode curr(Object obj){
+               return (ByteSnglLnkNode)getValue(currField,obj);
+            }
+            static ByteSnglLnkNode next(Object obj){
+               return (ByteSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends ByteSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
+          }
+          public static ByteSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
+          }
+          public static ByteSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.ByteSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.ByteSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static ByteSnglLnkNode prev(Object obj){
+               return (ByteSnglLnkNode)getValue(prevField,obj);
+            }
+            static ByteSnglLnkNode curr(Object obj){
+               return (ByteSnglLnkNode)getValue(currField,obj);
+            }
+            static ByteSnglLnkNode next(Object obj){
+               return (ByteSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
+          }
+          public static ByteSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.ByteSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.ByteSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static ByteSnglLnkNode prev(Object obj){
+               return (ByteSnglLnkNode)getValue(prevField,obj);
+            }
+            static ByteSnglLnkNode curr(Object obj){
+               return (ByteSnglLnkNode)getValue(currField,obj);
+            }
+            static ByteSnglLnkNode next(Object obj){
+               return (ByteSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static ByteSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
+          }
+          public static ByteSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.ByteSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.ByteSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.ByteSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static ByteSnglLnkNode prev(Object obj){
+               return (ByteSnglLnkNode)getValue(prevField,obj);
+            }
+            static ByteSnglLnkNode curr(Object obj){
+               return (ByteSnglLnkNode)getValue(currField,obj);
+            }
+            static ByteSnglLnkNode next(Object obj){
+               return (ByteSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.ByteSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static ByteSnglLnkNode prev(Object obj){
+             return (ByteSnglLnkNode)getValue(prevField,obj);
+          }
+          static ByteSnglLnkNode curr(Object obj){
+             return (ByteSnglLnkNode)getValue(currField,obj);
+          }
+          static ByteSnglLnkNode next(Object obj){
+             return (ByteSnglLnkNode)getValue(nextField,obj);
+          }
+        }
+    }
     static interface ByteArrSeq{
         public static int size(Object obj){
             return ((omni.impl.seq.ByteArrSeq)obj).size;
@@ -1400,6 +1826,145 @@ final class FieldAndMethodAccessor
                     return (OmniList.OfByte)getValue(parentField,obj);
                 }
             }
+        }
+    }
+    static interface CharSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
+        }
+        public static CharSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends CharSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
+          }
+          public static CharSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.CharSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.CharSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static CharSnglLnkNode prev(Object obj){
+               return (CharSnglLnkNode)getValue(prevField,obj);
+            }
+            static CharSnglLnkNode curr(Object obj){
+               return (CharSnglLnkNode)getValue(currField,obj);
+            }
+            static CharSnglLnkNode next(Object obj){
+               return (CharSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends CharSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
+          }
+          public static CharSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
+          }
+          public static CharSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.CharSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.CharSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static CharSnglLnkNode prev(Object obj){
+               return (CharSnglLnkNode)getValue(prevField,obj);
+            }
+            static CharSnglLnkNode curr(Object obj){
+               return (CharSnglLnkNode)getValue(currField,obj);
+            }
+            static CharSnglLnkNode next(Object obj){
+               return (CharSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
+          }
+          public static CharSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.CharSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.CharSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static CharSnglLnkNode prev(Object obj){
+               return (CharSnglLnkNode)getValue(prevField,obj);
+            }
+            static CharSnglLnkNode curr(Object obj){
+               return (CharSnglLnkNode)getValue(currField,obj);
+            }
+            static CharSnglLnkNode next(Object obj){
+               return (CharSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static CharSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
+          }
+          public static CharSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.CharSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.CharSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.CharSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static CharSnglLnkNode prev(Object obj){
+               return (CharSnglLnkNode)getValue(prevField,obj);
+            }
+            static CharSnglLnkNode curr(Object obj){
+               return (CharSnglLnkNode)getValue(currField,obj);
+            }
+            static CharSnglLnkNode next(Object obj){
+               return (CharSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.CharSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static CharSnglLnkNode prev(Object obj){
+             return (CharSnglLnkNode)getValue(prevField,obj);
+          }
+          static CharSnglLnkNode curr(Object obj){
+             return (CharSnglLnkNode)getValue(currField,obj);
+          }
+          static CharSnglLnkNode next(Object obj){
+             return (CharSnglLnkNode)getValue(nextField,obj);
+          }
         }
     }
     static interface CharArrSeq{
@@ -1843,6 +2408,145 @@ final class FieldAndMethodAccessor
             }
         }
     }
+    static interface ShortSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
+        }
+        public static ShortSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends ShortSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
+          }
+          public static ShortSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.ShortSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.ShortSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static ShortSnglLnkNode prev(Object obj){
+               return (ShortSnglLnkNode)getValue(prevField,obj);
+            }
+            static ShortSnglLnkNode curr(Object obj){
+               return (ShortSnglLnkNode)getValue(currField,obj);
+            }
+            static ShortSnglLnkNode next(Object obj){
+               return (ShortSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends ShortSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
+          }
+          public static ShortSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
+          }
+          public static ShortSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.ShortSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.ShortSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static ShortSnglLnkNode prev(Object obj){
+               return (ShortSnglLnkNode)getValue(prevField,obj);
+            }
+            static ShortSnglLnkNode curr(Object obj){
+               return (ShortSnglLnkNode)getValue(currField,obj);
+            }
+            static ShortSnglLnkNode next(Object obj){
+               return (ShortSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
+          }
+          public static ShortSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.ShortSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.ShortSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static ShortSnglLnkNode prev(Object obj){
+               return (ShortSnglLnkNode)getValue(prevField,obj);
+            }
+            static ShortSnglLnkNode curr(Object obj){
+               return (ShortSnglLnkNode)getValue(currField,obj);
+            }
+            static ShortSnglLnkNode next(Object obj){
+               return (ShortSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static ShortSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
+          }
+          public static ShortSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.ShortSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.ShortSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.ShortSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static ShortSnglLnkNode prev(Object obj){
+               return (ShortSnglLnkNode)getValue(prevField,obj);
+            }
+            static ShortSnglLnkNode curr(Object obj){
+               return (ShortSnglLnkNode)getValue(currField,obj);
+            }
+            static ShortSnglLnkNode next(Object obj){
+               return (ShortSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.ShortSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static ShortSnglLnkNode prev(Object obj){
+             return (ShortSnglLnkNode)getValue(prevField,obj);
+          }
+          static ShortSnglLnkNode curr(Object obj){
+             return (ShortSnglLnkNode)getValue(currField,obj);
+          }
+          static ShortSnglLnkNode next(Object obj){
+             return (ShortSnglLnkNode)getValue(nextField,obj);
+          }
+        }
+    }
     static interface ShortArrSeq{
         public static int size(Object obj){
             return ((omni.impl.seq.ShortArrSeq)obj).size;
@@ -2282,6 +2986,145 @@ final class FieldAndMethodAccessor
                     return (OmniList.OfShort)getValue(parentField,obj);
                 }
             }
+        }
+    }
+    static interface IntSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
+        }
+        public static IntSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends IntSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
+          }
+          public static IntSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.IntSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.IntSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static IntSnglLnkNode prev(Object obj){
+               return (IntSnglLnkNode)getValue(prevField,obj);
+            }
+            static IntSnglLnkNode curr(Object obj){
+               return (IntSnglLnkNode)getValue(currField,obj);
+            }
+            static IntSnglLnkNode next(Object obj){
+               return (IntSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends IntSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
+          }
+          public static IntSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
+          }
+          public static IntSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.IntSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.IntSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static IntSnglLnkNode prev(Object obj){
+               return (IntSnglLnkNode)getValue(prevField,obj);
+            }
+            static IntSnglLnkNode curr(Object obj){
+               return (IntSnglLnkNode)getValue(currField,obj);
+            }
+            static IntSnglLnkNode next(Object obj){
+               return (IntSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
+          }
+          public static IntSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.IntSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.IntSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static IntSnglLnkNode prev(Object obj){
+               return (IntSnglLnkNode)getValue(prevField,obj);
+            }
+            static IntSnglLnkNode curr(Object obj){
+               return (IntSnglLnkNode)getValue(currField,obj);
+            }
+            static IntSnglLnkNode next(Object obj){
+               return (IntSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static IntSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
+          }
+          public static IntSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.IntSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.IntSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.IntSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static IntSnglLnkNode prev(Object obj){
+               return (IntSnglLnkNode)getValue(prevField,obj);
+            }
+            static IntSnglLnkNode curr(Object obj){
+               return (IntSnglLnkNode)getValue(currField,obj);
+            }
+            static IntSnglLnkNode next(Object obj){
+               return (IntSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.IntSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static IntSnglLnkNode prev(Object obj){
+             return (IntSnglLnkNode)getValue(prevField,obj);
+          }
+          static IntSnglLnkNode curr(Object obj){
+             return (IntSnglLnkNode)getValue(currField,obj);
+          }
+          static IntSnglLnkNode next(Object obj){
+             return (IntSnglLnkNode)getValue(nextField,obj);
+          }
         }
     }
     static interface IntArrSeq{
@@ -2725,6 +3568,145 @@ final class FieldAndMethodAccessor
             }
         }
     }
+    static interface LongSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
+        }
+        public static LongSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends LongSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
+          }
+          public static LongSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.LongSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.LongSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static LongSnglLnkNode prev(Object obj){
+               return (LongSnglLnkNode)getValue(prevField,obj);
+            }
+            static LongSnglLnkNode curr(Object obj){
+               return (LongSnglLnkNode)getValue(currField,obj);
+            }
+            static LongSnglLnkNode next(Object obj){
+               return (LongSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends LongSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
+          }
+          public static LongSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
+          }
+          public static LongSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.LongSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.LongSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static LongSnglLnkNode prev(Object obj){
+               return (LongSnglLnkNode)getValue(prevField,obj);
+            }
+            static LongSnglLnkNode curr(Object obj){
+               return (LongSnglLnkNode)getValue(currField,obj);
+            }
+            static LongSnglLnkNode next(Object obj){
+               return (LongSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
+          }
+          public static LongSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.LongSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.LongSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static LongSnglLnkNode prev(Object obj){
+               return (LongSnglLnkNode)getValue(prevField,obj);
+            }
+            static LongSnglLnkNode curr(Object obj){
+               return (LongSnglLnkNode)getValue(currField,obj);
+            }
+            static LongSnglLnkNode next(Object obj){
+               return (LongSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static LongSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
+          }
+          public static LongSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.LongSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.LongSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.LongSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static LongSnglLnkNode prev(Object obj){
+               return (LongSnglLnkNode)getValue(prevField,obj);
+            }
+            static LongSnglLnkNode curr(Object obj){
+               return (LongSnglLnkNode)getValue(currField,obj);
+            }
+            static LongSnglLnkNode next(Object obj){
+               return (LongSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.LongSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static LongSnglLnkNode prev(Object obj){
+             return (LongSnglLnkNode)getValue(prevField,obj);
+          }
+          static LongSnglLnkNode curr(Object obj){
+             return (LongSnglLnkNode)getValue(currField,obj);
+          }
+          static LongSnglLnkNode next(Object obj){
+             return (LongSnglLnkNode)getValue(nextField,obj);
+          }
+        }
+    }
     static interface LongArrSeq{
         public static int size(Object obj){
             return ((omni.impl.seq.LongArrSeq)obj).size;
@@ -3166,6 +4148,145 @@ final class FieldAndMethodAccessor
             }
         }
     }
+    static interface FloatSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
+        }
+        public static FloatSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends FloatSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
+          }
+          public static FloatSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.FloatSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.FloatSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static FloatSnglLnkNode prev(Object obj){
+               return (FloatSnglLnkNode)getValue(prevField,obj);
+            }
+            static FloatSnglLnkNode curr(Object obj){
+               return (FloatSnglLnkNode)getValue(currField,obj);
+            }
+            static FloatSnglLnkNode next(Object obj){
+               return (FloatSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends FloatSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
+          }
+          public static FloatSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
+          }
+          public static FloatSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.FloatSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.FloatSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static FloatSnglLnkNode prev(Object obj){
+               return (FloatSnglLnkNode)getValue(prevField,obj);
+            }
+            static FloatSnglLnkNode curr(Object obj){
+               return (FloatSnglLnkNode)getValue(currField,obj);
+            }
+            static FloatSnglLnkNode next(Object obj){
+               return (FloatSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
+          }
+          public static FloatSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.FloatSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.FloatSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static FloatSnglLnkNode prev(Object obj){
+               return (FloatSnglLnkNode)getValue(prevField,obj);
+            }
+            static FloatSnglLnkNode curr(Object obj){
+               return (FloatSnglLnkNode)getValue(currField,obj);
+            }
+            static FloatSnglLnkNode next(Object obj){
+               return (FloatSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static FloatSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
+          }
+          public static FloatSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.FloatSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.FloatSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.FloatSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static FloatSnglLnkNode prev(Object obj){
+               return (FloatSnglLnkNode)getValue(prevField,obj);
+            }
+            static FloatSnglLnkNode curr(Object obj){
+               return (FloatSnglLnkNode)getValue(currField,obj);
+            }
+            static FloatSnglLnkNode next(Object obj){
+               return (FloatSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.FloatSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static FloatSnglLnkNode prev(Object obj){
+             return (FloatSnglLnkNode)getValue(prevField,obj);
+          }
+          static FloatSnglLnkNode curr(Object obj){
+             return (FloatSnglLnkNode)getValue(currField,obj);
+          }
+          static FloatSnglLnkNode next(Object obj){
+             return (FloatSnglLnkNode)getValue(nextField,obj);
+          }
+        }
+    }
     static interface FloatArrSeq{
         public static int size(Object obj){
             return ((omni.impl.seq.FloatArrSeq)obj).size;
@@ -3605,6 +4726,145 @@ final class FieldAndMethodAccessor
                     return (OmniList.OfFloat)getValue(parentField,obj);
                 }
             }
+        }
+    }
+    static interface DoubleSnglLnkSeq{
+        public static int size(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
+        }
+        public static DoubleSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
+        }
+        interface UncheckedStack extends DoubleSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
+          }
+          public static DoubleSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.DoubleSnglLnkSeq.UncheckedStack parent(Object obj){
+              return (omni.impl.seq.DoubleSnglLnkSeq.UncheckedStack)getValue(parentField,obj);
+            }
+            static DoubleSnglLnkNode prev(Object obj){
+               return (DoubleSnglLnkNode)getValue(prevField,obj);
+            }
+            static DoubleSnglLnkNode curr(Object obj){
+               return (DoubleSnglLnkNode)getValue(currField,obj);
+            }
+            static DoubleSnglLnkNode next(Object obj){
+               return (DoubleSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface UncheckedQueue extends DoubleSnglLnkSeq{
+          public static int size(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
+          }
+          public static DoubleSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
+          }
+          public static DoubleSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq.UncheckedQueue)obj).tail;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"UncheckedQueue"+DOLLARSIGN+"Itr","this"+DOLLARSIGN+"0");
+            static omni.impl.seq.DoubleSnglLnkSeq.UncheckedQueue parent(Object obj){
+              return (omni.impl.seq.DoubleSnglLnkSeq.UncheckedQueue)getValue(parentField,obj);
+            }
+            static DoubleSnglLnkNode prev(Object obj){
+               return (DoubleSnglLnkNode)getValue(prevField,obj);
+            }
+            static DoubleSnglLnkNode curr(Object obj){
+               return (DoubleSnglLnkNode)getValue(currField,obj);
+            }
+            static DoubleSnglLnkNode next(Object obj){
+               return (DoubleSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedStack extends UncheckedStack{
+          public static int size(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
+          }
+          public static DoubleSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq.CheckedStack)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.DoubleSnglLnkSeq.CheckedStack parent(Object obj){
+              return (omni.impl.seq.DoubleSnglLnkSeq.CheckedStack)getValue(parentField,obj);
+            }
+            static DoubleSnglLnkNode prev(Object obj){
+               return (DoubleSnglLnkNode)getValue(prevField,obj);
+            }
+            static DoubleSnglLnkNode curr(Object obj){
+               return (DoubleSnglLnkNode)getValue(currField,obj);
+            }
+            static DoubleSnglLnkNode next(Object obj){
+               return (DoubleSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface CheckedQueue extends UncheckedQueue{
+          public static DoubleSnglLnkNode tail(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue)obj).tail;
+          }
+          public static int size(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
+          }
+          public static DoubleSnglLnkNode head(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
+          }
+          public static int modCount(Object obj){
+            return ((omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue)obj).modCount;
+          }
+          interface Itr extends AbstractItr
+          {
+            static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","parent");
+            static final Field modCountField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"CheckedQueue"+DOLLARSIGN+"Itr","modCount");
+            static int modCount(Object obj){
+              return getIntValue(modCountField,obj);
+            }
+            static omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue parent(Object obj){
+              return (omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue)getValue(parentField,obj);
+            }
+            static DoubleSnglLnkNode prev(Object obj){
+               return (DoubleSnglLnkNode)getValue(prevField,obj);
+            }
+            static DoubleSnglLnkNode curr(Object obj){
+               return (DoubleSnglLnkNode)getValue(currField,obj);
+            }
+            static DoubleSnglLnkNode next(Object obj){
+               return (DoubleSnglLnkNode)getValue(nextField,obj);
+            }
+          }
+        }
+        interface AbstractItr
+        {
+          static final Field prevField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"AbstractItr","prev");
+          static final Field currField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"AbstractItr","curr");
+          static final Field nextField=prepareFieldForClassName("omni.impl.seq.DoubleSnglLnkSeq"+DOLLARSIGN+"AbstractItr","next");
+          static DoubleSnglLnkNode prev(Object obj){
+             return (DoubleSnglLnkNode)getValue(prevField,obj);
+          }
+          static DoubleSnglLnkNode curr(Object obj){
+             return (DoubleSnglLnkNode)getValue(currField,obj);
+          }
+          static DoubleSnglLnkNode next(Object obj){
+             return (DoubleSnglLnkNode)getValue(nextField,obj);
+          }
         }
     }
     static interface DoubleArrSeq{

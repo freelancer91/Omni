@@ -1,0 +1,102 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import omni.util.TypeConversionUtil;
+import org.junit.jupiter.api.Assertions;
+import omni.impl.$ClassPrefix$InputTestArgType;
+import omni.impl.$ClassPrefix$OutputTestArgType;
+import org.junit.jupiter.params.provider.Arguments;
+import java.util.NoSuchElementException;
+import java.util.stream.Stream;
+import omni.util.OmniArray;
+import omni.impl.FunctionCallType;
+import omni.impl.QueryCastType;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import omni.impl.seq.$ClassPrefix$SnglLnkSeqSeqMonitor.NestedType;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.CheckedType;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.PreModScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceLocation;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceContentsScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.ListItrSetScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.ItrType;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.IterationScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.ItrRemoveScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredComparatorGen;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredRemoveIfPredicateGen;
+import java.nio.file.Files;
+#IF OfRef
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObjectGen;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObject;
+#ENDIF
+import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceVerificationItr;
+import omni.impl.seq.$ClassPrefix$SnglLnkSeqMonitor.QueryTester;
+import omni.api.OmniCollection;
+import omni.api.OmniList;
+import java.util.ArrayList;
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"})
+#ENDIF
+@Execution(ExecutionMode.CONCURRENT)
+public class $ClassPrefix$SnglLnkSeqTest{
+  @FunctionalInterface
+  interface ArgBuilder{
+    void buildArgs(Stream.Builder<Arguments> streamBuilder,NestedType nestedType,CheckedType checkedType);
+    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
+      Stream.Builder<Arguments> streamBuilder=Stream.builder();
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
+          argBuilder.buildArgs(streamBuilder,nestedType,checkedType);
+        }
+      }
+      return streamBuilder.build();
+    }
+  }
+  #MACRO TestMethods(true)
+#MACRODEF TestMethods(PARALLEL)
+#MACRO testConstructor_void<PARALLEL>()
+
+#ENDDEF
+
+#MACRODEF testConstructor_void<PARALLEL>()
+static Stream<Arguments> getConstructor_voidArgs(){
+  return ArgBuilder.buildSeqArgs((streamBuilder,NestedType nestedType,CheckedType checkedType)->{
+    streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType)));
+  });
+}
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testConstructor_void(){
+  getConstructor_voidArgs().parallel().map(Arguments::get).forEach(args->{
+      testConstructor_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0]);
+  });
+}
+private static void testConstructor_voidHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("getConstructor_voidArgs")
+public void testConstructor_void
+#ENDIF
+($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
+  if(checkedType.checked){
+    Assertions.assertEquals(0,nestedType==NestedType.QUEUE?FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.modCount(seqMonitor.seq):FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.modCount(seqMonitor.seq));
+  }
+  Assertions.assertEquals(0,seqMonitor.seq.size);
+  Assertions.assertNull(seqMonitor.seq.head);
+}
+#ENDDEF
+
+}

@@ -6668,7 +6668,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
   final int parentPreAlloc;
   final int parentPostAlloc;
   final int rootPostAlloc;
-  final OmniCollection.OfRef root;
+  final RefArrSeq root;
   final OmniCollection.OfRef parent;
   final OmniCollection.OfRef seq;
   int expectedRootSize;
@@ -6804,10 +6804,15 @@ class RefArrSeqMonitor implements RefSeqMonitor{
         throw new Error("Unknown nestedType "+nestedType);
     }
   }
-  abstract class AbstractItrMonitor implements ItrMonitor{
+  class UncheckedArrSeqItrMonitor implements ItrMonitor{
     final OmniIterator.OfRef itr;
     int expectedCursor;
     int expectedLastRet;
+    private UncheckedArrSeqItrMonitor(OmniIterator.OfRef itr,int expectedCursor){
+      this.itr=itr;
+      this.expectedCursor=expectedCursor;
+      this.expectedLastRet=-1;
+    }
     public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
       int expectedBound=nestedType.forwardIteration?expectedSeqSize:0;
       {
@@ -6825,11 +6830,6 @@ class RefArrSeqMonitor implements RefSeqMonitor{
         }
       }
     }
-    AbstractItrMonitor(OmniIterator.OfRef itr,int expectedCursor){
-      this.itr=itr;
-      this.expectedCursor=expectedCursor;
-      this.expectedLastRet=-1;
-    }
     public void iterateReverse(){
       ((OmniListIterator.OfRef)itr).previous();
       expectedLastRet=--expectedCursor;
@@ -6837,7 +6837,6 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     public RefSeqMonitor getSeqMonitor(){
       return RefArrSeqMonitor.this;
     }
-    public abstract void verifyNext(int expectedVal,RefOutputTestArgType outputType);
     public void set(int v,RefInputTestArgType inputArgType){
        inputArgType.callListItrSet((OmniListIterator.OfRef)itr,v);
     }
@@ -6852,11 +6851,6 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     }
     public int previousIndex(){
       return ((OmniListIterator.OfRef)itr).previousIndex();
-    }
-  }
-   class UncheckedArrSeqItrMonitor extends AbstractItrMonitor{
-    private UncheckedArrSeqItrMonitor(OmniIterator.OfRef itr,int expectedCursor){
-      super(itr,expectedCursor);
     }
     @Override public void verifyIteratorState(){
       int actualCursor;
@@ -6917,7 +6911,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
       ++expectedSeqModCount;
       expectedCursor=expectedLastRet;
       expectedLastRet=-1;
-      Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
     }
   }
   class CheckedArrSeqItrMonitor extends UncheckedArrSeqItrMonitor{
@@ -6965,7 +6959,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
   }
   public UncheckedArrSeqItrMonitor getItrMonitor(){
     var itr=seq.iterator();
-    int expectedCursor=nestedType==NestedType.STACK?((RefArrSeq)root).size:0;
+    int expectedCursor=nestedType==NestedType.STACK?root.size:0;
     return checkedType.checked
       ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
       :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
@@ -7045,15 +7039,15 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     return this.expectedSeqSize;
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
-      var arr=((RefArrSeq)root).arr;
-      int offset=0;
-      for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
-        RefInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
-      }
-      return new ArrSeqSequenceVerificationItr(this,offset,arr);
+    var arr=root.arr;
+    int offset=0;
+    for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+      RefInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+    }
+    return new ArrSeqSequenceVerificationItr(this,offset,arr);
   }
   public SequenceVerificationItr verifyPreAlloc(){
-    var arr=((RefArrSeq)root).arr;
+    var arr=root.arr;
     int offset=0;
     for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
       RefInputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
@@ -7089,11 +7083,9 @@ class RefArrSeqMonitor implements RefSeqMonitor{
         throw new Error("Unknown preModScenario "+preModScenario);
     }
   }
-  public boolean add(Object obj)
-  {
+  public boolean add(Object obj){
     boolean ret=seq.add(obj);
-    if(ret)
-    {
+    if(ret){
       ++expectedSeqSize;
       ++expectedParentSize;
       ++expectedRootSize;
@@ -7137,8 +7129,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     inputArgType.callListPut(seq,index,val);
   }
   public String toString(){
-    StringBuilder builder=new StringBuilder();
-    builder.append("RefArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
+    var builder=new StringBuilder("RefArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
     switch(nestedType){
       case STACK:
         builder.append("Stack{").append(initialCapacity);
@@ -7286,7 +7277,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     ++expectedSeqModCount;
     ++expectedParentModCount;
     ++expectedRootModCount;
-    Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+    Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
   }
   public void get(int expectedVal,RefOutputTestArgType outputType,int index){
     outputType.verifyListGet(seq,index,expectedVal);
@@ -7303,7 +7294,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
       ++expectedRootModCount;
       int newBound=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
       int oldBound=newBound+seqSize;
-      verifyRangeIsNull(((RefArrSeq)root).arr,newBound,oldBound);
+      verifyRangeIsNull(root.arr,newBound,oldBound);
     }
   }
   public void pop(int expectedVal,RefOutputTestArgType outputType){
@@ -7314,7 +7305,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     ++expectedSeqModCount;
     ++expectedParentModCount;
     ++expectedRootModCount;
-    Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+    Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
   }
   public void poll(int expectedVal,RefOutputTestArgType outputType){
     outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
@@ -7325,7 +7316,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
       ++expectedSeqModCount;
       ++expectedParentModCount;
       ++expectedRootModCount;
-      Assertions.assertNull(((RefArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
     }
   }
   public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
@@ -7339,16 +7330,14 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     {
       retVal=seq.removeIf((Predicate)pred);
     }
-    if(retVal)
-    {
+    if(retVal){
       ++expectedSeqModCount;
       ++expectedParentModCount;
       ++expectedRootModCount;
       int numRemoved;
       numRemoved=pred.numRemoved;
-      verifyRangeIsNull(((RefArrSeq)root).arr,(seqSize-numRemoved)+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc,seqSize+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc);
-      for(var removedVal:pred.removedVals)
-      {
+      verifyRangeIsNull(root.arr,(seqSize-numRemoved)+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc,seqSize+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc);
+      for(var removedVal:pred.removedVals){
         Assertions.assertFalse(seq.contains(removedVal));
       }
       expectedSeqSize-=numRemoved;
@@ -7367,37 +7356,26 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     }
     verifyStructuralIntegrity();
   }
-  public void writeObject(ObjectOutputStream oos) throws IOException
-  {
-    switch(nestedType)
-    {
+  public void writeObject(ObjectOutputStream oos) throws IOException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.RefArrSeq.CheckedList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.RefArrSeq.UncheckedList.writeObject(seq,oos);
         }
         break;
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.RefArrSeq.CheckedStack.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.RefArrSeq.UncheckedStack.writeObject(seq,oos);
         }
         break;
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.RefArrSeq.CheckedSubList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.RefArrSeq.UncheckedSubList.writeObject(seq,oos);
         }
         break;
@@ -7405,35 +7383,24 @@ class RefArrSeqMonitor implements RefSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
-  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException
-  {
-    switch(nestedType)
-    {
+  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.RefArrSeq.CheckedList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.RefArrSeq.UncheckedList.readObject(seq,ois);
         }
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.RefArrSeq.CheckedStack.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.RefArrSeq.UncheckedStack.readObject(seq,ois);
         }
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.RefArrSeq.CheckedSubList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.RefArrSeq.UncheckedSubList.readObject(seq,ois);
         }
       default:

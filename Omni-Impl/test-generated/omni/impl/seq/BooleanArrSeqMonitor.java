@@ -6239,7 +6239,7 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
   final int parentPreAlloc;
   final int parentPostAlloc;
   final int rootPostAlloc;
-  final OmniCollection.OfBoolean root;
+  final BooleanArrSeq root;
   final OmniCollection.OfBoolean parent;
   final OmniCollection.OfBoolean seq;
   int expectedRootSize;
@@ -6375,10 +6375,15 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
         throw new Error("Unknown nestedType "+nestedType);
     }
   }
-  abstract class AbstractItrMonitor implements ItrMonitor{
+  class UncheckedArrSeqItrMonitor implements ItrMonitor{
     final OmniIterator.OfBoolean itr;
     int expectedCursor;
     int expectedLastRet;
+    private UncheckedArrSeqItrMonitor(OmniIterator.OfBoolean itr,int expectedCursor){
+      this.itr=itr;
+      this.expectedCursor=expectedCursor;
+      this.expectedLastRet=-1;
+    }
     public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
       int expectedBound=nestedType.forwardIteration?expectedSeqSize:0;
       if(functionCallType==FunctionCallType.Boxed){
@@ -6399,11 +6404,6 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
         }
       }
     }
-    AbstractItrMonitor(OmniIterator.OfBoolean itr,int expectedCursor){
-      this.itr=itr;
-      this.expectedCursor=expectedCursor;
-      this.expectedLastRet=-1;
-    }
     public void iterateReverse(){
       ((OmniListIterator.OfBoolean)itr).previousBoolean();
       expectedLastRet=--expectedCursor;
@@ -6411,7 +6411,6 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     public BooleanSeqMonitor getSeqMonitor(){
       return BooleanArrSeqMonitor.this;
     }
-    public abstract void verifyNext(int expectedVal,BooleanOutputTestArgType outputType);
     public void set(int v,BooleanInputTestArgType inputArgType){
        inputArgType.callListItrSet((OmniListIterator.OfBoolean)itr,v);
     }
@@ -6426,11 +6425,6 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     }
     public int previousIndex(){
       return ((OmniListIterator.OfBoolean)itr).previousIndex();
-    }
-  }
-   class UncheckedArrSeqItrMonitor extends AbstractItrMonitor{
-    private UncheckedArrSeqItrMonitor(OmniIterator.OfBoolean itr,int expectedCursor){
-      super(itr,expectedCursor);
     }
     @Override public void verifyIteratorState(){
       int actualCursor;
@@ -6538,7 +6532,7 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
   }
   public UncheckedArrSeqItrMonitor getItrMonitor(){
     var itr=seq.iterator();
-    int expectedCursor=nestedType==NestedType.STACK?((BooleanArrSeq)root).size:0;
+    int expectedCursor=nestedType==NestedType.STACK?root.size:0;
     return checkedType.checked
       ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
       :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
@@ -6610,15 +6604,15 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     return this.expectedSeqSize;
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
-      var arr=((BooleanArrSeq)root).arr;
-      int offset=0;
-      for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
-        BooleanInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
-      }
-      return new ArrSeqSequenceVerificationItr(this,offset,arr);
+    var arr=root.arr;
+    int offset=0;
+    for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+      BooleanInputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+    }
+    return new ArrSeqSequenceVerificationItr(this,offset,arr);
   }
   public SequenceVerificationItr verifyPreAlloc(){
-    var arr=((BooleanArrSeq)root).arr;
+    var arr=root.arr;
     int offset=0;
     for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
       BooleanInputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
@@ -6688,8 +6682,7 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     inputArgType.callListPut(seq,index,val);
   }
   public String toString(){
-    StringBuilder builder=new StringBuilder();
-    builder.append("BooleanArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
+    var builder=new StringBuilder("BooleanArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
     switch(nestedType){
       case STACK:
         builder.append("Stack{").append(initialCapacity);
@@ -6856,8 +6849,7 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     }
   }
   public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
-    if(functionCallType==FunctionCallType.Boxed)
-    {
+    if(functionCallType==FunctionCallType.Boxed){
       Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedRet),((OmniList.OfBoolean)seq).set(index,TypeConversionUtil.convertToBoolean(val)));
     }
     else
@@ -6868,16 +6860,14 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
   public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfBoolean clone){
     int seqSize=expectedSeqSize;
     boolean retVal;
-    if(functionCallType==FunctionCallType.Boxed)
-    {
+    if(functionCallType==FunctionCallType.Boxed){
       retVal=seq.removeIf((Predicate)pred);
     }
     else
     {
       retVal=seq.removeIf((BooleanPredicate)pred);
     }
-    if(retVal)
-    {
+    if(retVal){
       ++expectedSeqModCount;
       ++expectedParentModCount;
       ++expectedRootModCount;
@@ -6891,21 +6881,15 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
           ++numFalse;
         }
       }
-      if(pred.removedVals.contains(true))
-      {
-        if(pred.removedVals.contains(false))
-        {
+      if(pred.removedVals.contains(true)){
+        if(pred.removedVals.contains(false)){
           numRemoved=seqSize;
           Assertions.assertTrue(seq.isEmpty());
-        }
-        else
-        {
+        }else{
           numRemoved=numTrue;
           Assertions.assertFalse(seq.contains(true));
         }
-      }
-      else
-      {
+      }else{
         numRemoved=numFalse;
         Assertions.assertFalse(seq.contains(false));
       }
@@ -6925,37 +6909,26 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     }
     verifyStructuralIntegrity();
   }
-  public void writeObject(ObjectOutputStream oos) throws IOException
-  {
-    switch(nestedType)
-    {
+  public void writeObject(ObjectOutputStream oos) throws IOException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.BooleanArrSeq.CheckedList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.writeObject(seq,oos);
         }
         break;
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.BooleanArrSeq.CheckedStack.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.BooleanArrSeq.UncheckedStack.writeObject(seq,oos);
         }
         break;
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.BooleanArrSeq.UncheckedSubList.writeObject(seq,oos);
         }
         break;
@@ -6963,35 +6936,24 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
-  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException
-  {
-    switch(nestedType)
-    {
+  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.BooleanArrSeq.CheckedList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.readObject(seq,ois);
         }
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.BooleanArrSeq.CheckedStack.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.BooleanArrSeq.UncheckedStack.readObject(seq,ois);
         }
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.BooleanArrSeq.UncheckedSubList.readObject(seq,ois);
         }
       default:

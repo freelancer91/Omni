@@ -396,9 +396,7 @@ BOXED_TYPEVALUE_NAME(false){
     ++seqMonitor.expectedParentSize;
     ++seqMonitor.expectedRootSize;
   #ENDIF
-  
 #ENDIF
-    
   }
   void addNotEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor){
     #IF OfRef
@@ -540,7 +538,6 @@ BOXED_TYPEVALUE_NAME(false){
     int initContainsBeginning($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
 #ENDIF
   };
-
   private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,$ArrayType$[] arr){
     for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
       arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
@@ -562,7 +559,7 @@ BOXED_TYPEVALUE_NAME(false){
   final int parentPreAlloc;
   final int parentPostAlloc;
   final int rootPostAlloc;
-  final OmniCollection.Of$ClassPrefix$ root;
+  final $ClassPrefix$ArrSeq root;
   final OmniCollection.Of$ClassPrefix$ parent;
   final OmniCollection.Of$ClassPrefix$ seq;
   int expectedRootSize;
@@ -571,7 +568,6 @@ BOXED_TYPEVALUE_NAME(false){
   int expectedRootModCount;
   int expectedParentModCount;
   int expectedSeqModCount;
-  
   $ClassPrefix$ArrSeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,$ArrayType$[] arr){
     this.nestedType=nestedType;
     this.checkedType=checkedType;
@@ -701,14 +697,15 @@ BOXED_TYPEVALUE_NAME(false){
         throw new Error("Unknown nestedType "+nestedType);
     }
   }
-
-
-
-
-  abstract class AbstractItrMonitor implements ItrMonitor{
+  class UncheckedArrSeqItrMonitor implements ItrMonitor{
     final OmniIterator.Of$ClassPrefix$ itr;
     int expectedCursor;
     int expectedLastRet;
+    private UncheckedArrSeqItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor){
+      this.itr=itr;
+      this.expectedCursor=expectedCursor;
+      this.expectedLastRet=-1;
+    }
     public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
       int expectedBound=nestedType.forwardIteration?expectedSeqSize:0;
 #IFNOT OfRef
@@ -731,11 +728,6 @@ BOXED_TYPEVALUE_NAME(false){
         }
       }
     }
-    AbstractItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor){
-      this.itr=itr;
-      this.expectedCursor=expectedCursor;
-      this.expectedLastRet=-1;
-    }
     public void iterateReverse(){
       ((OmniListIterator.Of$ClassPrefix$)itr).previous$TypeNameModifier$();
       expectedLastRet=--expectedCursor;
@@ -743,14 +735,9 @@ BOXED_TYPEVALUE_NAME(false){
     public $ClassPrefix$SeqMonitor getSeqMonitor(){
       return $ClassPrefix$ArrSeqMonitor.this;
     }
-    public abstract void verifyNext(int expectedVal,$ClassPrefix$OutputTestArgType outputType);
-    
-    
     public void set(int v,$ClassPrefix$InputTestArgType inputArgType){
        inputArgType.callListItrSet((OmniListIterator.Of$ClassPrefix$)itr,v);
     }
-    
-   
     public boolean hasNext(){
       return itr.hasNext();
     }
@@ -762,11 +749,6 @@ BOXED_TYPEVALUE_NAME(false){
     }
     public int previousIndex(){
       return ((OmniListIterator.Of$ClassPrefix$)itr).previousIndex();
-    }
-  }
-   class UncheckedArrSeqItrMonitor extends AbstractItrMonitor{
-    private UncheckedArrSeqItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor){
-      super(itr,expectedCursor);
     }
     @Override public void verifyIteratorState(){
       int actualCursor;
@@ -828,7 +810,7 @@ BOXED_TYPEVALUE_NAME(false){
       expectedCursor=expectedLastRet;
       expectedLastRet=-1;
 #IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
 #ENDIF
     }
   }
@@ -877,8 +859,7 @@ BOXED_TYPEVALUE_NAME(false){
   }
   public UncheckedArrSeqItrMonitor getItrMonitor(){
     var itr=seq.iterator();
-
-    int expectedCursor=nestedType==NestedType.STACK?(($ClassPrefix$ArrSeq)root).size:0;
+    int expectedCursor=nestedType==NestedType.STACK?root.size:0;
     return checkedType.checked
       ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
       :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
@@ -894,11 +875,7 @@ BOXED_TYPEVALUE_NAME(false){
     return checkedType.checked
       ?new CheckedArrSeqItrMonitor(itr,index)
       :new UncheckedArrSeqItrMonitor(itr,index);
-
   }
-  
-
- 
   private static class ArrSeqSequenceVerificationItr extends SequenceVerificationItr{
     final $ArrayType$[] arr;
     int offset;
@@ -920,7 +897,6 @@ BOXED_TYPEVALUE_NAME(false){
 #ELSE
       Assertions.assertEquals(val,arr[offset++]);
 #ENDIF
-      
     }
 #IF OfRef
     @Override public void verifyIndexAndIterate(MonitoredObject monitoredObject){
@@ -931,7 +907,6 @@ BOXED_TYPEVALUE_NAME(false){
         Assertions.assertEquals(monitoredObject.compareVal,(Object)v);
       }
     }
-
 #ENDIF
     @Override public void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val){
       inputArgType.verifyVal(val,arr[offset++]);
@@ -969,17 +944,16 @@ BOXED_TYPEVALUE_NAME(false){
   public int getExpectedSeqSize(){
     return this.expectedSeqSize;
   }
-  
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
-      var arr=(($ClassPrefix$ArrSeq)root).arr;
-      int offset=0;
-      for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
-        $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
-      }
-      return new ArrSeqSequenceVerificationItr(this,offset,arr);
+    var arr=root.arr;
+    int offset=0;
+    for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
+      $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(expectedVal,arr[offset]);
+    }
+    return new ArrSeqSequenceVerificationItr(this,offset,arr);
   }
   public SequenceVerificationItr verifyPreAlloc(){
-    var arr=(($ClassPrefix$ArrSeq)root).arr;
+    var arr=root.arr;
     int offset=0;
     for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
       $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
@@ -1016,11 +990,9 @@ BOXED_TYPEVALUE_NAME(false){
     }
   }
 #IF OfRef
-  public boolean add(Object obj)
-  {
+  public boolean add(Object obj){
     boolean ret=seq.add(obj);
-    if(ret)
-    {
+    if(ret){
       ++expectedSeqSize;
       ++expectedParentSize;
       ++expectedRootSize;
@@ -1031,7 +1003,6 @@ BOXED_TYPEVALUE_NAME(false){
     return ret;
   }
 #ENDIF
-  
   public void add(int index,int val,$ClassPrefix$InputTestArgType inputArgType){
     inputArgType.callListAdd(seq,index,val);
     ++expectedRootSize;
@@ -1041,7 +1012,6 @@ BOXED_TYPEVALUE_NAME(false){
     ++expectedParentModCount;
     ++expectedSeqModCount;
   }
-  
   public boolean add(int val,$ClassPrefix$InputTestArgType inputArgType){
     boolean ret=inputArgType.callCollectionAdd(seq,val);
     if(ret){
@@ -1054,7 +1024,6 @@ BOXED_TYPEVALUE_NAME(false){
     }
     return ret;
   }
-  
   public void push(int val,$ClassPrefix$InputTestArgType inputArgType){
     inputArgType.callStackPush(seq,val);
     ++expectedRootSize;
@@ -1064,14 +1033,11 @@ BOXED_TYPEVALUE_NAME(false){
     ++expectedParentModCount;
     ++expectedSeqModCount;
   }
-  
   public void put(int index,int val,$ClassPrefix$InputTestArgType inputArgType){
     inputArgType.callListPut(seq,index,val);
   }
   public String toString(){
-    StringBuilder builder=new StringBuilder();
-
-    builder.append("$ClassPrefix$ArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
+    var builder=new StringBuilder("$ClassPrefix$ArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
     switch(nestedType){
       case STACK:
         builder.append("Stack{").append(initialCapacity);
@@ -1088,7 +1054,6 @@ BOXED_TYPEVALUE_NAME(false){
     return builder.append('}').toString();
   }
   public void verifyStructuralIntegrity(){
-
       switch(nestedType){
         case STACK:
           if(checkedType.checked){
@@ -1177,7 +1142,6 @@ BOXED_TYPEVALUE_NAME(false){
       ++expectedRootModCount;
     }
   }
-
   public void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
     int seqSize=expectedSeqSize;
   #IFNOT OfRef
@@ -1241,7 +1205,7 @@ BOXED_TYPEVALUE_NAME(false){
     ++expectedParentModCount;
     ++expectedRootModCount;
 #IF OfRef
-    Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+    Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
 #ENDIF
   }
   public void get(int expectedVal,$ClassPrefix$OutputTestArgType outputType,int index){
@@ -1260,7 +1224,7 @@ BOXED_TYPEVALUE_NAME(false){
 #IF OfRef
       int newBound=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
       int oldBound=newBound+seqSize;
-      verifyRangeIsNull((($ClassPrefix$ArrSeq)root).arr,newBound,oldBound);
+      verifyRangeIsNull(root.arr,newBound,oldBound);
 #ENDIF
     }
   }
@@ -1273,7 +1237,7 @@ BOXED_TYPEVALUE_NAME(false){
     ++expectedParentModCount;
     ++expectedRootModCount;
 #IF OfRef
-    Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+    Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
 #ENDIF
   }
   public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
@@ -1286,16 +1250,13 @@ BOXED_TYPEVALUE_NAME(false){
       ++expectedParentModCount;
       ++expectedRootModCount;
   #IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
+      Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
   #ENDIF
     }
-
   }
-  
   public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
   #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed)
-    {
+    if(functionCallType==FunctionCallType.Boxed){
       Assertions.assertEquals(TypeConversionUtil.convertTo$BoxedType$(expectedRet),((OmniList.Of$ClassPrefix$)seq).set(index,TypeConversionUtil.convertTo$BoxedType$(val)));
     }
     else
@@ -1304,16 +1265,13 @@ BOXED_TYPEVALUE_NAME(false){
       Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(expectedRet),((OmniList.Of$ClassPrefix$)seq).set(index,TypeConversionUtil.convertTo$ArrayType$(val)));
     }
   }
-  
   public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
 #IF OfRef,OfBoolean
     int seqSize=expectedSeqSize;
 #ENDIF
-
     boolean retVal;
 #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed)
-    {
+    if(functionCallType==FunctionCallType.Boxed){
       retVal=seq.removeIf((Predicate)pred);
     }
     else
@@ -1321,8 +1279,7 @@ BOXED_TYPEVALUE_NAME(false){
     {
       retVal=seq.removeIf(($TypeNameModifier$Predicate)pred);
     }
-    if(retVal)
-    {
+    if(retVal){
       ++expectedSeqModCount;
       ++expectedParentModCount;
       ++expectedRootModCount;
@@ -1337,31 +1294,24 @@ BOXED_TYPEVALUE_NAME(false){
           ++numFalse;
         }
       }
-      if(pred.removedVals.contains(true))
-      {
-        if(pred.removedVals.contains(false))
-        {
+      if(pred.removedVals.contains(true)){
+        if(pred.removedVals.contains(false)){
           numRemoved=seqSize;
           Assertions.assertTrue(seq.isEmpty());
-        }
-        else
-        {
+        }else{
           numRemoved=numTrue;
           Assertions.assertFalse(seq.contains(true));
         }
-      }
-      else
-      {
+      }else{
         numRemoved=numFalse;
         Assertions.assertFalse(seq.contains(false));
       }
 #ELSE
       numRemoved=pred.numRemoved;
   #IF OfRef
-      verifyRangeIsNull((($ClassPrefix$ArrSeq)root).arr,(seqSize-numRemoved)+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc,seqSize+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc);
+      verifyRangeIsNull(root.arr,(seqSize-numRemoved)+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc,seqSize+rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc);
   #ENDIF
-      for(var removedVal:pred.removedVals)
-      {
+      for(var removedVal:pred.removedVals){
         Assertions.assertFalse(seq.contains(removedVal));
       }
 #ENDIF
@@ -1385,78 +1335,51 @@ BOXED_TYPEVALUE_NAME(false){
     }
     verifyStructuralIntegrity();
   }
-  
-  public void writeObject(ObjectOutputStream oos) throws IOException
-  {
-
-    switch(nestedType)
-    {
+  public void writeObject(ObjectOutputStream oos) throws IOException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedList.writeObject(seq,oos);
         }
         break;
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedStack.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedStack.writeObject(seq,oos);
         }
         break;
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedSubList.writeObject(seq,oos);
-        }
-        else
-        {
+        }else{
           FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.writeObject(seq,oos);
         }
         break;
       default:
         throw new Error("unknown nested type "+nestedType);
     }
-
   }
-  
-  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException
-  {
-    switch(nestedType)
-    {
+  public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
+    switch(nestedType){
       case LIST:
-        if(checkedType.checked)
-        {
-          
+        if(checkedType.checked){
           return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedList.readObject(seq,ois);
         }
       case STACK:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedStack.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedStack.readObject(seq,ois);
         }
       case SUBLIST:
-        if(checkedType.checked)
-        {
+        if(checkedType.checked){
           return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedSubList.readObject(seq,ois);
-        }
-        else
-        {
+        }else{
           return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.readObject(seq,ois);
         }
       default:
