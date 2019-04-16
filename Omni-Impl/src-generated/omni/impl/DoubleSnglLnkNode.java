@@ -27,6 +27,9 @@ public class DoubleSnglLnkNode implements Comparable<DoubleSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+HashUtil.hashDouble(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(DoubleSnglLnkNode curr,DoubleSnglLnkNode tail,DoubleConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(DoubleSnglLnkNode curr,DoubleConsumer action){
     do{
       action.accept(curr.val);

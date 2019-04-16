@@ -36,6 +36,9 @@ public class ShortSnglLnkNode implements Comparable<ShortSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(ShortSnglLnkNode curr,ShortSnglLnkNode tail,ShortConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(ShortSnglLnkNode curr,ShortConsumer action){
     do{
       action.accept(curr.val);

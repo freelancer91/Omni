@@ -1452,7 +1452,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          BooleanSnglLnkNode.uncheckedForEach(head,action);
+          BooleanSnglLnkNode.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1463,7 +1463,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          BooleanSnglLnkNode.uncheckedForEach(head,action::accept);
+          BooleanSnglLnkNode.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1790,14 +1790,20 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       @Override void uncheckedForEachRemaining(BooleanSnglLnkNode next,BooleanConsumer action){
         final int modCount=this.modCount;
         BooleanSnglLnkNode prev,curr;
+        final CheckedQueue parent;
+        final var tail=(parent=this.parent).tail;
         try{
-          curr=this.curr;
-          do{
+          for(curr=this.curr;;next=curr.next)
+          {
             action.accept(next.val);
             prev=curr;
-          }while((next=(curr=next).next)!=null);
+            if((curr=next)==tail)
+            {
+              break;
+            }
+          }
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1876,8 +1882,13 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
       return new UncheckedQueue();
     }
     @Override void push(boolean val){
-      BooleanSnglLnkNode newNode;
-      this.tail.next=(newNode=new BooleanSnglLnkNode(val));
+      final var newNode=new BooleanSnglLnkNode(val);
+      final BooleanSnglLnkNode tail;
+      if((tail=this.tail)!=null){
+        tail.next=newNode;
+      }else{
+        this.head=newNode;
+      }
       this.tail=newNode;
       ++this.size;
     }
@@ -2152,7 +2163,7 @@ public abstract class BooleanSnglLnkSeq implements OmniCollection.OfBoolean,Clon
         {
           parent.head=next;
         }else{
-          prev.next=null;
+          prev.next=next;
         }
         if(this.curr==parent.tail)
         {

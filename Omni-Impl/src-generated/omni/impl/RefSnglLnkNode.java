@@ -15,6 +15,9 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
     this.val=val;
     this.next=next;
   }
+  public static <E> void uncheckedToString(RefSnglLnkNode<E> curr,RefSnglLnkNode<E> tail,StringBuilder builder){
+    for(builder.append(curr.val);curr!=tail;builder.append(',').append(' ').append((curr=curr.next).val)){}
+  }
   public static <E> void uncheckedToString(RefSnglLnkNode<E> curr,StringBuilder builder){
     for(;;builder.append(',').append(' ')){
       builder.append(curr.val);
@@ -23,15 +26,29 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
       }
     }
   }
+  public static <E> int uncheckedHashCode(RefSnglLnkNode<E> curr,RefSnglLnkNode<E> tail){
+    int hash=31+Objects.hashCode(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+Objects.hashCode((curr=curr.next).val);
+    }
+    return hash;
+  }
   public static <E> int uncheckedHashCode(RefSnglLnkNode<E> curr){
     int hash=31+Objects.hashCode(curr.val);
     for(;(curr=curr.next)!=null;hash=(hash*31)+Objects.hashCode(curr.val)){}
     return hash;
   }
+  public static <E> void uncheckedForEach(RefSnglLnkNode<E> curr,RefSnglLnkNode<E> tail,Consumer<? super E> action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static <E> void uncheckedForEach(RefSnglLnkNode<E> curr,Consumer<? super E> action){
     do{
       action.accept(curr.val);
     }while((curr=curr.next)!=null);
+  }
+  public static <E> boolean uncheckedcontainsNonNull(RefSnglLnkNode<E> curr,RefSnglLnkNode<E> tail,Object nonNull){
+    for(;!nonNull.equals(curr.val);curr=curr.next){if(curr==tail){return false;}}
+    return true;
   }
   public static <E> boolean uncheckedcontainsNonNull(RefSnglLnkNode<E> curr
   ,Object nonNull

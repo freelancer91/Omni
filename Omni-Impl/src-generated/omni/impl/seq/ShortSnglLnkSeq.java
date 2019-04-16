@@ -1293,7 +1293,7 @@ public abstract class ShortSnglLnkSeq implements OmniCollection.OfShort,Cloneabl
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ShortSnglLnkNode.uncheckedForEach(head,action);
+          ShortSnglLnkNode.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1304,7 +1304,7 @@ public abstract class ShortSnglLnkSeq implements OmniCollection.OfShort,Cloneabl
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          ShortSnglLnkNode.uncheckedForEach(head,action::accept);
+          ShortSnglLnkNode.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1620,14 +1620,20 @@ public abstract class ShortSnglLnkSeq implements OmniCollection.OfShort,Cloneabl
       @Override void uncheckedForEachRemaining(ShortSnglLnkNode next,ShortConsumer action){
         final int modCount=this.modCount;
         ShortSnglLnkNode prev,curr;
+        final CheckedQueue parent;
+        final var tail=(parent=this.parent).tail;
         try{
-          curr=this.curr;
-          do{
+          for(curr=this.curr;;next=curr.next)
+          {
             action.accept(next.val);
             prev=curr;
-          }while((next=(curr=next).next)!=null);
+            if((curr=next)==tail)
+            {
+              break;
+            }
+          }
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1698,8 +1704,13 @@ public abstract class ShortSnglLnkSeq implements OmniCollection.OfShort,Cloneabl
       return new UncheckedQueue();
     }
     @Override void push(short val){
-      ShortSnglLnkNode newNode;
-      this.tail.next=(newNode=new ShortSnglLnkNode(val));
+      final var newNode=new ShortSnglLnkNode(val);
+      final ShortSnglLnkNode tail;
+      if((tail=this.tail)!=null){
+        tail.next=newNode;
+      }else{
+        this.head=newNode;
+      }
       this.tail=newNode;
       ++this.size;
     }
@@ -1926,7 +1937,7 @@ public abstract class ShortSnglLnkSeq implements OmniCollection.OfShort,Cloneabl
         {
           parent.head=next;
         }else{
-          prev.next=null;
+          prev.next=next;
         }
         if(this.curr==parent.tail)
         {

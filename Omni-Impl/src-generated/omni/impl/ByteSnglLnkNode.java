@@ -36,6 +36,9 @@ public class ByteSnglLnkNode implements Comparable<ByteSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(ByteSnglLnkNode curr,ByteSnglLnkNode tail,ByteConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(ByteSnglLnkNode curr,ByteConsumer action){
     do{
       action.accept(curr.val);

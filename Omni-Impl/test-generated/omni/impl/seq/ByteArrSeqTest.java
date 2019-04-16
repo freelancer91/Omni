@@ -3,8 +3,6 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.ByteInputTestArgType;
 import omni.impl.ByteOutputTestArgType;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
@@ -31,12 +29,14 @@ import omni.impl.seq.ByteSeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.ByteSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.ByteSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
+import org.junit.jupiter.api.Tag;
 import omni.impl.seq.ByteSeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.ByteArrSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import java.util.ArrayList;
 @Execution(ExecutionMode.CONCURRENT)
+@Tag("ArrSeqTest")
 public class ByteArrSeqTest{
   @FunctionalInterface
   interface ArgBuilder{
@@ -2651,7 +2651,7 @@ public class ByteArrSeqTest{
       Stream.Builder<Arguments> builder=Stream.builder();
       for(var checkedType:CheckedType.values()){
         for(var itrScenario:IterationScenario.values()){
-          if(checkedType.checked || itrScenario.expectedException==null){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
               if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
                 for(var outputType:ByteOutputTestArgType.values()){
@@ -2704,8 +2704,10 @@ public class ByteArrSeqTest{
         default:
           throw new Error("unknown itr scenario "+itrScenario);
       }
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+      if(seqMonitor.checkedType.checked){
+        seqMonitor.illegalAdd(itrScenario.preModScenario);
+        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+      }
       itrMonitor.verifyIteratorState();
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
@@ -2714,7 +2716,7 @@ public class ByteArrSeqTest{
       Stream.Builder<Arguments> builder=Stream.builder();
       for(var checkedType:CheckedType.values()){
         for(var itrScenario:IterationScenario.values()){
-          if(checkedType.checked || itrScenario.expectedException==null){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
               if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
                 for(var itrType:ItrType.values()){
@@ -2772,8 +2774,11 @@ public class ByteArrSeqTest{
         default:
           throw new Error("unknown itr scenario "+itrScenario);
       }
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+      if(seqMonitor.checkedType.checked)
+      {
+        seqMonitor.illegalAdd(itrScenario.preModScenario);
+        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+      }
       itrMonitor.verifyIteratorState();
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);

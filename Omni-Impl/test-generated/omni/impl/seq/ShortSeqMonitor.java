@@ -1320,6 +1320,10 @@ interface ShortSeqMonitor
     public void verifyIndexAndIterate(int val){
       verifyIndexAndIterate(ShortInputTestArgType.ARRAY_TYPE,val);
     }
+    public SequenceVerificationItr verifyNaturalAscending(int length)
+    {
+       return verifyAscending(0,ShortInputTestArgType.ARRAY_TYPE,length);
+    }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,ShortInputTestArgType.ARRAY_TYPE,length);
     }
@@ -1330,13 +1334,21 @@ interface ShortSeqMonitor
       return verifyAscending(0,inputArgType,length);
     }
     public SequenceVerificationItr verifyDescending(int length){
-      return verifyDescending(ShortInputTestArgType.ARRAY_TYPE,length);
+      return verifyDescending(length,ShortInputTestArgType.ARRAY_TYPE,length);
     }
-    public SequenceVerificationItr verifyDescending(ShortInputTestArgType inputArgType,int length){
-      for(int i=0,v=length;i<length;++i){
+    public SequenceVerificationItr verifyDescending(int v,int length)
+    {
+       return verifyDescending(v,ShortInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyDescending(int v,ShortInputTestArgType inputArgType,int length)
+    {
+      for(int i=0;i<length;++i){
         verifyIndexAndIterate(inputArgType,--v);
       }
       return this;
+    }
+    public SequenceVerificationItr verifyDescending(ShortInputTestArgType inputArgType,int length){
+      return verifyDescending(length,inputArgType,length);
     }
     public SequenceVerificationItr verifyMidPointInsertion(int length){
       return verifyMidPointInsertion(ShortInputTestArgType.ARRAY_TYPE,length);

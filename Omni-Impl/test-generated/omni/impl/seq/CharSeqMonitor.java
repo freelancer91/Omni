@@ -1320,6 +1320,10 @@ interface CharSeqMonitor
     public void verifyIndexAndIterate(int val){
       verifyIndexAndIterate(CharInputTestArgType.ARRAY_TYPE,val);
     }
+    public SequenceVerificationItr verifyNaturalAscending(int length)
+    {
+       return verifyAscending(0,CharInputTestArgType.ARRAY_TYPE,length);
+    }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,CharInputTestArgType.ARRAY_TYPE,length);
     }
@@ -1330,13 +1334,21 @@ interface CharSeqMonitor
       return verifyAscending(0,inputArgType,length);
     }
     public SequenceVerificationItr verifyDescending(int length){
-      return verifyDescending(CharInputTestArgType.ARRAY_TYPE,length);
+      return verifyDescending(length,CharInputTestArgType.ARRAY_TYPE,length);
     }
-    public SequenceVerificationItr verifyDescending(CharInputTestArgType inputArgType,int length){
-      for(int i=0,v=length;i<length;++i){
+    public SequenceVerificationItr verifyDescending(int v,int length)
+    {
+       return verifyDescending(v,CharInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyDescending(int v,CharInputTestArgType inputArgType,int length)
+    {
+      for(int i=0;i<length;++i){
         verifyIndexAndIterate(inputArgType,--v);
       }
       return this;
+    }
+    public SequenceVerificationItr verifyDescending(CharInputTestArgType inputArgType,int length){
+      return verifyDescending(length,inputArgType,length);
     }
     public SequenceVerificationItr verifyMidPointInsertion(int length){
       return verifyMidPointInsertion(CharInputTestArgType.ARRAY_TYPE,length);

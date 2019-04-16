@@ -37,6 +37,9 @@ public class BooleanSnglLnkNode implements Comparable<BooleanSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+Boolean.hashCode(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(BooleanSnglLnkNode curr,BooleanSnglLnkNode tail,BooleanConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(BooleanSnglLnkNode curr,BooleanConsumer action){
     do{
       action.accept(curr.val);

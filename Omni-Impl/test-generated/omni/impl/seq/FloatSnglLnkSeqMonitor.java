@@ -19,8 +19,12 @@ import omni.impl.QueryCastType;
 @SuppressWarnings({"rawtypes","unchecked"})
 class FloatSnglLnkSeqMonitor implements FloatSeqMonitor{
   static enum NestedType{
-    QUEUE,
-    STACK;
+    QUEUE(true),
+    STACK(false);
+    final boolean forwardIteration;
+    NestedType(boolean forwardIteration){
+      this.forwardIteration=forwardIteration;
+    }
   }
   static enum QueryTester
   {
@@ -4019,7 +4023,8 @@ class FloatSnglLnkSeqMonitor implements FloatSeqMonitor{
     }else{
       FloatSnglLnkNode node;
       Assertions.assertNotNull(node=seq.head);
-      while(--expectedSeqSize!=0){
+      int i=expectedSeqSize;
+      while(--i!=0){
         Assertions.assertNotNull(node=node.next);
       }
       Assertions.assertNull(node.next);
@@ -4161,6 +4166,7 @@ class FloatSnglLnkSeqMonitor implements FloatSeqMonitor{
       this.curr=curr;
     }
     @Override public SequenceVerificationItr verifyPostAlloc(int expectedVal){
+      Assertions.assertNull(curr);
       return this;
     }
     @Override public void verifyLiteralIndexAndIterate(float val){
@@ -4199,16 +4205,47 @@ class FloatSnglLnkSeqMonitor implements FloatSeqMonitor{
       return val==this || (val instanceof SnglLnkSeqSequenceVerificationItr && (that=(SnglLnkSeqSequenceVerificationItr)val).seqMonitor.seq==this.seqMonitor.seq && that.curr==this.curr);
     }
     @Override public SequenceVerificationItr verifyRootPostAlloc(){
+      Assertions.assertNull(curr);
       return this;
     }
     @Override public SequenceVerificationItr verifyParentPostAlloc(){
+      Assertions.assertNull(curr);
       return this;
+    }
+    @Override public SequenceVerificationItr verifyPostAlloc(){
+      Assertions.assertNull(curr);
+      return this;
+    }
+    @Override public SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
+      if(seqMonitor.nestedType.forwardIteration && preModScenario==PreModScenario.ModSeq){
+        verifyIllegalAdd();
+      }
+      Assertions.assertNull(curr);
+      return this;
+    }
+    public SequenceVerificationItr verifyNaturalAscending(int length)
+    {
+      if(seqMonitor.nestedType.forwardIteration)
+      {
+        return verifyAscending(length);
+      }
+      else
+      {
+        return verifyDescending(length);
+      }
     }
   }
   public UncheckedSnglLnkSeqItrMonitor getItrMonitor(){
     return checkedType.checked
       ?new CheckedSnglLnkSeqItrMonitor()
       :new UncheckedSnglLnkSeqItrMonitor();
+  }
+  public SequenceVerificationItr verifyPreAlloc(PreModScenario preModScenario){
+    var verifyItr=new SnglLnkSeqSequenceVerificationItr(this,seq.head);
+    if(!nestedType.forwardIteration && preModScenario==PreModScenario.ModSeq){
+      verifyItr.verifyIllegalAdd();
+    }
+    return verifyItr;
   }
   public SequenceVerificationItr verifyPreAlloc(){
     return new SnglLnkSeqSequenceVerificationItr(this,seq.head);

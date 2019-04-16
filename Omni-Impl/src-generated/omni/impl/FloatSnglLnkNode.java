@@ -37,6 +37,9 @@ public class FloatSnglLnkNode implements Comparable<FloatSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+HashUtil.hashFloat(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(FloatSnglLnkNode curr,FloatSnglLnkNode tail,FloatConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(FloatSnglLnkNode curr,FloatConsumer action){
     do{
       action.accept(curr.val);

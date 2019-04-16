@@ -1334,6 +1334,10 @@ interface BooleanSeqMonitor
     public void verifyIndexAndIterate(int val){
       verifyIndexAndIterate(BooleanInputTestArgType.ARRAY_TYPE,val);
     }
+    public SequenceVerificationItr verifyNaturalAscending(int length)
+    {
+       return verifyAscending(0,BooleanInputTestArgType.ARRAY_TYPE,length);
+    }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,BooleanInputTestArgType.ARRAY_TYPE,length);
     }
@@ -1344,13 +1348,21 @@ interface BooleanSeqMonitor
       return verifyAscending(0,inputArgType,length);
     }
     public SequenceVerificationItr verifyDescending(int length){
-      return verifyDescending(BooleanInputTestArgType.ARRAY_TYPE,length);
+      return verifyDescending(length,BooleanInputTestArgType.ARRAY_TYPE,length);
     }
-    public SequenceVerificationItr verifyDescending(BooleanInputTestArgType inputArgType,int length){
-      for(int i=0,v=length;i<length;++i){
+    public SequenceVerificationItr verifyDescending(int v,int length)
+    {
+       return verifyDescending(v,BooleanInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyDescending(int v,BooleanInputTestArgType inputArgType,int length)
+    {
+      for(int i=0;i<length;++i){
         verifyIndexAndIterate(inputArgType,--v);
       }
       return this;
+    }
+    public SequenceVerificationItr verifyDescending(BooleanInputTestArgType inputArgType,int length){
+      return verifyDescending(length,inputArgType,length);
     }
     public SequenceVerificationItr verifyMidPointInsertion(int length){
       return verifyMidPointInsertion(BooleanInputTestArgType.ARRAY_TYPE,length);

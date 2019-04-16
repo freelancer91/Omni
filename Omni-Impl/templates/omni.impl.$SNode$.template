@@ -43,6 +43,11 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
     this.next=next;
   }
 #IF OfRef,OfDouble
+  #IF OfRef
+  public static $<E>$ void uncheckedToString($SNode$$<E>$ curr,$SNode$$<E>$ tail,StringBuilder builder){
+    for(builder.append(curr.val);curr!=tail;builder.append(',').append(' ').append((curr=curr.next).val)){}
+  }
+  #ENDIF
   public static $<E>$ void uncheckedToString($SNode$$<E>$ curr,StringBuilder builder){
     for(;;builder.append(',').append(' ')){
       builder.append(curr.val);
@@ -90,7 +95,15 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
 #ENDIF
 
 
-
+#IF OfRef
+  public static $<E>$ int uncheckedHashCode($SNode$$<E>$ curr,$SNode$$<E>$ tail){
+    int hash=31+$hashCodeMethod$(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+$hashCodeMethod$((curr=curr.next).val);
+    }
+    return hash;
+  }
+#ENDIF
 
 
 
@@ -99,12 +112,22 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
     for(;(curr=curr.next)!=null;hash=(hash*31)+$hashCodeMethod$(curr.val)){}
     return hash;
   }
+  public static $<E>$ void uncheckedForEach($SNode$$<E>$ curr,$SNode$$<E>$ tail,$TypeNameModifier$Consumer$<? super E>$ action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
+  
   public static $<E>$ void uncheckedForEach($SNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
     do{
       action.accept(curr.val);
     }while((curr=curr.next)!=null);
   }
+  
+  
 #IF OfRef
+  public static $<E>$ boolean uncheckedcontainsNonNull($SNode$$<E>$ curr,$SNode$$<E>$ tail,Object nonNull){
+    for(;!nonNull.equals(curr.val);curr=curr.next){if(curr==tail){return false;}}
+    return true;
+  }
   #MACRO NodeQuery<NonNull>(!nonNull.equals)
   #MACRO NodeQuery<Null>(null!=)
   #MACRO NodeQuery< >(!pred.test)

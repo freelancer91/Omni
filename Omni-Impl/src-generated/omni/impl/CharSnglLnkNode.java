@@ -27,6 +27,9 @@ public class CharSnglLnkNode implements Comparable<CharSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(CharSnglLnkNode curr,CharSnglLnkNode tail,CharConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(CharSnglLnkNode curr,CharConsumer action){
     do{
       action.accept(curr.val);

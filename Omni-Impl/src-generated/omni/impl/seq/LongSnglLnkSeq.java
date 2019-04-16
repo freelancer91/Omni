@@ -1125,7 +1125,7 @@ public abstract class LongSnglLnkSeq implements OmniCollection.OfLong,Cloneable,
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          LongSnglLnkNode.uncheckedForEach(head,action);
+          LongSnglLnkNode.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1136,7 +1136,7 @@ public abstract class LongSnglLnkSeq implements OmniCollection.OfLong,Cloneable,
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          LongSnglLnkNode.uncheckedForEach(head,action::accept);
+          LongSnglLnkNode.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1422,14 +1422,20 @@ public abstract class LongSnglLnkSeq implements OmniCollection.OfLong,Cloneable,
       @Override void uncheckedForEachRemaining(LongSnglLnkNode next,LongConsumer action){
         final int modCount=this.modCount;
         LongSnglLnkNode prev,curr;
+        final CheckedQueue parent;
+        final var tail=(parent=this.parent).tail;
         try{
-          curr=this.curr;
-          do{
+          for(curr=this.curr;;next=curr.next)
+          {
             action.accept(next.val);
             prev=curr;
-          }while((next=(curr=next).next)!=null);
+            if((curr=next)==tail)
+            {
+              break;
+            }
+          }
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1500,8 +1506,13 @@ public abstract class LongSnglLnkSeq implements OmniCollection.OfLong,Cloneable,
       return new UncheckedQueue();
     }
     @Override void push(long val){
-      LongSnglLnkNode newNode;
-      this.tail.next=(newNode=new LongSnglLnkNode(val));
+      final var newNode=new LongSnglLnkNode(val);
+      final LongSnglLnkNode tail;
+      if((tail=this.tail)!=null){
+        tail.next=newNode;
+      }else{
+        this.head=newNode;
+      }
       this.tail=newNode;
       ++this.size;
     }
@@ -1700,7 +1711,7 @@ public abstract class LongSnglLnkSeq implements OmniCollection.OfLong,Cloneable,
         {
           parent.head=next;
         }else{
-          prev.next=null;
+          prev.next=next;
         }
         if(this.curr==parent.tail)
         {

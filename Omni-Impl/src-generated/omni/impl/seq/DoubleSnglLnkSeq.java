@@ -1316,7 +1316,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          DoubleSnglLnkNode.uncheckedForEach(head,action);
+          DoubleSnglLnkNode.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1327,7 +1327,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          DoubleSnglLnkNode.uncheckedForEach(head,action::accept);
+          DoubleSnglLnkNode.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1647,14 +1647,20 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       @Override void uncheckedForEachRemaining(DoubleSnglLnkNode next,DoubleConsumer action){
         final int modCount=this.modCount;
         DoubleSnglLnkNode prev,curr;
+        final CheckedQueue parent;
+        final var tail=(parent=this.parent).tail;
         try{
-          curr=this.curr;
-          do{
+          for(curr=this.curr;;next=curr.next)
+          {
             action.accept(next.val);
             prev=curr;
-          }while((next=(curr=next).next)!=null);
+            if((curr=next)==tail)
+            {
+              break;
+            }
+          }
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1725,8 +1731,13 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       return new UncheckedQueue();
     }
     @Override void push(double val){
-      DoubleSnglLnkNode newNode;
-      this.tail.next=(newNode=new DoubleSnglLnkNode(val));
+      final var newNode=new DoubleSnglLnkNode(val);
+      final DoubleSnglLnkNode tail;
+      if((tail=this.tail)!=null){
+        tail.next=newNode;
+      }else{
+        this.head=newNode;
+      }
       this.tail=newNode;
       ++this.size;
     }
@@ -1959,7 +1970,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         {
           parent.head=next;
         }else{
-          prev.next=null;
+          prev.next=next;
         }
         if(this.curr==parent.tail)
         {

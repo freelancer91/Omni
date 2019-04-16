@@ -3,8 +3,6 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.ShortInputTestArgType;
 import omni.impl.ShortOutputTestArgType;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
@@ -31,12 +29,14 @@ import omni.impl.seq.ShortSeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.ShortSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.ShortSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
+import org.junit.jupiter.api.Tag;
 import omni.impl.seq.ShortSeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.ShortArrSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import java.util.ArrayList;
 @Execution(ExecutionMode.CONCURRENT)
+@Tag("ArrSeqTest")
 public class ShortArrSeqTest{
   @FunctionalInterface
   interface ArgBuilder{
@@ -2636,7 +2636,7 @@ public class ShortArrSeqTest{
       Stream.Builder<Arguments> builder=Stream.builder();
       for(var checkedType:CheckedType.values()){
         for(var itrScenario:IterationScenario.values()){
-          if(checkedType.checked || itrScenario.expectedException==null){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
               if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
                 for(var outputType:ShortOutputTestArgType.values()){
@@ -2689,8 +2689,10 @@ public class ShortArrSeqTest{
         default:
           throw new Error("unknown itr scenario "+itrScenario);
       }
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+      if(seqMonitor.checkedType.checked){
+        seqMonitor.illegalAdd(itrScenario.preModScenario);
+        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+      }
       itrMonitor.verifyIteratorState();
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
@@ -2699,7 +2701,7 @@ public class ShortArrSeqTest{
       Stream.Builder<Arguments> builder=Stream.builder();
       for(var checkedType:CheckedType.values()){
         for(var itrScenario:IterationScenario.values()){
-          if(checkedType.checked || itrScenario.expectedException==null){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
               if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
                 for(var itrType:ItrType.values()){
@@ -2757,8 +2759,11 @@ public class ShortArrSeqTest{
         default:
           throw new Error("unknown itr scenario "+itrScenario);
       }
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+      if(seqMonitor.checkedType.checked)
+      {
+        seqMonitor.illegalAdd(itrScenario.preModScenario);
+        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+      }
       itrMonitor.verifyIteratorState();
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);

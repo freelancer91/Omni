@@ -36,6 +36,9 @@ public class LongSnglLnkNode implements Comparable<LongSnglLnkNode>
     for(;(curr=curr.next)!=null;hash=(hash*31)+Long.hashCode(curr.val)){}
     return hash;
   }
+  public static  void uncheckedForEach(LongSnglLnkNode curr,LongSnglLnkNode tail,LongConsumer action){
+    for(action.accept(curr.val);curr!=tail;action.accept((curr=curr.next).val)){}
+  }
   public static  void uncheckedForEach(LongSnglLnkNode curr,LongConsumer action){
     do{
       action.accept(curr.val);

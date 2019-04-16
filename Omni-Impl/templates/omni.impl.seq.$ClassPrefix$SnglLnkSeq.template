@@ -993,7 +993,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          return $SNode$.uncheckedHashCode(head);
+          return $SNode$.uncheckedHashCode(head,tail);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1006,7 +1006,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedToString(head,builder);
+          $SNode$.uncheckedToString(head,tail,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1020,7 +1020,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedForEach(head,action);
+          $SNode$.uncheckedForEach(head,tail,action);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1032,7 +1032,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          $SNode$.uncheckedForEach(head,action::accept);
+          $SNode$.uncheckedForEach(head,tail,action::accept);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1328,7 +1328,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         if(val!=null){
           final int modCount=this.modCount;
           try{
-            return $SNode$.uncheckedcontainsNonNull(head,val);
+            return $SNode$.uncheckedcontainsNonNull(head,tail,val);
           }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
           }
@@ -1364,14 +1364,20 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       @Override void uncheckedForEachRemaining($SNode$$<E>$ next,$TypeNameModifier$Consumer$<? super E>$ action){
         final int modCount=this.modCount;
         $SNode$$<E>$ prev,curr;
+        final CheckedQueue$<E>$ parent;
+        final var tail=(parent=this.parent).tail;
         try{
-          curr=this.curr;
-          do{
+          for(curr=this.curr;;next=curr.next)
+          {
             action.accept(next.val);
             prev=curr;
-          }while((next=(curr=next).next)!=null);
+            if((curr=next)==tail)
+            {
+              break;
+            }
+          }
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1463,8 +1469,13 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       return new UncheckedQueue$<E>$();
     }
     @Override void push($exposedType$ val){
-      $SNode$$<E>$ newNode;
-      this.tail.next=(newNode=new $SNode$$<E>$(val));
+      final var newNode=new $SNode$$<E>$(val);
+      final $SNode$$<E>$ tail;
+      if((tail=this.tail)!=null){
+        tail.next=newNode;
+      }else{
+        this.head=newNode;
+      }
       this.tail=newNode;
       ++this.size;
     }
@@ -1685,7 +1696,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         {
           parent.head=next;
         }else{
-          prev.next=null;
+          prev.next=next;
         }
         if(this.curr==parent.tail)
         {

@@ -3,8 +3,6 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.RefInputTestArgType;
 import omni.impl.RefOutputTestArgType;
-//import org.junit.jupiter.params.ParameterizedTest;
-//import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
@@ -31,6 +29,7 @@ import omni.impl.seq.RefSeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.RefSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.RefSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
+import org.junit.jupiter.api.Tag;
 import omni.impl.seq.RefSeqMonitor.MonitoredObjectGen;
 import omni.impl.seq.RefSeqMonitor.MonitoredObject;
 import omni.impl.seq.RefSeqMonitor.SequenceVerificationItr;
@@ -40,6 +39,7 @@ import omni.api.OmniList;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Execution(ExecutionMode.CONCURRENT)
+@Tag("ArrSeqTest")
 public class RefArrSeqTest{
   @FunctionalInterface
   interface ArgBuilder{
@@ -3090,7 +3090,7 @@ public class RefArrSeqTest{
       Stream.Builder<Arguments> builder=Stream.builder();
       for(var checkedType:CheckedType.values()){
         for(var itrScenario:IterationScenario.values()){
-          if(checkedType.checked || itrScenario.expectedException==null){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
               if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
                 for(var outputType:RefOutputTestArgType.values()){
@@ -3143,8 +3143,10 @@ public class RefArrSeqTest{
         default:
           throw new Error("unknown itr scenario "+itrScenario);
       }
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+      if(seqMonitor.checkedType.checked){
+        seqMonitor.illegalAdd(itrScenario.preModScenario);
+        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+      }
       itrMonitor.verifyIteratorState();
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
@@ -3153,7 +3155,7 @@ public class RefArrSeqTest{
       Stream.Builder<Arguments> builder=Stream.builder();
       for(var checkedType:CheckedType.values()){
         for(var itrScenario:IterationScenario.values()){
-          if(checkedType.checked || itrScenario.expectedException==null){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
               if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
                 for(var itrType:ItrType.values()){
@@ -3211,8 +3213,11 @@ public class RefArrSeqTest{
         default:
           throw new Error("unknown itr scenario "+itrScenario);
       }
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+      if(seqMonitor.checkedType.checked)
+      {
+        seqMonitor.illegalAdd(itrScenario.preModScenario);
+        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+      }
       itrMonitor.verifyIteratorState();
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
