@@ -454,9 +454,13 @@ public class BooleanSnglLnkSeqTest{
       }
     });
   }
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getforEach_ConsumerArgs")
-  public void testforEach_Consumer
+  @org.junit.jupiter.api.Test
+  public void testforEach_Consumer(){
+    getforEach_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
+        testforEach_ConsumerHelper((BooleanSnglLnkSeqMonitor)args[0],(MonitoredFunctionGen)args[1],(SequenceContentsScenario)args[2],(FunctionCallType)args[3]);
+    });
+  }
+  private static void testforEach_ConsumerHelper
   (BooleanSnglLnkSeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
@@ -514,5 +518,132 @@ public class BooleanSnglLnkSeqTest{
     }
     Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
     //TODO verify iterated values
+  }
+  static Stream<Arguments> getremoveIf_PredicateArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
+        if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
+          for(var functionCallType:FunctionCallType.values()){
+  /*
+            for(int seqSize=0;seqSize<=10;++seqSize){
+              long randSeedBound;
+              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+                randSeedBound=0;
+              }else{
+                randSeedBound=100;
+              }
+              for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
+                for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
+                  for(int initVal=0;initVal<=1;++initVal){
+                    streamBuilder.accept(Arguments.of(new BooleanSnglLnkSeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,initVal,period));
+                  }
+                  if(period>=seqSize){
+                    break;
+                  }
+                }
+              }
+            }
+  */
+          }
+        }
+      }
+   });
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveIf_Predicate(){
+    getremoveIf_PredicateArgs().parallel().map(Arguments::get).forEach(args->{
+      testremoveIf_PredicateHelper((BooleanSnglLnkSeqMonitor)args[0],(MonitoredRemoveIfPredicateGen)args[1],(double)args[2],(long)args[3],(FunctionCallType)args[4],(int)args[5]
+      ,(int)args[6],(int)args[7]
+      );
+    });
+  }
+  private static void testremoveIf_PredicateHelper
+  (BooleanSnglLnkSeqMonitor seqMonitor,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
+  ,int initVal,int period
+  ){
+  int trueCount=0;
+  for(int i=0;i<seqSize;){
+    seqMonitor.add(initVal);
+    if((initVal&1)!=0)
+    {
+      ++trueCount;
+    }
+    if((++i)%period==0)
+    {
+      ++initVal;
+    }
+  }
+    final var clone=(OmniCollection.OfBoolean)seqMonitor.seq.clone();
+    final int numExpectedCalls=seqMonitor.seq.contains(true)?seqMonitor.seq.contains(false)?2:1:seqMonitor.seq.contains(false)?1:0;
+    final int numExpectedRemoved;
+    switch(monitoredRemoveIfPredicateGen){
+      case RemoveTrue:
+        numExpectedRemoved=trueCount;
+        break;
+      case RemoveFalse:
+        numExpectedRemoved=seqSize-trueCount;
+        break;
+      case RemoveAll:
+        numExpectedRemoved=seqSize;
+        break;
+      case Random:
+        numExpectedRemoved=-1;
+        break;
+      case RemoveNone:
+      case Throw:
+      case ModSeq:
+      case ThrowModSeq:
+        numExpectedRemoved=0;
+        break;
+      default:
+        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+    }
+    final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
+    if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0)
+    {
+      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
+      seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
+      return;
+    }else{
+      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+    }
+    var verifyItr=seqMonitor.verifyPreAlloc(!seqMonitor.nestedType.forwardIteration &&(monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ModSeq ||  monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ThrowModSeq)?PreModScenario.ModSeq:null);
+    if(seqMonitor.nestedType.forwardIteration){
+      var cloneItr=clone.iterator();
+      while(cloneItr.hasNext()){
+        verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextBoolean());
+      }
+    }else{
+      if(monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ModSeq){
+        //tricky to verify
+        //skip it
+        return;
+      }
+      var arr=clone.toBooleanArray();
+      for(int i=arr.length;--i>=0;){
+         verifyItr.verifyLiteralIndexAndIterate(arr[i]);
+      }
+    }
+    if(seqMonitor.nestedType.forwardIteration && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ThrowModSeq)
+    {
+      verifyItr.verifyPostAlloc(); 
+    }
+    switch(monitoredRemoveIfPredicateGen){
+      case Random:
+      case RemoveAll:
+      case RemoveNone:
+      case RemoveTrue:
+      case RemoveFalse:
+      case Throw:
+        verifyItr.verifyPostAlloc();
+        break;
+      case ModSeq:
+      case ThrowModSeq:
+        //The nature of concurrent modification makes verifying the contents of the array tricky due to array reallocations
+        //skip it in this scenario
+        break;
+      default:
+        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+    }
   }
 }
