@@ -3,9 +3,11 @@ import omni.util.TypeConversionUtil;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.OmniArray;
+import omni.util.PeekAndPollIfc;
 import org.junit.jupiter.api.Assertions;
 @SuppressWarnings({"rawtypes"}) 
 public enum RefOutputTestArgType{
@@ -34,22 +36,28 @@ public enum RefOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfRef col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfRef col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(null,((OmniStack.OfRef)col).poll());
+        Assertions.assertEquals(null,((PeekAndPollIfc<?>)col).poll());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((OmniStack.OfRef)col).poll());
+        Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((PeekAndPollIfc<?>)col).poll());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfRef col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfRef col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(null,((OmniStack.OfRef)col).peek());
+        Assertions.assertEquals(null,((PeekAndPollIfc<?>)col).peek());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((OmniStack.OfRef)col).peek());
+        Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((PeekAndPollIfc<?>)col).peek());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfRef col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((OmniStack.OfRef)col).pop());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfRef col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((OmniQueue.OfRef)col).element());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfRef col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedVal),((OmniQueue.OfRef)col).remove());
     }
   }
   ;
@@ -58,8 +66,10 @@ public enum RefOutputTestArgType{
   public abstract void verifyListRemoveAt(OmniCollection.OfRef col,int index,int valToConvert);
   public abstract void verifyListGet(OmniCollection.OfRef col,int index,int valToConvert);
   public abstract void verifyToArray(OmniCollection.OfRef col,int expectedSize);
-  public abstract void verifyStackPoll(OmniCollection.OfRef col,int expectedSize,int expectedVal);
+  public abstract void verifyPoll(OmniCollection.OfRef col,int expectedSize,int expectedVal);
   public abstract void verifyStackPop(OmniCollection.OfRef col,int expectedVal);
-  public abstract void verifyStackPeek(OmniCollection.OfRef col,int expectedSize,int expectedVal);
+  public abstract void verifyQueueRemove(OmniCollection.OfRef col,int expectedVal);
+  public abstract void verifyQueueElement(OmniCollection.OfRef col,int expectedVal);
+  public abstract void verifyPeek(OmniCollection.OfRef col,int expectedSize,int expectedVal);
   //TODO other method tests
 }

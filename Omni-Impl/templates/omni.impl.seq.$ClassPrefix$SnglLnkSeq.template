@@ -100,7 +100,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if((marker&word)==0){
         do{
           if(--numRemoved==0){
-            prev.next=null;
+            prev.next=curr.next;
             return;
           }
           if((marker<<=1)==0){
@@ -112,6 +112,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         prev.next=curr;
       }
       if(--numSurvivors==0){
+        curr.next=null;
         return;
       }
       if((marker<<=1)==0){
@@ -144,7 +145,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if((marker&word)==0){
         do{
           if(--numRemoved==0){
-            prev.next=null;
+            prev.next=curr.next;
             return;
           }
           curr=curr.next;
@@ -152,6 +153,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         prev.next=curr;
       }
       if(--numSurvivors==0){
+        curr.next=null;
         return;
       }
       prev=curr;
@@ -359,7 +361,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     final $SNode$$<E>$ head;
     if((head=this.head)!=null){
       $SNode$.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
-    }else{
+    }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
@@ -977,10 +979,56 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       //TODO
       return false;
     }
+    @Override public $exposedType$ $elementMethod$(){
+      final $SNode$$<E>$ head;
+      if((head=this.head)!=null){
+        return head.val;
+      }
+      throw new NoSuchElementException();
+    }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        final var tail=this.tail;
+        out.writeInt(size=this.size);
+        if(size!=0)
+        {
+          $SNode$$<E>$ curr;
+    #IF OfBoolean
+          for(int word=TypeUtil.castToByte((curr=this.head).val),marker=1;;)
+          {
+            if(curr==tail)
+            {
+              out.writeByte(word);
+              return;
+            }
+            if((marker<<=1)==(1<<8))
+            {
+              out.writeByte(word);
+              word=0;
+              marker=1;
+            }
+            if((curr=curr.next).val)
+            {
+              word|=marker;
+            }
+          }
+    #ELSE
+          for(curr=this.head;;curr=curr.next)
+          {
+      #IF OfRef
+            out.writeObject(curr.val);
+      #ELSE
+            out.write$TypeNameModifier$(curr.val);
+      #ENDIF
+            if(curr==tail)
+            {
+              return;
+            }
+          }
+    #ENDIF
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -1057,6 +1105,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         ++this.modCount;
         this.head=null;
         this.tail=null;
+        this.size=0;
       }
     }
     @Override public Object clone(){
@@ -1159,7 +1208,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=null;
+              prev.next=curr.next;
               if(curr==tail)
               {
                 this.tail=prev;
@@ -1175,6 +1224,8 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           prev.next=curr;
         }
         if(--numSurvivors==0){
+          this.tail=curr;
+          curr.next=null;
           return;
         }
         if((marker<<=1)==0){
@@ -1190,7 +1241,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=null;
+              prev.next=curr.next;
               if(curr==tail)
               {
                 this.tail=prev;
@@ -1202,6 +1253,8 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           prev.next=curr;
         }
         if(--numSurvivors==0){
+          this.tail=curr;
+          curr.next=null;
           return;
         }
         prev=curr;
@@ -1838,53 +1891,52 @@ public RETTYPE peekSUFFIX(){
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
   final int modCount=this.modCount;
+  try
   #ENDIF
 #ENDIF
-  if(POSTEST(head.val))
   {
+    final var tail=this.tail;
+    if(POSTEST(head.val)){
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
-    CheckedCollection.checkModCount(modCount,this.modCount);
+      CheckedCollection.checkModCount(modCount,this.modCount);
   #ENDIF
 #ENDIF
-    
-    if(head==tail)
-    {
-      this.tail=null;
-    }
-    this.head=head.next;
-  }else{
-    $SNode$$<E>$ prev;
-    #IFSWITCH CHECKED==true
-      #IFSWITCH SUFFIX==NonNull
-    try
-      #ENDIF
-    #ENDIF
-    {
+      if(head==tail){
+        this.tail=null;
+      }
+      this.head=head.next;
+    }else{
+      $SNode$$<E>$ prev;
       do{
-        if(head==tail)
-        {
+        if(head==tail){
+#IFSWITCH CHECKED==true
+  #IFSWITCH SUFFIX==NonNull
+          CheckedCollection.checkModCount(modCount,this.modCount);
+  #ENDIF
+#ENDIF
           return false;
         }
-        //if((head=(prev=head).next)==null){
-        //  return false;
-        //}
       }while(NEGTEST((head=(prev=head).next).val));
-    }
-    #IFSWITCH CHECKED==true
-      #IFSWITCH SUFFIX==NonNull
-    finally{
+#IFSWITCH CHECKED==true
+  #IFSWITCH SUFFIX==NonNull
       CheckedCollection.checkModCount(modCount,this.modCount);
+  #ENDIF
+#ENDIF
+      if(head==tail){
+        this.tail=prev;
+      }
+      prev.next=head.next;
     }
-      #ENDIF
-    #ENDIF
-    if(head==tail)
-    {
-      this.tail=prev;
-    }
-    prev.next=head.next;
   }
 #IFSWITCH CHECKED==true
+  #IFSWITCH SUFFIX==NonNull
+  catch(ConcurrentModificationException e){
+    throw e;
+  }catch(RuntimeException e){
+    throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+  }
+  #ENDIF
   this.modCount=modCount+1;
 #ENDIF
   --this.size;
@@ -1899,39 +1951,48 @@ public RETTYPE peekSUFFIX(){
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
   final int modCount=this.modCount;
+  try
   #ENDIF
 #ENDIF
-  if(POSTEST(head.val)){
+  {
+    if(POSTEST(head.val)){
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
-    CheckedCollection.checkModCount(modCount,this.modCount);
+      CheckedCollection.checkModCount(modCount,this.modCount);
   #ENDIF
 #ENDIF
-    this.head=head.next;
-  }else{
-    $SNode$$<E>$ prev;
-#IFSWITCH CHECKED==true
-  #IFSWITCH SUFFIX==NonNull
-    try
-  #ENDIF
-#ENDIF
-    {
+      this.head=head.next;
+    }else{
+      $SNode$$<E>$ prev;
       do{
         if((head=(prev=head).next)==null){
+#IFSWITCH CHECKED==true
+  #IFSWITCH SUFFIX==NonNull
+          CheckedCollection.checkModCount(modCount,this.modCount);
+  #ENDIF
+#ENDIF
           return false;
         }
       }while(NEGTEST(head.val));
-    }
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
-    finally{
       CheckedCollection.checkModCount(modCount,this.modCount);
-    }
   #ENDIF
 #ENDIF
-    prev.next=head.next;
+      prev.next=head.next;
+    }
   }
 #IFSWITCH CHECKED==true
+  #IFSWITCH SUFFIX==NonNull
+  catch(ConcurrentModificationException e)
+  {
+    throw e;
+  }
+  catch(RuntimeException e)
+  {
+    throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+  }
+  #ENDIF
   this.modCount=modCount+1;
 #ENDIF
   --this.size;

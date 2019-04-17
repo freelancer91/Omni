@@ -124,7 +124,7 @@ public class $ClassPrefix$ArrSeqTest{
   #MACRO testListItradd_val<PARALLEL>()
   #MACRO testtoString_void<PARALLEL>()
   #MACRO testMASSIVEtoString_void<PARALLEL>()
-  #MACRO testreadAndwriteObject_ObjectInputStream<PARALLEL>()
+  #MACRO testreadAndwriteObject<PARALLEL>()
 #ENDDEF
 
 #MACRODEF testConstructor_int<PARALLEL>()
@@ -3365,7 +3365,7 @@ public void testStackpeek_void
 #ENDIF
 ($ClassPrefix$ArrSeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
   for(int i=0;i<100;){
-    outputArgType.verifyStackPeek(seqMonitor.seq,i,i);
+    outputArgType.verifyPeek(seqMonitor.seq,i,i);
     seqMonitor.verifyStructuralIntegrity();
     seqMonitor.add(++i);
   }
@@ -4797,8 +4797,8 @@ public void testtoString_void
 #ENDDEF
 }
 
-#MACRODEF testreadAndwriteObject_ObjectInputStream<PARALLEL>()
-static Stream<Arguments> gettestreadAndwriteObject_ObjectInputStreamArgs(){
+#MACRODEF testreadAndwriteObject<PARALLEL>()
+static Stream<Arguments> getreadAndwriteObjectArgs(){
   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
     for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
       if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
@@ -4811,16 +4811,16 @@ static Stream<Arguments> gettestreadAndwriteObject_ObjectInputStreamArgs(){
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
-public void testreadAndwriteObject_ObjectInputStream(){
-  gettestreadAndwriteObject_ObjectInputStreamArgs().parallel().map(Arguments::get).forEach(args->{
-      testreadAndwriteObject_ObjectInputStreamHelper(($ClassPrefix$ArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+public void testreadAndwriteObject(){
+  getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
+      testreadAndwriteObjectHelper(($ClassPrefix$ArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
   });
 }
-private static void testreadAndwriteObject_ObjectInputStreamHelper
+private static void testreadAndwriteObjectHelper
 #ELSE
 @org.junit.jupiter.params.ParameterizedTest
-@org.junit.jupiter.params.provider.MethodSource("gettestreadAndwriteObject_ObjectInputStreamArgs")
-public void testreadAndwriteObject_ObjectInputStream
+@org.junit.jupiter.params.provider.MethodSource("getreadAndwriteObjectArgs")
+public void testreadAndwriteObject
 #ENDIF
 ($ClassPrefix$ArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
 {

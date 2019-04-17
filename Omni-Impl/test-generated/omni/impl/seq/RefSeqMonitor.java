@@ -754,9 +754,9 @@ interface RefSeqMonitor
       throw new IndexOutOfBoundsException();
     }
   }
-  static class ModArrSeqMonitoredObject extends MonitoredObject{
+  static class ModSeqMonitoredObject extends MonitoredObject{
     final RefSeqMonitor seqMonitor;
-    ModArrSeqMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
+    ModSeqMonitoredObject(RefSeqMonitor seqMonitor,int compareVal){
       super(compareVal);
       this.seqMonitor=seqMonitor;
     }
@@ -941,12 +941,12 @@ interface RefSeqMonitor
   }
   static enum MonitoredObjectGen{
     NoThrow(null,true){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject();
       }
     },
     Throw(IndexOutOfBoundsException.class,true){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -964,7 +964,7 @@ interface RefSeqMonitor
       }
     },
     ModSeq(ConcurrentModificationException.class,true){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -985,7 +985,7 @@ interface RefSeqMonitor
       }
     },
     ModParent(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1006,7 +1006,7 @@ interface RefSeqMonitor
       }
     },
     ModRoot(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1027,7 +1027,7 @@ interface RefSeqMonitor
       }
     },
     ThrowModSeq(ConcurrentModificationException.class,true){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1048,7 +1048,7 @@ interface RefSeqMonitor
       }
     },
     ThrowModParent(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1069,7 +1069,7 @@ interface RefSeqMonitor
       }
     },
     ThrowModRoot(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject(RefSeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1095,7 +1095,7 @@ interface RefSeqMonitor
       this.expectedException=expectedException;
       this.appliesToRoot=appliesToRoot;
     }
-    abstract MonitoredObject getMonitoredObject(RefArrSeqMonitor monitor);
+    abstract MonitoredObject getMonitoredObject(RefSeqMonitor monitor);
   }
   static enum MonitoredComparatorGen{
     NullComparatorThrowAIOB(IllegalArgumentException.class,true,true,false,true){
@@ -1149,12 +1149,12 @@ interface RefSeqMonitor
         return null;
       }
       @Override void initHelper(RefSeqMonitor seqMonitor){
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,3));
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,2));
       }
       @Override void initReverseHelper(RefSeqMonitor seqMonitor){
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,2));
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
          switch(preModScenario){
@@ -2019,6 +2019,9 @@ interface RefSeqMonitor
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
     public abstract boolean equals(Object val);
+    public SequenceVerificationItr verifyNaturalAscending(int v,RefInputTestArgType inputArgType,int length){
+      return verifyAscending(v,inputArgType,length);
+    }
     public SequenceVerificationItr verifyAscending(int v,RefInputTestArgType inputArgType,int length){
       for(int i=0;i<length;++i,++v){
         verifyIndexAndIterate(inputArgType,v);
@@ -2030,7 +2033,14 @@ interface RefSeqMonitor
     }
     public SequenceVerificationItr verifyNaturalAscending(int length)
     {
-       return verifyAscending(0,RefInputTestArgType.ARRAY_TYPE,length);
+       return verifyNaturalAscending(0,RefInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNaturalAscending(int v,int length)
+    {
+       return verifyNaturalAscending(v,RefInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNaturalAscending(RefInputTestArgType inputArgType,int length){
+      return verifyNaturalAscending(0,inputArgType,length);
     }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,RefInputTestArgType.ARRAY_TYPE,length);

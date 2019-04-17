@@ -12,6 +12,7 @@ import omni.util.TypeConversionUtil;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 #IF OfRef
@@ -66,6 +67,7 @@ public enum $ClassPrefix$InputTestArgType{
   ;
 #MACRODEF InputTestArgTypeImpl<VALUE_NAME,INPUTTYPE,OUTPUTTYPE>()
 VALUE_NAME{
+  public boolean callQueueOffer(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){return ((OmniQueue.Of$ClassPrefix$)seq).offer(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public void callListItrAdd(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert){itr.add(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public void callListItrSet(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert){itr.set(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public void callListPut(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert){((OmniList.Of$ClassPrefix$)seq).put(index,TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
@@ -75,6 +77,7 @@ VALUE_NAME{
   public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedValToConvert),actualVal);}
 }
 #ENDDEF
+    public abstract boolean callQueueOffer(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
     public abstract void callListItrAdd(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert);
     public abstract void callListItrSet(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert);
     public abstract void callListPut(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert);

@@ -1,6 +1,6 @@
 package omni.impl;
 import omni.function.CharConsumer;
-public class CharSnglLnkNode implements Comparable<CharSnglLnkNode>
+public class CharSnglLnkNode
 {
   public transient char val;
   public transient CharSnglLnkNode next;
@@ -103,14 +103,5 @@ public class CharSnglLnkNode implements Comparable<CharSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(CharSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      return this.val-that.val;
-    }
-    return 0;
   }
 }

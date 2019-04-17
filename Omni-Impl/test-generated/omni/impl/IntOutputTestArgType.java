@@ -3,9 +3,11 @@ import omni.util.TypeConversionUtil;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.OmniArray;
+import omni.util.PeekAndPollIfc;
 import org.junit.jupiter.api.Assertions;
 public enum IntOutputTestArgType{
   ARRAY_TYPE{
@@ -33,22 +35,28 @@ public enum IntOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Integer.MIN_VALUE,((OmniStack.OfInt)col).pollInt());
+        Assertions.assertEquals(Integer.MIN_VALUE,((PeekAndPollIfc.IntInput)col).pollInt());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((OmniStack.OfInt)col).pollInt());
+        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((PeekAndPollIfc.IntInput)col).pollInt());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Integer.MIN_VALUE,((OmniStack.OfInt)col).peekInt());
+        Assertions.assertEquals(Integer.MIN_VALUE,((PeekAndPollIfc.IntInput)col).peekInt());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((OmniStack.OfInt)col).peekInt());
+        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((PeekAndPollIfc.IntInput)col).peekInt());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfInt col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((OmniStack.OfInt)col).popInt());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((OmniQueue.OfInt)col).intElement());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((OmniQueue.OfInt)col).removeInt());
     }
   }
   ,
@@ -77,22 +85,28 @@ public enum IntOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(null,((OmniStack.OfInt)col).poll());
+        Assertions.assertNull(((PeekAndPollIfc<?>)col).poll());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((OmniStack.OfInt)col).poll());
+        Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((PeekAndPollIfc<?>)col).poll());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(null,((OmniStack.OfInt)col).peek());
+        Assertions.assertNull(((PeekAndPollIfc<?>)col).peek());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((OmniStack.OfInt)col).peek());
+        Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((PeekAndPollIfc<?>)col).peek());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfInt col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((OmniStack.OfInt)col).pop());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((OmniQueue.OfInt)col).element());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToInteger(expectedVal),((OmniQueue.OfInt)col).remove());
     }
   }
   ,
@@ -121,22 +135,28 @@ public enum IntOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((OmniStack.OfInt)col).pollDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).pollDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniStack.OfInt)col).pollDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).pollDouble());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((OmniStack.OfInt)col).peekDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).peekDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniStack.OfInt)col).peekDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).peekDouble());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfInt col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniStack.OfInt)col).popDouble());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniQueue.OfInt)col).doubleElement());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniQueue.OfInt)col).removeDouble());
     }
   }
   ,
@@ -165,22 +185,28 @@ public enum IntOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Float.NaN,((OmniStack.OfInt)col).pollFloat());
+        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatInput)col).pollFloat());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((OmniStack.OfInt)col).pollFloat());
+        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatInput)col).pollFloat());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Float.NaN,((OmniStack.OfInt)col).peekFloat());
+        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatInput)col).peekFloat());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((OmniStack.OfInt)col).peekFloat());
+        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatInput)col).peekFloat());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfInt col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((OmniStack.OfInt)col).popFloat());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((OmniQueue.OfInt)col).floatElement());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((OmniQueue.OfInt)col).removeFloat());
     }
   }
   ,
@@ -209,22 +235,28 @@ public enum IntOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Long.MIN_VALUE,((OmniStack.OfInt)col).pollLong());
+        Assertions.assertEquals(Long.MIN_VALUE,((PeekAndPollIfc.LongInput)col).pollLong());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((OmniStack.OfInt)col).pollLong());
+        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((PeekAndPollIfc.LongInput)col).pollLong());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Long.MIN_VALUE,((OmniStack.OfInt)col).peekLong());
+        Assertions.assertEquals(Long.MIN_VALUE,((PeekAndPollIfc.LongInput)col).peekLong());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((OmniStack.OfInt)col).peekLong());
+        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((PeekAndPollIfc.LongInput)col).peekLong());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfInt col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((OmniStack.OfInt)col).popLong());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((OmniQueue.OfInt)col).longElement());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfInt col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((OmniQueue.OfInt)col).removeLong());
     }
   }
   ;
@@ -233,8 +265,10 @@ public enum IntOutputTestArgType{
   public abstract void verifyListRemoveAt(OmniCollection.OfInt col,int index,int valToConvert);
   public abstract void verifyListGet(OmniCollection.OfInt col,int index,int valToConvert);
   public abstract void verifyToArray(OmniCollection.OfInt col,int expectedSize);
-  public abstract void verifyStackPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal);
+  public abstract void verifyPoll(OmniCollection.OfInt col,int expectedSize,int expectedVal);
   public abstract void verifyStackPop(OmniCollection.OfInt col,int expectedVal);
-  public abstract void verifyStackPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal);
+  public abstract void verifyQueueRemove(OmniCollection.OfInt col,int expectedVal);
+  public abstract void verifyQueueElement(OmniCollection.OfInt col,int expectedVal);
+  public abstract void verifyPeek(OmniCollection.OfInt col,int expectedSize,int expectedVal);
   //TODO other method tests
 }

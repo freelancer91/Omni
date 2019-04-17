@@ -266,22 +266,4 @@ public class BooleanSnglLnkNodeTest
        Assertions.assertEquals((Object)TypeConversionUtil.convertTocharboolean(i),(Object)dst[10-i]);
      }
   }
-  @Test
-  public void testCompareTo()
-  {
-    var lessVal=false;
-    var lessEqualsVal=false;
-    var greaterVal=true;
-    var greaterEqualsVal=true;
-    var lessNode=new BooleanSnglLnkNode(lessVal);
-    var lessEqualsNode=new BooleanSnglLnkNode(lessEqualsVal);
-    var greaterNode=new BooleanSnglLnkNode(greaterVal);
-    var greaterEqualsNode=new BooleanSnglLnkNode(greaterEqualsVal);
-    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
-    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
-    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
-    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
-  }
 }

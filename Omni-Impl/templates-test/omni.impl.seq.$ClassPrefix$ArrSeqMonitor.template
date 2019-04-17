@@ -1241,7 +1241,7 @@ BOXED_TYPEVALUE_NAME(false){
 #ENDIF
   }
   public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

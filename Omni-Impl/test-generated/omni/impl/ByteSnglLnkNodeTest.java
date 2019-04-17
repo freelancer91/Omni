@@ -218,22 +218,4 @@ public class ByteSnglLnkNodeTest
        Assertions.assertEquals((Object)TypeConversionUtil.convertToshort(i),(Object)dst[10-i]);
      }
   }
-  @Test
-  public void testCompareTo()
-  {
-    byte lessVal=0;
-    byte lessEqualsVal=0;
-    byte greaterVal=1;
-    byte greaterEqualsVal=1;
-    var lessNode=new ByteSnglLnkNode(lessVal);
-    var lessEqualsNode=new ByteSnglLnkNode(lessEqualsVal);
-    var greaterNode=new ByteSnglLnkNode(greaterVal);
-    var greaterEqualsNode=new ByteSnglLnkNode(greaterEqualsVal);
-    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
-    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
-    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
-    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
-  }
 }

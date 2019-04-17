@@ -1311,6 +1311,9 @@ interface ShortSeqMonitor
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
     public abstract boolean equals(Object val);
+    public SequenceVerificationItr verifyNaturalAscending(int v,ShortInputTestArgType inputArgType,int length){
+      return verifyAscending(v,inputArgType,length);
+    }
     public SequenceVerificationItr verifyAscending(int v,ShortInputTestArgType inputArgType,int length){
       for(int i=0;i<length;++i,++v){
         verifyIndexAndIterate(inputArgType,v);
@@ -1322,7 +1325,14 @@ interface ShortSeqMonitor
     }
     public SequenceVerificationItr verifyNaturalAscending(int length)
     {
-       return verifyAscending(0,ShortInputTestArgType.ARRAY_TYPE,length);
+       return verifyNaturalAscending(0,ShortInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNaturalAscending(int v,int length)
+    {
+       return verifyNaturalAscending(v,ShortInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNaturalAscending(ShortInputTestArgType inputArgType,int length){
+      return verifyNaturalAscending(0,inputArgType,length);
     }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,ShortInputTestArgType.ARRAY_TYPE,length);

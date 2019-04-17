@@ -1,7 +1,7 @@
 package omni.impl;
 import omni.function.ShortConsumer;
 import omni.util.ToStringUtil;
-public class ShortSnglLnkNode implements Comparable<ShortSnglLnkNode>
+public class ShortSnglLnkNode
 {
   public transient short val;
   public transient ShortSnglLnkNode next;
@@ -112,14 +112,5 @@ public class ShortSnglLnkNode implements Comparable<ShortSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(ShortSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      return this.val-that.val;
-    }
-    return 0;
   }
 }

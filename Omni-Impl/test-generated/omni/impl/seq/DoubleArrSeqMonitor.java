@@ -6848,7 +6848,7 @@ class DoubleArrSeqMonitor implements DoubleSeqMonitor{
     ++expectedRootModCount;
   }
   public void poll(int expectedVal,DoubleOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

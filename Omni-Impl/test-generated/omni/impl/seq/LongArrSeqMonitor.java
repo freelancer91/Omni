@@ -6848,7 +6848,7 @@ class LongArrSeqMonitor implements LongSeqMonitor{
     ++expectedRootModCount;
   }
   public void poll(int expectedVal,LongOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

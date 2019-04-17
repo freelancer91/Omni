@@ -2,7 +2,7 @@ package omni.impl;
 import omni.function.FloatConsumer;
 import omni.util.ToStringUtil;
 import omni.util.HashUtil;
-public class FloatSnglLnkNode implements Comparable<FloatSnglLnkNode>
+public class FloatSnglLnkNode
 {
   public transient float val;
   public transient FloatSnglLnkNode next;
@@ -111,14 +111,5 @@ public class FloatSnglLnkNode implements Comparable<FloatSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(FloatSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      return Float.compare(this.val,that.val);
-    }
-    return 0;
   }
 }

@@ -847,9 +847,9 @@ interface $ClassPrefix$SeqMonitor
       throw new IndexOutOfBoundsException();
     }
   }
-  static class ModArrSeqMonitoredObject extends MonitoredObject{
+  static class ModSeqMonitoredObject extends MonitoredObject{
     final $ClassPrefix$SeqMonitor seqMonitor;
-    ModArrSeqMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
+    ModSeqMonitoredObject($ClassPrefix$SeqMonitor seqMonitor,int compareVal){
       super(compareVal);
       this.seqMonitor=seqMonitor;
     }
@@ -1094,12 +1094,12 @@ interface $ClassPrefix$SeqMonitor
 #IF OfRef
   static enum MonitoredObjectGen{
     NoThrow(null,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject();
       }
     },
     Throw(IndexOutOfBoundsException.class,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1117,7 +1117,7 @@ interface $ClassPrefix$SeqMonitor
       }
     },
     ModSeq(ConcurrentModificationException.class,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1138,7 +1138,7 @@ interface $ClassPrefix$SeqMonitor
       }
     },
     ModParent(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1159,7 +1159,7 @@ interface $ClassPrefix$SeqMonitor
       }
     },
     ModRoot(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1180,7 +1180,7 @@ interface $ClassPrefix$SeqMonitor
       }
     },
     ThrowModSeq(ConcurrentModificationException.class,true){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1201,7 +1201,7 @@ interface $ClassPrefix$SeqMonitor
       }
     },
     ThrowModParent(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1222,7 +1222,7 @@ interface $ClassPrefix$SeqMonitor
       }
     },
     ThrowModRoot(ConcurrentModificationException.class,false){
-      MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor){
+      MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor){
         return new MonitoredObject(){
           @Override public boolean equals(Object obj){
             ++numEqualsCalls;
@@ -1248,7 +1248,7 @@ interface $ClassPrefix$SeqMonitor
       this.expectedException=expectedException;
       this.appliesToRoot=appliesToRoot;
     }
-    abstract MonitoredObject getMonitoredObject($ClassPrefix$ArrSeqMonitor monitor);
+    abstract MonitoredObject getMonitoredObject($ClassPrefix$SeqMonitor monitor);
   }
 #ENDIF
   static enum MonitoredComparatorGen{
@@ -1304,12 +1304,12 @@ interface $ClassPrefix$SeqMonitor
         return null;
       }
       @Override void initHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,3));
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,2));
       }
       @Override void initReverseHelper($ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,2));
-        seqMonitor.add(new ModArrSeqMonitoredObject(seqMonitor,3));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.add(new ModSeqMonitoredObject(seqMonitor,3));
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
          switch(preModScenario){
@@ -2211,7 +2211,9 @@ interface $ClassPrefix$SeqMonitor
     public abstract SequenceVerificationItr getPositiveOffset(int i);
     public abstract SequenceVerificationItr skip(int i);
     public abstract boolean equals(Object val);
-    
+    public SequenceVerificationItr verifyNaturalAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length){
+      return verifyAscending(v,inputArgType,length);
+    }
     public SequenceVerificationItr verifyAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length){
       for(int i=0;i<length;++i,++v){
         verifyIndexAndIterate(inputArgType,v);
@@ -2223,7 +2225,14 @@ interface $ClassPrefix$SeqMonitor
     }
     public SequenceVerificationItr verifyNaturalAscending(int length)
     {
-       return verifyAscending(0,$ClassPrefix$InputTestArgType.ARRAY_TYPE,length);
+       return verifyNaturalAscending(0,$ClassPrefix$InputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNaturalAscending(int v,int length)
+    {
+       return verifyNaturalAscending(v,$ClassPrefix$InputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNaturalAscending($ClassPrefix$InputTestArgType inputArgType,int length){
+      return verifyNaturalAscending(0,inputArgType,length);
     }
     public SequenceVerificationItr verifyAscending(int length){
       return verifyAscending(0,$ClassPrefix$InputTestArgType.ARRAY_TYPE,length);

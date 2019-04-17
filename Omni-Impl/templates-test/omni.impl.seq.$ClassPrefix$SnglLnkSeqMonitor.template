@@ -33,6 +33,7 @@ import omni.api.OmniIterator;
 import omni.api.OmniStack;
 import omni.util.TypeUtil;
 import omni.impl.QueryCastType;
+import java.io.Externalizable;
 @SuppressWarnings({"rawtypes","unchecked"})
 class $ClassPrefix$SnglLnkSeqMonitor implements $ClassPrefix$SeqMonitor{
   static enum NestedType{
@@ -47,90 +48,90 @@ class $ClassPrefix$SnglLnkSeqMonitor implements $ClassPrefix$SeqMonitor{
   {
 #IF OfRef
     ObjectNonNull(true){
-      @Override boolean invokecontainsObject($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokecontainsBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokecontainsUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValObject($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchObject($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override void addEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override void addNotEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor){
+      @Override boolean invokecontainsObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokecontainsBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokecontainsUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveValObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokesearchObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokesearchBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokesearchUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override void addEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override void addNotEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
         seqMonitor.seq.add(new Object());
         ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
         ++seqMonitor.expectedSeqSize;
-        ++seqMonitor.expectedParentSize;
-        ++seqMonitor.expectedRootSize;
       }
-      @Override boolean invokecontainsMonitored($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+      @Override boolean invokecontainsMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return seqMonitor.seq.contains(monitoredObject);
       }
-      @Override boolean invokeremoveValMonitored($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+      @Override boolean invokeremoveValMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
         boolean ret=seqMonitor.seq.remove(monitoredObject);
         if(ret){
           ++seqMonitor.expectedSeqModCount;
-          ++seqMonitor.expectedParentModCount;
-          ++seqMonitor.expectedRootModCount;
           --seqMonitor.expectedSeqSize;
-          --seqMonitor.expectedParentSize;
-          --seqMonitor.expectedRootSize;
-#IF OfRef
-          Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-#ENDIF
         }
         return ret;
       }
-      @Override int invokesearchMonitored($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+      @Override int invokesearchMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search(monitoredObject);
       }
-      @Override int initContainsEnd($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+      @Override int initContainsEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0;i<99;++i){
+        for(int i=0;i<seqSize-1;++i){
           seqMonitor.seq.add(new Object());
         }
         seqMonitor.seq.add(monitoredObject);
-        seqMonitor.expectedSeqModCount+=100;
-        seqMonitor.expectedParentModCount+=100;
-        seqMonitor.expectedRootModCount+=100;
-        seqMonitor.expectedSeqSize+=100;
-        seqMonitor.expectedParentSize+=100;
-        seqMonitor.expectedRootSize+=100;
-        return seqMonitor.expectedSeqSize-1;
+        seqMonitor.expectedSeqModCount+=seqSize;
+        seqMonitor.expectedSeqSize+=seqSize;
+        if(seqMonitor.nestedType.forwardIteration)
+        {
+          return seqMonitor.expectedSeqSize-1;
+        }
+        else
+        {
+          return 0;
+        }
+        
       }
-      @Override int initContainsMiddle($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+      @Override int initContainsMiddle($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0;i<50;++i){
+        for(int i=0,bound=seqSize/2;i<bound;++i){
           seqMonitor.seq.add(new Object());
         }
         seqMonitor.seq.add(monitoredObject);
-        for(int i=51;i<100;++i){
+        for(int i=(seqSize/2)+1;i<seqSize;++i){
           seqMonitor.seq.add(new Object());
         }
-        seqMonitor.expectedSeqModCount+=100;
-        seqMonitor.expectedParentModCount+=100;
-        seqMonitor.expectedRootModCount+=100;
-        seqMonitor.expectedSeqSize+=100;
-        seqMonitor.expectedParentSize+=100;
-        seqMonitor.expectedRootSize+=100;
-        return seqMonitor.expectedSeqSize/2;
+        seqMonitor.expectedSeqModCount+=seqSize;
+        seqMonitor.expectedSeqSize+=seqSize;
+        if(seqMonitor.nestedType.forwardIteration)
+        {
+          return seqMonitor.expectedSeqSize/2;
+        }
+        else
+        {
+          return (seqMonitor.expectedSeqSize/2)-1;
+        }
+        
       }
-      @Override int initContainsBeginning($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+      @Override int initContainsBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
         seqMonitor.seq.add(monitoredObject);
-        for(int i=1;i<100;++i){
+        for(int i=1;i<seqSize;++i){
           seqMonitor.seq.add(new Object());
         }
-        seqMonitor.expectedSeqModCount+=100;
-        seqMonitor.expectedParentModCount+=100;
-        seqMonitor.expectedRootModCount+=100;
-        seqMonitor.expectedSeqSize+=100;
-        seqMonitor.expectedParentSize+=100;
-        seqMonitor.expectedRootSize+=100;
-        return 0;
+        seqMonitor.expectedSeqModCount+=seqSize;
+        seqMonitor.expectedSeqSize+=seqSize;
+        if(seqMonitor.nestedType.forwardIteration)
+        {
+          return 0;
+        }
+        else
+        {
+          return seqMonitor.expectedSeqSize-1;
+        }
       }
     },
 #ENDIF
@@ -228,74 +229,59 @@ class $ClassPrefix$SnglLnkSeqMonitor implements $ClassPrefix$SeqMonitor{
 
 #MACRODEF QueryTesterImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
 BOXED_TYPEVALUE_NAME(false){
-  @Override boolean invokecontainsObject($ClassPrefix$ArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokeremoveValObject($ClassPrefix$ArrSeqMonitor seqMonitor){
+  @Override boolean invokecontainsObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveValObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
     boolean ret=seqMonitor.seq.remove((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
     if(ret){
       ++seqMonitor.expectedSeqModCount;
       --seqMonitor.expectedSeqSize;
-#IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-#ENDIF
     }
     return ret;
   }
-  @Override int invokesearchObject($ClassPrefix$ArrSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokecontainsBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokesearchObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokecontainsBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
 #IFSWITCH BOXED_TYPE==Object
-  @Override boolean invokeremoveValBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){
+  @Override boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
     boolean ret=seqMonitor.seq.remove((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
     if(ret){
       ++seqMonitor.expectedSeqModCount;
       --seqMonitor.expectedSeqSize;
-  #IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-  #ENDIF
     }
     return ret;
   }
 #ELSE
-  @Override boolean invokeremoveValBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){
+  @Override boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
     boolean ret=seqMonitor.seq.removeVal((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
     if(ret){
       ++seqMonitor.expectedSeqModCount;
       --seqMonitor.expectedSeqSize;
-  #IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-  #ENDIF
     }
     return ret;
   }
 #ENDIF
-  @Override int invokesearchBoxed($ClassPrefix$ArrSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokecontainsUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokesearchBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokecontainsUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
 #IFSWITCH PRIMITIVE_TYPE==Object
-  @Override boolean invokeremoveValUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){
+  @Override boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
     boolean ret=seqMonitor.seq.remove((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
     if(ret){
       ++seqMonitor.expectedSeqModCount;
       --seqMonitor.expectedSeqSize;
-  #IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-  #ENDIF
     }
     return ret;
   }
 #ELSE
-  @Override boolean invokeremoveValUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){
+  @Override boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
     boolean ret=seqMonitor.seq.removeVal((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
     if(ret){
       ++seqMonitor.expectedSeqModCount;
       --seqMonitor.expectedSeqSize;
-  #IF OfRef
-      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
-  #ENDIF
     }
     return ret;
   }
 #ENDIF
-  @Override int invokesearchUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  void addEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor){
+  @Override int invokesearchUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  void addEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
 #IF OfRef
     seqMonitor.seq.add((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
     ++seqMonitor.expectedSeqModCount;
@@ -326,7 +312,7 @@ BOXED_TYPEVALUE_NAME(false){
   #ENDIF
 #ENDIF
   }
-  void addNotEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor){
+  void addNotEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
     #IF OfRef
     seqMonitor.seq.add((Object)(boolean)NOT_EQUALS_VAL);
     #ELSE
@@ -342,7 +328,7 @@ BOXED_TYPEVALUE_NAME(false){
     QueryTester(boolean isObjectNonNull){
       this.isObjectNonNull=isObjectNonNull;
     }
-    boolean invokecontains($ClassPrefix$ArrSeqMonitor seqMonitor,QueryCastType queryCastType){
+    boolean invokecontains($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
       switch(queryCastType){
         case Unboxed:
           return invokecontainsUnboxed(seqMonitor);
@@ -354,7 +340,7 @@ BOXED_TYPEVALUE_NAME(false){
           throw new Error("Unknown queryCastType "+queryCastType);
       }
     }
-    boolean invokeremoveVal($ClassPrefix$ArrSeqMonitor seqMonitor,QueryCastType queryCastType){
+    boolean invokeremoveVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
       switch(queryCastType){
         case Unboxed:
           return invokeremoveValUnboxed(seqMonitor);
@@ -366,7 +352,7 @@ BOXED_TYPEVALUE_NAME(false){
           throw new Error("Unknown queryCastType "+queryCastType);
       }
     }
-    int invokesearch($ClassPrefix$ArrSeqMonitor seqMonitor,QueryCastType queryCastType){
+    int invokesearch($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
       switch(queryCastType){
         case Unboxed:
           return invokesearchUnboxed(seqMonitor);
@@ -379,55 +365,55 @@ BOXED_TYPEVALUE_NAME(false){
       }
     }
     
-    abstract boolean invokecontainsObject($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract boolean invokecontainsBoxed($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract boolean invokecontainsUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValObject($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValBoxed($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract int invokesearchObject($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract int invokesearchBoxed($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract int invokesearchUnboxed($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract void addEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor);
-    abstract void addNotEqualsVal($ClassPrefix$ArrSeqMonitor seqMonitor);
-    void initDoesNotContain($ClassPrefix$ArrSeqMonitor seqMonitor){
-      for(int i=0;i<100;++i){
+    abstract boolean invokecontainsObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract boolean invokecontainsBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract boolean invokecontainsUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract int invokesearchObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract int invokesearchBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract int invokesearchUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract void addEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    abstract void addNotEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
+    void initDoesNotContain($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
+      for(int i=0;i<seqSize;++i){
         addNotEqualsVal(seqMonitor);
       }
     }
-    int initContainsEnd($ClassPrefix$ArrSeqMonitor seqMonitor){
+    int initContainsEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
       Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<99;++i){
+      for(int i=0;i<seqSize-1;++i){
         addNotEqualsVal(seqMonitor);
       }
       addEqualsVal(seqMonitor);
       return seqMonitor.expectedSeqSize-1;
     }
-    int initContainsMiddle($ClassPrefix$ArrSeqMonitor seqMonitor){
+    int initContainsMiddle($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
       Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<50;++i){
+      for(int i=0,bound=seqSize/2;i<bound;++i){
         addNotEqualsVal(seqMonitor);
       }
       addEqualsVal(seqMonitor);
-      for(int i=51;i<100;++i){
+      for(int i=(seqSize/2)+1;i<seqSize;++i){
         addNotEqualsVal(seqMonitor);
       }
       return seqMonitor.expectedSeqSize/2;
     }
-    int initContainsBeginning($ClassPrefix$ArrSeqMonitor seqMonitor){
+    int initContainsBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
       addEqualsVal(seqMonitor);
-      for(int i=1;i<100;++i){
+      for(int i=1;i<seqSize;++i){
         addNotEqualsVal(seqMonitor);
       }
       return 0;
     }
 #IF OfRef
-    boolean invokecontainsMonitored($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    boolean invokeremoveValMonitored($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int invokesearchMonitored($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsEnd($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsMiddle($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsBeginning($ClassPrefix$ArrSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    boolean invokecontainsMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    boolean invokeremoveValMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int invokesearchMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int initContainsEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
+    int initContainsMiddle($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
+    int initContainsBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
 #ENDIF
   };
   NestedType nestedType;
@@ -484,6 +470,14 @@ BOXED_TYPEVALUE_NAME(false){
     }
     return ret;
   }
+  public boolean offer(int val,$ClassPrefix$InputTestArgType inputArgType){
+    boolean ret=inputArgType.callQueueOffer(seq,val);
+    if(ret){
+      ++expectedSeqSize;
+      ++expectedSeqModCount;
+    }
+    return ret;
+  }
   public void push(int val,$ClassPrefix$InputTestArgType inputArgType){
     inputArgType.callStackPush(seq,val);
     ++expectedSeqSize;
@@ -526,12 +520,23 @@ BOXED_TYPEVALUE_NAME(false){
     }
   }
   public void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyStackPop(seq,expectedVal);
+    switch(nestedType)
+    {
+      case QUEUE:
+        outputType.verifyQueueRemove(seq,expectedVal);
+        break;
+      case STACK:
+        outputType.verifyStackPop(seq,expectedVal);
+        break; 
+      default:
+        throw new Error("Unknown nested type "+nestedType);
+    }
+   
     --expectedSeqSize;
     ++expectedSeqModCount;
   }
   public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       ++expectedSeqModCount;
@@ -601,7 +606,7 @@ BOXED_TYPEVALUE_NAME(false){
     verifyStructuralIntegrity();
   }
   public void writeObject(ObjectOutputStream oos) throws IOException{
-    oos.writeObject(seq);
+    ((Externalizable)seq).writeExternal(oos);
   }
   public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
     return ois.readObject();
@@ -846,18 +851,18 @@ BOXED_TYPEVALUE_NAME(false){
       return this;
     
     }
-    public SequenceVerificationItr verifyNaturalAscending(int length)
+    public SequenceVerificationItr verifyNaturalAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length)
     {
       if(seqMonitor.nestedType.forwardIteration)
       {
-        return verifyAscending(length);
+        return verifyAscending(v,inputArgType,length);
       }
       else
       {
-        return verifyDescending(length);
+        return verifyDescending(v+length,inputArgType,length);
       }
-       
     }
+   
     
   }
   public UncheckedSnglLnkSeqItrMonitor getItrMonitor(){

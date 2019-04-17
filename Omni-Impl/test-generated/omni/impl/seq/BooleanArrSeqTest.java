@@ -1232,7 +1232,7 @@ public class BooleanArrSeqTest{
     private static void testStackpeek_voidHelper
     (BooleanArrSeqMonitor seqMonitor,BooleanOutputTestArgType outputArgType){
       for(int i=0;i<100;){
-        outputArgType.verifyStackPeek(seqMonitor.seq,i,i);
+        outputArgType.verifyPeek(seqMonitor.seq,i,i);
         seqMonitor.verifyStructuralIntegrity();
         seqMonitor.add(++i);
       }
@@ -3019,7 +3019,7 @@ public class BooleanArrSeqTest{
       }
       verifyItr.skip(seqSize).verifyPostAlloc(1);
     }
-    static Stream<Arguments> gettestreadAndwriteObject_ObjectInputStreamArgs(){
+    static Stream<Arguments> getreadAndwriteObjectArgs(){
       return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
         for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
           if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
@@ -3031,12 +3031,12 @@ public class BooleanArrSeqTest{
       });
     }
     @org.junit.jupiter.api.Test
-    public void testreadAndwriteObject_ObjectInputStream(){
-      gettestreadAndwriteObject_ObjectInputStreamArgs().parallel().map(Arguments::get).forEach(args->{
-          testreadAndwriteObject_ObjectInputStreamHelper((BooleanArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+    public void testreadAndwriteObject(){
+      getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
+          testreadAndwriteObjectHelper((BooleanArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
       });
     }
-    private static void testreadAndwriteObject_ObjectInputStreamHelper
+    private static void testreadAndwriteObjectHelper
     (BooleanArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
     {
       int numToAdd=seqContentsScenario.nonEmpty?100:0;

@@ -2,7 +2,7 @@ package omni.impl;
 import omni.function.BooleanConsumer;
 import omni.util.ToStringUtil;
 import omni.util.TypeUtil;
-public class BooleanSnglLnkNode implements Comparable<BooleanSnglLnkNode>
+public class BooleanSnglLnkNode
 {
   public transient boolean val;
   public transient BooleanSnglLnkNode next;
@@ -137,23 +137,5 @@ public class BooleanSnglLnkNode implements Comparable<BooleanSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(BooleanSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      if(this.val)
-      {
-        if(!that.val)
-        {
-          return 1;
-        }
-      }else if(that.val)
-      {
-        return -1;
-      }
-    }
-    return 0;
   }
 }

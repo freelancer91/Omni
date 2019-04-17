@@ -186,22 +186,4 @@ public class RefSnglLnkNodeTest<E>
        Assertions.assertEquals((Object)TypeConversionUtil.convertToObject(i),(Object)dst[10-i]);
      }
   }
-  @Test
-  public void testCompareTo()
-  {
-    var lessVal=TypeConversionUtil.convertToInteger(100);
-    var lessEqualsVal=TypeConversionUtil.convertToInteger(100);
-    var greaterVal=TypeConversionUtil.convertToInteger(101);
-    var greaterEqualsVal=TypeConversionUtil.convertToInteger(101);
-    var lessNode=new RefSnglLnkNode<Integer>(lessVal);
-    var lessEqualsNode=new RefSnglLnkNode<Integer>(lessEqualsVal);
-    var greaterNode=new RefSnglLnkNode<Integer>(greaterVal);
-    var greaterEqualsNode=new RefSnglLnkNode<Integer>(greaterEqualsVal);
-    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
-    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
-    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
-    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
-  }
 }

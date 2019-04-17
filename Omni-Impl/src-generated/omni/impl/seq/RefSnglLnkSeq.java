@@ -33,7 +33,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       if((marker&word)==0){
         do{
           if(--numRemoved==0){
-            prev.next=null;
+            prev.next=curr.next;
             return;
           }
           if((marker<<=1)==0){
@@ -45,6 +45,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         prev.next=curr;
       }
       if(--numSurvivors==0){
+        curr.next=null;
         return;
       }
       if((marker<<=1)==0){
@@ -77,7 +78,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       if((marker&word)==0){
         do{
           if(--numRemoved==0){
-            prev.next=null;
+            prev.next=curr.next;
             return;
           }
           curr=curr.next;
@@ -85,6 +86,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         prev.next=curr;
       }
       if(--numSurvivors==0){
+        curr.next=null;
         return;
       }
       prev=curr;
@@ -200,7 +202,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     final RefSnglLnkNode<E> head;
     if((head=this.head)!=null){
       RefSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
-    }else{
+    }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
@@ -888,23 +890,30 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     )
     {
       final int modCount=this.modCount;
-      if(nonNull.equals(head.val)){
-        CheckedCollection.checkModCount(modCount,this.modCount);
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        try
-        {
+      try
+      {
+        if(nonNull.equals(head.val)){
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
             if((head=(prev=head).next)==null){
+              CheckedCollection.checkModCount(modCount,this.modCount);
               return false;
             }
           }while(!nonNull.equals(head.val));
-        }
-        finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
+          prev.next=head.next;
         }
-        prev.next=head.next;
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       this.modCount=modCount+1;
       --this.size;
@@ -913,18 +922,18 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
     )
     {
-      if(null==(head.val)){
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+      {
+        if(null==(head.val)){
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(null!=(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -934,18 +943,18 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       ,Predicate<? super E> pred
     )
     {
-      if(pred.test(head.val)){
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+      {
+        if(pred.test(head.val)){
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(!pred.test(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -1362,18 +1371,18 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       ,Object nonNull
     )
     {
-      if(nonNull.equals(head.val)){
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+      {
+        if(nonNull.equals(head.val)){
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(!nonNull.equals(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -1381,18 +1390,18 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
     )
     {
-      if(null==(head.val)){
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+      {
+        if(null==(head.val)){
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(null!=(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -1401,18 +1410,18 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       ,Predicate<? super E> pred
     )
     {
-      if(pred.test(head.val)){
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+      {
+        if(pred.test(head.val)){
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(!pred.test(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -1452,10 +1461,31 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
       //TODO
       return false;
     }
+    @Override public E element(){
+      final RefSnglLnkNode<E> head;
+      if((head=this.head)!=null){
+        return head.val;
+      }
+      throw new NoSuchElementException();
+    }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        final var tail=this.tail;
+        out.writeInt(size=this.size);
+        if(size!=0)
+        {
+          RefSnglLnkNode<E> curr;
+          for(curr=this.head;;curr=curr.next)
+          {
+            out.writeObject(curr.val);
+            if(curr==tail)
+            {
+              return;
+            }
+          }
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -1513,6 +1543,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         ++this.modCount;
         this.head=null;
         this.tail=null;
+        this.size=0;
       }
     }
     @Override public Object clone(){
@@ -1564,7 +1595,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=null;
+              prev.next=curr.next;
               if(curr==tail)
               {
                 this.tail=prev;
@@ -1580,6 +1611,8 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
           prev.next=curr;
         }
         if(--numSurvivors==0){
+          this.tail=curr;
+          curr.next=null;
           return;
         }
         if((marker<<=1)==0){
@@ -1595,7 +1628,7 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=null;
+              prev.next=curr.next;
               if(curr==tail)
               {
                 this.tail=prev;
@@ -1607,6 +1640,8 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
           prev.next=curr;
         }
         if(--numSurvivors==0){
+          this.tail=curr;
+          curr.next=null;
           return;
         }
         prev=curr;
@@ -1677,36 +1712,34 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     ,Object nonNull
     ){
       final int modCount=this.modCount;
-      if(nonNull.equals(head.val))
+      try
       {
-        CheckedCollection.checkModCount(modCount,this.modCount);
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        try
-        {
+        final var tail=this.tail;
+        if(nonNull.equals(head.val)){
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
+              CheckedCollection.checkModCount(modCount,this.modCount);
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(!nonNull.equals((head=(prev=head).next).val));
-        }
-        finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
+      }
+      catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       this.modCount=modCount+1;
       --this.size;
@@ -1714,31 +1747,25 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     }
     @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
     ){
-      if(null==(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+        final var tail=this.tail;
+        if(null==(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(null!=((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -1747,31 +1774,25 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
     ,Predicate<? super E> pred
     ){
-      if(pred.test(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+        final var tail=this.tail;
+        if(pred.test(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(!pred.test((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -2013,62 +2034,50 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     @Override boolean uncheckedremoveValNonNull(RefSnglLnkNode<E> head
     ,Object nonNull
     ){
-      if(nonNull.equals(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+        final var tail=this.tail;
+        if(nonNull.equals(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(!nonNull.equals((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       --this.size;
       return true;
     }
     @Override boolean uncheckedremoveValNull(RefSnglLnkNode<E> head
     ){
-      if(null==(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+        final var tail=this.tail;
+        if(null==(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(null!=((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -2076,31 +2085,25 @@ public abstract class RefSnglLnkSeq<E> implements OmniCollection.OfRef<E>,Clonea
     @Override boolean uncheckedremoveVal(RefSnglLnkNode<E> head
     ,Predicate<? super E> pred
     ){
-      if(pred.test(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        RefSnglLnkNode<E> prev;
-        {
+        final var tail=this.tail;
+        if(pred.test(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          RefSnglLnkNode<E> prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(!pred.test((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       --this.size;
       return true;

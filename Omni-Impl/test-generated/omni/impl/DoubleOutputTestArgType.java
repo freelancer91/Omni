@@ -3,9 +3,11 @@ import omni.util.TypeConversionUtil;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.OmniArray;
+import omni.util.PeekAndPollIfc;
 import org.junit.jupiter.api.Assertions;
 public enum DoubleOutputTestArgType{
   ARRAY_TYPE{
@@ -33,22 +35,28 @@ public enum DoubleOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((OmniStack.OfDouble)col).pollDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).pollDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniStack.OfDouble)col).pollDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).pollDouble());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((OmniStack.OfDouble)col).peekDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).peekDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniStack.OfDouble)col).peekDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).peekDouble());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfDouble col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniStack.OfDouble)col).popDouble());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfDouble col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniQueue.OfDouble)col).doubleElement());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfDouble col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((OmniQueue.OfDouble)col).removeDouble());
     }
   }
   ,
@@ -77,22 +85,28 @@ public enum DoubleOutputTestArgType{
         }
       }
     }
-    @Override public void verifyStackPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
+    @Override public void verifyPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(null,((OmniStack.OfDouble)col).poll());
+        Assertions.assertNull(((PeekAndPollIfc<?>)col).poll());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((OmniStack.OfDouble)col).poll());
+        Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((PeekAndPollIfc<?>)col).poll());
       }
     }
-    @Override public void verifyStackPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
+    @Override public void verifyPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(null,((OmniStack.OfDouble)col).peek());
+        Assertions.assertNull(((PeekAndPollIfc<?>)col).peek());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((OmniStack.OfDouble)col).peek());
+        Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((PeekAndPollIfc<?>)col).peek());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfDouble col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((OmniStack.OfDouble)col).pop());
+    }
+    @Override public void verifyQueueElement(OmniCollection.OfDouble col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((OmniQueue.OfDouble)col).element());
+    }
+    @Override public void verifyQueueRemove(OmniCollection.OfDouble col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(expectedVal),((OmniQueue.OfDouble)col).remove());
     }
   }
   ;
@@ -101,8 +115,10 @@ public enum DoubleOutputTestArgType{
   public abstract void verifyListRemoveAt(OmniCollection.OfDouble col,int index,int valToConvert);
   public abstract void verifyListGet(OmniCollection.OfDouble col,int index,int valToConvert);
   public abstract void verifyToArray(OmniCollection.OfDouble col,int expectedSize);
-  public abstract void verifyStackPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal);
+  public abstract void verifyPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal);
   public abstract void verifyStackPop(OmniCollection.OfDouble col,int expectedVal);
-  public abstract void verifyStackPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal);
+  public abstract void verifyQueueRemove(OmniCollection.OfDouble col,int expectedVal);
+  public abstract void verifyQueueElement(OmniCollection.OfDouble col,int expectedVal);
+  public abstract void verifyPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal);
   //TODO other method tests
 }

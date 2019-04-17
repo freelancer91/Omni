@@ -207,22 +207,4 @@ public class ShortSnglLnkNodeTest
        Assertions.assertEquals((Object)TypeConversionUtil.convertToint(i),(Object)dst[10-i]);
      }
   }
-  @Test
-  public void testCompareTo()
-  {
-    short lessVal=0;
-    short lessEqualsVal=0;
-    short greaterVal=1;
-    short greaterEqualsVal=1;
-    var lessNode=new ShortSnglLnkNode(lessVal);
-    var lessEqualsNode=new ShortSnglLnkNode(lessEqualsVal);
-    var greaterNode=new ShortSnglLnkNode(greaterVal);
-    var greaterEqualsNode=new ShortSnglLnkNode(greaterEqualsVal);
-    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
-    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
-    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
-    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
-  }
 }

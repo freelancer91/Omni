@@ -6838,7 +6838,7 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
     ++expectedRootModCount;
   }
   public void poll(int expectedVal,BooleanOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

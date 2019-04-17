@@ -207,22 +207,4 @@ public class DoubleSnglLnkNodeTest
        Assertions.assertEquals((Object)TypeConversionUtil.convertToDouble(i),(Object)dst[10-i]);
      }
   }
-  @Test
-  public void testCompareTo()
-  {
-    double lessVal=0;
-    double lessEqualsVal=0;
-    double greaterVal=1;
-    double greaterEqualsVal=1;
-    var lessNode=new DoubleSnglLnkNode(lessVal);
-    var lessEqualsNode=new DoubleSnglLnkNode(lessEqualsVal);
-    var greaterNode=new DoubleSnglLnkNode(greaterVal);
-    var greaterEqualsNode=new DoubleSnglLnkNode(greaterEqualsVal);
-    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
-    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
-    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
-    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
-  }
 }

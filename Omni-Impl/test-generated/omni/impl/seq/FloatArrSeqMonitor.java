@@ -6848,7 +6848,7 @@ class FloatArrSeqMonitor implements FloatSeqMonitor{
     ++expectedRootModCount;
   }
   public void poll(int expectedVal,FloatOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

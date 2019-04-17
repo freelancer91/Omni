@@ -1,7 +1,7 @@
 package omni.impl;
 import java.util.function.IntConsumer;
 import omni.util.ToStringUtil;
-public class IntSnglLnkNode implements Comparable<IntSnglLnkNode>
+public class IntSnglLnkNode
 {
   public transient int val;
   public transient IntSnglLnkNode next;
@@ -104,22 +104,5 @@ public class IntSnglLnkNode implements Comparable<IntSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(IntSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      int thisVal,thatVal;
-      if((thisVal=this.val)<(thatVal=that.val))
-      {
-        return -1;
-      }
-      if(thisVal>thatVal)
-      {
-        return 1;
-      }
-    }
-    return 0;
   }
 }

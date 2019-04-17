@@ -1,7 +1,7 @@
 package omni.impl;
 import java.util.function.LongConsumer;
 import omni.util.ToStringUtil;
-public class LongSnglLnkNode implements Comparable<LongSnglLnkNode>
+public class LongSnglLnkNode
 {
   public transient long val;
   public transient LongSnglLnkNode next;
@@ -96,22 +96,5 @@ public class LongSnglLnkNode implements Comparable<LongSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(LongSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      long thisVal,thatVal;
-      if((thisVal=this.val)<(thatVal=that.val))
-      {
-        return -1;
-      }
-      if(thisVal>thatVal)
-      {
-        return 1;
-      }
-    }
-    return 0;
   }
 }

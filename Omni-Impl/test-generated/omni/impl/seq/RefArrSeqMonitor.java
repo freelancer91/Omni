@@ -7308,7 +7308,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
     Assertions.assertNull(root.arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
   }
   public void poll(int expectedVal,RefOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

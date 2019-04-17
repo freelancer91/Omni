@@ -29,7 +29,7 @@ import omni.util.HashUtil;
 import omni.util.TypeUtil;
 #ENDIF
 
-public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
+public class $SNode$$<E>$
 {
   public transient $exposedType$ val;
   public transient $SNode$$<E>$ next;
@@ -162,45 +162,6 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
     #ENDIF
   #ENDIF
 #ENDIF
-#IF OfRef
-  @SuppressWarnings("unchecked")
-#ENDIF
-  @Override
-  public int compareTo($SNode$$<E>$ that)
-  {
-    if(this!=that)
-    {
-#IF OfBoolean
-      if(this.val)
-      {
-        if(!that.val)
-        {
-          return 1;
-        }
-      }else if(that.val)
-      {
-        return -1;
-      }
-#ELSEIF OfByte,OfShort,OfChar
-      return this.val-that.val;
-#ELSEIF OfInt,OfLong
-      $exposedType$ thisVal,thatVal;
-      if((thisVal=this.val)<(thatVal=that.val))
-      {
-        return -1;
-      }
-      if(thisVal>thatVal)
-      {
-        return 1;
-      }
-#ELSEIF OfFloat,OfDouble
-      return $BoxedType$.compare(this.val,that.val);
-#ELSE
-      return ((Comparable$<E>$)this.val).compareTo(that.val);
-#ENDIF
-    }
-    return 0;
-  }
 }
 #MACRODEF UncheckedToArrayImpl(DSTARR,CAST)
 public static $<E>$ void uncheckedCopyInto($SNode$$<E>$ curr,DSTARR[] dst){

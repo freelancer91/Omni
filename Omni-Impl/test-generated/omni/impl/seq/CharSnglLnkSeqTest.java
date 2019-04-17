@@ -587,42 +587,763 @@ public class CharSnglLnkSeqTest{
       return;
     }else{
       Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+      //TODO verify contents of sequence in throw cases 
     }
-    var verifyItr=seqMonitor.verifyPreAlloc(!seqMonitor.nestedType.forwardIteration &&(monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ModSeq ||  monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ThrowModSeq)?PreModScenario.ModSeq:null);
-    if(seqMonitor.nestedType.forwardIteration){
-      var cloneItr=clone.iterator();
-      while(cloneItr.hasNext()){
-        verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextChar());
+  }
+  @org.junit.jupiter.api.Test
+  public void testclone_void(){
+    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
+        testclone_voidHelper((CharSnglLnkSeqMonitor)args[0],(int)args[1]);
+    });
+  }
+  private static void testclone_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var clone=(OmniCollection.OfChar)seqMonitor.seq.clone();
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+    Assertions.assertNotSame(clone,seqMonitor.seq);
+    switch(seqMonitor.nestedType){
+      case STACK:
+        if(seqMonitor.checkedType.checked){
+          Assertions.assertTrue(clone instanceof CharSnglLnkSeq.CheckedStack);
+          Assertions.assertEquals(0,((CharSnglLnkSeq.CheckedStack)clone).modCount);
+        }else{
+          Assertions.assertTrue(clone instanceof CharSnglLnkSeq.UncheckedStack);
+        }
+        break;
+      case QUEUE:
+        if(seqMonitor.checkedType.checked){
+          Assertions.assertTrue(clone instanceof CharSnglLnkSeq.CheckedQueue);
+          Assertions.assertEquals(0,((CharSnglLnkSeq.CheckedQueue)clone).modCount);
+        }else{
+          Assertions.assertTrue(clone instanceof CharSnglLnkSeq.UncheckedQueue);
+        }
+        break;
+      default:
+        throw new Error("Unknown nested type "+seqMonitor.nestedType);
+    }
+    var snglLnkSeqClone=(CharSnglLnkSeq)clone;
+    var originalHead=((CharSnglLnkSeq)seqMonitor.seq).head;
+    var cloneHead=snglLnkSeqClone.head;
+    Assertions.assertEquals(numToAdd,snglLnkSeqClone.size);
+    if(snglLnkSeqClone.size==0)
+    {
+      Assertions.assertNull(cloneHead);
+      if(seqMonitor.nestedType==NestedType.QUEUE)
+      {
+        if(seqMonitor.checkedType.checked)
+        {
+          Assertions.assertNull(((CharSnglLnkSeq.CheckedQueue)snglLnkSeqClone).tail);
+        }
+        else
+        {
+          Assertions.assertNull(((CharSnglLnkSeq.UncheckedQueue)snglLnkSeqClone).tail);
+        }
+      }
+    }
+    else
+    {
+      for(int i=snglLnkSeqClone.size;;cloneHead=cloneHead.next,originalHead=originalHead.next)
+      {
+        Assertions.assertNotNull(cloneHead);
+        Assertions.assertNotSame(cloneHead,originalHead);
+        Assertions.assertEquals(cloneHead.val,originalHead.val);
+        if(--i==0)
+        {
+          if(seqMonitor.nestedType==NestedType.QUEUE)
+          {
+            if(seqMonitor.checkedType.checked)
+            {
+              Assertions.assertSame(cloneHead,((CharSnglLnkSeq.CheckedQueue)snglLnkSeqClone).tail);
+            }
+            else
+            {
+              Assertions.assertSame(cloneHead,((CharSnglLnkSeq.UncheckedQueue)snglLnkSeqClone).tail);
+            }
+          }
+          Assertions.assertNull(cloneHead.next);
+          Assertions.assertNull(originalHead.next);
+          break;
+        }
+      }
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testsize_void(){
+    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
+        testsize_voidHelper((CharSnglLnkSeqMonitor)args[0],(int)args[1]);
+    });
+  }
+  private static void testsize_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      Assertions.assertEquals(i,seqMonitor.seq.size());
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getItrMonitor();
+    while(numToAdd>0){
+      Assertions.assertEquals(numToAdd--,seqMonitor.seq.size());
+      seqMonitor.verifyStructuralIntegrity();
+      itrMonitor.iterateForward();
+      itrMonitor.remove();
+    }
+    Assertions.assertEquals(numToAdd,seqMonitor.seq.size());
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testisEmpty_void(){
+    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
+        testisEmpty_voidHelper((CharSnglLnkSeqMonitor)args[0],(int)args[1]);
+    });
+  }
+  private static void testisEmpty_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      Assertions.assertEquals(i==0,seqMonitor.seq.isEmpty());
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getItrMonitor();
+    while(numToAdd>0){
+      Assertions.assertEquals((numToAdd--)==0,seqMonitor.seq.isEmpty());
+      seqMonitor.verifyStructuralIntegrity();
+      itrMonitor.iterateForward();
+      itrMonitor.remove();
+    }
+    Assertions.assertTrue(seqMonitor.seq.isEmpty());
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+  }
+  static Stream<Arguments> getadd_valArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(var inputArgType:CharInputTestArgType.values()){
+        streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),inputArgType));
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testadd_val(){
+    getadd_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testadd_valHelper((CharSnglLnkSeqMonitor)args[0],(CharInputTestArgType)args[1]);
+    });
+  }
+  private static void testadd_valHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seqMonitor.add(i,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+  }
+  static Stream<Arguments> getStackpush_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var inputArgType:CharInputTestArgType.values()){
+        builder.accept(Arguments.of(new CharSnglLnkSeqMonitor(NestedType.STACK,checkedType),inputArgType));
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testStackpush_val(){
+    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testStackpush_valHelper((CharSnglLnkSeqMonitor)args[0],(CharInputTestArgType)args[1]);
+    });
+  }
+  private static void testStackpush_valHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.push(i,inputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+  }
+  static Stream<Arguments> getQueueoffer_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var inputArgType:CharInputTestArgType.values()){
+        builder.accept(Arguments.of(new CharSnglLnkSeqMonitor(NestedType.QUEUE,checkedType),inputArgType));
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueoffer_val(){
+    getQueueoffer_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testQueueoffer_valHelper((CharSnglLnkSeqMonitor)args[0],(CharInputTestArgType)args[1]);
+    });
+  }
+  private static void testQueueoffer_valHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testcontains_val(){
+    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
+        testcontains_valHelper((CharSnglLnkSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
+        );
+    });
+  }
+  private static void testcontains_valHelper
+  (CharSnglLnkSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+  ){
+    if(seqSize>0){
+      {
+        switch(seqLocation){
+          case BEGINNING:
+            argType.initContainsBeginning(seqMonitor,seqSize);
+            break;
+          case MIDDLE:
+            argType.initContainsMiddle(seqMonitor,seqSize);
+            break;
+          case END:
+            argType.initContainsEnd(seqMonitor,seqSize);
+            break;
+          case IOBHI:
+            argType.initDoesNotContain(seqMonitor,seqSize);
+            break;
+          default:
+            throw new Error("Unknown seqLocation "+seqLocation);
+        }
+      }
+    }
+    Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokecontains(seqMonitor,queryCastType));
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testsearch_val(){
+    getQueryStackArguments().parallel().map(Arguments::get).forEach(args->{
+        testsearch_valHelper((CharSnglLnkSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
+        );
+    });
+  }
+  private static void testsearch_valHelper
+  (CharSnglLnkSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+  ){
+    int expectedIndex;
+    if(seqSize>0){
+      {
+        switch(seqLocation){
+          case BEGINNING:
+            expectedIndex=argType.initContainsBeginning(seqMonitor,seqSize);
+            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            break;
+          case MIDDLE:
+            expectedIndex=argType.initContainsMiddle(seqMonitor,seqSize);
+            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            break;
+          case END:
+            expectedIndex=argType.initContainsEnd(seqMonitor,seqSize);
+            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            break;
+          case IOBHI:
+            argType.initDoesNotContain(seqMonitor,seqSize);
+            expectedIndex=-1;
+            break;
+          default:
+            throw new Error("Unknown seqLocation "+seqLocation);
+        }
       }
     }else{
-      if(monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ModSeq){
-        //tricky to verify
-        //skip it
+      expectedIndex=-1;
+    }
+    Assertions.assertEquals(expectedIndex,argType.invokesearch(seqMonitor,queryCastType));
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveVal_val(){
+    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
+        testremoveVal_valHelper((CharSnglLnkSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
+        );
+    });
+  }
+  private static void testremoveVal_valHelper
+  (CharSnglLnkSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+  ){
+    if(seqSize>0){
+      {
+        switch(seqLocation){
+          case BEGINNING:
+            argType.initContainsBeginning(seqMonitor,seqSize);
+            break;
+          case MIDDLE:
+            argType.initContainsMiddle(seqMonitor,seqSize);
+            break;
+          case END:
+            argType.initContainsEnd(seqMonitor,seqSize);
+            break;
+          case IOBHI:
+            argType.initDoesNotContain(seqMonitor,seqSize);
+            break;
+          default:
+            throw new Error("Unknown seqLocation "+seqLocation);
+        }
+      }
+    }
+    boolean expectedResult;
+    Assertions.assertEquals(expectedResult=seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveVal(seqMonitor,queryCastType));
+    if(expectedResult){
+      --seqSize;
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpeek_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpeek_voidHelper((CharSnglLnkSeqMonitor)args[0],(CharOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpeek_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharOutputTestArgType outputArgType){
+    if(seqMonitor.nestedType.forwardIteration)
+    {
+      for(int i=0;i<100;++i){
+        seqMonitor.add(i);
+      }
+      for(int i=0;i<100;++i){
+        outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.pop(i,outputArgType);
+      }
+      outputArgType.verifyPeek(seqMonitor.seq,0,0);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    else
+    {
+      for(int i=0;i<100;){
+        outputArgType.verifyPeek(seqMonitor.seq,i,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.add(++i);
+      }
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testpoll_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpoll_voidHelper((CharSnglLnkSeqMonitor)args[0],(CharOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpoll_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    if(seqMonitor.nestedType.forwardIteration)
+    {
+      for(int i=0;i<100;++i){
+        seqMonitor.poll(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    else
+    {
+      for(int i=100;--i>=0;){
+        seqMonitor.poll(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    seqMonitor.poll(0,outputArgType);
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpop_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpop_voidHelper((CharSnglLnkSeqMonitor)args[0],(CharOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpop_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    if(seqMonitor.nestedType.forwardIteration)
+    {
+      for(int i=0;i<100;++i){
+        seqMonitor.pop(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    else
+    {
+      for(int i=100;--i>=0;){
+        seqMonitor.pop(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  static Stream<Arguments> getreadAndwriteObjectArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(monitoredFunctionGen.appliesToRoot)){
+          for(int seqSize:new int[]{0,1,100}){
+            streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize
+            ));
+          }
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testreadAndwriteObject(){
+    getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
+        testreadAndwriteObjectHelper((CharSnglLnkSeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]
+        );
+    });
+  }
+  private static void testreadAndwriteObjectHelper
+  (CharSnglLnkSeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd
+  )
+  {
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    final File file;
+    try
+    {
+      file=Files.createTempFile(null,null).toFile();
+    } 
+    catch(Exception e)
+    {
+      Assertions.fail(e);
+      return;
+    }
+    if(monitoredFunctionGen.expectedException==null){
+      try(var oos=new ObjectOutputStream(new FileOutputStream(file));)
+      {
+        oos.writeObject(seqMonitor.seq);
+      }
+      catch(Exception e)
+      {
+        Assertions.fail(e);
+      }
+      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+      OmniCollection.OfChar readCol=null;
+      try(var ois=new ObjectInputStream(new FileInputStream(file));)
+      {
+        readCol=(OmniCollection.OfChar)ois.readObject();
+      }
+      catch(Exception e)
+      {
+        Assertions.fail(e);
         return;
       }
-      var arr=clone.toCharArray();
-      for(int i=arr.length;--i>=0;){
-         verifyItr.verifyLiteralIndexAndIterate(arr[i]);
+      var itr=readCol.iterator();
+      if(seqMonitor.nestedType.forwardIteration)
+      {
+        for(int i=0;i<numToAdd;++i)
+        {
+          Assertions.assertEquals(TypeConversionUtil.convertTochar(i),itr.nextChar());
+        }
+      }
+      else
+      {
+        for(int i=0;i<numToAdd;++i)
+        {
+          Assertions.assertEquals(TypeConversionUtil.convertTochar(numToAdd-i-1),itr.nextChar());
+        }
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }else{
+      Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
+        try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(file,seqMonitor);)
+        {
+          seqMonitor.writeObject(moos);
+        }
+      });
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  static Stream<Arguments> gettoArray_voidArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(int seqSize:new int[]{0,1,100}){
+        for(var outputArgType:CharOutputTestArgType.values()){
+          streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),seqSize,outputArgType));
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_void(){
+    gettoArray_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoArray_voidHelper((CharSnglLnkSeqMonitor)args[0],(int)args[1],(CharOutputTestArgType)args[2]);
+    });
+  }
+  private static void testtoArray_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,int numToAdd,CharOutputTestArgType outputArgType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    outputArgType.verifyToArray(seqMonitor.seq,numToAdd);
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testclear_void(){
+    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
+        testclear_voidHelper((CharSnglLnkSeqMonitor)args[0],(int)args[1]);
+    });
+  }
+  private static void testclear_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.clear();
+    seqMonitor.verifyStructuralIntegrity();
+    Assertions.assertTrue(seqMonitor.seq.isEmpty());
+    seqMonitor.verifyPreAlloc().verifyPostAlloc();
+  }
+  static Stream<Arguments> getQueueelement_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var outputType:CharOutputTestArgType.values()){
+        builder.accept(Arguments.of(new CharSnglLnkSeqMonitor(NestedType.QUEUE,checkedType),outputType));
       }
     }
-    if(seqMonitor.nestedType.forwardIteration && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.ThrowModSeq)
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueelement_void(){
+    getQueueelement_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testQueueelement_voidHelper((CharSnglLnkSeqMonitor)args[0],(CharOutputTestArgType)args[1]);
+    });
+  }
+  private static void testQueueelement_voidHelper
+  (CharSnglLnkSeqMonitor seqMonitor,CharOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i)
     {
-      verifyItr.verifyPostAlloc(); 
+      seqMonitor.add(i);
     }
-    switch(monitoredRemoveIfPredicateGen){
-      case Random:
-      case RemoveAll:
-      case RemoveNone:
+    for(int i=0;i<100;++i){
+      outputArgType.verifyQueueElement(seqMonitor.seq,i);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.pop(i,outputArgType);
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  static Stream<Arguments> gettoArray_IntFunctionArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&monitoredFunctionGen.appliesToRoot){
+          for(int seqSize:new int[]{0,1,100}){
+            streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize));
+          }
+        }
+      }   
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_IntFunction(){
+    gettoArray_IntFunctionArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoArray_IntFunctionHelper((CharSnglLnkSeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]);
+    });
+  }
+  private static void testtoArray_IntFunctionHelper
+  (CharSnglLnkSeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var arrConstructor=monitoredFunctionGen.getMonitoredArrayConstructor(seqMonitor);
+    if(monitoredFunctionGen.expectedException==null){
+      var resultArr=seqMonitor.seq.toArray(arrConstructor);
+      Assertions.assertEquals(numToAdd,resultArr.length);
+      var itr=seqMonitor.seq.iterator();
+      for(int i=0;i<numToAdd;++i){
+        Assertions.assertEquals(resultArr[i],(Object)itr.nextChar());
+      }
+    }else{
+       Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.seq.toArray(arrConstructor));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    var verifyItr=seqMonitor.verifyPreAlloc();
+    switch(monitoredFunctionGen){
+      case NoThrow:
       case Throw:
-        verifyItr.verifyPostAlloc();
+        verifyItr.verifyNaturalAscending(numToAdd);
         break;
       case ModSeq:
       case ThrowModSeq:
-        //The nature of concurrent modification makes verifying the contents of the array tricky due to array reallocations
-        //skip it in this scenario
+        if(seqMonitor.nestedType.forwardIteration){
+          verifyItr.verifyAscending(numToAdd).verifyIllegalAdd();
+        }else{
+          verifyItr.verifyIllegalAdd().verifyDescending(numToAdd);
+        }
         break;
       default:
-        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+        throw new Error("Unknown monitoredFunctionGen "+monitoredFunctionGen);
+    }
+    verifyItr.verifyPostAlloc();
+  }
+  static Stream<Arguments> gettoArray_ObjectArrayArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(int seqSize=0;seqSize<=15;seqSize+=5){
+        for(int arrSize=0;arrSize<=20;arrSize+=5){
+          streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),seqSize,arrSize));
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_ObjectArray(){
+    gettoArray_ObjectArrayArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoArray_ObjectArrayHelper((CharSnglLnkSeqMonitor)args[0],(int)args[1],(int)args[2]);
+    });
+  }
+  private static void testtoArray_ObjectArrayHelper
+  (CharSnglLnkSeqMonitor seqMonitor,int seqSize,int arrSize){
+    for(int i=0;i<seqSize;++i){
+      seqMonitor.add(i);
+    }
+    Character[] paramArr=new Character[arrSize];
+    for(int i=seqSize,bound=seqSize+arrSize;i<bound;++i){
+      paramArr[i-seqSize]=TypeConversionUtil.convertToCharacter(i);
+    }
+    var resultArr=seqMonitor.seq.toArray(paramArr);
+    seqMonitor.verifyStructuralIntegrity();
+    if(arrSize<seqSize){
+      Assertions.assertNotSame(paramArr,resultArr);
+      Assertions.assertEquals(seqSize,resultArr.length);
+    }
+    else if(arrSize>seqSize){
+      Assertions.assertSame(paramArr,resultArr);
+      Assertions.assertNull(resultArr[seqSize]);
+      for(int i=seqSize+1;i<arrSize;++i){
+        Assertions.assertEquals(TypeConversionUtil.convertToCharacter(i+seqSize),resultArr[i]);
+      }
+    }else{
+      Assertions.assertSame(paramArr,resultArr);
+    }
+    var itr=seqMonitor.seq.iterator();
+    for(int i=0;i<seqSize;++i){
+      Assertions.assertEquals((Object)itr.nextChar(),resultArr[i]);
+    }
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(seqSize).verifyPostAlloc();
+  }
+  static Stream<Arguments> getPeekPollAndPopArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+      for(var outputType:CharOutputTestArgType.values()){
+        streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),outputType));
+      }
+    });
+  }
+  static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
+    for(var checkedType:CheckedType.values()){
+      for(var seqLocation:SequenceLocation.values()){
+        if(seqLocation!=SequenceLocation.IOBLO){
+          for(int seqSize:new int[]{0,1,100}){
+            if(seqLocation==SequenceLocation.IOBHI || (seqSize>1 || (seqLocation==SequenceLocation.BEGINNING && seqSize>0))){
+              for(var argType:QueryTester.values()){
+                for(var queryCastType:QueryCastType.values()){
+                  switch(argType){
+                    case Booleannull:
+                    case Bytenull:
+                    case Characternull:
+                    case Shortnull:
+                    case Integernull:
+                    case Longnull:
+                    case Floatnull:
+                    case Doublenull:
+                      if(queryCastType!=QueryCastType.ToBoxed || (seqSize>0 && seqLocation.expectedException==null)){
+                        continue;
+                      }
+                      break;
+                    case Objectnull:
+                      if(queryCastType!=QueryCastType.ToObject || (seqSize>0 && seqLocation.expectedException==null)){
+                        continue;
+                      }
+                      break;
+                    case Booleanfalse:
+                    case Byte0:
+                    case Character0:
+                    case Short0:
+                    case Integer0:
+                    case Long0:
+                    case Floatpos0:
+                    case Floatneg0:
+                    case Doublepos0:
+                    case Doubleneg0:
+                    case Booleantrue:
+                    case Bytepos1:
+                    case Characterpos1:
+                    case Shortpos1:
+                    case Integerpos1:
+                    case Longpos1:
+                    case Floatpos1:
+                    case Doublepos1:
+                    //values beyond the range of boolean
+                    case Bytepos2:
+                    case Characterpos2:
+                    case Shortpos2:
+                    case Integerpos2:
+                    case Longpos2:
+                    case Floatpos2:
+                    case Doublepos2:
+                    //positive values out of the range of byte
+                    case CharacterMAX_BYTE_PLUS1:
+                    case ShortMAX_BYTE_PLUS1:
+                    case IntegerMAX_BYTE_PLUS1:
+                    case LongMAX_BYTE_PLUS1:
+                    case FloatMAX_BYTE_PLUS1:
+                    case DoubleMAX_BYTE_PLUS1:
+                    //positive values out of the range of short
+                    case CharacterMAX_SHORT_PLUS1:
+                    case IntegerMAX_SHORT_PLUS1:
+                    case LongMAX_SHORT_PLUS1:
+                    case FloatMAX_SHORT_PLUS1:
+                    case DoubleMAX_SHORT_PLUS1:
+                    //these input values cannot potentially return true
+                    break;
+                    default:
+                    if(seqSize>0 && seqLocation.expectedException==null){
+                      continue;
+                    }
+                    //these values must necessarily return false
+                  }
+                  builder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize));
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
+  static Stream<Arguments> getQueryStackArguments(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    buildQueryArguments(builder,NestedType.STACK);
+    return builder.build();
+  }
+  static Stream<Arguments> getQueryCollectionArguments(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      buildQueryArguments(builder,nestedType);
+    }
+    return builder.build();
+  }
+static Stream<Arguments> getBasicCollectionTestArgs(){
+  return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
+    for(int seqSize:new int[]{0,1,100}){
+      streamBuilder.accept(Arguments.of(new CharSnglLnkSeqMonitor(nestedType,checkedType),seqSize));
+    }
+  });
+}
 }

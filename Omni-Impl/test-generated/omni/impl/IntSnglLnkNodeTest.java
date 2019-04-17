@@ -196,22 +196,4 @@ public class IntSnglLnkNodeTest
        Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(i),(Object)dst[10-i]);
      }
   }
-  @Test
-  public void testCompareTo()
-  {
-    int lessVal=0;
-    int lessEqualsVal=0;
-    int greaterVal=1;
-    int greaterEqualsVal=1;
-    var lessNode=new IntSnglLnkNode(lessVal);
-    var lessEqualsNode=new IntSnglLnkNode(lessEqualsVal);
-    var greaterNode=new IntSnglLnkNode(greaterVal);
-    var greaterEqualsNode=new IntSnglLnkNode(greaterEqualsVal);
-    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
-    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
-    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
-    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
-    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
-  }
 }

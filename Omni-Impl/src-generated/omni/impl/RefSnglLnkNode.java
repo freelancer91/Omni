@@ -2,7 +2,7 @@ package omni.impl;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Consumer;
-public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
+public class RefSnglLnkNode<E>
 {
   public transient E val;
   public transient RefSnglLnkNode<E> next;
@@ -94,15 +94,5 @@ public class RefSnglLnkNode<E> implements Comparable<RefSnglLnkNode<E>>
         return;
       }
     }
-  }
-  @SuppressWarnings("unchecked")
-  @Override
-  public int compareTo(RefSnglLnkNode<E> that)
-  {
-    if(this!=that)
-    {
-      return ((Comparable<E>)this.val).compareTo(that.val);
-    }
-    return 0;
   }
 }

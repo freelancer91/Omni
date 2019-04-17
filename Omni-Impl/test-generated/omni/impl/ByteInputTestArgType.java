@@ -3,10 +3,12 @@ import omni.util.TypeConversionUtil;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.api.OmniQueue;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 public enum ByteInputTestArgType{
   ARRAY_TYPE{
+    public boolean callQueueOffer(OmniCollection.OfByte seq,int valToConvert){return ((OmniQueue.OfByte)seq).offer(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfByte itr,int valToConvert){itr.add(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListItrSet(OmniListIterator.OfByte itr,int valToConvert){itr.set(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListPut(OmniCollection.OfByte seq,int index,int valToConvert){((OmniList.OfByte)seq).put(index,TypeConversionUtil.convertTobyte(valToConvert));}
@@ -17,6 +19,7 @@ public enum ByteInputTestArgType{
   }
   ,
   BOXED_TYPE{
+    public boolean callQueueOffer(OmniCollection.OfByte seq,int valToConvert){return ((OmniQueue.OfByte)seq).offer(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfByte itr,int valToConvert){itr.add(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListItrSet(OmniListIterator.OfByte itr,int valToConvert){itr.set(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListPut(OmniCollection.OfByte seq,int index,int valToConvert){((OmniList.OfByte)seq).put(index,TypeConversionUtil.convertToByte(valToConvert));}
@@ -27,6 +30,7 @@ public enum ByteInputTestArgType{
   }
   ,
   PRIMITIVE_BOOLEAN{
+    public boolean callQueueOffer(OmniCollection.OfByte seq,int valToConvert){return ((OmniQueue.OfByte)seq).offer(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfByte itr,int valToConvert){itr.add(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfByte itr,int valToConvert){itr.set(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListPut(OmniCollection.OfByte seq,int index,int valToConvert){((OmniList.OfByte)seq).put(index,TypeConversionUtil.convertToboolean(valToConvert));}
@@ -37,6 +41,7 @@ public enum ByteInputTestArgType{
   }
   ,
   BOXED_BOOLEAN{
+    public boolean callQueueOffer(OmniCollection.OfByte seq,int valToConvert){return ((OmniQueue.OfByte)seq).offer(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfByte itr,int valToConvert){itr.add(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfByte itr,int valToConvert){itr.set(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListPut(OmniCollection.OfByte seq,int index,int valToConvert){((OmniList.OfByte)seq).put(index,TypeConversionUtil.convertToBoolean(valToConvert));}
@@ -46,6 +51,7 @@ public enum ByteInputTestArgType{
     public void verifyVal(int expectedValToConvert,byte actualVal){Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedValToConvert),actualVal);}
   }
   ;
+    public abstract boolean callQueueOffer(OmniCollection.OfByte seq,int valToConvert);
     public abstract void callListItrAdd(OmniListIterator.OfByte itr,int valToConvert);
     public abstract void callListItrSet(OmniListIterator.OfByte itr,int valToConvert);
     public abstract void callListPut(OmniCollection.OfByte seq,int index,int valToConvert);

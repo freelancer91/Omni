@@ -6848,7 +6848,7 @@ class ShortArrSeqMonitor implements ShortSeqMonitor{
     ++expectedRootModCount;
   }
   public void poll(int expectedVal,ShortOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;

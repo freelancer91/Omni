@@ -1,7 +1,7 @@
 package omni.impl;
 import omni.function.ByteConsumer;
 import omni.util.ToStringUtil;
-public class ByteSnglLnkNode implements Comparable<ByteSnglLnkNode>
+public class ByteSnglLnkNode
 {
   public transient byte val;
   public transient ByteSnglLnkNode next;
@@ -120,14 +120,5 @@ public class ByteSnglLnkNode implements Comparable<ByteSnglLnkNode>
         return;
       }
     }
-  }
-  @Override
-  public int compareTo(ByteSnglLnkNode that)
-  {
-    if(this!=that)
-    {
-      return this.val-that.val;
-    }
-    return 0;
   }
 }

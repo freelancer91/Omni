@@ -37,7 +37,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       if((marker&word)==0){
         do{
           if(--numRemoved==0){
-            prev.next=null;
+            prev.next=curr.next;
             return;
           }
           if((marker<<=1)==0){
@@ -49,6 +49,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         prev.next=curr;
       }
       if(--numSurvivors==0){
+        curr.next=null;
         return;
       }
       if((marker<<=1)==0){
@@ -81,7 +82,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       if((marker&word)==0){
         do{
           if(--numRemoved==0){
-            prev.next=null;
+            prev.next=curr.next;
             return;
           }
           curr=curr.next;
@@ -89,6 +90,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         prev.next=curr;
       }
       if(--numSurvivors==0){
+        curr.next=null;
         return;
       }
       prev=curr;
@@ -254,7 +256,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     final FloatSnglLnkNode head;
     if((head=this.head)!=null){
       FloatSnglLnkNode.uncheckedCopyInto(head,arr=OmniArray.uncheckedArrResize(size,arr));
-    }else{
+    }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
@@ -931,18 +933,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       ,int bits
     )
     {
-      if(bits==Float.floatToRawIntBits(head.val)){
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+      {
+        if(bits==Float.floatToRawIntBits(head.val)){
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(bits!=Float.floatToRawIntBits(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -951,18 +953,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
     )
     {
-      if(0==(head.val)){
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+      {
+        if(0==(head.val)){
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(0!=(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -971,18 +973,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
     )
     {
-      if(Float.isNaN(head.val)){
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+      {
+        if(Float.isNaN(head.val)){
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(!Float.isNaN(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -1344,18 +1346,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       ,int bits
     )
     {
-      if(bits==Float.floatToRawIntBits(head.val)){
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+      {
+        if(bits==Float.floatToRawIntBits(head.val)){
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(bits!=Float.floatToRawIntBits(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -1363,18 +1365,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
     )
     {
-      if(0==(head.val)){
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+      {
+        if(0==(head.val)){
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(0!=(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -1382,18 +1384,18 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
     )
     {
-      if(Float.isNaN(head.val)){
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+      {
+        if(Float.isNaN(head.val)){
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
             if((head=(prev=head).next)==null){
               return false;
             }
           }while(!Float.isNaN(head.val));
+          prev.next=head.next;
         }
-        prev.next=head.next;
       }
       --this.size;
       return true;
@@ -1433,10 +1435,31 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
       //TODO
       return false;
     }
+    @Override public float floatElement(){
+      final FloatSnglLnkNode head;
+      if((head=this.head)!=null){
+        return head.val;
+      }
+      throw new NoSuchElementException();
+    }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        final var tail=this.tail;
+        out.writeInt(size=this.size);
+        if(size!=0)
+        {
+          FloatSnglLnkNode curr;
+          for(curr=this.head;;curr=curr.next)
+          {
+            out.writeFloat(curr.val);
+            if(curr==tail)
+            {
+              return;
+            }
+          }
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -1479,6 +1502,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         ++this.modCount;
         this.head=null;
         this.tail=null;
+        this.size=0;
       }
     }
     @Override public Object clone(){
@@ -1560,7 +1584,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=null;
+              prev.next=curr.next;
               if(curr==tail)
               {
                 this.tail=prev;
@@ -1576,6 +1600,8 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
           prev.next=curr;
         }
         if(--numSurvivors==0){
+          this.tail=curr;
+          curr.next=null;
           return;
         }
         if((marker<<=1)==0){
@@ -1591,7 +1617,7 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=null;
+              prev.next=curr.next;
               if(curr==tail)
               {
                 this.tail=prev;
@@ -1603,6 +1629,8 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
           prev.next=curr;
         }
         if(--numSurvivors==0){
+          this.tail=curr;
+          curr.next=null;
           return;
         }
         prev=curr;
@@ -1672,31 +1700,25 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
     ,int bits
     ){
-      if(bits==Float.floatToRawIntBits(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+        final var tail=this.tail;
+        if(bits==Float.floatToRawIntBits(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(bits!=Float.floatToRawIntBits((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -1704,31 +1726,25 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     }
     @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
     ){
-      if(0==(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+        final var tail=this.tail;
+        if(0==(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(0!=((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -1736,31 +1752,25 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     }
     @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
     ){
-      if(Float.isNaN(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+        final var tail=this.tail;
+        if(Float.isNaN(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(!Float.isNaN((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       this.modCount=modCount+1;
       --this.size;
@@ -2022,93 +2032,75 @@ public abstract class FloatSnglLnkSeq implements OmniCollection.OfFloat,Cloneabl
     @Override boolean uncheckedremoveValBits(FloatSnglLnkNode head
     ,int bits
     ){
-      if(bits==Float.floatToRawIntBits(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+        final var tail=this.tail;
+        if(bits==Float.floatToRawIntBits(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(bits!=Float.floatToRawIntBits((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       --this.size;
       return true;
     }
     @Override boolean uncheckedremoveVal0(FloatSnglLnkNode head
     ){
-      if(0==(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+        final var tail=this.tail;
+        if(0==(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(0!=((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       --this.size;
       return true;
     }
     @Override boolean uncheckedremoveValNaN(FloatSnglLnkNode head
     ){
-      if(Float.isNaN(head.val))
       {
-        if(head==tail)
-        {
-          this.tail=null;
-        }
-        this.head=head.next;
-      }else{
-        FloatSnglLnkNode prev;
-        {
+        final var tail=this.tail;
+        if(Float.isNaN(head.val)){
+          if(head==tail){
+            this.tail=null;
+          }
+          this.head=head.next;
+        }else{
+          FloatSnglLnkNode prev;
           do{
-            if(head==tail)
-            {
+            if(head==tail){
               return false;
             }
-            //if((head=(prev=head).next)==null){
-            //  return false;
-            //}
           }while(!Float.isNaN((head=(prev=head).next).val));
+          if(head==tail){
+            this.tail=prev;
+          }
+          prev.next=head.next;
         }
-        if(head==tail)
-        {
-          this.tail=prev;
-        }
-        prev.next=head.next;
       }
       --this.size;
       return true;

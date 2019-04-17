@@ -6848,7 +6848,7 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
     ++expectedRootModCount;
   }
   public void poll(int expectedVal,ByteOutputTestArgType outputType){
-    outputType.verifyStackPoll(seq,expectedSeqSize,expectedVal);
+    outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       --expectedSeqSize;
       --expectedParentSize;
