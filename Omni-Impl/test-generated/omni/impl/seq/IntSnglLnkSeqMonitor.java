@@ -3880,6 +3880,21 @@ class IntSnglLnkSeqMonitor implements IntSeqMonitor{
   final IntSnglLnkSeq seq;
   int expectedSeqSize;
   int expectedSeqModCount;
+  IntSnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType,IntSnglLnkNode head,int seqSize,IntSnglLnkNode tail){
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedSeqSize=seqSize;
+    switch(nestedType){
+      case QUEUE:
+        this.seq=checkedType.checked?new IntSnglLnkSeq.CheckedQueue(head,seqSize,tail):new IntSnglLnkSeq.UncheckedQueue(head,seqSize,tail);
+        break;
+      case STACK:
+        this.seq=checkedType.checked?new IntSnglLnkSeq.CheckedStack(head,seqSize):new IntSnglLnkSeq.UncheckedStack(head,seqSize);
+        break;
+      default:
+        throw new Error("unknown nested type "+nestedType);
+    }
+  }
   IntSnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType){
     this.nestedType=nestedType;
     this.checkedType=checkedType;
@@ -4271,5 +4286,8 @@ class IntSnglLnkSeqMonitor implements IntSeqMonitor{
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
     return new SnglLnkSeqSequenceVerificationItr(this,seq.head);
+  }
+  public String callToString(){
+    return seq.toString();
   }
 }

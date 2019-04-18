@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import org.junit.jupiter.api.Assertions;
 import omni.impl.FunctionCallType;
 import omni.impl.BooleanOutputTestArgType;
 import omni.impl.BooleanInputTestArgType;
@@ -1516,4 +1517,59 @@ interface BooleanSeqMonitor
   void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfBoolean clone);
   void writeObject(ObjectOutputStream oos) throws IOException;
   Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException;
+  private static int verifySingleStrElement(String str,int strOffset){
+    Assertions.assertTrue(str.charAt(strOffset)=='t' && str.charAt(++strOffset)=='r' && str.charAt(++strOffset)=='u' && str.charAt(++strOffset)=='e',"String fails at index "+strOffset);
+    return strOffset;
+  }
+  private static void verifyLargeStr(String str,int offset,int bound,SequenceVerificationItr verifyItr){
+    if(offset>=bound){
+      return;
+    }
+    int strOffset;
+    if(offset==0){
+      strOffset=verifySingleStrElement(str,1);
+    }else{
+      strOffset=(6*offset)-2;
+    }
+    for(;;){
+      verifyItr.verifyIndexAndIterate(1);
+      if(++offset==bound){
+        return;
+      }
+      if(str.charAt(++strOffset)!=',' || str.charAt(++strOffset)!=' '){
+        break;
+      }
+      strOffset=verifySingleStrElement(str,++strOffset);
+    }
+    Assertions.fail("string fails at index "+strOffset);
+  }
+  String callToString();
+  default void verifyMASSIVEString(){
+    String string=callToString();
+    verifyStructuralIntegrity();
+    var verifyItr=verifyPreAlloc(1);
+    Assertions.assertEquals('[',string.charAt(0));
+    Assertions.assertEquals(']',string.charAt(string.length()-1));
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int seqSize=getExpectedSeqSize();
+    int threadOffset=0;
+    int threadSpan=seqSize/numThreads;
+    Thread[] threads=new Thread[numThreads-1];
+    for(int i=0;i<numThreads-1;++i){
+      final int thisThreadOffset=threadOffset;
+      final int thisThreadBound=thisThreadOffset+threadSpan;
+      final var thisThreadVerifyItr=verifyItr.getPositiveOffset(thisThreadOffset);
+      threadOffset=thisThreadBound;
+      (threads[i]=new Thread(()->verifyLargeStr(string,thisThreadOffset,thisThreadBound,thisThreadVerifyItr))).start();
+    }
+    verifyLargeStr(string,threadOffset,threadOffset+threadSpan,verifyItr.getPositiveOffset(threadOffset));
+    try{
+      for(int i=0;i<numThreads-1;++i){
+        threads[i].join();
+      }
+    }catch(InterruptedException e){
+      Assertions.fail(e);
+    }
+    verifyItr.skip(seqSize).verifyPostAlloc(1);
+  }
 }

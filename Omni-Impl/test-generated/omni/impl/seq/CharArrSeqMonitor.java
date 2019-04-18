@@ -6952,4 +6952,7 @@ class CharArrSeqMonitor implements CharSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
+  public String callToString(){
+    return seq.toString();
+  }
 }

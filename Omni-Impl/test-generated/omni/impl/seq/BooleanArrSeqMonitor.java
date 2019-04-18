@@ -6960,4 +6960,7 @@ class BooleanArrSeqMonitor implements BooleanSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
+  public String callToString(){
+    return seq.toString();
+  }
 }

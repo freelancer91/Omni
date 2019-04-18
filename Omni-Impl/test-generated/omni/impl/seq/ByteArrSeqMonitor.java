@@ -6952,4 +6952,7 @@ class ByteArrSeqMonitor implements ByteSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
+  public String callToString(){
+    return seq.toString();
+  }
 }

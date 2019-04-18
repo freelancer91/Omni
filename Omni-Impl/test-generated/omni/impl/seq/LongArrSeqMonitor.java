@@ -6952,4 +6952,7 @@ class LongArrSeqMonitor implements LongSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
+  public String callToString(){
+    return seq.toString();
+  }
 }

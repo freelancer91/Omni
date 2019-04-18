@@ -7407,4 +7407,7 @@ class RefArrSeqMonitor implements RefSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
+  public String callToString(){
+    return seq.toString();
+  }
 }

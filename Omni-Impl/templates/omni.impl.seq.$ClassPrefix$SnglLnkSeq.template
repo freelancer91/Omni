@@ -451,7 +451,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     CheckedStack($SNode$$<E>$ head,int size){
       super(head,size);
     }
-    
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       int modCount=this.modCount;
       try{
@@ -460,10 +459,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    
-    
-    
-    
     @Override public void push($exposedType$ val){
       ++this.modCount;
       super.push(val);
@@ -826,8 +821,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
 #ENDIF
       }
     }
-    
-    
     @Override public void push($exposedType$ val){
       this.head=new $SNode$$<E>$(val,this.head);
       ++this.size;

@@ -421,6 +421,21 @@ BOXED_TYPEVALUE_NAME(false){
   final $ClassPrefix$SnglLnkSeq seq;
   int expectedSeqSize;
   int expectedSeqModCount;
+  $ClassPrefix$SnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType,$SNode$ head,int seqSize,$SNode$ tail){
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedSeqSize=seqSize;
+    switch(nestedType){
+      case QUEUE:
+        this.seq=checkedType.checked?new $ClassPrefix$SnglLnkSeq.CheckedQueue(head,seqSize,tail):new $ClassPrefix$SnglLnkSeq.UncheckedQueue(head,seqSize,tail);
+        break;
+      case STACK:
+        this.seq=checkedType.checked?new $ClassPrefix$SnglLnkSeq.CheckedStack(head,seqSize):new $ClassPrefix$SnglLnkSeq.UncheckedStack(head,seqSize);
+        break;
+      default:
+        throw new Error("unknown nested type "+nestedType);
+    }
+  }
   $ClassPrefix$SnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType){
     this.nestedType=nestedType;
     this.checkedType=checkedType;
@@ -883,6 +898,10 @@ BOXED_TYPEVALUE_NAME(false){
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
     return new SnglLnkSeqSequenceVerificationItr(this,seq.head);
+  }
+  
+  public String callToString(){
+    return seq.toString();
   }
   
 }

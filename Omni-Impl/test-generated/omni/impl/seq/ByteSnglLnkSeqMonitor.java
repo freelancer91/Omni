@@ -3880,6 +3880,21 @@ class ByteSnglLnkSeqMonitor implements ByteSeqMonitor{
   final ByteSnglLnkSeq seq;
   int expectedSeqSize;
   int expectedSeqModCount;
+  ByteSnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType,ByteSnglLnkNode head,int seqSize,ByteSnglLnkNode tail){
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedSeqSize=seqSize;
+    switch(nestedType){
+      case QUEUE:
+        this.seq=checkedType.checked?new ByteSnglLnkSeq.CheckedQueue(head,seqSize,tail):new ByteSnglLnkSeq.UncheckedQueue(head,seqSize,tail);
+        break;
+      case STACK:
+        this.seq=checkedType.checked?new ByteSnglLnkSeq.CheckedStack(head,seqSize):new ByteSnglLnkSeq.UncheckedStack(head,seqSize);
+        break;
+      default:
+        throw new Error("unknown nested type "+nestedType);
+    }
+  }
   ByteSnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType){
     this.nestedType=nestedType;
     this.checkedType=checkedType;
@@ -4271,5 +4286,8 @@ class ByteSnglLnkSeqMonitor implements ByteSeqMonitor{
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
     return new SnglLnkSeqSequenceVerificationItr(this,seq.head);
+  }
+  public String callToString(){
+    return seq.toString();
   }
 }

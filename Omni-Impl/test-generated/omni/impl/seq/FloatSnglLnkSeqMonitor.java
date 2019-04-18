@@ -3880,6 +3880,21 @@ class FloatSnglLnkSeqMonitor implements FloatSeqMonitor{
   final FloatSnglLnkSeq seq;
   int expectedSeqSize;
   int expectedSeqModCount;
+  FloatSnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType,FloatSnglLnkNode head,int seqSize,FloatSnglLnkNode tail){
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.expectedSeqSize=seqSize;
+    switch(nestedType){
+      case QUEUE:
+        this.seq=checkedType.checked?new FloatSnglLnkSeq.CheckedQueue(head,seqSize,tail):new FloatSnglLnkSeq.UncheckedQueue(head,seqSize,tail);
+        break;
+      case STACK:
+        this.seq=checkedType.checked?new FloatSnglLnkSeq.CheckedStack(head,seqSize):new FloatSnglLnkSeq.UncheckedStack(head,seqSize);
+        break;
+      default:
+        throw new Error("unknown nested type "+nestedType);
+    }
+  }
   FloatSnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType){
     this.nestedType=nestedType;
     this.checkedType=checkedType;
@@ -4271,5 +4286,8 @@ class FloatSnglLnkSeqMonitor implements FloatSeqMonitor{
   }
   public SequenceVerificationItr verifyPreAlloc(int expectedVal){
     return new SnglLnkSeqSequenceVerificationItr(this,seq.head);
+  }
+  public String callToString(){
+    return seq.toString();
   }
 }

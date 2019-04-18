@@ -6952,4 +6952,7 @@ class ShortArrSeqMonitor implements ShortSeqMonitor{
         throw new Error("unknown nested type "+nestedType);
     }
   }
+  public String callToString(){
+    return seq.toString();
+  }
 }
