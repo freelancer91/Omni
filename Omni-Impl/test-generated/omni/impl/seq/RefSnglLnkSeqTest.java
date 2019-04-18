@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import omni.impl.RefSnglLnkNode;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.RefInputTestArgType;
@@ -7,7 +6,6 @@ import omni.impl.RefOutputTestArgType;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
-import omni.util.OmniArray;
 import omni.impl.FunctionCallType;
 import omni.impl.QueryCastType;
 import java.io.File;
@@ -23,12 +21,9 @@ import omni.impl.seq.RefSeqMonitor.CheckedType;
 import omni.impl.seq.RefSeqMonitor.PreModScenario;
 import omni.impl.seq.RefSeqMonitor.SequenceLocation;
 import omni.impl.seq.RefSeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.RefSeqMonitor.ListItrSetScenario;
-import omni.impl.seq.RefSeqMonitor.ItrType;
 import omni.impl.seq.RefSeqMonitor.IterationScenario;
 import omni.impl.seq.RefSeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.RefSeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.RefSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.RefSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
 import omni.impl.seq.RefSeqMonitor.MonitoredObjectGen;
@@ -36,7 +31,6 @@ import omni.impl.seq.RefSeqMonitor.MonitoredObject;
 import omni.impl.seq.RefSeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.RefSnglLnkSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
-import omni.api.OmniList;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("SnglLnkSeq")

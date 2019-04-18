@@ -43,8 +43,6 @@ import java.io.ObjectOutput;
 import java.io.IOException;
 public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Cloneable,Externalizable{
   private static final long serialVersionUID=1L;
-  
-  
   transient int size;
   transient $SNode$$<E>$ head;
   private $ClassPrefix$SnglLnkSeq(){

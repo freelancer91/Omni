@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import omni.impl.DoubleSnglLnkNode;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.DoubleInputTestArgType;
@@ -7,7 +6,6 @@ import omni.impl.DoubleOutputTestArgType;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
-import omni.util.OmniArray;
 import omni.impl.FunctionCallType;
 import omni.impl.QueryCastType;
 import java.io.File;
@@ -23,18 +21,14 @@ import omni.impl.seq.DoubleSeqMonitor.CheckedType;
 import omni.impl.seq.DoubleSeqMonitor.PreModScenario;
 import omni.impl.seq.DoubleSeqMonitor.SequenceLocation;
 import omni.impl.seq.DoubleSeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.DoubleSeqMonitor.ListItrSetScenario;
-import omni.impl.seq.DoubleSeqMonitor.ItrType;
 import omni.impl.seq.DoubleSeqMonitor.IterationScenario;
 import omni.impl.seq.DoubleSeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.DoubleSeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.DoubleSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.DoubleSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
 import omni.impl.seq.DoubleSeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.DoubleSnglLnkSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
-import omni.api.OmniList;
 import java.util.ArrayList;
 @Tag("SnglLnkSeq")
 @Execution(ExecutionMode.CONCURRENT)

@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import omni.impl.ByteSnglLnkNode;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.ByteInputTestArgType;
@@ -7,6 +6,7 @@ import omni.impl.ByteOutputTestArgType;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
+import omni.impl.ByteSnglLnkNode;
 import omni.util.OmniArray;
 import omni.impl.FunctionCallType;
 import omni.impl.QueryCastType;
@@ -23,18 +23,14 @@ import omni.impl.seq.ByteSeqMonitor.CheckedType;
 import omni.impl.seq.ByteSeqMonitor.PreModScenario;
 import omni.impl.seq.ByteSeqMonitor.SequenceLocation;
 import omni.impl.seq.ByteSeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.ByteSeqMonitor.ListItrSetScenario;
-import omni.impl.seq.ByteSeqMonitor.ItrType;
 import omni.impl.seq.ByteSeqMonitor.IterationScenario;
 import omni.impl.seq.ByteSeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.ByteSeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.ByteSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.ByteSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
 import omni.impl.seq.ByteSeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.ByteSnglLnkSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
-import omni.api.OmniList;
 import java.util.ArrayList;
 @Tag("SnglLnkSeq")
 @Execution(ExecutionMode.CONCURRENT)

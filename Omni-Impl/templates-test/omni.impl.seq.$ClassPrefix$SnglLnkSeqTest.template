@@ -8,7 +8,6 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
-import omni.impl.$SNode$;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.$ClassPrefix$InputTestArgType;
@@ -16,7 +15,10 @@ import omni.impl.$ClassPrefix$OutputTestArgType;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
+#IFNOT OfRef,OfDouble,OfChar
+import omni.impl.$SNode$;
 import omni.util.OmniArray;
+#ENDIF
 import omni.impl.FunctionCallType;
 import omni.impl.QueryCastType;
 import java.io.File;
@@ -32,12 +34,9 @@ import omni.impl.seq.$ClassPrefix$SeqMonitor.CheckedType;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.PreModScenario;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceLocation;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.ListItrSetScenario;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.ItrType;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.IterationScenario;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
 #IF OfRef
@@ -47,7 +46,6 @@ import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObject;
 import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.$ClassPrefix$SnglLnkSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
-import omni.api.OmniList;
 import java.util.ArrayList;
 #IF OfRef
 @SuppressWarnings({"rawtypes","unchecked"})

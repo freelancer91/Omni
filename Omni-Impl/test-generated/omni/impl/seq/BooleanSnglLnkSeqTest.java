@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import omni.impl.BooleanSnglLnkNode;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.BooleanInputTestArgType;
@@ -7,6 +6,7 @@ import omni.impl.BooleanOutputTestArgType;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
+import omni.impl.BooleanSnglLnkNode;
 import omni.util.OmniArray;
 import omni.impl.FunctionCallType;
 import omni.impl.QueryCastType;
@@ -23,18 +23,14 @@ import omni.impl.seq.BooleanSeqMonitor.CheckedType;
 import omni.impl.seq.BooleanSeqMonitor.PreModScenario;
 import omni.impl.seq.BooleanSeqMonitor.SequenceLocation;
 import omni.impl.seq.BooleanSeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.BooleanSeqMonitor.ListItrSetScenario;
-import omni.impl.seq.BooleanSeqMonitor.ItrType;
 import omni.impl.seq.BooleanSeqMonitor.IterationScenario;
 import omni.impl.seq.BooleanSeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.BooleanSeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.BooleanSeqMonitor.MonitoredComparatorGen;
 import omni.impl.seq.BooleanSeqMonitor.MonitoredRemoveIfPredicateGen;
 import java.nio.file.Files;
 import omni.impl.seq.BooleanSeqMonitor.SequenceVerificationItr;
 import omni.impl.seq.BooleanSnglLnkSeqMonitor.QueryTester;
 import omni.api.OmniCollection;
-import omni.api.OmniList;
 import java.util.ArrayList;
 @Tag("SnglLnkSeq")
 @Execution(ExecutionMode.CONCURRENT)
