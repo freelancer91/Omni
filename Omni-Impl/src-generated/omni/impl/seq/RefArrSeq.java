@@ -23,22 +23,17 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,Externalizable
-{
+public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection.OfRef<E>,Externalizable{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
-  transient int size;
   transient Object[] arr; 
-  private RefArrSeq()
-  {
+  private RefArrSeq(){
     super();
     this.arr=OmniArray.OfRef.DEFAULT_ARR;
   }
-  private RefArrSeq(int initialCapacity)
-  {
+  private RefArrSeq(int initialCapacity){
     super();
-    switch(initialCapacity)
-    { 
+    switch(initialCapacity){ 
     default:
       this.arr=new Object[initialCapacity];
       return;
@@ -47,14 +42,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     case 0:
     }
   }
-  private RefArrSeq(int size,Object[] arr)
-  {
-    super();
-    this.size=size;
+  private RefArrSeq(int size,Object[] arr){
+    super(size);
     this.arr=arr;
   }
-  @Override public void writeExternal(ObjectOutput out) throws IOException
-  {
+  @Override public void writeExternal(ObjectOutput out) throws IOException{
     int size;
     out.writeInt(size=this.size);
     if(size!=0)
@@ -67,41 +59,31 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
   {
     int size;
     this.size=size=in.readInt();
-    if(size!=0)
-    {
+    if(size!=0){
       OmniArray.OfRef.readArray(this.arr=new Object[size],0,size-1,in);
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> long markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter)
-  {
-    for(long word=0L,marker=1L;;marker<<=1)
-    {
-      if(!filter.test((E)arr[srcOffset]))
-      {
+  private static <E> long markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter){
+    for(long word=0L,marker=1L;;marker<<=1){
+      if(!filter.test((E)arr[srcOffset])){
         word|=marker;
       }
-      if(++srcOffset==srcBound)
-      {
+      if(++srcOffset==srcBound){
         return word;
       }
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> int markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter,long[] survivorSet)
-  {
-    for(int numSurvivors=0,wordOffset=0;;)
-    {
+  private static <E> int markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter,long[] survivorSet){
+    for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
-      do
-      {
-        if(!filter.test((E)arr[srcOffset]))
-        {
+      do{
+        if(!filter.test((E)arr[srcOffset])){
           word|=marker;
           ++numSurvivors;
         }
-        if(++srcOffset==srcBound)
-        {
+        if(++srcOffset==srcBound){
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
@@ -110,8 +92,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       survivorSet[wordOffset++]=word;
     }
   }
-  private static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long word)
-  {
+  private static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long word){
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
       ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
@@ -119,26 +100,19 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
   }
-  private static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
-  {
-    for(int wordOffset=0;;)
-    {
+  private static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet){
+    for(int wordOffset=0;;){
       long word=survivorSet[wordOffset];
-      for(int s=srcOffset;;)
-      {
+      for(int s=srcOffset;;){
         int numTail0s;
-        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
-        {
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64){
           break;
         }
         ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
         dstOffset+=numTail0s;
-        if(numTail0s==64)
-        {
+        if(numTail0s==64){
           break;
-        }
-        if(dstOffset>=dstBound)
-        {
+        }else if(dstOffset>=dstBound){
           return;
         }
         s+=numTail0s;
@@ -148,44 +122,23 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       srcOffset+=64;
     }
   }
-  @Override
-  public abstract Object clone();
-  @Override
-  public int size()
-  {
-    return this.size;
-  }
-  @Override
-  public boolean isEmpty()
-  {
-    return this.size==0;
-  }
-  @Override
-  public void clear()
-  {
+  @Override public void clear(){
     int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       this.size=0;
       OmniArray.OfRef.nullifyRange(this.arr,size-1,0);
     }
   }
-  @Override
-  public int hashCode()
-  {
+  @Override public int hashCode(){
     final int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       return uncheckedHashCode(size);
     }
     return 1;
   }
-  @Override
-  public String toString()
-  {
+  @Override public String toString(){
     int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       final StringBuilder builder=new StringBuilder("[");
       uncheckedToString(size,builder);
       return builder.append(']').toString();
@@ -260,8 +213,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontainsNonNull(this.arr,0,size-1,val);
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -312,8 +264,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -328,8 +279,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -344,8 +294,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -360,8 +309,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -376,8 +324,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -392,8 +339,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -408,8 +354,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -424,8 +369,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return OmniArray.OfRef.uncheckedcontains(this.arr,0,size-1,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
@@ -500,8 +444,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveValNonNull(size,val);
           }
           return this.uncheckedremoveValNull(size);
@@ -552,8 +495,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -568,8 +510,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -584,8 +525,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -600,8 +540,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -616,8 +555,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -632,8 +570,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -648,8 +585,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -664,8 +600,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         final int size;
         if((size=this.size)!=0)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return this.uncheckedremoveValNull(size);
@@ -678,101 +613,73 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
   abstract boolean uncheckedremoveValNull(int size);
   abstract boolean uncheckedremoveVal(int size,Predicate<Object> pred);
   abstract void uncheckedForEach(int size,Consumer<? super E> action);
-  @Override
-  public void forEach(Consumer<? super E> action)
-  {
+  @Override public void forEach(Consumer<? super E> action){
     final int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       uncheckedForEach(size,action);
     }
   }
-  private void uncheckedAppend(int size,E val)
-  {
+  private void uncheckedAppend(int size,E val){
     Object[] arr;
-    if((arr=this.arr).length==size)
-    {
+    if((arr=this.arr).length==size){
       ArrCopy.uncheckedCopy(arr,0,arr=new Object[OmniArray.growBy50Pct(size)],0,size);
       this.arr=arr;
     }
     arr[size]=val;
     this.size=size+1;
   }
-  private void uncheckedInit(E val)
-  {
+  private void uncheckedInit(E val){
     Object[] arr;
-    if((arr=this.arr)==null)
-    {
+    if((arr=this.arr)==null){
       this.arr=new Object[]{val};
-    }
-    else
-    {
-      if(arr==OmniArray.OfRef.DEFAULT_ARR)
-      {
+    }else{
+      if(arr==OmniArray.OfRef.DEFAULT_ARR){
         this.arr=arr=new Object[OmniArray.DEFAULT_ARR_SEQ_CAP];
       }
       arr[0]=val;
     }
     this.size=1;
   }
-  public void push(E val)
-  {
+  public void push(E val){
     final int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       uncheckedAppend(size,val);
-    }
-    else
-    {
+    }else{
       uncheckedInit(val);
     }
   }
-  @Override
-  public boolean add(E val)
-  {
+  @Override public boolean add(E val){
     push(val);
     return true;
   }
   abstract void uncheckedCopyInto(Object[] dst,int length);
-  @Override
-  public <T> T[] toArray(T[] arr)
-  {
+  @Override public <T> T[] toArray(T[] arr){
     final int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       uncheckedCopyInto(arr=OmniArray.uncheckedArrResize(size,arr),size);
-    }
-    else if(arr.length!=0)
-    {
+    }else if(arr.length!=0){
       arr[0]=null;
     }
     return arr;
   }
-  @Override
-  public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-  {
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     final int size;
     T[] dst=arrConstructor.apply(size=this.size);
-    if(size!=0)
-    {
+    if(size!=0){
       uncheckedCopyInto(dst,size);
     }
     return dst;
   }
-  @Override
-  public Object[] toArray()
-  {
+  @Override public Object[] toArray(){
     final int size;
-    if((size=this.size)!=0)
-    {
+    if((size=this.size)!=0){
       final Object[] dst;
       uncheckedCopyInto(dst=new Object[size],size);
       return dst;
     }
     return OmniArray.OfRef.DEFAULT_ARR;
   }
-  boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
-  {
+  boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
     final int numRemoved;
     final Object[] arr;
     if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr,0,size,filter))!=0){
@@ -782,17 +689,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     }
     return false;
   }
-  @Override
-  public boolean removeIf(Predicate<? super E> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super E> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
   }
   @SuppressWarnings("unchecked")
-  private static <E> int pullSurvivorsDown(Object[] arr,int srcOffset,int srcBound,int dstOffset,Predicate<? super E> filter)
-  {
-    while(++srcOffset!=srcBound)
-    {
+  private static <E> int pullSurvivorsDown(Object[] arr,int srcOffset,int srcBound,int dstOffset,Predicate<? super E> filter){
+    while(++srcOffset!=srcBound){
       final Object v;
       if(!filter.test((E)(v=arr[srcOffset])))
       {
@@ -802,8 +705,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     return srcBound-dstOffset;
   }
   @SuppressWarnings("unchecked")
-  private static <E> int uncheckedRemoveIfImpl(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter)
-  {
+  private static <E> int uncheckedRemoveIfImpl(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter){
     do{
       if(filter.test((E)arr[srcOffset])){
         return pullSurvivorsDown(arr,srcOffset,srcBound,srcOffset,filter);
@@ -812,72 +714,51 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     return 0;
   }
   @SuppressWarnings("unchecked")
-  private static <E> int uncheckedRemoveIfImpl(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter,CheckedCollection.AbstractModCountChecker modCountChecker)
-  {
-    do
-    {
-      if(filter.test((E)arr[srcOffset]))
-      {
+  private static <E> int uncheckedRemoveIfImpl(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter,CheckedCollection.AbstractModCountChecker modCountChecker){
+    do{
+      if(filter.test((E)arr[srcOffset])){
         int dstOffset=srcOffset;
-        outer:for(;;)
-        {
-          if(++srcOffset==srcBound)
-          {
+        outer:for(;;){
+          if(++srcOffset==srcBound){
             modCountChecker.checkModCount();
             break outer;
           }
           Object before;
-          if(!filter.test((E)(before=arr[srcOffset])))
-          {
-            for(int i=srcBound-1;;--i)
-            {
-              if(i==srcOffset)
-              {
+          if(!filter.test((E)(before=arr[srcOffset]))){
+            for(int i=srcBound-1;;--i){
+              if(i==srcOffset){
                 modCountChecker.checkModCount();
                 arr[dstOffset++]=before;
                 break outer;
               }
               Object after;
-              if(!filter.test((E)(after=arr[i])))
-              {
+              if(!filter.test((E)(after=arr[i]))){
                 int n;
-                if((n=i-(++srcOffset))!=0)
-                {
-                  if(n>64)
-                  {
+                if((n=i-(++srcOffset))!=0){
+                  if(n>64){
                     long[] survivorSet;
                     int numSurvivors=markSurvivors(arr,srcOffset,i,filter,survivorSet=new long[(n-1>>6)+1]);
                     modCountChecker.checkModCount();
-                    if(numSurvivors!=0)
-                    {
-                      if(numSurvivors==n)
-                      {
+                    if(numSurvivors!=0){
+                      if(numSurvivors==n){
                         ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
-                      }
-                      else
-                      {
+                      }else{
                         arr[dstOffset]=before;
                         pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorSet);
                         arr[dstOffset++]=after;
                       }
                       break outer;
                     }
-                  }
-                  else
-                  {
+                  }else{
                     long survivorWord=markSurvivors(arr,srcOffset,i,filter);
                     modCountChecker.checkModCount();
                     int numSurvivors;
-                    if((numSurvivors=Long.bitCount(survivorWord))!=0)
-                    {
-                      if(numSurvivors==n)
-                      {
+                    if((numSurvivors=Long.bitCount(survivorWord))!=0){
+                      if(numSurvivors==n){
                         ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
-                      }
-                      else
-                      {
+                      }else{
                         arr[dstOffset]=before;
                         pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
                         arr[dstOffset++]=after;
@@ -885,9 +766,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
                       break outer;
                     }
                   }
-                }
-                else
-                {
+                }else{
                   modCountChecker.checkModCount();
                 }
                 arr[dstOffset++]=before;
@@ -909,47 +788,33 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       implements OmniStack.OfRef<E>,Cloneable
   {
     private static final long serialVersionUID=1L;
-    public UncheckedStack()
-    {
+    public UncheckedStack(){
       super();
     }
-    public UncheckedStack(int initialCapacity)
-    {
+    public UncheckedStack(int initialCapacity){
       super(initialCapacity);
     }
-    UncheckedStack(int size,Object[] arr)
-    {
+    UncheckedStack(int size,Object[] arr){
       super(size,arr);
     }
-    @Override
-    public boolean equals(Object val)
-    {
+    @Override public boolean equals(Object val){
       //TODO implements equals method for UncheckedStack<E>
       return false;
     }
-    @Override
-    public Object clone()
-    {
+    @Override public Object clone(){
       final Object[] copy;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(this.arr,0,copy=new Object[size],0,size);
-      }
-      else
-      {
+      }else{
         copy=OmniArray.OfRef.DEFAULT_ARR;
       }
       return new UncheckedStack<E>(size,copy);
     }
-    @Override
-    void uncheckedToString(int size,StringBuilder builder)
-    {
+    @Override void uncheckedToString(int size,StringBuilder builder){
       OmniArray.OfRef.descendingToString(this.arr,0,size-1,builder);
     }
-  @Override
-  int uncheckedHashCode(int size)
-  {
+  @Override int uncheckedHashCode(int size){
     return OmniArray.OfRef.descendingSeqHashCode(this.arr,0,size-1);
   }
     @Override public int search(boolean val){
@@ -1018,8 +883,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearchNonNull(this.arr,size,val);
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1070,8 +934,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1086,8 +949,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1102,8 +964,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1118,8 +979,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1134,8 +994,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1150,8 +1009,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1166,8 +1024,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1182,8 +1039,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedsearch(this.arr,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
@@ -1192,33 +1048,24 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }//end val check
       return -1;
     }
-    @Override
-    boolean uncheckedremoveValNonNull(int size,Object nonNull)
-    {
+    @Override boolean uncheckedremoveValNonNull(int size,Object nonNull){
       {
         final var arr=this.arr;
-        for(int index=--size;;--index)
-        {
-          if(nonNull.equals(arr[index]))
-          {
+        for(int index=--size;;--index){
+          if(nonNull.equals(arr[index])){
             OmniArray.OfRef.removeIndexAndPullDown(arr,index,size);
             this.size=size;
             return true;
-          }
-          if(index==0)
-          {
+          }else if(index==0){
             return false;
           }
         }
       }
     }
-    @Override
-    boolean uncheckedremoveValNull(int size
-    )
-    {
+    @Override boolean uncheckedremoveValNull(int size
+    ){
       final var arr=this.arr;
-      for(int index=--size;;--index)
-      {
+      for(int index=--size;;--index){
         if(
         arr[index]==null
         )
@@ -1226,21 +1073,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,size);
           this.size=size;
           return true;
-        }
-        if(index==0)
-        {
+        }else if(index==0){
           return false;
         }
       }
     }
-    @Override
-    boolean uncheckedremoveVal (int size
+    @Override boolean uncheckedremoveVal (int size
     ,Predicate<Object> pred
-    )
-    {
+    ){
       final var arr=this.arr;
-      for(int index=--size;;--index)
-      {
+      for(int index=--size;;--index){
         if(
         pred.test(arr[index])
         )
@@ -1248,16 +1090,12 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,size);
           this.size=size;
           return true;
-        }
-        if(index==0)
-        {
+        }else if(index==0){
           return false;
         }
       }
     }
-    @Override
-    void uncheckedForEach(int size,Consumer<? super E> action)
-    {
+    @Override void uncheckedForEach(int size,Consumer<? super E> action){
       {
         OmniArray.OfRef.descendingForEach(this.arr,0,size-1,action);
       }
@@ -1267,53 +1105,37 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     {
       transient final UncheckedStack<E> parent;
       transient int cursor;
-      private Itr(UncheckedStack<E> parent)
-      {
+      private Itr(UncheckedStack<E> parent){
         this.parent=parent;
         this.cursor=parent.size;
       }
-      @Override
-      public boolean hasNext()
-      {
+      @Override public boolean hasNext(){
         return this.cursor>0;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         return (E)parent.arr[--cursor];
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         final UncheckedStack<E> root;
         OmniArray.OfRef.removeIndexAndPullDown((root=this.parent).arr,this.cursor,--root.size);
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         final int cursor;
-        if((cursor=this.cursor)>0)
-        {
+        if((cursor=this.cursor)>0){
           OmniArray.OfRef.descendingForEach(parent.arr,0,cursor-1,action);
           this.cursor=0;
         }
       }
     }
-    @Override
-    public OmniIterator.OfRef<E> iterator()
-    {
+    @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);
     }
-    @Override
-    void uncheckedCopyInto(Object[] dst,int length)
-    {
+    @Override void uncheckedCopyInto(Object[] dst,int length){
       ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,length);
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E pop()
-    {
+    @Override public E pop(){
       final Object[] arr;
       final int size;
       final var ret=(E)(arr=this.arr)[size=--this.size];
@@ -1321,12 +1143,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       return ret;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E poll()
-    {
+    @Override public E poll(){
       int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         final var ret=(E)(arr[--size]);
         arr[size]=null;
         this.size=size;
@@ -1335,12 +1154,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       return null;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E peek()
-    {
+    @Override public E peek(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         return (E)(arr[size-1]);
       }
       return null;
@@ -1352,47 +1168,33 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       implements OmniList.OfRef<E>,Cloneable
   {
     private static final long serialVersionUID=1L;
-    public UncheckedList()
-    {
+    public UncheckedList(){
       super();
     }
-    public UncheckedList(int initialCapacity)
-    {
+    public UncheckedList(int initialCapacity){
       super(initialCapacity);
     }
-    UncheckedList(int size,Object[] arr)
-    {
+    UncheckedList(int size,Object[] arr){
       super(size,arr);
     }
-    @Override
-    public boolean equals(Object val)
-    {
+    @Override public boolean equals(Object val){
       //TODO implements equals method for UncheckedList<E>
       return false;
     }
-    @Override
-    public Object clone()
-    {
+    @Override public Object clone(){
       final Object[] copy;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(this.arr,0,copy=new Object[size],0,size);
-      }
-      else
-      {
+      }else{
         copy=OmniArray.OfRef.DEFAULT_ARR;
       }
       return new UncheckedList<E>(size,copy);
     }
-    @Override
-    void uncheckedToString(int size,StringBuilder builder)
-    {
+    @Override void uncheckedToString(int size,StringBuilder builder){
       OmniArray.OfRef.ascendingToString(this.arr,0,size-1,builder);
     }
-  @Override
-  int uncheckedHashCode(int size)
-  {
+  @Override int uncheckedHashCode(int size){
     return OmniArray.OfRef.ascendingSeqHashCode(this.arr,0,size-1);
   }
     @Override public int indexOf(boolean val){
@@ -1461,8 +1263,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOfNonNull(this.arr,size,val);
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1513,8 +1314,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1529,8 +1329,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1545,8 +1344,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1561,8 +1359,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1577,8 +1374,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1593,8 +1389,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1609,8 +1404,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1625,8 +1419,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
@@ -1701,8 +1494,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOfNonNull(this.arr,size,val);
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1753,8 +1545,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1769,8 +1560,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1785,8 +1575,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1801,8 +1590,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1817,8 +1605,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1833,8 +1620,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1849,8 +1635,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1865,8 +1650,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(this.arr,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
@@ -1875,33 +1659,25 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }//end val check
       return -1;
     }
-    @Override
-    boolean uncheckedremoveValNonNull(int size,Object nonNull)
-    {
+    @Override boolean uncheckedremoveValNonNull(int size,Object nonNull){
       {
         final var arr=this.arr;
-        for(int index=0;;)
-        {
-          if(nonNull.equals(arr[index]))
-          {
+        for(int index=0;;){
+          if(nonNull.equals(arr[index])){
             OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
             this.size=size;
             return true;
-          }
-          if(++index==size)
+          }else if(++index==size)
           {
             return false;
           }
         }
       }
     }
-    @Override
-    boolean uncheckedremoveValNull(int size
-    )
-    {
+    @Override boolean uncheckedremoveValNull(int size
+    ){
       final var arr=this.arr;
-      for(int index=0;;)
-      {
+      for(int index=0;;){
         if(
         arr[index]==null
         )
@@ -1909,21 +1685,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
-        }
-        if(++index==size)
-        {
+        }else if(++index==size){
           return false;
         }
       }
     }
-    @Override
-    boolean uncheckedremoveVal (int size
+    @Override boolean uncheckedremoveVal (int size
     ,Predicate<Object> pred
-    )
-    {
+    ){
       final var arr=this.arr;
-      for(int index=0;;)
-      {
+      for(int index=0;;){
         if(
         pred.test(arr[index])
         )
@@ -1931,16 +1702,12 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
-        }
-        if(++index==size)
-        {
+        }else if(++index==size){
           return false;
         }
       }
     }
-    @Override
-    void uncheckedForEach(int size,Consumer<? super E> action)
-    {
+    @Override void uncheckedForEach(int size,Consumer<? super E> action){
       {
         OmniArray.OfRef.ascendingForEach(this.arr,0,size-1,action);
       }
@@ -1950,174 +1717,124 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     {
       transient final UncheckedList<E> parent;
       transient int cursor;
-      private Itr(UncheckedList<E> parent)
-      {
+      private Itr(UncheckedList<E> parent){
         this.parent=parent;
         this.cursor=0;
       }
-      private Itr(UncheckedList<E> parent,int cursor)
-      {
+      private Itr(UncheckedList<E> parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
       }
-      @Override
-      public boolean hasNext()
-      {
+      @Override public boolean hasNext(){
         return this.cursor<parent.size;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         return (E)parent.arr[cursor++];
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         final UncheckedList<E> root;
         OmniArray.OfRef.removeIndexAndPullDown((root=this.parent).arr,--this.cursor,--root.size);
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         final int cursor,bound;
         final UncheckedList<E> parent;
-        if((cursor=this.cursor)<(bound=(parent=this.parent).size))
-        {
+        if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           OmniArray.OfRef.ascendingForEach(parent.arr,cursor,bound-1,action);
           this.cursor=bound;
         }
       }
     }
-    @Override
-    public OmniIterator.OfRef<E> iterator()
-    {
+    @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);
     }
-    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>
-    {
+    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
       transient int lastRet;
-      private ListItr(UncheckedList<E> parent)
-      {
+      private ListItr(UncheckedList<E> parent){
         super(parent);
         this.lastRet=-1;
       }
-      private ListItr(UncheckedList<E> parent,int cursor)
-      {
+      private ListItr(UncheckedList<E> parent,int cursor){
         super(parent,cursor);
         this.lastRet=-1;
       }
-      @Override
-      public boolean hasPrevious()
-      {
+      @Override public boolean hasPrevious(){
         return this.cursor>0;
       }
-      @Override
-      public int nextIndex()
-      {
+      @Override public int nextIndex(){
         return this.cursor;
       }
-      @Override
-      public int previousIndex()
-      {
+      @Override public int previousIndex(){
         return this.cursor-1;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         int lastRet;
         this.lastRet=lastRet=this.cursor++;
         return (E)parent.arr[lastRet];
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         final UncheckedList<E> root;
         final int lastRet;
         OmniArray.OfRef.removeIndexAndPullDown((root=this.parent).arr,lastRet=this.lastRet,--root.size);
         this.cursor=lastRet;
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         int cursor;
         final int bound;
         final UncheckedList<E> parent;
-        if((cursor=this.cursor)<(bound=(parent=this.parent).size))
-        {
+        if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           OmniArray.OfRef.ascendingForEach(parent.arr,cursor,cursor=bound-1,action);
           this.lastRet=cursor;
           this.cursor=bound;
         }
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E previous()
-      {
+      @Override public E previous(){
         final int lastRet;
         this.lastRet=lastRet=--this.cursor;
         return (E)parent.arr[lastRet];
       }
-      @Override
-      public void set(E val)
-      {
+      @Override public void set(E val){
         parent.arr[this.lastRet]=val;
       }
-      @Override
-      public void add(E val)
-      {
+      @Override public void add(E val){
         final UncheckedList<E> root;
         final int rootSize;
         if((rootSize=(root=this.parent).size)!=0)
         {
           ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
-        }
-        else
-        {
+        }else{
           ((RefArrSeq<E>)root).uncheckedInit(val);
           ++this.cursor;
         }
       }
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator()
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(){
       return new ListItr<E>(this);
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator(int index)
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(int index){
       return new ListItr<E>(this,index);
     }
-      private void uncheckedInsert(int index,int size,E val)
-      {
+      private void uncheckedInsert(int index,int size,E val){
         final int tailDist;
-        if((tailDist=size-index)==0)
-        {
+        if((tailDist=size-index)==0){
           super.uncheckedAppend(size,val);
-        }
-        else
-        {
+        }else{
           Object[] arr;
-          if((arr=this.arr).length==size)
-          {
+          if((arr=this.arr).length==size){
             final Object[] tmp;
             ArrCopy.semicheckedCopy(arr,0,tmp=new Object[OmniArray.growBy50Pct(size)],0,index);
             ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
             this.arr=arr=tmp;
-          }
-          else
-          {
+          }else{
             ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
           }
           arr[index]=val;
           this.size=size+1;
         }
       }
-    @Override
-    public void add(int index,E val)
-    {
+    @Override public void add(int index,E val){
       final int size;
       if((size=this.size)!=0){
         ((UncheckedList<E>)this).uncheckedInsert(index,size,val);
@@ -2125,46 +1842,33 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         ((RefArrSeq<E>)this).uncheckedInit(val);
       }
     }
-    @Override
-    void uncheckedCopyInto(Object[] dst,int length)
-    {
+    @Override void uncheckedCopyInto(Object[] dst,int length){
       ArrCopy.uncheckedCopy(this.arr,0,dst,0,length);
     }
-    @Override
-    public void put(int index,E val)
-    {
+    @Override public void put(int index,E val){
       this.arr[index]=val;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E get(int index)
-    {
+    @Override public E get(int index){
       return (E)this.arr[index];
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E set(int index,E val)
-    {
+    @Override public E set(int index,E val){
       final Object[] arr;
       final var ret=(E)(arr=this.arr)[index];
       arr[index]=val;
       return ret;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E remove(int index)
-    {
+    @Override public E remove(int index){
       final Object[] arr;
       final var ret=(E)(arr=this.arr)[index];
       OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
       return ret;
     }
-    @Override
-    public void replaceAll(UnaryOperator<E> operator)
-    {
+    @Override public void replaceAll(UnaryOperator<E> operator){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         OmniArray.OfRef.uncheckedReplaceAll(this.arr,0,size,operator);
       }
     }
@@ -2172,14 +1876,10 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     public void sort(Comparator<? super E> sorter)
     {
       final int size;
-      if((size=this.size)>1)
-      {
-        if(sorter==null)
-        {
+      if((size=this.size)>1){
+        if(sorter==null){
           RefSortUtil.uncheckedStableAscendingSort(this.arr,0,size);
-        }
-        else
-        {
+        }else{
           RefSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
         }
       }
@@ -2204,14 +1904,10 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     public void unstableSort(Comparator<? super E> sorter)
     {
       final int size;
-      if((size=this.size)>1)
-      {
-        if(sorter==null)
-        {
+      if((size=this.size)>1){
+        if(sorter==null){
           RefSortUtil.uncheckedUnstableAscendingSort(this.arr,0,size);
-        }
-        else
-        {
+        }else{
           RefSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
         }
       }
@@ -2232,47 +1928,38 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         RefSortUtil.uncheckedUnstableDescendingSort(this.arr,0,size);
       }
     }
-    @Override
-    public OmniList.OfRef<E> subList(int fromIndex,int toIndex)
-    {
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       return new UncheckedSubList<E>(this,fromIndex,toIndex-fromIndex);
     }
   }
   public
     static class UncheckedSubList<E>
+      extends AbstractSeq
       implements OmniList.OfRef<E>,Cloneable
-        ,Serializable
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
-    transient int size;
     transient final UncheckedList<E> root;
     transient final UncheckedSubList<E> parent;
-    private UncheckedSubList(UncheckedList<E> root,int rootOffset,int size)
-    {
-      super();
+    private UncheckedSubList(UncheckedList<E> root,int rootOffset,int size){
+      super(size);
       this.root=root;
       this.parent=null;
       this.rootOffset=rootOffset;
-      this.size=size;
     }
-    private UncheckedSubList(UncheckedSubList<E> parent,int rootOffset,int size)
-    {
-      super();
+    private UncheckedSubList(UncheckedSubList<E> parent,int rootOffset,int size){
+      super(size);
       this.root=parent.root;
       this.parent=parent;
       this.rootOffset=rootOffset;
-      this.size=size;
     }
-    private static class SerializableSubList<E> implements Serializable
-    {
+    private static class SerializableSubList<E> implements Serializable{
       private static final long serialVersionUID=1L;
       private transient Object[] arr;
       private transient int size;
       private transient final int rootOffset;
       private SerializableSubList(Object[] arr,int size,int rootOffset
-      )
-      {
+      ){
         this.arr=arr;
         this.size=size;
         this.rootOffset=rootOffset;
@@ -2285,18 +1972,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       {
         int size;
         this.size=size=ois.readInt();
-        if(size!=0)
-        {
+        if(size!=0){
           OmniArray.OfRef.readArray(this.arr=new Object[size],0,size-1,ois);
         }
       }
-      private void writeObject(ObjectOutputStream oos) throws IOException
-      {
+      private void writeObject(ObjectOutputStream oos) throws IOException{
         {
           int size;
           oos.writeInt(size=this.size);
-          if(size!=0)
-          {
+          if(size!=0){
             final int rootOffset;
             OmniArray.OfRef.writeArray(arr,rootOffset=this.rootOffset,rootOffset+size-1,oos);
           }
@@ -2306,34 +1990,24 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     private Object writeReplace(){
       return new SerializableSubList<E>(root.arr,this.size,this.rootOffset);
     }
-    @Override
-    public boolean equals(Object val)
-    {
+    @Override public boolean equals(Object val){
       //TODO implements equals method for UncheckedSubList<E>
       return false;
     }
-    @Override
-    public Object clone()
-    {
+    @Override public Object clone(){
       final Object[] copy;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(root.arr,rootOffset,copy=new Object[size],0,size);
-      }
-      else
-      {
+      }else{
         copy=OmniArray.OfRef.DEFAULT_ARR;
       }
       return new UncheckedList<E>(size,copy);
     }
-    @Override
-    public String toString()
-    {
+    @Override public String toString(){
       {
         final int size;
-        if((size=this.size)!=0)
-        {
+        if((size=this.size)!=0){
           final StringBuilder builder;
           final int rootOffset;
           OmniArray.OfRef.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
@@ -2342,35 +2016,19 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         return "[]";
       }
     }
-  @Override
-  public int hashCode()
-  {
+  @Override public int hashCode(){
     {
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         final int rootOffset;
         return OmniArray.OfRef.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       return 1;
     }
   }
-    @Override
-    public int size()
-    {
-      return this.size;
-    }
-    @Override
-    public boolean isEmpty()
-    {
-      return this.size==0;
-    }
-    @Override
-    public void clear()
-    {
+    @Override public void clear(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent){}
         final UncheckedList<E> root;
         (root=this.root).size=OmniArray.OfRef.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
@@ -2443,8 +2101,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveValNonNull(size,val);
             }
             return this.uncheckedremoveValNull(size);
@@ -2495,8 +2152,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2511,8 +2167,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2527,8 +2182,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2543,8 +2197,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2559,8 +2212,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2575,8 +2227,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2591,8 +2242,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2607,8 +2257,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -2688,8 +2337,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontainsNonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,val);
             }
@@ -2745,8 +2393,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
@@ -2763,8 +2410,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
@@ -2781,8 +2427,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
@@ -2799,8 +2444,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
@@ -2817,8 +2461,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
@@ -2835,8 +2478,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
@@ -2853,8 +2495,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
@@ -2871,8 +2512,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
@@ -2949,8 +2589,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOfNonNull(root.arr,this.rootOffset,size,val);
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3001,8 +2640,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3017,8 +2655,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3033,8 +2670,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3049,8 +2685,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3065,8 +2700,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3081,8 +2715,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3097,8 +2730,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3113,8 +2745,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
@@ -3189,8 +2820,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOfNonNull(root.arr,this.rootOffset,size,val);
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3241,8 +2871,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3257,8 +2886,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3273,8 +2901,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3289,8 +2916,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3305,8 +2931,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3321,8 +2946,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3337,8 +2961,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3353,8 +2976,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
@@ -3363,34 +2985,27 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }//end val check
       return -1;
     }
-    private boolean uncheckedremoveValNonNull(int size,Object nonNull)
-    {
+    private boolean uncheckedremoveValNonNull(int size,Object nonNull){
       final UncheckedList<E> root;
       final var arr=(root=this.root).arr;
       {
-        for(int index=this.rootOffset,bound=index+(--size);;++index)
-        {
-          if(nonNull.equals(arr[index]))
-          {
+        for(int index=this.rootOffset,bound=index+(--size);;++index){
+          if(nonNull.equals(arr[index])){
             for(var curr=parent;curr!=null;--curr.size,curr=curr.parent){}
             OmniArray.OfRef.removeIndexAndPullDown(arr,index,--root.size);
             this.size=size;
             return true;
-          }
-          if(index==bound)
-          {
+          }else if(index==bound){
             return false;
           }
         }
       }
     }
     private boolean uncheckedremoveValNull(int size
-    )
-    {
+    ){
       final UncheckedList<E> root;
       final var arr=(root=this.root).arr;
-      for(int index=this.rootOffset,bound=index+(--size);;++index)
-      {
+      for(int index=this.rootOffset,bound=index+(--size);;++index){
         if(
         arr[index]==null
         )
@@ -3399,21 +3014,17 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--root.size);
           this.size=size;
           return true;
-        }
-        if(index==bound)
-        {
+        }else if(index==bound){
           return false;
         }
       }
     }
     private boolean uncheckedremoveVal (int size
     ,Predicate<Object> pred
-    )
-    {
+    ){
       final UncheckedList<E> root;
       final var arr=(root=this.root).arr;
-      for(int index=this.rootOffset,bound=index+(--size);;++index)
-      {
+      for(int index=this.rootOffset,bound=index+(--size);;++index){
         if(
         pred.test(arr[index])
         )
@@ -3422,20 +3033,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--root.size);
           this.size=size;
           return true;
-        }
-        if(index==bound)
-        {
+        }else if(index==bound){
           return false;
         }
       }
     }
-    @Override
-    public void forEach(Consumer<? super E> action)
-    {
+    @Override public void forEach(Consumer<? super E> action){
       {
         final int size;
-        if((size=this.size)!=0)
-        {
+        if((size=this.size)!=0){
           final int rootOffset;
           OmniArray.OfRef.ascendingForEach(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,action);
         }
@@ -3446,31 +3052,23 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     {
       transient final UncheckedSubList<E> parent;
       transient int cursor;
-      private Itr(UncheckedSubList<E> parent)
-      {
+      private Itr(UncheckedSubList<E> parent){
         this.parent=parent;
         this.cursor=parent.rootOffset;
       }
-      private Itr(UncheckedSubList<E> parent,int cursor)
-      {
+      private Itr(UncheckedSubList<E> parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
       }
-      @Override
-      public boolean hasNext()
-      {
+      @Override public boolean hasNext(){
         final UncheckedSubList<E> parent;
         return this.cursor<(parent=this.parent).rootOffset+parent.size;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         return (E)parent.root.arr[cursor++];
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         UncheckedSubList<E> parent;
         final UncheckedList<E> root;
         OmniArray.OfRef.removeIndexAndPullDown((root=(parent=this.parent).root).arr,--this.cursor,--root.size);
@@ -3478,62 +3076,44 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           --parent.size;
         }while((parent=parent.parent)!=null);
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         final int cursor,bound;
         final UncheckedSubList<E> parent;
-        if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size))
-        {
+        if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           OmniArray.OfRef.ascendingForEach(parent.root.arr,cursor,bound-1,action);
           this.cursor=bound;
         }
       }
     }
-    @Override
-    public OmniIterator.OfRef<E> iterator()
-    {
+    @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);
     }
-    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>
-    {
+    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
       transient int lastRet;
-      private ListItr(UncheckedSubList<E> parent)
-      {
+      private ListItr(UncheckedSubList<E> parent){
         super(parent);
         this.lastRet=-1;
       }
-      private ListItr(UncheckedSubList<E> parent,int cursor)
-      {
+      private ListItr(UncheckedSubList<E> parent,int cursor){
         super(parent,cursor);
         this.lastRet=-1;
       }
-      @Override
-      public boolean hasPrevious()
-      {
+      @Override public boolean hasPrevious(){
         return this.cursor>parent.rootOffset;
       }
-      @Override
-      public int nextIndex()
-      {
+      @Override public int nextIndex(){
         return this.cursor-parent.rootOffset;
       }
-      @Override
-      public int previousIndex()
-      {
+      @Override public int previousIndex(){
         return this.cursor-parent.rootOffset-1;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         int lastRet;
         this.lastRet=lastRet=this.cursor++;
         return (E)parent.root.arr[lastRet];
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         UncheckedSubList<E> parent;
         final UncheckedList<E> root;
         final int lastRet;
@@ -3543,44 +3123,33 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           --parent.size;
         }while((parent=parent.parent)!=null);
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         int cursor;
         final int bound;
         final UncheckedSubList<E> parent;
-        if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size))
-        {
+        if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           OmniArray.OfRef.ascendingForEach(parent.root.arr,cursor,cursor=bound-1,action);
           this.lastRet=cursor;
           this.cursor=bound;
         }
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E previous()
-      {
+      @Override public E previous(){
         final int lastRet;
         this.lastRet=lastRet=--this.cursor;
         return (E)parent.root.arr[lastRet];
       }
-      @Override
-      public void set(E val)
-      {
+      @Override public void set(E val){
         parent.root.arr[this.lastRet]=val;
       }
-      @Override
-      public void add(E val)
-      {
+      @Override public void add(E val){
         final UncheckedList<E> root;
         final int rootSize;
         UncheckedSubList<E> parent;
         if((rootSize=(root=(parent=this.parent).root).size)!=0)
         {
           ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
-        }
-        else
-        {
+        }else{
           ((RefArrSeq<E>)root).uncheckedInit(val);
           ++this.cursor;
         }
@@ -3589,19 +3158,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }while((parent=parent.parent)!=null);
       }
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator()
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(){
       return new ListItr<E>(this);
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator(int index)
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(int index){
       return new ListItr<E>(this,index+this.rootOffset);
     }
-    @Override
-    public boolean add(E val)
-    {
+    @Override public boolean add(E val){
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
       final UncheckedList<E> root;
       final int rootSize;
@@ -3613,9 +3176,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }
       return true;
     }
-    @Override
-    public void add(int index,E val)
-    {
+    @Override public void add(int index,E val){
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
       ++this.size;
       final UncheckedList<E> root;
@@ -3626,70 +3187,51 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         ((RefArrSeq<E>)root).uncheckedInit(val);
       }
     }
-    @Override
-    public <T> T[] toArray(T[] arr)
-    {
+    @Override  public <T> T[] toArray(T[] arr){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(root.arr,this.rootOffset,arr=OmniArray.uncheckedArrResize(size,arr),0,size);
-      }
-      else if(arr.length!=0)
-      {
+      }else if(arr.length!=0){
         arr[0]=null;
       }
       return arr;
     }
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-    {
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final int size;
       final T[] dst;
       {
         dst=arrConstructor.apply(size=this.size);
       }
-      if(size!=0)
-      {
+      if(size!=0){
         ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst,0,size);
       }
       return dst;
     }
-    @Override
-    public Object[] toArray()
-    {
+    @Override public Object[] toArray(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         final Object[] dst;
         ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst=new Object[size],0,size);
         return dst;
       }
       return OmniArray.OfRef.DEFAULT_ARR;
     }
-    @Override
-    public void put(int index,E val)
-    {
+    @Override public void put(int index,E val){
       root.arr[index+this.rootOffset]=val;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E get(int index)
-    {
+    @Override public E get(int index){
       return (E)root.arr[index+this.rootOffset];
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E set(int index,E val)
-    {
+    @Override public E set(int index,E val){
       final Object[] arr;
       final var ret=(E)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E remove(int index)
-    {
+    @Override public E remove(int index){
       final Object[] arr;
       for(var curr=parent;curr!=null;--curr.size,curr=curr.parent){}
       final UncheckedList<E> root;
@@ -3698,12 +3240,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       this.size=size-1;
       return ret;
     }
-    @Override
-    public boolean removeIf(Predicate<? super E> filter)
-    {
+    @Override public boolean removeIf(Predicate<? super E> filter){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         {
           final Object[] arr;
           final int numRemoved;
@@ -3719,12 +3258,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }
       return false;
     }
-    @Override
-    public void replaceAll(UnaryOperator<E> operator)
-    {
+    @Override public void replaceAll(UnaryOperator<E> operator){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         final int rootOffset;
         OmniArray.OfRef.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
       }
@@ -3733,15 +3269,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     public void sort(Comparator<? super E> sorter)
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
-        if(sorter==null)
-        {
+        if(sorter==null){
           RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
+        }else{
           RefSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
         }
       }
@@ -3768,15 +3300,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     public void unstableSort(Comparator<? super E> sorter)
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
-        if(sorter==null)
-        {
+        if(sorter==null){
           RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
+        }else{
           RefSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
         }
       }
@@ -3799,9 +3327,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         RefSortUtil.uncheckedUnstableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
     }
-    @Override
-    public OmniList.OfRef<E> subList(int fromIndex,int toIndex)
-    {
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       return new UncheckedSubList<E>(this,this.rootOffset+fromIndex,toIndex-fromIndex);
     }
   }
@@ -3811,20 +3337,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
-    public CheckedStack()
-    {
+    public CheckedStack(){
       super();
     }
-    public CheckedStack(int initialCapacity)
-    {
+    public CheckedStack(int initialCapacity){
       super(initialCapacity);
     }
-    CheckedStack(int size,Object[] arr)
-    {
+    CheckedStack(int size,Object[] arr){
       super(size,arr);
     }
-    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
-    {
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
       ModCountChecker(int modCount){
         super(modCount);
       }
@@ -3832,71 +3354,47 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         return CheckedStack.this.modCount;
       }
     }
-    @Override public void writeExternal(ObjectOutput out) throws IOException
-    {
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
       int modCount=this.modCount;
-      try
-      {
+      try{
         super.writeExternal(out);
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override
-    public boolean equals(Object val)
-    {
+    @Override public boolean equals(Object val){
       //TODO implements equals method for CheckedStack<E>
       return false;
     }
-    @Override
-    public Object clone()
-    {
+    @Override public Object clone(){
       final Object[] copy;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(this.arr,0,copy=new Object[size],0,size);
-      }
-      else
-      {
+      }else{
         copy=OmniArray.OfRef.DEFAULT_ARR;
       }
       return new CheckedStack<E>(size,copy);
     }
-    @Override
-    void uncheckedToString(int size,StringBuilder builder)
-    {
+    @Override void uncheckedToString(int size,StringBuilder builder){
       final int modCount=this.modCount;
-      try
-      {
+      try{
         super.uncheckedToString(size,builder);
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-  @Override
-  int uncheckedHashCode(int size)
-  {
+  @Override int uncheckedHashCode(int size){
     final int modCount=this.modCount;
-    try
-    {
+    try{
       return super.uncheckedHashCode(size);
-    }
-    finally
-    {
+    }finally{
       CheckedCollection.checkModCount(modCount,this.modCount);
     }
   }
-    @Override
-    public void clear()
-    {
+    @Override public void clear(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ++this.modCount;
         this.size=0;
         OmniArray.OfRef.nullifyRange(this.arr,size-1,0);
@@ -3908,8 +3406,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int modCount=this.modCount;
               try{
                 return OmniArray.OfRef.uncheckedcontainsNonNull(this.arr,0,size-1,val);
@@ -3929,8 +3426,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int modCount=this.modCount;
               try{
                 return OmniArray.OfRef.uncheckedsearchNonNull(this.arr,size,val);
@@ -3944,46 +3440,34 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }//end val check
       return -1;
     }
-    @Override
-    boolean uncheckedremoveValNonNull(int size,Object nonNull)
-    {
+    @Override boolean uncheckedremoveValNonNull(int size,Object nonNull){
       int modCount=this.modCount;
       try
       {
         final var arr=this.arr;
-        for(int index=--size;;--index)
-        {
-          if(nonNull.equals(arr[index]))
-          {
+        for(int index=--size;;--index){
+          if(nonNull.equals(arr[index])){
             CheckedCollection.checkModCount(modCount,this.modCount);
             this.modCount=modCount+1;
             OmniArray.OfRef.removeIndexAndPullDown(arr,index,size);
             this.size=size;
             return true;
-          }
-          if(index==0)
-          {
+          }else if(index==0){
             CheckedCollection.checkModCount(modCount,this.modCount);
             return false;
           }
         }
       }
-      catch(final ConcurrentModificationException e)
-      {
+      catch(final ConcurrentModificationException e){
         throw e;
-      }
-      catch(final RuntimeException e)
-      {
+      }catch(final RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
     }
-    @Override
-    boolean uncheckedremoveValNull(int size
-    )
-    {
+    @Override boolean uncheckedremoveValNull(int size
+    ){
       final var arr=this.arr;
-      for(int index=--size;;--index)
-      {
+      for(int index=--size;;--index){
         if(
         arr[index]==null
         )
@@ -3992,21 +3476,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,size);
           this.size=size;
           return true;
-        }
-        if(index==0)
-        {
+        }else if(index==0){
           return false;
         }
       }
     }
-    @Override
-    boolean uncheckedremoveVal (int size
+    @Override boolean uncheckedremoveVal (int size
     ,Predicate<Object> pred
-    )
-    {
+    ){
       final var arr=this.arr;
-      for(int index=--size;;--index)
-      {
+      for(int index=--size;;--index){
         if(
         pred.test(arr[index])
         )
@@ -4015,23 +3494,18 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,size);
           this.size=size;
           return true;
-        }
-        if(index==0)
-        {
+        }else if(index==0){
           return false;
         }
       }
     }
-    @Override
-    void uncheckedForEach(int size,Consumer<? super E> action)
-    {
+    @Override void uncheckedForEach(int size,Consumer<? super E> action){
       int modCount=this.modCount;
       try
       {
         OmniArray.OfRef.descendingForEach(this.arr,0,size-1,action);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
@@ -4042,39 +3516,31 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       transient int cursor;
       transient int lastRet;
       transient int modCount;
-      private Itr(CheckedStack<E> parent)
-      {
+      private Itr(CheckedStack<E> parent){
         this.parent=parent;
         this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
-      @Override
-      public boolean hasNext()
-      {
+      @Override public boolean hasNext(){
         return this.cursor>0;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         final CheckedStack<E> root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
         int cursor;
         if((cursor=this.cursor)>0)
-        {
+        {  
           this.lastRet=--cursor;
           this.cursor=cursor;
-            return (E)root.arr[cursor];
+          return (E)root.arr[cursor];
         }
         throw new NoSuchElementException();
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         final int lastRet;
-        if((lastRet=this.lastRet)!=-1)
-        {
+        if((lastRet=this.lastRet)!=-1){
           int modCount;
           final CheckedStack<E> root;
           CheckedCollection.checkModCount(modCount=this.modCount,(root=this.parent).modCount);
@@ -4087,20 +3553,14 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new IllegalStateException();
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         final int cursor;
-        if((cursor=this.cursor)>0)
-        {
+        if((cursor=this.cursor)>0){
           final int modCount=this.modCount;
           final var parent=this.parent;
-          try
-          {
+          try{
             OmniArray.OfRef.descendingForEach(parent.arr,0,cursor-1,action);
-          }
-          finally
-          {
+          }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
           this.cursor=0;
@@ -4108,39 +3568,27 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
       }
     }
-    @Override
-    public OmniIterator.OfRef<E> iterator()
-    {
+    @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);
     }
-    @Override
-    public void push(E val)
-    {
+    @Override public void push(E val){
       ++this.modCount;
       super.push(val);
     }
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-    {
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       return super.toArray(arrSize->{
         final int modCount=this.modCount;
-        try
-        {
+        try{
           return arrConstructor.apply(arrSize);
-        }
-        finally
-        {
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       });
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E pop()
-    {
+    @Override public E pop(){
       int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ++this.modCount;
         final Object[] arr;
         final var ret=(E)(arr=this.arr)[--size];
@@ -4151,12 +3599,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       throw new NoSuchElementException();
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E poll()
-    {
+    @Override public E poll(){
       int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ++this.modCount;
         final var ret=(E)(arr[--size]);
         arr[size]=null;
@@ -4165,12 +3610,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }
       return null;
     }
-    @Override
-    boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
-    {
+    @Override boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
       final int modCount=this.modCount;
-      try
-      {
+      try{
         final int numRemoved;
         final Object[] arr;
         if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
@@ -4182,13 +3624,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           this.size=size;
           return true;
         }
-      }
-      catch(ConcurrentModificationException e)
-      {
+      }catch(ConcurrentModificationException e){
         throw e;
-      }
-      catch(RuntimeException e)
-      {
+      }catch(RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4201,20 +3639,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
-    public CheckedList()
-    {
+    public CheckedList(){
       super();
     }
-    public CheckedList(int initialCapacity)
-    {
+    public CheckedList(int initialCapacity){
       super(initialCapacity);
     }
-    CheckedList(int size,Object[] arr)
-    {
+    CheckedList(int size,Object[] arr){
       super(size,arr);
     }
-    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
-    {
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
       ModCountChecker(int modCount){
         super(modCount);
       }
@@ -4222,71 +3656,47 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         return CheckedList.this.modCount;
       }
     }
-    @Override public void writeExternal(ObjectOutput out) throws IOException
-    {
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
       int modCount=this.modCount;
-      try
-      {
+      try{
         super.writeExternal(out);
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override
-    public boolean equals(Object val)
-    {
+    @Override public boolean equals(Object val){
       //TODO implements equals method for CheckedList<E>
       return false;
     }
-    @Override
-    public Object clone()
-    {
+    @Override public Object clone(){
       final Object[] copy;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(this.arr,0,copy=new Object[size],0,size);
-      }
-      else
-      {
+      }else{
         copy=OmniArray.OfRef.DEFAULT_ARR;
       }
       return new CheckedList<E>(size,copy);
     }
-    @Override
-    void uncheckedToString(int size,StringBuilder builder)
-    {
+    @Override void uncheckedToString(int size,StringBuilder builder){
       final int modCount=this.modCount;
-      try
-      {
+      try{
         super.uncheckedToString(size,builder);
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-  @Override
-  int uncheckedHashCode(int size)
-  {
+  @Override int uncheckedHashCode(int size){
     final int modCount=this.modCount;
-    try
-    {
+    try{
       return super.uncheckedHashCode(size);
-    }
-    finally
-    {
+    }finally{
       CheckedCollection.checkModCount(modCount,this.modCount);
     }
   }
-    @Override
-    public void clear()
-    {
+    @Override public void clear(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ++this.modCount;
         this.size=0;
         OmniArray.OfRef.nullifyRange(this.arr,size-1,0);
@@ -4298,8 +3708,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int modCount=this.modCount;
               try{
                 return OmniArray.OfRef.uncheckedcontainsNonNull(this.arr,0,size-1,val);
@@ -4319,8 +3728,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int modCount=this.modCount;
               try{
                 return OmniArray.OfRef.uncheckedindexOfNonNull(this.arr,size,val);
@@ -4340,8 +3748,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int modCount=this.modCount;
               try{
                 return OmniArray.OfRef.uncheckedlastIndexOfNonNull(this.arr,size,val);
@@ -4355,46 +3762,35 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }//end val check
       return -1;
     }
-    @Override
-    boolean uncheckedremoveValNonNull(int size,Object nonNull)
-    {
+    @Override boolean uncheckedremoveValNonNull(int size,Object nonNull){
       int modCount=this.modCount;
       try
       {
         final var arr=this.arr;
-        for(int index=0;;)
-        {
-          if(nonNull.equals(arr[index]))
-          {
+        for(int index=0;;){
+          if(nonNull.equals(arr[index])){
             CheckedCollection.checkModCount(modCount,this.modCount);
             this.modCount=modCount+1;
             OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
             this.size=size;
             return true;
-          }
-          if(++index==size)
+          }else if(++index==size)
           {
             CheckedCollection.checkModCount(modCount,this.modCount);
             return false;
           }
         }
       }
-      catch(final ConcurrentModificationException e)
-      {
+      catch(final ConcurrentModificationException e){
         throw e;
-      }
-      catch(final RuntimeException e)
-      {
+      }catch(final RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
     }
-    @Override
-    boolean uncheckedremoveValNull(int size
-    )
-    {
+    @Override boolean uncheckedremoveValNull(int size
+    ){
       final var arr=this.arr;
-      for(int index=0;;)
-      {
+      for(int index=0;;){
         if(
         arr[index]==null
         )
@@ -4403,21 +3799,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
-        }
-        if(++index==size)
-        {
+        }else if(++index==size){
           return false;
         }
       }
     }
-    @Override
-    boolean uncheckedremoveVal (int size
+    @Override boolean uncheckedremoveVal (int size
     ,Predicate<Object> pred
-    )
-    {
+    ){
       final var arr=this.arr;
-      for(int index=0;;)
-      {
+      for(int index=0;;){
         if(
         pred.test(arr[index])
         )
@@ -4426,23 +3817,18 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
-        }
-        if(++index==size)
-        {
+        }else if(++index==size){
           return false;
         }
       }
     }
-    @Override
-    void uncheckedForEach(int size,Consumer<? super E> action)
-    {
+    @Override void uncheckedForEach(int size,Consumer<? super E> action){
       int modCount=this.modCount;
       try
       {
         OmniArray.OfRef.ascendingForEach(this.arr,0,size-1,action);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
@@ -4453,46 +3839,37 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       transient int cursor;
       transient int lastRet;
       transient int modCount;
-      private Itr(CheckedList<E> parent)
-      {
+      private Itr(CheckedList<E> parent){
         this.parent=parent;
         this.cursor=0;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
-      private Itr(CheckedList<E> parent,int cursor)
-      {
+      private Itr(CheckedList<E> parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
-      @Override
-      public boolean hasNext()
-      {
+      @Override public boolean hasNext(){
         return this.cursor<parent.size;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         final CheckedList<E> root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
         final int cursor;
         if((cursor=this.cursor)<root.size)
-        {
+        {  
           this.lastRet=cursor;
           this.cursor=cursor+1;
-            return (E)root.arr[cursor];
+          return (E)root.arr[cursor];
         }
         throw new NoSuchElementException();
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         final int lastRet;
-        if((lastRet=this.lastRet)!=-1)
-        {
+        if((lastRet=this.lastRet)!=-1){
           int modCount;
           final CheckedList<E> root;
           CheckedCollection.checkModCount(modCount=this.modCount,(root=this.parent).modCount);
@@ -4505,21 +3882,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new IllegalStateException();
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         int cursor;
         final int bound;
         final CheckedList<E> parent;
-        if((cursor=this.cursor)<(bound=(parent=this.parent).size))
-        {
+        if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           final int modCount=this.modCount;
-          try
-          {
+          try{
             OmniArray.OfRef.ascendingForEach(parent.arr,cursor,cursor=bound-1,action);
-          }
-          finally
-          {
+          }finally{
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
           this.cursor=bound;
@@ -4527,40 +3898,27 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
       }
     }
-    @Override
-    public OmniIterator.OfRef<E> iterator()
-    {
+    @Override public OmniIterator.OfRef<E> iterator(){
       return new Itr<E>(this);
     }
-    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>
-    {
-      private ListItr(CheckedList<E> parent)
-      {
+    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
+      private ListItr(CheckedList<E> parent){
         super(parent);
       }
-      private ListItr(CheckedList<E> parent,int cursor)
-      {
+      private ListItr(CheckedList<E> parent,int cursor){
         super(parent,cursor);
       }
-      @Override
-      public boolean hasPrevious()
-      {
+      @Override public boolean hasPrevious(){
         return this.cursor>0;
       }
-      @Override
-      public int nextIndex()
-      {
+      @Override public int nextIndex(){
         return this.cursor;
       }
-      @Override
-      public int previousIndex()
-      {
+      @Override public int previousIndex(){
         return this.cursor-1;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E previous()
-      {
+      @Override public E previous(){
         final CheckedList<E> root;
         int cursor;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
@@ -4572,12 +3930,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new NoSuchElementException();
       }
-      @Override
-      public void set(E val)
-      {
+      @Override public void set(E val){
         final int lastRet;
-        if((lastRet=this.lastRet)!=-1)
-        {
+        if((lastRet=this.lastRet)!=-1){
           final CheckedList<E> root;
           CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
           root.arr[lastRet]=val;
@@ -4585,9 +3940,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new IllegalStateException();
       }
-      @Override
-      public void add(E val)
-      {
+      @Override public void add(E val){
         int modCount;
         final CheckedList<E> root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.parent).modCount);
@@ -4598,35 +3951,25 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         if((rootSize=root.size)!=0)
         {
           ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
-        }
-        else
-        {
+        }else{
           ((RefArrSeq<E>)root).uncheckedInit(val);
           ++this.cursor;
         }
       }
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator()
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(){
       return new ListItr<E>(this);
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator(int index)
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(int index){
       CheckedCollection.checkLo(index);
       CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr<E>(this,index);
     }
-    @Override
-    public void push(E val)
-    {
+    @Override public void push(E val){
       ++this.modCount;
       super.push(val);
     }
-    @Override
-    public void add(int index,E val)
-    {
+    @Override public void add(int index,E val){
       final int size;
       CheckedCollection.checkLo(index);
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -4637,40 +3980,29 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         ((RefArrSeq<E>)this).uncheckedInit(val);
       }
     }
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-    {
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       return super.toArray(arrSize->{
         final int modCount=this.modCount;
-        try
-        {
+        try{
           return arrConstructor.apply(arrSize);
-        }
-        finally
-        {
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
       });
     }
-    @Override
-    public void put(int index,E val)
-    {
+    @Override public void put(int index,E val){
       CheckedCollection.checkLo(index);
       CheckedCollection.checkReadHi(index,this.size);
       this.arr[index]=val;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E get(int index)
-    {
+    @Override public E get(int index){
       CheckedCollection.checkLo(index);
       CheckedCollection.checkReadHi(index,this.size);
       return (E)this.arr[index];
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E set(int index,E val)
-    {
+    @Override public E set(int index,E val){
       CheckedCollection.checkLo(index);
       CheckedCollection.checkReadHi(index,this.size);
       final Object[] arr;
@@ -4679,9 +4011,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       return ret;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E remove(int index)
-    {
+    @Override public E remove(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -4692,12 +4022,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       this.size=size;
       return ret;
     }
-    @Override
-    boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
-    {
+    @Override boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
       final int modCount=this.modCount;
-      try
-      {
+      try{
         final int numRemoved;
         final Object[] arr;
         if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
@@ -4709,31 +4036,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           this.size=size;
           return true;
         }
-      }
-      catch(ConcurrentModificationException e)
-      {
+      }catch(ConcurrentModificationException e){
         throw e;
-      }
-      catch(RuntimeException e)
-      {
+      }catch(RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
-    @Override
-    public void replaceAll(UnaryOperator<E> operator)
-    {
+    @Override public void replaceAll(UnaryOperator<E> operator){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         int modCount=this.modCount;
-        try
-        {
+        try{
           OmniArray.OfRef.uncheckedReplaceAll(this.arr,0,size,operator);
-        }
-        finally
-        {
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
         this.modCount=modCount+1;
@@ -4743,26 +4060,17 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     public void sort(Comparator<? super E> sorter)
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int modCount=this.modCount;
-        try
-        {
-          if(sorter==null)
-          {
+        try{
+          if(sorter==null){
             RefSortUtil.uncheckedStableAscendingSort(this.arr,0,size);
-          }
-          else
-          {
+          }else{
             RefSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-        }
-        catch(RuntimeException e)
-        {
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4775,11 +4083,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       final int size;
       if((size=this.size)>1){
         final int modCount=this.modCount;
-        try
-        {
+        try{
           RefSortUtil.uncheckedStableAscendingSort(this.arr,0,size);
-        }
-        catch(ArrayIndexOutOfBoundsException e){
+        }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
@@ -4794,11 +4100,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       final int size;
       if((size=this.size)>1){
         final int modCount=this.modCount;
-        try
-        {
+        try{
           RefSortUtil.uncheckedStableDescendingSort(this.arr,0,size);
-        }
-        catch(ArrayIndexOutOfBoundsException e){
+        }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
@@ -4811,26 +4115,17 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     public void unstableSort(Comparator<? super E> sorter)
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int modCount=this.modCount;
-        try
-        {
-          if(sorter==null)
-          {
+        try{
+          if(sorter==null){
             RefSortUtil.uncheckedUnstableAscendingSort(this.arr,0,size);
-          }
-          else
-          {
+          }else{
             RefSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
-        }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-        }
-        catch(RuntimeException e)
-        {
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4843,11 +4138,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       final int size;
       if((size=this.size)>1){
         final int modCount=this.modCount;
-        try
-        {
+        try{
           RefSortUtil.uncheckedUnstableAscendingSort(this.arr,0,size);
-        }
-        catch(ArrayIndexOutOfBoundsException e){
+        }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
@@ -4862,11 +4155,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       final int size;
       if((size=this.size)>1){
         final int modCount=this.modCount;
-        try
-        {
+        try{
           RefSortUtil.uncheckedUnstableDescendingSort(this.arr,0,size);
-        }
-        catch(ArrayIndexOutOfBoundsException e){
+        }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
@@ -4875,43 +4166,35 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         this.modCount=modCount+1;
       }
     }
-    @Override
-    public OmniList.OfRef<E> subList(int fromIndex,int toIndex)
-    {
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       return new CheckedSubList<E>(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
   private
     static class CheckedSubList<E>
+      extends AbstractSeq
       implements OmniList.OfRef<E>,Cloneable
-        ,Serializable
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
     transient final int rootOffset;
-    transient int size;
     transient final CheckedList<E> root;
     transient final CheckedSubList<E> parent;
-    private CheckedSubList(CheckedList<E> root,int rootOffset,int size)
-    {
-      super();
+    private CheckedSubList(CheckedList<E> root,int rootOffset,int size){
+      super(size);
       this.root=root;
       this.parent=null;
       this.rootOffset=rootOffset;
-      this.size=size;
       this.modCount=root.modCount;
     }
-    private CheckedSubList(CheckedSubList<E> parent,int rootOffset,int size)
-    {
-      super();
+    private CheckedSubList(CheckedSubList<E> parent,int rootOffset,int size){
+      super(size);
       this.root=parent.root;
       this.parent=parent;
       this.rootOffset=rootOffset;
-      this.size=size;
       this.modCount=parent.modCount;
     }
-    private static class SerializableSubList<E> implements Serializable
-    {
+    private static class SerializableSubList<E> implements Serializable{
       private static final long serialVersionUID=1L;
       private transient Object[] arr;
       private transient int size;
@@ -4919,8 +4202,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       private transient final CheckedList<E>.ModCountChecker modCountChecker;
       private SerializableSubList(Object[] arr,int size,int rootOffset
         ,CheckedList<E>.ModCountChecker modCountChecker
-      )
-      {
+      ){
         this.arr=arr;
         this.size=size;
         this.rootOffset=rootOffset;
@@ -4934,25 +4216,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       {
         int size;
         this.size=size=ois.readInt();
-        if(size!=0)
-        {
+        if(size!=0){
           OmniArray.OfRef.readArray(this.arr=new Object[size],0,size-1,ois);
         }
       }
-      private void writeObject(ObjectOutputStream oos) throws IOException
-      {
+      private void writeObject(ObjectOutputStream oos) throws IOException{
         try
         {
           int size;
           oos.writeInt(size=this.size);
-          if(size!=0)
-          {
+          if(size!=0){
             final int rootOffset;
             OmniArray.OfRef.writeArray(arr,rootOffset=this.rootOffset,rootOffset+size-1,oos);
           }
         }
-        finally
-        {
+        finally{
           modCountChecker.checkModCount();
         }
       }
@@ -4961,39 +4239,29 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       final CheckedList<E> root;
       return new SerializableSubList<E>((root=this.root).arr,this.size,this.rootOffset,root.new ModCountChecker(this.modCount));
     }
-    @Override
-    public boolean equals(Object val)
-    {
+    @Override public boolean equals(Object val){
       //TODO implements equals method for CheckedSubList<E>
       return false;
     }
-    @Override
-    public Object clone()
-    {
+    @Override public Object clone(){
       final CheckedList<E> root;
       CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
       final Object[] copy;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(root.arr,rootOffset,copy=new Object[size],0,size);
-      }
-      else
-      {
+      }else{
         copy=OmniArray.OfRef.DEFAULT_ARR;
       }
       return new CheckedList<E>(size,copy);
     }
-    @Override
-    public String toString()
-    {
+    @Override public String toString(){
       final int modCount=this.modCount;
       final var root=this.root;
       try
       {
         final int size;
-        if((size=this.size)!=0)
-        {
+        if((size=this.size)!=0){
           final StringBuilder builder;
           final int rootOffset;
           OmniArray.OfRef.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
@@ -5001,52 +4269,40 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         return "[]";
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
-  @Override
-  public int hashCode()
-  {
+  @Override public int hashCode(){
     final int modCount=this.modCount;
     final var root=this.root;
     try
     {
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         final int rootOffset;
         return OmniArray.OfRef.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       return 1;
     }
-    finally
-    {
+    finally{
       CheckedCollection.checkModCount(modCount,root.modCount);
     }
   }
-    @Override
-    public int size()
-    {
+    @Override public int size(){
       CheckedCollection.checkModCount(modCount,root.modCount);
       return this.size;
     }
-    @Override
-    public boolean isEmpty()
-    {
+    @Override public boolean isEmpty(){
       CheckedCollection.checkModCount(modCount,root.modCount);
       return this.size==0;
     }
-    @Override
-    public void clear()
-    {
+    @Override public void clear(){
       final CheckedList<E> root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         root.modCount=++modCount;
         this.modCount=modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=size,curr=curr.parent){}
@@ -5125,8 +4381,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveValNonNull(size,val);
             }
             return this.uncheckedremoveValNull(size);
@@ -5181,8 +4436,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5198,8 +4452,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5215,8 +4468,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5232,8 +4484,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5249,8 +4500,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5266,8 +4516,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5283,8 +4532,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5300,8 +4548,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return this.uncheckedremoveVal(size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return this.uncheckedremoveValNull(size);
@@ -5324,8 +4571,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5344,8 +4590,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5364,8 +4609,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5384,8 +4628,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5404,8 +4647,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5420,8 +4662,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               final int rootOffset;
               return OmniArray.OfRef.uncheckedcontainsNonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,val);
             }
@@ -5429,8 +4670,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5449,8 +4689,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5469,8 +4708,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5489,8 +4727,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5505,8 +4742,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
@@ -5514,8 +4750,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5530,8 +4765,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
@@ -5539,8 +4773,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5555,8 +4788,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
@@ -5564,8 +4796,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5580,8 +4811,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
@@ -5589,8 +4819,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5605,8 +4834,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
@@ -5614,8 +4842,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5630,8 +4857,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
@@ -5639,8 +4865,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5655,8 +4880,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
@@ -5664,8 +4888,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5680,8 +4903,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 final int rootOffset;
                 return OmniArray.OfRef.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
@@ -5689,8 +4911,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5708,8 +4929,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5727,8 +4947,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5746,8 +4965,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5765,8 +4983,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5784,8 +5001,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5800,15 +5016,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedindexOfNonNull(root.arr,this.rootOffset,size,val);
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5826,8 +5040,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5845,8 +5058,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5864,8 +5076,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5880,15 +5091,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5903,15 +5112,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5926,15 +5133,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5949,15 +5154,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5972,15 +5175,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -5995,15 +5196,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6018,15 +5217,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6041,15 +5238,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedindexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6067,8 +5262,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6086,8 +5280,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6105,8 +5298,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6124,8 +5316,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6143,8 +5334,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6159,15 +5349,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return OmniArray.OfRef.uncheckedlastIndexOfNonNull(root.arr,this.rootOffset,size,val);
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6185,8 +5373,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6204,8 +5391,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6223,8 +5409,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
               return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred(val));
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6239,15 +5424,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6262,15 +5445,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6285,15 +5466,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6308,15 +5487,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6331,15 +5508,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6354,15 +5529,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6377,15 +5550,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
@@ -6400,31 +5571,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           final int size;
           if((size=this.size)!=0)
           {
-            if(val!=null)
-            {
+            if(val!=null){
                 return OmniArray.OfRef.uncheckedlastIndexOf(root.arr,this.rootOffset,size,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
           } //end size check
         } //end checked sublist try modcount
-        finally
-        {
+        finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }//end val check
       return -1;
     }
-    private boolean uncheckedremoveValNonNull(int size,Object nonNull)
-    {
+    private boolean uncheckedremoveValNonNull(int size,Object nonNull){
       int modCount=this.modCount;
       final CheckedList<E> root;
       final var arr=(root=this.root).arr;
       try
       {
-        for(int index=this.rootOffset,bound=index+(--size);;++index)
-        {
-          if(nonNull.equals(arr[index]))
-          {
+        for(int index=this.rootOffset,bound=index+(--size);;++index){
+          if(nonNull.equals(arr[index])){
             CheckedCollection.checkModCount(modCount,root.modCount);
             root.modCount=++modCount;
             this.modCount=modCount;
@@ -6432,32 +5598,25 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             OmniArray.OfRef.removeIndexAndPullDown(arr,index,--root.size);
             this.size=size;
             return true;
-          }
-          if(index==bound)
-          {
+          }else if(index==bound){
             CheckedCollection.checkModCount(modCount,root.modCount);
             return false;
           }
         }
       }
-      catch(final ConcurrentModificationException e)
-      {
+      catch(final ConcurrentModificationException e){
         throw e;
-      }
-      catch(final RuntimeException e)
-      {
+      }catch(final RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,root.modCount,e);
       }
     }
     private boolean uncheckedremoveValNull(int size
-    )
-    {
+    ){
       int modCount;
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final var arr=root.arr;
-      for(int index=this.rootOffset,bound=index+(--size);;++index)
-      {
+      for(int index=this.rootOffset,bound=index+(--size);;++index){
         if(
         arr[index]==null
         )
@@ -6468,23 +5627,19 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--root.size);
           this.size=size;
           return true;
-        }
-        if(index==bound)
-        {
+        }else if(index==bound){
           return false;
         }
       }
     }
     private boolean uncheckedremoveVal (int size
     ,Predicate<Object> pred
-    )
-    {
+    ){
       int modCount;
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final var arr=root.arr;
-      for(int index=this.rootOffset,bound=index+(--size);;++index)
-      {
+      for(int index=this.rootOffset,bound=index+(--size);;++index){
         if(
         pred.test(arr[index])
         )
@@ -6495,29 +5650,23 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--root.size);
           this.size=size;
           return true;
-        }
-        if(index==bound)
-        {
+        }else if(index==bound){
           return false;
         }
       }
     }
-    @Override
-    public void forEach(Consumer<? super E> action)
-    {
+    @Override public void forEach(Consumer<? super E> action){
       int modCount=this.modCount;
       final var root=this.root;
       try
       {
         final int size;
-        if((size=this.size)!=0)
-        {
+        if((size=this.size)!=0){
           final int rootOffset;
           OmniArray.OfRef.ascendingForEach(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,action);
         }
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
@@ -6528,48 +5677,39 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       transient int cursor;
       transient int lastRet;
       transient int modCount;
-      private Itr(CheckedSubList<E> parent)
-      {
+      private Itr(CheckedSubList<E> parent){
         this.parent=parent;
         this.cursor=parent.rootOffset;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
-      private Itr(CheckedSubList<E> parent,int cursor)
-      {
+      private Itr(CheckedSubList<E> parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
-      @Override
-      public boolean hasNext()
-      {
+      @Override public boolean hasNext(){
         final CheckedSubList<E> parent;
         return this.cursor<(parent=this.parent).rootOffset+parent.size;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E next()
-      {
+      @Override public E next(){
         final CheckedList<E> root;
         final CheckedSubList<E> parent;
         CheckedCollection.checkModCount(modCount,(root=(parent=this.parent).root).modCount);
         final int cursor;
         if((cursor=this.cursor)<(parent.rootOffset+parent.size))
-        {
+        {  
           this.lastRet=cursor;
           this.cursor=cursor+1;
-            return (E)root.arr[cursor];
+          return (E)root.arr[cursor];
         }
         throw new NoSuchElementException();
       }
-      @Override
-      public void remove()
-      {
+      @Override public void remove(){
         final int lastRet;
-        if((lastRet=this.lastRet)!=-1)
-        {
+        if((lastRet=this.lastRet)!=-1){
           int modCount;
           final CheckedList<E> root;
           CheckedSubList<E> parent;
@@ -6587,22 +5727,16 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new IllegalStateException();
       }
-      @Override
-      public void forEachRemaining(Consumer<? super E> action)
-      {
+      @Override public void forEachRemaining(Consumer<? super E> action){
         int cursor;
         final int bound;
         final CheckedSubList<E> parent;
-        if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size))
-        {
+        if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           final int modCount=this.modCount;
           final var root=parent.root;
-          try
-          {
+          try{
             OmniArray.OfRef.ascendingForEach(root.arr,cursor,cursor=bound-1,action);
-          }
-          finally
-          {
+          }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
           this.cursor=bound;
@@ -6610,41 +5744,28 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
       }
     }
-    @Override
-    public OmniIterator.OfRef<E> iterator()
-    {
+    @Override public OmniIterator.OfRef<E> iterator(){
       CheckedCollection.checkModCount(modCount,root.modCount);
       return new Itr<E>(this);
     }
-    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>
-    {
-      private ListItr(CheckedSubList<E> parent)
-      {
+    private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
+      private ListItr(CheckedSubList<E> parent){
         super(parent);
       }
-      private ListItr(CheckedSubList<E> parent,int cursor)
-      {
+      private ListItr(CheckedSubList<E> parent,int cursor){
         super(parent,cursor);
       }
-      @Override
-      public boolean hasPrevious()
-      {
+      @Override public boolean hasPrevious(){
         return this.cursor>parent.rootOffset;
       }
-      @Override
-      public int nextIndex()
-      {
+      @Override public int nextIndex(){
         return this.cursor-parent.rootOffset;
       }
-      @Override
-      public int previousIndex()
-      {
+      @Override public int previousIndex(){
         return this.cursor-parent.rootOffset-1;
       }
       @SuppressWarnings("unchecked")
-      @Override
-      public E previous()
-      {
+      @Override public E previous(){
         final CheckedList<E> root;
         int cursor;
         final CheckedSubList<E> parent;
@@ -6657,12 +5778,9 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new NoSuchElementException();
       }
-      @Override
-      public void set(E val)
-      {
+      @Override public void set(E val){
         final int lastRet;
-        if((lastRet=this.lastRet)!=-1)
-        {
+        if((lastRet=this.lastRet)!=-1){
           final CheckedList<E> root;
           CheckedCollection.checkModCount(modCount,(root=this.parent.root).modCount);
           root.arr[lastRet]=val;
@@ -6670,9 +5788,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }
         throw new IllegalStateException();
       }
-      @Override
-      public void add(E val)
-      {
+      @Override public void add(E val){
         int modCount;
         final CheckedList<E> root;
         CheckedSubList<E> parent;
@@ -6688,31 +5804,23 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         if((rootSize=root.size)!=0)
         {
           ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
-        }
-        else
-        {
+        }else{
           ((RefArrSeq<E>)root).uncheckedInit(val);
           ++this.cursor;
         }
       }
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator()
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(){
       CheckedCollection.checkModCount(modCount,root.modCount);
       return new ListItr<E>(this);
     }
-    @Override
-    public OmniListIterator.OfRef<E> listIterator(int index)
-    {
+    @Override public OmniListIterator.OfRef<E> listIterator(int index){
       CheckedCollection.checkModCount(modCount,root.modCount);
       CheckedCollection.checkLo(index);
       CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr<E>(this,index+this.rootOffset);
     }
-    @Override
-    public boolean add(E val)
-    {
+    @Override public boolean add(E val){
       final CheckedList<E> root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -6727,9 +5835,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       }
       return true;
     }
-    @Override
-    public void add(int index,E val)
-    {
+    @Override public void add(int index,E val){
       final CheckedList<E> root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -6746,25 +5852,18 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         ((RefArrSeq<E>)root).uncheckedInit(val);
       }
     }
-    @Override
-    public <T> T[] toArray(T[] arr)
-    {
+    @Override  public <T> T[] toArray(T[] arr){
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ArrCopy.uncheckedCopy(root.arr,this.rootOffset,arr=OmniArray.uncheckedArrResize(size,arr),0,size);
-      }
-      else if(arr.length!=0)
-      {
+      }else if(arr.length!=0){
         arr[0]=null;
       }
       return arr;
     }
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-    {
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       final int size;
       final T[] dst;
       final CheckedList<E> root;
@@ -6773,33 +5872,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       {
         dst=arrConstructor.apply(size=this.size);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       }
-      if(size!=0)
-      {
+      if(size!=0){
         ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst,0,size);
       }
       return dst;
     }
-    @Override
-    public Object[] toArray()
-    {
+    @Override public Object[] toArray(){
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         final Object[] dst;
         ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst=new Object[size],0,size);
         return dst;
       }
       return OmniArray.OfRef.DEFAULT_ARR;
     }
-    @Override
-    public void put(int index,E val)
-    {
+    @Override public void put(int index,E val){
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       CheckedCollection.checkLo(index);
@@ -6807,9 +5899,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       root.arr[index+this.rootOffset]=val;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E get(int index)
-    {
+    @Override public E get(int index){
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       CheckedCollection.checkLo(index);
@@ -6817,9 +5907,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       return (E)root.arr[index+this.rootOffset];
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E set(int index,E val)
-    {
+    @Override public E set(int index,E val){
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       CheckedCollection.checkLo(index);
@@ -6830,9 +5918,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       return ret;
     }
     @SuppressWarnings("unchecked")
-    @Override
-    public E remove(int index)
-    {
+    @Override public E remove(int index){
       int modCount;
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -6848,14 +5934,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
       this.size=size-1;
       return ret;
     }
-    @Override
-    public boolean removeIf(Predicate<? super E> filter)
-    {
+    @Override public boolean removeIf(Predicate<? super E> filter){
       int modCount=this.modCount;
       final var root=this.root;
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         try
         {
           final Object[] arr;
@@ -6870,35 +5953,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
             return true;
           }
         }
-        catch(ConcurrentModificationException e)
-        {
+        catch(ConcurrentModificationException e){
           throw e;
-        }
-        catch(RuntimeException e)
-        {
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,root.modCount,e);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override
-    public void replaceAll(UnaryOperator<E> operator)
-    {
+    @Override public void replaceAll(UnaryOperator<E> operator){
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)==0)
-        {
+        if((size=this.size)==0){
           return;
         }
         final int rootOffset;
         OmniArray.OfRef.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
@@ -6910,34 +5984,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
         try
         {
           final int rootOffset;
-          if(sorter==null)
-          {
+          if(sorter==null){
             RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-          }
-          else
-          {
+          }else{
             {
               RefSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
             }
           }
         }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        catch(ArrayIndexOutOfBoundsException e){
           throw new IllegalArgumentException("Comparison method violates its general contract!",e);
         }
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
@@ -6960,8 +6026,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }
-      }
-      finally{
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
@@ -6984,8 +6049,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }
-      }
-      finally{
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
@@ -6997,34 +6061,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
         try
         {
           final int rootOffset;
-          if(sorter==null)
-          {
+          if(sorter==null){
             RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-          }
-          else
-          {
+          }else{
             {
               RefSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
             }
           }
         }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        catch(ArrayIndexOutOfBoundsException e){
           throw new IllegalArgumentException("Comparison method violates its general contract!",e);
         }
-      }
-      finally
-      {
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
@@ -7047,8 +6103,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }
-      }
-      finally{
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
@@ -7071,17 +6126,14 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable,
         }catch(ArrayIndexOutOfBoundsException e){
           throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
         }
-      }
-      finally{
+      }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
-    @Override
-    public OmniList.OfRef<E> subList(int fromIndex,int toIndex)
-    {
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       CheckedCollection.checkModCount(modCount,root.modCount);
       return new CheckedSubList<E>(this,this.rootOffset+fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }

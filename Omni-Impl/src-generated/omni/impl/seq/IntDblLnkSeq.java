@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.IntDblLnkNode;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
@@ -16,25 +15,18 @@ import java.util.function.IntBinaryOperator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class IntDblLnkSeq implements
+public abstract class IntDblLnkSeq extends AbstractSeq implements
    IntSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient IntDblLnkNode head;
   transient IntDblLnkNode tail;
   private  IntDblLnkSeq(){
   }
   private IntDblLnkSeq(IntDblLnkNode head,int size,IntDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class IntDblLnkSeq implements
       }
     }
   }
-  private IntDblLnkNode getNode(int index,int size)
-  {
+  private IntDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class IntDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(IntConsumer action)
-  {
+  @Override public void forEach(IntConsumer action){
     final IntDblLnkNode head;
     if((head=this.head)!=null){
       IntDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Integer> action)
-  {
+  @Override public void forEach(Consumer<? super Integer> action){
     final IntDblLnkNode head;
     if((head=this.head)!=null){
       IntDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -255,8 +244,7 @@ public abstract class IntDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final int v;
-          if((v=(int)val)==val)
-          {
+          if((v=(int)val)==val){
             return IntDblLnkNode.uncheckedcontains(head,tail,v);
           }
         } //end size check
@@ -391,8 +379,7 @@ public abstract class IntDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final int v;
-          if((v=(int)val)==val)
-          {
+          if((v=(int)val)==val){
             return uncheckedremoveVal(head,tail,v);
           }
         } //end size check
@@ -527,8 +514,7 @@ public abstract class IntDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final int v;
-          if((v=(int)val)==val)
-          {
+          if((v=(int)val)==val){
             return IntDblLnkNode.uncheckedindexOf(head,tail,v);
           }
         } //end size check
@@ -663,8 +649,7 @@ public abstract class IntDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final int v;
-          if((v=(int)val)==val)
-          {
+          if((v=(int)val)==val){
             return IntDblLnkNode.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
@@ -795,7 +780,6 @@ public abstract class IntDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(IntUnaryOperator operator){
     final IntDblLnkNode head;
     if((head=this.head)!=null){
@@ -808,18 +792,15 @@ public abstract class IntDblLnkSeq implements
       IntDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(IntPredicate filter)
-  {
+  @Override public boolean removeIf(IntPredicate filter){
     final IntDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Integer> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Integer> filter){
     final IntDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(IntDblLnkNode head,int size,IntPredicate filter)
-  {
+  boolean uncheckedRemoveIf(IntDblLnkNode head,int size,IntPredicate filter){
     //TODO
     return false;
   }
@@ -856,8 +837,7 @@ public abstract class IntDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         IntDblLnkNode head,newTail;
         final var newHead=newTail=new IntDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new IntDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -981,8 +961,7 @@ public abstract class IntDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final int v;
-            if((v=(int)val)==val)
-            {
+            if((v=(int)val)==val){
               return IntDblLnkNode.uncheckedsearch(head,tail,v);
             }
           } //end size check
@@ -1117,8 +1096,7 @@ public abstract class IntDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final int v;
-            if((v=(int)val)==val)
-            {
+            if((v=(int)val)==val){
               return uncheckedremoveLastOccurrence(head,tail,v);
             }
           } //end size check

@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.DoubleDblLnkNode;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -16,25 +15,18 @@ import omni.function.DoubleComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class DoubleDblLnkSeq implements
+public abstract class DoubleDblLnkSeq extends AbstractSeq implements
    DoubleSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient DoubleDblLnkNode head;
   transient DoubleDblLnkNode tail;
   private  DoubleDblLnkSeq(){
   }
   private DoubleDblLnkSeq(DoubleDblLnkNode head,int size,DoubleDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class DoubleDblLnkSeq implements
       }
     }
   }
-  private DoubleDblLnkNode getNode(int index,int size)
-  {
+  private DoubleDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class DoubleDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(DoubleConsumer action)
-  {
+  @Override public void forEach(DoubleConsumer action){
     final DoubleDblLnkNode head;
     if((head=this.head)!=null){
       DoubleDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Double> action)
-  {
+  @Override public void forEach(Consumer<? super Double> action){
     final DoubleDblLnkNode head;
     if((head=this.head)!=null){
       DoubleDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -203,8 +192,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,TypeUtil.DBL_TRUE_BITS);
           }
           return DoubleDblLnkNode.uncheckedcontains0(head,tail);
@@ -219,14 +207,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             {
               return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return DoubleDblLnkNode.uncheckedcontains0(head,tail);
           }
         } //end size check
@@ -240,15 +225,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToDouble(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToDouble(val)){
               return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return DoubleDblLnkNode.uncheckedcontains0(head,tail);
           }
         } //end size check
@@ -262,8 +243,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedcontainsNaN(head,tail);
@@ -278,8 +258,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedcontainsNaN(head,tail);
@@ -349,8 +328,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedcontains0(head,tail);
@@ -365,8 +343,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedcontains0(head,tail);
@@ -381,8 +358,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedcontainsBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedcontains0(head,tail);
@@ -397,8 +373,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return uncheckedremoveValBits(head,tail,TypeUtil.DBL_TRUE_BITS);
           }
           return uncheckedremoveVal0(head,tail);
@@ -413,14 +388,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             {
               return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return uncheckedremoveVal0(head,tail);
           }
         } //end size check
@@ -434,15 +406,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToDouble(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToDouble(val)){
               return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return uncheckedremoveVal0(head,tail);
           }
         } //end size check
@@ -456,8 +424,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return uncheckedremoveValNaN(head,tail);
@@ -472,8 +439,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return uncheckedremoveValNaN(head,tail);
@@ -543,8 +509,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return uncheckedremoveVal0(head,tail);
@@ -559,8 +524,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return uncheckedremoveVal0(head,tail);
@@ -575,8 +539,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return uncheckedremoveValBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return uncheckedremoveVal0(head,tail);
@@ -591,8 +554,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,TypeUtil.DBL_TRUE_BITS);
           }
           return DoubleDblLnkNode.uncheckedindexOf0(head,tail);
@@ -607,14 +569,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             {
               return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return DoubleDblLnkNode.uncheckedindexOf0(head,tail);
           }
         } //end size check
@@ -628,15 +587,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToDouble(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToDouble(val)){
               return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return DoubleDblLnkNode.uncheckedindexOf0(head,tail);
           }
         } //end size check
@@ -650,8 +605,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedindexOfNaN(head,tail);
@@ -666,8 +620,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedindexOfNaN(head,tail);
@@ -737,8 +690,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedindexOf0(head,tail);
@@ -753,8 +705,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedindexOf0(head,tail);
@@ -769,8 +720,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedindexOfBits(head,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedindexOf0(head,tail);
@@ -785,8 +735,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,TypeUtil.DBL_TRUE_BITS);
           }
           return DoubleDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -801,14 +750,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             {
               return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return DoubleDblLnkNode.uncheckedlastIndexOf0(size,tail);
           }
         } //end size check
@@ -822,15 +768,11 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToDouble(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToDouble(val)){
               return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
             }
-          }
-          else
-          {
+          }else{
             return DoubleDblLnkNode.uncheckedlastIndexOf0(size,tail);
           }
         } //end size check
@@ -844,8 +786,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
@@ -860,8 +801,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
@@ -931,8 +871,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -947,8 +886,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -963,8 +901,7 @@ public abstract class DoubleDblLnkSeq implements
         final DoubleDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return DoubleDblLnkNode.uncheckedlastIndexOfBits(size,tail,Double.doubleToRawLongBits(val));
           }
           return DoubleDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -1052,7 +989,6 @@ public abstract class DoubleDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(DoubleUnaryOperator operator){
     final DoubleDblLnkNode head;
     if((head=this.head)!=null){
@@ -1065,18 +1001,15 @@ public abstract class DoubleDblLnkSeq implements
       DoubleDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(DoublePredicate filter)
-  {
+  @Override public boolean removeIf(DoublePredicate filter){
     final DoubleDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Double> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Double> filter){
     final DoubleDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(DoubleDblLnkNode head,int size,DoublePredicate filter)
-  {
+  boolean uncheckedRemoveIf(DoubleDblLnkNode head,int size,DoublePredicate filter){
     //TODO
     return false;
   }
@@ -1113,8 +1046,7 @@ public abstract class DoubleDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         DoubleDblLnkNode head,newTail;
         final var newHead=newTail=new DoubleDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new DoubleDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -1213,8 +1145,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val)
-            {
+            if(val){
               return DoubleDblLnkNode.uncheckedsearchBits(head,tail,TypeUtil.DBL_TRUE_BITS);
             }
             return DoubleDblLnkNode.uncheckedsearch0(head,tail);
@@ -1229,14 +1160,11 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               {
                 return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return DoubleDblLnkNode.uncheckedsearch0(head,tail);
             }
           } //end size check
@@ -1250,15 +1178,11 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToDouble(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToDouble(val)){
                 return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return DoubleDblLnkNode.uncheckedsearch0(head,tail);
             }
           } //end size check
@@ -1272,8 +1196,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return DoubleDblLnkNode.uncheckedsearchNaN(head,tail);
@@ -1288,8 +1211,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return DoubleDblLnkNode.uncheckedsearchNaN(head,tail);
@@ -1359,8 +1281,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return DoubleDblLnkNode.uncheckedsearch0(head,tail);
@@ -1375,8 +1296,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return DoubleDblLnkNode.uncheckedsearch0(head,tail);
@@ -1391,8 +1311,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return DoubleDblLnkNode.uncheckedsearchBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return DoubleDblLnkNode.uncheckedsearch0(head,tail);
@@ -1407,8 +1326,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val)
-            {
+            if(val){
               return uncheckedremoveLastOccurrenceBits(head,tail,TypeUtil.DBL_TRUE_BITS);
             }
             return uncheckedremoveLastOccurrence0(head,tail);
@@ -1423,14 +1341,11 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               {
                 return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return uncheckedremoveLastOccurrence0(head,tail);
             }
           } //end size check
@@ -1444,15 +1359,11 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToDouble(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToDouble(val)){
                 return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return uncheckedremoveLastOccurrence0(head,tail);
             }
           } //end size check
@@ -1466,8 +1377,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveLastOccurrenceNaN(head,tail);
@@ -1482,8 +1392,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveLastOccurrenceNaN(head,tail);
@@ -1553,8 +1462,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveLastOccurrence0(head,tail);
@@ -1569,8 +1477,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveLastOccurrence0(head,tail);
@@ -1585,8 +1492,7 @@ public abstract class DoubleDblLnkSeq implements
           final DoubleDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveLastOccurrenceBits(head,tail,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveLastOccurrence0(head,tail);

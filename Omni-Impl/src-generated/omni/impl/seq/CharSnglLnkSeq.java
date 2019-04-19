@@ -19,14 +19,13 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,Externalizable{
+public abstract class CharSnglLnkSeq extends AbstractSeq implements OmniCollection.OfChar,Externalizable{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient CharSnglLnkNode head;
   private CharSnglLnkSeq(){
   }
   private CharSnglLnkSeq(CharSnglLnkNode head,int size){
-    this.size=size;
+    super(size);
     this.head=head;
   }
   private static  void pullSurvivorsDown(CharSnglLnkNode prev,CharPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
@@ -38,8 +37,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           if(--numRemoved==0){
             prev.next=curr.next;
             return;
-          }
-          if((marker<<=1)==0){
+          }else if((marker<<=1)==0){
             word=survivorSet[++wordOffset];
             marker=1L;
           }
@@ -50,8 +48,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       if(--numSurvivors==0){
         curr.next=null;
         return;
-      }
-      if((marker<<=1)==0){
+      }else if((marker<<=1)==0){
          word=survivorSet[++wordOffset];
          marker=1L;
       }
@@ -70,8 +67,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
-      }
-      while((marker<<=1)!=0L);
+      }while((marker<<=1)!=0L);
       survivorSet[wordOffset++]=word;
     }
   }
@@ -126,40 +122,28 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       if(curr==null){
         prev.next=null;
         break;
-      }
-      if(!filter.test(curr.val)){
+      }else if(!filter.test(curr.val)){
         prev.next=curr;
         do{
           ++numSurvivors;
           if((curr=(prev=curr).next)==null){
             break outer;
           }
-        }
-        while(!filter.test(curr.val));
+        }while(!filter.test(curr.val));
       }
     }
     return numSurvivors;
   }
-  @Override public void writeExternal(ObjectOutput out) throws IOException
-  {
+  @Override public void writeExternal(ObjectOutput out) throws IOException{
     int size;
     out.writeInt(size=this.size);
-    if(size!=0)
-    {
+    if(size!=0){
       var curr=this.head;
-      do
-      {
+      do{
         out.writeChar(curr.val);
       }
       while((curr=curr.next)!=null);
     }
-  }
-  @Override public abstract Object clone();
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -205,21 +189,18 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     return arr;
   }
   abstract void push(char val);
-  @Override public boolean add(char val)
-  {
+  @Override public boolean add(char val){
     push((val));
     return true;
   }
   public void push(Character val){
     push((char)val);
   }
-  @Override public boolean add(Character val)
-  {
+  @Override public boolean add(Character val){
     push((char)(val));
     return true;
   }
-  @Override public boolean add(boolean val)
-  {
+  @Override public boolean add(boolean val){
     push((char)TypeUtil.castToChar(val));
     return true;
   }
@@ -318,8 +299,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           if((head=this.head)!=null)
           {
             final char v;
-            if((v=(char)val)==val)
-            {
+            if((v=(char)val)==val){
               return CharSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
@@ -475,8 +455,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           if((head=this.head)!=null)
           {
             final char v;
-            if((v=(char)val)==val)
-            {
+            if((v=(char)val)==val){
               return uncheckedremoveVal(head,v);
             }
           } //end size check
@@ -741,27 +720,20 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
         }
       });
     }
-    private int removeIfHelper(CharSnglLnkNode prev,CharPredicate filter,int numLeft,int modCount)
-    {
-      if(numLeft!=0)
-      {
+    private int removeIfHelper(CharSnglLnkNode prev,CharPredicate filter,int numLeft,int modCount){
+      if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -871,8 +843,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     }
     @Override boolean uncheckedremoveVal(CharSnglLnkNode head
       ,int val
-    )
-    {
+    ){
       {
         if(val==(head.val)){
           this.head=head.next;
@@ -960,8 +931,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         CharSnglLnkNode curr;
         for(this.head=curr=new CharSnglLnkNode((char)in.readChar());--size!=0;curr=curr.next=new CharSnglLnkNode((char)in.readChar())){}
       }
@@ -1022,8 +992,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           if((head=this.head)!=null)
           {
             final char v;
-            if((v=(char)val)==val)
-            {
+            if((v=(char)val)==val){
               return CharSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
@@ -1222,8 +1191,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     }
     @Override boolean uncheckedremoveVal(CharSnglLnkNode head
       ,int val
-    )
-    {
+    ){
       {
         if(val==(head.val)){
           this.head=head.next;
@@ -1243,8 +1211,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     @Override public OmniIterator.OfChar iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr
-    {
+    private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedStack.this.head);
       }
@@ -1261,8 +1228,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       }
     }
   }
-  public static class CheckedQueue extends UncheckedQueue
-  {
+  public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedQueue(){
@@ -1288,14 +1254,11 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
         int size;
         final var tail=this.tail;
         out.writeInt(size=this.size);
-        if(size!=0)
-        {
+        if(size!=0){
           CharSnglLnkNode curr;
-          for(curr=this.head;;curr=curr.next)
-          {
+          for(curr=this.head;;curr=curr.next){
             out.writeChar(curr.val);
-            if(curr==tail)
-            {
+            if(curr==tail){
               return;
             }
           }
@@ -1337,8 +1300,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       });
     }
     @Override public void clear(){
-      if(size!=0)
-      {
+      if(size!=0){
         ++this.modCount;
         this.head=null;
         this.tail=null;
@@ -1375,8 +1337,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1390,8 +1351,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Character)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1405,8 +1365,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1420,8 +1379,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1435,8 +1393,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1450,8 +1407,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1461,8 +1417,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       }
       return Integer.MIN_VALUE;
     }
-    private void pullSurvivorsDown(CharSnglLnkNode prev,CharPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved)
-    {
+    private void pullSurvivorsDown(CharSnglLnkNode prev,CharPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1470,13 +1425,11 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
-            }
-            if((marker<<=1)==0){
+            }else if((marker<<=1)==0){
               word=survivorSet[++wordOffset];
               marker=1L;
             }
@@ -1503,8 +1456,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
@@ -1524,22 +1476,17 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     private int removeIfHelper(CharSnglLnkNode prev,CharPredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -1612,8 +1559,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     @Override public OmniIterator.OfChar iterator(){
       return new Itr(this);
     }
-    private static class Itr extends AbstractItr
-    {
+    private static class Itr extends AbstractItr{
       transient final CheckedQueue parent;
       transient int modCount;
       Itr(CheckedQueue parent){
@@ -1638,12 +1584,10 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next)
-          {
+          for(curr=this.curr;;next=curr.next){
             action.accept(next.val);
             prev=curr;
-            if((curr=next)==tail)
-            {
+            if((curr=next)==tail){
               break;
             }
           }
@@ -1668,8 +1612,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
           }else{
             prev.next=next;
           }
-          if(curr==parent.tail)
-          {
+          if(curr==parent.tail){
             parent.tail=prev;
           }
           this.curr=prev;
@@ -1697,8 +1640,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         CharSnglLnkNode curr;
         for(this.head=curr=new CharSnglLnkNode((char)in.readChar());--size!=0;curr=curr.next=new CharSnglLnkNode((char)in.readChar())){}
         this.tail=curr;
@@ -1749,8 +1691,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1773,8 +1714,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Character)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1787,8 +1727,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1801,8 +1740,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1815,8 +1753,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1829,8 +1766,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       final CharSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1839,8 +1775,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       }
       return Integer.MIN_VALUE;
     }
-    private int removeIfHelper(CharSnglLnkNode prev,CharSnglLnkNode tail,CharPredicate filter)
-    {
+    private int removeIfHelper(CharSnglLnkNode prev,CharSnglLnkNode tail,CharPredicate filter){
       int numSurvivors=1;
       outer:for(CharSnglLnkNode next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
@@ -1857,8 +1792,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
       }
       return numSurvivors;
     }
-    private int removeIfHelper(CharSnglLnkNode prev,CharSnglLnkNode curr,CharSnglLnkNode tail,CharPredicate filter)
-    {
+    private int removeIfHelper(CharSnglLnkNode prev,CharSnglLnkNode curr,CharSnglLnkNode tail,CharPredicate filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1877,10 +1811,8 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     }
     @Override boolean uncheckedremoveIf(CharSnglLnkNode head,CharPredicate filter){
       if(filter.test(head.val)){
-        for(var tail=this.tail;head!=tail;)
-        {
-          if(!filter.test((head=head.next).val))
-          {
+        for(var tail=this.tail;head!=tail;){
+          if(!filter.test((head=head.next).val)){
             this.size=removeIfHelper(head,tail,filter);
             this.head=head;
             return true;  
@@ -1892,11 +1824,9 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
         return true;
       }else{
         int numSurvivors=1;
-        for(final var tail=this.tail;head!=tail;++numSurvivors)
-        {
+        for(final var tail=this.tail;head!=tail;++numSurvivors){
           final CharSnglLnkNode prev;
-          if(filter.test((head=(prev=head).next).val))
-          {
+          if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
           }
@@ -1933,8 +1863,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     @Override public OmniIterator.OfChar iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr
-    {
+    private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedQueue.this.head);
       }
@@ -1942,14 +1871,12 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
         final CharSnglLnkNode prev;
-        if((prev=this.prev)==null)
-        {
+        if((prev=this.prev)==null){
           parent.head=next;
         }else{
           prev.next=next;
         }
-        if(this.curr==parent.tail)
-        {
+        if(this.curr==parent.tail){
           parent.tail=prev;
         }
         this.curr=prev;
@@ -1962,8 +1889,7 @@ public abstract class CharSnglLnkSeq implements OmniCollection.OfChar,Cloneable,
     transient CharSnglLnkNode prev;
     transient CharSnglLnkNode curr;
     transient CharSnglLnkNode next;
-    AbstractItr(CharSnglLnkNode next)
-    {
+    AbstractItr(CharSnglLnkNode next){
       this.next=next; 
     }
     @Override public char nextChar(){

@@ -9,7 +9,6 @@
 #TYPEDEF OfRef
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.$DNode$;
 import java.util.function.Consumer;
 #IF OfDouble,OfLong,OfInt
@@ -43,29 +42,22 @@ import omni.function.$Comparator$;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
+public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
 #IF OfRef
    OmniList.Of$ClassPrefix$$<E>$
 #ELSE
    $ClassPrefix$SubListDefault$<E>$
 #ENDIF
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient $DNode$$<E>$ head;
   transient $DNode$$<E>$ tail;
   private  $ClassPrefix$DblLnkSeq(){
   }
   private $ClassPrefix$DblLnkSeq($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -119,8 +111,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
       }
     }
   }
-  private $DNode$$<E>$ getNode(int index,int size)
-  {
+  private $DNode$$<E>$ getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -179,16 +170,14 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
     }
     return ret;
   }
-  @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action)
-  {
+  @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
     final $DNode$$<E>$ head;
     if((head=this.head)!=null){
       $DNode$.uncheckedForEachAscending(head,size,action);
     }
   }
 #IFNOT OfRef
-  @Override public void forEach(Consumer<? super $BoxedType$> action)
-  {
+  @Override public void forEach(Consumer<? super $BoxedType$> action){
     final $DNode$$<E>$ head;
     if((head=this.head)!=null){
       $DNode$.uncheckedForEachAscending(head,size,action::accept);
@@ -250,8 +239,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
 #ELSE
   #MACRO UncheckedRemoveVal<Root,false,>(val==)
 #ENDIF
-  @Override public abstract Object clone();
-  
   @Override public void replaceAll($UnaryOperator$$<E>$ operator){
     final $DNode$$<E>$ head;
     if((head=this.head)!=null){
@@ -266,23 +253,152 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
     }
   }
 #ENDIF
-
-  @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter)
-  {
+  @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
     final $DNode$$<E>$ head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
 #IFNOT OfRef
-  @Override public boolean removeIf(Predicate<? super $BoxedType$> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
     final $DNode$$<E>$ head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
 #ENDIF
-  boolean uncheckedRemoveIf($DNode$$<E>$ head,int size,$TypeNameModifier$Predicate$<? super E>$ filter)
-  {
-    //TODO
-    return false;
+#IF OfBoolean
+  private int removeIfHelper($SNode$$<E>$ prev,int numLeft,boolean retainThis){
+    int numSurvivors=1;
+    /*
+    outer:for($SNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
+      if((next=prev.next).val^retainThis){
+        do{
+          if(next==tail){
+            this.tail=prev;
+            prev.next=null;
+            break outer;
+          }
+        }
+        while((next=next.next).val^retainThis);
+        prev.next=next;
+      }
+    }
+    */
+    return numSurvivors;
+  }
+  private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ curr,int numLeft,boolean retainThis){
+    int numSurvivors=0;
+    /*
+    while(curr!=tail) {
+      if((curr=curr.next).val==retainThis){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if(curr==tail){
+            return numSurvivors;
+          }
+        }while((curr=(prev=curr).next).val==retainThis);
+      }
+    }
+    prev.next=null;
+    this.tail=prev;
+    */
+    return numSurvivors;
+  }
+#ELSE
+  private int removeIfHelper($SNode$$<E>$ prev,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
+    int numSurvivors=1;
+    /*
+    outer:for($SNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
+      if(filter.test((next=prev.next).val)){
+        do{
+          if(next==tail){
+            this.tail=prev;
+            prev.next=null;
+            break outer;
+          }
+        }
+        while(filter.test((next=next.next).val));
+        prev.next=next;
+      }
+    }
+    */
+    return numSurvivors;
+  }
+  private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
+    int numSurvivors=0;
+    /*
+    while(curr!=tail) {
+      if(!filter.test((curr=curr.next).val)){
+        prev.next=curr;
+        do{
+          ++numSurvivors;
+          if(curr==tail){
+            return numSurvivors;
+          }
+        }while(!filter.test((curr=(prev=curr).next).val));
+      }
+    }
+    prev.next=null;
+    this.tail=prev;
+    */
+    return numSurvivors;
+  }
+#ENDIF
+  boolean uncheckedRemoveIf($DNode$$<E>$ head,int size,$TypeNameModifier$Predicate$<? super E>$ filter){
+#IF OfBoolean
+    boolean firstVal;
+    if(filter.test(firstVal=head.val)){
+      for(int i=size;--i!=0;){
+        if((head=head.next).val^firstVal){
+          if(filter.test(firstVal=!firstVal)){
+            break;
+          }
+          this.head=head;
+          this.size=removeIfHelper(head,i,firstVal);
+          return true;
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+      return true;
+    }else{
+      int numSurvivors=1;
+      for(int i=size;--i!=0;++numSurvivors){
+        final $SNode$$<E>$ prev;
+        if((head=(prev=head).next).val^firstVal){
+          if(filter.test(!firstVal)){
+            this.size=numSurvivors+removeIfHelper(prev,head,i,firstVal);
+            return true;
+          }
+          break;
+        }
+      }
+      return false;
+    }
+#ELSE
+    if(filter.test(head.val)){
+      for(int i=size;--i!=0;){
+        if(!filter.test((head=head.next).val)){
+          this.size=removeIfHelper(head,i,filter);
+          this.head=head;
+          return true;  
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+      return true;
+    }else{
+      int numSurvivors=1;
+      for(int i=size;--i!=0;++numSurvivors){
+        final $SNode$$<E>$ prev;
+        if(filter.test((head=(prev=head).next).val)){
+          this.size=numSurvivors+removeIfHelper(prev,head,i,filter);
+          return true;
+        }
+      }
+      return false;
+    }
+#ENDIF
   }
   @Override public void sort($Comparator$$<? super E>$ sorter){
     //TODO
@@ -320,7 +436,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
     return 0;
   }
   //TODO serialization methods
-  
   public static class UncheckedList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>${
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -330,8 +445,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         $DNode$$<E>$ head,newTail;
         final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
@@ -503,7 +617,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ implements
     #MACRO OutputMethods<false>(PollImpl)
     #MACRO OutputMethods<false>(PeekImpl)
   }
-
 }
 #MACRODEF ToArrayImpl(RETTYPE,DEFAULTARR,CLASSPREFIX)
 @Override public RETTYPE[] toCLASSPREFIXArray(){
@@ -671,8 +784,7 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
       {
 #IFSWITCH INPUTTYPE==boolean
   #IF OfDouble,OfFloat
-        if(val)
-        {
+        if(val){
           #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
         }
         #MACRO ReturnUncheckedQuery0()
@@ -681,8 +793,7 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==byte,char,short
   #IF OfDouble,OfFloat
-        if(val!=0)
-        {
+        if(val!=0){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
         }
         #MACRO ReturnUncheckedQuery0()
@@ -691,11 +802,9 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==int
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
-          switch(val)
-          {
+          switch(val){
           default:
             break returnFalse;
           case 0:
@@ -709,17 +818,14 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ELSEIF OfFloat,OfDouble
     #IF OfDouble
     #ENDIF
-        if(val!=0)
-        {
+        if(val!=0){
     #IF OfFloat
           if(TypeUtil.checkCastTo$ClassPrefix$(val))
     #ENDIF
           {
             #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
           }
-        }
-        else
-        {
+        }else{
           #MACRO ReturnUncheckedQuery0()
         }
   #ELSE
@@ -727,38 +833,28 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==long
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
-          if(val==0L)
-          {
+          if(val==0L){
             v=false;
-          }else if(val==1L)
-          {
+          }else if(val==1L){
             v=true;
-          }
-          else
-          {
+          }else{
             break returnFalse;
           }
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSEIF OfFloat,OfDouble
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastTo$ClassPrefix$(val))
-          {
+        if(val!=0){
+          if(TypeUtil.checkCastTo$ClassPrefix$(val)){
             #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
           }
-        }
-        else
-        {
+        }else{
           #MACRO ReturnUncheckedQuery0()
         }
   #ELSEIF OfByte,OfChar,OfShort,OfInt
         final $ArrayType$ v;
-        if((v=($ArrayType$)val)==val)
-        {
+        if((v=($ArrayType$)val)==val){
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSE
@@ -766,11 +862,9 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==float
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
-          switch(Float.floatToRawIntBits(val))
-          {
+          switch(Float.floatToRawIntBits(val)){
             default:
               break returnFalse;
             case 0:
@@ -783,8 +877,7 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSEIF OfFloat,OfDouble
-        if(val==val)
-        {
+        if(val==val){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
         }
         #MACRO ReturnUncheckedQueryNaN()
@@ -805,37 +898,27 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==double
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
           long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
+          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
             v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
+          }else if(bits==TypeUtil.DBL_TRUE_BITS){
             v=true;
-          }
-          else
-          {
+          }else{
             break returnFalse;
           }
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSEIF OfFloat
         final $ArrayType$ v;
-        if(val==(v=($ArrayType$)val))
-        {
+        if(val==(v=($ArrayType$)val)){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-        }
-        else if(v!=v)
-        {
+        }else if(v!=v){
           #MACRO ReturnUncheckedQueryNaN()
         }
   #ELSEIF OfDouble
-        if(val==val)
-        {
+        if(val==val){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
         }
         #MACRO ReturnUncheckedQueryNaN()
@@ -854,8 +937,7 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==Object
   #IF OfRef
-        if(val!=null)
-        {
+        if(val!=null){
           #MACRO ReturnUncheckedQueryNonNull(val)
         }
         #MACRO ReturnUncheckedQueryNull()
@@ -1168,8 +1250,7 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
         }
   #ENDIF
 #ELSE
-        if(val!=null)
-        {
+        if(val!=null){
           #MACRO ReturnUncheckedQuery($queryCastRef$(CAST(val)))
         }
         #MACRO ReturnUncheckedQueryNull()
@@ -1186,7 +1267,6 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
 #ENDIF
 }
 #ENDDEF
-
 #MACRODEF UncheckedQueryParam()
 #IFSWITCH SUFFIX==NonNull
 ,Object nonNull
@@ -1233,7 +1313,6 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
   #ENDIF
 #ENDIF
 }
-
 #ENDDEF
 #MACRODEF UncheckedRemoveLastOccurrence<CHECKED,SUFFIX>(POSTEST)
 boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
@@ -1265,7 +1344,6 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
   return false;
 #ENDIF
 }
-
 #ENDDEF
 #MACRODEF OutputMethods<CHECKED>(MACRONAME)
 #MACRO MACRONAME($TypeNameModifier$,$exposedType$,$defaultVal$,)
@@ -1292,7 +1370,6 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
   #ENDIF
 #ENDIF
 #ENDDEF
-
 #MACRODEF PollImpl(CLASSPREFIX,RETTYPE,DEFAULTVAL,CAST)
 @Override public RETTYPE pollCLASSPREFIX(){
   $DNode$$<E>$ head;
@@ -1347,5 +1424,3 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
   return DEFAULTVAL;
 }
 #ENDDEF
-
-

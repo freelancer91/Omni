@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.ShortDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.ShortConsumer;
@@ -16,25 +15,18 @@ import omni.function.ShortComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class ShortDblLnkSeq implements
+public abstract class ShortDblLnkSeq extends AbstractSeq implements
    ShortSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient ShortDblLnkNode head;
   transient ShortDblLnkNode tail;
   private  ShortDblLnkSeq(){
   }
   private ShortDblLnkSeq(ShortDblLnkNode head,int size,ShortDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class ShortDblLnkSeq implements
       }
     }
   }
-  private ShortDblLnkNode getNode(int index,int size)
-  {
+  private ShortDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class ShortDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(ShortConsumer action)
-  {
+  @Override public void forEach(ShortConsumer action){
     final ShortDblLnkNode head;
     if((head=this.head)!=null){
       ShortDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Short> action)
-  {
+  @Override public void forEach(Consumer<? super Short> action){
     final ShortDblLnkNode head;
     if((head=this.head)!=null){
       ShortDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -265,8 +254,7 @@ public abstract class ShortDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final short v;
-          if((v=(short)val)==val)
-          {
+          if((v=(short)val)==val){
             return ShortDblLnkNode.uncheckedcontains(head,tail,v);
           }
         } //end size check
@@ -421,8 +409,7 @@ public abstract class ShortDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final short v;
-          if((v=(short)val)==val)
-          {
+          if((v=(short)val)==val){
             return uncheckedremoveVal(head,tail,v);
           }
         } //end size check
@@ -577,8 +564,7 @@ public abstract class ShortDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final short v;
-          if((v=(short)val)==val)
-          {
+          if((v=(short)val)==val){
             return ShortDblLnkNode.uncheckedindexOf(head,tail,v);
           }
         } //end size check
@@ -733,8 +719,7 @@ public abstract class ShortDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final short v;
-          if((v=(short)val)==val)
-          {
+          if((v=(short)val)==val){
             return ShortDblLnkNode.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
@@ -884,7 +869,6 @@ public abstract class ShortDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(ShortUnaryOperator operator){
     final ShortDblLnkNode head;
     if((head=this.head)!=null){
@@ -897,18 +881,15 @@ public abstract class ShortDblLnkSeq implements
       ShortDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(ShortPredicate filter)
-  {
+  @Override public boolean removeIf(ShortPredicate filter){
     final ShortDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Short> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Short> filter){
     final ShortDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(ShortDblLnkNode head,int size,ShortPredicate filter)
-  {
+  boolean uncheckedRemoveIf(ShortDblLnkNode head,int size,ShortPredicate filter){
     //TODO
     return false;
   }
@@ -945,8 +926,7 @@ public abstract class ShortDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ShortDblLnkNode head,newTail;
         final var newHead=newTail=new ShortDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new ShortDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -1071,8 +1051,7 @@ public abstract class ShortDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final short v;
-            if((v=(short)val)==val)
-            {
+            if((v=(short)val)==val){
               return ShortDblLnkNode.uncheckedsearch(head,tail,v);
             }
           } //end size check
@@ -1227,8 +1206,7 @@ public abstract class ShortDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final short v;
-            if((v=(short)val)==val)
-            {
+            if((v=(short)val)==val){
               return uncheckedremoveLastOccurrence(head,tail,v);
             }
           } //end size check

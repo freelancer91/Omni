@@ -19,14 +19,13 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Cloneable,Externalizable{
+public abstract class DoubleSnglLnkSeq extends AbstractSeq implements OmniCollection.OfDouble,Externalizable{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient DoubleSnglLnkNode head;
   private DoubleSnglLnkSeq(){
   }
   private DoubleSnglLnkSeq(DoubleSnglLnkNode head,int size){
-    this.size=size;
+    super(size);
     this.head=head;
   }
   private static  void pullSurvivorsDown(DoubleSnglLnkNode prev,DoublePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
@@ -38,8 +37,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           if(--numRemoved==0){
             prev.next=curr.next;
             return;
-          }
-          if((marker<<=1)==0){
+          }else if((marker<<=1)==0){
             word=survivorSet[++wordOffset];
             marker=1L;
           }
@@ -50,8 +48,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       if(--numSurvivors==0){
         curr.next=null;
         return;
-      }
-      if((marker<<=1)==0){
+      }else if((marker<<=1)==0){
          word=survivorSet[++wordOffset];
          marker=1L;
       }
@@ -70,8 +67,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
-      }
-      while((marker<<=1)!=0L);
+      }while((marker<<=1)!=0L);
       survivorSet[wordOffset++]=word;
     }
   }
@@ -126,40 +122,28 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       if(curr==null){
         prev.next=null;
         break;
-      }
-      if(!filter.test(curr.val)){
+      }else if(!filter.test(curr.val)){
         prev.next=curr;
         do{
           ++numSurvivors;
           if((curr=(prev=curr).next)==null){
             break outer;
           }
-        }
-        while(!filter.test(curr.val));
+        }while(!filter.test(curr.val));
       }
     }
     return numSurvivors;
   }
-  @Override public void writeExternal(ObjectOutput out) throws IOException
-  {
+  @Override public void writeExternal(ObjectOutput out) throws IOException{
     int size;
     out.writeInt(size=this.size);
-    if(size!=0)
-    {
+    if(size!=0){
       var curr=this.head;
-      do
-      {
+      do{
         out.writeDouble(curr.val);
       }
       while((curr=curr.next)!=null);
     }
-  }
-  @Override public abstract Object clone();
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -202,46 +186,38 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     return arr;
   }
   abstract void push(double val);
-  @Override public boolean add(double val)
-  {
+  @Override public boolean add(double val){
     push((val));
     return true;
   }
   public void push(Double val){
     push((double)val);
   }
-  @Override public boolean add(Double val)
-  {
+  @Override public boolean add(Double val){
     push((double)(val));
     return true;
   }
-  @Override public boolean add(boolean val)
-  {
+  @Override public boolean add(boolean val){
     push((double)TypeUtil.castToDouble(val));
     return true;
   }
-  @Override public boolean add(int val)
-  {
+  @Override public boolean add(int val){
     push((double)(val));
     return true;
   }
-  @Override public boolean add(char val)
-  {
+  @Override public boolean add(char val){
     push((double)(val));
     return true;
   }
-  @Override public boolean add(short val)
-  {
+  @Override public boolean add(short val){
     push((double)(val));
     return true;
   }
-  @Override public boolean add(long val)
-  {
+  @Override public boolean add(long val){
     push((double)(val));
     return true;
   }
-  @Override public boolean add(float val)
-  {
+  @Override public boolean add(float val){
     push((double)(val));
     return true;
   }
@@ -278,8 +254,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val)
-            {
+            if(val){
               return DoubleSnglLnkNode.uncheckedcontainsBits(head,TypeUtil.DBL_TRUE_BITS);
             }
             return DoubleSnglLnkNode.uncheckedcontains0(head);
@@ -294,14 +269,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               {
                 return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return DoubleSnglLnkNode.uncheckedcontains0(head);
             }
           } //end size check
@@ -315,15 +287,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToDouble(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToDouble(val)){
                 return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return DoubleSnglLnkNode.uncheckedcontains0(head);
             }
           } //end size check
@@ -337,8 +305,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedcontainsNaN(head);
@@ -353,8 +320,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedcontainsNaN(head);
@@ -424,8 +390,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedcontains0(head);
@@ -440,8 +405,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedcontains0(head);
@@ -456,8 +420,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedcontains0(head);
@@ -472,8 +435,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val)
-            {
+            if(val){
               return uncheckedremoveValBits(head,TypeUtil.DBL_TRUE_BITS);
             }
             return uncheckedremoveVal0(head);
@@ -488,14 +450,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               {
                 return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return uncheckedremoveVal0(head);
             }
           } //end size check
@@ -509,15 +468,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToDouble(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToDouble(val)){
                 return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return uncheckedremoveVal0(head);
             }
           } //end size check
@@ -531,8 +486,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveValNaN(head);
@@ -547,8 +501,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveValNaN(head);
@@ -618,8 +571,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveVal0(head);
@@ -634,8 +586,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveVal0(head);
@@ -650,8 +601,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
             }
             return uncheckedremoveVal0(head);
@@ -775,27 +725,20 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         }
       });
     }
-    private int removeIfHelper(DoubleSnglLnkNode prev,DoublePredicate filter,int numLeft,int modCount)
-    {
-      if(numLeft!=0)
-      {
+    private int removeIfHelper(DoubleSnglLnkNode prev,DoublePredicate filter,int numLeft,int modCount){
+      if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -861,8 +804,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     }
     @Override boolean uncheckedremoveValBits(DoubleSnglLnkNode head
       ,long bits
-    )
-    {
+    ){
       {
         if(bits==Double.doubleToRawLongBits(head.val)){
           this.head=head.next;
@@ -881,8 +823,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       return true;
     }
     @Override boolean uncheckedremoveVal0(DoubleSnglLnkNode head
-    )
-    {
+    ){
       {
         if(0==(head.val)){
           this.head=head.next;
@@ -901,8 +842,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       return true;
     }
     @Override boolean uncheckedremoveValNaN(DoubleSnglLnkNode head
-    )
-    {
+    ){
       {
         if(Double.isNaN(head.val)){
           this.head=head.next;
@@ -990,8 +930,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         DoubleSnglLnkNode curr;
         for(this.head=curr=new DoubleSnglLnkNode((double)in.readDouble());--size!=0;curr=curr.next=new DoubleSnglLnkNode((double)in.readDouble())){}
       }
@@ -1026,8 +965,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val)
-            {
+            if(val){
               return DoubleSnglLnkNode.uncheckedsearchBits(head,TypeUtil.DBL_TRUE_BITS);
             }
             return DoubleSnglLnkNode.uncheckedsearch0(head);
@@ -1042,14 +980,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               {
                 return DoubleSnglLnkNode.uncheckedsearchBits(head,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return DoubleSnglLnkNode.uncheckedsearch0(head);
             }
           } //end size check
@@ -1063,15 +998,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToDouble(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToDouble(val)){
                 return DoubleSnglLnkNode.uncheckedsearchBits(head,Double.doubleToRawLongBits(val));
               }
-            }
-            else
-            {
+            }else{
               return DoubleSnglLnkNode.uncheckedsearch0(head);
             }
           } //end size check
@@ -1085,8 +1016,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return DoubleSnglLnkNode.uncheckedsearchBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedsearchNaN(head);
@@ -1101,8 +1031,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           final DoubleSnglLnkNode head;
           if((head=this.head)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return DoubleSnglLnkNode.uncheckedsearchBits(head,Double.doubleToRawLongBits(val));
             }
             return DoubleSnglLnkNode.uncheckedsearchNaN(head);
@@ -1214,8 +1143,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     }
     @Override boolean uncheckedremoveValBits(DoubleSnglLnkNode head
       ,long bits
-    )
-    {
+    ){
       {
         if(bits==Double.doubleToRawLongBits(head.val)){
           this.head=head.next;
@@ -1233,8 +1161,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       return true;
     }
     @Override boolean uncheckedremoveVal0(DoubleSnglLnkNode head
-    )
-    {
+    ){
       {
         if(0==(head.val)){
           this.head=head.next;
@@ -1252,8 +1179,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       return true;
     }
     @Override boolean uncheckedremoveValNaN(DoubleSnglLnkNode head
-    )
-    {
+    ){
       {
         if(Double.isNaN(head.val)){
           this.head=head.next;
@@ -1273,8 +1199,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     @Override public OmniIterator.OfDouble iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr
-    {
+    private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedStack.this.head);
       }
@@ -1291,8 +1216,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       }
     }
   }
-  public static class CheckedQueue extends UncheckedQueue
-  {
+  public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedQueue(){
@@ -1318,14 +1242,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         int size;
         final var tail=this.tail;
         out.writeInt(size=this.size);
-        if(size!=0)
-        {
+        if(size!=0){
           DoubleSnglLnkNode curr;
-          for(curr=this.head;;curr=curr.next)
-          {
+          for(curr=this.head;;curr=curr.next){
             out.writeDouble(curr.val);
-            if(curr==tail)
-            {
+            if(curr==tail){
               return;
             }
           }
@@ -1367,8 +1288,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       });
     }
     @Override public void clear(){
-      if(size!=0)
-      {
+      if(size!=0){
         ++this.modCount;
         this.head=null;
         this.tail=null;
@@ -1405,8 +1325,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       final DoubleSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1420,8 +1339,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       final DoubleSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Double)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1431,8 +1349,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       }
       return null;
     }
-    private void pullSurvivorsDown(DoubleSnglLnkNode prev,DoublePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved)
-    {
+    private void pullSurvivorsDown(DoubleSnglLnkNode prev,DoublePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1440,13 +1357,11 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
-            }
-            if((marker<<=1)==0){
+            }else if((marker<<=1)==0){
               word=survivorSet[++wordOffset];
               marker=1L;
             }
@@ -1473,8 +1388,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
@@ -1494,22 +1408,17 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     private int removeIfHelper(DoubleSnglLnkNode prev,DoublePredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -1634,8 +1543,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     @Override public OmniIterator.OfDouble iterator(){
       return new Itr(this);
     }
-    private static class Itr extends AbstractItr
-    {
+    private static class Itr extends AbstractItr{
       transient final CheckedQueue parent;
       transient int modCount;
       Itr(CheckedQueue parent){
@@ -1660,12 +1568,10 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next)
-          {
+          for(curr=this.curr;;next=curr.next){
             action.accept(next.val);
             prev=curr;
-            if((curr=next)==tail)
-            {
+            if((curr=next)==tail){
               break;
             }
           }
@@ -1690,8 +1596,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
           }else{
             prev.next=next;
           }
-          if(curr==parent.tail)
-          {
+          if(curr==parent.tail){
             parent.tail=prev;
           }
           this.curr=prev;
@@ -1719,8 +1624,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         DoubleSnglLnkNode curr;
         for(this.head=curr=new DoubleSnglLnkNode((double)in.readDouble());--size!=0;curr=curr.next=new DoubleSnglLnkNode((double)in.readDouble())){}
         this.tail=curr;
@@ -1771,8 +1675,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       final DoubleSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1795,8 +1698,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       final DoubleSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Double)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1805,8 +1707,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       }
       return null;
     }
-    private int removeIfHelper(DoubleSnglLnkNode prev,DoubleSnglLnkNode tail,DoublePredicate filter)
-    {
+    private int removeIfHelper(DoubleSnglLnkNode prev,DoubleSnglLnkNode tail,DoublePredicate filter){
       int numSurvivors=1;
       outer:for(DoubleSnglLnkNode next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
@@ -1823,8 +1724,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
       }
       return numSurvivors;
     }
-    private int removeIfHelper(DoubleSnglLnkNode prev,DoubleSnglLnkNode curr,DoubleSnglLnkNode tail,DoublePredicate filter)
-    {
+    private int removeIfHelper(DoubleSnglLnkNode prev,DoubleSnglLnkNode curr,DoubleSnglLnkNode tail,DoublePredicate filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1843,10 +1743,8 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     }
     @Override boolean uncheckedremoveIf(DoubleSnglLnkNode head,DoublePredicate filter){
       if(filter.test(head.val)){
-        for(var tail=this.tail;head!=tail;)
-        {
-          if(!filter.test((head=head.next).val))
-          {
+        for(var tail=this.tail;head!=tail;){
+          if(!filter.test((head=head.next).val)){
             this.size=removeIfHelper(head,tail,filter);
             this.head=head;
             return true;  
@@ -1858,11 +1756,9 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         return true;
       }else{
         int numSurvivors=1;
-        for(final var tail=this.tail;head!=tail;++numSurvivors)
-        {
+        for(final var tail=this.tail;head!=tail;++numSurvivors){
           final DoubleSnglLnkNode prev;
-          if(filter.test((head=(prev=head).next).val))
-          {
+          if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
           }
@@ -1949,8 +1845,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     @Override public OmniIterator.OfDouble iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr
-    {
+    private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedQueue.this.head);
       }
@@ -1958,14 +1853,12 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
         final DoubleSnglLnkNode prev;
-        if((prev=this.prev)==null)
-        {
+        if((prev=this.prev)==null){
           parent.head=next;
         }else{
           prev.next=next;
         }
-        if(this.curr==parent.tail)
-        {
+        if(this.curr==parent.tail){
           parent.tail=prev;
         }
         this.curr=prev;
@@ -1978,8 +1871,7 @@ public abstract class DoubleSnglLnkSeq implements OmniCollection.OfDouble,Clonea
     transient DoubleSnglLnkNode prev;
     transient DoubleSnglLnkNode curr;
     transient DoubleSnglLnkNode next;
-    AbstractItr(DoubleSnglLnkNode next)
-    {
+    AbstractItr(DoubleSnglLnkNode next){
       this.next=next; 
     }
     @Override public double nextDouble(){

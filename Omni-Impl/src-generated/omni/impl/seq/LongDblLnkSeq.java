@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.LongDblLnkNode;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
@@ -16,25 +15,18 @@ import omni.function.LongComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class LongDblLnkSeq implements
+public abstract class LongDblLnkSeq extends AbstractSeq implements
    LongSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient LongDblLnkNode head;
   transient LongDblLnkNode tail;
   private  LongDblLnkSeq(){
   }
   private LongDblLnkSeq(LongDblLnkNode head,int size,LongDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class LongDblLnkSeq implements
       }
     }
   }
-  private LongDblLnkNode getNode(int index,int size)
-  {
+  private LongDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class LongDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(LongConsumer action)
-  {
+  @Override public void forEach(LongConsumer action){
     final LongDblLnkNode head;
     if((head=this.head)!=null){
       LongDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Long> action)
-  {
+  @Override public void forEach(Consumer<? super Long> action){
     final LongDblLnkNode head;
     if((head=this.head)!=null){
       LongDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -750,7 +739,6 @@ public abstract class LongDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(LongUnaryOperator operator){
     final LongDblLnkNode head;
     if((head=this.head)!=null){
@@ -763,18 +751,15 @@ public abstract class LongDblLnkSeq implements
       LongDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(LongPredicate filter)
-  {
+  @Override public boolean removeIf(LongPredicate filter){
     final LongDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Long> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Long> filter){
     final LongDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(LongDblLnkNode head,int size,LongPredicate filter)
-  {
+  boolean uncheckedRemoveIf(LongDblLnkNode head,int size,LongPredicate filter){
     //TODO
     return false;
   }
@@ -811,8 +796,7 @@ public abstract class LongDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         LongDblLnkNode head,newTail;
         final var newHead=newTail=new LongDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new LongDblLnkNode(newTail,(head=head.next).val),++i){}

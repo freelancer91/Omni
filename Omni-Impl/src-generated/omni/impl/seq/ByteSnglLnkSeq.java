@@ -20,14 +20,13 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,Externalizable{
+public abstract class ByteSnglLnkSeq extends AbstractSeq implements OmniCollection.OfByte,Externalizable{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient ByteSnglLnkNode head;
   private ByteSnglLnkSeq(){
   }
   private ByteSnglLnkSeq(ByteSnglLnkNode head,int size){
-    this.size=size;
+    super(size);
     this.head=head;
   }
   private static  void pullSurvivorsDown(ByteSnglLnkNode prev,BytePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
@@ -39,8 +38,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           if(--numRemoved==0){
             prev.next=curr.next;
             return;
-          }
-          if((marker<<=1)==0){
+          }else if((marker<<=1)==0){
             word=survivorSet[++wordOffset];
             marker=1L;
           }
@@ -51,8 +49,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       if(--numSurvivors==0){
         curr.next=null;
         return;
-      }
-      if((marker<<=1)==0){
+      }else if((marker<<=1)==0){
          word=survivorSet[++wordOffset];
          marker=1L;
       }
@@ -71,8 +68,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
-      }
-      while((marker<<=1)!=0L);
+      }while((marker<<=1)!=0L);
       survivorSet[wordOffset++]=word;
     }
   }
@@ -127,40 +123,28 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       if(curr==null){
         prev.next=null;
         break;
-      }
-      if(!filter.test(curr.val)){
+      }else if(!filter.test(curr.val)){
         prev.next=curr;
         do{
           ++numSurvivors;
           if((curr=(prev=curr).next)==null){
             break outer;
           }
-        }
-        while(!filter.test(curr.val));
+        }while(!filter.test(curr.val));
       }
     }
     return numSurvivors;
   }
-  @Override public void writeExternal(ObjectOutput out) throws IOException
-  {
+  @Override public void writeExternal(ObjectOutput out) throws IOException{
     int size;
     out.writeInt(size=this.size);
-    if(size!=0)
-    {
+    if(size!=0){
       var curr=this.head;
-      do
-      {
+      do{
         out.writeByte(curr.val);
       }
       while((curr=curr.next)!=null);
     }
-  }
-  @Override public abstract Object clone();
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -214,21 +198,18 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     return arr;
   }
   abstract void push(byte val);
-  @Override public boolean add(byte val)
-  {
+  @Override public boolean add(byte val){
     push((val));
     return true;
   }
   public void push(Byte val){
     push((byte)val);
   }
-  @Override public boolean add(Byte val)
-  {
+  @Override public boolean add(Byte val){
     push((byte)(val));
     return true;
   }
-  @Override public boolean add(boolean val)
-  {
+  @Override public boolean add(boolean val){
     push((byte)TypeUtil.castToByte(val));
     return true;
   }
@@ -336,8 +317,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           if((head=this.head)!=null)
           {
             final byte v;
-            if((v=(byte)val)==val)
-            {
+            if((v=(byte)val)==val){
               return ByteSnglLnkNode.uncheckedcontains(head,v);
             }
           } //end size check
@@ -480,8 +460,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           if((head=this.head)!=null)
           {
             final byte v;
-            if((v=(byte)val)==val)
-            {
+            if((v=(byte)val)==val){
               return uncheckedremoveVal(head,v);
             }
           } //end size check
@@ -740,27 +719,20 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
         }
       });
     }
-    private int removeIfHelper(ByteSnglLnkNode prev,BytePredicate filter,int numLeft,int modCount)
-    {
-      if(numLeft!=0)
-      {
+    private int removeIfHelper(ByteSnglLnkNode prev,BytePredicate filter,int numLeft,int modCount){
+      if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -881,8 +853,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     }
     @Override boolean uncheckedremoveVal(ByteSnglLnkNode head
       ,int val
-    )
-    {
+    ){
       {
         if(val==(head.val)){
           this.head=head.next;
@@ -970,8 +941,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         ByteSnglLnkNode curr;
         for(this.head=curr=new ByteSnglLnkNode((byte)in.readByte());--size!=0;curr=curr.next=new ByteSnglLnkNode((byte)in.readByte())){}
       }
@@ -1032,8 +1002,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           if((head=this.head)!=null)
           {
             final byte v;
-            if((v=(byte)val)==val)
-            {
+            if((v=(byte)val)==val){
               return ByteSnglLnkNode.uncheckedsearch(head,v);
             }
           } //end size check
@@ -1242,8 +1211,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     }
     @Override boolean uncheckedremoveVal(ByteSnglLnkNode head
       ,int val
-    )
-    {
+    ){
       {
         if(val==(head.val)){
           this.head=head.next;
@@ -1263,8 +1231,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     @Override public OmniIterator.OfByte iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr
-    {
+    private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedStack.this.head);
       }
@@ -1281,8 +1248,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       }
     }
   }
-  public static class CheckedQueue extends UncheckedQueue
-  {
+  public static class CheckedQueue extends UncheckedQueue{
     private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedQueue(){
@@ -1308,14 +1274,11 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
         int size;
         final var tail=this.tail;
         out.writeInt(size=this.size);
-        if(size!=0)
-        {
+        if(size!=0){
           ByteSnglLnkNode curr;
-          for(curr=this.head;;curr=curr.next)
-          {
+          for(curr=this.head;;curr=curr.next){
             out.writeByte(curr.val);
-            if(curr==tail)
-            {
+            if(curr==tail){
               return;
             }
           }
@@ -1357,8 +1320,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       });
     }
     @Override public void clear(){
-      if(size!=0)
-      {
+      if(size!=0){
         ++this.modCount;
         this.head=null;
         this.tail=null;
@@ -1395,8 +1357,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1410,8 +1371,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Byte)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1425,8 +1385,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1440,8 +1399,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1455,8 +1413,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1470,8 +1427,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1485,8 +1441,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(short)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1496,8 +1451,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       }
       return Short.MIN_VALUE;
     }
-    private void pullSurvivorsDown(ByteSnglLnkNode prev,BytePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved)
-    {
+    private void pullSurvivorsDown(ByteSnglLnkNode prev,BytePredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1505,13 +1459,11 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
-            }
-            if((marker<<=1)==0){
+            }else if((marker<<=1)==0){
               word=survivorSet[++wordOffset];
               marker=1L;
             }
@@ -1538,8 +1490,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
@@ -1559,22 +1510,17 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     private int removeIfHelper(ByteSnglLnkNode prev,BytePredicate filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -1647,8 +1593,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     @Override public OmniIterator.OfByte iterator(){
       return new Itr(this);
     }
-    private static class Itr extends AbstractItr
-    {
+    private static class Itr extends AbstractItr{
       transient final CheckedQueue parent;
       transient int modCount;
       Itr(CheckedQueue parent){
@@ -1673,12 +1618,10 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next)
-          {
+          for(curr=this.curr;;next=curr.next){
             action.accept(next.val);
             prev=curr;
-            if((curr=next)==tail)
-            {
+            if((curr=next)==tail){
               break;
             }
           }
@@ -1703,8 +1646,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
           }else{
             prev.next=next;
           }
-          if(curr==parent.tail)
-          {
+          if(curr==parent.tail){
             parent.tail=prev;
           }
           this.curr=prev;
@@ -1732,8 +1674,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         ByteSnglLnkNode curr;
         for(this.head=curr=new ByteSnglLnkNode((byte)in.readByte());--size!=0;curr=curr.next=new ByteSnglLnkNode((byte)in.readByte())){}
         this.tail=curr;
@@ -1784,8 +1725,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1808,8 +1748,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(Byte)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1822,8 +1761,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(double)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1836,8 +1774,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(float)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1850,8 +1787,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(long)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1864,8 +1800,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(int)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1878,8 +1813,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       final ByteSnglLnkNode head;
       if((head=this.head)!=null){
         final var ret=(short)(head.val);
-        if(head==this.tail)
-        {
+        if(head==this.tail){
           this.tail=null;
         }
         this.head=head.next;
@@ -1888,8 +1822,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       }
       return Short.MIN_VALUE;
     }
-    private int removeIfHelper(ByteSnglLnkNode prev,ByteSnglLnkNode tail,BytePredicate filter)
-    {
+    private int removeIfHelper(ByteSnglLnkNode prev,ByteSnglLnkNode tail,BytePredicate filter){
       int numSurvivors=1;
       outer:for(ByteSnglLnkNode next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
@@ -1906,8 +1839,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
       }
       return numSurvivors;
     }
-    private int removeIfHelper(ByteSnglLnkNode prev,ByteSnglLnkNode curr,ByteSnglLnkNode tail,BytePredicate filter)
-    {
+    private int removeIfHelper(ByteSnglLnkNode prev,ByteSnglLnkNode curr,ByteSnglLnkNode tail,BytePredicate filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1926,10 +1858,8 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     }
     @Override boolean uncheckedremoveIf(ByteSnglLnkNode head,BytePredicate filter){
       if(filter.test(head.val)){
-        for(var tail=this.tail;head!=tail;)
-        {
-          if(!filter.test((head=head.next).val))
-          {
+        for(var tail=this.tail;head!=tail;){
+          if(!filter.test((head=head.next).val)){
             this.size=removeIfHelper(head,tail,filter);
             this.head=head;
             return true;  
@@ -1941,11 +1871,9 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
         return true;
       }else{
         int numSurvivors=1;
-        for(final var tail=this.tail;head!=tail;++numSurvivors)
-        {
+        for(final var tail=this.tail;head!=tail;++numSurvivors){
           final ByteSnglLnkNode prev;
-          if(filter.test((head=(prev=head).next).val))
-          {
+          if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
           }
@@ -1982,8 +1910,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     @Override public OmniIterator.OfByte iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr
-    {
+    private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedQueue.this.head);
       }
@@ -1991,14 +1918,12 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
         final ByteSnglLnkNode prev;
-        if((prev=this.prev)==null)
-        {
+        if((prev=this.prev)==null){
           parent.head=next;
         }else{
           prev.next=next;
         }
-        if(this.curr==parent.tail)
-        {
+        if(this.curr==parent.tail){
           parent.tail=prev;
         }
         this.curr=prev;
@@ -2011,8 +1936,7 @@ public abstract class ByteSnglLnkSeq implements OmniCollection.OfByte,Cloneable,
     transient ByteSnglLnkNode prev;
     transient ByteSnglLnkNode curr;
     transient ByteSnglLnkNode next;
-    AbstractItr(ByteSnglLnkNode next)
-    {
+    AbstractItr(ByteSnglLnkNode next){
       this.next=next; 
     }
     @Override public byte nextByte(){

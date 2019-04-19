@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.RefDblLnkNode;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -12,25 +11,18 @@ import java.util.Comparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class RefDblLnkSeq<E> implements
+public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
    OmniList.OfRef<E>
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient RefDblLnkNode<E> head;
   transient RefDblLnkNode<E> tail;
   private  RefDblLnkSeq(){
   }
   private RefDblLnkSeq(RefDblLnkNode<E> head,int size,RefDblLnkNode<E> tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -84,8 +76,7 @@ public abstract class RefDblLnkSeq<E> implements
       }
     }
   }
-  private RefDblLnkNode<E> getNode(int index,int size)
-  {
+  private RefDblLnkNode<E> getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -144,8 +135,7 @@ public abstract class RefDblLnkSeq<E> implements
     }
     return ret;
   }
-  @Override public void forEach(Consumer<? super E> action)
-  {
+  @Override public void forEach(Consumer<? super E> action){
     final RefDblLnkNode<E> head;
     if((head=this.head)!=null){
       RefDblLnkNode.uncheckedForEachAscending(head,size,action);
@@ -243,8 +233,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontainsNonNull(head,tail,val);
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -295,8 +284,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -311,8 +299,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -327,8 +314,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -343,8 +329,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -359,8 +344,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -375,8 +359,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -391,8 +374,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -407,8 +389,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
@@ -483,8 +464,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveValNonNull(head,tail,val);
           }
           return uncheckedremoveValNull(head,tail);
@@ -535,8 +515,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -551,8 +530,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -567,8 +545,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -583,8 +560,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -599,8 +575,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -615,8 +590,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -631,8 +605,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -647,8 +620,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return uncheckedremoveVal(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return uncheckedremoveValNull(head,tail);
@@ -723,8 +695,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOfNonNull(head,tail,val);
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -775,8 +746,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -791,8 +761,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -807,8 +776,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -823,8 +791,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -839,8 +806,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -855,8 +821,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -871,8 +836,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -887,8 +851,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
@@ -963,8 +926,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOfNonNull(size,tail,val);
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1015,8 +977,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1031,8 +992,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1047,8 +1007,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1063,8 +1022,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1079,8 +1037,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1095,8 +1052,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1111,8 +1067,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1127,8 +1082,7 @@ public abstract class RefDblLnkSeq<E> implements
         final RefDblLnkNode<E> tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=null)
-          {
+          if(val!=null){
             return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
@@ -1217,20 +1171,17 @@ public abstract class RefDblLnkSeq<E> implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(UnaryOperator<E> operator){
     final RefDblLnkNode<E> head;
     if((head=this.head)!=null){
       RefDblLnkNode.uncheckedReplaceAll(head,size,operator);
     }
   }
-  @Override public boolean removeIf(Predicate<? super E> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super E> filter){
     final RefDblLnkNode<E> head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  boolean uncheckedRemoveIf(RefDblLnkNode<E> head,int size,Predicate<? super E> filter)
-  {
+  boolean uncheckedRemoveIf(RefDblLnkNode<E> head,int size,Predicate<? super E> filter){
     //TODO
     return false;
   }
@@ -1270,8 +1221,7 @@ public abstract class RefDblLnkSeq<E> implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         RefDblLnkNode<E> head,newTail;
         final var newHead=newTail=new RefDblLnkNode<E>((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<E>(newTail,(head=head.next).val),++i){}
@@ -1430,8 +1380,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearchNonNull(head,tail,val);
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1482,8 +1431,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1498,8 +1446,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1514,8 +1461,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1530,8 +1476,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1546,8 +1491,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1562,8 +1506,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1578,8 +1521,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1594,8 +1536,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return RefDblLnkNode.uncheckedsearch(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head,tail);
@@ -1670,8 +1611,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrenceNonNull(head,tail,val);
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1722,8 +1662,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1738,8 +1677,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1754,8 +1692,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1770,8 +1707,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1786,8 +1722,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1802,8 +1737,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1818,8 +1752,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);
@@ -1834,8 +1767,7 @@ public abstract class RefDblLnkSeq<E> implements
           final RefDblLnkNode<E> tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=null)
-            {
+            if(val!=null){
               return uncheckedremoveLastOccurrence(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(head,tail);

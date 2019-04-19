@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.ByteDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.ByteConsumer;
@@ -16,25 +15,18 @@ import omni.function.ByteComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class ByteDblLnkSeq implements
+public abstract class ByteDblLnkSeq extends AbstractSeq implements
    ByteSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient ByteDblLnkNode head;
   transient ByteDblLnkNode tail;
   private  ByteDblLnkSeq(){
   }
   private ByteDblLnkSeq(ByteDblLnkNode head,int size,ByteDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class ByteDblLnkSeq implements
       }
     }
   }
-  private ByteDblLnkNode getNode(int index,int size)
-  {
+  private ByteDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class ByteDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(ByteConsumer action)
-  {
+  @Override public void forEach(ByteConsumer action){
     final ByteDblLnkNode head;
     if((head=this.head)!=null){
       ByteDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Byte> action)
-  {
+  @Override public void forEach(Consumer<? super Byte> action){
     final ByteDblLnkNode head;
     if((head=this.head)!=null){
       ByteDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -274,8 +263,7 @@ public abstract class ByteDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final byte v;
-          if((v=(byte)val)==val)
-          {
+          if((v=(byte)val)==val){
             return ByteDblLnkNode.uncheckedcontains(head,tail,v);
           }
         } //end size check
@@ -418,8 +406,7 @@ public abstract class ByteDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final byte v;
-          if((v=(byte)val)==val)
-          {
+          if((v=(byte)val)==val){
             return uncheckedremoveVal(head,tail,v);
           }
         } //end size check
@@ -562,8 +549,7 @@ public abstract class ByteDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final byte v;
-          if((v=(byte)val)==val)
-          {
+          if((v=(byte)val)==val){
             return ByteDblLnkNode.uncheckedindexOf(head,tail,v);
           }
         } //end size check
@@ -706,8 +692,7 @@ public abstract class ByteDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final byte v;
-          if((v=(byte)val)==val)
-          {
+          if((v=(byte)val)==val){
             return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
@@ -845,7 +830,6 @@ public abstract class ByteDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(ByteUnaryOperator operator){
     final ByteDblLnkNode head;
     if((head=this.head)!=null){
@@ -858,18 +842,15 @@ public abstract class ByteDblLnkSeq implements
       ByteDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(BytePredicate filter)
-  {
+  @Override public boolean removeIf(BytePredicate filter){
     final ByteDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Byte> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Byte> filter){
     final ByteDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(ByteDblLnkNode head,int size,BytePredicate filter)
-  {
+  boolean uncheckedRemoveIf(ByteDblLnkNode head,int size,BytePredicate filter){
     //TODO
     return false;
   }
@@ -906,8 +887,7 @@ public abstract class ByteDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         ByteDblLnkNode head,newTail;
         final var newHead=newTail=new ByteDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new ByteDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -1032,8 +1012,7 @@ public abstract class ByteDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final byte v;
-            if((v=(byte)val)==val)
-            {
+            if((v=(byte)val)==val){
               return ByteDblLnkNode.uncheckedsearch(head,tail,v);
             }
           } //end size check
@@ -1176,8 +1155,7 @@ public abstract class ByteDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final byte v;
-            if((v=(byte)val)==val)
-            {
+            if((v=(byte)val)==val){
               return uncheckedremoveLastOccurrence(head,tail,v);
             }
           } //end size check

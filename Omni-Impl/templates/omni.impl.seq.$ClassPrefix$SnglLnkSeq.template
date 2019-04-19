@@ -27,7 +27,6 @@ import java.util.function.$TypeNameModifier$Predicate;
 import omni.function.$TypeNameModifier$Consumer;
 import omni.function.$TypeNameModifier$Predicate;
 #ENDIF
-
 #IF OfRef
 import omni.util.OmniPred;
 #ELSE
@@ -41,14 +40,13 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Cloneable,Externalizable{
+public abstract class $ClassPrefix$SnglLnkSeq$<E>$ extends AbstractSeq implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient $SNode$$<E>$ head;
   private $ClassPrefix$SnglLnkSeq(){
   }
   private $ClassPrefix$SnglLnkSeq($SNode$$<E>$ head,int size){
-    this.size=size;
+    super(size);
     this.head=head;
   }
 #IF OfBoolean
@@ -73,8 +71,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if(curr==null){
         prev.next=null;
         break;
-      }
-      if(curr.val==retainThis){
+      }else if(curr.val==retainThis){
         prev.next=curr;
         do{
           ++numSurvivors;
@@ -88,9 +85,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     return numSurvivors;
   }
 #ELSE
-  
-
-
   private static $<E>$ void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
     int wordOffset;
     for(long word=survivorSet[wordOffset=0],marker=1L;;){
@@ -100,8 +94,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           if(--numRemoved==0){
             prev.next=curr.next;
             return;
-          }
-          if((marker<<=1)==0){
+          }else if((marker<<=1)==0){
             word=survivorSet[++wordOffset];
             marker=1L;
           }
@@ -112,8 +105,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if(--numSurvivors==0){
         curr.next=null;
         return;
-      }
-      if((marker<<=1)==0){
+      }else if((marker<<=1)==0){
          word=survivorSet[++wordOffset];
          marker=1L;
       }
@@ -132,8 +124,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
-      }
-      while((marker<<=1)!=0L);
+      }while((marker<<=1)!=0L);
       survivorSet[wordOffset++]=word;
     }
   }
@@ -167,8 +158,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       }
     }
   }
-
- 
   private static $<E>$ int retainSurvivors($SNode$$<E>$ prev, final $TypeNameModifier$Predicate$<? super E>$ filter){
     int numSurvivors=1;
     outer:for($SNode$$<E>$ next;(next=prev.next)!=null;++numSurvivors,prev=next){
@@ -190,52 +179,40 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       if(curr==null){
         prev.next=null;
         break;
-      }
-      if(!filter.test(curr.val)){
+      }else if(!filter.test(curr.val)){
         prev.next=curr;
         do{
           ++numSurvivors;
           if((curr=(prev=curr).next)==null){
             break outer;
           }
-        }
-        while(!filter.test(curr.val));
+        }while(!filter.test(curr.val));
       }
     }
     return numSurvivors;
   }
 #ENDIF
-
-  
-  @Override public void writeExternal(ObjectOutput out) throws IOException
-  {
+  @Override public void writeExternal(ObjectOutput out) throws IOException{
     int size;
     out.writeInt(size=this.size);
-    if(size!=0)
-    {
+    if(size!=0){
       var curr=this.head;
 #IF OfBoolean
-      for(int word=TypeUtil.castToByte(curr.val),marker=1;;)
-      {
-        if((curr=curr.next)==null)
-        {
+      for(int word=TypeUtil.castToByte(curr.val),marker=1;;){
+        if((curr=curr.next)==null){
           out.writeByte(word);
           return;
-        }
-        if((marker<<=1)==(1<<8))
-        {
+        }else if((marker<<=1)==(1<<8)){
           out.writeByte(word);
           word=0;
           marker=1;
         }
-        if(curr.val)
-        {
+        if(curr.val){
           word|=marker;
         }
       }
 #ELSE
-      do
-      {
+      do{
   #IF OfRef
         out.writeObject(curr.val);
   #ELSE
@@ -245,14 +222,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       while((curr=curr.next)!=null);
 #ENDIF
     }
-  }
-  
-  @Override public abstract Object clone();
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -416,7 +385,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     return false;
   }
 #ENDIF
-
   #MACRO peek($exposedType$,$TypeNameModifier$,$defaultVal$,($exposedType$))
 #IFNOT OfRef
   #MACRO peek($BoxedType$,,null,($BoxedType$))
@@ -493,32 +461,32 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       throw new NoSuchElementException();
     }
 #IF OfRef
-  @Override public int hashCode(){
-    final $SNode$$<E>$ head;
-    if((head=this.head)!=null){
-      final int modCount=this.modCount;
-      try{
-        return $SNode$.uncheckedHashCode(head);
-      }finally{
-        CheckedCollection.checkModCount(modCount,this.modCount);
+    @Override public int hashCode(){
+      final $SNode$$<E>$ head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          return $SNode$.uncheckedHashCode(head);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
       }
+      return 1;
     }
-    return 1;
-  }
-  @Override public String toString(){
-    final $SNode$$<E>$ head;
-    if((head=this.head)!=null){
-      final StringBuilder builder=new StringBuilder("[");
-      final int modCount=this.modCount;
-      try{
-        $SNode$.uncheckedToString(head,builder);
-      }finally{
-        CheckedCollection.checkModCount(modCount,this.modCount);
+    @Override public String toString(){
+      final $SNode$$<E>$ head;
+      if((head=this.head)!=null){
+        final StringBuilder builder=new StringBuilder("[");
+        final int modCount=this.modCount;
+        try{
+          $SNode$.uncheckedToString(head,builder);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        return builder.append(']').toString();
       }
-      return builder.append(']').toString();
+      return "[]";
     }
-    return "[]";
-  }
 #ENDIF    
     @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
       final $SNode$$<E>$ head;
@@ -555,27 +523,20 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       });
     }
 #IFNOT OfBoolean
-    private int removeIfHelper($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount)
-    {
-      if(numLeft!=0)
-      {
+    private int removeIfHelper($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
+      if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -690,8 +651,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     #MACRO StackUncheckedRemoveVal<true,>(val==,val!=)
 #ENDIF
 #IF OfRef
-    @Override
-    public int search(Object val){
+    @Override public int search(Object val){
       final $SNode$$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
@@ -706,8 +666,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       }
       return -1;
     }
-    @Override
-    public boolean contains(Object val){
+    @Override public boolean contains(Object val){
       final $SNode$$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
@@ -799,15 +758,12 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         $SNode$$<E>$ curr;
 #IF OfBoolean
         int word,marker;
-        for(this.head=curr=new $SNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $SNode$$<E>$((word&marker)!=0))
-        {
-          if((marker<<=1)==(1<<8))
-          {
+        for(this.head=curr=new $SNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $SNode$$<E>$((word&marker)!=0)){
+          if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
           }
@@ -938,8 +894,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr$<E>$
-    {
+    private class Itr extends AbstractItr$<E>${
       Itr(){
         super(UncheckedStack.this.head);
       }
@@ -956,8 +911,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       }
     }
   }
-  public static class CheckedQueue$<E>$ extends UncheckedQueue$<E>$
-  {
+  public static class CheckedQueue$<E>$ extends UncheckedQueue$<E>${
     private static final long serialVersionUID=1L;
     transient int modCount;
     public CheckedQueue(){
@@ -983,38 +937,30 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         int size;
         final var tail=this.tail;
         out.writeInt(size=this.size);
-        if(size!=0)
-        {
+        if(size!=0){
           $SNode$$<E>$ curr;
     #IF OfBoolean
-          for(int word=TypeUtil.castToByte((curr=this.head).val),marker=1;;)
-          {
-            if(curr==tail)
-            {
+          for(int word=TypeUtil.castToByte((curr=this.head).val),marker=1;;){
+            if(curr==tail){
               out.writeByte(word);
               return;
-            }
-            if((marker<<=1)==(1<<8))
-            {
+            }else if((marker<<=1)==(1<<8)){
               out.writeByte(word);
               word=0;
               marker=1;
             }
-            if((curr=curr.next).val)
-            {
+            if((curr=curr.next).val){
               word|=marker;
             }
           }
     #ELSE
-          for(curr=this.head;;curr=curr.next)
-          {
+          for(curr=this.head;;curr=curr.next){
       #IF OfRef
             out.writeObject(curr.val);
       #ELSE
             out.write$TypeNameModifier$(curr.val);
       #ENDIF
-            if(curr==tail)
-            {
+            if(curr==tail){
               return;
             }
           }
@@ -1024,8 +970,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    
-    
 #IF OfRef
     @Override public int hashCode(){
       final $SNode$$<E>$ head;
@@ -1088,11 +1032,8 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         }
       });
     }
-    
-
     @Override public void clear(){
-      if(size!=0)
-      {
+      if(size!=0){
         ++this.modCount;
         this.head=null;
         this.tail=null;
@@ -1148,10 +1089,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     #ENDIF
   #ENDIF
 #ENDIF
-
-
-
-
 #IF OfBoolean
     private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,boolean retainThis){
       int numSurvivors=1;
@@ -1191,8 +1128,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       return numSurvivors;
     }
 #ELSE
-    private void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved)
-    {
+    private void pullSurvivorsDown($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1200,13 +1136,11 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
-            }
-            if((marker<<=1)==0){
+            }else if((marker<<=1)==0){
               word=survivorSet[++wordOffset];
               marker=1L;
             }
@@ -1233,8 +1167,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           do{
             if(--numRemoved==0){
               prev.next=curr.next;
-              if(curr==tail)
-              {
+              if(curr==tail){
                 this.tail=prev;
               }
               return;
@@ -1254,22 +1187,17 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     private int removeIfHelper($SNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,int numLeft,int modCount){
       if(numLeft!=0){
         int numSurvivors;
-        if(numLeft>64)
-        {
+        if(numLeft>64){
           long[] survivorSet;
           numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors)!=0)
-          {
+          if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
-        }
-        else
-        {
+        }else{
           long survivorWord=markSurvivors(prev.next,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0)
-          {
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -1305,7 +1233,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           this.size=0;
           return true;
         }else{
-          
           for(int numSurvivors=1;head!=tail;++numSurvivors){
             $SNode$$<E>$ prev;
             if((head=(prev=head).next).val^firstVal){
@@ -1365,8 +1292,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     #MACRO QueueUncheckedRemoveVal<true,>(val==,val!=)
 #ENDIF
 #IF OfRef
-    @Override
-    public boolean contains(Object val){
+    @Override public boolean contains(Object val){
       final $SNode$$<E>$ head;
       if((head=this.head)!=null){
         if(val!=null){
@@ -1385,8 +1311,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
       return new Itr$<E>$(this);
     }
-    private static class Itr$<E>$ extends AbstractItr$<E>$
-    {
+    private static class Itr$<E>$ extends AbstractItr$<E>${
       transient final CheckedQueue$<E>$ parent;
       transient int modCount;
       Itr(CheckedQueue$<E>$ parent){
@@ -1411,12 +1336,10 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         final CheckedQueue$<E>$ parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next)
-          {
+          for(curr=this.curr;;next=curr.next){
             action.accept(next.val);
             prev=curr;
-            if((curr=next)==tail)
-            {
+            if((curr=next)==tail){
               break;
             }
           }
@@ -1441,8 +1364,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
           }else{
             prev.next=next;
           }
-          if(curr==parent.tail)
-          {
+          if(curr==parent.tail){
             parent.tail=prev;
           }
           this.curr=prev;
@@ -1451,7 +1373,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         throw new IllegalStateException();
       }
     }
-
   }
   public static class UncheckedQueue$<E>$ extends $ClassPrefix$SnglLnkSeq$<E>$ implements OmniQueue.Of$ClassPrefix$$<E>${
     private static final long serialVersionUID=1L;
@@ -1477,15 +1398,12 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     {
       int size;
       this.size=size=in.readInt();
-      if(size!=0)
-      {
+      if(size!=0){
         $SNode$$<E>$ curr;
 #IF OfBoolean
         int word,marker;
-        for(this.head=curr=new $SNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $SNode$$<E>$((word&marker)!=0))
-        {
-          if((marker<<=1)==(1<<8))
-          {
+        for(this.head=curr=new $SNode$(((marker=1)&(word=in.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $SNode$$<E>$((word&marker)!=0)){
+          if((marker<<=1)==(1<<8)){
             word=in.readUnsignedByte();
             marker=1;
           }
@@ -1573,8 +1491,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
   #ENDIF
 #ENDIF
 #IF OfBoolean
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,boolean retainThis)
-    {
+    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,boolean retainThis){
       int numSurvivors=1;
       outer:for($SNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
         if((next=prev.next).val^retainThis){
@@ -1609,8 +1526,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       return numSurvivors;
     }
 #ELSE
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
+    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       int numSurvivors=1;
       outer:for($SNode$$<E>$ next;prev!=tail;++numSurvivors,prev=next){
         if(filter.test((next=prev.next).val)){
@@ -1627,8 +1543,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       }
       return numSurvivors;
     }
-    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ curr,$SNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
+    private int removeIfHelper($SNode$$<E>$ prev,$SNode$$<E>$ curr,$SNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       int numSurvivors=0;
       while(curr!=tail) {
         if(!filter.test((curr=curr.next).val)){
@@ -1650,8 +1565,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
 #IF OfBoolean
       boolean firstVal;
       if(filter.test(firstVal=head.val)){
-        for(var tail=this.tail;head!=tail;)
-        {
+        for(var tail=this.tail;head!=tail;){
           if((head=head.next).val^firstVal){
             if(filter.test(firstVal=!firstVal)){
               break;
@@ -1667,13 +1581,10 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         return true;
       }else{
         int numSurvivors=1;
-        for(final var tail=this.tail;head!=tail;++numSurvivors)
-        {
+        for(final var tail=this.tail;head!=tail;++numSurvivors){
           final $SNode$$<E>$ prev;
-          if((head=(prev=head).next).val^firstVal)
-          {
-            if(filter.test(!firstVal))
-            {
+          if((head=(prev=head).next).val^firstVal){
+            if(filter.test(!firstVal)){
               this.size=numSurvivors+removeIfHelper(prev,head,tail,firstVal);
               return true;
             }
@@ -1684,10 +1595,8 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       }
 #ELSE
       if(filter.test(head.val)){
-        for(var tail=this.tail;head!=tail;)
-        {
-          if(!filter.test((head=head.next).val))
-          {
+        for(var tail=this.tail;head!=tail;){
+          if(!filter.test((head=head.next).val)){
             this.size=removeIfHelper(head,tail,filter);
             this.head=head;
             return true;  
@@ -1699,11 +1608,9 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         return true;
       }else{
         int numSurvivors=1;
-        for(final var tail=this.tail;head!=tail;++numSurvivors)
-        {
+        for(final var tail=this.tail;head!=tail;++numSurvivors){
           final $SNode$$<E>$ prev;
-          if(filter.test((head=(prev=head).next).val))
-          {
+          if(filter.test((head=(prev=head).next).val)){
             this.size=numSurvivors+removeIfHelper(prev,head,tail,filter);
             return true;
           }
@@ -1723,12 +1630,10 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
 #ELSE
     #MACRO QueueUncheckedRemoveVal<false,>(val==,val!=)
 #ENDIF
-
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
       return new Itr();
     }
-    private class Itr extends AbstractItr$<E>$
-    {
+    private class Itr extends AbstractItr$<E>${
       Itr(){
         super(UncheckedQueue.this.head);
       }
@@ -1736,21 +1641,18 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
         final UncheckedQueue$<E>$ parent;
         --(parent=UncheckedQueue.this).size;
         final $SNode$$<E>$ prev;
-        if((prev=this.prev)==null)
-        {
+        if((prev=this.prev)==null){
           parent.head=next;
         }else{
           prev.next=next;
         }
-        if(this.curr==parent.tail)
-        {
+        if(this.curr==parent.tail){
           parent.tail=prev;
         }
         this.curr=prev;
       }
     }
   }
-  
   private static class AbstractItr$<E>$
 #IF OfRef
       implements OmniIterator.Of$ClassPrefix$$<E>$
@@ -1761,12 +1663,9 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
     transient $SNode$$<E>$ prev;
     transient $SNode$$<E>$ curr;
     transient $SNode$$<E>$ next;
-    
-    AbstractItr($SNode$$<E>$ next)
-    {
+    AbstractItr($SNode$$<E>$ next){
       this.next=next; 
     }
-    
     @Override public $exposedType$ next$TypeNameModifier$(){
       final $SNode$$<E>$ next;
       this.next=(next=this.next).next;
@@ -1774,7 +1673,6 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       this.curr=next;
       return next.val;
     }
-    
     @Override public boolean hasNext(){
       return next!=null;
     }
@@ -1802,16 +1700,10 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ implements OmniCollection.Of$
       }
     }
 #ENDIF
-    
   }
 }
-
-
-
-
 #MACRODEF add(INPUTTYPE,CAST)
-@Override public boolean add(INPUTTYPE val)
-{
+@Override public boolean add(INPUTTYPE val){
   push(CAST(val));
   return true;
 }
@@ -1830,8 +1722,7 @@ public RETTYPE peekSUFFIX(){
   final $SNode$$<E>$ head;
   if((head=this.head)!=null){
     final var ret=CAST(head.val);
-    if(head==this.tail)
-    {
+    if(head==this.tail){
       this.tail=null;
     }
     this.head=head.next;
@@ -1873,8 +1764,6 @@ public RETTYPE peekSUFFIX(){
   #ENDIF
 #ENDIF
 #ENDDEF
-
-
 #MACRODEF QueueUncheckedRemoveVal<CHECKED,SUFFIX>(POSTEST,NEGTEST)
 @Override boolean uncheckedremoveValSUFFIX($SNode$$<E>$ head
 #MACRO UncheckedQueryParam()
@@ -1937,8 +1826,7 @@ public RETTYPE peekSUFFIX(){
 #MACRODEF StackUncheckedRemoveVal<CHECKED,SUFFIX>(POSTEST,NEGTEST)
 @Override boolean uncheckedremoveValSUFFIX($SNode$$<E>$ head
   #MACRO UncheckedQueryParam()
-)
-{
+){
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
   final int modCount=this.modCount;
@@ -1975,12 +1863,9 @@ public RETTYPE peekSUFFIX(){
   }
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
-  catch(ConcurrentModificationException e)
-  {
+  catch(ConcurrentModificationException e){
     throw e;
-  }
-  catch(RuntimeException e)
-  {
+  }catch(RuntimeException e){
     throw CheckedCollection.checkModCount(modCount,this.modCount,e);
   }
   #ENDIF
@@ -2001,8 +1886,6 @@ public RETTYPE peekSUFFIX(){
   return DEFAULTARR;
 }
 #ENDDEF
-
-
 #MACRODEF QueryMethods<STRUCTNAME,METHODNAME>()
 #IFSWITCH STRUCTNAME==Root
   #MACRO QueryMethod<boolean>( )
@@ -2184,8 +2067,7 @@ ERROR unknown method name METHODNAME
       {
 #IFSWITCH INPUTTYPE==boolean
   #IF OfDouble,OfFloat
-        if(val)
-        {
+        if(val){
           #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
         }
         #MACRO ReturnUncheckedQuery0()
@@ -2194,8 +2076,7 @@ ERROR unknown method name METHODNAME
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==byte,char,short
   #IF OfDouble,OfFloat
-        if(val!=0)
-        {
+        if(val!=0){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
         }
         #MACRO ReturnUncheckedQuery0()
@@ -2204,11 +2085,9 @@ ERROR unknown method name METHODNAME
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==int
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
-          switch(val)
-          {
+          switch(val){
           default:
             break returnFalse;
           case 0:
@@ -2222,17 +2101,14 @@ ERROR unknown method name METHODNAME
   #ELSEIF OfFloat,OfDouble
     #IF OfDouble
     #ENDIF
-        if(val!=0)
-        {
+        if(val!=0){
     #IF OfFloat
           if(TypeUtil.checkCastTo$ClassPrefix$(val))
     #ENDIF
           {
             #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
           }
-        }
-        else
-        {
+        }else{
           #MACRO ReturnUncheckedQuery0()
         }
   #ELSE
@@ -2240,38 +2116,28 @@ ERROR unknown method name METHODNAME
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==long
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
-          if(val==0L)
-          {
+          if(val==0L){
             v=false;
-          }else if(val==1L)
-          {
+          }else if(val==1L){
             v=true;
-          }
-          else
-          {
+          }else{
             break returnFalse;
           }
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSEIF OfFloat,OfDouble
-        if(val!=0)
-        {
-          if(TypeUtil.checkCastTo$ClassPrefix$(val))
-          {
+        if(val!=0){
+          if(TypeUtil.checkCastTo$ClassPrefix$(val)){
             #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
           }
-        }
-        else
-        {
+        }else{
           #MACRO ReturnUncheckedQuery0()
         }
   #ELSEIF OfByte,OfChar,OfShort,OfInt
         final $ArrayType$ v;
-        if((v=($ArrayType$)val)==val)
-        {
+        if((v=($ArrayType$)val)==val){
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSE
@@ -2279,11 +2145,9 @@ ERROR unknown method name METHODNAME
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==float
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
-          switch(Float.floatToRawIntBits(val))
-          {
+          switch(Float.floatToRawIntBits(val)){
             default:
               break returnFalse;
             case 0:
@@ -2296,8 +2160,7 @@ ERROR unknown method name METHODNAME
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSEIF OfFloat,OfDouble
-        if(val==val)
-        {
+        if(val==val){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
         }
         #MACRO ReturnUncheckedQueryNaN()
@@ -2318,37 +2181,27 @@ ERROR unknown method name METHODNAME
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==double
   #IF OfBoolean
-        returnFalse:for(;;)
-        {
+        returnFalse:for(;;){
           final $ArrayType$ v;
           long bits;
-          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-          {
+          if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
             v=false;
-          }
-          else if(bits==TypeUtil.DBL_TRUE_BITS)
-          {
+          }else if(bits==TypeUtil.DBL_TRUE_BITS){
             v=true;
-          }
-          else
-          {
+          }else{
             break returnFalse;
           }
           #MACRO ReturnUncheckedQuery(v)
         }
   #ELSEIF OfFloat
         final $ArrayType$ v;
-        if(val==(v=($ArrayType$)val))
-        {
+        if(val==(v=($ArrayType$)val)){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
-        }
-        else if(v!=v)
-        {
+        }else if(v!=v){
           #MACRO ReturnUncheckedQueryNaN()
         }
   #ELSEIF OfDouble
-        if(val==val)
-        {
+        if(val==val){
           #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
         }
         #MACRO ReturnUncheckedQueryNaN()
@@ -2367,8 +2220,7 @@ ERROR unknown method name METHODNAME
   #ENDIF
 #ELSEIFSWITCH INPUTTYPE==Object
   #IF OfRef
-        if(val!=null)
-        {
+        if(val!=null){
           #MACRO ReturnUncheckedQueryNonNull(val)
         }
         #MACRO ReturnUncheckedQueryNull()
@@ -2686,8 +2538,7 @@ ERROR unknown method name METHODNAME
         }
   #ENDIF
 #ELSE
-        if(val!=null)
-        {
+        if(val!=null){
           #MACRO ReturnUncheckedQuery($queryCastRef$(CAST(val)))
         }
         #MACRO ReturnUncheckedQueryNull()

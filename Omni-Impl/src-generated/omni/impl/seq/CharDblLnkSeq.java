@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.CharDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.CharConsumer;
@@ -16,25 +15,18 @@ import omni.function.CharComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class CharDblLnkSeq implements
+public abstract class CharDblLnkSeq extends AbstractSeq implements
    CharSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient CharDblLnkNode head;
   transient CharDblLnkNode tail;
   private  CharDblLnkSeq(){
   }
   private CharDblLnkSeq(CharDblLnkNode head,int size,CharDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class CharDblLnkSeq implements
       }
     }
   }
-  private CharDblLnkNode getNode(int index,int size)
-  {
+  private CharDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class CharDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(CharConsumer action)
-  {
+  @Override public void forEach(CharConsumer action){
     final CharDblLnkNode head;
     if((head=this.head)!=null){
       CharDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Character> action)
-  {
+  @Override public void forEach(Consumer<? super Character> action){
     final CharDblLnkNode head;
     if((head=this.head)!=null){
       CharDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -265,8 +254,7 @@ public abstract class CharDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final char v;
-          if((v=(char)val)==val)
-          {
+          if((v=(char)val)==val){
             return CharDblLnkNode.uncheckedcontains(head,tail,v);
           }
         } //end size check
@@ -422,8 +410,7 @@ public abstract class CharDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final char v;
-          if((v=(char)val)==val)
-          {
+          if((v=(char)val)==val){
             return uncheckedremoveVal(head,tail,v);
           }
         } //end size check
@@ -579,8 +566,7 @@ public abstract class CharDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final char v;
-          if((v=(char)val)==val)
-          {
+          if((v=(char)val)==val){
             return CharDblLnkNode.uncheckedindexOf(head,tail,v);
           }
         } //end size check
@@ -736,8 +722,7 @@ public abstract class CharDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final char v;
-          if((v=(char)val)==val)
-          {
+          if((v=(char)val)==val){
             return CharDblLnkNode.uncheckedlastIndexOf(size,tail,v);
           }
         } //end size check
@@ -888,7 +873,6 @@ public abstract class CharDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(CharUnaryOperator operator){
     final CharDblLnkNode head;
     if((head=this.head)!=null){
@@ -901,18 +885,15 @@ public abstract class CharDblLnkSeq implements
       CharDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(CharPredicate filter)
-  {
+  @Override public boolean removeIf(CharPredicate filter){
     final CharDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Character> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Character> filter){
     final CharDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(CharDblLnkNode head,int size,CharPredicate filter)
-  {
+  boolean uncheckedRemoveIf(CharDblLnkNode head,int size,CharPredicate filter){
     //TODO
     return false;
   }
@@ -949,8 +930,7 @@ public abstract class CharDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         CharDblLnkNode head,newTail;
         final var newHead=newTail=new CharDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new CharDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -1075,8 +1055,7 @@ public abstract class CharDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final char v;
-            if((v=(char)val)==val)
-            {
+            if((v=(char)val)==val){
               return CharDblLnkNode.uncheckedsearch(head,tail,v);
             }
           } //end size check
@@ -1232,8 +1211,7 @@ public abstract class CharDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final char v;
-            if((v=(char)val)==val)
-            {
+            if((v=(char)val)==val){
               return uncheckedremoveLastOccurrence(head,tail,v);
             }
           } //end size check

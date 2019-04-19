@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.FloatDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.FloatConsumer;
@@ -16,25 +15,18 @@ import omni.function.FloatComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class FloatDblLnkSeq implements
+public abstract class FloatDblLnkSeq extends AbstractSeq implements
    FloatSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient FloatDblLnkNode head;
   transient FloatDblLnkNode tail;
   private  FloatDblLnkSeq(){
   }
   private FloatDblLnkSeq(FloatDblLnkNode head,int size,FloatDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -88,8 +80,7 @@ public abstract class FloatDblLnkSeq implements
       }
     }
   }
-  private FloatDblLnkNode getNode(int index,int size)
-  {
+  private FloatDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -148,15 +139,13 @@ public abstract class FloatDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(FloatConsumer action)
-  {
+  @Override public void forEach(FloatConsumer action){
     final FloatDblLnkNode head;
     if((head=this.head)!=null){
       FloatDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Float> action)
-  {
+  @Override public void forEach(Consumer<? super Float> action){
     final FloatDblLnkNode head;
     if((head=this.head)!=null){
       FloatDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -212,8 +201,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return FloatDblLnkNode.uncheckedcontainsBits(head,tail,TypeUtil.FLT_TRUE_BITS);
           }
           return FloatDblLnkNode.uncheckedcontains0(head,tail);
@@ -228,15 +216,12 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
               return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return FloatDblLnkNode.uncheckedcontains0(head,tail);
           }
         } //end size check
@@ -250,15 +235,11 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToFloat(val)){
               return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return FloatDblLnkNode.uncheckedcontains0(head,tail);
           }
         } //end size check
@@ -272,8 +253,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
@@ -289,12 +269,9 @@ public abstract class FloatDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final float v;
-          if(val==(v=(float)val))
-          {
+          if(val==(v=(float)val)){
             return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
+          }else if(v!=v){
             return FloatDblLnkNode.uncheckedcontainsNaN(head,tail);
           }
         } //end size check
@@ -376,8 +353,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedcontains0(head,tail);
@@ -392,8 +368,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedcontains0(head,tail);
@@ -408,8 +383,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedcontains0(head,tail);
@@ -424,8 +398,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return uncheckedremoveValBits(head,tail,TypeUtil.FLT_TRUE_BITS);
           }
           return uncheckedremoveVal0(head,tail);
@@ -440,15 +413,12 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
               return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return uncheckedremoveVal0(head,tail);
           }
         } //end size check
@@ -462,15 +432,11 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToFloat(val)){
               return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return uncheckedremoveVal0(head,tail);
           }
         } //end size check
@@ -484,8 +450,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(val));
           }
           return uncheckedremoveValNaN(head,tail);
@@ -501,12 +466,9 @@ public abstract class FloatDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final float v;
-          if(val==(v=(float)val))
-          {
+          if(val==(v=(float)val)){
             return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
+          }else if(v!=v){
             return uncheckedremoveValNaN(head,tail);
           }
         } //end size check
@@ -588,8 +550,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(val));
           }
           return uncheckedremoveVal0(head,tail);
@@ -604,8 +565,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(val));
           }
           return uncheckedremoveVal0(head,tail);
@@ -620,8 +580,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return uncheckedremoveValBits(head,tail,Float.floatToRawIntBits(val));
           }
           return uncheckedremoveVal0(head,tail);
@@ -636,8 +595,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return FloatDblLnkNode.uncheckedindexOfBits(head,tail,TypeUtil.FLT_TRUE_BITS);
           }
           return FloatDblLnkNode.uncheckedindexOf0(head,tail);
@@ -652,15 +610,12 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
               return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return FloatDblLnkNode.uncheckedindexOf0(head,tail);
           }
         } //end size check
@@ -674,15 +629,11 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToFloat(val)){
               return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return FloatDblLnkNode.uncheckedindexOf0(head,tail);
           }
         } //end size check
@@ -696,8 +647,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
@@ -713,12 +663,9 @@ public abstract class FloatDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final float v;
-          if(val==(v=(float)val))
-          {
+          if(val==(v=(float)val)){
             return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
+          }else if(v!=v){
             return FloatDblLnkNode.uncheckedindexOfNaN(head,tail);
           }
         } //end size check
@@ -800,8 +747,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedindexOf0(head,tail);
@@ -816,8 +762,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedindexOf0(head,tail);
@@ -832,8 +777,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedindexOfBits(head,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedindexOf0(head,tail);
@@ -848,8 +792,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val)
-          {
+          if(val){
             return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,TypeUtil.FLT_TRUE_BITS);
           }
           return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -864,15 +807,12 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             if(TypeUtil.checkCastToFloat(val))
             {
               return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
           }
         } //end size check
@@ -886,15 +826,11 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
-            if(TypeUtil.checkCastToFloat(val))
-            {
+          if(val!=0){
+            if(TypeUtil.checkCastToFloat(val)){
               return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
             }
-          }
-          else
-          {
+          }else{
             return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
           }
         } //end size check
@@ -908,8 +844,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val==val)
-          {
+          if(val==val){
             return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
@@ -925,12 +860,9 @@ public abstract class FloatDblLnkSeq implements
         if((tail=this.tail)!=null)
         {
           final float v;
-          if(val==(v=(float)val))
-          {
+          if(val==(v=(float)val)){
             return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(v));
-          }
-          else if(v!=v)
-          {
+          }else if(v!=v){
             return FloatDblLnkNode.uncheckedlastIndexOfNaN(size,tail);
           }
         } //end size check
@@ -1012,8 +944,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -1028,8 +959,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -1044,8 +974,7 @@ public abstract class FloatDblLnkSeq implements
         final FloatDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          if(val!=0)
-          {
+          if(val!=0){
             return FloatDblLnkNode.uncheckedlastIndexOfBits(size,tail,Float.floatToRawIntBits(val));
           }
           return FloatDblLnkNode.uncheckedlastIndexOf0(size,tail);
@@ -1133,7 +1062,6 @@ public abstract class FloatDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(FloatUnaryOperator operator){
     final FloatDblLnkNode head;
     if((head=this.head)!=null){
@@ -1146,18 +1074,15 @@ public abstract class FloatDblLnkSeq implements
       FloatDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(FloatPredicate filter)
-  {
+  @Override public boolean removeIf(FloatPredicate filter){
     final FloatDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Float> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Float> filter){
     final FloatDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(FloatDblLnkNode head,int size,FloatPredicate filter)
-  {
+  boolean uncheckedRemoveIf(FloatDblLnkNode head,int size,FloatPredicate filter){
     //TODO
     return false;
   }
@@ -1194,8 +1119,7 @@ public abstract class FloatDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         FloatDblLnkNode head,newTail;
         final var newHead=newTail=new FloatDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new FloatDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -1294,8 +1218,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val)
-            {
+            if(val){
               return FloatDblLnkNode.uncheckedsearchBits(head,tail,TypeUtil.FLT_TRUE_BITS);
             }
             return FloatDblLnkNode.uncheckedsearch0(head,tail);
@@ -1310,15 +1233,12 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               if(TypeUtil.checkCastToFloat(val))
               {
                 return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(val));
               }
-            }
-            else
-            {
+            }else{
               return FloatDblLnkNode.uncheckedsearch0(head,tail);
             }
           } //end size check
@@ -1332,15 +1252,11 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToFloat(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToFloat(val)){
                 return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(val));
               }
-            }
-            else
-            {
+            }else{
               return FloatDblLnkNode.uncheckedsearch0(head,tail);
             }
           } //end size check
@@ -1354,8 +1270,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(val));
             }
             return FloatDblLnkNode.uncheckedsearchNaN(head,tail);
@@ -1371,12 +1286,9 @@ public abstract class FloatDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final float v;
-            if(val==(v=(float)val))
-            {
+            if(val==(v=(float)val)){
               return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(v));
-            }
-            else if(v!=v)
-            {
+            }else if(v!=v){
               return FloatDblLnkNode.uncheckedsearchNaN(head,tail);
             }
           } //end size check
@@ -1458,8 +1370,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(val));
             }
             return FloatDblLnkNode.uncheckedsearch0(head,tail);
@@ -1474,8 +1385,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(val));
             }
             return FloatDblLnkNode.uncheckedsearch0(head,tail);
@@ -1490,8 +1400,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return FloatDblLnkNode.uncheckedsearchBits(head,tail,Float.floatToRawIntBits(val));
             }
             return FloatDblLnkNode.uncheckedsearch0(head,tail);
@@ -1506,8 +1415,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val)
-            {
+            if(val){
               return uncheckedremoveLastOccurrenceBits(head,tail,TypeUtil.FLT_TRUE_BITS);
             }
             return uncheckedremoveLastOccurrence0(head,tail);
@@ -1522,15 +1430,12 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               if(TypeUtil.checkCastToFloat(val))
               {
                 return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(val));
               }
-            }
-            else
-            {
+            }else{
               return uncheckedremoveLastOccurrence0(head,tail);
             }
           } //end size check
@@ -1544,15 +1449,11 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
-              if(TypeUtil.checkCastToFloat(val))
-              {
+            if(val!=0){
+              if(TypeUtil.checkCastToFloat(val)){
                 return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(val));
               }
-            }
-            else
-            {
+            }else{
               return uncheckedremoveLastOccurrence0(head,tail);
             }
           } //end size check
@@ -1566,8 +1467,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val==val)
-            {
+            if(val==val){
               return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(val));
             }
             return uncheckedremoveLastOccurrenceNaN(head,tail);
@@ -1583,12 +1483,9 @@ public abstract class FloatDblLnkSeq implements
           if((tail=this.tail)!=null)
           {
             final float v;
-            if(val==(v=(float)val))
-            {
+            if(val==(v=(float)val)){
               return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(v));
-            }
-            else if(v!=v)
-            {
+            }else if(v!=v){
               return uncheckedremoveLastOccurrenceNaN(head,tail);
             }
           } //end size check
@@ -1670,8 +1567,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(val));
             }
             return uncheckedremoveLastOccurrence0(head,tail);
@@ -1686,8 +1582,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(val));
             }
             return uncheckedremoveLastOccurrence0(head,tail);
@@ -1702,8 +1597,7 @@ public abstract class FloatDblLnkSeq implements
           final FloatDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            if(val!=0)
-            {
+            if(val!=0){
               return uncheckedremoveLastOccurrenceBits(head,tail,Float.floatToRawIntBits(val));
             }
             return uncheckedremoveLastOccurrence0(head,tail);

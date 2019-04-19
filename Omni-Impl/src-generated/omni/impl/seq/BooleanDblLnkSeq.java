@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.api.OmniList;
-import java.io.Serializable;
 import omni.impl.BooleanDblLnkNode;
 import java.util.function.Consumer;
 import omni.function.BooleanConsumer;
@@ -15,25 +14,18 @@ import omni.function.BooleanComparator;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
-public abstract class BooleanDblLnkSeq implements
+public abstract class BooleanDblLnkSeq extends AbstractSeq implements
    BooleanSubListDefault
-  ,Cloneable,Serializable{
+{
   private static final long serialVersionUID=1L;
-  transient int size;
   transient BooleanDblLnkNode head;
   transient BooleanDblLnkNode tail;
   private  BooleanDblLnkSeq(){
   }
   private BooleanDblLnkSeq(BooleanDblLnkNode head,int size,BooleanDblLnkNode tail){
+    super(size);
     this.head=head;
-    this.size=size;
     this.tail=tail;
-  }
-  @Override public int size(){
-    return this.size;
-  }
-  @Override public boolean isEmpty(){
-    return this.size==0;
   }
   @Override public void clear(){
     this.head=null;
@@ -87,8 +79,7 @@ public abstract class BooleanDblLnkSeq implements
       }
     }
   }
-  private BooleanDblLnkNode getNode(int index,int size)
-  {
+  private BooleanDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
       for(var tail=this.tail;;tail=tail.prev){
@@ -147,15 +138,13 @@ public abstract class BooleanDblLnkSeq implements
     }
     return ret;
   }
-  @Override public void forEach(BooleanConsumer action)
-  {
+  @Override public void forEach(BooleanConsumer action){
     final BooleanDblLnkNode head;
     if((head=this.head)!=null){
       BooleanDblLnkNode.uncheckedForEachAscending(head,size,action);
     }
   }
-  @Override public void forEach(Consumer<? super Boolean> action)
-  {
+  @Override public void forEach(Consumer<? super Boolean> action){
     final BooleanDblLnkNode head;
     if((head=this.head)!=null){
       BooleanDblLnkNode.uncheckedForEachAscending(head,size,action::accept);
@@ -277,11 +266,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(val)
-            {
+            switch(val){
             default:
               break returnFalse;
             case 0:
@@ -303,18 +290,13 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            if(val==0L)
-            {
+            if(val==0L){
               v=false;
-            }else if(val==1L)
-            {
+            }else if(val==1L){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return BooleanDblLnkNode.uncheckedcontains(head,tail,v);
@@ -330,11 +312,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
+            switch(Float.floatToRawIntBits(val)){
               default:
                 break returnFalse;
               case 0:
@@ -357,20 +337,14 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
+            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
               v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return BooleanDblLnkNode.uncheckedcontains(head,tail,v);
@@ -468,11 +442,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(val)
-            {
+            switch(val){
             default:
               break returnFalse;
             case 0:
@@ -494,18 +466,13 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            if(val==0L)
-            {
+            if(val==0L){
               v=false;
-            }else if(val==1L)
-            {
+            }else if(val==1L){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return uncheckedremoveVal(head,tail,v);
@@ -521,11 +488,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
+            switch(Float.floatToRawIntBits(val)){
               default:
                 break returnFalse;
               case 0:
@@ -548,20 +513,14 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
+            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
               v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return uncheckedremoveVal(head,tail,v);
@@ -659,11 +618,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(val)
-            {
+            switch(val){
             default:
               break returnFalse;
             case 0:
@@ -685,18 +642,13 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            if(val==0L)
-            {
+            if(val==0L){
               v=false;
-            }else if(val==1L)
-            {
+            }else if(val==1L){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return BooleanDblLnkNode.uncheckedindexOf(head,tail,v);
@@ -712,11 +664,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
+            switch(Float.floatToRawIntBits(val)){
               default:
                 break returnFalse;
               case 0:
@@ -739,20 +689,14 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
+            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
               v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return BooleanDblLnkNode.uncheckedindexOf(head,tail,v);
@@ -850,11 +794,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(val)
-            {
+            switch(val){
             default:
               break returnFalse;
             case 0:
@@ -876,18 +818,13 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            if(val==0L)
-            {
+            if(val==0L){
               v=false;
-            }else if(val==1L)
-            {
+            }else if(val==1L){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return BooleanDblLnkNode.uncheckedlastIndexOf(size,tail,v);
@@ -903,11 +840,9 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
-            switch(Float.floatToRawIntBits(val))
-            {
+            switch(Float.floatToRawIntBits(val)){
               default:
                 break returnFalse;
               case 0:
@@ -930,20 +865,14 @@ public abstract class BooleanDblLnkSeq implements
         final BooleanDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          returnFalse:for(;;)
-          {
+          returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-            {
+            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
               v=false;
-            }
-            else if(bits==TypeUtil.DBL_TRUE_BITS)
-            {
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
-            }
-            else
-            {
+            }else{
               break returnFalse;
             }
             return BooleanDblLnkNode.uncheckedlastIndexOf(size,tail,v);
@@ -1050,7 +979,6 @@ public abstract class BooleanDblLnkSeq implements
     }
     return false;
   }
-  @Override public abstract Object clone();
   @Override public void replaceAll(BooleanPredicate operator){
     final BooleanDblLnkNode head;
     if((head=this.head)!=null){
@@ -1063,18 +991,15 @@ public abstract class BooleanDblLnkSeq implements
       BooleanDblLnkNode.uncheckedReplaceAll(head,size,operator::apply);
     }
   }
-  @Override public boolean removeIf(BooleanPredicate filter)
-  {
+  @Override public boolean removeIf(BooleanPredicate filter){
     final BooleanDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter);
   }
-  @Override public boolean removeIf(Predicate<? super Boolean> filter)
-  {
+  @Override public boolean removeIf(Predicate<? super Boolean> filter){
     final BooleanDblLnkNode head;
     return (head=this.head)!=null && uncheckedRemoveIf(head,size,filter::test);
   }
-  boolean uncheckedRemoveIf(BooleanDblLnkNode head,int size,BooleanPredicate filter)
-  {
+  boolean uncheckedRemoveIf(BooleanDblLnkNode head,int size,BooleanPredicate filter){
     //TODO
     return false;
   }
@@ -1108,8 +1033,7 @@ public abstract class BooleanDblLnkSeq implements
     }
     @Override public Object clone(){
       final int size;
-      if((size=this.size)!=0)
-      {
+      if((size=this.size)!=0){
         BooleanDblLnkNode head,newTail;
         final var newHead=newTail=new BooleanDblLnkNode((head=this.head).val);
         for(int i=1;i!=size;newTail=newTail.next=new BooleanDblLnkNode(newTail,(head=head.next).val),++i){}
@@ -1220,11 +1144,9 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
-              switch(val)
-              {
+              switch(val){
               default:
                 break returnFalse;
               case 0:
@@ -1246,18 +1168,13 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
-              if(val==0L)
-              {
+              if(val==0L){
                 v=false;
-              }else if(val==1L)
-              {
+              }else if(val==1L){
                 v=true;
-              }
-              else
-              {
+              }else{
                 break returnFalse;
               }
               return BooleanDblLnkNode.uncheckedsearch(head,tail,v);
@@ -1273,11 +1190,9 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
-              switch(Float.floatToRawIntBits(val))
-              {
+              switch(Float.floatToRawIntBits(val)){
                 default:
                   break returnFalse;
                 case 0:
@@ -1300,20 +1215,14 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-              {
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
                 v=false;
-              }
-              else if(bits==TypeUtil.DBL_TRUE_BITS)
-              {
+              }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
-              }
-              else
-              {
+              }else{
                 break returnFalse;
               }
               return BooleanDblLnkNode.uncheckedsearch(head,tail,v);
@@ -1411,11 +1320,9 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
-              switch(val)
-              {
+              switch(val){
               default:
                 break returnFalse;
               case 0:
@@ -1437,18 +1344,13 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
-              if(val==0L)
-              {
+              if(val==0L){
                 v=false;
-              }else if(val==1L)
-              {
+              }else if(val==1L){
                 v=true;
-              }
-              else
-              {
+              }else{
                 break returnFalse;
               }
               return uncheckedremoveLastOccurrence(head,tail,v);
@@ -1464,11 +1366,9 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
-              switch(Float.floatToRawIntBits(val))
-              {
+              switch(Float.floatToRawIntBits(val)){
                 default:
                   break returnFalse;
                 case 0:
@@ -1491,20 +1391,14 @@ public abstract class BooleanDblLnkSeq implements
           final BooleanDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            returnFalse:for(;;)
-            {
+            returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
-              {
+              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
                 v=false;
-              }
-              else if(bits==TypeUtil.DBL_TRUE_BITS)
-              {
+              }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
-              }
-              else
-              {
+              }else{
                 break returnFalse;
               }
               return uncheckedremoveLastOccurrence(head,tail,v);
