@@ -24,6 +24,15 @@ import java.util.function.$UnaryOperator$;
 #ELSE
 import omni.function.$UnaryOperator$;
 #ENDIF
+#IFNOT OfRef,OfDouble,OfChar
+import omni.util.ToStringUtil;
+#ENDIF
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
+#IF OfRef
+import java.util.Objects;
+#ENDIF
 public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
 {
   public transient $DNode$$<E>$ prev;
@@ -49,26 +58,141 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
     this.val=val;
     this.next=next;
   }
-  public static $<E>$ void uncheckedForEachAscending($DNode$$<E>$ node,int length,$TypeNameModifier$Consumer$<? super E>$ action){
+  //TODO example this implementation to other array types
+  #IF OfRef
+  @SuppressWarnings("unchecked")
+  #ENDIF
+  public static $<E>$ void uncheckedCopyFrom($ArrayType$[] src,int length,$DNode$$<E>$ dst){
+    for(;;dst=dst.prev)
+    {
+      dst.val=($exposedType$)src[--length];
+      if(length==0)
+      {
+        return;
+      }
+    }
+  }
+  
+  
+#IF OfRef,OfDouble
+  #IF OfRef
+  public static $<E>$ void uncheckedToString($DNode$$<E>$ curr,int size,StringBuilder builder){
+    for(builder.append(curr.val);--size!=0;builder.append(',').append(' ').append((curr=curr.next).val)){}
+  }
+  #ENDIF
+  public static $<E>$ void uncheckedToString($DNode$$<E>$ curr,$DNode$$<E>$ tail,StringBuilder builder){
+    for(;;curr=curr.next,builder.append(',').append(' ')){
+      builder.append(curr.val);
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+#ELSEIF OfChar
+  public static $<E>$ void uncheckedToString($DNode$$<E>$ curr,$DNode$$<E>$ tail,char[] buffer){
+    int bufferOffset=1;
+    for(;;curr=curr.next,buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
+      buffer[bufferOffset]=curr.val;
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+#ELSE
+  public static $<E>$ int uncheckedToString($DNode$$<E>$ curr,$DNode$$<E>$ tail,byte[] buffer){
+    int bufferOffset=1;
+    for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+#IF OfByte
+      bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+#ELSE
+      bufferOffset=ToStringUtil.getString$TypeNameModifier$(curr.val,buffer,bufferOffset);
+#ENDIF
+      if(curr==tail){
+        return bufferOffset;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedToString($DNode$$<E>$ curr,$DNode$$<E>$ tail,ToStringUtil.OmniStringBuilderByte builder){
+    for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+#IF OfByte
+      builder.uncheckedAppendShort(curr.val);
+#ELSE
+      builder.uncheckedAppend$TypeNameModifier$(curr.val);
+#ENDIF
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+#ENDIF
+  public static $<E>$ int uncheckedHashCode($DNode$$<E>$ curr,$DNode$$<E>$ tail){
+    int hash=31+$hashCodeMethod$(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+$hashCodeMethod$((curr=curr.next).val);
+    }
+    return hash;
+  }
+#IF OfRef
+  public static $<E>$ int uncheckedHashCode($DNode$$<E>$ curr,int size){
+    int hash=31+$hashCodeMethod$(curr.val);
+    while(--size!=0){
+      hash=(hash*31)+$hashCodeMethod$((curr=curr.next).val);
+    }
+    return hash;
+  }
+#ENDIF
+  public static $<E>$ void uncheckedForEachAscending($DNode$$<E>$ node,int size,$TypeNameModifier$Consumer$<? super E>$ action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--length==0){
+      if(--size!=0){
         return;
       }
     }
   }
-  public static $<E>$ void uncheckedForEachDescending($DNode$$<E>$ node,int length,$TypeNameModifier$Consumer$<? super E>$ action){
-    for(;;node=node.prev){
-      action.accept(node.val);
-      if(--length==0){
-        return;
-      }
-    }
-  }
-  public static $<E>$ void uncheckedReplaceAll($DNode$$<E>$ node,int length,$UnaryOperator$$<E>$ operator){
+  public static $<E>$ void uncheckedReplaceAll($DNode$$<E>$ node,int size,$UnaryOperator$$<E>$ operator){
     for(;;node=node.next){
       node.val=operator.$applyMethod$(node.val);
-      if(--length==0){
+      if(--size!=0){
+        return;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedForEachAscending($DNode$$<E>$ node,$TypeNameModifier$Consumer$<? super E>$ action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.next)==null){
+        return;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedForEachAscending($DNode$$<E>$ node,$DNode$$<E>$ tail,$TypeNameModifier$Consumer$<? super E>$ action){
+    for(;;node=node.next){
+      action.accept(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedReplaceAll($DNode$$<E>$ node,$DNode$$<E>$ tail,$UnaryOperator$$<E>$ operator){
+    for(;;node=node.next){
+      node.val=operator.$applyMethod$(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedForEachDescending($DNode$$<E>$ node,$TypeNameModifier$Consumer$<? super E>$ action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.prev)==null){
+        return;
+      }
+    }
+  }
+  public static $<E>$ void uncheckedForEachDescending($DNode$$<E>$ node,int size,$TypeNameModifier$Consumer$<? super E>$ action){
+    for(;;node=node.prev){
+      action.accept(node.val);
+      if(--size!=0){
         return;
       }
     }
@@ -77,6 +201,22 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
     $DNode$$<E>$ next,prev;
     (next=node.next).prev=(prev=node.prev);
     prev.next=next;
+  }
+  public static $<E>$ $DNode$$<E>$ iterateAscending($DNode$$<E>$ node,int length){
+    if(length!=0){
+      do{
+        node=node.next;
+      }while(--length!=0);
+    }
+    return node;
+  }
+  public static $<E>$ $DNode$$<E>$ iterateDescending($DNode$$<E>$ node,int length){
+    if(length!=0){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+    }
+    return node;
   }
   public static $<E>$ $DNode$$<E>$ uncheckedIterateAscending($DNode$$<E>$ node,int length){
     do{
@@ -91,6 +231,20 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
     return node;
   }
 #IF OfRef
+  public static $<E>$ boolean uncheckedcontainsNonNull($DNode$$<E>$ head,int size,Object nonNull){
+    for(;!nonNull.equals(head.val);head=head.next){if(--size==0){return false;}}
+    return true;
+  }
+  public static $<E>$ int uncheckedsearchNonNull($DNode$$<E>$ head,int size,Object nonNull){
+    int index=1;
+    for(;!nonNull.equals(head.val);++index,head=head.next){if(--size==0){return -1;}}
+    return index;
+  }
+  public static $<E>$ int uncheckedindexOfNonNull($DNode$$<E>$ head,int size,Object nonNull){
+    int index=0;
+    for(;!nonNull.equals(head.val);++index,head=head.next){if(--size==0){return -1;}}
+    return index;
+  }
   #MACRO NodeQuery<NonNull>(!nonNull.equals)
   #MACRO NodeQuery<Null>(null!=)
   #MACRO NodeQuery< >(!pred.test)
@@ -164,11 +318,11 @@ public static $<E>$ boolean uncheckedcontainsSUFFIX($DNode$$<E>$ head,$DNode$$<E
   for(;TEST(head.val);head=head.next){if(head==tail){return false;}}
   return true;
 }
-public static $<E>$ int uncheckedsearchSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
+public static $<E>$ int uncheckedsearchSUFFIX($DNode$$<E>$ head
 #MACRO UncheckedQueryParam()
 ){
   int index=1;
-  for(;TEST(head.val);++index,head=head.next){if(head==tail){return -1;}}
+  for(;TEST(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
   return index;
 }
 public static $<E>$ int uncheckedindexOfSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail

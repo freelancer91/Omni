@@ -2,6 +2,7 @@ package omni.impl;
 import omni.function.BooleanConsumer;
 import omni.util.TypeUtil;
 import omni.function.BooleanPredicate;
+import omni.util.ToStringUtil;
 public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
 {
   public transient BooleanDblLnkNode prev;
@@ -27,26 +28,93 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
     this.val=val;
     this.next=next;
   }
-  public static  void uncheckedForEachAscending(BooleanDblLnkNode node,int length,BooleanConsumer action){
+  //TODO example this implementation to other array types
+  public static  void uncheckedCopyFrom(boolean[] src,int length,BooleanDblLnkNode dst){
+    for(;;dst=dst.prev)
+    {
+      dst.val=(boolean)src[--length];
+      if(length==0)
+      {
+        return;
+      }
+    }
+  }
+  public static  int uncheckedToString(BooleanDblLnkNode curr,BooleanDblLnkNode tail,byte[] buffer){
+    int bufferOffset=1;
+    for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+      bufferOffset=ToStringUtil.getStringBoolean(curr.val,buffer,bufferOffset);
+      if(curr==tail){
+        return bufferOffset;
+      }
+    }
+  }
+  public static  void uncheckedToString(BooleanDblLnkNode curr,BooleanDblLnkNode tail,ToStringUtil.OmniStringBuilderByte builder){
+    for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+      builder.uncheckedAppendBoolean(curr.val);
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+  public static  int uncheckedHashCode(BooleanDblLnkNode curr,BooleanDblLnkNode tail){
+    int hash=31+Boolean.hashCode(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+Boolean.hashCode((curr=curr.next).val);
+    }
+    return hash;
+  }
+  public static  void uncheckedForEachAscending(BooleanDblLnkNode node,int size,BooleanConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--length==0){
+      if(--size!=0){
         return;
       }
     }
   }
-  public static  void uncheckedForEachDescending(BooleanDblLnkNode node,int length,BooleanConsumer action){
-    for(;;node=node.prev){
-      action.accept(node.val);
-      if(--length==0){
-        return;
-      }
-    }
-  }
-  public static  void uncheckedReplaceAll(BooleanDblLnkNode node,int length,BooleanPredicate operator){
+  public static  void uncheckedReplaceAll(BooleanDblLnkNode node,int size,BooleanPredicate operator){
     for(;;node=node.next){
       node.val=operator.test(node.val);
-      if(--length==0){
+      if(--size!=0){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(BooleanDblLnkNode node,BooleanConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.next)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(BooleanDblLnkNode node,BooleanDblLnkNode tail,BooleanConsumer action){
+    for(;;node=node.next){
+      action.accept(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedReplaceAll(BooleanDblLnkNode node,BooleanDblLnkNode tail,BooleanPredicate operator){
+    for(;;node=node.next){
+      node.val=operator.test(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(BooleanDblLnkNode node,BooleanConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.prev)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(BooleanDblLnkNode node,int size,BooleanConsumer action){
+    for(;;node=node.prev){
+      action.accept(node.val);
+      if(--size!=0){
         return;
       }
     }
@@ -55,6 +123,22 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
     BooleanDblLnkNode next,prev;
     (next=node.next).prev=(prev=node.prev);
     prev.next=next;
+  }
+  public static  BooleanDblLnkNode iterateAscending(BooleanDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.next;
+      }while(--length!=0);
+    }
+    return node;
+  }
+  public static  BooleanDblLnkNode iterateDescending(BooleanDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+    }
+    return node;
   }
   public static  BooleanDblLnkNode uncheckedIterateAscending(BooleanDblLnkNode node,int length){
     do{
@@ -74,11 +158,11 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
     for(;val!=(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearch (BooleanDblLnkNode head,BooleanDblLnkNode tail
+  public static  int uncheckedsearch (BooleanDblLnkNode head
   ,boolean val
   ){
     int index=1;
-    for(;val!=(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;val!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf (BooleanDblLnkNode head,BooleanDblLnkNode tail

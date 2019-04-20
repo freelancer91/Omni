@@ -1,6 +1,7 @@
 package omni.impl;
 import omni.function.ShortConsumer;
 import omni.function.ShortUnaryOperator;
+import omni.util.ToStringUtil;
 public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
 {
   public transient ShortDblLnkNode prev;
@@ -26,26 +27,93 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
     this.val=val;
     this.next=next;
   }
-  public static  void uncheckedForEachAscending(ShortDblLnkNode node,int length,ShortConsumer action){
+  //TODO example this implementation to other array types
+  public static  void uncheckedCopyFrom(short[] src,int length,ShortDblLnkNode dst){
+    for(;;dst=dst.prev)
+    {
+      dst.val=(short)src[--length];
+      if(length==0)
+      {
+        return;
+      }
+    }
+  }
+  public static  int uncheckedToString(ShortDblLnkNode curr,ShortDblLnkNode tail,byte[] buffer){
+    int bufferOffset=1;
+    for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+      bufferOffset=ToStringUtil.getStringShort(curr.val,buffer,bufferOffset);
+      if(curr==tail){
+        return bufferOffset;
+      }
+    }
+  }
+  public static  void uncheckedToString(ShortDblLnkNode curr,ShortDblLnkNode tail,ToStringUtil.OmniStringBuilderByte builder){
+    for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+      builder.uncheckedAppendShort(curr.val);
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+  public static  int uncheckedHashCode(ShortDblLnkNode curr,ShortDblLnkNode tail){
+    int hash=31+(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+((curr=curr.next).val);
+    }
+    return hash;
+  }
+  public static  void uncheckedForEachAscending(ShortDblLnkNode node,int size,ShortConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--length==0){
+      if(--size!=0){
         return;
       }
     }
   }
-  public static  void uncheckedForEachDescending(ShortDblLnkNode node,int length,ShortConsumer action){
-    for(;;node=node.prev){
-      action.accept(node.val);
-      if(--length==0){
-        return;
-      }
-    }
-  }
-  public static  void uncheckedReplaceAll(ShortDblLnkNode node,int length,ShortUnaryOperator operator){
+  public static  void uncheckedReplaceAll(ShortDblLnkNode node,int size,ShortUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsShort(node.val);
-      if(--length==0){
+      if(--size!=0){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(ShortDblLnkNode node,ShortConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.next)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(ShortDblLnkNode node,ShortDblLnkNode tail,ShortConsumer action){
+    for(;;node=node.next){
+      action.accept(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedReplaceAll(ShortDblLnkNode node,ShortDblLnkNode tail,ShortUnaryOperator operator){
+    for(;;node=node.next){
+      node.val=operator.applyAsShort(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(ShortDblLnkNode node,ShortConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.prev)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(ShortDblLnkNode node,int size,ShortConsumer action){
+    for(;;node=node.prev){
+      action.accept(node.val);
+      if(--size!=0){
         return;
       }
     }
@@ -54,6 +122,22 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
     ShortDblLnkNode next,prev;
     (next=node.next).prev=(prev=node.prev);
     prev.next=next;
+  }
+  public static  ShortDblLnkNode iterateAscending(ShortDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.next;
+      }while(--length!=0);
+    }
+    return node;
+  }
+  public static  ShortDblLnkNode iterateDescending(ShortDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+    }
+    return node;
   }
   public static  ShortDblLnkNode uncheckedIterateAscending(ShortDblLnkNode node,int length){
     do{
@@ -73,11 +157,11 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
     for(;val!=(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearch (ShortDblLnkNode head,ShortDblLnkNode tail
+  public static  int uncheckedsearch (ShortDblLnkNode head
   ,int val
   ){
     int index=1;
-    for(;val!=(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;val!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf (ShortDblLnkNode head,ShortDblLnkNode tail

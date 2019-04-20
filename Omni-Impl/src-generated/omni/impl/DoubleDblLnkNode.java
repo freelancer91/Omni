@@ -1,6 +1,7 @@
 package omni.impl;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
+import omni.util.HashUtil;
 public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
 {
   public transient DoubleDblLnkNode prev;
@@ -26,26 +27,84 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     this.val=val;
     this.next=next;
   }
-  public static  void uncheckedForEachAscending(DoubleDblLnkNode node,int length,DoubleConsumer action){
+  //TODO example this implementation to other array types
+  public static  void uncheckedCopyFrom(double[] src,int length,DoubleDblLnkNode dst){
+    for(;;dst=dst.prev)
+    {
+      dst.val=(double)src[--length];
+      if(length==0)
+      {
+        return;
+      }
+    }
+  }
+  public static  void uncheckedToString(DoubleDblLnkNode curr,DoubleDblLnkNode tail,StringBuilder builder){
+    for(;;curr=curr.next,builder.append(',').append(' ')){
+      builder.append(curr.val);
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+  public static  int uncheckedHashCode(DoubleDblLnkNode curr,DoubleDblLnkNode tail){
+    int hash=31+HashUtil.hashDouble(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+HashUtil.hashDouble((curr=curr.next).val);
+    }
+    return hash;
+  }
+  public static  void uncheckedForEachAscending(DoubleDblLnkNode node,int size,DoubleConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--length==0){
+      if(--size!=0){
         return;
       }
     }
   }
-  public static  void uncheckedForEachDescending(DoubleDblLnkNode node,int length,DoubleConsumer action){
-    for(;;node=node.prev){
-      action.accept(node.val);
-      if(--length==0){
-        return;
-      }
-    }
-  }
-  public static  void uncheckedReplaceAll(DoubleDblLnkNode node,int length,DoubleUnaryOperator operator){
+  public static  void uncheckedReplaceAll(DoubleDblLnkNode node,int size,DoubleUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsDouble(node.val);
-      if(--length==0){
+      if(--size!=0){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(DoubleDblLnkNode node,DoubleConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.next)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(DoubleDblLnkNode node,DoubleDblLnkNode tail,DoubleConsumer action){
+    for(;;node=node.next){
+      action.accept(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedReplaceAll(DoubleDblLnkNode node,DoubleDblLnkNode tail,DoubleUnaryOperator operator){
+    for(;;node=node.next){
+      node.val=operator.applyAsDouble(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(DoubleDblLnkNode node,DoubleConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.prev)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(DoubleDblLnkNode node,int size,DoubleConsumer action){
+    for(;;node=node.prev){
+      action.accept(node.val);
+      if(--size!=0){
         return;
       }
     }
@@ -54,6 +113,22 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     DoubleDblLnkNode next,prev;
     (next=node.next).prev=(prev=node.prev);
     prev.next=next;
+  }
+  public static  DoubleDblLnkNode iterateAscending(DoubleDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.next;
+      }while(--length!=0);
+    }
+    return node;
+  }
+  public static  DoubleDblLnkNode iterateDescending(DoubleDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+    }
+    return node;
   }
   public static  DoubleDblLnkNode uncheckedIterateAscending(DoubleDblLnkNode node,int length){
     do{
@@ -73,11 +148,11 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     for(;bits!=Double.doubleToRawLongBits(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearchBits(DoubleDblLnkNode head,DoubleDblLnkNode tail
+  public static  int uncheckedsearchBits(DoubleDblLnkNode head
   ,long bits
   ){
     int index=1;
-    for(;bits!=Double.doubleToRawLongBits(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;bits!=Double.doubleToRawLongBits(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOfBits(DoubleDblLnkNode head,DoubleDblLnkNode tail
@@ -98,10 +173,10 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     for(;0!=(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearch0(DoubleDblLnkNode head,DoubleDblLnkNode tail
+  public static  int uncheckedsearch0(DoubleDblLnkNode head
   ){
     int index=1;
-    for(;0!=(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;0!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf0(DoubleDblLnkNode head,DoubleDblLnkNode tail
@@ -120,10 +195,10 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     for(;!Double.isNaN(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearchNaN(DoubleDblLnkNode head,DoubleDblLnkNode tail
+  public static  int uncheckedsearchNaN(DoubleDblLnkNode head
   ){
     int index=1;
-    for(;!Double.isNaN(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;!Double.isNaN(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOfNaN(DoubleDblLnkNode head,DoubleDblLnkNode tail

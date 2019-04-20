@@ -1,6 +1,8 @@
 package omni.impl;
 import omni.function.FloatConsumer;
 import omni.function.FloatUnaryOperator;
+import omni.util.ToStringUtil;
+import omni.util.HashUtil;
 public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
 {
   public transient FloatDblLnkNode prev;
@@ -26,26 +28,93 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     this.val=val;
     this.next=next;
   }
-  public static  void uncheckedForEachAscending(FloatDblLnkNode node,int length,FloatConsumer action){
+  //TODO example this implementation to other array types
+  public static  void uncheckedCopyFrom(float[] src,int length,FloatDblLnkNode dst){
+    for(;;dst=dst.prev)
+    {
+      dst.val=(float)src[--length];
+      if(length==0)
+      {
+        return;
+      }
+    }
+  }
+  public static  int uncheckedToString(FloatDblLnkNode curr,FloatDblLnkNode tail,byte[] buffer){
+    int bufferOffset=1;
+    for(;;curr=curr.next,buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+      bufferOffset=ToStringUtil.getStringFloat(curr.val,buffer,bufferOffset);
+      if(curr==tail){
+        return bufferOffset;
+      }
+    }
+  }
+  public static  void uncheckedToString(FloatDblLnkNode curr,FloatDblLnkNode tail,ToStringUtil.OmniStringBuilderByte builder){
+    for(;;curr=curr.next,builder.uncheckedAppendCommaAndSpace()){
+      builder.uncheckedAppendFloat(curr.val);
+      if(curr==tail){
+        return;
+      }
+    }
+  }
+  public static  int uncheckedHashCode(FloatDblLnkNode curr,FloatDblLnkNode tail){
+    int hash=31+HashUtil.hashFloat(curr.val);
+    while(curr!=tail){
+      hash=(hash*31)+HashUtil.hashFloat((curr=curr.next).val);
+    }
+    return hash;
+  }
+  public static  void uncheckedForEachAscending(FloatDblLnkNode node,int size,FloatConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--length==0){
+      if(--size!=0){
         return;
       }
     }
   }
-  public static  void uncheckedForEachDescending(FloatDblLnkNode node,int length,FloatConsumer action){
-    for(;;node=node.prev){
-      action.accept(node.val);
-      if(--length==0){
-        return;
-      }
-    }
-  }
-  public static  void uncheckedReplaceAll(FloatDblLnkNode node,int length,FloatUnaryOperator operator){
+  public static  void uncheckedReplaceAll(FloatDblLnkNode node,int size,FloatUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsFloat(node.val);
-      if(--length==0){
+      if(--size!=0){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(FloatDblLnkNode node,FloatConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.next)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachAscending(FloatDblLnkNode node,FloatDblLnkNode tail,FloatConsumer action){
+    for(;;node=node.next){
+      action.accept(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedReplaceAll(FloatDblLnkNode node,FloatDblLnkNode tail,FloatUnaryOperator operator){
+    for(;;node=node.next){
+      node.val=operator.applyAsFloat(node.val);
+      if(node==tail){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(FloatDblLnkNode node,FloatConsumer action){
+    for(;;){
+      action.accept(node.val);
+      if((node=node.prev)==null){
+        return;
+      }
+    }
+  }
+  public static  void uncheckedForEachDescending(FloatDblLnkNode node,int size,FloatConsumer action){
+    for(;;node=node.prev){
+      action.accept(node.val);
+      if(--size!=0){
         return;
       }
     }
@@ -54,6 +123,22 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     FloatDblLnkNode next,prev;
     (next=node.next).prev=(prev=node.prev);
     prev.next=next;
+  }
+  public static  FloatDblLnkNode iterateAscending(FloatDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.next;
+      }while(--length!=0);
+    }
+    return node;
+  }
+  public static  FloatDblLnkNode iterateDescending(FloatDblLnkNode node,int length){
+    if(length!=0){
+      do{
+        node=node.prev;
+      }while(--length!=0);
+    }
+    return node;
   }
   public static  FloatDblLnkNode uncheckedIterateAscending(FloatDblLnkNode node,int length){
     do{
@@ -73,11 +158,11 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     for(;bits!=Float.floatToRawIntBits(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearchBits(FloatDblLnkNode head,FloatDblLnkNode tail
+  public static  int uncheckedsearchBits(FloatDblLnkNode head
   ,int bits
   ){
     int index=1;
-    for(;bits!=Float.floatToRawIntBits(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;bits!=Float.floatToRawIntBits(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOfBits(FloatDblLnkNode head,FloatDblLnkNode tail
@@ -98,10 +183,10 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     for(;0!=(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearch0(FloatDblLnkNode head,FloatDblLnkNode tail
+  public static  int uncheckedsearch0(FloatDblLnkNode head
   ){
     int index=1;
-    for(;0!=(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;0!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf0(FloatDblLnkNode head,FloatDblLnkNode tail
@@ -120,10 +205,10 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     for(;!Float.isNaN(head.val);head=head.next){if(head==tail){return false;}}
     return true;
   }
-  public static  int uncheckedsearchNaN(FloatDblLnkNode head,FloatDblLnkNode tail
+  public static  int uncheckedsearchNaN(FloatDblLnkNode head
   ){
     int index=1;
-    for(;!Float.isNaN(head.val);++index,head=head.next){if(head==tail){return -1;}}
+    for(;!Float.isNaN(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOfNaN(FloatDblLnkNode head,FloatDblLnkNode tail
