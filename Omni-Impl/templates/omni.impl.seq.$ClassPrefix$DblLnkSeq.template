@@ -45,6 +45,9 @@ import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
 import java.io.Externalizable;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.IOException;
@@ -71,10 +74,56 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     this.head=head;
     this.tail=tail;
   }
-  @Override public void clear(){
-    this.head=null;
-    this.size=0;
-    this.tail=null;
+  abstract void addLast($exposedType$ val);
+  @Override public boolean add($exposedType$ val){
+    addLast(val);
+    return true;
+  }
+  private void iterateDescendingAndInsert(int dist,$DNode$$<E>$ after,$DNode$$<E>$ newNode){
+    newNode.next=after=$DNode$.iterateDescending(after,dist-2);
+    final $DNode$$<E>$ before;
+    newNode.prev=before=after.prev;
+    before.next=newNode;
+    after.prev=newNode;
+  }
+  private void iterateAscendingAndInsert(int dist,$DNode$$<E>$ before,$DNode$$<E>$ newNode){
+    newNode.prev=before=$DNode$.iterateAscending(before,dist-1);
+    final $DNode$$<E>$ after;
+    newNode.next=after=before.next;
+    before.next=newNode;
+    after.prev=newNode;
+  }
+  private void insertNode(int index,$DNode$$<E>$ newNode){
+    int tailDist;
+    if((tailDist=++this.size-index)<=index){
+      //the insertion point is closer to the tail
+      var tail=this.tail;
+      if(tailDist==1){
+        //the insertion point IS the tail
+        newNode.prev=tail;
+        tail.next=newNode;
+        this.tail=newNode;
+      }else{
+        //iterate from the root's tail
+        iterateDescendingAndInsert(tailDist,tail,newNode);
+      }
+    }else{
+      //the insertion point is closer to the head
+      $DNode$$<E>$ head;
+      if((head=this.head)==null){
+        //the root was empty, so initialize it
+        this.head=newNode;
+        this.tail=newNode;
+      }else if(index==0){
+        //the insertion point IS the head
+        head.prev=newNode;
+        newNode.next=head;
+        this.head=newNode;
+      }else{
+        //iterate from the root's head 
+        iterateAscendingAndInsert(index,head,newNode);
+      }
+    }
   }
 #IFNOT OfBoolean
   private static $<E>$ int markSurvivors($DNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
@@ -104,67 +153,14 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     }
   }
 #ENDIF
-  public void addLast($exposedType$ val){
-    $DNode$$<E>$ tail;
-    if((tail=this.tail)==null){
-      this.head=tail=new $DNode$$<E>$(val);
-    }else{
-      tail.next=tail=new $DNode$$<E>$(tail,val);
-    }
-    this.tail=tail;
-    ++this.size;
-  }
-  @Override public boolean add($exposedType$ val){
-    addLast(val);
-    return true;
-  }
-  @Override public void add(int index,$exposedType$ val){
-    int tailDist;
-    if((tailDist=++this.size-index)<=index){
-      var tail=this.tail;
-      if(tailDist==1){
-        tail.next=tail=new $DNode$$<E>$(tail,val);
-        this.tail=tail;
-      }else{
-        while(--tailDist!=1){
-          tail=tail.prev;
-        }
-        $DNode$$<E>$ before;
-        (before=tail.prev).next=before=new $DNode$$<E>$(before,val,tail);
-        tail.prev=before;
-      }
-    }else{
-      $DNode$$<E>$ head;
-      if((head=this.head)==null){
-        this.head=head=new $DNode$$<E>$(val);
-        this.tail=head;
-      }else if(index==0){
-        head.prev=head=new $DNode$$<E>$(val,head);
-        this.head=head;
-      }else{
-        while(--index!=0){
-          head=head.next;
-        }
-        $DNode$$<E>$ after;
-        (after=head.next).prev=after=new $DNode$$<E>$(head,val,after);
-        head.next=after;
-      }
-    }
-  }
   private $DNode$$<E>$ getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
-      for(var tail=this.tail;;tail=tail.prev){
-        if(--tailDist==0){
-          return tail;
-        }
-      }
+      //the node is closer to the tail
+      return $DNode$.iterateDescending(tail,tailDist-1);
     }else{
-      for(var head=this.head;;--index,head=head.next){
-        if(index==0){
-          return head;
-        }
-      }
+      //the node is closer to the head
+      return $DNode$.iterateAscending(head,index);
     }
   }
   @Override public $exposedType$ set(int index,$exposedType$ val){
@@ -178,37 +174,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
   }
   @Override public $exposedType$ get$TypeNameModifier$(int index){
     return getNode(index,size).val;
-  }
-  @Override public $exposedType$ $removeAtIndexMethod$(int index){
-    final $exposedType$ ret;
-    int tailDist;
-    if((tailDist=--this.size-index)<=index){
-      var tail=this.tail;
-      if(tailDist==0){
-        ret=tail.val;
-        if(index==0){
-          this.head=null;
-          this.tail=null;
-        }else{
-          this.tail=tail=tail.prev;
-          tail.next=null;
-        }
-      }else{
-        ret=(tail=$DNode$.uncheckedIterateDescending(tail,tailDist)).val;
-        $DNode$.eraseNode(tail);
-      }
-    }else{
-      var head=this.head;
-      if(index==0){
-        ret=head.val;
-        this.head=head=head.next;
-        head.prev=null;
-      }else{
-        ret=(head=$DNode$.uncheckedIterateAscending(head,index)).val;
-        $DNode$.eraseNode(head);
-      }
-    }
-    return ret;
   }
   @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
     final $DNode$$<E>$ head;
@@ -241,22 +206,22 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     }
     return dst;
   }
-  #MACRO ToArrayImpl($ArrayType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
+  #MACRO ToArrayImpl<false>($ArrayType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
 #IFNOT OfRef
-  #MACRO ToArrayImpl($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
+  #MACRO ToArrayImpl<false>($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
   #IFNOT OfDouble
-  #MACRO ToArrayImpl(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
+  #MACRO ToArrayImpl<false>(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
     #IFNOT OfFloat
-  #MACRO ToArrayImpl(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
+  #MACRO ToArrayImpl<false>(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
       #IFNOT OfLong
-  #MACRO ToArrayImpl(long,OmniArray.OfLong.DEFAULT_ARR,Long)
+  #MACRO ToArrayImpl<false>(long,OmniArray.OfLong.DEFAULT_ARR,Long)
         #IFNOT OfInt
-  #MACRO ToArrayImpl(int,OmniArray.OfInt.DEFAULT_ARR,Int)
+  #MACRO ToArrayImpl<false>(int,OmniArray.OfInt.DEFAULT_ARR,Int)
           #IFNOT OfShort,OfChar
-  #MACRO ToArrayImpl(short,OmniArray.OfShort.DEFAULT_ARR,Short)
+  #MACRO ToArrayImpl<false>(short,OmniArray.OfShort.DEFAULT_ARR,Short)
             #IFNOT OfByte
-  #MACRO ToArrayImpl(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
-  #MACRO ToArrayImpl(char,OmniArray.OfChar.DEFAULT_ARR,Char)
+  #MACRO ToArrayImpl<false>(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
+  #MACRO ToArrayImpl<false>(char,OmniArray.OfChar.DEFAULT_ARR,Char)
             #ENDIF
           #ENDIF
         #ENDIF
@@ -264,8 +229,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     #ENDIF
   #ENDIF
 #ENDIF
-
-
   @Override public void replaceAll($UnaryOperator$$<E>$ operator){
     final $DNode$$<E>$ head;
     if((head=this.head)!=null){
@@ -280,7 +243,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     }
   }
 #ENDIF
-
   #MACRO ComparatorSortImpl<Stable,Root,false>($Comparator$$<? super E>$,sorter)
 #IFNOT OfRef
   #MACRO ComparatorSortImpl<Stable,Root,false>(Comparator<? super $BoxedType$>,sorter::compare)
@@ -347,128 +309,429 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     }
     return 1;
   }
-  private static class UncheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>$
-  {
+  #MACRO QueryMethods<contains,Root,false>()
+  #MACRO QueryMethods<indexOf,Root,false>()
+  #MACRO QueryMethods<lastIndexOf,Root,false>()
+  private static class UncheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
     private static final long serialVersionUID=1L;
     transient final UncheckedList$<E>$ root;
     transient final UncheckedSubList$<E>$ parent;
-    transient final int rootOffset;
-    
+    transient final int parentOffset;
     private UncheckedSubList(UncheckedList$<E>$ root,int rootOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
-      this.rootOffset=rootOffset;
+      this.parentOffset=rootOffset;
     }
-    private UncheckedSubList(UncheckedSubList$<E>$ parent,int rootOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    private UncheckedSubList(UncheckedSubList$<E>$ parent,int parentOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
-      this.rootOffset=rootOffset;
+      this.parentOffset=parentOffset;
     }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+    private Object writeReplace(){
+      return new UncheckedList$<E>$(this.head,this.size,this.tail);
     }
-    //TODO serialization methods
-    
-    private void bubbleUpDecrementSize(int numRemoved)
+    #MACRO SubListAddMethods<Unchecked>()
+    #MACRO SubListClear<Unchecked>()
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+      final $DNode$$<E>$ head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
+    }
+#IFNOT OfRef
+    @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
+      final $DNode$$<E>$ head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
+    }
+#ENDIF
+#IF OfBoolean
+    private void collapseHeadHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ tail,boolean retainThis)
     {
-      var curr=this;
-      do
+      //TODO
+    }
+    private void collapseTailHelper($DNode$$<E>$ head,$DNode$$<E>$ oldTail,boolean retainThis)
+    {
+      //TODO
+    }
+    private void collapseHeadAndTailHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ oldTail,boolean removeThis,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      //TODO
+    }
+    private boolean collapseBodyHelper($DNode$$<E>$ head,$DNode$$<E>$ tail,boolean retainThis,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      //TODO
+      return false;
+    }
+#ELSE
+    private void collapseHeadHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      //TODO
+    }
+    private void collapseTailHelper($DNode$$<E>$ head,$DNode$$<E>$ oldTail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      //TODO
+    }
+    private void collapseHeadAndTailHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ oldTail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      //TODO
+    }
+    private boolean collapseBodyHelper($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      //TODO
+      return false;
+    }
+#ENDIF
+
+    private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+      var tail=this.tail;
+#IF OfBoolean
+      $ArrayType$ firstVal;
+      if(filter.test(firstVal=head.val)){
+        if(tail==head)
+        {
+          this.size=0;
+          removeLastNode(head);
+          --root.size;
+        }
+        else
+        {
+          if(tail.val^firstVal)
+          {
+            if(filter.test(firstVal=!firstVal))
+            {
+              final UncheckedList$<E>$ root;
+              final int size;
+              (root=this.root).size-=(size=this.size);
+              clearAllHelper(size,root);
+            }
+            else
+            {
+              collapseHeadHelper(head,tail,firstVal);
+            }
+          }
+          else
+          {
+            collapseHeadAndTailHelper(head,tail,firstVal,filter);
+          }
+        }
+        return true;
+      }else{
+        if(tail!=head)
+        {
+          if(tail.val^firstVal)
+          {
+            if(filter.test(!firstVal))
+            {
+              collapseTailHelper(head,tail,firstVal);
+              return true;
+            }
+          }
+          else
+          {
+            return collapseBodyHelper(head,tail,firstVal,filter);
+          }
+        }
+      }
+#ELSE
+      if(filter.test(head.val))
       {
-        curr.size-=numRemoved;
-      }
-      while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpClearBody($DNode$$<E>$ before,$DNode$$<E>$ head,int numRemoved,$DNode$$<E>$ tail,$DNode$$<E>$ after){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          while(curr.tail==tail){
-            curr.tail=before;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
+        if(tail==head)
+        {
+          this.size=0;
+          removeLastNode(head);
+          --root.size;
+        }
+        else
+        {
+          if(filter.test(tail.val))
+          {
+            collapseHeadAndTailHelper(head,tail,filter);
           }
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }else if(curr.tail!=tail){
-          do{
-            curr.head=after;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }while(curr.head==head);
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }
-      }
-    }
-    private void bubbleUpClearHead($DNode$$<E>$ tail, $DNode$$<E>$ after,int numRemoved){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.tail!=tail){
-          do{
-            curr.head=after;
-            curr.size-=numRemoved;
-          }while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRemoved){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          do{
-            curr.tail=before;
-            curr.size-=numRemoved;
+          else
+          {
+            collapseHeadHelper(head,tail,filter);
           }
-          while((curr=curr.parent)!=null);
-          break;
+        }
+        return true;
+      }
+      else
+      {
+        if(tail!=head)
+        {
+          if(filter.test(tail.val))
+          {
+            collapseTailHelper(head,tail,filter);
+            return true;
+          }
+          return collapseBodyHelper(head,tail,filter);
         }
       }
+#ENDIF
+      return false;
     }
-    @Override public void clear(){
+    #MACRO SubListRemoveAtIndexMethod<Unchecked>()
+    @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
-        final UncheckedList$<E>$ root;
-        (root=this.root).size-=size;
-        $DNode$$<E>$ before,head,tail,after=(tail=this.tail).next;
-        if((before=(head=this.head).prev)==null){
-          if(after==null){
-            bubbleUpClearAll();
-            root.head=null;
-            root.tail=null;
-          }else{
-            after.prev=null;
-            bubbleUpClearHead(tail,after,size);
-            root.head=after;
-          }
+        $DNode$$<E>$ head,newTail;
+        final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
+        return new UncheckedList$<E>$(newHead,size,newTail);
+      }
+      return new UncheckedList$<E>$();
+    }
+    private static class AscendingItr$<E>$
+#IF OfRef
+      implements OmniIterator.OfRef$<E>$
+#ELSE
+      extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+    {
+      transient final UncheckedSubList$<E>$ parent;
+      transient $DNode$$<E>$ curr;
+      private AscendingItr(UncheckedSubList$<E>$ parent,$DNode$$<E>$ curr){
+        this.parent=parent;
+        this.curr=curr;
+      }
+      private AscendingItr(UncheckedSubList$<E>$ parent){
+        this.parent=parent;
+        this.curr=parent.head;
+      }
+      @Override public boolean hasNext(){
+        return curr!=null;
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final $DNode$$<E>$ curr;
+        this.curr=(curr=this.curr)==parent.tail?null:curr.next;
+        return curr.val;
+      }
+      @Override public void remove(){
+        UncheckedSubList$<E>$ parent;
+        if(--(parent=this.parent).size==0){
+          parent.removeLastNode(parent.tail);
         }else{
-          before.next=after;
-          if(after==null){
-            bubbleUpClearTail(head,before,size);
-            root.tail=before;
+          $DNode$$<E>$ curr;
+          if((curr=this.curr)==null){
+            parent.peelTail(parent.tail);
           }else{
-            after.prev=before;
-            bubbleUpClearBody(before,head,size,tail,after);
+            $DNode$$<E>$ lastRet;
+            if((lastRet=curr.prev)==parent.head){
+              parent.peelHead(lastRet);
+            }else{
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
+              parent.bubbleUpDecrementSize();
+            }
           }
         }
-        this.head=null;
-        this.tail=null;
-        this.size=0;
+        --parent.root.size;
       }
+      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachAscending(curr,parent.tail,action);
+          this.curr=null;
+        }
+      }
+#IFNOT OfRef
+      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachAscending(curr,parent.tail,action::accept);
+          this.curr=null;
+        }
+      }
+#ENDIF
     }
+    private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
+      transient int currIndex;
+      transient $DNode$$<E>$ lastRet;
+      private BidirectionalItr(UncheckedSubList$<E>$ parent){
+        super(parent);
+      }
+      private BidirectionalItr(UncheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+        super(parent,curr);
+        this.currIndex=currIndex;
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final $DNode$$<E>$ curr;
+        this.lastRet=curr=this.curr;
+        this.curr=curr.next;
+        ++this.currIndex;
+        return curr.val;
+      }
+      @Override public $exposedType$ previous$TypeNameModifier$(){
+        $DNode$$<E>$ curr;
+        this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+        this.curr=curr;
+        --this.currIndex;
+        return curr.val;
+      }
+      @Override public boolean hasNext(){
+        return currIndex<parent.size;
+      }
+      @Override public boolean hasPrevious(){
+        return currIndex>0;
+      }
+      @Override public int nextIndex(){
+        return this.currIndex;
+      }
+      @Override public int previousIndex(){
+        return this.currIndex-1;
+      }
+      
+      @Override public void set($exposedType$ val){
+        lastRet.val=val;
+      }
+      @Override public void add($exposedType$ val){
+        int size;
+        UncheckedSubList$<E>$ currList;
+        final var newNode=new $DNode$$<E>$(val);
+        this.lastRet=null;
+        if((size=++(currList=this.parent).size)==1){
+          ++currIndex;
+          //initialize the list
+          UncheckedSubList$<E>$ parent;
+          do{
+            currList.head=newNode;
+            currList.tail=newNode;
+            if((parent=currList.parent)==null){
+              //all parents were empty, insert in the root
+              (($ClassPrefix$DblLnkSeq$<E>$)currList.root).insertNode(currList.parentOffset,newNode);
+              this.curr=newNode.next;
+              return;
+            }
+          }while((size=++(currList=parent).size)==1);
+        }
+        final UncheckedList$<E>$ root;
+        ++(root=currList.root).size;
+        $DNode$$<E>$ after,before;
+        int currIndex;
+        if((currIndex=++this.currIndex)==size){
+          //the insertion point IS the tail
+          if((after=(before=currList.tail).next)==null){
+            //there are no nodes after this list
+            currList.bubbleUpAppend(newNode);
+            root.tail=newNode;
+          }else{
+            //there are nodes after this list
+            currList.bubbleUpAppend(newNode,before);
+            after.prev=newNode;
+          }
+        }else{
+          if(currIndex==1){
+            //the insertion point IS the head
+            if((before=(after=currList.head).prev)==null){
+              //there are no nodes before this list
+              currList.bubbleUpPrepend(newNode);
+              root.tail=newNode;
+            }else{
+              //there are nodes before this list
+              currList.bubbleUpPrepend(newNode,after);
+              before.next=newNode;
+            }
+          }else{
+            newNode.next=after=curr;
+            newNode.prev=before=after.prev;
+            after.prev=newNode;
+            before.next=newNode;
+            currList.bubbleUpIncrementSize();
+          }
+        }
+      }
+      @Override public void remove(){
+        $DNode$$<E>$ lastRet;
+        if((lastRet=this.lastRet).next==curr){
+          --currIndex;
+        }
+        UncheckedSubList$<E>$ parent;
+        if(--(parent=this.parent).size==0){
+          parent.removeLastNode(parent.tail);
+        }else{
+          if(lastRet==parent.tail){
+            parent.peelTail(lastRet);
+          }else{
+            if(lastRet==parent.head){
+              parent.peelHead(lastRet);
+            }else{
+              $DNode$.eraseNode(lastRet);
+              parent.bubbleUpDecrementSize();
+            }
+          }
+        }
+        --parent.root.size;
+      }
+      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+        final int bound;
+        final UncheckedSubList$<E>$ parent;
+        if(this.currIndex<(bound=(parent=this.parent).size)){
+          final $DNode$$<E>$ lastRet;
+          $DNode$.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
+          this.lastRet=lastRet;
+          this.curr=lastRet.next;
+          this.currIndex=bound;
+        }
+      }
+#IFNOT OfRef
+      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+        final int bound;
+        final UncheckedSubList$<E>$ parent;
+        if(this.currIndex<(bound=(parent=this.parent).size)){
+          final $DNode$$<E>$ lastRet;
+          $DNode$.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
+          this.lastRet=lastRet;
+          this.curr=lastRet.next;
+          this.currIndex=bound;
+        }
+      }
+#ENDIF
+    }
+    @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+      return new AscendingItr$<E>$(this);
+    }
+    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(){
+      return new BidirectionalItr$<E>$(this);
+    }
+    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index){
+      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,this.size),index);
+    }
+    @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
+      final int tailDist,subListSize=toIndex-fromIndex;
+      final $DNode$$<E>$ subListHead,subListTail;
+      if((tailDist=this.size-toIndex)<=fromIndex){
+        subListTail=$DNode$.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=$DNode$.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+      }
+      return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
+    }
+    #MACRO QueryMethods<removeVal,SubList,false>()
+    
+#IF OfRef
+    #MACRO UncheckedRemoveVal<SubList,false,NonNull>(nonNull.equals)
+    #MACRO UncheckedRemoveVal<SubList,false,Null>(null==)
+    #MACRO UncheckedRemoveVal<SubList,false,>(pred.test)
+#ELSEIF OfFloat,OfDouble
+    #MACRO UncheckedRemoveVal<SubList,false,Bits>(bits==$convertToBits$)
+    #MACRO UncheckedRemoveVal<SubList,false,0>(0==)
+    #MACRO UncheckedRemoveVal<SubList,false,NaN>($BoxedType$.isNaN)
+#ELSE
+    #MACRO UncheckedRemoveVal<SubList,false,>(val==)
+#ENDIF
   }
-  
-  private static class CheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>$
-  {
+  private static class CheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
     private static final long serialVersionUID=1L;
     transient final CheckedList$<E>$ root;
     transient final CheckedSubList$<E>$ parent;
     transient final int parentOffset;
     transient int modCount;
-     private CheckedSubList(CheckedList$<E>$ root,int rootOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
+    private CheckedSubList(CheckedList$<E>$ root,int rootOffset,$DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
@@ -482,275 +745,392 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       this.parentOffset=parentOffset;
       this.modCount=parent.modCount;
     }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+#IF OfRef
+    #MACRO UncheckedRemoveVal<SubList,true,NonNull>(nonNull.equals)
+    #MACRO UncheckedRemoveVal<SubList,true,Null>(null==)
+    #MACRO UncheckedRemoveVal<SubList,true,>(pred.test)
+#ELSEIF OfFloat,OfDouble
+    #MACRO UncheckedRemoveVal<SubList,true,Bits>(bits==$convertToBits$)
+    #MACRO UncheckedRemoveVal<SubList,true,0>(0==)
+    #MACRO UncheckedRemoveVal<SubList,true,NaN>($BoxedType$.isNaN)
+#ELSE
+    #MACRO UncheckedRemoveVal<SubList,true,>(val==)
+#ENDIF
+    
+    @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return new BidirectionalItr$<E>$(this);
     }
-    private void bubbleUpIncrementSize(){
-      var curr=this;
-      do{
-        ++curr.size;
-        ++curr.modCount;
-      }while((curr=curr.parent)!=null);
+    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return new BidirectionalItr$<E>$(this);
     }
-    private void bubbleUpAppend($DNode$$<E>$ oldTail,$DNode$$<E>$ newTail)
+    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkWriteHi(index,size=this.size);
+      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size),index);
+    }
+    private static class BidirectionalItr$<E>$
+#IFNOT OfRef
+      extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+      implements OmniListIterator.Of$ClassPrefix$$<E>$
     {
-      for(var curr=parent;curr!=null;++curr.size,++curr.modCount,curr.tail=newNode,curr=curr.parent)
-      {
-        if(curr.tail!=tail)
+      transient final CheckedSubList$<E>$ parent;
+      transient int modCount;
+      transient $DNode$$<E>$ curr;
+      transient $DNode$$<E>$ lastRet;
+      transient int currIndex;
+      BidirectionalItr(CheckedSubList$<E>$ parent){
+        this.parent=parent;
+        this.modCount=parent.modCount;
+        this.curr=parent.head;
+      }
+      BidirectionalItr(CheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+        this.parent=parent;
+        this.modCount=parent.modCount;
+        this.curr=curr;
+        this.currIndex=currIndex;
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final CheckedSubList$<E>$ parent;
+        CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
+        final int currIndex;
+        if((currIndex=this.currIndex)<parent.size){
+          $DNode$$<E>$ curr;
+          this.lastRet=curr=this.curr;
+          this.curr=curr.next;
+          this.currIndex=currIndex+1;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public $exposedType$ previous$TypeNameModifier$(){
+        final CheckedSubList$<E>$ parent;
+        CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
+        final int currIndex;
+        if((currIndex=this.currIndex)!=0){
+          $DNode$$<E>$ curr;
+          this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.currIndex=currIndex-1;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public boolean hasNext(){
+        return currIndex<parent.size;
+      }
+      @Override public boolean hasPrevious(){
+        return currIndex>0;
+      }
+      @Override public int nextIndex(){
+        return this.currIndex;
+      }
+      @Override public int previousIndex(){
+        return this.currIndex-1;
+      }
+      @Override public void set($exposedType$ val){
+        final $DNode$$<E>$ lastRet;
+        if((lastRet=this.lastRet)!=null)
         {
-          bubbleUpIncrementSize();
+          CheckedCollection.checkModCount(modCount,parent.root.modCount);
+          lastRet.val=val;
           return;
         }
+        throw new IllegalStateException();
       }
-    }
-    private void bubbleUpAppend($DNode$$<E>$ newTail)
-    {
-      for(var curr=parent;curr!=null;++curr.size,++curr.modCount,curr.tail=newNode,curr=curr.parent)
-      {
-      }
-    }
-    private void bubbleUpInit($DNode$$<E>$ newNode)
-    {
-      for(var curr=parent;curr!=null;curr.size=1,++curr.modCount,curr.tail=newNode,curr.head=newNode,curr=curr.parent)
-      {
-      }
-    }
-    @Override public void addLast($exposedType$ val)
-    {
-      final CheckedList$<E>$ root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount;
-      root.modCount=++modCount;
-      $DNode$$<E>$ tail,newNode;
-      if((tail=this.tail)==null)
-      {
-        newNode=new $DNode$$<E>$(val);
-        this.head=newNode;
-        //TODO
-        int rootSize;
-        if((rootSize=root.size)==0)
-        {
-          bubbleUpInit(newNode);
-          root.head=newNode;
-          root.tail=newNode;
+      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+        int size,numLeft;
+        final CheckedSubList$<E>$ parent;
+        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+          final int modCount=this.modCount;
+          try{
+            $DNode$.uncheckedForEachAscending(this.curr,numLeft,action);
+          }finally{
+            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+          }
+          $DNode$$<E>$ lastRet;
+          this.lastRet=lastRet=parent.tail;
+          this.curr=lastRet.next;
+          this.currIndex=size;
         }
-        else
-        {
-          //TODO
-          UncheckedList$<E>$ curr;
-          var parent=(curr=this).parent;
-          for(;;)
-          {
-            if(parent==null)
-            {
-              //TODO
-            }
-            parent.modCount=modCount;
-            int parentSize;
-            if((parentSize=parent.size++)!=0){
-              int parentOffset;
-              if((parentOffset=curr.parentOffset)==0){
-                $DNode$$<E>$ parentHead,before;
-                newNode.next=parentHead=parent.head;
-                parent.head=newNode;
-                newNode.prev=before=parentHead.prev;
-                if(before==null)
-                {
-                  root.head=newNode;
-                  for(;;)
-                  {
-                    if((parent=parent.parent)==null)
-                    {
-                      break;
-                    }
-                    parent.modCount=modCount;
-                    parent.head=newNode;
-                    ++parent.size;
-                  }
-                }else{
-                  before.next=newNode;
-                  for(;;)
-                  {
-                    if((parent=parent.parent)==null)
-                    {
-                      break;
-                    }
-                    if(parent.head!=parentHead)
-                    {
-                      parent.bubbleUpIncrementSize();
-                      break;
-                    }
-                    parent.modCount=modCount;
-                    parent.head=newNode;
-                    ++parent.size;
-                  }
-                }
-              }else if(parentOffset==parentSize){
-                $DNode$$<E>$ parentTail,after;
-                newNode.prev=parentTail=parent.tail;
-                parent.tail=newNode;
-                newNode.next=after=parentTail.next;
-                if(after==null)
-                {
-                  root.tail=newNode;
-                  for(;;)
-                  {
-                    if((parent=parent.parent)==null)
-                    {
-                      break;
-                    }
-                    parent.modCount=modCount;
-                    parent.tail=newNode;
-                    ++parent.size;
-                  }
-                }else{
-                  after.prev=newNode;
-                  for(;;)
-                  {
-                    if((parent=parent.parent)==null)
-                    {
-                      break;
-                    }
-                    if(parent.tail!=parentTail)
-                    {
-                      parent.bubbleUpIncrementSize();
-                      break;
-                    }
-                    parent.modCount=modCount;
-                    parent.tail=newNode;
-                    ++parent.size;
-                  }
-                }
+      }
+#IFNOT OfRef
+      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+        final int size,numLeft;
+        final CheckedSubList$<E>$ parent;
+        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+          final int modCount=this.modCount;
+          try{
+            $DNode$.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+          }finally{
+            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+          }
+          $DNode$$<E>$ lastRet;
+          this.lastRet=lastRet=parent.tail;
+          this.curr=lastRet.next;
+          this.currIndex=size;
+        }
+      }
+#ENDIF
+      
+      @Override public void remove(){
+        $DNode$$<E>$ lastRet;
+        if((lastRet=this.lastRet)!=null){
+          CheckedSubList$<E>$ parent;
+          CheckedList$<E>$ root;
+          int modCount;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=(parent=this.parent).root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          parent.modCount=modCount;
+          if(lastRet.next==curr){
+            --currIndex;
+          }
+          if(--(parent=this.parent).size==0){
+            parent.removeLastNode(parent.tail);
+          }else{
+            if(lastRet==parent.tail){
+              parent.peelTail(lastRet);
+            }else{
+              if(lastRet==parent.head){
+                parent.peelHead(lastRet);
               }else{
-                //TODO
+                $DNode$.eraseNode(lastRet);
+                parent.bubbleUpDecrementSize();
               }
             }
-            parent.head=newNode;
-            parent.tail=newNode;
           }
+          --root.size;
+          return;
         }
-        root.size=rootSize+1;
+        throw new IllegalStateException();
       }
-      else
-      {
-        $DNode$$<E>$ after;
-        if((after=tail.next)==null)
-        {
-          //TODO
-          tail.next=newNode=new $DNode$$<E>$(tail,val);
-          root.tail=newNode;
-          bubbleUpAppend(newNode);
-        }
-        else
-        {
-          tail.next=newNode=new $DNode$$<E>$(tail,val,after);
-          after.prev=newNode;
-          bubbleUpAppend(tail,newNode);
+      @Override public void add($exposedType$ val){
+        CheckedSubList$<E>$ currList;
+        CheckedList$<E>$ root;
+        int modCount;
+        CheckedCollection.checkModCount(modCount=this.modCount,(root=(currList=this.parent).root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        currList.modCount=modCount;
+        int size;
+        final var newNode=new $DNode$$<E>$(val);
+        this.lastRet=null;
+        if((size=++currList.size)==1){
+          ++currIndex;
+          //initialize the list
+          CheckedSubList$<E>$ parent;
+          do{
+            currList.head=newNode;
+            currList.tail=newNode;
+            if((parent=currList.parent)==null){
+              //all parents were empty, insert in the root
+              (($ClassPrefix$DblLnkSeq$<E>$)currList.root).insertNode(currList.parentOffset,newNode);
+              this.curr=newNode.next;
+              return;
+            }
+          }while((size=++(currList=parent).size)==1);
         }
         ++root.size;
-      }
-      
-      this.modCount=modCount;
-      ++this.size;
-      this.tail=newNode;
-    }
-    //TODO serialization methods
-    private void bubbleUpDecrementSize(int numRemoved)
-    {
-      var curr=this;
-      do
-      {
-        ++curr.modCount;
-        curr.size-=numRemoved;
-      }
-      while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpClearBody($DNode$$<E>$ before,$DNode$$<E>$ head,int numRemoved,$DNode$$<E>$ tail,$DNode$$<E>$ after){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          while(curr.tail==tail){
-            ++curr.modCount;
-            curr.tail=before;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }else if(curr.tail!=tail){
-          do{
-            ++curr.modCount;
-            curr.head=after;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }while(curr.head==head);
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }
-      }
-    }
-    private void bubbleUpClearHead($DNode$$<E>$ tail, $DNode$$<E>$ after,int numRemoved){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.tail!=tail){
-          do{
-            ++curr.modCount;
-            curr.head=after;
-            curr.size-=numRemoved;
-          }while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRemoved){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          do{
-            ++curr.modCount;
-            curr.tail=before;
-            curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    @Override public void clear(){
-      final CheckedList$<E>$ root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      final int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        root.size-=size;
-        $DNode$$<E>$ before,head,tail,after=(tail=this.tail).next;
-        if((before=(head=this.head).prev)==null){
-          if(after==null){
-            bubbleUpClearAll();
-            root.head=null;
-            root.tail=null;
+        $DNode$$<E>$ after,before;
+        int currIndex;
+        if((currIndex=++this.currIndex)==size){
+          //the insertion point IS the tail
+          if((after=(before=currList.tail).next)==null){
+            //there are no nodes after this list
+            currList.bubbleUpAppend(newNode);
+            root.tail=newNode;
           }else{
-            after.prev=null;
-            bubbleUpClearHead(tail,after,size);
-            root.head=after;
+            //there are nodes after this list
+            currList.bubbleUpAppend(newNode,before);
+            after.prev=newNode;
           }
         }else{
-          before.next=after;
-          if(after==null){
-            bubbleUpClearTail(head,before,size);
-            root.tail=before;
+          if(currIndex==1){
+            //the insertion point IS the head
+            if((before=(after=currList.head).prev)==null){
+              //there are no nodes before this list
+              currList.bubbleUpPrepend(newNode);
+              root.tail=newNode;
+            }else{
+              //there are nodes before this list
+              currList.bubbleUpPrepend(newNode,after);
+              before.next=newNode;
+            }
           }else{
-            after.prev=before;
-            bubbleUpClearBody(before,head,size,tail,after);
+            newNode.next=after=curr;
+            newNode.prev=before=after.prev;
+            after.prev=newNode;
+            before.next=newNode;
+            currList.bubbleUpIncrementSize();
           }
         }
-        this.modCount=modCount;
-        this.head=null;
-        this.tail=null;
-        this.size=0;
       }
+    }
+    
+    @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      int tailDist;
+      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
+      final $DNode$$<E>$ subListHead,subListTail;
+      if((tailDist-=toIndex)<=fromIndex){
+        subListTail=$DNode$.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=$DNode$.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+      }
+      return new CheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
+    }
+    @Override public Object clone(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      final int size;
+      if((size=this.size)!=0){
+        $DNode$$<E>$ head,newTail;
+        final var newHead=newTail=new $DNode$$<E>$((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new $DNode$$<E>$(newTail,(head=head.next).val),++i){}
+        return new CheckedList$<E>$(newHead,size,newTail);
+      }
+      return new CheckedList$<E>$();
+    }
+    #MACRO QueryMethods<removeVal,SubList,true>()
+    #MACRO QueryMethods<indexOf,SubList,true>()
+    #MACRO QueryMethods<lastIndexOf,SubList,true>()
+    #MACRO QueryMethods<contains,SubList,true>()
+    private static class SerializableSubList$<E>$ implements Serializable{
+      private static final long serialVersionUID=1L;
+      private transient $DNode$$<E>$ head;
+      private transient $DNode$$<E>$ tail;
+      private transient int size;
+      private transient final CheckedList$<E>$.ModCountChecker modCountChecker;
+      private SerializableSubList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail,CheckedList$<E>$.ModCountChecker modCountChecker){
+        this.head=head;
+        this.tail=tail;
+        this.size=size;
+        this.modCountChecker=modCountChecker;
+      }
+      private Object readResolve(){
+        return new CheckedList$<E>$(head,size,tail);
+      }
+#IF OfRef
+      @SuppressWarnings("unchecked")
+#ENDIF
+      private void readObject(ObjectInputStream ois) throws IOException
+#IF OfRef
+        ,ClassNotFoundException
+#ENDIF
+      {
+        int size;
+        this.size=size=ois.readInt();
+        if(size!=0){
+          $DNode$$<E>$ curr;
+#IF OfBoolean
+          int word,marker;
+          for(this.head=curr=new $DNode$(((marker=1)&(word=ois.readUnsignedByte()))!=0);--size!=0;curr=curr.next=new $DNode$$<E>$(curr,(word&marker)!=0)){
+            if((marker<<=1)==(1<<8)){
+              word=ois.readUnsignedByte();
+              marker=1;
+            }
+          }
+#ELSEIF OfRef
+          for(this.head=curr=new $DNode$$<E>$(($exposedType$)ois.readObject());--size!=0;curr=curr.next=new $DNode$$<E>$(curr,($exposedType$)ois.readObject())){}
+#ELSE
+          for(this.head=curr=new $DNode$$<E>$(($exposedType$)ois.read$TypeNameModifier$());--size!=0;curr=curr.next=new $DNode$$<E>$(curr,($exposedType$)ois.read$TypeNameModifier$())){}
+#ENDIF
+          this.tail=curr;
+        }
+      }
+      private void writeObject(ObjectOutputStream oos) throws IOException{
+        try{
+          int size;
+          oos.writeInt(size=this.size);
+          if(size!=0){
+            var curr=this.head;
+#IF OfBoolean
+            for(int word=TypeUtil.castToByte(curr.val),marker=1;;){
+              if((curr=curr.next)==null){
+                oos.writeByte(word);
+                return;
+              }else if((marker<<=1)==(1<<8)){
+                oos.writeByte(word);
+                word=0;
+                marker=1;
+              }
+              if(curr.val){
+                word|=marker;
+              }
+            }
+#ELSE
+            do{
+  #IF OfRef
+              oos.writeObject(curr.val);
+  #ELSE
+              oos.write$TypeNameModifier$(curr.val);
+  #ENDIF
+            }while((curr=curr.next)!=null);
+#ENDIF
+          }
+        }finally{
+          modCountChecker.checkModCount();
+        }
+      }
+    }
+    private Object writeReplace(){
+      return new SerializableSubList$<E>$(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
+    }   
+    @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+#IFNOT OfRef
+    @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter::test);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+#ENDIF
+    private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+      //TODO
+      return false;
+    }
+    #MACRO SubListRemoveAtIndexMethod<Checked>()
+    #MACRO SubListAddMethods<Checked>()
+    #MACRO SubListClear<Checked>()
+    @Override public $exposedType$ set(int index,$exposedType$ val){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final $DNode$$<E>$ node;
+      final var ret=(node=(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size)).val;
+      node.val=val;
+      return ret;
+    }
+    @Override public void put(int index,$exposedType$ val){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val=val;
+    }
+    @Override public $exposedType$ get$TypeNameModifier$(int index){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      return (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val;
     }
     @Override public int size(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -789,7 +1169,13 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
-#IFNOT OfRef
+    #MACRO ComparatorSortImpl<Stable,SubList,true>($Comparator$$<? super E>$,sorter)
+    #MACRO NonComparatorSortImpl<Stable,SubList,true,Ascending>()
+    #MACRO NonComparatorSortImpl<Stable,SubList,true,Descending>()
+#IF OfRef
+    #MACRO NonComparatorSortImpl<Unstable,SubList,true,Ascending>()
+    #MACRO NonComparatorSortImpl<Unstable,SubList,true,Descending>()
+#ELSE
     @Override public void replaceAll(UnaryOperator<$BoxedType$> operator){
       int modCount=this.modCount;
       final CheckedList$<E>$ root;
@@ -819,23 +1205,80 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
-#ENDIF
-
-    #MACRO ComparatorSortImpl<Stable,SubList,true>($Comparator$$<? super E>$,sorter)
-#IFNOT OfRef
     #MACRO ComparatorSortImpl<Stable,SubList,true>(Comparator<? super $BoxedType$>,sorter::compare)
-#ENDIF
-    #MACRO NonComparatorSortImpl<Stable,SubList,true,Ascending>()
-    #MACRO NonComparatorSortImpl<Stable,SubList,true,Descending>()
-#IF OfRef
-    #MACRO NonComparatorSortImpl<Unstable,SubList,true,Ascending>()
-    #MACRO NonComparatorSortImpl<Unstable,SubList,true,Descending>()
 #ENDIF
 #IFNOT OfBoolean
     #MACRO ComparatorSortImpl<Unstable,SubList,true>($Comparator$$<? super E>$,sorter)
 #ENDIF
+    @Override public <T> T[] toArray(T[] dst){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toArray(dst);
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      return super.toArray(arrSize->
+      {
+        final int modCount=this.modCount;
+        try{
+          return arrConstructor.apply(arrSize);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      });
+    }
+    #MACRO ToArrayImpl<true>($ArrayType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
+  #IFNOT OfRef
+    #MACRO ToArrayImpl<true>($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
+    #IFNOT OfDouble
+    #MACRO ToArrayImpl<true>(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
+      #IFNOT OfFloat
+    #MACRO ToArrayImpl<true>(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
+        #IFNOT OfLong
+    #MACRO ToArrayImpl<true>(long,OmniArray.OfLong.DEFAULT_ARR,Long)
+          #IFNOT OfInt
+    #MACRO ToArrayImpl<true>(int,OmniArray.OfInt.DEFAULT_ARR,Int)
+            #IFNOT OfShort,OfChar
+    #MACRO ToArrayImpl<true>(short,OmniArray.OfShort.DEFAULT_ARR,Short)
+              #IFNOT OfByte
+    #MACRO ToArrayImpl<true>(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
+    #MACRO ToArrayImpl<true>(char,OmniArray.OfChar.DEFAULT_ARR,Char)
+              #ENDIF
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+    @Override public String toString(){
+#IF OfRef
+      int modCount=this.modCount;
+      try{
+        return super.toString();
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+#ELSE
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toString();
+#ENDIF
+    }
+    @Override public int hashCode(){
+#IF OfRef
+      int modCount=this.modCount;
+      try{
+        return super.hashCode();
+      }finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+#ELSE
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.hashCode();
+#ENDIF
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    } 
   }
-  
   public static class CheckedList$<E>$ extends UncheckedList$<E>${
     transient int modCount;
     public CheckedList(){
@@ -843,6 +1286,16 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     CheckedList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
       super(head,size,tail);
     }
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
+    {
+      ModCountChecker(int modCount){
+        super(modCount);
+      }
+      @Override protected int getActualModCount(){
+        return CheckedList.this.modCount;
+      }
+    }
+    
     @Override public void clear(){
       if(size!=0){
         ++this.modCount;
@@ -851,6 +1304,8 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         this.tail=null;
       }
     }
+    #MACRO RootRemoveMethods<Checked>()
+    #MACRO RootAddMethods<Checked>()
     @Override public $exposedType$ set(int index,$exposedType$ val){
       CheckedCollection.checkLo(index);
       int size;
@@ -872,103 +1327,20 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       CheckedCollection.checkReadHi(index,size=this.size);
       return (($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size).val;
     }
-    @Override public $exposedType$ $removeAtIndexMethod$(int index){
-      CheckedCollection.checkLo(index);
-      int size;
-      CheckedCollection.checkReadHi(index,size=this.size);
-      final $exposedType$ ret;
-      this.size=--size;
-      if((size-=index)<=index){
-        var tail=this.tail;
-        if(size==0){
-          ret=tail.val;
-          if(index==0){
-            this.head=null;
-            this.tail=null;
-          }else{
-            this.tail=tail=tail.prev;
-            tail.next=null;
-          }
-        }else{
-          ret=(tail=$DNode$.uncheckedIterateDescending(tail,size)).val;
-          $DNode$.eraseNode(tail);
-        }
-      }else{
-        var head=this.head;
-        if(index==0){
-          ret=head.val;
-          this.head=head=head.next;
-          head.prev=null;
-        }else{
-          ret=(head=$DNode$.uncheckedIterateAscending(head,index)).val;
-          $DNode$.eraseNode(head);
-        }
+    @Override public $exposedType$ getLast$TypeNameModifier$(){
+      final $DNode$$<E>$ tail;
+      if((tail=this.tail)!=null){
+         return tail.val;
       }
-      return ret;
+      throw new NoSuchElementException();
     }
-    @Override public void add(int index,$exposedType$ val){
-      CheckedCollection.checkLo(index);
-      int size;
-      CheckedCollection.checkWriteHi(index,size=this.size);
-      ++this.modCount;
-      this.size=size+1;
-      if((size-=index)<=index){
-        var tail=this.tail;
-        if(size==0){
-          tail.next=tail=new $DNode$$<E>$(tail,val);
-          this.tail=tail;
-        }else{
-          while(--size!=0){
-            tail=tail.prev;
-          }
-          $DNode$$<E>$ before;
-          (before=tail.prev).next=before=new $DNode$$<E>$(before,val,tail);
-          tail.prev=before;
-        }
-      }else{
-        $DNode$$<E>$ head;
-        if((head=this.head)==null){
-          this.head=head=new $DNode$$<E>$(val);
-          this.tail=head;
-        }else if(index==0){
-          head.prev=head=new $DNode$$<E>$(val,head);
-          this.head=head;
-        }else{
-          while(--index!=0){
-            head=head.next;
-          }
-          $DNode$$<E>$ after;
-          (after=head.next).prev=after=new $DNode$$<E>$(head,val,after);
-          head.next=after;
-        }
-      }
-    }
-    @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action)
-    {
+    @Override public $exposedType$ $elementMethod$(){
       final $DNode$$<E>$ head;
       if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          $DNode$.uncheckedForEachAscending(head,this.size,action);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
+         return head.val;
       }
+      throw new NoSuchElementException();
     }
-#IFNOT OfRef
-    @Override public void forEach(Consumer<? super $BoxedType$> action)
-    {
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          $DNode$.uncheckedForEachAscending(head,this.size,action::accept);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-    }
-#ENDIF
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       return super.toArray(arrSize->{
         final int modCount=this.modCount;
@@ -979,10 +1351,20 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         }
       });
     }
+    @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          $DNode$.uncheckedForEachAscending(head,this.size,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
     @Override public void replaceAll($UnaryOperator$$<E>$ operator){
       final $DNode$$<E>$ head;
-      if((head=this.head)!=null)
-      {
+      if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
           $DNode$.uncheckedReplaceAll(head,this.size,operator);
@@ -992,11 +1374,53 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         }
       }
     }
-#IFNOT OfRef
+    #MACRO ComparatorSortImpl<Stable,Root,true>($Comparator$$<? super E>$,sorter)
+    #MACRO NonComparatorSortImpl<Stable,Root,true,Ascending>()
+    #MACRO NonComparatorSortImpl<Stable,Root,true,Descending>()
+#IF OfRef
+    @Override public String toString(){
+      final RefDblLnkNode<E> head;
+      if((head=this.head)!=null){
+        final StringBuilder builder=new StringBuilder("[");
+        final int modCount=this.modCount;
+        try{
+          RefDblLnkNode.uncheckedToString(head,tail,builder);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        return builder.append(']').toString();
+      }
+      return "[]";
+    }
+    @Override public int hashCode(){
+      final RefDblLnkNode<E> head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          return RefDblLnkNode.uncheckedHashCode(head,tail);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      return 1;
+    }
+    #MACRO NonComparatorSortImpl<Unstable,Root,true,Ascending>()
+    #MACRO NonComparatorSortImpl<Unstable,Root,true,Descending>()
+#ELSE
+    @Override public void forEach(Consumer<? super $BoxedType$> action){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          $DNode$.uncheckedForEachAscending(head,this.size,action::accept);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
     @Override public void replaceAll(UnaryOperator<$BoxedType$> operator){
       final $DNode$$<E>$ head;
-      if((head=this.head)!=null)
-      {
+      if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
           $DNode$.uncheckedReplaceAll(head,this.size,operator::apply);
@@ -1006,6 +1430,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         }
       }
     }
+    #MACRO ComparatorSortImpl<Stable,Root,true>(Comparator<? super $BoxedType$>,sorter::compare)
 #ENDIF
 #IF OfBoolean
     private int removeIfHelper($DNode$$<E>$ prev,int numLeft,boolean retainThis){
@@ -1048,6 +1473,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       return numSurvivors;
     }
 #ELSE
+    #MACRO ComparatorSortImpl<Unstable,Root,true>($Comparator$$<? super E>$,sorter)
     private void pullSurvivorsDown($DNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
@@ -1055,7 +1481,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              
               if(curr==tail){
                 prev.next=null;
                 this.tail=prev;
@@ -1210,48 +1635,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       }
       return false;
     }
-    #MACRO ComparatorSortImpl<Stable,Root,true>($Comparator$$<? super E>$,sorter)
-#IFNOT OfRef
-    #MACRO ComparatorSortImpl<Stable,Root,true>(Comparator<? super $BoxedType$>,sorter::compare)
-#ENDIF
-    #MACRO NonComparatorSortImpl<Stable,Root,true,Ascending>()
-    #MACRO NonComparatorSortImpl<Stable,Root,true,Descending>()
-
-#IF OfRef
-    #MACRO NonComparatorSortImpl<Unstable,Root,true,Ascending>()
-    #MACRO NonComparatorSortImpl<Unstable,Root,true,Descending>()
-#ENDIF
-#IFNOT OfBoolean
-    #MACRO ComparatorSortImpl<Unstable,Root,true>($Comparator$$<? super E>$,sorter)
-#ENDIF
-#IF OfRef
-    @Override public String toString(){
-      final RefDblLnkNode<E> head;
-      if((head=this.head)!=null){
-        final StringBuilder builder=new StringBuilder("[");
-        final int modCount=this.modCount;
-        try{
-          RefDblLnkNode.uncheckedToString(head,tail,builder);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-        return builder.append(']').toString();
-      }
-      return "[]";
-    }
-    @Override public int hashCode(){
-      final RefDblLnkNode<E> head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          return RefDblLnkNode.uncheckedHashCode(head,tail);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
-      return 1;
-    }
-#ENDIF
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
@@ -1274,6 +1657,115 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       //TODO
       return false;
     }
+    @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
+      return new DescendingItr$<E>$(this);
+    }
+    @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+      return new BidirectionalItr$<E>$(this);
+    }
+    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(){
+      return new BidirectionalItr$<E>$(this);
+    }
+    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index){
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkWriteHi(index,size=this.size);
+      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size),index);
+    }
+    @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
+      int tailDist;
+      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
+      final $DNode$$<E>$ subListHead,subListTail;
+      if((tailDist-=toIndex)<=fromIndex){
+        subListTail=$DNode$.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=$DNode$.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+      }
+      return new CheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
+    } 
+#IF OfRef
+    @Override public int search(Object val){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        if(val!=null){
+          final int modCount=this.modCount;
+          try{
+            return $DNode$.uncheckedsearchNonNull(head,this.size,val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+        return $DNode$.uncheckedsearchNull(head);
+      }
+      return -1;
+    }
+    @Override public boolean contains(Object val){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        if(val!=null){
+          final int modCount=this.modCount;
+          try{
+            return $DNode$.uncheckedcontainsNonNull(head,this.size,val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+        return $DNode$.uncheckedcontainsNull(head,tail);
+      }
+      return false;
+    }
+    @Override public int indexOf(Object val){
+      final $DNode$$<E>$ head;
+      if((head=this.head)!=null){
+        if(val!=null){
+          final int modCount=this.modCount;
+          try{
+            return $DNode$.uncheckedindexOfNonNull(head,this.size,val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+        return $DNode$.uncheckedindexOfNull(head,tail);
+      }
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      final $DNode$$<E>$ tail;
+      if((tail=this.tail)!=null){
+        if(val!=null){
+          final int modCount=this.modCount;
+          try{
+            return $DNode$.uncheckedlastIndexOfNonNull(this.size,tail,val);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+        return $DNode$.uncheckedlastIndexOfNull(this.size,tail);
+      }
+      return -1;
+    }
+#ENDIF
+#IF OfRef
+    #MACRO UncheckedRemoveLastOccurrence<true,NonNull>(nonNull.equals)
+    #MACRO UncheckedRemoveLastOccurrence<true,Null>(null==)
+    #MACRO UncheckedRemoveLastOccurrence<true,>(pred.test)
+    #MACRO UncheckedRemoveVal<Root,true,NonNull>(nonNull.equals)
+    #MACRO UncheckedRemoveVal<Root,true,Null>(null==)
+    #MACRO UncheckedRemoveVal<Root,true,>(pred.test)
+#ELSEIF OfFloat,OfDouble
+    #MACRO UncheckedRemoveLastOccurrence<true,Bits>(bits==$convertToBits$)
+    #MACRO UncheckedRemoveLastOccurrence<true,0>(0==)
+    #MACRO UncheckedRemoveLastOccurrence<true,NaN>($BoxedType$.isNaN)
+    #MACRO UncheckedRemoveVal<Root,true,Bits>(bits==$convertToBits$)
+    #MACRO UncheckedRemoveVal<Root,true,0>(0==)
+    #MACRO UncheckedRemoveVal<Root,true,NaN>($BoxedType$.isNaN)
+#ELSE
+    #MACRO UncheckedRemoveLastOccurrence<true,>(val==)
+    #MACRO UncheckedRemoveVal<Root,true,>(val==)
+#ENDIF
+    #MACRO OutputMethods<true>(PollImpl)
     private static class DescendingItr$<E>$
 #IF OfRef
       implements OmniIterator.Of$ClassPrefix$$<E>$
@@ -1370,13 +1862,35 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       }
 #ENDIF  
     }
-    private static class BidirectionalItr$<E>$ extends DescendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>$
-    {
+    private static class BidirectionalItr$<E>$ extends DescendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
       private BidirectionalItr(CheckedList$<E>$ parent){
         super(parent,parent.head,0);
       }
       private BidirectionalItr(CheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
         super(parent,curr,currIndex);
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        CheckedCollection.checkModCount(modCount,parent.modCount);
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          this.lastRet=curr;
+          this.curr=curr.next;
+          ++this.currIndex;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public $exposedType$ previous$TypeNameModifier$(){
+        final CheckedList$<E>$ parent;
+        CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+        final int currIndex;
+        if((currIndex=this.currIndex)!=0){
+          $DNode$$<E>$ curr;
+          this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.currIndex=currIndex-1;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
       }
       @Override public boolean hasPrevious(){
         return this.currIndex!=0;
@@ -1422,29 +1936,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         }
         this.lastRet=null;
       }
-      @Override public $exposedType$ previous$TypeNameModifier$(){
-        CheckedCollection.checkModCount(modCount,parent.modCount);
-        final int currIndex;
-        if((currIndex=this.currIndex)!=0){
-          final $DNode$$<E>$ curr;
-          this.lastRet=curr=this.curr.prev;
-          this.curr=curr;
-          this.currIndex=currIndex-1;
-          return curr.val;
-        }
-        throw new NoSuchElementException();
-      }
-      @Override public $exposedType$ next$TypeNameModifier$(){
-        CheckedCollection.checkModCount(modCount,parent.modCount);
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          this.lastRet=curr;
-          this.curr=curr.next;
-          ++currIndex;
-          return curr.val;
-        }
-        throw new NoSuchElementException();
-      }
+
       @Override public void remove(){
         $DNode$$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
@@ -1508,160 +2000,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       }
 #ENDIF  
     }
-    @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
-      return new DescendingItr$<E>$(this);
-    }
-    @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
-      return new BidirectionalItr$<E>$(this);
-    }
-    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(){
-      return new BidirectionalItr$<E>$(this);
-    }
-    @Override public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index){
-      CheckedCollection.checkLo(index);
-      int size;
-      CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,size),index);
-    }
-    @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
-      //TODO
-      return null;
-    }
-    @Override public $exposedType$ getLast$TypeNameModifier$(){
-      final $DNode$$<E>$ tail;
-      if((tail=this.tail)!=null){
-         return tail.val;
-      }
-      throw new NoSuchElementException();
-    }
-    @Override public void addLast($exposedType$ val){
-      ++this.modCount;
-      super.addLast(val);
-    }
-    @Override public void push($exposedType$ val){
-      ++this.modCount;
-      super.push(val);
-    }
-    @Override public $exposedType$ removeLast$TypeNameModifier$(){
-      $DNode$$<E>$ tail;
-      if((tail=this.tail)!=null){
-        ++this.modCount;
-        final var ret=tail.val;
-        if(--size==0){
-          this.head=null;
-          this.tail=null;
-        }else{
-          (tail=tail.prev).next=null;
-          this.tail=tail;
-        }
-        return ret;
-      }
-      throw new NoSuchElementException();
-    }
-    @Override public $exposedType$ pop$TypeNameModifier$(){
-      $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        ++this.modCount;
-        final var ret=head.val;
-        if(--size==0){
-          this.head=null;
-          this.tail=null;
-        }else{
-          (head=head.next).prev=null;
-          this.head=head;
-        }
-        return ret;
-      }
-      throw new NoSuchElementException();
-    }
-    @Override public $exposedType$ $elementMethod$(){
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-         return head.val;
-      }
-      throw new NoSuchElementException();
-    }
-#IF OfRef
-    @Override public int search(Object val){
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        if(val!=null){
-          final int modCount=this.modCount;
-          try{
-            return $DNode$.uncheckedsearchNonNull(head,this.size,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,this.modCount);
-          }
-        }
-        return $DNode$.uncheckedsearchNull(head);
-      }
-      return -1;
-    }
-    @Override public boolean contains(Object val){
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        if(val!=null){
-          final int modCount=this.modCount;
-          try{
-            return $DNode$.uncheckedcontainsNonNull(head,this.size,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,this.modCount);
-          }
-        }
-        return $DNode$.uncheckedcontainsNull(head,tail);
-      }
-      return false;
-    }
-    @Override public int indexOf(Object val){
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        if(val!=null){
-          final int modCount=this.modCount;
-          try{
-            return $DNode$.uncheckedindexOfNonNull(head,this.size,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,this.modCount);
-          }
-        }
-        return $DNode$.uncheckedindexOfNull(head,tail);
-      }
-      return -1;
-    }
-    @Override public int lastIndexOf(Object val){
-      final $DNode$$<E>$ tail;
-      if((tail=this.tail)!=null){
-        if(val!=null){
-          final int modCount=this.modCount;
-          try{
-            return $DNode$.uncheckedlastIndexOfNonNull(this.size,tail,val);
-          }finally{
-            CheckedCollection.checkModCount(modCount,this.modCount);
-          }
-        }
-        return $DNode$.uncheckedlastIndexOfNull(this.size,tail);
-      }
-      return -1;
-    }
-#ENDIF
-#IF OfRef
-    #MACRO UncheckedRemoveLastOccurrence<true,NonNull>(nonNull.equals)
-    #MACRO UncheckedRemoveLastOccurrence<true,Null>(null==)
-    #MACRO UncheckedRemoveLastOccurrence<true,>(pred.test)
-    #MACRO UncheckedRemoveVal<Root,true,NonNull>(nonNull.equals)
-    #MACRO UncheckedRemoveVal<Root,true,Null>(null==)
-    #MACRO UncheckedRemoveVal<Root,true,>(pred.test)
-#ELSEIF OfFloat,OfDouble
-    #MACRO UncheckedRemoveLastOccurrence<true,Bits>(bits==$convertToBits$)
-    #MACRO UncheckedRemoveLastOccurrence<true,0>(0==)
-    #MACRO UncheckedRemoveLastOccurrence<true,NaN>($BoxedType$.isNaN)
-    #MACRO UncheckedRemoveVal<Root,true,Bits>(bits==$convertToBits$)
-    #MACRO UncheckedRemoveVal<Root,true,0>(0==)
-    #MACRO UncheckedRemoveVal<Root,true,NaN>($BoxedType$.isNaN)
-#ELSE
-    #MACRO UncheckedRemoveLastOccurrence<true,>(val==)
-    #MACRO UncheckedRemoveVal<Root,true,>(val==)
-#ENDIF
-    #MACRO OutputMethods<true>(PollImpl)
   }
   public static class UncheckedList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,Externalizable{
     private static final long serialVersionUID=1L;
@@ -1670,6 +2008,13 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     UncheckedList($DNode$$<E>$ head,int size,$DNode$$<E>$ tail){
       super(head,size,tail);
     }
+    @Override public void clear(){
+      this.head=null;
+      this.size=0;
+      this.tail=null;
+    }
+    #MACRO RootRemoveMethods<Unchecked>()
+    #MACRO RootAddMethods<Unchecked>()
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       int size;
       out.writeInt(size=this.size);
@@ -1743,10 +2088,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       //TODO
       return false;
     }
-    #MACRO QueryMethods<contains>()
-    #MACRO QueryMethods<indexOf>()
-    #MACRO QueryMethods<lastIndexOf>()
-    #MACRO QueryMethods<removeVal>()
+    #MACRO QueryMethods<removeVal,Root,false>()
 #IF OfRef
     #MACRO UncheckedRemoveVal<Root,false,NonNull>(nonNull.equals)
     #MACRO UncheckedRemoveVal<Root,false,Null>(null==)
@@ -1761,221 +2103,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
       return new DescendingItr$<E>$(this);
     }
-    private static class AscendingItr$<E>$
-#IF OfRef
-      implements OmniIterator.Of$ClassPrefix$$<E>$
-#ELSE
-      extends Abstract$ClassPrefix$Itr$<E>$
-#ENDIF
-    {
-      transient final UncheckedList$<E>$ parent;
-      transient $DNode$$<E>$ curr;
-      private AscendingItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr){
-        this.parent=parent;
-        this.curr=curr;
-      }
-      private AscendingItr(UncheckedList$<E>$ parent){
-        this.parent=parent;
-        this.curr=parent.head;
-      }
-      @Override public boolean hasNext(){
-        return curr!=null;
-      }
-      @Override public void remove(){
-        final UncheckedList$<E>$ parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          $DNode$$<E>$ curr;
-          if((curr=this.curr)==null){
-            (curr=parent.tail.prev).next=null;
-            parent.tail=curr;
-          }else{
-            $DNode$$<E>$ lastRet;
-            if((lastRet=curr.prev)==parent.head){
-              parent.head=curr;
-              curr.prev=null;
-            }else{
-              curr.prev=lastRet=lastRet.prev;
-              lastRet.next=curr;
-            }
-          }
-        }
-      }
-      @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
-        this.curr=(curr=this.curr).next;
-        return curr.val;
-      }
-      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action);
-          this.curr=null;
-        }
-      }
-#IFNOT OfRef
-      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-#ENDIF
-    }
-    private static class DescendingItr$<E>$ extends AscendingItr$<E>${
-      private DescendingItr(UncheckedList$<E>$ parent){
-        super(parent,parent.tail);
-      }
-      @Override public void remove(){
-        final UncheckedList$<E>$ parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          $DNode$$<E>$ curr;
-          if((curr=this.curr)==null){
-            (curr=parent.head.next).prev=null;
-            parent.head=curr;
-          }else{
-            $DNode$$<E>$ lastRet;
-            if((lastRet=curr.next)==parent.tail){
-              parent.tail=curr;
-              curr.next=null;
-            }else{
-              curr.next=lastRet=lastRet.next;
-              lastRet.prev=curr;
-            }
-          }
-        }
-      }
-      @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
-        this.curr=(curr=this.curr).prev;
-        return curr.val;
-      }
-      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachDescending(curr,action);
-          this.curr=null;
-        }
-      }
-#IFNOT OfRef
-      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachDescending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-#ENDIF
-    }
-    private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
-      transient int currIndex;
-      transient $DNode$$<E>$ lastRet;
-      private BidirectionalItr(UncheckedList$<E>$ parent){
-        super(parent);
-      }
-      private BidirectionalItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
-        super(parent,curr);
-        this.currIndex=currIndex;
-      }
-      @Override public boolean hasPrevious(){
-        return curr.prev!=null;
-      }
-      @Override public int nextIndex(){
-        return currIndex;
-      }
-      @Override public int previousIndex(){
-        return currIndex-1;
-      }
-      @Override public void add($exposedType$ val){
-        final UncheckedList$<E>$ parent;
-        $DNode$$<E>$ newNode;
-        final int currIndex;
-        if((currIndex=++this.currIndex)==++(parent=this.parent).size){
-          if(currIndex==1){
-            parent.head=newNode=new $DNode$$<E>$(val);
-          }else{
-            (newNode=parent.tail).next=newNode=new $DNode$$<E>$(newNode,val);
-          }
-          parent.tail=newNode;
-        }else{
-          if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new $DNode$$<E>$(val,newNode);
-          }else{
-            final $DNode$$<E>$ tmp;
-            (newNode=curr).prev=newNode=new $DNode$$<E>$(tmp=newNode.prev,val,newNode);
-            tmp.next=newNode;
-          }
-        }
-        this.lastRet=null;
-      }
-      @Override public void set($exposedType$ val){
-        lastRet.val=val;
-      }
-      @Override public $exposedType$ previous$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
-        this.lastRet=curr=this.curr.prev;
-        this.curr=curr;
-        --this.currIndex;
-        return curr.val;
-      }
-      @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
-        this.lastRet=curr=this.curr;
-        this.curr=curr.next;
-        ++this.currIndex;
-        return curr.val;
-      }
-      @Override public void remove(){
-        $DNode$$<E>$ lastRet;
-        if((lastRet=this.lastRet).next==curr){
-          --currIndex;
-        }
-        final UncheckedList$<E>$ parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          if(lastRet==parent.tail){
-            parent.tail=lastRet=lastRet.prev;
-            lastRet.next=null;
-          }else if(lastRet==parent.head){
-            parent.head=lastRet=lastRet.next;
-            lastRet.prev=null;
-          }else{
-            $DNode$.eraseNode(lastRet);
-          }
-        }
-        this.lastRet=null;
-      }
-      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action);
-          final UncheckedList$<E>$ parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-#IFNOT OfRef
-      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action::accept);
-          final UncheckedList$<E>$ parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-#ENDIF
-    }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
       return new AscendingItr$<E>$(this);
     }
@@ -1986,8 +2113,16 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       return new BidirectionalItr$<E>$(this,(($ClassPrefix$DblLnkSeq$<E>$)this).getNode(index,this.size),index);
     }
     @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
-      //TODO
-      return null;
+      final int tailDist,subListSize=toIndex-fromIndex;
+      final $DNode$$<E>$ subListHead,subListTail;
+      if((tailDist=this.size-toIndex)<=fromIndex){
+        subListTail=$DNode$.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=$DNode$.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+      }
+      return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
     }
     @Override public $exposedType$ getLast$TypeNameModifier$(){
       return tail.val;
@@ -2000,46 +2135,16 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       addLast(($exposedType$)val);
       return true;
     }
+#IF OfBoolean,OfRef
     @Override public void addFirst($exposedType$ val){
       push(($exposedType$)val);
     }
+#ENDIF
+#IF OfRef
     @Override public $exposedType$ removeFirst$TypeNameModifier$(){
       return pop$TypeNameModifier$();
     }
-    @Override public void push($exposedType$ val){
-      $DNode$$<E>$ head;
-      if((head=this.head)==null){
-        this.head=tail=new $DNode$$<E>$(val);
-      }else{
-        head.prev=head=new $DNode$$<E>$(val,head);
-      }
-      this.head=head;
-      ++this.size;
-    }
-    @Override public $exposedType$ removeLast$TypeNameModifier$(){
-      $DNode$$<E>$ tail;
-      final var ret=(tail=this.tail).val;
-      if(--size==0){
-        this.head=null;
-        this.tail=null;
-      }else{
-        (tail=tail.prev).next=null;
-        this.tail=tail;
-      }
-      return ret;
-    }
-    @Override public $exposedType$ pop$TypeNameModifier$(){
-      $DNode$$<E>$ head;
-      final var ret=(head=this.head).val;
-      if(--size==0){
-        this.head=null;
-        this.tail=null;
-      }else{
-        (head=head.next).prev=null;
-        this.head=head;
-      }
-      return ret;
-    }
+#ENDIF
     @Override public boolean removeFirstOccurrence(Object val){
       return remove(val);
     }
@@ -2050,8 +2155,8 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       addLast(($exposedType$)val);
       return true;
     }
-    #MACRO QueryMethods<search>()
-    #MACRO QueryMethods<removeLastOccurrence>()
+    #MACRO QueryMethods<search,Root,false>()
+    #MACRO QueryMethods<removeLastOccurrence,Root,false>()
 #IF OfRef
     #MACRO UncheckedRemoveLastOccurrence<false,NonNull>(nonNull.equals)
     #MACRO UncheckedRemoveLastOccurrence<false,Null>(null==)
@@ -2273,10 +2378,231 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       }
 #ENDIF
     }
+    private static class AscendingItr$<E>$
+#IF OfRef
+      implements OmniIterator.Of$ClassPrefix$$<E>$
+#ELSE
+      extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+    {
+      transient final UncheckedList$<E>$ parent;
+      transient $DNode$$<E>$ curr;
+      private AscendingItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr){
+        this.parent=parent;
+        this.curr=curr;
+      }
+      private AscendingItr(UncheckedList$<E>$ parent){
+        this.parent=parent;
+        this.curr=parent.head;
+      }
+      @Override public boolean hasNext(){
+        return curr!=null;
+      }
+      @Override public void remove(){
+        final UncheckedList$<E>$ parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          $DNode$$<E>$ curr;
+          if((curr=this.curr)==null){
+            (curr=parent.tail.prev).next=null;
+            parent.tail=curr;
+          }else{
+            $DNode$$<E>$ lastRet;
+            if((lastRet=curr.prev)==parent.head){
+              parent.head=curr;
+              curr.prev=null;
+            }else{
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
+            }
+          }
+        }
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final $DNode$$<E>$ curr;
+        this.curr=(curr=this.curr).next;
+        return curr.val;
+      }
+      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachAscending(curr,action);
+          this.curr=null;
+        }
+      }
+#IFNOT OfRef
+      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachAscending(curr,action::accept);
+          this.curr=null;
+        }
+      }
+#ENDIF
+    }
+    private static class DescendingItr$<E>$ extends AscendingItr$<E>${
+      private DescendingItr(UncheckedList$<E>$ parent){
+        super(parent,parent.tail);
+      }
+      @Override public void remove(){
+        final UncheckedList$<E>$ parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          $DNode$$<E>$ curr;
+          if((curr=this.curr)==null){
+            (curr=parent.head.next).prev=null;
+            parent.head=curr;
+          }else{
+            $DNode$$<E>$ lastRet;
+            if((lastRet=curr.next)==parent.tail){
+              parent.tail=curr;
+              curr.next=null;
+            }else{
+              curr.next=lastRet=lastRet.next;
+              lastRet.prev=curr;
+            }
+          }
+        }
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final $DNode$$<E>$ curr;
+        this.curr=(curr=this.curr).prev;
+        return curr.val;
+      }
+      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachDescending(curr,action);
+          this.curr=null;
+        }
+      }
+#IFNOT OfRef
+      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachDescending(curr,action::accept);
+          this.curr=null;
+        }
+      }
+#ENDIF
+    }
+    private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
+      transient int currIndex;
+      transient $DNode$$<E>$ lastRet;
+      private BidirectionalItr(UncheckedList$<E>$ parent){
+        super(parent);
+      }
+      private BidirectionalItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+        super(parent,curr);
+        this.currIndex=currIndex;
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final $DNode$$<E>$ curr;
+        this.lastRet=curr=this.curr;
+        this.curr=curr.next;
+        ++this.currIndex;
+        return curr.val;
+      }
+      @Override public $exposedType$ previous$TypeNameModifier$(){
+        $DNode$$<E>$ curr;
+        this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+        this.curr=curr;
+        --this.currIndex;
+        return curr.val;
+      }
+      @Override public boolean hasPrevious(){
+        return curr.prev!=null;
+      }
+      @Override public int nextIndex(){
+        return currIndex;
+      }
+      @Override public int previousIndex(){
+        return currIndex-1;
+      }
+      @Override public void add($exposedType$ val){
+        final UncheckedList$<E>$ parent;
+        $DNode$$<E>$ newNode;
+        final int currIndex;
+        if((currIndex=++this.currIndex)==++(parent=this.parent).size){
+          if(currIndex==1){
+            parent.head=newNode=new $DNode$$<E>$(val);
+          }else{
+            (newNode=parent.tail).next=newNode=new $DNode$$<E>$(newNode,val);
+          }
+          parent.tail=newNode;
+        }else{
+          if(currIndex==1){
+            (newNode=parent.head).prev=newNode=new $DNode$$<E>$(val,newNode);
+          }else{
+            final $DNode$$<E>$ tmp;
+            (newNode=curr).prev=newNode=new $DNode$$<E>$(tmp=newNode.prev,val,newNode);
+            tmp.next=newNode;
+          }
+        }
+        this.lastRet=null;
+      }
+      @Override public void set($exposedType$ val){
+        lastRet.val=val;
+      }
+      
+      
+      @Override public void remove(){
+        $DNode$$<E>$ lastRet;
+        if((lastRet=this.lastRet).next==curr){
+          --currIndex;
+        }
+        final UncheckedList$<E>$ parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          if(lastRet==parent.tail){
+            parent.tail=lastRet=lastRet.prev;
+            lastRet.next=null;
+          }else if(lastRet==parent.head){
+            parent.head=lastRet=lastRet.next;
+            lastRet.prev=null;
+          }else{
+            $DNode$.eraseNode(lastRet);
+          }
+        }
+        this.lastRet=null;
+      }
+      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachAscending(curr,action);
+          final UncheckedList$<E>$ parent;
+          this.lastRet=(parent=this.parent).tail;
+          this.currIndex=parent.size;
+          this.curr=null;
+        }
+      }
+#IFNOT OfRef
+      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+        final $DNode$$<E>$ curr;
+        if((curr=this.curr)!=null){
+          $DNode$.uncheckedForEachAscending(curr,action::accept);
+          final UncheckedList$<E>$ parent;
+          this.lastRet=(parent=this.parent).tail;
+          this.currIndex=parent.size;
+          this.curr=null;
+        }
+      }
+#ENDIF
+    }
   }
 }
-#MACRODEF ToArrayImpl(RETTYPE,DEFAULTARR,CLASSPREFIX)
+#MACRODEF ToArrayImpl<CHECKED>(RETTYPE,DEFAULTARR,CLASSPREFIX)
 @Override public RETTYPE[] toCLASSPREFIXArray(){
+#IFSWITCH CHECKED==true
+  CheckedCollection.checkModCount(modCount,root.modCount);
+  return super.toCLASSPREFIXArray();
+#ELSE
   int size;
   if((size=this.size)!=0){
     final RETTYPE[] dst;
@@ -2284,9 +2610,58 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     return dst;
   }
   return DEFAULTARR;
+#ENDIF
 }
 #ENDDEF
-#MACRODEF QueryMethods<METHODNAME>()
+#MACRODEF QueryMethods<METHODNAME,STRUCTNAME,CHECKED>()
+#IFSWITCH STRUCTNAME==Root
+#MACRO QueryMethod<boolean>( )
+#MACRO QueryMethod<int>( )
+#MACRO QueryMethod<long>( )
+#MACRO QueryMethod<float>( )
+#MACRO QueryMethod<double>( )
+#MACRO QueryMethod<Object>( )
+  #IF OfByte
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+  #ENDIF
+  #IF OfInt,OfLong
+    #IFSWITCH METHODNAME==contains,removeVal
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+    #ENDIF
+  #ENDIF
+  #IF OfRef
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfDouble
+    #IFSWITCH METHODNAME==removeVal,contains
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+    #ENDIF
+  #ENDIF
+  #IF OfChar,OfFloat,OfShort
+#IFSWITCH METHODNAME==contains,removeVal
+#MACRO QueryMethod<byte>( )
+#ENDIF
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfRef
+#MACRO QueryMethod<Boolean>((boolean))
+#MACRO QueryMethod<Byte>((byte))
+#MACRO QueryMethod<Character>((char))
+#MACRO QueryMethod<Short>((short))
+#MACRO QueryMethod<Integer>((int))
+#MACRO QueryMethod<Long>((long))
+#MACRO QueryMethod<Float>((float))
+#MACRO QueryMethod<Double>((double))
+  #ENDIF
+#ELSE
+  #IFSWITCH METHODNAME==removeVal
 #MACRO QueryMethod<boolean>( )
 #MACRO QueryMethod<int>( )
 #MACRO QueryMethod<long>( )
@@ -2312,7 +2687,59 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
 #MACRO QueryMethod<Float>((float))
 #MACRO QueryMethod<Double>((double))
   #ENDIF
+  #ELSE
+    #IFSWITCH CHECKED==true
+#MACRO QueryMethod<boolean>( )
+#MACRO QueryMethod<int>( )
+#MACRO QueryMethod<long>( )
+#MACRO QueryMethod<float>( )
+#MACRO QueryMethod<double>( )
+#MACRO QueryMethod<Object>( )
+  #IF OfInt,OfLong
+    #IFSWITCH METHODNAME==contains
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+    #ENDIF
+  #ENDIF
+  #IF OfByte
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+  #ENDIF
+  #IF OfRef
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfDouble
+    #IFSWITCH METHODNAME==contains
+#MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+    #ENDIF
+  #ENDIF
+  #IF OfChar,OfFloat,OfShort
+#IFSWITCH METHODNAME==contains
+#MACRO QueryMethod<byte>( )
+#ENDIF
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfRef
+#MACRO QueryMethod<Boolean>((boolean))
+#MACRO QueryMethod<Byte>((byte))
+#MACRO QueryMethod<Character>((char))
+#MACRO QueryMethod<Short>((short))
+#MACRO QueryMethod<Integer>((int))
+#MACRO QueryMethod<Long>((long))
+#MACRO QueryMethod<Float>((float))
+#MACRO QueryMethod<Double>((double))
+  #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  
 #ENDDEF
+
 #MACRODEF SizeCheck()
 #IFSWITCH METHODNAME==contains,indexOf,search,removeVal
 final $DNode$$<E>$ head;
@@ -2401,7 +2828,11 @@ ERROR unknown method name METHODNAME in ReturnUncheckedQuery(VAL)
 ERROR ReturnUncheckedQueryNonNull(VAL) is not valid for $ClassPrefix$
 #ENDIF
 #IFSWITCH METHODNAME==contains,indexOf
+  #IFSWITCH CHECKED==true
+return $DNode$.uncheckedMETHODNAMENonNull(head,this.size,VAL);
+  #ELSE
 return $DNode$.uncheckedMETHODNAMENonNull(head,tail,VAL);
+  #ENDIF
 #ELSEIFSWITCH METHODNAME==search
 return $DNode$.uncheckedMETHODNAMENonNull(head,VAL);
 #ELSEIFSWITCH METHODNAME==lastIndexOf
@@ -2433,10 +2864,46 @@ ERROR unknown method name METHODNAME in ReturnUncheckedQueryNull()
 #ENDIF
 #ENDDEF
 #MACRODEF CheckedSubListQueryModCountDecl()
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==true
+    #IFNOTSWITCH METHODNAME==removeVal
+      #IF OfRef
+        #IFSWITCH INPUTTYPE==Object
+final int modCount=this.modCount;
+try
+        #ELSE
+CheckedCollection.checkModCount(modCount,root.modCount);
+        #ENDIF
+      #ELSE
+CheckedCollection.checkModCount(modCount,root.modCount);
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
 #ENDDEF
 #MACRODEF CheckedSubListQueryFinallyModCount()
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==true
+    #IFNOTSWITCH METHODNAME==removeVal
+      #IF OfRef
+        #IFSWITCH INPUTTYPE==Object
+finally{
+  CheckedCollection.checkModCount(modCount,root.modCount);
+}
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
 #ENDDEF
 #MACRODEF CheckedSubListRemoveValModCountCheck()
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==true
+    #IFSWITCH METHODNAME==removeVal
+CheckedCollection.checkModCount(modCount,root.modCount);
+    #ENDIF
+  #ENDIF
+#ENDIF
 #ENDDEF
 #MACRODEF QueryMethod<INPUTTYPE>(CAST)
 #IFSWITCH METHODNAME==removeVal
@@ -2970,10 +3437,10 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
 #ENDIF
 #ENDDEF
 #MACRODEF UncheckedRemoveVal<STRUCTNAME,CHECKED,SUFFIX>(POSTEST)
+#IFSWITCH STRUCTNAME==Root
 boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
 #MACRO UncheckedQueryParam()
 ){
-#IFSWITCH STRUCTNAME==Root
   #IFSWITCH CHECKED==true
     #IFSWITCH SUFFIX==NonNull
   int modCount=this.modCount;
@@ -3028,11 +3495,104 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     #ENDIF
   #ENDIF
   return false;
-#ELSE
- //TODO
- return false;
-#ENDIF
 }
+#ELSE
+private boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
+#MACRO UncheckedQueryParam()
+){
+#IFSWITCH CHECKED==true
+  #IFSWITCH SUFFIX==NonNull
+  int modCount=this.modCount;
+  final var root=this.root;
+  try
+  #ELSE
+  int modCount;
+  final CheckedList$<E>$ root;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+  #ENDIF
+  {
+    if(POSTEST(head.val)){
+  #IFSWITCH SUFFIX==NonNull
+      CheckedCollection.checkModCount(modCount,root.modCount);
+  #ENDIF
+      root.modCount=++modCount;
+      --root.size;
+      this.modCount=modCount;
+      if(--this.size==0){
+        removeLastNode(head);
+      }else{
+        peelHead(head);
+      }
+      return true;
+    }else{
+  #IFSWITCH SUFFIX==NonNull
+      for(int numLeft,size=numLeft=this.size;--numLeft!=0;){
+  #ELSE
+      for(final var tail=this.tail;tail!=head;){
+  #ENDIF
+        if(POSTEST((head=head.next).val)){
+  #IFSWITCH SUFFIX==NonNull
+          CheckedCollection.checkModCount(modCount,root.modCount);
+  #ENDIF
+          root.modCount=++modCount;
+          --root.size;
+          this.modCount=modCount;
+          this.size=size-1;
+  #IFSWITCH SUFFIX==NonNull
+          if(numLeft==1){
+  #ELSE
+          if(head==tail){
+  #ENDIF
+            peelTail(head);
+          }else{
+            $DNode$$<E>$ before,after;
+            (before=head.prev).next=(after=head.next);
+            after.prev=before;
+            bubbleUpDecrementSize();
+          }
+          return true;
+        }
+      }
+    }
+  }
+  #IFSWITCH SUFFIX==NonNull
+  catch(ConcurrentModificationException e){
+    throw e;
+  }catch(RuntimeException e){
+    throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+  }
+  CheckedCollection.checkModCount(modCount,root.modCount);
+  #ENDIF
+#ELSE
+  if(POSTEST(head.val)){
+    --root.size;
+    if(--this.size==0){
+      removeLastNode(head);
+    }else{
+      peelHead(head);
+    }
+    return true;
+  }else{
+    for(final var tail=this.tail;tail!=head;){
+      if(POSTEST((head=head.next).val)){
+        --root.size;
+        --this.size;
+        if(head==tail){
+          peelTail(head);
+        }else{
+          $DNode$$<E>$ before,after;
+          (before=head.prev).next=(after=head.next);
+          after.prev=before;
+          bubbleUpDecrementSize();
+        }
+        return true;
+      }
+    }
+  }
+#ENDIF
+  return false;
+}
+#ENDIF
 #ENDDEF
 #MACRODEF UncheckedRemoveLastOccurrence<CHECKED,SUFFIX>(POSTEST)
 boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
@@ -3183,8 +3743,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 #ENDIF
 {
   final int size;
-  if((size=this.size)>1)
-  {
+  if((size=this.size)>1){
     //todo: see about making an in-place sort implementation rather than copying to an array
     final $ArrayType$[] tmp;
     final $DNode$$<E>$ tail;
@@ -3209,8 +3768,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     }
 #IFSWITCH CHECKED==true
   #IFSWITCH STRUCTNAME==SubList
-    finally
-    {
+    finally{
       final CheckedList$<E>$ root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       root.modCount=++modCount;
@@ -3219,8 +3777,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     }
   #ELSE
     #IF OfRef
-    finally
-    {
+    finally{
       CheckedCollection.checkModCount(modCount,this.modCount);
       this.modCount=modCount+1;
     }
@@ -3233,8 +3790,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   }
 #IFSWITCH CHECKED==true
   #IFSWITCH STRUCTNAME==SubList
-  else
-  {
+  else{
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
   #ENDIF
@@ -3248,8 +3804,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 @Override public void unstableSort(COMPARATOR sorter){
 #ENDIF
   final int size;
-  if((size=this.size)>1)
-  {
+  if((size=this.size)>1){
     //todo: see about making an in-place sort implementation rather than copying to an array
     final $ArrayType$[] tmp;
     final $DNode$$<E>$ tail;
@@ -3261,8 +3816,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   #ENDIF
 #ENDIF
     {
-      if(sorter==null)
-      {
+      if(sorter==null){
 #IFSWITCH CHECKED==true
   #IFNOT OfRef
     #IFSWITCH STRUCTNAME==SubList
@@ -3282,9 +3836,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 #ELSE
         $ClassPrefix$SortUtil.uncheckedAscendingSort(tmp,0,size);
 #ENDIF
-      }
-      else
-      {
+      }else{
 #IFSWITCH CHECKED==true
   #IFNOT OfRef
         int modCount=this.modCount;
@@ -3300,8 +3852,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
         }
 #IFSWITCH CHECKED==true
   #IFNOT OfRef
-        finally
-        {
+        finally{
     #IFSWITCH STRUCTNAME==Root
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
@@ -3319,8 +3870,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
     }
 #IFSWITCH CHECKED==true
   #IF OfRef
-    finally
-    {
+    finally{
     #IFSWITCH STRUCTNAME==Root
       CheckedCollection.checkModCount(modCount,this.modCount);
       this.modCount=modCount+1;
@@ -3338,12 +3888,759 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
   }
 #IFSWITCH CHECKED==true
   #IFSWITCH STRUCTNAME==SubList
-  else
-  {
+  else{
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
   #ENDIF
 #ENDIF
 }
 #ENDDEF
+#MACRODEF SubListAddMethods<CHECKED>()
+private void bubbleUpAppend($DNode$$<E>$ newNode){
+  for(var curr=this;;){
+    curr.tail=newNode;
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    if((curr=curr.parent)==null){
+      break;
+    }
+    ++curr.size;
+  }
+}
+private void bubbleUpAppend($DNode$$<E>$ newNode,$DNode$$<E>$ oldTail){
+  for(var curr=this;;){
+    curr.tail=newNode;
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    if((curr=curr.parent)==null){
+      return;
+    }
+    ++curr.size;
+    if(curr.tail!=oldTail){
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      curr.bubbleUpIncrementSize();
+      return;
+    }
+  }
+}
+private void bubbleUpPrepend($DNode$$<E>$ newNode){
+  for(var curr=this;;){
+    curr.head=newNode;
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    if((curr=curr.parent)==null){
+      break;
+    }
+    ++curr.size;
+  }
+}
+private void bubbleUpPrepend($DNode$$<E>$ newNode,$DNode$$<E>$ oldHead){
+  for(var curr=this;;){
+    curr.head=newNode;
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    if((curr=curr.parent)==null){
+      return;
+    }
+    ++curr.size;
+    if(curr.head!=oldHead){
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      curr.bubbleUpIncrementSize();
+      return;
+    }
+  }
+}
+private void bubbleUpIncrementSize(){
+  for(var curr=parent;curr!=null;
+#IFSWITCH CHECKED==Checked
+  ++curr.modCount,
+#ENDIF
+  ++curr.size,curr=curr.parent){}
+}
+@Override public void add(int index,$exposedType$ val){
+  int size;
+  CHECKEDSubList$<E>$ curr;
+#IFSWITCH CHECKED==Checked
+  final CHECKEDList$<E>$ root;
+  int modCount;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+  CheckedCollection.checkLo(index);
+  CheckedCollection.checkWriteHi(index,size=this.size);
+  root.modCount=++modCount;
+  (curr=this).size=++size;
+  final var newNode=new $DNode$$<E>$(val);
+  if(size==1){
+#ELSE
+  final var newNode=new $DNode$$<E>$(val);
+  if((size=++(curr=this).size)==1){
+#ENDIF
+    //initialize this list
+    CHECKEDSubList$<E>$ parent;
+    do{
+      curr.head=newNode;
+      curr.tail=newNode;
+#IFSWITCH CHECKED==Checked
+      curr.modCount=modCount;
+#ENDIF
+      if((parent=curr.parent)==null){
+        //all parents were empty, insert in the root
+        (($ClassPrefix$DblLnkSeq$<E>$)root).insertNode(curr.parentOffset,newNode);
+        return;
+      }
+    }
+    while((size=++(curr=parent).size)==1);
+  }
+#IFSWITCH CHECKED==Checked
+  ++root.size;
+#ELSE
+  final CHECKEDList$<E>$ root;
+  ++(root=this.root).size;
+#ENDIF
+  $DNode$$<E>$ before,after;
+  if((size-=index)<index){
+    //the insertion point is closer to the tail
+    if(size==1){
+      //the insertion point IS the tail
+      if((after=(before=curr.tail).next)==null){
+        //there are no nodes after this list
+        curr.bubbleUpAppend(newNode);
+        root.tail=newNode;
+      }else{
+        //there are nodes after this list
+        curr.bubbleUpAppend(newNode,before);
+        after.prev=newNode;
+      }
+    }else{
+      //iterate from the tail and insert
+      before=(after=$DNode$.iterateDescending(curr.tail,size-1)).prev;
+      after.prev=newNode;
+#IFSWITCH CHECKED==Checked
+      curr.modCount=modCount;
+#ENDIF
+      curr.bubbleUpIncrementSize();
+    }
+    before.next=newNode;
+  }else{
+    //the insertion point is closer to the head
+    if(index==0){
+      //the insertion point IS the tail
+      if((before=(after=curr.head).prev)==null){
+        //there are no nodes before this list
+        curr.bubbleUpPrepend(newNode);
+        root.head=newNode;
+      }else{
+        //there are nodes before this list
+        curr.bubbleUpPrepend(newNode,after);
+        before.next=newNode;
+      }
+    }else{
+      //iterate from the head and insert
+      after=(before=$DNode$.iterateAscending(curr.head,index-1)).next;
+      before.next=newNode;
+#IFSWITCH CHECKED==Checked
+      curr.modCount=modCount;
+#ENDIF
+      curr.bubbleUpIncrementSize();
+    }
+    after.prev=newNode;
+  }
+  newNode.next=after;
+  newNode.prev=before;
+}
+@Override void addLast($exposedType$ val){
+#IFSWITCH CHECKED==Checked
+  final CHECKEDList$<E>$ root;
+  int modCount;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+  root.modCount=++modCount;
+#ELSE
+  final CHECKEDList$<E>$ root=this.root;
+#ENDIF
+  var newNode=new $DNode$$<E>$(val);
+  CHECKEDSubList$<E>$ parent,curr=this;
+  for(;++curr.size==1;curr=parent){
+    curr.head=newNode;
+    curr.tail=newNode;
+#IFSWITCH CHECKED==Checked
+    curr.modCount=modCount;
+#ENDIF
+    if((parent=curr.parent)==null){
+      //all parents were empty, insert in the root
+      (($ClassPrefix$DblLnkSeq$<E>$)root).insertNode(curr.parentOffset,newNode);
+      return;
+    }
+  }
+  $DNode$$<E>$ oldTail,after;
+  if((after=(oldTail=curr.tail).next)==null){
+    curr.bubbleUpAppend(newNode);
+    root.tail=newNode;
+  }else{
+    curr.bubbleUpAppend(newNode,oldTail);
+    after.prev=newNode;
+  }
+  ++root.size;
+  newNode.next=after;
+  oldTail.next=newNode;
+  newNode.prev=oldTail;
+}
+#ENDDEF
+#MACRODEF RootRemoveMethods<CHECKED>()
+@Override public $exposedType$ removeLast$TypeNameModifier$(){
+  $DNode$$<E>$ tail;
+#IFSWITCH CHECKED==Checked
+  if((tail=this.tail)!=null){
+    ++this.modCount;
+    final var ret=tail.val;
+#ELSE
+  final var ret=(tail=this.tail).val;{
+#ENDIF
+  if(--size==0){
+      this.head=null;
+      this.tail=null;
+    }else{
+      (tail=tail.prev).next=null;
+      this.tail=tail;
+    }
+    return ret;
+  }
+#IFSWITCH CHECKED==Checked
+  throw new NoSuchElementException();
+#ENDIF
+}
+@Override public $exposedType$ pop$TypeNameModifier$(){
+  $DNode$$<E>$ head;
+#IFSWITCH CHECKED==Checked
+  if((head=this.head)!=null){
+    ++this.modCount;
+    final var ret=head.val;
+#ELSE
+  final var ret=(head=this.head).val;{
+#ENDIF
+  if(--size==0){
+      this.head=null;
+      this.tail=null;
+    }else{
+      (head=head.next).prev=null;
+      this.head=head;
+    }
+    return ret;
+  }
+#IFSWITCH CHECKED==Checked
+  throw new NoSuchElementException();
+#ENDIF
+}
+@Override public $exposedType$ $removeAtIndexMethod$(int index){
+  final $exposedType$ ret;
+#IFSWITCH CHECKED==Checked
+  CheckedCollection.checkLo(index);
+  int size;
+  CheckedCollection.checkReadHi(index,size=this.size);
+  ++this.modCount;
+  this.size=--size;
+  if((size-=index)<=index){
+#ELSE
+  int size;
+  if((size=--this.size-index)<=index){
+#ENDIF
+    //the node to remove is closer to the tail
+    var tail=this.tail;
+    if(size==0){
+      //the node to the remove IS the tail
+      ret=tail.val;
+      if(index==0){
+        //the node is the last node
+        this.head=null;
+        this.tail=null;
+      }else{
+        //peel off the tail
+        this.tail=tail=tail.prev;
+        tail.next=null;
+      }
+    }else{
+      //iterate from the tail
+      $DNode$$<E>$ before;
+      ret=(before=(tail=$DNode$.iterateDescending(tail,size-1)).prev).val;
+      (before=before.prev).next=tail;
+      tail.prev=before;
+    }
+  }else{
+    //the node to remove is close to the head
+    var head=this.head;
+    if(index==0){
+      //peel off the head
+      ret=head.val;
+      this.head=head=head.next;
+      head.prev=null;
+    }else{
+      //iterate from the head
+      $DNode$$<E>$ after;
+      ret=(after=(head=$DNode$.iterateAscending(head,index)).next).val;
+      (after=after.next).prev=head;
+      head.next=after;
+    }
+  }
+  return ret;
+}
+#ENDDEF
+#MACRODEF RootAddMethods<CHECKED>()
+@Override public void add(int index,$exposedType$ val){
+  int size;
+#IFSWITCH CHECKED==Checked
+  CheckedCollection.checkLo(index);
+  CheckedCollection.checkWriteHi(index,size=this.size);
+  ++this.modCount;
+  this.size=++size;
+  if((size-=index)<index){
+#ELSE
+  if((size=++this.size-index)<index){
+#ENDIF
+    //the insertion point is closer to the tail
+    var tail=this.tail;
+    if(size==1){
+      //the insertion point IS the tail
+      tail.next=tail=new $DNode$$<E>$(tail,val);
+      this.tail=tail;
+    }else{
+      //iterate from the tail and insert
+      $DNode$$<E>$ before;
+      (before=(tail=$DNode$.iterateDescending(tail,size-1)).prev).next=before=new $DNode$$<E>$(before,val,tail);
+      tail.prev=before;
+    }
+  }else{
+    //the insertion point is closer to the head
+    $DNode$$<E>$ head;
+    if((head=this.head)==null){
+      //initialize the list
+      this.head=head=new $DNode$$<E>$(val);
+      this.tail=head;
+    }else if(index==0){
+      //the insertion point IS the head
+      head.prev=head=new $DNode$$<E>$(val,head);
+      this.head=head;
+    }else{
+      //iterate from the head and insert
+      $DNode$$<E>$ after;
+      (after=(head=$DNode$.iterateAscending(head,index-1)).next).prev=after=new $DNode$$<E>$(head,val,after);
+      head.next=after;
+    }
+  }
+}
+#IFSWITCH CHECKED==Checked
+@Override public void addLast($exposedType$ val){
+  ++this.modCount;
+  super.addLast(val);
+}
+@Override public void push($exposedType$ val){
+  ++this.modCount;
+  super.push(val);
+}
+#ELSE
+@Override public void addLast($exposedType$ val){
+  $DNode$$<E>$ tail;
+  if((tail=this.tail)==null){
+    this.head=tail=new $DNode$$<E>$(val);
+  }else{
+    tail.next=tail=new $DNode$$<E>$(tail,val);
+  }
+  this.tail=tail;
+  ++this.size;
+}
+@Override public void push($exposedType$ val){
+  $DNode$$<E>$ head;
+  if((head=this.head)==null){
+    this.head=tail=new $DNode$$<E>$(val);
+  }else{
+    head.prev=head=new $DNode$$<E>$(val,head);
+  }
+  this.head=head;
+  ++this.size;
+}
+#ENDIF
+#ENDDEF
+#MACRODEF SubListRemoveAtIndexMethod<CHECKED>()
+private void bubbleUpPeelHead($DNode$$<E>$ newHead,$DNode$$<E>$ oldHead){
+  var curr=parent;
+  do{
+    if(curr.head!=oldHead){
+      curr.bubbleUpPeelHead(newHead);
+      break;
+    }
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    curr.size=0;
+    curr.head=null;
+    curr.tail=null;
+  }while((curr=curr.parent)!=null);
+}
+private void bubbleUpPeelHead($DNode$$<E>$ newHead){
+  var curr=this;
+  do{
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    curr.head=newHead;
+    --curr.size; 
+  }while((curr=curr.parent)==null);
+}
+private void bubbleUpPeelTail($DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
+  var curr=parent;
+  do{
+    if(curr.tail!=oldTail){
+      curr.bubbleUpPeelTail(newTail);
+      break;
+    }
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    curr.size=0;
+    curr.head=null;
+    curr.tail=null;
+  }while((curr=curr.parent)!=null);
+}
+private void bubbleUpPeelTail($DNode$$<E>$ newTail){
+  var curr=this;
+  do{
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    curr.tail=newTail;
+    --curr.size;
+  }while((curr=curr.parent)==null);
+}
+private void uncheckedBubbleUpDecrementSize(){
+  var curr=this;
+  do{
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    --curr.size;    
+  }while((curr=curr.parent)!=null);
+}
+private void bubbleUpDecrementSize(){
+   CHECKEDSubList$<E>$ parent;
+   if((parent=this.parent)!=null){
+     parent.uncheckedBubbleUpDecrementSize();
+   }
+}
+private void peelTail($DNode$$<E>$ tail){
+  $DNode$$<E>$ after,before;
+  (before=tail.prev).next=(after=tail.next);
+  this.tail=before;
+  if(after==null){
+    for(var curr=this.parent;curr!=null;curr=curr.parent){
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      --curr.size;
+      curr.tail=before;
+    }
+    root.tail=before;
+  }else{
+    after.prev=before;
+    for(var curr=this.parent;curr!=null;curr=curr.parent){
+      if(curr.tail!=tail){
+        curr.uncheckedBubbleUpDecrementSize();
+        break;
+      }
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      --curr.size;
+      curr.tail=before;
+    }
+  }
+}
+private void removeLastNode($DNode$$<E>$ lastNode){
+  $DNode$$<E>$ after,before=lastNode.prev;
+  if((after=lastNode.next)==null){
+    CHECKEDList$<E>$ root;
+    (root=this.root).tail=before;
+    if(before==null){
+      for(var curr=parent;curr!=null;
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount,
+#ENDIF
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+      root.head=null;
+    }else{
+      before.next=null;
+      bubbleUpPeelTail(before,lastNode);
+    }
+  }else{
+    if(before==null){
+      after.prev=null;
+      bubbleUpPeelHead(after,lastNode);
+      root.head=after;
+    }else{
+      var curr=parent;
+      do{
+        if(curr.head!=lastNode){
+          do{
+            if(curr.tail!=lastNode){
+              curr.uncheckedBubbleUpDecrementSize();
+              break;
+            }
+#IFSWITCH CHECKED==Checked
+            ++curr.modCount;
+#ENDIF
+            --curr.size;
+            curr.tail=before;
+          }
+          while((curr=curr.parent)!=null);
+          break;
+        }
+        if(curr.tail!=lastNode){
+          for(;;){
+#IFSWITCH CHECKED==Checked
+            ++curr.modCount;
+#ENDIF
+            --curr.size;
+            curr.head=after;
+            if((curr=curr.parent)==null){
+              break;
+            }
+            if(curr.head!=lastNode){
+              curr.uncheckedBubbleUpDecrementSize();
+              break;
+            }
+          }
+          break;
+        }
+#IFSWITCH CHECKED==Checked
+        ++curr.modCount;
+#ENDIF
+        curr.head=null;
+        curr.tail=null;
+        curr.size=0;
+      }
+      while((curr=curr.parent)!=null);
+    }
+  }
+  this.head=null;
+  this.tail=null;
+}
+private void peelHead($DNode$$<E>$ head){
+  $DNode$$<E>$ after,before;
+  (after=head.next).prev=(before=head.prev);
+  this.head=after;
+  if(before==null){
+    for(var curr=this.parent;curr!=null;curr=curr.parent){
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      --curr.size;
+      curr.head=after;
+    }
+    root.head=after;
+  }else{
+    before.next=after;
+    for(var curr=this.parent;curr!=null;curr=curr.parent){
+      if(curr.head!=head){
+        curr.uncheckedBubbleUpDecrementSize();
+        break;
+      }
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      --curr.size;
+      curr.head=after;
+    }
+  }
+}
+@Override public $exposedType$ $removeAtIndexMethod$(int index){
+  final $exposedType$ ret;
+  int size;
+#IFSWITCH CHECKED==Checked
+  final CHECKEDList$<E>$ root;
+  int modCount;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+  CheckedCollection.checkLo(index);
+  CheckedCollection.checkReadHi(index,size=this.size);
+  root.modCount=++modCount;
+  this.modCount=modCount;
+  this.size=--size;
+  if((size-=index)<=index){
+#ELSE
+  if((size=(--this.size)-index)<=index){
+#ENDIF
+    var tail=this.tail;
+    if(size==0){
+      ret=tail.val;
+      if(index==0){
+        removeLastNode(tail);
+      }else{
+        peelTail(tail);
+      }
+    }else{
+      $DNode$$<E>$ before;
+      ret=(before=( tail=$DNode$.iterateDescending(tail,size-1)).prev).val;
+      (before=before.prev).next=tail;
+      tail.prev=before;
+      bubbleUpDecrementSize();
+    }
+  }else{
+    var head=this.head;
+    if(index==0){
+      ret=head.val;
+      peelHead(head);
+    }else{
+      $DNode$$<E>$ after;
+      ret=(after=( head=$DNode$.iterateAscending(head,index)).next).val;
+      (after=after.next).prev=head;
+      head.next=after;
+      bubbleUpDecrementSize();
+    }
+  }
+  --root.size;
+  return ret;
+}
+#ENDDEF
+#MACRODEF SubListClear<CHECKED>()
+@Override public void clear(){
+#IFSWITCH CHECKED==Checked
+  final CHECKEDList$<E>$ root;
+  int modCount;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+#ENDIF
+  int size;
+  if((size=this.size)!=0){
+#IFSWITCH CHECKED==Checked
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    root.size-=size;
+#ELSE
+    final UncheckedList$<E>$ root;
+    (root=this.root).size-=size;
+#ENDIF
+    clearAllHelper(size,root);
+  }
+}
+private void clearAllHelper(int size,CHECKEDList$<E>$ root)
+{
+  $DNode$$<E>$ before,head,tail,after=(tail=this.tail).next;
+  if((before=(head=this.head).prev)==null){
+    //this sublist is not preceded by nodes
+    if(after==null){
+      bubbleUpClearAll();
+      root.head=null;
+      root.tail=null;
+    }else{
+      after.prev=null;
+      bubbleUpClearHead(tail,after,size);
+      root.head=after;
+    }
+  }else{
+    before.next=after;
+    if(after==null){
+      bubbleUpClearTail(head,before,size);
+      root.tail=before;
+    }else{
+      after.prev=before;
+      bubbleUpClearBody(before,head,size,tail,after);
+    }
+  }
+  this.head=null;
+  this.tail=null;
+  this.size=0;
+}
+
+private void bubbleUpClearAll(){
+  for(var curr=parent;curr!=null;
+#IFSWITCH CHECKED==Checked
+  ++curr.modCount,
+#ENDIF
+  curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+}
+private void bubbleUpDecrementSize(int numRemoved){
+  var curr=this;
+  do{
+#IFSWITCH CHECKED==Checked
+    ++curr.modCount;
+#ENDIF
+    curr.size-=numRemoved;
+  }while((curr=curr.parent)!=null);
+}
+private void bubbleUpClearBody($DNode$$<E>$ before,$DNode$$<E>$ head,int numRemoved,$DNode$$<E>$ tail,$DNode$$<E>$ after){
+  for(var curr=parent;curr!=null;
+#IFSWITCH CHECKED==Checked
+  ++curr.modCount,
+#ENDIF
+  curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+    if(curr.head!=head){
+      while(curr.tail==tail){
+#IFSWITCH CHECKED==Checked
+        ++curr.modCount;
+#ENDIF
+        curr.tail=before;
+        curr.size-=numRemoved;
+        if((curr=curr.parent)==null){
+          return;
+        }
+      }
+      curr.bubbleUpDecrementSize(numRemoved);
+      return;
+    }else if(curr.tail!=tail){
+      do{
+#IFSWITCH CHECKED==Checked
+        ++curr.modCount;
+#ENDIF
+        curr.head=after;
+        curr.size-=numRemoved;
+        if((curr=curr.parent)==null){
+          return;
+        }
+      }while(curr.head==head);
+      curr.bubbleUpDecrementSize(numRemoved);
+      return;
+    }
+  }
+}
+private void bubbleUpClearHead($DNode$$<E>$ tail, $DNode$$<E>$ after,int numRemoved){
+  for(var curr=parent;curr!=null;
+#IFSWITCH CHECKED==Checked
+  ++curr.modCount,
+#ENDIF
+  curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+    if(curr.tail!=tail){
+      do{
+#IFSWITCH CHECKED==Checked
+        ++curr.modCount;
+#ENDIF
+        curr.head=after;
+        curr.size-=numRemoved;
+      }while((curr=curr.parent)!=null);
+      break;
+    }
+  }
+}
+private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRemoved){
+  for(var curr=parent;curr!=null;
+#IFSWITCH CHECKED==Checked
+  ++curr.modCount,
+#ENDIF
+  curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+    if(curr.head!=head){
+      do{
+#IFSWITCH CHECKED==Checked
+        ++curr.modCount;
+#ENDIF
+        curr.tail=before;
+        curr.size-=numRemoved;
+      }
+      while((curr=curr.parent)!=null);
+      break;
+    }
+  }
+}
+#ENDDEF
+
 

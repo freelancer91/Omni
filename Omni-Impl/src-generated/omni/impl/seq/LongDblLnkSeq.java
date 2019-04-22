@@ -18,6 +18,9 @@ import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.api.OmniDeque;
 import java.io.Externalizable;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.IOException;
@@ -38,10 +41,56 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     this.head=head;
     this.tail=tail;
   }
-  @Override public void clear(){
-    this.head=null;
-    this.size=0;
-    this.tail=null;
+  abstract void addLast(long val);
+  @Override public boolean add(long val){
+    addLast(val);
+    return true;
+  }
+  private void iterateDescendingAndInsert(int dist,LongDblLnkNode after,LongDblLnkNode newNode){
+    newNode.next=after=LongDblLnkNode.iterateDescending(after,dist-2);
+    final LongDblLnkNode before;
+    newNode.prev=before=after.prev;
+    before.next=newNode;
+    after.prev=newNode;
+  }
+  private void iterateAscendingAndInsert(int dist,LongDblLnkNode before,LongDblLnkNode newNode){
+    newNode.prev=before=LongDblLnkNode.iterateAscending(before,dist-1);
+    final LongDblLnkNode after;
+    newNode.next=after=before.next;
+    before.next=newNode;
+    after.prev=newNode;
+  }
+  private void insertNode(int index,LongDblLnkNode newNode){
+    int tailDist;
+    if((tailDist=++this.size-index)<=index){
+      //the insertion point is closer to the tail
+      var tail=this.tail;
+      if(tailDist==1){
+        //the insertion point IS the tail
+        newNode.prev=tail;
+        tail.next=newNode;
+        this.tail=newNode;
+      }else{
+        //iterate from the root's tail
+        iterateDescendingAndInsert(tailDist,tail,newNode);
+      }
+    }else{
+      //the insertion point is closer to the head
+      LongDblLnkNode head;
+      if((head=this.head)==null){
+        //the root was empty, so initialize it
+        this.head=newNode;
+        this.tail=newNode;
+      }else if(index==0){
+        //the insertion point IS the head
+        head.prev=newNode;
+        newNode.next=head;
+        this.head=newNode;
+      }else{
+        //iterate from the root's head 
+        iterateAscendingAndInsert(index,head,newNode);
+      }
+    }
   }
   private static  int markSurvivors(LongDblLnkNode curr,LongPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
@@ -69,67 +118,14 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
     }
   }
-  public void addLast(long val){
-    LongDblLnkNode tail;
-    if((tail=this.tail)==null){
-      this.head=tail=new LongDblLnkNode(val);
-    }else{
-      tail.next=tail=new LongDblLnkNode(tail,val);
-    }
-    this.tail=tail;
-    ++this.size;
-  }
-  @Override public boolean add(long val){
-    addLast(val);
-    return true;
-  }
-  @Override public void add(int index,long val){
-    int tailDist;
-    if((tailDist=++this.size-index)<=index){
-      var tail=this.tail;
-      if(tailDist==1){
-        tail.next=tail=new LongDblLnkNode(tail,val);
-        this.tail=tail;
-      }else{
-        while(--tailDist!=1){
-          tail=tail.prev;
-        }
-        LongDblLnkNode before;
-        (before=tail.prev).next=before=new LongDblLnkNode(before,val,tail);
-        tail.prev=before;
-      }
-    }else{
-      LongDblLnkNode head;
-      if((head=this.head)==null){
-        this.head=head=new LongDblLnkNode(val);
-        this.tail=head;
-      }else if(index==0){
-        head.prev=head=new LongDblLnkNode(val,head);
-        this.head=head;
-      }else{
-        while(--index!=0){
-          head=head.next;
-        }
-        LongDblLnkNode after;
-        (after=head.next).prev=after=new LongDblLnkNode(head,val,after);
-        head.next=after;
-      }
-    }
-  }
   private LongDblLnkNode getNode(int index,int size){
     int tailDist;
     if((tailDist=size-index)<index){
-      for(var tail=this.tail;;tail=tail.prev){
-        if(--tailDist==0){
-          return tail;
-        }
-      }
+      //the node is closer to the tail
+      return LongDblLnkNode.iterateDescending(tail,tailDist-1);
     }else{
-      for(var head=this.head;;--index,head=head.next){
-        if(index==0){
-          return head;
-        }
-      }
+      //the node is closer to the head
+      return LongDblLnkNode.iterateAscending(head,index);
     }
   }
   @Override public long set(int index,long val){
@@ -143,37 +139,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   }
   @Override public long getLong(int index){
     return getNode(index,size).val;
-  }
-  @Override public long removeLongAt(int index){
-    final long ret;
-    int tailDist;
-    if((tailDist=--this.size-index)<=index){
-      var tail=this.tail;
-      if(tailDist==0){
-        ret=tail.val;
-        if(index==0){
-          this.head=null;
-          this.tail=null;
-        }else{
-          this.tail=tail=tail.prev;
-          tail.next=null;
-        }
-      }else{
-        ret=(tail=LongDblLnkNode.uncheckedIterateDescending(tail,tailDist)).val;
-        LongDblLnkNode.eraseNode(tail);
-      }
-    }else{
-      var head=this.head;
-      if(index==0){
-        ret=head.val;
-        this.head=head=head.next;
-        head.prev=null;
-      }else{
-        ret=(head=LongDblLnkNode.uncheckedIterateAscending(head,index)).val;
-        LongDblLnkNode.eraseNode(head);
-      }
-    }
-    return ret;
   }
   @Override public void forEach(LongConsumer action){
     final LongDblLnkNode head;
@@ -254,19 +219,15 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   }
   @Override public void sort(LongComparator sorter){
     final int size;
-    if((size=this.size)>1)
-    {
+    if((size=this.size)>1){
       //todo: see about making an in-place sort implementation rather than copying to an array
       final long[] tmp;
       final LongDblLnkNode tail;
       LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
       {
-        if(sorter==null)
-        {
+        if(sorter==null){
           LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        else
-        {
+        }else{
           {
             LongSortUtil.uncheckedStableSort(tmp,0,size,sorter);
           }
@@ -277,19 +238,15 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   }
   @Override public void sort(Comparator<? super Long> sorter){
     final int size;
-    if((size=this.size)>1)
-    {
+    if((size=this.size)>1){
       //todo: see about making an in-place sort implementation rather than copying to an array
       final long[] tmp;
       final LongDblLnkNode tail;
       LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
       {
-        if(sorter==null)
-        {
+        if(sorter==null){
           LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        else
-        {
+        }else{
           {
             LongSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
           }
@@ -301,8 +258,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   @Override public void stableAscendingSort()
   {
     final int size;
-    if((size=this.size)>1)
-    {
+    if((size=this.size)>1){
       //todo: see about making an in-place sort implementation rather than copying to an array
       final long[] tmp;
       final LongDblLnkNode tail;
@@ -316,8 +272,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   @Override public void stableDescendingSort()
   {
     final int size;
-    if((size=this.size)>1)
-    {
+    if((size=this.size)>1){
       //todo: see about making an in-place sort implementation rather than copying to an array
       final long[] tmp;
       final LongDblLnkNode tail;
@@ -330,19 +285,15 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   }
   @Override public void unstableSort(LongComparator sorter){
     final int size;
-    if((size=this.size)>1)
-    {
+    if((size=this.size)>1){
       //todo: see about making an in-place sort implementation rather than copying to an array
       final long[] tmp;
       final LongDblLnkNode tail;
       LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
       {
-        if(sorter==null)
-        {
+        if(sorter==null){
           LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        else
-        {
+        }else{
           {
             LongSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
           }
@@ -378,39 +329,547 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
     return 1;
   }
-  private static class UncheckedSubList extends LongDblLnkSeq
-  {
+  @Override public boolean contains(boolean val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedcontains(head,tail,TypeUtil.castToLong(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(int val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(long val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(float val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          final long v;
+          if(TypeUtil.floatEquals(val,v=(long)val))
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(double val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          final long v;
+          if(TypeUtil.doubleEquals(val,v=(long)val))
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(Object val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          //todo: a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            final long l;
+            if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+              l=((Number)val).longValue();
+            }else if(val instanceof Float){
+              final float f;
+              if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                break returnFalse;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                break returnFalse;
+              }
+            }else if(val instanceof Character){
+              l=(char)val;
+            }else if(val instanceof Boolean){
+              l=TypeUtil.castToLong((boolean)val);
+            }else{
+              break returnFalse;
+            }
+            return LongDblLnkNode.uncheckedcontains(head,tail,l);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(byte val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public boolean contains(char val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return false;
+  }
+  @Override public int indexOf(boolean val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedindexOf(head,tail,TypeUtil.castToLong(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int indexOf(int val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int indexOf(long val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int indexOf(float val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          final long v;
+          if(TypeUtil.floatEquals(val,v=(long)val))
+          {
+            return LongDblLnkNode.uncheckedindexOf(head,tail,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int indexOf(double val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          final long v;
+          if(TypeUtil.doubleEquals(val,v=(long)val))
+          {
+            return LongDblLnkNode.uncheckedindexOf(head,tail,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int indexOf(Object val){
+    {
+      {
+        final LongDblLnkNode head;
+        if((head=this.head)!=null)
+        {
+          //todo: a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            final long l;
+            if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+              l=((Number)val).longValue();
+            }else if(val instanceof Float){
+              final float f;
+              if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                break returnFalse;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                break returnFalse;
+              }
+            }else if(val instanceof Character){
+              l=(char)val;
+            }else if(val instanceof Boolean){
+              l=TypeUtil.castToLong((boolean)val);
+            }else{
+              break returnFalse;
+            }
+            return LongDblLnkNode.uncheckedindexOf(head,tail,l);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int lastIndexOf(boolean val){
+    {
+      {
+        final LongDblLnkNode tail;
+        if((tail=this.tail)!=null)
+        {
+          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,TypeUtil.castToLong(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int lastIndexOf(int val){
+    {
+      {
+        final LongDblLnkNode tail;
+        if((tail=this.tail)!=null)
+        {
+          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int lastIndexOf(long val){
+    {
+      {
+        final LongDblLnkNode tail;
+        if((tail=this.tail)!=null)
+        {
+          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int lastIndexOf(float val){
+    {
+      {
+        final LongDblLnkNode tail;
+        if((tail=this.tail)!=null)
+        {
+          final long v;
+          if(TypeUtil.floatEquals(val,v=(long)val))
+          {
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int lastIndexOf(double val){
+    {
+      {
+        final LongDblLnkNode tail;
+        if((tail=this.tail)!=null)
+        {
+          final long v;
+          if(TypeUtil.doubleEquals(val,v=(long)val))
+          {
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  @Override public int lastIndexOf(Object val){
+    {
+      {
+        final LongDblLnkNode tail;
+        if((tail=this.tail)!=null)
+        {
+          //todo: a pattern-matching switch statement would be great here
+          returnFalse:for(;;){
+            final long l;
+            if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+              l=((Number)val).longValue();
+            }else if(val instanceof Float){
+              final float f;
+              if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                break returnFalse;
+              }
+            }else if(val instanceof Double){
+              final double d;
+              if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                break returnFalse;
+              }
+            }else if(val instanceof Character){
+              l=(char)val;
+            }else if(val instanceof Boolean){
+              l=TypeUtil.castToLong((boolean)val);
+            }else{
+              break returnFalse;
+            }
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,l);
+          }
+        } //end size check
+      } //end checked sublist try modcount
+    }//end val check
+    return -1;
+  }
+  private static class UncheckedSubList extends LongDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
     transient final UncheckedSubList parent;
-    transient final int rootOffset;
+    transient final int parentOffset;
     private UncheckedSubList(UncheckedList root,int rootOffset,LongDblLnkNode head,int size,LongDblLnkNode tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
-      this.rootOffset=rootOffset;
+      this.parentOffset=rootOffset;
     }
-    private UncheckedSubList(UncheckedSubList parent,int rootOffset,LongDblLnkNode head,int size,LongDblLnkNode tail){
+    private UncheckedSubList(UncheckedSubList parent,int parentOffset,LongDblLnkNode head,int size,LongDblLnkNode tail){
       super(head,size,tail);
       this.root=parent.root;
       this.parent=parent;
-      this.rootOffset=rootOffset;
+      this.parentOffset=parentOffset;
+    }
+    private Object writeReplace(){
+      return new UncheckedList(this.head,this.size,this.tail);
+    }
+    private void bubbleUpAppend(LongDblLnkNode newNode){
+      for(var curr=this;;){
+        curr.tail=newNode;
+        if((curr=curr.parent)==null){
+          break;
+        }
+        ++curr.size;
+      }
+    }
+    private void bubbleUpAppend(LongDblLnkNode newNode,LongDblLnkNode oldTail){
+      for(var curr=this;;){
+        curr.tail=newNode;
+        if((curr=curr.parent)==null){
+          return;
+        }
+        ++curr.size;
+        if(curr.tail!=oldTail){
+          curr.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode newNode){
+      for(var curr=this;;){
+        curr.head=newNode;
+        if((curr=curr.parent)==null){
+          break;
+        }
+        ++curr.size;
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode newNode,LongDblLnkNode oldHead){
+      for(var curr=this;;){
+        curr.head=newNode;
+        if((curr=curr.parent)==null){
+          return;
+        }
+        ++curr.size;
+        if(curr.head!=oldHead){
+          curr.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpIncrementSize(){
+      for(var curr=parent;curr!=null;
+      ++curr.size,curr=curr.parent){}
+    }
+    @Override public void add(int index,long val){
+      int size;
+      UncheckedSubList curr;
+      final var newNode=new LongDblLnkNode(val);
+      if((size=++(curr=this).size)==1){
+        //initialize this list
+        UncheckedSubList parent;
+        do{
+          curr.head=newNode;
+          curr.tail=newNode;
+          if((parent=curr.parent)==null){
+            //all parents were empty, insert in the root
+            ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+            return;
+          }
+        }
+        while((size=++(curr=parent).size)==1);
+      }
+      final UncheckedList root;
+      ++(root=this.root).size;
+      LongDblLnkNode before,after;
+      if((size-=index)<index){
+        //the insertion point is closer to the tail
+        if(size==1){
+          //the insertion point IS the tail
+          if((after=(before=curr.tail).next)==null){
+            //there are no nodes after this list
+            curr.bubbleUpAppend(newNode);
+            root.tail=newNode;
+          }else{
+            //there are nodes after this list
+            curr.bubbleUpAppend(newNode,before);
+            after.prev=newNode;
+          }
+        }else{
+          //iterate from the tail and insert
+          before=(after=LongDblLnkNode.iterateDescending(curr.tail,size-1)).prev;
+          after.prev=newNode;
+          curr.bubbleUpIncrementSize();
+        }
+        before.next=newNode;
+      }else{
+        //the insertion point is closer to the head
+        if(index==0){
+          //the insertion point IS the tail
+          if((before=(after=curr.head).prev)==null){
+            //there are no nodes before this list
+            curr.bubbleUpPrepend(newNode);
+            root.head=newNode;
+          }else{
+            //there are nodes before this list
+            curr.bubbleUpPrepend(newNode,after);
+            before.next=newNode;
+          }
+        }else{
+          //iterate from the head and insert
+          after=(before=LongDblLnkNode.iterateAscending(curr.head,index-1)).next;
+          before.next=newNode;
+          curr.bubbleUpIncrementSize();
+        }
+        after.prev=newNode;
+      }
+      newNode.next=after;
+      newNode.prev=before;
+    }
+    @Override void addLast(long val){
+      final UncheckedList root=this.root;
+      var newNode=new LongDblLnkNode(val);
+      UncheckedSubList parent,curr=this;
+      for(;++curr.size==1;curr=parent){
+        curr.head=newNode;
+        curr.tail=newNode;
+        if((parent=curr.parent)==null){
+          //all parents were empty, insert in the root
+          ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+          return;
+        }
+      }
+      LongDblLnkNode oldTail,after;
+      if((after=(oldTail=curr.tail).next)==null){
+        curr.bubbleUpAppend(newNode);
+        root.tail=newNode;
+      }else{
+        curr.bubbleUpAppend(newNode,oldTail);
+        after.prev=newNode;
+      }
+      ++root.size;
+      newNode.next=after;
+      oldTail.next=newNode;
+      newNode.prev=oldTail;
+    }
+    @Override public void clear(){
+      int size;
+      if((size=this.size)!=0){
+        final UncheckedList root;
+        (root=this.root).size-=size;
+        clearAllHelper(size,root);
+      }
+    }
+    private void clearAllHelper(int size,UncheckedList root)
+    {
+      LongDblLnkNode before,head,tail,after=(tail=this.tail).next;
+      if((before=(head=this.head).prev)==null){
+        //this sublist is not preceded by nodes
+        if(after==null){
+          bubbleUpClearAll();
+          root.head=null;
+          root.tail=null;
+        }else{
+          after.prev=null;
+          bubbleUpClearHead(tail,after,size);
+          root.head=after;
+        }
+      }else{
+        before.next=after;
+        if(after==null){
+          bubbleUpClearTail(head,before,size);
+          root.tail=before;
+        }else{
+          after.prev=before;
+          bubbleUpClearBody(before,head,size,tail,after);
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
     }
     private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
     }
-    //TODO serialization methods
-    private void bubbleUpDecrementSize(int numRemoved)
-    {
+    private void bubbleUpDecrementSize(int numRemoved){
       var curr=this;
-      do
-      {
+      do{
         curr.size-=numRemoved;
-      }
-      while((curr=curr.parent)!=null);
+      }while((curr=curr.parent)!=null);
     }
     private void bubbleUpClearBody(LongDblLnkNode before,LongDblLnkNode head,int numRemoved,LongDblLnkNode tail,LongDblLnkNode after){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
           while(curr.tail==tail){
             curr.tail=before;
@@ -435,7 +894,8 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
     }
     private void bubbleUpClearHead(LongDblLnkNode tail, LongDblLnkNode after,int numRemoved){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.tail!=tail){
           do{
             curr.head=after;
@@ -446,7 +906,8 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
     }
     private void bubbleUpClearTail(LongDblLnkNode head, LongDblLnkNode before,int numRemoved){
-      for(var curr=parent;curr!=null;curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
           do{
             curr.tail=before;
@@ -457,46 +918,651 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
       }
     }
-    @Override public void clear(){
-      final int size;
-      if((size=this.size)!=0){
-        final UncheckedList root;
-        (root=this.root).size-=size;
-        LongDblLnkNode before,head,tail,after=(tail=this.tail).next;
-        if((before=(head=this.head).prev)==null){
-          if(after==null){
-            bubbleUpClearAll();
-            root.head=null;
-            root.tail=null;
-          }else{
-            after.prev=null;
-            bubbleUpClearHead(tail,after,size);
-            root.head=after;
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @Override public boolean removeIf(LongPredicate filter){
+      final LongDblLnkNode head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Long> filter){
+      final LongDblLnkNode head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
+    }
+    private void collapseHeadHelper(LongDblLnkNode oldHead,LongDblLnkNode tail,LongPredicate filter)
+    {
+      //TODO
+    }
+    private void collapseTailHelper(LongDblLnkNode head,LongDblLnkNode oldTail,LongPredicate filter)
+    {
+      //TODO
+    }
+    private void collapseHeadAndTailHelper(LongDblLnkNode oldHead,LongDblLnkNode oldTail,LongPredicate filter)
+    {
+      //TODO
+    }
+    private boolean collapseBodyHelper(LongDblLnkNode head,LongDblLnkNode tail,LongPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    private boolean uncheckedRemoveIf(LongDblLnkNode head,LongPredicate filter){
+      var tail=this.tail;
+      if(filter.test(head.val))
+      {
+        if(tail==head)
+        {
+          this.size=0;
+          removeLastNode(head);
+          --root.size;
+        }
+        else
+        {
+          if(filter.test(tail.val))
+          {
+            collapseHeadAndTailHelper(head,tail,filter);
           }
-        }else{
-          before.next=after;
-          if(after==null){
-            bubbleUpClearTail(head,before,size);
-            root.tail=before;
-          }else{
-            after.prev=before;
-            bubbleUpClearBody(before,head,size,tail,after);
+          else
+          {
+            collapseHeadHelper(head,tail,filter);
           }
         }
-        this.head=null;
-        this.tail=null;
-        this.size=0;
+        return true;
+      }
+      else
+      {
+        if(tail!=head)
+        {
+          if(filter.test(tail.val))
+          {
+            collapseTailHelper(head,tail,filter);
+            return true;
+          }
+          return collapseBodyHelper(head,tail,filter);
+        }
+      }
+      return false;
+    }
+    private void bubbleUpPeelHead(LongDblLnkNode newHead,LongDblLnkNode oldHead){
+      var curr=parent;
+      do{
+        if(curr.head!=oldHead){
+          curr.bubbleUpPeelHead(newHead);
+          break;
+        }
+        curr.size=0;
+        curr.head=null;
+        curr.tail=null;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpPeelHead(LongDblLnkNode newHead){
+      var curr=this;
+      do{
+        curr.head=newHead;
+        --curr.size; 
+      }while((curr=curr.parent)==null);
+    }
+    private void bubbleUpPeelTail(LongDblLnkNode newTail,LongDblLnkNode oldTail){
+      var curr=parent;
+      do{
+        if(curr.tail!=oldTail){
+          curr.bubbleUpPeelTail(newTail);
+          break;
+        }
+        curr.size=0;
+        curr.head=null;
+        curr.tail=null;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpPeelTail(LongDblLnkNode newTail){
+      var curr=this;
+      do{
+        curr.tail=newTail;
+        --curr.size;
+      }while((curr=curr.parent)==null);
+    }
+    private void uncheckedBubbleUpDecrementSize(){
+      var curr=this;
+      do{
+        --curr.size;    
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpDecrementSize(){
+       UncheckedSubList parent;
+       if((parent=this.parent)!=null){
+         parent.uncheckedBubbleUpDecrementSize();
+       }
+    }
+    private void peelTail(LongDblLnkNode tail){
+      LongDblLnkNode after,before;
+      (before=tail.prev).next=(after=tail.next);
+      this.tail=before;
+      if(after==null){
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          --curr.size;
+          curr.tail=before;
+        }
+        root.tail=before;
+      }else{
+        after.prev=before;
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          if(curr.tail!=tail){
+            curr.uncheckedBubbleUpDecrementSize();
+            break;
+          }
+          --curr.size;
+          curr.tail=before;
+        }
       }
     }
+    private void removeLastNode(LongDblLnkNode lastNode){
+      LongDblLnkNode after,before=lastNode.prev;
+      if((after=lastNode.next)==null){
+        UncheckedList root;
+        (root=this.root).tail=before;
+        if(before==null){
+          for(var curr=parent;curr!=null;
+          curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+          root.head=null;
+        }else{
+          before.next=null;
+          bubbleUpPeelTail(before,lastNode);
+        }
+      }else{
+        if(before==null){
+          after.prev=null;
+          bubbleUpPeelHead(after,lastNode);
+          root.head=after;
+        }else{
+          var curr=parent;
+          do{
+            if(curr.head!=lastNode){
+              do{
+                if(curr.tail!=lastNode){
+                  curr.uncheckedBubbleUpDecrementSize();
+                  break;
+                }
+                --curr.size;
+                curr.tail=before;
+              }
+              while((curr=curr.parent)!=null);
+              break;
+            }
+            if(curr.tail!=lastNode){
+              for(;;){
+                --curr.size;
+                curr.head=after;
+                if((curr=curr.parent)==null){
+                  break;
+                }
+                if(curr.head!=lastNode){
+                  curr.uncheckedBubbleUpDecrementSize();
+                  break;
+                }
+              }
+              break;
+            }
+            curr.head=null;
+            curr.tail=null;
+            curr.size=0;
+          }
+          while((curr=curr.parent)!=null);
+        }
+      }
+      this.head=null;
+      this.tail=null;
+    }
+    private void peelHead(LongDblLnkNode head){
+      LongDblLnkNode after,before;
+      (after=head.next).prev=(before=head.prev);
+      this.head=after;
+      if(before==null){
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          --curr.size;
+          curr.head=after;
+        }
+        root.head=after;
+      }else{
+        before.next=after;
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          if(curr.head!=head){
+            curr.uncheckedBubbleUpDecrementSize();
+            break;
+          }
+          --curr.size;
+          curr.head=after;
+        }
+      }
+    }
+    @Override public long removeLongAt(int index){
+      final long ret;
+      int size;
+      if((size=(--this.size)-index)<=index){
+        var tail=this.tail;
+        if(size==0){
+          ret=tail.val;
+          if(index==0){
+            removeLastNode(tail);
+          }else{
+            peelTail(tail);
+          }
+        }else{
+          LongDblLnkNode before;
+          ret=(before=( tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          (before=before.prev).next=tail;
+          tail.prev=before;
+          bubbleUpDecrementSize();
+        }
+      }else{
+        var head=this.head;
+        if(index==0){
+          ret=head.val;
+          peelHead(head);
+        }else{
+          LongDblLnkNode after;
+          ret=(after=( head=LongDblLnkNode.iterateAscending(head,index)).next).val;
+          (after=after.next).prev=head;
+          head.next=after;
+          bubbleUpDecrementSize();
+        }
+      }
+      --root.size;
+      return ret;
+    }
+    @Override public Object clone(){
+      final int size;
+      if((size=this.size)!=0){
+        LongDblLnkNode head,newTail;
+        final var newHead=newTail=new LongDblLnkNode((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new LongDblLnkNode(newTail,(head=head.next).val),++i){}
+        return new UncheckedList(newHead,size,newTail);
+      }
+      return new UncheckedList();
+    }
+    private static class AscendingItr
+      extends AbstractLongItr
+    {
+      transient final UncheckedSubList parent;
+      transient LongDblLnkNode curr;
+      private AscendingItr(UncheckedSubList parent,LongDblLnkNode curr){
+        this.parent=parent;
+        this.curr=curr;
+      }
+      private AscendingItr(UncheckedSubList parent){
+        this.parent=parent;
+        this.curr=parent.head;
+      }
+      @Override public boolean hasNext(){
+        return curr!=null;
+      }
+      @Override public long nextLong(){
+        final LongDblLnkNode curr;
+        this.curr=(curr=this.curr)==parent.tail?null:curr.next;
+        return curr.val;
+      }
+      @Override public void remove(){
+        UncheckedSubList parent;
+        if(--(parent=this.parent).size==0){
+          parent.removeLastNode(parent.tail);
+        }else{
+          LongDblLnkNode curr;
+          if((curr=this.curr)==null){
+            parent.peelTail(parent.tail);
+          }else{
+            LongDblLnkNode lastRet;
+            if((lastRet=curr.prev)==parent.head){
+              parent.peelHead(lastRet);
+            }else{
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
+              parent.bubbleUpDecrementSize();
+            }
+          }
+        }
+        --parent.root.size;
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachAscending(curr,parent.tail,action);
+          this.curr=null;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachAscending(curr,parent.tail,action::accept);
+          this.curr=null;
+        }
+      }
+    }
+    private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfLong{
+      transient int currIndex;
+      transient LongDblLnkNode lastRet;
+      private BidirectionalItr(UncheckedSubList parent){
+        super(parent);
+      }
+      private BidirectionalItr(UncheckedSubList parent,LongDblLnkNode curr,int currIndex){
+        super(parent,curr);
+        this.currIndex=currIndex;
+      }
+      @Override public long nextLong(){
+        final LongDblLnkNode curr;
+        this.lastRet=curr=this.curr;
+        this.curr=curr.next;
+        ++this.currIndex;
+        return curr.val;
+      }
+      @Override public long previousLong(){
+        LongDblLnkNode curr;
+        this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+        this.curr=curr;
+        --this.currIndex;
+        return curr.val;
+      }
+      @Override public boolean hasNext(){
+        return currIndex<parent.size;
+      }
+      @Override public boolean hasPrevious(){
+        return currIndex>0;
+      }
+      @Override public int nextIndex(){
+        return this.currIndex;
+      }
+      @Override public int previousIndex(){
+        return this.currIndex-1;
+      }
+      @Override public void set(long val){
+        lastRet.val=val;
+      }
+      @Override public void add(long val){
+        int size;
+        UncheckedSubList currList;
+        final var newNode=new LongDblLnkNode(val);
+        this.lastRet=null;
+        if((size=++(currList=this.parent).size)==1){
+          ++currIndex;
+          //initialize the list
+          UncheckedSubList parent;
+          do{
+            currList.head=newNode;
+            currList.tail=newNode;
+            if((parent=currList.parent)==null){
+              //all parents were empty, insert in the root
+              ((LongDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
+              this.curr=newNode.next;
+              return;
+            }
+          }while((size=++(currList=parent).size)==1);
+        }
+        final UncheckedList root;
+        ++(root=currList.root).size;
+        LongDblLnkNode after,before;
+        int currIndex;
+        if((currIndex=++this.currIndex)==size){
+          //the insertion point IS the tail
+          if((after=(before=currList.tail).next)==null){
+            //there are no nodes after this list
+            currList.bubbleUpAppend(newNode);
+            root.tail=newNode;
+          }else{
+            //there are nodes after this list
+            currList.bubbleUpAppend(newNode,before);
+            after.prev=newNode;
+          }
+        }else{
+          if(currIndex==1){
+            //the insertion point IS the head
+            if((before=(after=currList.head).prev)==null){
+              //there are no nodes before this list
+              currList.bubbleUpPrepend(newNode);
+              root.tail=newNode;
+            }else{
+              //there are nodes before this list
+              currList.bubbleUpPrepend(newNode,after);
+              before.next=newNode;
+            }
+          }else{
+            newNode.next=after=curr;
+            newNode.prev=before=after.prev;
+            after.prev=newNode;
+            before.next=newNode;
+            currList.bubbleUpIncrementSize();
+          }
+        }
+      }
+      @Override public void remove(){
+        LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet).next==curr){
+          --currIndex;
+        }
+        UncheckedSubList parent;
+        if(--(parent=this.parent).size==0){
+          parent.removeLastNode(parent.tail);
+        }else{
+          if(lastRet==parent.tail){
+            parent.peelTail(lastRet);
+          }else{
+            if(lastRet==parent.head){
+              parent.peelHead(lastRet);
+            }else{
+              LongDblLnkNode.eraseNode(lastRet);
+              parent.bubbleUpDecrementSize();
+            }
+          }
+        }
+        --parent.root.size;
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        final int bound;
+        final UncheckedSubList parent;
+        if(this.currIndex<(bound=(parent=this.parent).size)){
+          final LongDblLnkNode lastRet;
+          LongDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
+          this.lastRet=lastRet;
+          this.curr=lastRet.next;
+          this.currIndex=bound;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final int bound;
+        final UncheckedSubList parent;
+        if(this.currIndex<(bound=(parent=this.parent).size)){
+          final LongDblLnkNode lastRet;
+          LongDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
+          this.lastRet=lastRet;
+          this.curr=lastRet.next;
+          this.currIndex=bound;
+        }
+      }
+    }
+    @Override public OmniIterator.OfLong iterator(){
+      return new AscendingItr(this);
+    }
+    @Override public OmniListIterator.OfLong listIterator(){
+      return new BidirectionalItr(this);
+    }
+    @Override public OmniListIterator.OfLong listIterator(int index){
+      return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,this.size),index);
+    }
+    @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
+      final int tailDist,subListSize=toIndex-fromIndex;
+      final LongDblLnkNode subListHead,subListTail;
+      if((tailDist=this.size-toIndex)<=fromIndex){
+        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      }
+      return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+    }
+    @Override public boolean removeVal(boolean val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,TypeUtil.castToLong(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(int val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.floatEquals(val,v=(long)val))
+            {
+              return uncheckedremoveVal(head,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.doubleEquals(val,v=(long)val))
+            {
+              return uncheckedremoveVal(head,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            //todo: a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final long l;
+              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+                l=((Number)val).longValue();
+              }else if(val instanceof Float){
+                final float f;
+                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                l=(char)val;
+              }else if(val instanceof Boolean){
+                l=TypeUtil.castToLong((boolean)val);
+              }else{
+                break returnFalse;
+              }
+              return uncheckedremoveVal(head,l);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    private boolean uncheckedremoveVal(LongDblLnkNode head
+    ,long val
+    ){
+      if(val==(head.val)){
+        --root.size;
+        if(--this.size==0){
+          removeLastNode(head);
+        }else{
+          peelHead(head);
+        }
+        return true;
+      }else{
+        for(final var tail=this.tail;tail!=head;){
+          if(val==((head=head.next).val)){
+            --root.size;
+            --this.size;
+            if(head==tail){
+              peelTail(head);
+            }else{
+              LongDblLnkNode before,after;
+              (before=head.prev).next=(after=head.next);
+              after.prev=before;
+              bubbleUpDecrementSize();
+            }
+            return true;
+          }
+        }
+      }
+      return false;
+    }
   }
-  private static class CheckedSubList extends LongDblLnkSeq
-  {
+  private static class CheckedSubList extends LongDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final CheckedList root;
     transient final CheckedSubList parent;
     transient final int parentOffset;
     transient int modCount;
-     private CheckedSubList(CheckedList root,int rootOffset,LongDblLnkNode head,int size,LongDblLnkNode tail){
+    private CheckedSubList(CheckedList root,int rootOffset,LongDblLnkNode head,int size,LongDblLnkNode tail){
       super(head,size,tail);
       this.root=root;
       this.parent=null;
@@ -510,22 +1576,1253 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       this.parentOffset=parentOffset;
       this.modCount=parent.modCount;
     }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
-    }
-    //TODO serialization methods
-    private void bubbleUpDecrementSize(int numRemoved)
-    {
-      var curr=this;
-      do
+    private boolean uncheckedremoveVal(LongDblLnkNode head
+    ,long val
+    ){
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       {
+        if(val==(head.val)){
+          root.modCount=++modCount;
+          --root.size;
+          this.modCount=modCount;
+          if(--this.size==0){
+            removeLastNode(head);
+          }else{
+            peelHead(head);
+          }
+          return true;
+        }else{
+          for(final var tail=this.tail;tail!=head;){
+            if(val==((head=head.next).val)){
+              root.modCount=++modCount;
+              --root.size;
+              this.modCount=modCount;
+              this.size=size-1;
+              if(head==tail){
+                peelTail(head);
+              }else{
+                LongDblLnkNode before,after;
+                (before=head.prev).next=(after=head.next);
+                after.prev=before;
+                bubbleUpDecrementSize();
+              }
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
+    @Override public OmniIterator.OfLong iterator(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return new BidirectionalItr(this);
+    }
+    @Override public OmniListIterator.OfLong listIterator(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return new BidirectionalItr(this);
+    }
+    @Override public OmniListIterator.OfLong listIterator(int index){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkWriteHi(index,size=this.size);
+      return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,size),index);
+    }
+    private static class BidirectionalItr
+      extends AbstractLongItr
+      implements OmniListIterator.OfLong
+    {
+      transient final CheckedSubList parent;
+      transient int modCount;
+      transient LongDblLnkNode curr;
+      transient LongDblLnkNode lastRet;
+      transient int currIndex;
+      BidirectionalItr(CheckedSubList parent){
+        this.parent=parent;
+        this.modCount=parent.modCount;
+        this.curr=parent.head;
+      }
+      BidirectionalItr(CheckedSubList parent,LongDblLnkNode curr,int currIndex){
+        this.parent=parent;
+        this.modCount=parent.modCount;
+        this.curr=curr;
+        this.currIndex=currIndex;
+      }
+      @Override public long nextLong(){
+        final CheckedSubList parent;
+        CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
+        final int currIndex;
+        if((currIndex=this.currIndex)<parent.size){
+          LongDblLnkNode curr;
+          this.lastRet=curr=this.curr;
+          this.curr=curr.next;
+          this.currIndex=currIndex+1;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public long previousLong(){
+        final CheckedSubList parent;
+        CheckedCollection.checkModCount(modCount,(parent=this.parent).root.modCount);
+        final int currIndex;
+        if((currIndex=this.currIndex)!=0){
+          LongDblLnkNode curr;
+          this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.currIndex=currIndex-1;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public boolean hasNext(){
+        return currIndex<parent.size;
+      }
+      @Override public boolean hasPrevious(){
+        return currIndex>0;
+      }
+      @Override public int nextIndex(){
+        return this.currIndex;
+      }
+      @Override public int previousIndex(){
+        return this.currIndex-1;
+      }
+      @Override public void set(long val){
+        final LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet)!=null)
+        {
+          CheckedCollection.checkModCount(modCount,parent.root.modCount);
+          lastRet.val=val;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        int size,numLeft;
+        final CheckedSubList parent;
+        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+          final int modCount=this.modCount;
+          try{
+            LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
+          }finally{
+            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+          }
+          LongDblLnkNode lastRet;
+          this.lastRet=lastRet=parent.tail;
+          this.curr=lastRet.next;
+          this.currIndex=size;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final int size,numLeft;
+        final CheckedSubList parent;
+        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+          final int modCount=this.modCount;
+          try{
+            LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+          }finally{
+            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+          }
+          LongDblLnkNode lastRet;
+          this.lastRet=lastRet=parent.tail;
+          this.curr=lastRet.next;
+          this.currIndex=size;
+        }
+      }
+      @Override public void remove(){
+        LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet)!=null){
+          CheckedSubList parent;
+          CheckedList root;
+          int modCount;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=(parent=this.parent).root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          parent.modCount=modCount;
+          if(lastRet.next==curr){
+            --currIndex;
+          }
+          if(--(parent=this.parent).size==0){
+            parent.removeLastNode(parent.tail);
+          }else{
+            if(lastRet==parent.tail){
+              parent.peelTail(lastRet);
+            }else{
+              if(lastRet==parent.head){
+                parent.peelHead(lastRet);
+              }else{
+                LongDblLnkNode.eraseNode(lastRet);
+                parent.bubbleUpDecrementSize();
+              }
+            }
+          }
+          --root.size;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override public void add(long val){
+        CheckedSubList currList;
+        CheckedList root;
+        int modCount;
+        CheckedCollection.checkModCount(modCount=this.modCount,(root=(currList=this.parent).root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        currList.modCount=modCount;
+        int size;
+        final var newNode=new LongDblLnkNode(val);
+        this.lastRet=null;
+        if((size=++currList.size)==1){
+          ++currIndex;
+          //initialize the list
+          CheckedSubList parent;
+          do{
+            currList.head=newNode;
+            currList.tail=newNode;
+            if((parent=currList.parent)==null){
+              //all parents were empty, insert in the root
+              ((LongDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
+              this.curr=newNode.next;
+              return;
+            }
+          }while((size=++(currList=parent).size)==1);
+        }
+        ++root.size;
+        LongDblLnkNode after,before;
+        int currIndex;
+        if((currIndex=++this.currIndex)==size){
+          //the insertion point IS the tail
+          if((after=(before=currList.tail).next)==null){
+            //there are no nodes after this list
+            currList.bubbleUpAppend(newNode);
+            root.tail=newNode;
+          }else{
+            //there are nodes after this list
+            currList.bubbleUpAppend(newNode,before);
+            after.prev=newNode;
+          }
+        }else{
+          if(currIndex==1){
+            //the insertion point IS the head
+            if((before=(after=currList.head).prev)==null){
+              //there are no nodes before this list
+              currList.bubbleUpPrepend(newNode);
+              root.tail=newNode;
+            }else{
+              //there are nodes before this list
+              currList.bubbleUpPrepend(newNode,after);
+              before.next=newNode;
+            }
+          }else{
+            newNode.next=after=curr;
+            newNode.prev=before=after.prev;
+            after.prev=newNode;
+            before.next=newNode;
+            currList.bubbleUpIncrementSize();
+          }
+        }
+      }
+    }
+    @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      int tailDist;
+      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
+      final LongDblLnkNode subListHead,subListTail;
+      if((tailDist-=toIndex)<=fromIndex){
+        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      }
+      return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+    }
+    @Override public Object clone(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      final int size;
+      if((size=this.size)!=0){
+        LongDblLnkNode head,newTail;
+        final var newHead=newTail=new LongDblLnkNode((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new LongDblLnkNode(newTail,(head=head.next).val),++i){}
+        return new CheckedList(newHead,size,newTail);
+      }
+      return new CheckedList();
+    }
+    @Override public boolean removeVal(boolean val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,TypeUtil.castToLong(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(int val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.floatEquals(val,v=(long)val))
+            {
+              return uncheckedremoveVal(head,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.doubleEquals(val,v=(long)val))
+            {
+              return uncheckedremoveVal(head,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean remove(Object val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            //todo: a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final long l;
+              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+                l=((Number)val).longValue();
+              }else if(val instanceof Float){
+                final float f;
+                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                l=(char)val;
+              }else if(val instanceof Boolean){
+                l=TypeUtil.castToLong((boolean)val);
+              }else{
+                break returnFalse;
+              }
+              return uncheckedremoveVal(head,l);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      {
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return uncheckedremoveVal(head,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public int indexOf(boolean val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedindexOf(head,tail,TypeUtil.castToLong(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(int val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(long val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(float val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.floatEquals(val,v=(long)val))
+            {
+              return LongDblLnkNode.uncheckedindexOf(head,tail,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(double val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.doubleEquals(val,v=(long)val))
+            {
+              return LongDblLnkNode.uncheckedindexOf(head,tail,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int indexOf(Object val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            //todo: a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final long l;
+              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+                l=((Number)val).longValue();
+              }else if(val instanceof Float){
+                final float f;
+                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                l=(char)val;
+              }else if(val instanceof Boolean){
+                l=TypeUtil.castToLong((boolean)val);
+              }else{
+                break returnFalse;
+              }
+              return LongDblLnkNode.uncheckedindexOf(head,tail,l);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(boolean val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode tail;
+          if((tail=this.tail)!=null)
+          {
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,TypeUtil.castToLong(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(int val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode tail;
+          if((tail=this.tail)!=null)
+          {
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(long val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode tail;
+          if((tail=this.tail)!=null)
+          {
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(float val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode tail;
+          if((tail=this.tail)!=null)
+          {
+            final long v;
+            if(TypeUtil.floatEquals(val,v=(long)val))
+            {
+              return LongDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(double val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode tail;
+          if((tail=this.tail)!=null)
+          {
+            final long v;
+            if(TypeUtil.doubleEquals(val,v=(long)val))
+            {
+              return LongDblLnkNode.uncheckedlastIndexOf(size,tail,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public int lastIndexOf(Object val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode tail;
+          if((tail=this.tail)!=null)
+          {
+            //todo: a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final long l;
+              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+                l=((Number)val).longValue();
+              }else if(val instanceof Float){
+                final float f;
+                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                l=(char)val;
+              }else if(val instanceof Boolean){
+                l=TypeUtil.castToLong((boolean)val);
+              }else{
+                break returnFalse;
+              }
+              return LongDblLnkNode.uncheckedlastIndexOf(size,tail,l);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return -1;
+    }
+    @Override public boolean contains(boolean val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,TypeUtil.castToLong(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(int val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(long val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(float val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.floatEquals(val,v=(long)val))
+            {
+              return LongDblLnkNode.uncheckedcontains(head,tail,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(double val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            final long v;
+            if(TypeUtil.doubleEquals(val,v=(long)val))
+            {
+              return LongDblLnkNode.uncheckedcontains(head,tail,v);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(Object val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            //todo: a pattern-matching switch statement would be great here
+            returnFalse:for(;;){
+              final long l;
+              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+                l=((Number)val).longValue();
+              }else if(val instanceof Float){
+                final float f;
+                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Double){
+                final double d;
+                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+                  break returnFalse;
+                }
+              }else if(val instanceof Character){
+                l=(char)val;
+              }else if(val instanceof Boolean){
+                l=TypeUtil.castToLong((boolean)val);
+              }else{
+                break returnFalse;
+              }
+              return LongDblLnkNode.uncheckedcontains(head,tail,l);
+            }
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(byte val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    @Override public boolean contains(char val){
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        {
+          final LongDblLnkNode head;
+          if((head=this.head)!=null)
+          {
+            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          } //end size check
+        } //end checked sublist try modcount
+      }//end val check
+      return false;
+    }
+    private static class SerializableSubList implements Serializable{
+      private static final long serialVersionUID=1L;
+      private transient LongDblLnkNode head;
+      private transient LongDblLnkNode tail;
+      private transient int size;
+      private transient final CheckedList.ModCountChecker modCountChecker;
+      private SerializableSubList(LongDblLnkNode head,int size,LongDblLnkNode tail,CheckedList.ModCountChecker modCountChecker){
+        this.head=head;
+        this.tail=tail;
+        this.size=size;
+        this.modCountChecker=modCountChecker;
+      }
+      private Object readResolve(){
+        return new CheckedList(head,size,tail);
+      }
+      private void readObject(ObjectInputStream ois) throws IOException
+      {
+        int size;
+        this.size=size=ois.readInt();
+        if(size!=0){
+          LongDblLnkNode curr;
+          for(this.head=curr=new LongDblLnkNode((long)ois.readLong());--size!=0;curr=curr.next=new LongDblLnkNode(curr,(long)ois.readLong())){}
+          this.tail=curr;
+        }
+      }
+      private void writeObject(ObjectOutputStream oos) throws IOException{
+        try{
+          int size;
+          oos.writeInt(size=this.size);
+          if(size!=0){
+            var curr=this.head;
+            do{
+              oos.writeLong(curr.val);
+            }while((curr=curr.next)!=null);
+          }
+        }finally{
+          modCountChecker.checkModCount();
+        }
+      }
+    }
+    private Object writeReplace(){
+      return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
+    }   
+    @Override public boolean removeIf(LongPredicate filter){
+      final LongDblLnkNode head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override public boolean removeIf(Predicate<? super Long> filter){
+      final LongDblLnkNode head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter::test);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    private boolean uncheckedRemoveIf(LongDblLnkNode head,LongPredicate filter){
+      //TODO
+      return false;
+    }
+    private void bubbleUpPeelHead(LongDblLnkNode newHead,LongDblLnkNode oldHead){
+      var curr=parent;
+      do{
+        if(curr.head!=oldHead){
+          curr.bubbleUpPeelHead(newHead);
+          break;
+        }
+        ++curr.modCount;
+        curr.size=0;
+        curr.head=null;
+        curr.tail=null;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpPeelHead(LongDblLnkNode newHead){
+      var curr=this;
+      do{
+        ++curr.modCount;
+        curr.head=newHead;
+        --curr.size; 
+      }while((curr=curr.parent)==null);
+    }
+    private void bubbleUpPeelTail(LongDblLnkNode newTail,LongDblLnkNode oldTail){
+      var curr=parent;
+      do{
+        if(curr.tail!=oldTail){
+          curr.bubbleUpPeelTail(newTail);
+          break;
+        }
+        ++curr.modCount;
+        curr.size=0;
+        curr.head=null;
+        curr.tail=null;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpPeelTail(LongDblLnkNode newTail){
+      var curr=this;
+      do{
+        ++curr.modCount;
+        curr.tail=newTail;
+        --curr.size;
+      }while((curr=curr.parent)==null);
+    }
+    private void uncheckedBubbleUpDecrementSize(){
+      var curr=this;
+      do{
+        ++curr.modCount;
+        --curr.size;    
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpDecrementSize(){
+       CheckedSubList parent;
+       if((parent=this.parent)!=null){
+         parent.uncheckedBubbleUpDecrementSize();
+       }
+    }
+    private void peelTail(LongDblLnkNode tail){
+      LongDblLnkNode after,before;
+      (before=tail.prev).next=(after=tail.next);
+      this.tail=before;
+      if(after==null){
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          ++curr.modCount;
+          --curr.size;
+          curr.tail=before;
+        }
+        root.tail=before;
+      }else{
+        after.prev=before;
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          if(curr.tail!=tail){
+            curr.uncheckedBubbleUpDecrementSize();
+            break;
+          }
+          ++curr.modCount;
+          --curr.size;
+          curr.tail=before;
+        }
+      }
+    }
+    private void removeLastNode(LongDblLnkNode lastNode){
+      LongDblLnkNode after,before=lastNode.prev;
+      if((after=lastNode.next)==null){
+        CheckedList root;
+        (root=this.root).tail=before;
+        if(before==null){
+          for(var curr=parent;curr!=null;
+          ++curr.modCount,
+          curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+          root.head=null;
+        }else{
+          before.next=null;
+          bubbleUpPeelTail(before,lastNode);
+        }
+      }else{
+        if(before==null){
+          after.prev=null;
+          bubbleUpPeelHead(after,lastNode);
+          root.head=after;
+        }else{
+          var curr=parent;
+          do{
+            if(curr.head!=lastNode){
+              do{
+                if(curr.tail!=lastNode){
+                  curr.uncheckedBubbleUpDecrementSize();
+                  break;
+                }
+                ++curr.modCount;
+                --curr.size;
+                curr.tail=before;
+              }
+              while((curr=curr.parent)!=null);
+              break;
+            }
+            if(curr.tail!=lastNode){
+              for(;;){
+                ++curr.modCount;
+                --curr.size;
+                curr.head=after;
+                if((curr=curr.parent)==null){
+                  break;
+                }
+                if(curr.head!=lastNode){
+                  curr.uncheckedBubbleUpDecrementSize();
+                  break;
+                }
+              }
+              break;
+            }
+            ++curr.modCount;
+            curr.head=null;
+            curr.tail=null;
+            curr.size=0;
+          }
+          while((curr=curr.parent)!=null);
+        }
+      }
+      this.head=null;
+      this.tail=null;
+    }
+    private void peelHead(LongDblLnkNode head){
+      LongDblLnkNode after,before;
+      (after=head.next).prev=(before=head.prev);
+      this.head=after;
+      if(before==null){
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          ++curr.modCount;
+          --curr.size;
+          curr.head=after;
+        }
+        root.head=after;
+      }else{
+        before.next=after;
+        for(var curr=this.parent;curr!=null;curr=curr.parent){
+          if(curr.head!=head){
+            curr.uncheckedBubbleUpDecrementSize();
+            break;
+          }
+          ++curr.modCount;
+          --curr.size;
+          curr.head=after;
+        }
+      }
+    }
+    @Override public long removeLongAt(int index){
+      final long ret;
+      int size;
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,size=this.size);
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      this.size=--size;
+      if((size-=index)<=index){
+        var tail=this.tail;
+        if(size==0){
+          ret=tail.val;
+          if(index==0){
+            removeLastNode(tail);
+          }else{
+            peelTail(tail);
+          }
+        }else{
+          LongDblLnkNode before;
+          ret=(before=( tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          (before=before.prev).next=tail;
+          tail.prev=before;
+          bubbleUpDecrementSize();
+        }
+      }else{
+        var head=this.head;
+        if(index==0){
+          ret=head.val;
+          peelHead(head);
+        }else{
+          LongDblLnkNode after;
+          ret=(after=( head=LongDblLnkNode.iterateAscending(head,index)).next).val;
+          (after=after.next).prev=head;
+          head.next=after;
+          bubbleUpDecrementSize();
+        }
+      }
+      --root.size;
+      return ret;
+    }
+    private void bubbleUpAppend(LongDblLnkNode newNode){
+      for(var curr=this;;){
+        curr.tail=newNode;
+        ++curr.modCount;
+        if((curr=curr.parent)==null){
+          break;
+        }
+        ++curr.size;
+      }
+    }
+    private void bubbleUpAppend(LongDblLnkNode newNode,LongDblLnkNode oldTail){
+      for(var curr=this;;){
+        curr.tail=newNode;
+        ++curr.modCount;
+        if((curr=curr.parent)==null){
+          return;
+        }
+        ++curr.size;
+        if(curr.tail!=oldTail){
+          ++curr.modCount;
+          curr.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode newNode){
+      for(var curr=this;;){
+        curr.head=newNode;
+        ++curr.modCount;
+        if((curr=curr.parent)==null){
+          break;
+        }
+        ++curr.size;
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode newNode,LongDblLnkNode oldHead){
+      for(var curr=this;;){
+        curr.head=newNode;
+        ++curr.modCount;
+        if((curr=curr.parent)==null){
+          return;
+        }
+        ++curr.size;
+        if(curr.head!=oldHead){
+          ++curr.modCount;
+          curr.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpIncrementSize(){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      ++curr.size,curr=curr.parent){}
+    }
+    @Override public void add(int index,long val){
+      int size;
+      CheckedSubList curr;
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,size=this.size);
+      root.modCount=++modCount;
+      (curr=this).size=++size;
+      final var newNode=new LongDblLnkNode(val);
+      if(size==1){
+        //initialize this list
+        CheckedSubList parent;
+        do{
+          curr.head=newNode;
+          curr.tail=newNode;
+          curr.modCount=modCount;
+          if((parent=curr.parent)==null){
+            //all parents were empty, insert in the root
+            ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+            return;
+          }
+        }
+        while((size=++(curr=parent).size)==1);
+      }
+      ++root.size;
+      LongDblLnkNode before,after;
+      if((size-=index)<index){
+        //the insertion point is closer to the tail
+        if(size==1){
+          //the insertion point IS the tail
+          if((after=(before=curr.tail).next)==null){
+            //there are no nodes after this list
+            curr.bubbleUpAppend(newNode);
+            root.tail=newNode;
+          }else{
+            //there are nodes after this list
+            curr.bubbleUpAppend(newNode,before);
+            after.prev=newNode;
+          }
+        }else{
+          //iterate from the tail and insert
+          before=(after=LongDblLnkNode.iterateDescending(curr.tail,size-1)).prev;
+          after.prev=newNode;
+          curr.modCount=modCount;
+          curr.bubbleUpIncrementSize();
+        }
+        before.next=newNode;
+      }else{
+        //the insertion point is closer to the head
+        if(index==0){
+          //the insertion point IS the tail
+          if((before=(after=curr.head).prev)==null){
+            //there are no nodes before this list
+            curr.bubbleUpPrepend(newNode);
+            root.head=newNode;
+          }else{
+            //there are nodes before this list
+            curr.bubbleUpPrepend(newNode,after);
+            before.next=newNode;
+          }
+        }else{
+          //iterate from the head and insert
+          after=(before=LongDblLnkNode.iterateAscending(curr.head,index-1)).next;
+          before.next=newNode;
+          curr.modCount=modCount;
+          curr.bubbleUpIncrementSize();
+        }
+        after.prev=newNode;
+      }
+      newNode.next=after;
+      newNode.prev=before;
+    }
+    @Override void addLast(long val){
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      var newNode=new LongDblLnkNode(val);
+      CheckedSubList parent,curr=this;
+      for(;++curr.size==1;curr=parent){
+        curr.head=newNode;
+        curr.tail=newNode;
+        curr.modCount=modCount;
+        if((parent=curr.parent)==null){
+          //all parents were empty, insert in the root
+          ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+          return;
+        }
+      }
+      LongDblLnkNode oldTail,after;
+      if((after=(oldTail=curr.tail).next)==null){
+        curr.bubbleUpAppend(newNode);
+        root.tail=newNode;
+      }else{
+        curr.bubbleUpAppend(newNode,oldTail);
+        after.prev=newNode;
+      }
+      ++root.size;
+      newNode.next=after;
+      oldTail.next=newNode;
+      newNode.prev=oldTail;
+    }
+    @Override public void clear(){
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0){
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        root.size-=size;
+        clearAllHelper(size,root);
+      }
+    }
+    private void clearAllHelper(int size,CheckedList root)
+    {
+      LongDblLnkNode before,head,tail,after=(tail=this.tail).next;
+      if((before=(head=this.head).prev)==null){
+        //this sublist is not preceded by nodes
+        if(after==null){
+          bubbleUpClearAll();
+          root.head=null;
+          root.tail=null;
+        }else{
+          after.prev=null;
+          bubbleUpClearHead(tail,after,size);
+          root.head=after;
+        }
+      }else{
+        before.next=after;
+        if(after==null){
+          bubbleUpClearTail(head,before,size);
+          root.tail=before;
+        }else{
+          after.prev=before;
+          bubbleUpClearBody(before,head,size,tail,after);
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    private void bubbleUpClearAll(){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+    }
+    private void bubbleUpDecrementSize(int numRemoved){
+      var curr=this;
+      do{
         ++curr.modCount;
         curr.size-=numRemoved;
-      }
-      while((curr=curr.parent)!=null);
+      }while((curr=curr.parent)!=null);
     }
     private void bubbleUpClearBody(LongDblLnkNode before,LongDblLnkNode head,int numRemoved,LongDblLnkNode tail,LongDblLnkNode after){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
           while(curr.tail==tail){
             ++curr.modCount;
@@ -552,7 +2849,9 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
     }
     private void bubbleUpClearHead(LongDblLnkNode tail, LongDblLnkNode after,int numRemoved){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.tail!=tail){
           do{
             ++curr.modCount;
@@ -564,7 +2863,9 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
     }
     private void bubbleUpClearTail(LongDblLnkNode head, LongDblLnkNode before,int numRemoved){
-      for(var curr=parent;curr!=null;++curr.modCount,curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
         if(curr.head!=head){
           do{
             ++curr.modCount;
@@ -576,40 +2877,29 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
       }
     }
-    @Override public void clear(){
-      final CheckedList root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+    @Override public long set(int index,long val){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
       final int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        root.size-=size;
-        LongDblLnkNode before,head,tail,after=(tail=this.tail).next;
-        if((before=(head=this.head).prev)==null){
-          if(after==null){
-            bubbleUpClearAll();
-            root.head=null;
-            root.tail=null;
-          }else{
-            after.prev=null;
-            bubbleUpClearHead(tail,after,size);
-            root.head=after;
-          }
-        }else{
-          before.next=after;
-          if(after==null){
-            bubbleUpClearTail(head,before,size);
-            root.tail=before;
-          }else{
-            after.prev=before;
-            bubbleUpClearBody(before,head,size,tail,after);
-          }
-        }
-        this.modCount=modCount;
-        this.head=null;
-        this.tail=null;
-        this.size=0;
-      }
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final LongDblLnkNode node;
+      final var ret=(node=((LongDblLnkSeq)this).getNode(index,size)).val;
+      node.val=val;
+      return ret;
+    }
+    @Override public void put(int index,long val){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      ((LongDblLnkSeq)this).getNode(index,size).val=val;
+    }
+    @Override public long getLong(int index){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      return ((LongDblLnkSeq)this).getNode(index,size).val;
     }
     @Override public int size(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -648,6 +2938,95 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
+    @Override public void sort(LongComparator sorter){
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        {
+          if(sorter==null){
+            final CheckedList root;
+            int modCount;
+            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+            this.modCount=modCount;
+            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
+          }else{
+            int modCount=this.modCount;
+            try
+            {
+              LongSortUtil.uncheckedStableSort(tmp,0,size,sorter);
+            }
+            finally{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              root.modCount=++modCount;
+              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+              this.modCount=modCount;
+            }
+          }
+        }
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+      else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+    }
+    @Override public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        int modCount=this.modCount;
+        try
+        {
+            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }
+        finally{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+          this.modCount=modCount;
+        }
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+      else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+    }
+    @Override public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        int modCount=this.modCount;
+        try
+        {
+            LongSortUtil.uncheckedDescendingSort(tmp,0,size);
+        }
+        finally{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+          this.modCount=modCount;
+        }
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+      else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+    }
     @Override public void replaceAll(UnaryOperator<Long> operator){
       int modCount=this.modCount;
       final CheckedList root;
@@ -677,60 +3056,15 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
-    @Override public void sort(LongComparator sorter){
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        {
-          if(sorter==null)
-          {
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }
-          else
-          {
-            int modCount=this.modCount;
-            try
-            {
-              LongSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
-            finally
-            {
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
-          }
-        }
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else
-      {
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-    }
     @Override public void sort(Comparator<? super Long> sorter){
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         //todo: see about making an in-place sort implementation rather than copying to an array
         final long[] tmp;
         final LongDblLnkNode tail;
         LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
         {
-          if(sorter==null)
-          {
+          if(sorter==null){
             final CheckedList root;
             int modCount;
             CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -738,16 +3072,13 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
             for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
             this.modCount=modCount;
             LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }
-          else
-          {
+          }else{
             int modCount=this.modCount;
             try
             {
               LongSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
             }
-            finally
-            {
+            finally{
               final CheckedList root;
               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               root.modCount=++modCount;
@@ -758,80 +3089,19 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
         LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
-      else
-      {
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-    }
-    @Override public void stableAscendingSort()
-    {
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        finally
-        {
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else
-      {
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-    }
-    @Override public void stableDescendingSort()
-    {
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            LongSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        finally
-        {
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else
-      {
+      else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void unstableSort(LongComparator sorter){
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         //todo: see about making an in-place sort implementation rather than copying to an array
         final long[] tmp;
         final LongDblLnkNode tail;
         LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
         {
-          if(sorter==null)
-          {
+          if(sorter==null){
             final CheckedList root;
             int modCount;
             CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -839,16 +3109,13 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
             for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
             this.modCount=modCount;
             LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }
-          else
-          {
+          }else{
             int modCount=this.modCount;
             try
             {
               LongSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
             }
-            finally
-            {
+            finally{
               final CheckedList root;
               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               root.modCount=++modCount;
@@ -859,11 +3126,53 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
         LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
-      else
-      {
+      else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
+    @Override public <T> T[] toArray(T[] dst){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toArray(dst);
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      return super.toArray(arrSize->
+      {
+        final int modCount=this.modCount;
+        try{
+          return arrConstructor.apply(arrSize);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      });
+    }
+    @Override public long[] toLongArray(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toLongArray();
+    }
+    @Override public Long[] toArray(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toArray();
+    }
+    @Override public double[] toDoubleArray(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toDoubleArray();
+    }
+    @Override public float[] toFloatArray(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toFloatArray();
+    }
+    @Override public String toString(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.toString();
+    }
+    @Override public int hashCode(){
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return super.hashCode();
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    } 
   }
   public static class CheckedList extends UncheckedList{
     transient int modCount;
@@ -872,6 +3181,15 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     CheckedList(LongDblLnkNode head,int size,LongDblLnkNode tail){
       super(head,size,tail);
     }
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
+    {
+      ModCountChecker(int modCount){
+        super(modCount);
+      }
+      @Override protected int getActualModCount(){
+        return CheckedList.this.modCount;
+      }
+    }
     @Override public void clear(){
       if(size!=0){
         ++this.modCount;
@@ -879,6 +3197,131 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         this.head=null;
         this.tail=null;
       }
+    }
+    @Override public long removeLastLong(){
+      LongDblLnkNode tail;
+      if((tail=this.tail)!=null){
+        ++this.modCount;
+        final var ret=tail.val;
+      if(--size==0){
+          this.head=null;
+          this.tail=null;
+        }else{
+          (tail=tail.prev).next=null;
+          this.tail=tail;
+        }
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public long popLong(){
+      LongDblLnkNode head;
+      if((head=this.head)!=null){
+        ++this.modCount;
+        final var ret=head.val;
+      if(--size==0){
+          this.head=null;
+          this.tail=null;
+        }else{
+          (head=head.next).prev=null;
+          this.head=head;
+        }
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public long removeLongAt(int index){
+      final long ret;
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      ++this.modCount;
+      this.size=--size;
+      if((size-=index)<=index){
+        //the node to remove is closer to the tail
+        var tail=this.tail;
+        if(size==0){
+          //the node to the remove IS the tail
+          ret=tail.val;
+          if(index==0){
+            //the node is the last node
+            this.head=null;
+            this.tail=null;
+          }else{
+            //peel off the tail
+            this.tail=tail=tail.prev;
+            tail.next=null;
+          }
+        }else{
+          //iterate from the tail
+          LongDblLnkNode before;
+          ret=(before=(tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          (before=before.prev).next=tail;
+          tail.prev=before;
+        }
+      }else{
+        //the node to remove is close to the head
+        var head=this.head;
+        if(index==0){
+          //peel off the head
+          ret=head.val;
+          this.head=head=head.next;
+          head.prev=null;
+        }else{
+          //iterate from the head
+          LongDblLnkNode after;
+          ret=(after=(head=LongDblLnkNode.iterateAscending(head,index)).next).val;
+          (after=after.next).prev=head;
+          head.next=after;
+        }
+      }
+      return ret;
+    }
+    @Override public void add(int index,long val){
+      int size;
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,size=this.size);
+      ++this.modCount;
+      this.size=++size;
+      if((size-=index)<index){
+        //the insertion point is closer to the tail
+        var tail=this.tail;
+        if(size==1){
+          //the insertion point IS the tail
+          tail.next=tail=new LongDblLnkNode(tail,val);
+          this.tail=tail;
+        }else{
+          //iterate from the tail and insert
+          LongDblLnkNode before;
+          (before=(tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).next=before=new LongDblLnkNode(before,val,tail);
+          tail.prev=before;
+        }
+      }else{
+        //the insertion point is closer to the head
+        LongDblLnkNode head;
+        if((head=this.head)==null){
+          //initialize the list
+          this.head=head=new LongDblLnkNode(val);
+          this.tail=head;
+        }else if(index==0){
+          //the insertion point IS the head
+          head.prev=head=new LongDblLnkNode(val,head);
+          this.head=head;
+        }else{
+          //iterate from the head and insert
+          LongDblLnkNode after;
+          (after=(head=LongDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new LongDblLnkNode(head,val,after);
+          head.next=after;
+        }
+      }
+    }
+    @Override public void addLast(long val){
+      ++this.modCount;
+      super.addLast(val);
+    }
+    @Override public void push(long val){
+      ++this.modCount;
+      super.push(val);
     }
     @Override public long set(int index,long val){
       CheckedCollection.checkLo(index);
@@ -901,100 +3344,19 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkReadHi(index,size=this.size);
       return ((LongDblLnkSeq)this).getNode(index,size).val;
     }
-    @Override public long removeLongAt(int index){
-      CheckedCollection.checkLo(index);
-      int size;
-      CheckedCollection.checkReadHi(index,size=this.size);
-      final long ret;
-      this.size=--size;
-      if((size-=index)<=index){
-        var tail=this.tail;
-        if(size==0){
-          ret=tail.val;
-          if(index==0){
-            this.head=null;
-            this.tail=null;
-          }else{
-            this.tail=tail=tail.prev;
-            tail.next=null;
-          }
-        }else{
-          ret=(tail=LongDblLnkNode.uncheckedIterateDescending(tail,size)).val;
-          LongDblLnkNode.eraseNode(tail);
-        }
-      }else{
-        var head=this.head;
-        if(index==0){
-          ret=head.val;
-          this.head=head=head.next;
-          head.prev=null;
-        }else{
-          ret=(head=LongDblLnkNode.uncheckedIterateAscending(head,index)).val;
-          LongDblLnkNode.eraseNode(head);
-        }
+    @Override public long getLastLong(){
+      final LongDblLnkNode tail;
+      if((tail=this.tail)!=null){
+         return tail.val;
       }
-      return ret;
+      throw new NoSuchElementException();
     }
-    @Override public void add(int index,long val){
-      CheckedCollection.checkLo(index);
-      int size;
-      CheckedCollection.checkWriteHi(index,size=this.size);
-      ++this.modCount;
-      this.size=size+1;
-      if((size-=index)<=index){
-        var tail=this.tail;
-        if(size==0){
-          tail.next=tail=new LongDblLnkNode(tail,val);
-          this.tail=tail;
-        }else{
-          while(--size!=0){
-            tail=tail.prev;
-          }
-          LongDblLnkNode before;
-          (before=tail.prev).next=before=new LongDblLnkNode(before,val,tail);
-          tail.prev=before;
-        }
-      }else{
-        LongDblLnkNode head;
-        if((head=this.head)==null){
-          this.head=head=new LongDblLnkNode(val);
-          this.tail=head;
-        }else if(index==0){
-          head.prev=head=new LongDblLnkNode(val,head);
-          this.head=head;
-        }else{
-          while(--index!=0){
-            head=head.next;
-          }
-          LongDblLnkNode after;
-          (after=head.next).prev=after=new LongDblLnkNode(head,val,after);
-          head.next=after;
-        }
-      }
-    }
-    @Override public void forEach(LongConsumer action)
-    {
+    @Override public long longElement(){
       final LongDblLnkNode head;
       if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          LongDblLnkNode.uncheckedForEachAscending(head,this.size,action);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
+         return head.val;
       }
-    }
-    @Override public void forEach(Consumer<? super Long> action)
-    {
-      final LongDblLnkNode head;
-      if((head=this.head)!=null){
-        final int modCount=this.modCount;
-        try{
-          LongDblLnkNode.uncheckedForEachAscending(head,this.size,action::accept);
-        }finally{
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      }
+      throw new NoSuchElementException();
     }
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
       return super.toArray(arrSize->{
@@ -1006,10 +3368,20 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
       });
     }
+    @Override public void forEach(LongConsumer action){
+      final LongDblLnkNode head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          LongDblLnkNode.uncheckedForEachAscending(head,this.size,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
     @Override public void replaceAll(LongUnaryOperator operator){
       final LongDblLnkNode head;
-      if((head=this.head)!=null)
-      {
+      if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
           LongDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
@@ -1019,10 +3391,76 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
       }
     }
+    @Override public void sort(LongComparator sorter){
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        {
+          if(sorter==null){
+            ++this.modCount;
+            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
+          }else{
+            int modCount=this.modCount;
+            try
+            {
+              LongSortUtil.uncheckedStableSort(tmp,0,size,sorter);
+            }
+            finally{
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.modCount=modCount+1;
+            }
+          }
+        }
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+    }
+    @Override public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        {
+            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }
+        ++this.modCount;
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+    }
+    @Override public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        {
+            LongSortUtil.uncheckedDescendingSort(tmp,0,size);
+        }
+        ++this.modCount;
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+    }
+    @Override public void forEach(Consumer<? super Long> action){
+      final LongDblLnkNode head;
+      if((head=this.head)!=null){
+        final int modCount=this.modCount;
+        try{
+          LongDblLnkNode.uncheckedForEachAscending(head,this.size,action::accept);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
     @Override public void replaceAll(UnaryOperator<Long> operator){
       final LongDblLnkNode head;
-      if((head=this.head)!=null)
-      {
+      if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
           LongDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
@@ -1030,6 +3468,58 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
+      }
+    }
+    @Override public void sort(Comparator<? super Long> sorter){
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        {
+          if(sorter==null){
+            ++this.modCount;
+            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
+          }else{
+            int modCount=this.modCount;
+            try
+            {
+              LongSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
+            }
+            finally{
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.modCount=modCount+1;
+            }
+          }
+        }
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
+      }
+    }
+    @Override public void unstableSort(LongComparator sorter){
+      final int size;
+      if((size=this.size)>1){
+        //todo: see about making an in-place sort implementation rather than copying to an array
+        final long[] tmp;
+        final LongDblLnkNode tail;
+        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
+        {
+          if(sorter==null){
+            ++this.modCount;
+            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
+          }else{
+            int modCount=this.modCount;
+            try
+            {
+              LongSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
+            }
+            finally{
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.modCount=modCount+1;
+            }
+          }
+        }
+        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     private void pullSurvivorsDown(LongDblLnkNode prev,LongPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
@@ -1153,131 +3643,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
       return false;
     }
-    @Override public void sort(LongComparator sorter){
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        {
-          if(sorter==null)
-          {
-            ++this.modCount;
-            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }
-          else
-          {
-            int modCount=this.modCount;
-            try
-            {
-              LongSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
-            finally
-            {
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
-          }
-        }
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-    }
-    @Override public void sort(Comparator<? super Long> sorter){
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        {
-          if(sorter==null)
-          {
-            ++this.modCount;
-            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }
-          else
-          {
-            int modCount=this.modCount;
-            try
-            {
-              LongSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-            }
-            finally
-            {
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
-          }
-        }
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-    }
-    @Override public void stableAscendingSort()
-    {
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        {
-            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        ++this.modCount;
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-    }
-    @Override public void stableDescendingSort()
-    {
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        {
-            LongSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        ++this.modCount;
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-    }
-    @Override public void unstableSort(LongComparator sorter){
-      final int size;
-      if((size=this.size)>1)
-      {
-        //todo: see about making an in-place sort implementation rather than copying to an array
-        final long[] tmp;
-        final LongDblLnkNode tail;
-        LongDblLnkNode.uncheckedCopyInto(tmp=new long[size],tail=this.tail,size);
-        {
-          if(sorter==null)
-          {
-            ++this.modCount;
-            LongSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }
-          else
-          {
-            int modCount=this.modCount;
-            try
-            {
-              LongSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
-            finally
-            {
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
-          }
-        }
-        LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-    }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
@@ -1300,232 +3665,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       //TODO
       return false;
     }
-    private static class DescendingItr
-      extends AbstractLongItr
-    {
-      transient final CheckedList parent;
-      transient int modCount;
-      transient LongDblLnkNode curr;
-      transient LongDblLnkNode lastRet;
-      transient int currIndex;
-      private DescendingItr(CheckedList parent){
-        this.parent=parent;
-        this.modCount=parent.modCount;
-        this.currIndex=parent.size;
-        this.curr=parent.tail;
-      }
-      private DescendingItr(CheckedList parent,LongDblLnkNode curr,int currIndex){
-        this.parent=parent;
-        this.modCount=parent.modCount;
-        this.curr=curr;
-        this.currIndex=currIndex;
-      }
-      @Override public boolean hasNext(){
-        return this.curr!=null;
-      }
-      @Override public long nextLong(){
-        CheckedCollection.checkModCount(modCount,parent.modCount);
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          this.lastRet=curr;
-          this.curr=curr.prev;
-          --currIndex;
-          return curr.val;
-        }
-        throw new NoSuchElementException();
-      }
-      @Override public void remove(){
-        LongDblLnkNode lastRet;
-        if((lastRet=this.lastRet)!=null){
-          final CheckedList parent;
-          int modCount;
-          CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
-          parent.modCount=++modCount;
-          this.modCount=modCount;
-          if(--parent.size==0){
-            parent.head=null;
-            parent.tail=null;
-          }else{
-            if(lastRet==parent.tail){
-              parent.tail=lastRet=lastRet.prev;
-              lastRet.next=null;
-            }else if(lastRet==parent.head){
-              parent.head=lastRet=lastRet.next;
-              lastRet.prev=null;
-            }else{
-              LongDblLnkNode.eraseNode(lastRet);
-            }
-          }
-          this.lastRet=null;
-          return;
-        }
-        throw new IllegalStateException();
-      }
-      @Override public void forEachRemaining(LongConsumer action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList parent;
-          try{
-            LongDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Long> action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList parent;
-          try{
-            LongDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action::accept);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
-        }
-      }
-    }
-    private static class BidirectionalItr extends DescendingItr implements OmniListIterator.OfLong
-    {
-      private BidirectionalItr(CheckedList parent){
-        super(parent,parent.head,0);
-      }
-      private BidirectionalItr(CheckedList parent,LongDblLnkNode curr,int currIndex){
-        super(parent,curr,currIndex);
-      }
-      @Override public boolean hasPrevious(){
-        return this.currIndex!=0;
-      }
-      @Override public int nextIndex(){
-        return this.currIndex;
-      }
-      @Override public int previousIndex(){
-        return this.currIndex-1;
-      }
-      @Override public void set(long val){
-        final LongDblLnkNode lastRet;
-        if((lastRet=this.lastRet)!=null){
-          CheckedCollection.checkModCount(modCount,parent.modCount);
-          lastRet.val=val;
-          return;
-        }
-        throw new IllegalStateException();
-      }
-      @Override public void add(long val){
-        final CheckedList parent;
-        int modCount;
-        CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
-        parent.modCount=++modCount;
-        this.modCount=modCount;
-        LongDblLnkNode newNode;
-        final int currIndex;
-        if((currIndex=++this.currIndex)==++parent.size){
-          if(currIndex==1){
-            parent.head=newNode=new LongDblLnkNode(val);
-          }else{
-            (newNode=parent.tail).next=newNode=new LongDblLnkNode(newNode,val);
-          }
-          parent.tail=newNode;
-        }else{
-          if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new LongDblLnkNode(val,newNode);
-          }else{
-            final LongDblLnkNode tmp;
-            (newNode=curr).prev=newNode=new LongDblLnkNode(tmp=newNode.prev,val,newNode);
-            tmp.next=newNode;
-          }
-        }
-        this.lastRet=null;
-      }
-      @Override public long previousLong(){
-        CheckedCollection.checkModCount(modCount,parent.modCount);
-        final int currIndex;
-        if((currIndex=this.currIndex)!=0){
-          final LongDblLnkNode curr;
-          this.lastRet=curr=this.curr.prev;
-          this.curr=curr;
-          this.currIndex=currIndex-1;
-          return curr.val;
-        }
-        throw new NoSuchElementException();
-      }
-      @Override public long nextLong(){
-        CheckedCollection.checkModCount(modCount,parent.modCount);
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          this.lastRet=curr;
-          this.curr=curr.next;
-          ++currIndex;
-          return curr.val;
-        }
-        throw new NoSuchElementException();
-      }
-      @Override public void remove(){
-        LongDblLnkNode lastRet;
-        if((lastRet=this.lastRet)!=null){
-          final CheckedList parent;
-          int modCount;
-          CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
-          parent.modCount=++modCount;
-          this.modCount=modCount;
-          if(lastRet.next==curr){
-            --currIndex;
-          }
-          if(--parent.size==0){
-            parent.head=null;
-            parent.tail=null;
-          }else{
-            if(lastRet==parent.tail){
-              parent.tail=lastRet=lastRet.prev;
-              lastRet.next=null;
-            }else if(lastRet==parent.head){
-              parent.head=lastRet=lastRet.next;
-              lastRet.prev=null;
-            }else{
-              LongDblLnkNode.eraseNode(lastRet);
-            }
-          }
-          this.lastRet=null;
-          return;
-        }
-        throw new IllegalStateException();
-      }
-      @Override public void forEachRemaining(LongConsumer action){
-        final int size,numLeft;
-        final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
-          final int modCount=this.modCount;
-          try{
-            LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
-          }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.tail;
-          this.currIndex=size;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Long> action){
-        final int size,numLeft;
-        final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
-          final int modCount=this.modCount;
-          try{
-            LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
-          }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.tail;
-          this.currIndex=size;
-        }
-      }
-    }
     @Override public OmniIterator.OfLong descendingIterator(){
       return new DescendingItr(this);
     }
@@ -1542,63 +3681,18 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
-      //TODO
-      return null;
-    }
-    @Override public long getLastLong(){
-      final LongDblLnkNode tail;
-      if((tail=this.tail)!=null){
-         return tail.val;
+      int tailDist;
+      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
+      final LongDblLnkNode subListHead,subListTail;
+      if((tailDist-=toIndex)<=fromIndex){
+        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
       }
-      throw new NoSuchElementException();
-    }
-    @Override public void addLast(long val){
-      ++this.modCount;
-      super.addLast(val);
-    }
-    @Override public void push(long val){
-      ++this.modCount;
-      super.push(val);
-    }
-    @Override public long removeLastLong(){
-      LongDblLnkNode tail;
-      if((tail=this.tail)!=null){
-        ++this.modCount;
-        final var ret=tail.val;
-        if(--size==0){
-          this.head=null;
-          this.tail=null;
-        }else{
-          (tail=tail.prev).next=null;
-          this.tail=tail;
-        }
-        return ret;
-      }
-      throw new NoSuchElementException();
-    }
-    @Override public long popLong(){
-      LongDblLnkNode head;
-      if((head=this.head)!=null){
-        ++this.modCount;
-        final var ret=head.val;
-        if(--size==0){
-          this.head=null;
-          this.tail=null;
-        }else{
-          (head=head.next).prev=null;
-          this.head=head;
-        }
-        return ret;
-      }
-      throw new NoSuchElementException();
-    }
-    @Override public long longElement(){
-      final LongDblLnkNode head;
-      if((head=this.head)!=null){
-         return head.val;
-      }
-      throw new NoSuchElementException();
-    }
+      return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+    } 
     boolean uncheckedremoveLastOccurrence(LongDblLnkNode tail
     ,long val
     ){
@@ -1792,6 +3886,231 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }
       return Float.NaN;
     }
+    private static class DescendingItr
+      extends AbstractLongItr
+    {
+      transient final CheckedList parent;
+      transient int modCount;
+      transient LongDblLnkNode curr;
+      transient LongDblLnkNode lastRet;
+      transient int currIndex;
+      private DescendingItr(CheckedList parent){
+        this.parent=parent;
+        this.modCount=parent.modCount;
+        this.currIndex=parent.size;
+        this.curr=parent.tail;
+      }
+      private DescendingItr(CheckedList parent,LongDblLnkNode curr,int currIndex){
+        this.parent=parent;
+        this.modCount=parent.modCount;
+        this.curr=curr;
+        this.currIndex=currIndex;
+      }
+      @Override public boolean hasNext(){
+        return this.curr!=null;
+      }
+      @Override public long nextLong(){
+        CheckedCollection.checkModCount(modCount,parent.modCount);
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          this.lastRet=curr;
+          this.curr=curr.prev;
+          --currIndex;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public void remove(){
+        LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet)!=null){
+          final CheckedList parent;
+          int modCount;
+          CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
+          parent.modCount=++modCount;
+          this.modCount=modCount;
+          if(--parent.size==0){
+            parent.head=null;
+            parent.tail=null;
+          }else{
+            if(lastRet==parent.tail){
+              parent.tail=lastRet=lastRet.prev;
+              lastRet.next=null;
+            }else if(lastRet==parent.head){
+              parent.head=lastRet=lastRet.next;
+              lastRet.prev=null;
+            }else{
+              LongDblLnkNode.eraseNode(lastRet);
+            }
+          }
+          this.lastRet=null;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        if(currIndex>0){
+          final int modCount=this.modCount;
+          final CheckedList parent;
+          try{
+            LongDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+          }
+          this.curr=null;
+          this.lastRet=parent.head;
+          this.currIndex=0;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        if(currIndex>0){
+          final int modCount=this.modCount;
+          final CheckedList parent;
+          try{
+            LongDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action::accept);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+          }
+          this.curr=null;
+          this.lastRet=parent.head;
+          this.currIndex=0;
+        }
+      }
+    }
+    private static class BidirectionalItr extends DescendingItr implements OmniListIterator.OfLong{
+      private BidirectionalItr(CheckedList parent){
+        super(parent,parent.head,0);
+      }
+      private BidirectionalItr(CheckedList parent,LongDblLnkNode curr,int currIndex){
+        super(parent,curr,currIndex);
+      }
+      @Override public long nextLong(){
+        CheckedCollection.checkModCount(modCount,parent.modCount);
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          this.lastRet=curr;
+          this.curr=curr.next;
+          ++this.currIndex;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public long previousLong(){
+        final CheckedList parent;
+        CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+        final int currIndex;
+        if((currIndex=this.currIndex)!=0){
+          LongDblLnkNode curr;
+          this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.currIndex=currIndex-1;
+          return curr.val;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public boolean hasPrevious(){
+        return this.currIndex!=0;
+      }
+      @Override public int nextIndex(){
+        return this.currIndex;
+      }
+      @Override public int previousIndex(){
+        return this.currIndex-1;
+      }
+      @Override public void set(long val){
+        final LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet)!=null){
+          CheckedCollection.checkModCount(modCount,parent.modCount);
+          lastRet.val=val;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override public void add(long val){
+        final CheckedList parent;
+        int modCount;
+        CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
+        parent.modCount=++modCount;
+        this.modCount=modCount;
+        LongDblLnkNode newNode;
+        final int currIndex;
+        if((currIndex=++this.currIndex)==++parent.size){
+          if(currIndex==1){
+            parent.head=newNode=new LongDblLnkNode(val);
+          }else{
+            (newNode=parent.tail).next=newNode=new LongDblLnkNode(newNode,val);
+          }
+          parent.tail=newNode;
+        }else{
+          if(currIndex==1){
+            (newNode=parent.head).prev=newNode=new LongDblLnkNode(val,newNode);
+          }else{
+            final LongDblLnkNode tmp;
+            (newNode=curr).prev=newNode=new LongDblLnkNode(tmp=newNode.prev,val,newNode);
+            tmp.next=newNode;
+          }
+        }
+        this.lastRet=null;
+      }
+      @Override public void remove(){
+        LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet)!=null){
+          final CheckedList parent;
+          int modCount;
+          CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
+          parent.modCount=++modCount;
+          this.modCount=modCount;
+          if(lastRet.next==curr){
+            --currIndex;
+          }
+          if(--parent.size==0){
+            parent.head=null;
+            parent.tail=null;
+          }else{
+            if(lastRet==parent.tail){
+              parent.tail=lastRet=lastRet.prev;
+              lastRet.next=null;
+            }else if(lastRet==parent.head){
+              parent.head=lastRet=lastRet.next;
+              lastRet.prev=null;
+            }else{
+              LongDblLnkNode.eraseNode(lastRet);
+            }
+          }
+          this.lastRet=null;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        final int size,numLeft;
+        final CheckedList parent;
+        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+          final int modCount=this.modCount;
+          try{
+            LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
+          }finally{
+            CheckedCollection.checkModCount(modCount,parent.modCount);
+          }
+          this.curr=null;
+          this.lastRet=parent.tail;
+          this.currIndex=size;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final int size,numLeft;
+        final CheckedList parent;
+        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+          final int modCount=this.modCount;
+          try{
+            LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
+          }finally{
+            CheckedCollection.checkModCount(modCount,parent.modCount);
+          }
+          this.curr=null;
+          this.lastRet=parent.tail;
+          this.currIndex=size;
+        }
+      }
+    }
   }
   public static class UncheckedList extends LongDblLnkSeq implements OmniDeque.OfLong,Externalizable{
     private static final long serialVersionUID=1L;
@@ -1799,6 +4118,134 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
     UncheckedList(LongDblLnkNode head,int size,LongDblLnkNode tail){
       super(head,size,tail);
+    }
+    @Override public void clear(){
+      this.head=null;
+      this.size=0;
+      this.tail=null;
+    }
+    @Override public long removeLastLong(){
+      LongDblLnkNode tail;
+      final var ret=(tail=this.tail).val;{
+      if(--size==0){
+          this.head=null;
+          this.tail=null;
+        }else{
+          (tail=tail.prev).next=null;
+          this.tail=tail;
+        }
+        return ret;
+      }
+    }
+    @Override public long popLong(){
+      LongDblLnkNode head;
+      final var ret=(head=this.head).val;{
+      if(--size==0){
+          this.head=null;
+          this.tail=null;
+        }else{
+          (head=head.next).prev=null;
+          this.head=head;
+        }
+        return ret;
+      }
+    }
+    @Override public long removeLongAt(int index){
+      final long ret;
+      int size;
+      if((size=--this.size-index)<=index){
+        //the node to remove is closer to the tail
+        var tail=this.tail;
+        if(size==0){
+          //the node to the remove IS the tail
+          ret=tail.val;
+          if(index==0){
+            //the node is the last node
+            this.head=null;
+            this.tail=null;
+          }else{
+            //peel off the tail
+            this.tail=tail=tail.prev;
+            tail.next=null;
+          }
+        }else{
+          //iterate from the tail
+          LongDblLnkNode before;
+          ret=(before=(tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).val;
+          (before=before.prev).next=tail;
+          tail.prev=before;
+        }
+      }else{
+        //the node to remove is close to the head
+        var head=this.head;
+        if(index==0){
+          //peel off the head
+          ret=head.val;
+          this.head=head=head.next;
+          head.prev=null;
+        }else{
+          //iterate from the head
+          LongDblLnkNode after;
+          ret=(after=(head=LongDblLnkNode.iterateAscending(head,index)).next).val;
+          (after=after.next).prev=head;
+          head.next=after;
+        }
+      }
+      return ret;
+    }
+    @Override public void add(int index,long val){
+      int size;
+      if((size=++this.size-index)<index){
+        //the insertion point is closer to the tail
+        var tail=this.tail;
+        if(size==1){
+          //the insertion point IS the tail
+          tail.next=tail=new LongDblLnkNode(tail,val);
+          this.tail=tail;
+        }else{
+          //iterate from the tail and insert
+          LongDblLnkNode before;
+          (before=(tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).next=before=new LongDblLnkNode(before,val,tail);
+          tail.prev=before;
+        }
+      }else{
+        //the insertion point is closer to the head
+        LongDblLnkNode head;
+        if((head=this.head)==null){
+          //initialize the list
+          this.head=head=new LongDblLnkNode(val);
+          this.tail=head;
+        }else if(index==0){
+          //the insertion point IS the head
+          head.prev=head=new LongDblLnkNode(val,head);
+          this.head=head;
+        }else{
+          //iterate from the head and insert
+          LongDblLnkNode after;
+          (after=(head=LongDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new LongDblLnkNode(head,val,after);
+          head.next=after;
+        }
+      }
+    }
+    @Override public void addLast(long val){
+      LongDblLnkNode tail;
+      if((tail=this.tail)==null){
+        this.head=tail=new LongDblLnkNode(val);
+      }else{
+        tail.next=tail=new LongDblLnkNode(tail,val);
+      }
+      this.tail=tail;
+      ++this.size;
+    }
+    @Override public void push(long val){
+      LongDblLnkNode head;
+      if((head=this.head)==null){
+        this.head=tail=new LongDblLnkNode(val);
+      }else{
+        head.prev=head=new LongDblLnkNode(val,head);
+      }
+      this.head=head;
+      ++this.size;
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       int size;
@@ -1834,387 +4281,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     @Override public boolean equals(Object val){
       //TODO
       return false;
-    }
-    @Override public boolean contains(boolean val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedcontains(head,tail,TypeUtil.castToLong(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(int val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(long val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(float val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            final long v;
-            if(TypeUtil.floatEquals(val,v=(long)val))
-            {
-              return LongDblLnkNode.uncheckedcontains(head,tail,v);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(double val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            final long v;
-            if(TypeUtil.doubleEquals(val,v=(long)val))
-            {
-              return LongDblLnkNode.uncheckedcontains(head,tail,v);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(Object val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            //todo: a pattern-matching switch statement would be great here
-            returnFalse:for(;;){
-              final long l;
-              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
-                l=((Number)val).longValue();
-              }else if(val instanceof Float){
-                final float f;
-                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                l=(char)val;
-              }else if(val instanceof Boolean){
-                l=TypeUtil.castToLong((boolean)val);
-              }else{
-                break returnFalse;
-              }
-              return LongDblLnkNode.uncheckedcontains(head,tail,l);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(byte val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(char val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public int indexOf(boolean val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,TypeUtil.castToLong(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(int val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(long val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(float val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            final long v;
-            if(TypeUtil.floatEquals(val,v=(long)val))
-            {
-              return LongDblLnkNode.uncheckedindexOf(head,tail,v);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(double val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            final long v;
-            if(TypeUtil.doubleEquals(val,v=(long)val))
-            {
-              return LongDblLnkNode.uncheckedindexOf(head,tail,v);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(Object val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            //todo: a pattern-matching switch statement would be great here
-            returnFalse:for(;;){
-              final long l;
-              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
-                l=((Number)val).longValue();
-              }else if(val instanceof Float){
-                final float f;
-                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                l=(char)val;
-              }else if(val instanceof Boolean){
-                l=TypeUtil.castToLong((boolean)val);
-              }else{
-                break returnFalse;
-              }
-              return LongDblLnkNode.uncheckedindexOf(head,tail,l);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(byte val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int indexOf(char val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(boolean val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,TypeUtil.castToLong(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(int val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(long val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(float val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            final long v;
-            if(TypeUtil.floatEquals(val,v=(long)val))
-            {
-              return LongDblLnkNode.uncheckedlastIndexOf(size,tail,v);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(double val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            final long v;
-            if(TypeUtil.doubleEquals(val,v=(long)val))
-            {
-              return LongDblLnkNode.uncheckedlastIndexOf(size,tail,v);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(Object val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            //todo: a pattern-matching switch statement would be great here
-            returnFalse:for(;;){
-              final long l;
-              if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
-                l=((Number)val).longValue();
-              }else if(val instanceof Float){
-                final float f;
-                if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Double){
-                final double d;
-                if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
-                  break returnFalse;
-                }
-              }else if(val instanceof Character){
-                l=(char)val;
-              }else if(val instanceof Boolean){
-                l=TypeUtil.castToLong((boolean)val);
-              }else{
-                break returnFalse;
-              }
-              return LongDblLnkNode.uncheckedlastIndexOf(size,tail,l);
-            }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(byte val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int lastIndexOf(char val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
     }
     @Override public boolean removeVal(boolean val){
       {
@@ -2376,211 +4442,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     @Override public OmniIterator.OfLong descendingIterator(){
       return new DescendingItr(this);
     }
-    private static class AscendingItr
-      extends AbstractLongItr
-    {
-      transient final UncheckedList parent;
-      transient LongDblLnkNode curr;
-      private AscendingItr(UncheckedList parent,LongDblLnkNode curr){
-        this.parent=parent;
-        this.curr=curr;
-      }
-      private AscendingItr(UncheckedList parent){
-        this.parent=parent;
-        this.curr=parent.head;
-      }
-      @Override public boolean hasNext(){
-        return curr!=null;
-      }
-      @Override public void remove(){
-        final UncheckedList parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          LongDblLnkNode curr;
-          if((curr=this.curr)==null){
-            (curr=parent.tail.prev).next=null;
-            parent.tail=curr;
-          }else{
-            LongDblLnkNode lastRet;
-            if((lastRet=curr.prev)==parent.head){
-              parent.head=curr;
-              curr.prev=null;
-            }else{
-              curr.prev=lastRet=lastRet.prev;
-              lastRet.next=curr;
-            }
-          }
-        }
-      }
-      @Override public long nextLong(){
-        final LongDblLnkNode curr;
-        this.curr=(curr=this.curr).next;
-        return curr.val;
-      }
-      @Override public void forEachRemaining(LongConsumer action){
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          LongDblLnkNode.uncheckedForEachAscending(curr,action);
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Long> action){
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          LongDblLnkNode.uncheckedForEachAscending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-    }
-    private static class DescendingItr extends AscendingItr{
-      private DescendingItr(UncheckedList parent){
-        super(parent,parent.tail);
-      }
-      @Override public void remove(){
-        final UncheckedList parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          LongDblLnkNode curr;
-          if((curr=this.curr)==null){
-            (curr=parent.head.next).prev=null;
-            parent.head=curr;
-          }else{
-            LongDblLnkNode lastRet;
-            if((lastRet=curr.next)==parent.tail){
-              parent.tail=curr;
-              curr.next=null;
-            }else{
-              curr.next=lastRet=lastRet.next;
-              lastRet.prev=curr;
-            }
-          }
-        }
-      }
-      @Override public long nextLong(){
-        final LongDblLnkNode curr;
-        this.curr=(curr=this.curr).prev;
-        return curr.val;
-      }
-      @Override public void forEachRemaining(LongConsumer action){
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          LongDblLnkNode.uncheckedForEachDescending(curr,action);
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Long> action){
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          LongDblLnkNode.uncheckedForEachDescending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-    }
-    private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfLong{
-      transient int currIndex;
-      transient LongDblLnkNode lastRet;
-      private BidirectionalItr(UncheckedList parent){
-        super(parent);
-      }
-      private BidirectionalItr(UncheckedList parent,LongDblLnkNode curr,int currIndex){
-        super(parent,curr);
-        this.currIndex=currIndex;
-      }
-      @Override public boolean hasPrevious(){
-        return curr.prev!=null;
-      }
-      @Override public int nextIndex(){
-        return currIndex;
-      }
-      @Override public int previousIndex(){
-        return currIndex-1;
-      }
-      @Override public void add(long val){
-        final UncheckedList parent;
-        LongDblLnkNode newNode;
-        final int currIndex;
-        if((currIndex=++this.currIndex)==++(parent=this.parent).size){
-          if(currIndex==1){
-            parent.head=newNode=new LongDblLnkNode(val);
-          }else{
-            (newNode=parent.tail).next=newNode=new LongDblLnkNode(newNode,val);
-          }
-          parent.tail=newNode;
-        }else{
-          if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new LongDblLnkNode(val,newNode);
-          }else{
-            final LongDblLnkNode tmp;
-            (newNode=curr).prev=newNode=new LongDblLnkNode(tmp=newNode.prev,val,newNode);
-            tmp.next=newNode;
-          }
-        }
-        this.lastRet=null;
-      }
-      @Override public void set(long val){
-        lastRet.val=val;
-      }
-      @Override public long previousLong(){
-        final LongDblLnkNode curr;
-        this.lastRet=curr=this.curr.prev;
-        this.curr=curr;
-        --this.currIndex;
-        return curr.val;
-      }
-      @Override public long nextLong(){
-        final LongDblLnkNode curr;
-        this.lastRet=curr=this.curr;
-        this.curr=curr.next;
-        ++this.currIndex;
-        return curr.val;
-      }
-      @Override public void remove(){
-        LongDblLnkNode lastRet;
-        if((lastRet=this.lastRet).next==curr){
-          --currIndex;
-        }
-        final UncheckedList parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          if(lastRet==parent.tail){
-            parent.tail=lastRet=lastRet.prev;
-            lastRet.next=null;
-          }else if(lastRet==parent.head){
-            parent.head=lastRet=lastRet.next;
-            lastRet.prev=null;
-          }else{
-            LongDblLnkNode.eraseNode(lastRet);
-          }
-        }
-        this.lastRet=null;
-      }
-      @Override public void forEachRemaining(LongConsumer action){
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          LongDblLnkNode.uncheckedForEachAscending(curr,action);
-          final UncheckedList parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Long> action){
-        final LongDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          LongDblLnkNode.uncheckedForEachAscending(curr,action::accept);
-          final UncheckedList parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-    }
     @Override public OmniIterator.OfLong iterator(){
       return new AscendingItr(this);
     }
@@ -2591,8 +4452,16 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,this.size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
-      //TODO
-      return null;
+      final int tailDist,subListSize=toIndex-fromIndex;
+      final LongDblLnkNode subListHead,subListTail;
+      if((tailDist=this.size-toIndex)<=fromIndex){
+        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+      }else{
+        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      }
+      return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
     }
     @Override public long getLastLong(){
       return tail.val;
@@ -2604,46 +4473,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     @Override public boolean offerLast(long val){
       addLast((long)val);
       return true;
-    }
-    @Override public void addFirst(long val){
-      push((long)val);
-    }
-    @Override public long removeFirstLong(){
-      return popLong();
-    }
-    @Override public void push(long val){
-      LongDblLnkNode head;
-      if((head=this.head)==null){
-        this.head=tail=new LongDblLnkNode(val);
-      }else{
-        head.prev=head=new LongDblLnkNode(val,head);
-      }
-      this.head=head;
-      ++this.size;
-    }
-    @Override public long removeLastLong(){
-      LongDblLnkNode tail;
-      final var ret=(tail=this.tail).val;
-      if(--size==0){
-        this.head=null;
-        this.tail=null;
-      }else{
-        (tail=tail.prev).next=null;
-        this.tail=tail;
-      }
-      return ret;
-    }
-    @Override public long popLong(){
-      LongDblLnkNode head;
-      final var ret=(head=this.head).val;
-      if(--size==0){
-        this.head=null;
-        this.tail=null;
-      }else{
-        (head=head.next).prev=null;
-        this.head=head;
-      }
-      return ret;
     }
     @Override public boolean removeFirstOccurrence(Object val){
       return remove(val);
@@ -2758,30 +4587,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }//end val check
       return -1;
     }
-    @Override public int search(byte val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedsearch(head,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
-    @Override public int search(char val){
-      {
-        {
-          final LongDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            return LongDblLnkNode.uncheckedsearch(head,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return -1;
-    }
     @Override public boolean removeLastOccurrence(boolean val){
       {
         {
@@ -2880,30 +4685,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
               }
               return uncheckedremoveLastOccurrence(tail,l);
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeLastOccurrence(byte val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return uncheckedremoveLastOccurrence(tail,(val));
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeLastOccurrence(char val){
-      {
-        {
-          final LongDblLnkNode tail;
-          if((tail=this.tail)!=null)
-          {
-            return uncheckedremoveLastOccurrence(tail,(val));
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3232,6 +5013,211 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           }
         }
         return false;
+      }
+    }
+    private static class AscendingItr
+      extends AbstractLongItr
+    {
+      transient final UncheckedList parent;
+      transient LongDblLnkNode curr;
+      private AscendingItr(UncheckedList parent,LongDblLnkNode curr){
+        this.parent=parent;
+        this.curr=curr;
+      }
+      private AscendingItr(UncheckedList parent){
+        this.parent=parent;
+        this.curr=parent.head;
+      }
+      @Override public boolean hasNext(){
+        return curr!=null;
+      }
+      @Override public void remove(){
+        final UncheckedList parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          LongDblLnkNode curr;
+          if((curr=this.curr)==null){
+            (curr=parent.tail.prev).next=null;
+            parent.tail=curr;
+          }else{
+            LongDblLnkNode lastRet;
+            if((lastRet=curr.prev)==parent.head){
+              parent.head=curr;
+              curr.prev=null;
+            }else{
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
+            }
+          }
+        }
+      }
+      @Override public long nextLong(){
+        final LongDblLnkNode curr;
+        this.curr=(curr=this.curr).next;
+        return curr.val;
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachAscending(curr,action);
+          this.curr=null;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachAscending(curr,action::accept);
+          this.curr=null;
+        }
+      }
+    }
+    private static class DescendingItr extends AscendingItr{
+      private DescendingItr(UncheckedList parent){
+        super(parent,parent.tail);
+      }
+      @Override public void remove(){
+        final UncheckedList parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          LongDblLnkNode curr;
+          if((curr=this.curr)==null){
+            (curr=parent.head.next).prev=null;
+            parent.head=curr;
+          }else{
+            LongDblLnkNode lastRet;
+            if((lastRet=curr.next)==parent.tail){
+              parent.tail=curr;
+              curr.next=null;
+            }else{
+              curr.next=lastRet=lastRet.next;
+              lastRet.prev=curr;
+            }
+          }
+        }
+      }
+      @Override public long nextLong(){
+        final LongDblLnkNode curr;
+        this.curr=(curr=this.curr).prev;
+        return curr.val;
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachDescending(curr,action);
+          this.curr=null;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachDescending(curr,action::accept);
+          this.curr=null;
+        }
+      }
+    }
+    private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfLong{
+      transient int currIndex;
+      transient LongDblLnkNode lastRet;
+      private BidirectionalItr(UncheckedList parent){
+        super(parent);
+      }
+      private BidirectionalItr(UncheckedList parent,LongDblLnkNode curr,int currIndex){
+        super(parent,curr);
+        this.currIndex=currIndex;
+      }
+      @Override public long nextLong(){
+        final LongDblLnkNode curr;
+        this.lastRet=curr=this.curr;
+        this.curr=curr.next;
+        ++this.currIndex;
+        return curr.val;
+      }
+      @Override public long previousLong(){
+        LongDblLnkNode curr;
+        this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+        this.curr=curr;
+        --this.currIndex;
+        return curr.val;
+      }
+      @Override public boolean hasPrevious(){
+        return curr.prev!=null;
+      }
+      @Override public int nextIndex(){
+        return currIndex;
+      }
+      @Override public int previousIndex(){
+        return currIndex-1;
+      }
+      @Override public void add(long val){
+        final UncheckedList parent;
+        LongDblLnkNode newNode;
+        final int currIndex;
+        if((currIndex=++this.currIndex)==++(parent=this.parent).size){
+          if(currIndex==1){
+            parent.head=newNode=new LongDblLnkNode(val);
+          }else{
+            (newNode=parent.tail).next=newNode=new LongDblLnkNode(newNode,val);
+          }
+          parent.tail=newNode;
+        }else{
+          if(currIndex==1){
+            (newNode=parent.head).prev=newNode=new LongDblLnkNode(val,newNode);
+          }else{
+            final LongDblLnkNode tmp;
+            (newNode=curr).prev=newNode=new LongDblLnkNode(tmp=newNode.prev,val,newNode);
+            tmp.next=newNode;
+          }
+        }
+        this.lastRet=null;
+      }
+      @Override public void set(long val){
+        lastRet.val=val;
+      }
+      @Override public void remove(){
+        LongDblLnkNode lastRet;
+        if((lastRet=this.lastRet).next==curr){
+          --currIndex;
+        }
+        final UncheckedList parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          if(lastRet==parent.tail){
+            parent.tail=lastRet=lastRet.prev;
+            lastRet.next=null;
+          }else if(lastRet==parent.head){
+            parent.head=lastRet=lastRet.next;
+            lastRet.prev=null;
+          }else{
+            LongDblLnkNode.eraseNode(lastRet);
+          }
+        }
+        this.lastRet=null;
+      }
+      @Override public void forEachRemaining(LongConsumer action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachAscending(curr,action);
+          final UncheckedList parent;
+          this.lastRet=(parent=this.parent).tail;
+          this.currIndex=parent.size;
+          this.curr=null;
+        }
+      }
+      @Override public void forEachRemaining(Consumer<? super Long> action){
+        final LongDblLnkNode curr;
+        if((curr=this.curr)!=null){
+          LongDblLnkNode.uncheckedForEachAscending(curr,action::accept);
+          final UncheckedList parent;
+          this.lastRet=(parent=this.parent).tail;
+          this.currIndex=parent.size;
+          this.curr=null;
+        }
       }
     }
   }
