@@ -856,6 +856,24 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     }//end val check
     return -1;
   }
+  private static int collapseBodyHelper(BooleanDblLnkNode newHead,BooleanDblLnkNode newTail,boolean removeThis){
+    int numRemoved=0;
+    outer: for(BooleanDblLnkNode prev;(newHead=(prev=newHead).next)!=newTail;){
+      if(newHead.val==removeThis){
+        do{
+          ++numRemoved;
+          if((newHead=newHead.next)==newTail){
+            newHead.prev=prev;
+            prev.next=newHead;
+            break outer;
+          }
+        }while(newHead.val==removeThis);
+        newHead.prev=prev;
+        prev.next=newHead;
+      }
+    }
+    return numRemoved;
+  }
   private static class UncheckedSubList extends BooleanDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
@@ -1015,181 +1033,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       oldTail.next=newNode;
       newNode.prev=oldTail;
     }
-    @Override public void clear(){
-      int size;
-      if((size=this.size)!=0){
-        final UncheckedList root;
-        (root=this.root).size-=size;
-        clearAllHelper(size,root);
-      }
-    }
-    private void clearAllHelper(int size,UncheckedList root)
-    {
-      BooleanDblLnkNode before,head,tail,after=(tail=this.tail).next;
-      if((before=(head=this.head).prev)==null){
-        //this sublist is not preceded by nodes
-        if(after==null){
-          bubbleUpClearAll();
-          root.head=null;
-          root.tail=null;
-        }else{
-          after.prev=null;
-          bubbleUpClearHead(tail,after,size);
-          root.head=after;
-        }
-      }else{
-        before.next=after;
-        if(after==null){
-          bubbleUpClearTail(head,before,size);
-          root.tail=before;
-        }else{
-          after.prev=before;
-          bubbleUpClearBody(before,head,size,tail,after);
-        }
-      }
-      this.head=null;
-      this.tail=null;
-      this.size=0;
-    }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
-    }
-    private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpClearBody(BooleanDblLnkNode before,BooleanDblLnkNode head,int numRemoved,BooleanDblLnkNode tail,BooleanDblLnkNode after){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          while(curr.tail==tail){
-            curr.tail=before;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }else if(curr.tail!=tail){
-          do{
-            curr.head=after;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }while(curr.head==head);
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }
-      }
-    }
-    private void bubbleUpClearHead(BooleanDblLnkNode tail, BooleanDblLnkNode after,int numRemoved){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.tail!=tail){
-          do{
-            curr.head=after;
-            curr.size-=numRemoved;
-          }while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    private void bubbleUpClearTail(BooleanDblLnkNode head, BooleanDblLnkNode before,int numRemoved){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          do{
-            curr.tail=before;
-            curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
-    }
-    @Override public boolean removeIf(BooleanPredicate filter){
-      final BooleanDblLnkNode head;
-      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
-    }
-    @Override public boolean removeIf(Predicate<? super Boolean> filter){
-      final BooleanDblLnkNode head;
-      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
-    }
-    private void collapseHeadHelper(BooleanDblLnkNode oldHead,BooleanDblLnkNode tail,boolean retainThis)
-    {
-      //TODO
-    }
-    private void collapseTailHelper(BooleanDblLnkNode head,BooleanDblLnkNode oldTail,boolean retainThis)
-    {
-      //TODO
-    }
-    private void collapseHeadAndTailHelper(BooleanDblLnkNode oldHead,BooleanDblLnkNode oldTail,boolean removeThis,BooleanPredicate filter)
-    {
-      //TODO
-    }
-    private boolean collapseBodyHelper(BooleanDblLnkNode head,BooleanDblLnkNode tail,boolean retainThis,BooleanPredicate filter)
-    {
-      //TODO
-      return false;
-    }
-    private boolean uncheckedRemoveIf(BooleanDblLnkNode head,BooleanPredicate filter){
-      var tail=this.tail;
-      boolean firstVal;
-      if(filter.test(firstVal=head.val)){
-        if(tail==head)
-        {
-          this.size=0;
-          removeLastNode(head);
-          --root.size;
-        }
-        else
-        {
-          if(tail.val^firstVal)
-          {
-            if(filter.test(firstVal=!firstVal))
-            {
-              final UncheckedList root;
-              final int size;
-              (root=this.root).size-=(size=this.size);
-              clearAllHelper(size,root);
-            }
-            else
-            {
-              collapseHeadHelper(head,tail,firstVal);
-            }
-          }
-          else
-          {
-            collapseHeadAndTailHelper(head,tail,firstVal,filter);
-          }
-        }
-        return true;
-      }else{
-        if(tail!=head)
-        {
-          if(tail.val^firstVal)
-          {
-            if(filter.test(!firstVal))
-            {
-              collapseTailHelper(head,tail,firstVal);
-              return true;
-            }
-          }
-          else
-          {
-            return collapseBodyHelper(head,tail,firstVal,filter);
-          }
-        }
-      }
       return false;
     }
     private void bubbleUpPeelHead(BooleanDblLnkNode newHead,BooleanDblLnkNode oldHead){
@@ -1377,6 +1222,371 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
       --root.size;
       return ret;
+    }
+    @Override public boolean removeIf(BooleanPredicate filter){
+      final BooleanDblLnkNode head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Boolean> filter){
+      final BooleanDblLnkNode head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
+    }
+    private int collapsehead(BooleanDblLnkNode oldhead,BooleanDblLnkNode tail,boolean retainThis){
+      int numRemoved=1;
+      BooleanDblLnkNode newhead;
+      outer:for(newhead=oldhead.next;newhead!=tail;++numRemoved,newhead=newhead.next){
+        if(newhead.val==retainThis){
+          BooleanDblLnkNode prev,curr;
+          for(curr=(prev=newhead).next;curr!=tail;curr=(prev=curr).next){
+            if(curr.val^retainThis){
+              do{
+                ++numRemoved;
+                if((curr=curr.next)==tail){
+                  curr.prev=prev;
+                  prev.next=curr;
+                  break outer;
+                }
+              }while(curr.val^retainThis);
+              curr.prev=prev;
+              prev.next=curr;
+            }
+          }
+          break;
+        }
+      }
+      this.head=newhead;
+      BooleanDblLnkNode tmp;
+      if((tmp=oldhead.prev)==null){
+        for(var parent=this.parent;parent!=null;
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){}
+        root.head=newhead;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.head!=oldhead){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.next=newhead;
+      }
+      newhead.prev=tmp;
+      return numRemoved;
+    }
+    private int collapsetail(BooleanDblLnkNode oldtail,BooleanDblLnkNode head,boolean retainThis){
+      int numRemoved=1;
+      BooleanDblLnkNode newtail;
+      outer:for(newtail=oldtail.prev;newtail!=head;++numRemoved,newtail=newtail.next){
+        if(newtail.val==retainThis){
+          BooleanDblLnkNode next,curr;
+          for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
+            if(curr.val^retainThis){
+              do{
+                ++numRemoved;
+                if((curr=curr.prev)==head){
+                  curr.next=next;
+                  next.prev=curr;
+                  break outer;
+                }
+              }while(curr.val^retainThis);
+              curr.next=next;
+              next.prev=curr;
+            }
+          }
+          break;
+        }
+      }
+      this.tail=newtail;
+      BooleanDblLnkNode tmp;
+      if((tmp=oldtail.next)==null){
+        for(var parent=this.parent;parent!=null;
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){}
+        root.tail=newtail;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.tail!=oldtail){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.prev=newtail;
+      }
+      newtail.next=tmp;
+      return numRemoved;
+    }
+    private void bubbleUpCollapseHeadAndTail(BooleanDblLnkNode oldHead,BooleanDblLnkNode newHead,int numRemoved,BooleanDblLnkNode newTail,BooleanDblLnkNode oldTail){
+      this.head=newHead;
+      this.tail=newTail;
+      final BooleanDblLnkNode after,before=oldHead.prev;
+      if((after=oldHead.next)==null){
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+          parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
+          UncheckedList root;
+          (root=this.root).head=newHead;
+          root.tail=newTail;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.tail=newTail;
+        }
+      }else{
+        after.prev=newTail;
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.tail!=oldTail){
+              do{
+                parent.size-=numRemoved;
+                parent.head=newHead;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.head=newHead;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                if(parent.tail!=oldTail){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+            if(parent.tail!=oldTail){
+              for(;;){
+                parent.size-=numRemoved;
+                parent.head=newHead;
+                if((parent=parent.parent)==null){
+                  break;
+                }
+                if(parent.head!=oldHead){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+      newHead.prev=before;
+      newTail.next=after;
+    }
+    private boolean uncheckedRemoveIf(BooleanDblLnkNode head,BooleanPredicate filter){
+      BooleanDblLnkNode tail;
+      {
+        boolean firstVal;
+        if(filter.test(firstVal=(tail=this.tail).val)){
+          if(tail==head){
+            --root.size;
+            this.size=size-1;
+            //only one node was in the list; remove it
+            removeLastNode(head);
+          }else{
+            if(head.val^firstVal){
+              if(filter.test(firstVal=!firstVal)){
+                final UncheckedList root;
+                int size;
+                (root=this.root).size-=(size=this.size);
+                //all nodes should be removed from the list
+                clearAllHelper(size,head,tail,root);
+              }else{
+                final int numRemoved;
+                root.size-=(numRemoved=collapsetail(tail,head,firstVal));
+                this.size=size-numRemoved;
+              }
+            }else{
+              collapseHeadAndTail(head,tail,firstVal,filter
+              );
+            }
+          }
+          return true;
+        }else{
+          if(tail!=head){
+            if(head.val^firstVal){
+              if(filter.test(!firstVal)){
+                final int numRemoved;
+                root.size-=(numRemoved=collapsehead(head,tail,firstVal));
+                this.size=size-numRemoved;
+              }
+            }else{
+              return collapseBody(head,tail,firstVal,filter
+              );
+            }
+          }
+        }
+      }
+      return false;
+    }
+    @Override public void clear(){
+      int size;
+      if((size=this.size)!=0){
+        final UncheckedList root;
+        (root=this.root).size-=size;
+        clearAllHelper(size,this.head,this.tail,root);
+      }
+    }
+    private void clearAllHelper(int size,BooleanDblLnkNode head,BooleanDblLnkNode tail,UncheckedList root){
+      BooleanDblLnkNode before,after=tail.next;
+      if((before=head.prev)==null){
+        //this sublist is not preceded by nodes
+        if(after==null){
+          bubbleUpClearAll();
+          root.tail=null;
+        }else{
+          bubbleUpClearHead(tail,after,size);
+          after.prev=null;
+        }
+        root.head=after;
+      }else{
+        before.next=after;
+        if(after==null){
+          bubbleUpClearTail(head,before,size);
+          root.tail=before;
+        }else{
+          bubbleUpClearBody(before,head,size,tail,after);
+          after.prev=before;
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    private void bubbleUpClearAll(){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+    }
+    private void bubbleUpDecrementSize(int numRemoved){
+      var curr=this;
+      do{
+        curr.size-=numRemoved;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpClearBody(BooleanDblLnkNode before,BooleanDblLnkNode head,int numRemoved,BooleanDblLnkNode tail,BooleanDblLnkNode after){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          while(curr.tail==tail){
+            curr.tail=before;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }else if(curr.tail!=tail){
+          do{
+            curr.head=after;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }while(curr.head==head);
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }
+      }
+    }
+    private void bubbleUpClearHead(BooleanDblLnkNode tail, BooleanDblLnkNode after,int numRemoved){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.tail!=tail){
+          do{
+            curr.head=after;
+            curr.size-=numRemoved;
+          }while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void bubbleUpClearTail(BooleanDblLnkNode head, BooleanDblLnkNode before,int numRemoved){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          do{
+            curr.tail=before;
+            curr.size-=numRemoved;
+          }
+          while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void collapseHeadAndTail(BooleanDblLnkNode head,BooleanDblLnkNode tail,boolean removeThis,BooleanPredicate filter
+    ){
+      {
+        int numRemoved=2;
+        for(var newHead=head.next;;++numRemoved,newHead=newHead.next){
+          if(newHead==tail){
+            break;
+          }
+          if(newHead.val^removeThis){
+            if(filter.test(!removeThis)){
+              break;   
+            }
+            BooleanDblLnkNode newTail;
+            for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
+              if(newTail.val^removeThis)
+              {
+                numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
+                break;
+              }
+            }
+            bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,newTail,tail);
+            this.size=size-numRemoved;
+            root.size-=numRemoved;
+            return;
+          }
+        }
+      }
+      final UncheckedList root;
+      final int size;
+      (root=this.root).size-=(size=this.size);
+      clearAllHelper(size,head,tail,root);
+    }
+    private boolean collapseBody(BooleanDblLnkNode head,BooleanDblLnkNode tail,boolean retainThis,BooleanPredicate filter
+    ){
+      for(BooleanDblLnkNode prev;(head=(prev=head).next)!=tail;){
+        if(head.val^retainThis){
+          if(filter.test(!retainThis)){
+            int numRemoved=1;
+            while((head=head.next)!=tail){
+              if(head.val==retainThis){
+                numRemoved+=collapseBodyHelper(head,tail,!retainThis);
+                break;
+              }
+              ++numRemoved;
+            }
+            prev.next=head;
+            head.prev=prev;
+            for(var parent=this.parent;parent!=null;
+              parent.size-=numRemoved,parent=parent.parent){}
+            root.size-=numRemoved;
+            this.size=size-numRemoved;
+            return true;
+          }
+          break;
+        }
+      }
+      return false;
     }
     @Override public Object clone(){
       final int size;
@@ -1889,8 +2099,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     }
     private static class BidirectionalItr
       extends AbstractBooleanItr
-      implements OmniListIterator.OfBoolean
-    {
+      implements OmniListIterator.OfBoolean{
       transient final CheckedSubList parent;
       transient int modCount;
       transient BooleanDblLnkNode curr;
@@ -1946,8 +2155,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
       @Override public void set(boolean val){
         final BooleanDblLnkNode lastRet;
-        if((lastRet=this.lastRet)!=null)
-        {
+        if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.root.modCount);
           lastRet.val=val;
           return;
@@ -2892,28 +3100,6 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    @Override public boolean removeIf(BooleanPredicate filter){
-      final BooleanDblLnkNode head;
-      if((head=this.head)!=null){
-        return uncheckedRemoveIf(head,filter);
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override public boolean removeIf(Predicate<? super Boolean> filter){
-      final BooleanDblLnkNode head;
-      if((head=this.head)!=null){
-        return uncheckedRemoveIf(head,filter::test);
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    private boolean uncheckedRemoveIf(BooleanDblLnkNode head,BooleanPredicate filter){
-      //TODO
-      return false;
-    }
     private void bubbleUpPeelHead(BooleanDblLnkNode newHead,BooleanDblLnkNode oldHead){
       var curr=parent;
       do{
@@ -3121,6 +3307,448 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       --root.size;
       return ret;
     }
+    @Override public boolean removeIf(BooleanPredicate filter){
+      final BooleanDblLnkNode head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override public boolean removeIf(Predicate<? super Boolean> filter){
+      final BooleanDblLnkNode head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter::test);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    private int collapsehead(BooleanDblLnkNode oldhead,BooleanDblLnkNode tail,boolean retainThis){
+      int numRemoved=1;
+      BooleanDblLnkNode newhead;
+      outer:for(newhead=oldhead.next;newhead!=tail;++numRemoved,newhead=newhead.next){
+        if(newhead.val==retainThis){
+          BooleanDblLnkNode prev,curr;
+          for(curr=(prev=newhead).next;curr!=tail;curr=(prev=curr).next){
+            if(curr.val^retainThis){
+              do{
+                ++numRemoved;
+                if((curr=curr.next)==tail){
+                  curr.prev=prev;
+                  prev.next=curr;
+                  break outer;
+                }
+              }while(curr.val^retainThis);
+              curr.prev=prev;
+              prev.next=curr;
+            }
+          }
+          break;
+        }
+      }
+      this.head=newhead;
+      BooleanDblLnkNode tmp;
+      if((tmp=oldhead.prev)==null){
+        for(var parent=this.parent;parent!=null;
+          ++parent.modCount,
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){}
+        root.head=newhead;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          ++parent.modCount,
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.head!=oldhead){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.next=newhead;
+      }
+      newhead.prev=tmp;
+      return numRemoved;
+    }
+    private int collapsetail(BooleanDblLnkNode oldtail,BooleanDblLnkNode head,boolean retainThis){
+      int numRemoved=1;
+      BooleanDblLnkNode newtail;
+      outer:for(newtail=oldtail.prev;newtail!=head;++numRemoved,newtail=newtail.next){
+        if(newtail.val==retainThis){
+          BooleanDblLnkNode next,curr;
+          for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
+            if(curr.val^retainThis){
+              do{
+                ++numRemoved;
+                if((curr=curr.prev)==head){
+                  curr.next=next;
+                  next.prev=curr;
+                  break outer;
+                }
+              }while(curr.val^retainThis);
+              curr.next=next;
+              next.prev=curr;
+            }
+          }
+          break;
+        }
+      }
+      this.tail=newtail;
+      BooleanDblLnkNode tmp;
+      if((tmp=oldtail.next)==null){
+        for(var parent=this.parent;parent!=null;
+          ++parent.modCount,
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){}
+        root.tail=newtail;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          ++parent.modCount,
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.tail!=oldtail){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.prev=newtail;
+      }
+      newtail.next=tmp;
+      return numRemoved;
+    }
+    private void bubbleUpCollapseHeadAndTail(BooleanDblLnkNode oldHead,BooleanDblLnkNode newHead,int numRemoved,BooleanDblLnkNode newTail,BooleanDblLnkNode oldTail){
+      this.head=newHead;
+      this.tail=newTail;
+      final BooleanDblLnkNode after,before=oldHead.prev;
+      if((after=oldHead.next)==null){
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+          ++parent.modCount,
+          parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
+          CheckedList root;
+          (root=this.root).head=newHead;
+          root.tail=newTail;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            ++parent.modCount,
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.tail=newTail;
+        }
+      }else{
+        after.prev=newTail;
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+            ++parent.modCount,
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.tail!=oldTail){
+              do{
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.head=newHead;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.head=newHead;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            ++parent.modCount,
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                if(parent.tail!=oldTail){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+            if(parent.tail!=oldTail){
+              for(;;){
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.head=newHead;
+                if((parent=parent.parent)==null){
+                  break;
+                }
+                if(parent.head!=oldHead){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+      newHead.prev=before;
+      newTail.next=after;
+    }
+    private boolean uncheckedRemoveIf(BooleanDblLnkNode head,BooleanPredicate filter){
+      BooleanDblLnkNode tail;
+      int modCount=this.modCount;
+      int size=this.size;
+      try
+      {
+        boolean firstVal;
+        if(filter.test(firstVal=(tail=this.tail).val)){
+          if(size==1){
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            --root.size;
+            this.size=size-1;
+            //only one node was in the list; remove it
+            removeLastNode(head);
+          }else{
+            if(head.val^firstVal){
+              if(filter.test(firstVal=!firstVal)){
+                final CheckedList root;
+                CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                root.size-=size;
+                //all nodes should be removed from the list
+                clearAllHelper(size,head,tail,root);
+              }else{
+                final CheckedList root;
+                CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                final int numRemoved;
+                root.size-=(numRemoved=collapsetail(tail,head,firstVal));
+                this.size=size-numRemoved;
+              }
+            }else{
+              collapseHeadAndTail(head,tail,firstVal,filter
+                ,size,modCount
+              );
+            }
+          }
+          return true;
+        }else{
+          if(size!=1){
+            if(head.val^firstVal){
+              if(filter.test(!firstVal)){
+                final CheckedList root;
+                CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                final int numRemoved;
+                root.size-=(numRemoved=collapsehead(head,tail,firstVal));
+                this.size=size-numRemoved;
+              }
+            }else{
+              return collapseBody(head,tail,firstVal,filter
+                ,size,modCount
+              );
+            }
+          }
+        }
+      }
+      catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public void clear(){
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0){
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        root.size-=size;
+        clearAllHelper(size,this.head,this.tail,root);
+      }
+    }
+    private void clearAllHelper(int size,BooleanDblLnkNode head,BooleanDblLnkNode tail,CheckedList root){
+      BooleanDblLnkNode before,after=tail.next;
+      if((before=head.prev)==null){
+        //this sublist is not preceded by nodes
+        if(after==null){
+          bubbleUpClearAll();
+          root.tail=null;
+        }else{
+          bubbleUpClearHead(tail,after,size);
+          after.prev=null;
+        }
+        root.head=after;
+      }else{
+        before.next=after;
+        if(after==null){
+          bubbleUpClearTail(head,before,size);
+          root.tail=before;
+        }else{
+          bubbleUpClearBody(before,head,size,tail,after);
+          after.prev=before;
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    private void bubbleUpClearAll(){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+    }
+    private void bubbleUpDecrementSize(int numRemoved){
+      var curr=this;
+      do{
+        ++curr.modCount;
+        curr.size-=numRemoved;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpClearBody(BooleanDblLnkNode before,BooleanDblLnkNode head,int numRemoved,BooleanDblLnkNode tail,BooleanDblLnkNode after){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          while(curr.tail==tail){
+            ++curr.modCount;
+            curr.tail=before;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }else if(curr.tail!=tail){
+          do{
+            ++curr.modCount;
+            curr.head=after;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }while(curr.head==head);
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }
+      }
+    }
+    private void bubbleUpClearHead(BooleanDblLnkNode tail, BooleanDblLnkNode after,int numRemoved){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.tail!=tail){
+          do{
+            ++curr.modCount;
+            curr.head=after;
+            curr.size-=numRemoved;
+          }while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void bubbleUpClearTail(BooleanDblLnkNode head, BooleanDblLnkNode before,int numRemoved){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          do{
+            ++curr.modCount;
+            curr.tail=before;
+            curr.size-=numRemoved;
+          }
+          while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void collapseHeadAndTail(BooleanDblLnkNode head,BooleanDblLnkNode tail,boolean removeThis,BooleanPredicate filter
+      ,int size,int modCount
+    ){
+      int numLeft;
+      if((numLeft=size-2)!=0)
+      {
+        int numRemoved=2;
+        for(var newHead=head.next;;++numRemoved,newHead=newHead.next){
+          if(newHead.val^removeThis){
+            if(filter.test(!removeThis)){
+              break;   
+            }
+            CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            BooleanDblLnkNode newTail;
+            for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
+              if(newTail.val^removeThis)
+              {
+                numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
+                break;
+              }
+            }
+            bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,newTail,tail);
+            this.size=size-numRemoved;
+            root.size-=numRemoved;
+            return;
+          }
+          if(--numLeft==0){
+            break;
+          }
+        }
+      }
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      root.size-=size;
+      clearAllHelper(size,head,tail,root);
+    }
+    private boolean collapseBody(BooleanDblLnkNode head,BooleanDblLnkNode tail,boolean retainThis,BooleanPredicate filter
+      ,int size,int modCount
+    ){
+      for(int numLeft=size-2;numLeft!=0;--numLeft){
+        BooleanDblLnkNode prev;
+        if((head=(prev=head).next).val^retainThis){
+          if(filter.test(!retainThis)){
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            int numRemoved=1;
+            while((head=head.next)!=tail){
+              if(head.val==retainThis){
+                numRemoved+=collapseBodyHelper(head,tail,!retainThis);
+                break;
+              }
+              ++numRemoved;
+            }
+            prev.next=head;
+            head.prev=prev;
+            for(var parent=this.parent;parent!=null;
+              parent.modCount=modCount,
+              parent.size-=numRemoved,parent=parent.parent){}
+            root.size-=numRemoved;
+            this.size=size-numRemoved;
+            return true;
+          }
+          break;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
     private void bubbleUpAppend(BooleanDblLnkNode newNode){
       for(var curr=this;;){
         curr.tail=newNode;
@@ -3279,116 +3907,6 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       newNode.next=after;
       oldTail.next=newNode;
       newNode.prev=oldTail;
-    }
-    @Override public void clear(){
-      final CheckedList root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        this.modCount=modCount;
-        root.size-=size;
-        clearAllHelper(size,root);
-      }
-    }
-    private void clearAllHelper(int size,CheckedList root)
-    {
-      BooleanDblLnkNode before,head,tail,after=(tail=this.tail).next;
-      if((before=(head=this.head).prev)==null){
-        //this sublist is not preceded by nodes
-        if(after==null){
-          bubbleUpClearAll();
-          root.head=null;
-          root.tail=null;
-        }else{
-          after.prev=null;
-          bubbleUpClearHead(tail,after,size);
-          root.head=after;
-        }
-      }else{
-        before.next=after;
-        if(after==null){
-          bubbleUpClearTail(head,before,size);
-          root.tail=before;
-        }else{
-          after.prev=before;
-          bubbleUpClearBody(before,head,size,tail,after);
-        }
-      }
-      this.head=null;
-      this.tail=null;
-      this.size=0;
-    }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
-    }
-    private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
-        ++curr.modCount;
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpClearBody(BooleanDblLnkNode before,BooleanDblLnkNode head,int numRemoved,BooleanDblLnkNode tail,BooleanDblLnkNode after){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          while(curr.tail==tail){
-            ++curr.modCount;
-            curr.tail=before;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }else if(curr.tail!=tail){
-          do{
-            ++curr.modCount;
-            curr.head=after;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }while(curr.head==head);
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }
-      }
-    }
-    private void bubbleUpClearHead(BooleanDblLnkNode tail, BooleanDblLnkNode after,int numRemoved){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.tail!=tail){
-          do{
-            ++curr.modCount;
-            curr.head=after;
-            curr.size-=numRemoved;
-          }while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    private void bubbleUpClearTail(BooleanDblLnkNode head, BooleanDblLnkNode before,int numRemoved){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          do{
-            ++curr.modCount;
-            curr.tail=before;
-            curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
-          break;
-        }
-      }
     }
     @Override public boolean set(int index,boolean val){
       CheckedCollection.checkModCount(modCount,root.modCount);

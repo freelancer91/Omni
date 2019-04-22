@@ -126,7 +126,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     }
   }
 #IFNOT OfBoolean
-  private static $<E>$ int markSurvivors($DNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
+  private static $<E>$ int markSurvivors($DNode$$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -134,20 +134,23 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
           word|=marker;
           ++numSurvivors;
         }
-        if((curr=curr.next)==null){
+        if(--numLeft==0)
+        {
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
+        curr=curr.next;
       }while((marker<<=1)!=0L);
       survivorSet[wordOffset++]=word;
     }
   }
-  private static $<E>$ long markSurvivors($DNode$$<E>$ curr,$TypeNameModifier$Predicate$<? super E>$ filter){
-    for(long word=0L,marker=1L;;marker<<=1){
+  private static $<E>$ long markSurvivors($DNode$$<E>$ curr,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
+    for(long word=0L,marker=1L;;marker<<=1,curr=curr.next){
       if(!filter.test(curr.val)){
         word|=marker;
       }
-      if((curr=curr.next)==null){
+      if(--numLeft==0)
+      {
         return word;
       }
     }
@@ -312,6 +315,26 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
   #MACRO QueryMethods<contains,Root,false>()
   #MACRO QueryMethods<indexOf,Root,false>()
   #MACRO QueryMethods<lastIndexOf,Root,false>()
+#IF OfBoolean
+  private static int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ newTail,$ArrayType$ removeThis){
+    int numRemoved=0;
+    outer: for($DNode$$<E>$ prev;(newHead=(prev=newHead).next)!=newTail;){
+      if(newHead.val==removeThis){
+        do{
+          ++numRemoved;
+          if((newHead=newHead.next)==newTail){
+            newHead.prev=prev;
+            prev.next=newHead;
+            break outer;
+          }
+        }while(newHead.val==removeThis);
+        newHead.prev=prev;
+        prev.next=newHead;
+      }
+    }
+    return numRemoved;
+  }
+#ENDIF
   private static class UncheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
     private static final long serialVersionUID=1L;
     transient final UncheckedList$<E>$ root;
@@ -333,147 +356,11 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       return new UncheckedList$<E>$(this.head,this.size,this.tail);
     }
     #MACRO SubListAddMethods<Unchecked>()
-    #MACRO SubListClear<Unchecked>()
     @Override public boolean equals(Object val){
       //TODO
       return false;
     }
-    @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
-      final $DNode$$<E>$ head;
-      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
-    }
-#IFNOT OfRef
-    @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
-      final $DNode$$<E>$ head;
-      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
-    }
-#ENDIF
-#IF OfBoolean
-    private void collapseHeadHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ tail,boolean retainThis)
-    {
-      //TODO
-    }
-    private void collapseTailHelper($DNode$$<E>$ head,$DNode$$<E>$ oldTail,boolean retainThis)
-    {
-      //TODO
-    }
-    private void collapseHeadAndTailHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ oldTail,boolean removeThis,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-    }
-    private boolean collapseBodyHelper($DNode$$<E>$ head,$DNode$$<E>$ tail,boolean retainThis,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-      return false;
-    }
-#ELSE
-    private void collapseHeadHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-    }
-    private void collapseTailHelper($DNode$$<E>$ head,$DNode$$<E>$ oldTail,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-    }
-    private void collapseHeadAndTailHelper($DNode$$<E>$ oldHead,$DNode$$<E>$ oldTail,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-    }
-    private boolean collapseBodyHelper($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-      return false;
-    }
-#ENDIF
-
-    private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
-      var tail=this.tail;
-#IF OfBoolean
-      $ArrayType$ firstVal;
-      if(filter.test(firstVal=head.val)){
-        if(tail==head)
-        {
-          this.size=0;
-          removeLastNode(head);
-          --root.size;
-        }
-        else
-        {
-          if(tail.val^firstVal)
-          {
-            if(filter.test(firstVal=!firstVal))
-            {
-              final UncheckedList$<E>$ root;
-              final int size;
-              (root=this.root).size-=(size=this.size);
-              clearAllHelper(size,root);
-            }
-            else
-            {
-              collapseHeadHelper(head,tail,firstVal);
-            }
-          }
-          else
-          {
-            collapseHeadAndTailHelper(head,tail,firstVal,filter);
-          }
-        }
-        return true;
-      }else{
-        if(tail!=head)
-        {
-          if(tail.val^firstVal)
-          {
-            if(filter.test(!firstVal))
-            {
-              collapseTailHelper(head,tail,firstVal);
-              return true;
-            }
-          }
-          else
-          {
-            return collapseBodyHelper(head,tail,firstVal,filter);
-          }
-        }
-      }
-#ELSE
-      if(filter.test(head.val))
-      {
-        if(tail==head)
-        {
-          this.size=0;
-          removeLastNode(head);
-          --root.size;
-        }
-        else
-        {
-          if(filter.test(tail.val))
-          {
-            collapseHeadAndTailHelper(head,tail,filter);
-          }
-          else
-          {
-            collapseHeadHelper(head,tail,filter);
-          }
-        }
-        return true;
-      }
-      else
-      {
-        if(tail!=head)
-        {
-          if(filter.test(tail.val))
-          {
-            collapseTailHelper(head,tail,filter);
-            return true;
-          }
-          return collapseBodyHelper(head,tail,filter);
-        }
-      }
-#ENDIF
-      return false;
-    }
-    #MACRO SubListRemoveAtIndexMethod<Unchecked>()
+    #MACRO SubListRemoveMethods<Unchecked>()
     @Override public Object clone(){
       final int size;
       if((size=this.size)!=0){
@@ -712,7 +599,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
     }
     #MACRO QueryMethods<removeVal,SubList,false>()
-    
 #IF OfRef
     #MACRO UncheckedRemoveVal<SubList,false,NonNull>(nonNull.equals)
     #MACRO UncheckedRemoveVal<SubList,false,Null>(null==)
@@ -756,7 +642,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
 #ELSE
     #MACRO UncheckedRemoveVal<SubList,true,>(val==)
 #ENDIF
-    
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
       CheckedCollection.checkModCount(modCount,root.modCount);
       return new BidirectionalItr$<E>$(this);
@@ -776,8 +661,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
 #IFNOT OfRef
       extends Abstract$ClassPrefix$Itr$<E>$
 #ENDIF
-      implements OmniListIterator.Of$ClassPrefix$$<E>$
-    {
+      implements OmniListIterator.Of$ClassPrefix$$<E>${
       transient final CheckedSubList$<E>$ parent;
       transient int modCount;
       transient $DNode$$<E>$ curr;
@@ -833,8 +717,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       }
       @Override public void set($exposedType$ val){
         final $DNode$$<E>$ lastRet;
-        if((lastRet=this.lastRet)!=null)
-        {
+        if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.root.modCount);
           lastRet.val=val;
           return;
@@ -875,7 +758,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         }
       }
 #ENDIF
-      
       @Override public void remove(){
         $DNode$$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
@@ -970,7 +852,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         }
       }
     }
-    
     @Override public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex){
       CheckedCollection.checkModCount(modCount,root.modCount);
       int tailDist;
@@ -1081,33 +962,8 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     private Object writeReplace(){
       return new SerializableSubList$<E>$(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    @Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        return uncheckedRemoveIf(head,filter);
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-#IFNOT OfRef
-    @Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
-      final $DNode$$<E>$ head;
-      if((head=this.head)!=null){
-        return uncheckedRemoveIf(head,filter::test);
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-#ENDIF
-    private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
-      //TODO
-      return false;
-    }
-    #MACRO SubListRemoveAtIndexMethod<Checked>()
+    #MACRO SubListRemoveMethods<Checked>()
     #MACRO SubListAddMethods<Checked>()
-    #MACRO SubListClear<Checked>()
     @Override public $exposedType$ set(int index,$exposedType$ val){
       CheckedCollection.checkModCount(modCount,root.modCount);
       CheckedCollection.checkLo(index);
@@ -1295,7 +1151,6 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
         return CheckedList.this.modCount;
       }
     }
-    
     @Override public void clear(){
       if(size!=0){
         ++this.modCount;
@@ -1542,14 +1397,14 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
-          long[] survivorSet;
-          numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+          final long[] survivorSet;
+          numSurvivors=markSurvivors(prev.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
         }else{
-          long survivorWord=markSurvivors(prev.next,filter);
+          final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
@@ -4265,7 +4120,7 @@ private void bubbleUpIncrementSize(){
 }
 #ENDIF
 #ENDDEF
-#MACRODEF SubListRemoveAtIndexMethod<CHECKED>()
+#MACRODEF SubListRemoveMethods<CHECKED>()
 private void bubbleUpPeelHead($DNode$$<E>$ newHead,$DNode$$<E>$ oldHead){
   var curr=parent;
   do{
@@ -4503,8 +4358,280 @@ private void peelHead($DNode$$<E>$ head){
   --root.size;
   return ret;
 }
-#ENDDEF
-#MACRODEF SubListClear<CHECKED>()
+@Override public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter){
+  final $DNode$$<E>$ head;
+#IFSWITCH CHECKED==Checked
+  if((head=this.head)!=null){
+    return uncheckedRemoveIf(head,filter);
+  }else{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  return false;
+#ELSE
+  return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
+#ENDIF
+}
+#IFNOT OfRef
+@Override public boolean removeIf(Predicate<? super $BoxedType$> filter){
+  final $DNode$$<E>$ head;
+  #IFSWITCH CHECKED==Checked
+  if((head=this.head)!=null){
+    return uncheckedRemoveIf(head,filter::test);
+  }else{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  return false;
+  #ELSE
+  return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
+  #ENDIF
+}
+#ENDIF
+
+
+#MACRO CollapseEnd(head,tail,next,prev)
+#MACRO CollapseEnd(tail,head,prev,next)
+
+private void bubbleUpCollapseHeadAndTail($DNode$$<E>$ oldHead,$DNode$$<E>$ newHead,int numRemoved,$DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
+  this.head=newHead;
+  this.tail=newTail;
+  final $DNode$$<E>$ after,before=oldHead.prev;
+  if((after=oldHead.next)==null){
+    if(before==null){
+      for(var parent=this.parent;parent!=null;
+#IFSWITCH CHECKED==Checked
+      ++parent.modCount,
+#ENDIF
+      parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
+      CHECKEDList$<E>$ root;
+      (root=this.root).head=newHead;
+      root.tail=newTail;
+    }else{
+      before.next=newHead;
+      for(var parent=this.parent;parent!=null;
+#IFSWITCH CHECKED==Checked
+        ++parent.modCount,
+#ENDIF
+        parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+        if(parent.head!=oldHead){
+          do{
+#IFSWITCH CHECKED==Checked
+            ++parent.modCount;
+#ENDIF
+            parent.size-=numRemoved;
+            parent.tail=newTail;
+          }while((parent=parent.parent)!=null);
+          break;
+        }
+      }
+      root.tail=newTail;
+    }
+  }else{
+    after.prev=newTail;
+    if(before==null){
+      for(var parent=this.parent;parent!=null;
+#IFSWITCH CHECKED==Checked
+        ++parent.modCount,
+#ENDIF
+        parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+        if(parent.tail!=oldTail){
+          do{
+#IFSWITCH CHECKED==Checked
+            ++parent.modCount;
+#ENDIF
+            parent.size-=numRemoved;
+            parent.head=newHead;
+          }while((parent=parent.parent)!=null);
+          break;
+        }
+      }
+      root.head=newHead;
+    }else{
+      before.next=newHead;
+      for(var parent=this.parent;parent!=null;
+#IFSWITCH CHECKED==Checked
+        ++parent.modCount,
+#ENDIF
+        parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+        if(parent.head!=oldHead){
+          do{
+            if(parent.tail!=oldTail){
+              parent.bubbleUpDecrementSize(numRemoved);
+              break;
+            }
+#IFSWITCH CHECKED==Checked
+            ++parent.modCount;
+#ENDIF
+            parent.size-=numRemoved;
+            parent.tail=newTail;
+          }while((parent=parent.parent)!=null);
+          break;
+        }
+        if(parent.tail!=oldTail){
+          for(;;){
+#IFSWITCH CHECKED==Checked
+            ++parent.modCount;
+#ENDIF
+            parent.size-=numRemoved;
+            parent.head=newHead;
+            if((parent=parent.parent)==null){
+              break;
+            }
+            if(parent.head!=oldHead){
+              parent.bubbleUpDecrementSize(numRemoved);
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
+  }
+  newHead.prev=before;
+  newTail.next=after;
+}
+
+private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
+  $DNode$$<E>$ tail;
+#IFSWITCH CHECKED==Checked
+  int modCount=this.modCount;
+  int size=this.size;
+  try
+#ENDIF
+  {
+#IF OfBoolean
+    boolean firstVal;
+    if(filter.test(firstVal=(tail=this.tail).val)){
+#ELSE
+    if(filter.test((tail=this.tail).val)){
+#ENDIF
+  #IFSWITCH CHECKED==Checked
+      if(size==1){
+        final CHECKEDList$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+  #ELSE
+      if(tail==head){
+  #ENDIF
+        --root.size;
+        this.size=size-1;
+        //only one node was in the list; remove it
+        removeLastNode(head);
+      }else{
+#IF OfBoolean
+        if(head.val^firstVal){
+          if(filter.test(firstVal=!firstVal)){
+            final CHECKEDList$<E>$ root;
+  #IFSWITCH CHECKED==Checked
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            root.size-=size;
+  #ELSE
+            int size;
+            (root=this.root).size-=(size=this.size);
+  #ENDIF
+            //all nodes should be removed from the list
+            clearAllHelper(size,head,tail,root);
+          }else{
+  #IFSWITCH CHECKED==Checked
+            final CHECKEDList$<E>$ root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+  #ENDIF
+            final int numRemoved;
+            root.size-=(numRemoved=collapsetail(tail,head,firstVal));
+            this.size=size-numRemoved;
+          }
+        }else{
+          collapseHeadAndTail(head,tail,firstVal,filter
+  #IFSWITCH CHECKED==Checked
+            ,size,modCount
+  #ENDIF
+          );
+        }
+      }
+      return true;
+    }else{
+  #IFSWITCH CHECKED==Checked
+      if(size!=1){
+  #ELSE
+      if(tail!=head){
+  #ENDIF
+        if(head.val^firstVal){
+          if(filter.test(!firstVal)){
+  #IFSWITCH CHECKED==Checked
+            final CHECKEDList$<E>$ root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+  #ENDIF
+            final int numRemoved;
+            root.size-=(numRemoved=collapsehead(head,tail,firstVal));
+            this.size=size-numRemoved;
+          }
+        }else{
+          return collapseBody(head,tail,firstVal,filter
+  #IFSWITCH CHECKED==Checked
+            ,size,modCount
+  #ENDIF
+          );
+        }
+      }
+    }
+#ELSE
+        if(filter.test(head.val)){
+          collapseHeadAndTail(head,tail,filter
+  #IFSWITCH CHECKED==Checked
+            ,size,modCount
+  #ENDIF
+          );
+        }else{
+          collapsetail(tail,head,filter
+  #IFSWITCH CHECKED==Checked
+            ,size,modCount
+  #ENDIF
+          );
+        }
+      }
+      return true;
+    }else{
+  #IFSWITCH CHECKED==Checked
+      if(size!=1){
+  #ELSE
+      if(tail!=head){
+  #ENDIF
+        if(filter.test(head.val)){
+          collapsehead(head,tail,filter
+  #IFSWITCH CHECKED==Checked
+            ,size,modCount
+  #ENDIF
+          );
+          return true;
+        }else{
+          return collapseBody(head,tail,filter
+  #IFSWITCH CHECKED==Checked
+            ,size,modCount
+  #ENDIF
+          );
+        }
+      }
+    }
+#ENDIF
+  }
+#IFSWITCH CHECKED==Checked
+  catch(ConcurrentModificationException e){
+    throw e;
+  }catch(RuntimeException e){
+    throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+  }
+  CheckedCollection.checkModCount(modCount,root.modCount);
+#ENDIF
+  return false;
+}
+
+
 @Override public void clear(){
 #IFSWITCH CHECKED==Checked
   final CHECKEDList$<E>$ root;
@@ -4521,38 +4648,35 @@ private void peelHead($DNode$$<E>$ head){
     final UncheckedList$<E>$ root;
     (root=this.root).size-=size;
 #ENDIF
-    clearAllHelper(size,root);
+    clearAllHelper(size,this.head,this.tail,root);
   }
 }
-private void clearAllHelper(int size,CHECKEDList$<E>$ root)
-{
-  $DNode$$<E>$ before,head,tail,after=(tail=this.tail).next;
-  if((before=(head=this.head).prev)==null){
+private void clearAllHelper(int size,$DNode$$<E>$ head,$DNode$$<E>$ tail,CHECKEDList$<E>$ root){
+  $DNode$$<E>$ before,after=tail.next;
+  if((before=head.prev)==null){
     //this sublist is not preceded by nodes
     if(after==null){
       bubbleUpClearAll();
-      root.head=null;
       root.tail=null;
     }else{
-      after.prev=null;
       bubbleUpClearHead(tail,after,size);
-      root.head=after;
+      after.prev=null;
     }
+    root.head=after;
   }else{
     before.next=after;
     if(after==null){
       bubbleUpClearTail(head,before,size);
       root.tail=before;
     }else{
-      after.prev=before;
       bubbleUpClearBody(before,head,size,tail,after);
+      after.prev=before;
     }
   }
   this.head=null;
   this.tail=null;
   this.size=0;
 }
-
 private void bubbleUpClearAll(){
   for(var curr=parent;curr!=null;
 #IFSWITCH CHECKED==Checked
@@ -4641,6 +4765,195 @@ private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRem
     }
   }
 }
+#IF OfBoolean
+private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ removeThis,$TypeNameModifier$Predicate$<? super E>$ filter
+  #IFSWITCH CHECKED==Checked
+  ,int size,int modCount
+  #ENDIF
+){
+  #IFSWITCH CHECKED==Checked
+  int numLeft;
+  if((numLeft=size-2)!=0)
+  #ENDIF
+  {
+    int numRemoved=2;
+    for(var newHead=head.next;;++numRemoved,newHead=newHead.next){
+  #IFNOTSWITCH CHECKED==Checked
+      if(newHead==tail){
+        break;
+      }
+  #ENDIF
+      if(newHead.val^removeThis){
+        if(filter.test(!removeThis)){
+          break;   
+        }
+  #IFSWITCH CHECKED==Checked
+        CHECKEDList$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+  #ENDIF
+        $DNode$$<E>$ newTail;
+        for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
+          if(newTail.val^removeThis)
+          {
+            numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
+            break;
+          }
+        }
+        bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,newTail,tail);
+        this.size=size-numRemoved;
+        root.size-=numRemoved;
+        return;
+      }
+  #IFSWITCH CHECKED==Checked
+      if(--numLeft==0){
+        break;
+      }
+  #ENDIF
+    }
+  }
+  final CHECKEDList$<E>$ root;
+  #IFSWITCH CHECKED==Checked
+  CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+  root.modCount=++modCount;
+  this.modCount=modCount;
+  root.size-=size;
+  #ELSE
+  final int size;
+  (root=this.root).size-=(size=this.size);
+  #ENDIF
+  clearAllHelper(size,head,tail,root);
+}
+private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ retainThis,$TypeNameModifier$Predicate$<? super E>$ filter
+  #IFSWITCH CHECKED==Checked
+  ,int size,int modCount
+  #ENDIF
+){
+  #IFSWITCH CHECKED==Checked
+  for(int numLeft=size-2;numLeft!=0;--numLeft){
+    $DNode$$<E>$ prev;
+    if((head=(prev=head).next).val^retainThis){
+      if(filter.test(!retainThis)){
+        final CHECKEDList$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+  #ELSE
+  for($DNode$$<E>$ prev;(head=(prev=head).next)!=tail;){
+    if(head.val^retainThis){
+      if(filter.test(!retainThis)){
+  #ENDIF
+        int numRemoved=1;
+        while((head=head.next)!=tail){
+          if(head.val==retainThis){
+            numRemoved+=collapseBodyHelper(head,tail,!retainThis);
+            break;
+          }
+          ++numRemoved;
+        }
+        prev.next=head;
+        head.prev=prev;
+        for(var parent=this.parent;parent!=null;
+  #IFSWITCH CHECKED==Checked
+          parent.modCount=modCount,
+  #ENDIF
+          parent.size-=numRemoved,parent=parent.parent){}
+        root.size-=numRemoved;
+        this.size=size-numRemoved;
+        return true;
+      }
+      break;
+    }
+  }
+#IFSWITCH CHECKED==Checked
+  CheckedCollection.checkModCount(modCount,root.modCount);
+#ENDIF
+  return false;
+}
+#ELSE
+private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
+  #IFSWITCH CHECKED==Checked
+  ,int size,int modCount
+  #ENDIF
+){
+  //TODO
+}
+private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
+  #IFSWITCH CHECKED==Checked
+  ,int size,int modCount
+  #ENDIF
+){
+  //TODO
+  return false;
+}
+#ENDIF
 #ENDDEF
+#MACRODEF CollapseEnd(HEAD,TAIL,NEXT,PREV)
+#IF OfBoolean
+private int collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$ArrayType$ retainThis){
+  int numRemoved=1;
+  $DNode$$<E>$ newHEAD;
+  outer:for(newHEAD=oldHEAD.NEXT;newHEAD!=TAIL;++numRemoved,newHEAD=newHEAD.next){
+    if(newHEAD.val==retainThis){
+      $DNode$$<E>$ PREV,curr;
+      for(curr=(PREV=newHEAD).NEXT;curr!=TAIL;curr=(PREV=curr).NEXT){
+        if(curr.val^retainThis){
+          do{
+            ++numRemoved;
+            if((curr=curr.NEXT)==TAIL){
+              curr.PREV=PREV;
+              PREV.NEXT=curr;
+              break outer;
+            }
+          }while(curr.val^retainThis);
+          curr.PREV=PREV;
+          PREV.NEXT=curr;
+        }
+      }
+      break;
+    }
+  }
+  this.HEAD=newHEAD;
+  $DNode$$<E>$ tmp;
+  if((tmp=oldHEAD.PREV)==null){
+    for(var parent=this.parent;parent!=null;
+#IFSWITCH CHECKED==Checked
+      ++parent.modCount,
+#ENDIF
+      parent.HEAD=newHEAD,parent.size-=numRemoved,parent=parent.parent){}
+    root.HEAD=newHEAD;
+  }else{
+    for(var parent=this.parent;parent!=null;
+#IFSWITCH CHECKED==Checked
+      ++parent.modCount,
+#ENDIF
+      parent.HEAD=newHEAD,parent.size-=numRemoved,parent=parent.parent){
+      if(parent.HEAD!=oldHEAD){
+        parent.bubbleUpDecrementSize(numRemoved);
+        break;
+      }
+    }
+    tmp.NEXT=newHEAD;
+  }
+  newHEAD.PREV=tmp;
+  return numRemoved;
+}
+#ELSE
+private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifier$Predicate$<? super E>$ filter
+  #IFSWITCH CHECKED==Checked
+  ,int size,int modCount
+  #ENDIF
+){
+  //TODO
+#IFSWITCH CHECKED==Checked
+  
+#ELSE
+
+#ENDIF
+  
+}
+#ENDIF
 
 
+#ENDDEF

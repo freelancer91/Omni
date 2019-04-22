@@ -92,7 +92,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
     }
   }
-  private static  int markSurvivors(FloatDblLnkNode curr,FloatPredicate filter,long[] survivorSet){
+  private static  int markSurvivors(FloatDblLnkNode curr,int numLeft,FloatPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -100,20 +100,23 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           word|=marker;
           ++numSurvivors;
         }
-        if((curr=curr.next)==null){
+        if(--numLeft==0)
+        {
           survivorSet[wordOffset]=word;
           return numSurvivors;
         }
+        curr=curr.next;
       }while((marker<<=1)!=0L);
       survivorSet[wordOffset++]=word;
     }
   }
-  private static  long markSurvivors(FloatDblLnkNode curr,FloatPredicate filter){
-    for(long word=0L,marker=1L;;marker<<=1){
+  private static  long markSurvivors(FloatDblLnkNode curr,int numLeft,FloatPredicate filter){
+    for(long word=0L,marker=1L;;marker<<=1,curr=curr.next){
       if(!filter.test(curr.val)){
         word|=marker;
       }
-      if((curr=curr.next)==null){
+      if(--numLeft==0)
+      {
         return word;
       }
     }
@@ -1040,167 +1043,8 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       oldTail.next=newNode;
       newNode.prev=oldTail;
     }
-    @Override public void clear(){
-      int size;
-      if((size=this.size)!=0){
-        final UncheckedList root;
-        (root=this.root).size-=size;
-        clearAllHelper(size,root);
-      }
-    }
-    private void clearAllHelper(int size,UncheckedList root)
-    {
-      FloatDblLnkNode before,head,tail,after=(tail=this.tail).next;
-      if((before=(head=this.head).prev)==null){
-        //this sublist is not preceded by nodes
-        if(after==null){
-          bubbleUpClearAll();
-          root.head=null;
-          root.tail=null;
-        }else{
-          after.prev=null;
-          bubbleUpClearHead(tail,after,size);
-          root.head=after;
-        }
-      }else{
-        before.next=after;
-        if(after==null){
-          bubbleUpClearTail(head,before,size);
-          root.tail=before;
-        }else{
-          after.prev=before;
-          bubbleUpClearBody(before,head,size,tail,after);
-        }
-      }
-      this.head=null;
-      this.tail=null;
-      this.size=0;
-    }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
-    }
-    private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpClearBody(FloatDblLnkNode before,FloatDblLnkNode head,int numRemoved,FloatDblLnkNode tail,FloatDblLnkNode after){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          while(curr.tail==tail){
-            curr.tail=before;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }else if(curr.tail!=tail){
-          do{
-            curr.head=after;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }while(curr.head==head);
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }
-      }
-    }
-    private void bubbleUpClearHead(FloatDblLnkNode tail, FloatDblLnkNode after,int numRemoved){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.tail!=tail){
-          do{
-            curr.head=after;
-            curr.size-=numRemoved;
-          }while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    private void bubbleUpClearTail(FloatDblLnkNode head, FloatDblLnkNode before,int numRemoved){
-      for(var curr=parent;curr!=null;
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          do{
-            curr.tail=before;
-            curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
     @Override public boolean equals(Object val){
       //TODO
-      return false;
-    }
-    @Override public boolean removeIf(FloatPredicate filter){
-      final FloatDblLnkNode head;
-      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
-    }
-    @Override public boolean removeIf(Predicate<? super Float> filter){
-      final FloatDblLnkNode head;
-      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
-    }
-    private void collapseHeadHelper(FloatDblLnkNode oldHead,FloatDblLnkNode tail,FloatPredicate filter)
-    {
-      //TODO
-    }
-    private void collapseTailHelper(FloatDblLnkNode head,FloatDblLnkNode oldTail,FloatPredicate filter)
-    {
-      //TODO
-    }
-    private void collapseHeadAndTailHelper(FloatDblLnkNode oldHead,FloatDblLnkNode oldTail,FloatPredicate filter)
-    {
-      //TODO
-    }
-    private boolean collapseBodyHelper(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter)
-    {
-      //TODO
-      return false;
-    }
-    private boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
-      var tail=this.tail;
-      if(filter.test(head.val))
-      {
-        if(tail==head)
-        {
-          this.size=0;
-          removeLastNode(head);
-          --root.size;
-        }
-        else
-        {
-          if(filter.test(tail.val))
-          {
-            collapseHeadAndTailHelper(head,tail,filter);
-          }
-          else
-          {
-            collapseHeadHelper(head,tail,filter);
-          }
-        }
-        return true;
-      }
-      else
-      {
-        if(tail!=head)
-        {
-          if(filter.test(tail.val))
-          {
-            collapseTailHelper(head,tail,filter);
-            return true;
-          }
-          return collapseBodyHelper(head,tail,filter);
-        }
-      }
       return false;
     }
     private void bubbleUpPeelHead(FloatDblLnkNode newHead,FloatDblLnkNode oldHead){
@@ -1388,6 +1232,234 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
       --root.size;
       return ret;
+    }
+    @Override public boolean removeIf(FloatPredicate filter){
+      final FloatDblLnkNode head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter);
+    }
+    @Override public boolean removeIf(Predicate<? super Float> filter){
+      final FloatDblLnkNode head;
+      return (head=this.head)!=null && uncheckedRemoveIf(head,filter::test);
+    }
+    private void collapsehead(FloatDblLnkNode oldhead,FloatDblLnkNode tail,FloatPredicate filter
+    ){
+      //TODO
+    }
+    private void collapsetail(FloatDblLnkNode oldtail,FloatDblLnkNode head,FloatPredicate filter
+    ){
+      //TODO
+    }
+    private void bubbleUpCollapseHeadAndTail(FloatDblLnkNode oldHead,FloatDblLnkNode newHead,int numRemoved,FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+      this.head=newHead;
+      this.tail=newTail;
+      final FloatDblLnkNode after,before=oldHead.prev;
+      if((after=oldHead.next)==null){
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+          parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
+          UncheckedList root;
+          (root=this.root).head=newHead;
+          root.tail=newTail;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.tail=newTail;
+        }
+      }else{
+        after.prev=newTail;
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.tail!=oldTail){
+              do{
+                parent.size-=numRemoved;
+                parent.head=newHead;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.head=newHead;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                if(parent.tail!=oldTail){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+            if(parent.tail!=oldTail){
+              for(;;){
+                parent.size-=numRemoved;
+                parent.head=newHead;
+                if((parent=parent.parent)==null){
+                  break;
+                }
+                if(parent.head!=oldHead){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+      newHead.prev=before;
+      newTail.next=after;
+    }
+    private boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
+      FloatDblLnkNode tail;
+      {
+        if(filter.test((tail=this.tail).val)){
+          if(tail==head){
+            --root.size;
+            this.size=size-1;
+            //only one node was in the list; remove it
+            removeLastNode(head);
+          }else{
+            if(filter.test(head.val)){
+              collapseHeadAndTail(head,tail,filter
+              );
+            }else{
+              collapsetail(tail,head,filter
+              );
+            }
+          }
+          return true;
+        }else{
+          if(tail!=head){
+            if(filter.test(head.val)){
+              collapsehead(head,tail,filter
+              );
+              return true;
+            }else{
+              return collapseBody(head,tail,filter
+              );
+            }
+          }
+        }
+      }
+      return false;
+    }
+    @Override public void clear(){
+      int size;
+      if((size=this.size)!=0){
+        final UncheckedList root;
+        (root=this.root).size-=size;
+        clearAllHelper(size,this.head,this.tail,root);
+      }
+    }
+    private void clearAllHelper(int size,FloatDblLnkNode head,FloatDblLnkNode tail,UncheckedList root){
+      FloatDblLnkNode before,after=tail.next;
+      if((before=head.prev)==null){
+        //this sublist is not preceded by nodes
+        if(after==null){
+          bubbleUpClearAll();
+          root.tail=null;
+        }else{
+          bubbleUpClearHead(tail,after,size);
+          after.prev=null;
+        }
+        root.head=after;
+      }else{
+        before.next=after;
+        if(after==null){
+          bubbleUpClearTail(head,before,size);
+          root.tail=before;
+        }else{
+          bubbleUpClearBody(before,head,size,tail,after);
+          after.prev=before;
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    private void bubbleUpClearAll(){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+    }
+    private void bubbleUpDecrementSize(int numRemoved){
+      var curr=this;
+      do{
+        curr.size-=numRemoved;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpClearBody(FloatDblLnkNode before,FloatDblLnkNode head,int numRemoved,FloatDblLnkNode tail,FloatDblLnkNode after){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          while(curr.tail==tail){
+            curr.tail=before;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }else if(curr.tail!=tail){
+          do{
+            curr.head=after;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }while(curr.head==head);
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }
+      }
+    }
+    private void bubbleUpClearHead(FloatDblLnkNode tail, FloatDblLnkNode after,int numRemoved){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.tail!=tail){
+          do{
+            curr.head=after;
+            curr.size-=numRemoved;
+          }while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void bubbleUpClearTail(FloatDblLnkNode head, FloatDblLnkNode before,int numRemoved){
+      for(var curr=parent;curr!=null;
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          do{
+            curr.tail=before;
+            curr.size-=numRemoved;
+          }
+          while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void collapseHeadAndTail(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+    ){
+      //TODO
+    }
+    private boolean collapseBody(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+    ){
+      //TODO
+      return false;
     }
     @Override public Object clone(){
       final int size;
@@ -2055,8 +2127,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
     }
     private static class BidirectionalItr
       extends AbstractFloatItr
-      implements OmniListIterator.OfFloat
-    {
+      implements OmniListIterator.OfFloat{
       transient final CheckedSubList parent;
       transient int modCount;
       transient FloatDblLnkNode curr;
@@ -2112,8 +2183,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
       @Override public void set(float val){
         final FloatDblLnkNode lastRet;
-        if((lastRet=this.lastRet)!=null)
-        {
+        if((lastRet=this.lastRet)!=null){
           CheckedCollection.checkModCount(modCount,parent.root.modCount);
           lastRet.val=val;
           return;
@@ -3106,28 +3176,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    @Override public boolean removeIf(FloatPredicate filter){
-      final FloatDblLnkNode head;
-      if((head=this.head)!=null){
-        return uncheckedRemoveIf(head,filter);
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    @Override public boolean removeIf(Predicate<? super Float> filter){
-      final FloatDblLnkNode head;
-      if((head=this.head)!=null){
-        return uncheckedRemoveIf(head,filter::test);
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
-      return false;
-    }
-    private boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
-      //TODO
-      return false;
-    }
     private void bubbleUpPeelHead(FloatDblLnkNode newHead,FloatDblLnkNode oldHead){
       var curr=parent;
       do{
@@ -3335,6 +3383,286 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       --root.size;
       return ret;
     }
+    @Override public boolean removeIf(FloatPredicate filter){
+      final FloatDblLnkNode head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    @Override public boolean removeIf(Predicate<? super Float> filter){
+      final FloatDblLnkNode head;
+      if((head=this.head)!=null){
+        return uncheckedRemoveIf(head,filter::test);
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      return false;
+    }
+    private void collapsehead(FloatDblLnkNode oldhead,FloatDblLnkNode tail,FloatPredicate filter
+      ,int size,int modCount
+    ){
+      //TODO
+    }
+    private void collapsetail(FloatDblLnkNode oldtail,FloatDblLnkNode head,FloatPredicate filter
+      ,int size,int modCount
+    ){
+      //TODO
+    }
+    private void bubbleUpCollapseHeadAndTail(FloatDblLnkNode oldHead,FloatDblLnkNode newHead,int numRemoved,FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+      this.head=newHead;
+      this.tail=newTail;
+      final FloatDblLnkNode after,before=oldHead.prev;
+      if((after=oldHead.next)==null){
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+          ++parent.modCount,
+          parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
+          CheckedList root;
+          (root=this.root).head=newHead;
+          root.tail=newTail;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            ++parent.modCount,
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.tail=newTail;
+        }
+      }else{
+        after.prev=newTail;
+        if(before==null){
+          for(var parent=this.parent;parent!=null;
+            ++parent.modCount,
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.tail!=oldTail){
+              do{
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.head=newHead;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+          }
+          root.head=newHead;
+        }else{
+          before.next=newHead;
+          for(var parent=this.parent;parent!=null;
+            ++parent.modCount,
+            parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){
+            if(parent.head!=oldHead){
+              do{
+                if(parent.tail!=oldTail){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.tail=newTail;
+              }while((parent=parent.parent)!=null);
+              break;
+            }
+            if(parent.tail!=oldTail){
+              for(;;){
+                ++parent.modCount;
+                parent.size-=numRemoved;
+                parent.head=newHead;
+                if((parent=parent.parent)==null){
+                  break;
+                }
+                if(parent.head!=oldHead){
+                  parent.bubbleUpDecrementSize(numRemoved);
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+      newHead.prev=before;
+      newTail.next=after;
+    }
+    private boolean uncheckedRemoveIf(FloatDblLnkNode head,FloatPredicate filter){
+      FloatDblLnkNode tail;
+      int modCount=this.modCount;
+      int size=this.size;
+      try
+      {
+        if(filter.test((tail=this.tail).val)){
+          if(size==1){
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            --root.size;
+            this.size=size-1;
+            //only one node was in the list; remove it
+            removeLastNode(head);
+          }else{
+            if(filter.test(head.val)){
+              collapseHeadAndTail(head,tail,filter
+                ,size,modCount
+              );
+            }else{
+              collapsetail(tail,head,filter
+                ,size,modCount
+              );
+            }
+          }
+          return true;
+        }else{
+          if(size!=1){
+            if(filter.test(head.val)){
+              collapsehead(head,tail,filter
+                ,size,modCount
+              );
+              return true;
+            }else{
+              return collapseBody(head,tail,filter
+                ,size,modCount
+              );
+            }
+          }
+        }
+      }
+      catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override public void clear(){
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0){
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        root.size-=size;
+        clearAllHelper(size,this.head,this.tail,root);
+      }
+    }
+    private void clearAllHelper(int size,FloatDblLnkNode head,FloatDblLnkNode tail,CheckedList root){
+      FloatDblLnkNode before,after=tail.next;
+      if((before=head.prev)==null){
+        //this sublist is not preceded by nodes
+        if(after==null){
+          bubbleUpClearAll();
+          root.tail=null;
+        }else{
+          bubbleUpClearHead(tail,after,size);
+          after.prev=null;
+        }
+        root.head=after;
+      }else{
+        before.next=after;
+        if(after==null){
+          bubbleUpClearTail(head,before,size);
+          root.tail=before;
+        }else{
+          bubbleUpClearBody(before,head,size,tail,after);
+          after.prev=before;
+        }
+      }
+      this.head=null;
+      this.tail=null;
+      this.size=0;
+    }
+    private void bubbleUpClearAll(){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
+    }
+    private void bubbleUpDecrementSize(int numRemoved){
+      var curr=this;
+      do{
+        ++curr.modCount;
+        curr.size-=numRemoved;
+      }while((curr=curr.parent)!=null);
+    }
+    private void bubbleUpClearBody(FloatDblLnkNode before,FloatDblLnkNode head,int numRemoved,FloatDblLnkNode tail,FloatDblLnkNode after){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          while(curr.tail==tail){
+            ++curr.modCount;
+            curr.tail=before;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }else if(curr.tail!=tail){
+          do{
+            ++curr.modCount;
+            curr.head=after;
+            curr.size-=numRemoved;
+            if((curr=curr.parent)==null){
+              return;
+            }
+          }while(curr.head==head);
+          curr.bubbleUpDecrementSize(numRemoved);
+          return;
+        }
+      }
+    }
+    private void bubbleUpClearHead(FloatDblLnkNode tail, FloatDblLnkNode after,int numRemoved){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.tail!=tail){
+          do{
+            ++curr.modCount;
+            curr.head=after;
+            curr.size-=numRemoved;
+          }while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void bubbleUpClearTail(FloatDblLnkNode head, FloatDblLnkNode before,int numRemoved){
+      for(var curr=parent;curr!=null;
+      ++curr.modCount,
+      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
+        if(curr.head!=head){
+          do{
+            ++curr.modCount;
+            curr.tail=before;
+            curr.size-=numRemoved;
+          }
+          while((curr=curr.parent)!=null);
+          break;
+        }
+      }
+    }
+    private void collapseHeadAndTail(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+      ,int size,int modCount
+    ){
+      //TODO
+    }
+    private boolean collapseBody(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
+      ,int size,int modCount
+    ){
+      //TODO
+      return false;
+    }
     private void bubbleUpAppend(FloatDblLnkNode newNode){
       for(var curr=this;;){
         curr.tail=newNode;
@@ -3493,116 +3821,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       newNode.next=after;
       oldTail.next=newNode;
       newNode.prev=oldTail;
-    }
-    @Override public void clear(){
-      final CheckedList root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        this.modCount=modCount;
-        root.size-=size;
-        clearAllHelper(size,root);
-      }
-    }
-    private void clearAllHelper(int size,CheckedList root)
-    {
-      FloatDblLnkNode before,head,tail,after=(tail=this.tail).next;
-      if((before=(head=this.head).prev)==null){
-        //this sublist is not preceded by nodes
-        if(after==null){
-          bubbleUpClearAll();
-          root.head=null;
-          root.tail=null;
-        }else{
-          after.prev=null;
-          bubbleUpClearHead(tail,after,size);
-          root.head=after;
-        }
-      }else{
-        before.next=after;
-        if(after==null){
-          bubbleUpClearTail(head,before,size);
-          root.tail=before;
-        }else{
-          after.prev=before;
-          bubbleUpClearBody(before,head,size,tail,after);
-        }
-      }
-      this.head=null;
-      this.tail=null;
-      this.size=0;
-    }
-    private void bubbleUpClearAll(){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
-    }
-    private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
-        ++curr.modCount;
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
-    }
-    private void bubbleUpClearBody(FloatDblLnkNode before,FloatDblLnkNode head,int numRemoved,FloatDblLnkNode tail,FloatDblLnkNode after){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          while(curr.tail==tail){
-            ++curr.modCount;
-            curr.tail=before;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }else if(curr.tail!=tail){
-          do{
-            ++curr.modCount;
-            curr.head=after;
-            curr.size-=numRemoved;
-            if((curr=curr.parent)==null){
-              return;
-            }
-          }while(curr.head==head);
-          curr.bubbleUpDecrementSize(numRemoved);
-          return;
-        }
-      }
-    }
-    private void bubbleUpClearHead(FloatDblLnkNode tail, FloatDblLnkNode after,int numRemoved){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.tail!=tail){
-          do{
-            ++curr.modCount;
-            curr.head=after;
-            curr.size-=numRemoved;
-          }while((curr=curr.parent)!=null);
-          break;
-        }
-      }
-    }
-    private void bubbleUpClearTail(FloatDblLnkNode head, FloatDblLnkNode before,int numRemoved){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){
-        if(curr.head!=head){
-          do{
-            ++curr.modCount;
-            curr.tail=before;
-            curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
-          break;
-        }
-      }
     }
     @Override public float set(int index,float val){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4313,14 +4531,14 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       if(numLeft!=0){
         int numSurvivors;
         if(numLeft>64){
-          long[] survivorSet;
-          numSurvivors=markSurvivors(prev.next,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+          final long[] survivorSet;
+          numSurvivors=markSurvivors(prev.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=numSurvivors)!=0){
             pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
           }
         }else{
-          long survivorWord=markSurvivors(prev.next,filter);
+          final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
