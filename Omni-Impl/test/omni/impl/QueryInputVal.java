@@ -722,9 +722,8 @@ public enum QueryInputVal{
         case BoxedShortNull:
         case ObjectNull:
             return DataTypeSet.OnlyObject.set;
-        default:
-            throw new Error("Unknown query input val " + inputVal);
         }
+        throw new Error("Unknown query input val " + inputVal);
     }
 
     private static Object initNotEqualsVal(QueryInputVal inputVal) {
@@ -1028,9 +1027,8 @@ public enum QueryInputVal{
         case PrimitiveLongPos0:
         case PrimitiveLongNeg0:
             return Boolean.TRUE;
-        default:
-            throw new Error("Unknown input val "+inputVal);
         }
+        throw new Error("Unknown input val " + inputVal);
     }
 
     private static final Object initVal(QueryInputVal inputVal) {
@@ -1424,9 +1422,8 @@ public enum QueryInputVal{
         case ObjectDoubleMinDouble:
         case PrimitiveDoubleMinDouble:
             return (double)Double.MIN_VALUE;
-        default:
-            throw new Error("Unknown input val "+inputVal);
         }
+        throw new Error("Unknown input val " + inputVal);
     }
 
 

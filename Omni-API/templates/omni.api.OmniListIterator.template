@@ -20,6 +20,72 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
+  public abstract interface DoubleOutput<E> extends OmniIterator.DoubleOutput<E>,OmniListIterator<E>{
+    public abstract double previousDouble();
+  }
+  public abstract interface FloatOutput<E> extends OmniIterator.FloatOutput<E>,DoubleOutput<E>{
+    public abstract float previousFloat();
+  }
+  public abstract interface LongOutput<E> extends OmniIterator.LongOutput<E>,FloatOutput<E>{
+    public abstract long previousLong();
+  }
+  public abstract interface IntOutput<E> extends OmniIterator.IntOutput<E>,LongOutput<E>{
+    public abstract int previousInt();
+  }
+  public abstract interface ShortOutput<E> extends OmniIterator.ShortOutput<E>,IntOutput<E>{
+    public abstract short previousShort();
+  }
+  public abstract interface CharOutput<E> extends OmniIterator.CharOutput<E>,IntOutput<E>{
+    public abstract char previousChar();
+  }
+  public abstract interface ByteOutput<E> extends OmniIterator.ByteOutput<E>,ShortOutput<E>{
+    public abstract byte previousByte();
+  }
+  
+  public abstract interface BooleanInput<E> extends OmniListIterator<E>{
+    public abstract void add(boolean val);
+    public abstract void add(Boolean val);
+    public abstract void set(boolean val);
+    public abstract void set(Boolean val);
+  }
+  public abstract interface ByteInput<E> extends BooleanInput<E>{
+    public abstract void add(byte val);
+    public abstract void add(Byte val);
+    public abstract void set(byte val);
+    public abstract void set(Byte val);
+  }
+  public abstract interface CharInput<E> extends BooleanInput<E>{
+    public abstract void add(char val);
+    public abstract void add(Character val);
+    public abstract void set(char val);
+    public abstract void set(Character val);
+  }
+  public abstract interface ShortInput<E> extends ByteInput<E>{
+    public abstract void add(short val);
+    public abstract void add(Short val);
+    public abstract void set(short val);
+    public abstract void set(Short val);
+  }
+  public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>{
+    public abstract void add(int val);
+    public abstract void add(Integer val);
+    public abstract void set(int val);
+    public abstract void set(Integer val);
+  }
+  public abstract interface LongInput<E> extends IntInput<E>{
+    public abstract void add(long val);
+    public abstract void add(Long val);
+    public abstract void set(long val);
+    public abstract void set(Long val);
+  }
+  public abstract interface FloatInput<E> extends LongInput<E>{
+    public abstract void add(float val);
+    public abstract void add(Float val);
+    public abstract void set(float val);
+    public abstract void set(Float val);
+  }
+  
+  
 #MACRODEF InputMethods(INPUTTYPE,CAST)
 public default void add(INPUTTYPE val)
 {
@@ -33,6 +99,13 @@ public default void set(INPUTTYPE val)
   
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
 public abstract interface OfCLASSPREFIX extends OmniListIterator<BOXEDTYPE>,OmniIterator.OfCLASSPREFIX
+#IFSWITCH ARRTYPE==boolean
+,BooleanInput<BOXEDTYPE>,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
+#ELSEIFSWITCH ARRTYPE==double
+,FloatInput<BOXEDTYPE>,DoubleOutput<BOXEDTYPE>
+#ELSEIFNOTSWITCH ARRTYPE==Object
+,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
+#ENDIF
 {
 
 

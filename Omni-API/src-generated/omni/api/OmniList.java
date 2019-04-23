@@ -236,7 +236,134 @@ public abstract interface OmniList extends OmniCollection
        return -1;
      }
   }
+  public abstract interface DoubleOutput<E> extends OmniList,OmniCollection.DoubleOutput<E>
+  {
+    public abstract OmniListIterator.DoubleOutput<E> listIterator();
+    public abstract OmniListIterator.DoubleOutput<E> listIterator(int index);
+    public abstract OmniList.DoubleOutput<E> subList(int fromIndex,int toIndex);
+    public abstract double getDouble(int index);
+    public abstract double removeDoubleAt(int index);
+  }
+  public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>
+  {
+    public abstract OmniListIterator.FloatOutput<E> listIterator();
+    public abstract OmniListIterator.FloatOutput<E> listIterator(int index);
+    public abstract OmniList.FloatOutput<E> subList(int fromIndex,int toIndex);
+    public abstract float getFloat(int index);
+    public abstract float removeFloatAt(int index);
+  }
+  public abstract interface LongOutput<E> extends FloatOutput<E>,OmniCollection.LongOutput<E>
+  {
+    public abstract OmniListIterator.LongOutput<E> listIterator();
+    public abstract OmniListIterator.LongOutput<E> listIterator(int index);
+    public abstract OmniList.LongOutput<E> subList(int fromIndex,int toIndex);
+    public abstract long getLong(int index);
+    public abstract long removeLongAt(int index);
+  }
+  public abstract interface IntOutput<E> extends LongOutput<E>,OmniCollection.IntOutput<E>
+  {
+    public abstract OmniListIterator.IntOutput<E> listIterator();
+    public abstract OmniListIterator.IntOutput<E> listIterator(int index);
+    public abstract OmniList.IntOutput<E> subList(int fromIndex,int toIndex);
+    public abstract int getInt(int index);
+    public abstract int removeIntAt(int index);
+  }
+  public abstract interface ShortOutput<E> extends IntOutput<E>,OmniCollection.ShortOutput<E>
+  {
+    public abstract OmniListIterator.ShortOutput<E> listIterator();
+    public abstract OmniListIterator.ShortOutput<E> listIterator(int index);
+    public abstract OmniList.ShortOutput<E> subList(int fromIndex,int toIndex);
+    public abstract short getShort(int index);
+    public abstract short removeShortAt(int index);
+  }
+  public abstract interface CharOutput<E> extends IntOutput<E>,OmniCollection.CharOutput<E>
+  {
+    public abstract OmniListIterator.CharOutput<E> listIterator();
+    public abstract OmniListIterator.CharOutput<E> listIterator(int index);
+    public abstract OmniList.CharOutput<E> subList(int fromIndex,int toIndex);
+    public abstract char getChar(int index);
+    public abstract char removeCharAt(int index);
+  }
+  public abstract interface ByteOutput<E> extends ShortOutput<E>,OmniCollection.ByteOutput<E>
+  {
+    public abstract OmniListIterator.ByteOutput<E> listIterator();
+    public abstract OmniListIterator.ByteOutput<E> listIterator(int index);
+    public abstract OmniList.ByteOutput<E> subList(int fromIndex,int toIndex);
+    public abstract byte getByte(int index);
+    public abstract byte removeByteAt(int index);
+  }
+  public abstract interface BooleanInput<E> extends OmniList,OmniCollection.BooleanInput
+  {
+    public abstract void add(int index,boolean val);
+    public abstract void add(int index,Boolean val);
+    public abstract void put(int index,boolean val);
+    public abstract void put(int index,Boolean val);
+    public abstract OmniListIterator.BooleanInput<E> listIterator();
+    public abstract OmniListIterator.BooleanInput<E> listIterator(int index);
+    public abstract OmniList.BooleanInput<E> subList(int fromIndex,int toIndex);
+  }
+  public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput
+  {
+    public abstract void add(int index,byte val);
+    public abstract void add(int index,Byte val);
+    public abstract void put(int index,byte val);
+    public abstract void put(int index,Byte val);
+    public abstract OmniListIterator.ByteInput<E> listIterator();
+    public abstract OmniListIterator.ByteInput<E> listIterator(int index);
+    public abstract OmniList.ByteInput<E> subList(int fromIndex,int toIndex);
+  }
+  public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput
+  {
+    public abstract void add(int index,char val);
+    public abstract void add(int index,Character val);
+    public abstract void put(int index,char val);
+    public abstract void put(int index,Character val);
+    public abstract OmniListIterator.CharInput<E> listIterator();
+    public abstract OmniListIterator.CharInput<E> listIterator(int index);
+    public abstract OmniList.CharInput<E> subList(int fromIndex,int toIndex);
+  }
+  public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput
+  {
+    public abstract void add(int index,short val);
+    public abstract void add(int index,Short val);
+    public abstract void put(int index,short val);
+    public abstract void put(int index,Short val);
+    public abstract OmniListIterator.ShortInput<E> listIterator();
+    public abstract OmniListIterator.ShortInput<E> listIterator(int index);
+    public abstract OmniList.ShortInput<E> subList(int fromIndex,int toIndex);
+  }
+  public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>,OmniCollection.IntInput
+  {
+    public abstract void add(int index,int val);
+    public abstract void add(int index,Integer val);
+    public abstract void put(int index,int val);
+    public abstract void put(int index,Integer val);
+    public abstract OmniListIterator.IntInput<E> listIterator();
+    public abstract OmniListIterator.IntInput<E> listIterator(int index);
+    public abstract OmniList.IntInput<E> subList(int fromIndex,int toIndex);
+  }
+  public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput
+  {
+    public abstract void add(int index,long val);
+    public abstract void add(int index,Long val);
+    public abstract void put(int index,long val);
+    public abstract void put(int index,Long val);
+    public abstract OmniListIterator.LongInput<E> listIterator();
+    public abstract OmniListIterator.LongInput<E> listIterator(int index);
+    public abstract OmniList.LongInput<E> subList(int fromIndex,int toIndex);
+  }
+  public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput
+  {
+    public abstract void add(int index,float val);
+    public abstract void add(int index,Float val);
+    public abstract void put(int index,float val);
+    public abstract void put(int index,Float val);
+    public abstract OmniListIterator.FloatInput<E> listIterator();
+    public abstract OmniListIterator.FloatInput<E> listIterator(int index);
+    public abstract OmniList.FloatInput<E> subList(int fromIndex,int toIndex);
+  }
     public abstract interface OfBoolean extends OfPrimitive,OmniCollection.OfBoolean
+    ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
     {
       public abstract Boolean get(int index);
       public abstract boolean getBoolean(int index);
@@ -326,6 +453,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfByte extends OfPrimitive,OmniCollection.OfByte
+    ,ByteInput<Byte>,ByteOutput<Byte>
     {
       public abstract Byte get(int index);
       public abstract byte getByte(int index);
@@ -422,6 +550,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfChar extends OfPrimitive,OmniCollection.OfChar
+    ,CharInput<Character>,CharOutput<Character>
     {
       public abstract Character get(int index);
       public abstract char getChar(int index);
@@ -510,6 +639,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfShort extends OfPrimitive,OmniCollection.OfShort
+    ,ShortInput<Short>,ShortOutput<Short>
     {
       public abstract Short get(int index);
       public abstract short getShort(int index);
@@ -614,6 +744,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfInt extends OfPrimitive,OmniCollection.OfInt
+    ,IntInput<Integer>,IntOutput<Integer>
     {
       public abstract Integer get(int index);
       public abstract int getInt(int index);
@@ -684,6 +815,22 @@ public abstract interface OmniList extends OmniCollection
       {
         return removeIntAt(index);
       }
+      public default void add(int index,char val)
+      {
+        add(index,(int)val);
+      }
+      public default void add(int index,Character val)
+      {
+        add(index,(int)val.charValue());
+      }
+      public default void put(int index,char val)
+      {
+        put(index,(int)val);
+      }
+      public default void put(int index,Character val)
+      {
+        put(index,(int)val.charValue());
+      }
       public default void add(int index,byte val)
       {
         add(index,(int)val);
@@ -742,6 +889,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfLong extends OfPrimitive,OmniCollection.OfLong
+    ,LongInput<Long>,LongOutput<Long>
     {
       public abstract Long get(int index);
       public abstract long getLong(int index);
@@ -803,6 +951,22 @@ public abstract interface OmniList extends OmniCollection
       public default float removeFloatAt(int index)
       {
         return removeLongAt(index);
+      }
+      public default void add(int index,char val)
+      {
+        add(index,(long)val);
+      }
+      public default void add(int index,Character val)
+      {
+        add(index,(long)val.charValue());
+      }
+      public default void put(int index,char val)
+      {
+        put(index,(long)val);
+      }
+      public default void put(int index,Character val)
+      {
+        put(index,(long)val.charValue());
       }
       public default void add(int index,byte val)
       {
@@ -878,6 +1042,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfFloat extends OfPrimitive,OmniCollection.OfFloat
+    ,FloatInput<Float>,FloatOutput<Float>
     {
       public abstract Float get(int index);
       public abstract float getFloat(int index);
@@ -931,6 +1096,22 @@ public abstract interface OmniList extends OmniCollection
       public default double removeDoubleAt(int index)
       {
         return removeFloatAt(index);
+      }
+      public default void add(int index,char val)
+      {
+        add(index,(float)val);
+      }
+      public default void add(int index,Character val)
+      {
+        add(index,(float)val.charValue());
+      }
+      public default void put(int index,char val)
+      {
+        put(index,(float)val);
+      }
+      public default void put(int index,Character val)
+      {
+        put(index,(float)val.charValue());
       }
       public default void add(int index,byte val)
       {
@@ -1006,6 +1187,7 @@ public abstract interface OmniList extends OmniCollection
       }
     }
     public abstract interface OfDouble extends OfPrimitive,OmniCollection.OfDouble
+    ,FloatInput<Double>,DoubleOutput<Double>
     {
       public abstract Double get(int index);
       public abstract double getDouble(int index);
@@ -1051,6 +1233,22 @@ public abstract interface OmniList extends OmniCollection
         put(index,(double)TypeUtil.
         castToDouble
         (val.booleanValue()));
+      }
+      public default void add(int index,char val)
+      {
+        add(index,(double)val);
+      }
+      public default void add(int index,Character val)
+      {
+        add(index,(double)val.charValue());
+      }
+      public default void put(int index,char val)
+      {
+        put(index,(double)val);
+      }
+      public default void put(int index,Character val)
+      {
+        put(index,(double)val.charValue());
       }
       public default void add(int index,byte val)
       {

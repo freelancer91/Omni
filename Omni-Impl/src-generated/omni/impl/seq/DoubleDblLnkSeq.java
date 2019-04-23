@@ -1429,8 +1429,7 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           do{
             curr.tail=before;
             curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
+          }while((curr=curr.parent)!=null);
           break;
         }
       }
@@ -1470,20 +1469,17 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
     }
     private boolean collapseBody(DoubleDblLnkNode head,DoubleDblLnkNode tail,DoublePredicate filter
     ){
-      for(DoubleDblLnkNode prev;(head=(prev=head).next)!=tail;)
-      {
+      for(DoubleDblLnkNode prev;(head=(prev=head).next)!=tail;){
         if(filter.test(head.val)){
           int numRemoved=1;
-          for(;(head=head.next)!=tail;++numRemoved)
-          {
+          for(;(head=head.next)!=tail;++numRemoved){
             if(!filter.test(head.val)){
               numRemoved+=collapseBodyHelper(head,tail,filter);
               break;
             }
           }
           head.prev=prev;
-          prev.next=tail;
-          this.size-=numRemoved;
+          prev.next=head;
           root.size-=numRemoved;
           bubbleUpDecrementSize(numRemoved);
           return true;
@@ -1559,8 +1555,8 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
       }
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfDouble{
-      transient int currIndex;
-      transient DoubleDblLnkNode lastRet;
+      private transient int currIndex;
+      private transient DoubleDblLnkNode lastRet;
       private BidirectionalItr(UncheckedSubList parent){
         super(parent);
       }
@@ -2142,17 +2138,17 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
     private static class BidirectionalItr
       extends AbstractDoubleItr
       implements OmniListIterator.OfDouble{
-      transient final CheckedSubList parent;
-      transient int modCount;
-      transient DoubleDblLnkNode curr;
-      transient DoubleDblLnkNode lastRet;
-      transient int currIndex;
-      BidirectionalItr(CheckedSubList parent){
+      private transient final CheckedSubList parent;
+      private transient int modCount;
+      private transient DoubleDblLnkNode curr;
+      private transient DoubleDblLnkNode lastRet;
+      private transient int currIndex;
+      private BidirectionalItr(CheckedSubList parent){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=parent.head;
       }
-      BidirectionalItr(CheckedSubList parent,DoubleDblLnkNode curr,int currIndex){
+      private BidirectionalItr(CheckedSubList parent,DoubleDblLnkNode curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -3353,26 +3349,7 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           break;
         }
         if(!filter.test(newhead.val)){
-          if(--numLeft!=0){
-            int numSurvivors;
-            if(numLeft>64){
-              long[] survivorSet;
-              numSurvivors=markSurvivors(newhead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              if((numLeft-=numSurvivors)!=0){
-                pullSurvivorsDown(newhead,survivorSet,numSurvivors,numLeft);
-              }
-            }else{
-              final long survivorWord=markSurvivors(newhead.next,numLeft,filter);
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
-                pullSurvivorsDown(newhead,survivorWord,numSurvivors,numLeft);
-              }
-            }
-            numRemoved+=numLeft;
-          }else{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          numRemoved+=collapseBodyHelper(newhead,--numLeft,filter,root.new ModCountChecker(modCount));
           break;
         }
       }
@@ -3414,26 +3391,7 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           break;
         }
         if(!filter.test(newtail.val)){
-          if(--numLeft!=0){
-            int numSurvivors;
-            if(numLeft>64){
-              long[] survivorSet;
-              numSurvivors=markSurvivors(head.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              if((numLeft-=numSurvivors)!=0){
-                pullSurvivorsDown(head,survivorSet,numSurvivors,numLeft);
-              }
-            }else{
-              final long survivorWord=markSurvivors(head.next,numLeft,filter);
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
-                pullSurvivorsDown(head,survivorWord,numSurvivors,numLeft);
-              }
-            }
-            numRemoved+=numLeft;
-          }else{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
           break;
         }
       }
@@ -3694,31 +3652,98 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
             ++curr.modCount;
             curr.tail=before;
             curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
+          }while((curr=curr.parent)!=null);
           break;
         }
       }
     }
+    private static  int collapseBodyHelper(DoubleDblLnkNode newHead,int numLeft,DoublePredicate filter,CheckedList.ModCountChecker modCountChecker)
+    {
+      if(numLeft!=0){
+        int numSurvivors;
+        if(numLeft>64){
+          long[] survivorSet;
+          numSurvivors=markSurvivors(newHead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+          modCountChecker.checkModCount();
+          if((numLeft-=numSurvivors)!=0){
+            pullSurvivorsDown(newHead,survivorSet,numSurvivors,numLeft);
+          }
+        }else{
+          final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
+          modCountChecker.checkModCount();
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+            pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft);
+          }
+        }
+      }else{
+        modCountChecker.checkModCount();
+      }
+      return numLeft;
+    }
     private void collapseHeadAndTail(DoubleDblLnkNode head,DoubleDblLnkNode tail,DoublePredicate filter
       ,int size,int modCount
     ){
-      int numLeft;
-      if((numLeft=size-2)!=0)
-      {
-        int numRemoved=2;
-        //TODO
+      int numRemoved;
+      if((numRemoved=2)!=size){
+        var newHead=head.next;
+        do{
+          if(!filter.test(newHead.val)){
+            var newTail=tail.prev;
+            final CheckedList root=this.root;
+            for(--size;numRemoved!=size;++numRemoved,newTail=newTail.prev){
+              if(numRemoved==size){
+                 CheckedCollection.checkModCount(modCount,root.modCount);
+                 break;
+              }
+              if(!filter.test(newTail.val)){
+                numRemoved+=collapseBodyHelper(newHead,size-1-numRemoved,filter,root.new ModCountChecker(modCount));
+                break;
+              }
+            }
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            root.size-=numRemoved;
+            this.size=size+1-numRemoved;
+            bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,newTail,tail);
+            return;
+          }
+        }
+        while(++numRemoved!=size);
       }
       CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
+      root.size-=size;
       clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(DoubleDblLnkNode head,DoubleDblLnkNode tail,DoublePredicate filter
       ,int size,int modCount
     ){
-      //TODO
+      for(int numLeft=size-2;numLeft!=0;--numLeft){
+        DoubleDblLnkNode prev;
+        if(filter.test((head=(prev=head).next).val)){
+          int numRemoved=1;
+          var root=this.root;
+          for(;;++numRemoved){
+            if(--numLeft==0){
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              break;
+            }else if(!filter.test((head=head.next).val)){
+              numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
+              break;
+            }
+          }
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          head.prev=prev;
+          prev.next=head;
+          root.size-=numRemoved;
+          bubbleUpDecrementSize(numRemoved);
+          return true;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
     private void bubbleUpAppend(DoubleDblLnkNode newNode){
@@ -5004,32 +5029,28 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         }
         throw new IllegalStateException();
       }
+      private void uncheckedForEachRemaining(int currIndex,DoubleConsumer action){
+        final int modCount=this.modCount;
+        final CheckedList parent;
+        try{
+          DoubleDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+        }
+        this.curr=null;
+        this.lastRet=parent.head;
+        this.currIndex=0;
+      }
       @Override public void forEachRemaining(DoubleConsumer action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList parent;
-          try{
-            DoubleDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
+        final int currIndex;
+        if((currIndex=this.currIndex)>0){
+          uncheckedForEachRemaining(currIndex,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Double> action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList parent;
-          try{
-            DoubleDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action::accept);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
+        final int currIndex;
+        if((currIndex=this.currIndex)>0){
+          uncheckedForEachRemaining(currIndex,action::accept);
         }
       }
     }
@@ -6222,6 +6243,41 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         return false;
       }
     }
+    private static class DescendingItr extends AscendingItr{
+      private DescendingItr(UncheckedList parent){
+        super(parent,parent.tail);
+      }
+      @Override public void remove(){
+        final UncheckedList parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          DoubleDblLnkNode curr;
+          if((curr=this.curr)==null){
+            (curr=parent.head.next).prev=null;
+            parent.head=curr;
+          }else{
+            DoubleDblLnkNode lastRet;
+            if((lastRet=curr.next)==parent.tail){
+              parent.tail=curr;
+              curr.next=null;
+            }else{
+              curr.next=lastRet=lastRet.next;
+              lastRet.prev=curr;
+            }
+          }
+        }
+      }
+      @Override public double nextDouble(){
+        final DoubleDblLnkNode curr;
+        this.curr=(curr=this.curr).prev;
+        return curr.val;
+      }
+      @Override void uncheckedForEachRemaining(DoubleDblLnkNode curr,DoubleConsumer action){
+        DoubleDblLnkNode.uncheckedForEachDescending(curr,action);
+      }
+    }
     private static class AscendingItr
       extends AbstractDoubleItr
     {
@@ -6265,70 +6321,28 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         this.curr=(curr=this.curr).next;
         return curr.val;
       }
+      void uncheckedForEachRemaining(DoubleDblLnkNode curr,DoubleConsumer action){
+        DoubleDblLnkNode.uncheckedForEachAscending(curr,action);
+        this.curr=null;
+      }
       @Override public void forEachRemaining(DoubleConsumer action){
         final DoubleDblLnkNode curr;
         if((curr=this.curr)!=null){
-          DoubleDblLnkNode.uncheckedForEachAscending(curr,action);
+          uncheckedForEachRemaining(curr,action);
           this.curr=null;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Double> action){
         final DoubleDblLnkNode curr;
         if((curr=this.curr)!=null){
-          DoubleDblLnkNode.uncheckedForEachAscending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-    }
-    private static class DescendingItr extends AscendingItr{
-      private DescendingItr(UncheckedList parent){
-        super(parent,parent.tail);
-      }
-      @Override public void remove(){
-        final UncheckedList parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          DoubleDblLnkNode curr;
-          if((curr=this.curr)==null){
-            (curr=parent.head.next).prev=null;
-            parent.head=curr;
-          }else{
-            DoubleDblLnkNode lastRet;
-            if((lastRet=curr.next)==parent.tail){
-              parent.tail=curr;
-              curr.next=null;
-            }else{
-              curr.next=lastRet=lastRet.next;
-              lastRet.prev=curr;
-            }
-          }
-        }
-      }
-      @Override public double nextDouble(){
-        final DoubleDblLnkNode curr;
-        this.curr=(curr=this.curr).prev;
-        return curr.val;
-      }
-      @Override public void forEachRemaining(DoubleConsumer action){
-        final DoubleDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          DoubleDblLnkNode.uncheckedForEachDescending(curr,action);
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Double> action){
-        final DoubleDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          DoubleDblLnkNode.uncheckedForEachDescending(curr,action::accept);
+          uncheckedForEachRemaining(curr,action::accept);
           this.curr=null;
         }
       }
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfDouble{
-      transient int currIndex;
-      transient DoubleDblLnkNode lastRet;
+      private transient int currIndex;
+      private transient DoubleDblLnkNode lastRet;
       private BidirectionalItr(UncheckedList parent){
         super(parent);
       }
@@ -6406,25 +6420,11 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         }
         this.lastRet=null;
       }
-      @Override public void forEachRemaining(DoubleConsumer action){
-        final DoubleDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          DoubleDblLnkNode.uncheckedForEachAscending(curr,action);
-          final UncheckedList parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Double> action){
-        final DoubleDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          DoubleDblLnkNode.uncheckedForEachAscending(curr,action::accept);
-          final UncheckedList parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
+      @Override void uncheckedForEachRemaining(DoubleDblLnkNode curr,DoubleConsumer action){
+        DoubleDblLnkNode.uncheckedForEachAscending(curr,action);
+        final UncheckedList parent;
+        this.lastRet=(parent=this.parent).tail;
+        this.currIndex=parent.size;
       }
     }
   }

@@ -37,16 +37,16 @@ public enum DoubleOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).pollDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleOutput<?>)col).pollDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).pollDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).pollDouble());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfDouble col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).peekDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).peekDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfDouble col,int expectedVal){

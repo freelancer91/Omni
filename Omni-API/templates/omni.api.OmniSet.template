@@ -11,8 +11,45 @@ public abstract interface OmniSet extends OmniCollection
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
+  public abstract interface DoubleOutput<E> extends OmniSet,OmniCollection.DoubleOutput<E>{
+  }
+  public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>{
+  }
+  public abstract interface LongOutput<E> extends FloatOutput<E>,OmniCollection.LongOutput<E>{
+  }
+  public abstract interface IntOutput<E> extends LongOutput<E>,OmniCollection.IntOutput<E>{
+  }
+  public abstract interface ShortOutput<E> extends IntOutput<E>,OmniCollection.ShortOutput<E>{
+  }
+  public abstract interface CharOutput<E> extends IntOutput<E>,OmniCollection.CharOutput<E>{
+  }
+  public abstract interface ByteOutput<E> extends ShortOutput<E>,OmniCollection.ByteOutput<E>{
+  }
+  public abstract interface BooleanInput extends OmniSet,OmniCollection.BooleanInput{
+  }
+  public abstract interface ByteInput extends BooleanInput,OmniCollection.ByteInput{
+  }
+  public abstract interface CharInput extends BooleanInput,OmniCollection.CharInput{
+  }
+  public abstract interface ShortInput extends ByteInput,OmniCollection.ShortInput{
+  }
+  public abstract interface IntInput extends CharInput,ShortInput,OmniCollection.IntInput{
+  }
+  public abstract interface LongInput extends IntInput,OmniCollection.LongInput{
+  }
+  public abstract interface FloatInput extends LongInput,OmniCollection.FloatInput{
+  }
+  
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-  public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,OmniSet{}
+  public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,OmniSet
+#IFSWITCH ARRTYPE==boolean
+,BooleanInput,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
+#ELSEIFSWITCH ARRTYPE==double
+,FloatInput,DoubleOutput<BOXEDTYPE>
+#ELSEIFNOTSWITCH ARRTYPE==Object
+,CLASSPREFIXInput,CLASSPREFIXOutput<BOXEDTYPE>
+#ENDIF
+  {}
 
 #ENDDEF
   public abstract interface OfRef<E>extends OmniCollection,OmniCollection.OfRef<E>,OmniSet{}

@@ -10,6 +10,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
   //@Override
   //public abstract int previousIndex();
   public abstract interface OfBoolean extends OmniListIterator<Boolean>,OmniIterator.OfBoolean
+  ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
   {
     public abstract void add(boolean val);
     public abstract void set(boolean val);
@@ -57,6 +58,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfByte extends OmniListIterator<Byte>,OmniIterator.OfByte
+  ,ByteInput<Byte>,ByteOutput<Byte>
   {
     public abstract void add(byte val);
     public abstract void set(byte val);
@@ -119,6 +121,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfChar extends OmniListIterator<Character>,OmniIterator.OfChar
+  ,CharInput<Character>,CharOutput<Character>
   {
     public abstract void add(char val);
     public abstract void set(char val);
@@ -177,6 +180,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfShort extends OmniListIterator<Short>,OmniIterator.OfShort
+  ,ShortInput<Short>,ShortOutput<Short>
   {
     public abstract void add(short val);
     public abstract void set(short val);
@@ -251,6 +255,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfInt extends OmniListIterator<Integer>,OmniIterator.OfInt
+  ,IntInput<Integer>,IntOutput<Integer>
   {
     public abstract void add(int val);
     public abstract void set(int val);
@@ -353,6 +358,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfLong extends OmniListIterator<Long>,OmniIterator.OfLong
+  ,LongInput<Long>,LongOutput<Long>
   {
     public abstract void add(long val);
     public abstract void set(long val);
@@ -467,6 +473,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfFloat extends OmniListIterator<Float>,OmniIterator.OfFloat
+  ,FloatInput<Float>,FloatOutput<Float>
   {
     public abstract void add(float val);
     public abstract void set(float val);
@@ -593,6 +600,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     }
   }
   public abstract interface OfDouble extends OmniListIterator<Double>,OmniIterator.OfDouble
+  ,FloatInput<Double>,DoubleOutput<Double>
   {
     public abstract void add(double val);
     public abstract void set(double val);
@@ -729,6 +737,69 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousDouble();
     }
+  }
+  public abstract interface DoubleOutput<E> extends OmniIterator.DoubleOutput<E>,OmniListIterator<E>{
+    public abstract double previousDouble();
+  }
+  public abstract interface FloatOutput<E> extends OmniIterator.FloatOutput<E>,DoubleOutput<E>{
+    public abstract float previousFloat();
+  }
+  public abstract interface LongOutput<E> extends OmniIterator.LongOutput<E>,FloatOutput<E>{
+    public abstract long previousLong();
+  }
+  public abstract interface IntOutput<E> extends OmniIterator.IntOutput<E>,LongOutput<E>{
+    public abstract int previousInt();
+  }
+  public abstract interface ShortOutput<E> extends OmniIterator.ShortOutput<E>,IntOutput<E>{
+    public abstract short previousShort();
+  }
+  public abstract interface CharOutput<E> extends OmniIterator.CharOutput<E>,IntOutput<E>{
+    public abstract char previousChar();
+  }
+  public abstract interface ByteOutput<E> extends OmniIterator.ByteOutput<E>,ShortOutput<E>{
+    public abstract byte previousByte();
+  }
+  public abstract interface BooleanInput<E> extends OmniListIterator<E>{
+    public abstract void add(boolean val);
+    public abstract void add(Boolean val);
+    public abstract void set(boolean val);
+    public abstract void set(Boolean val);
+  }
+  public abstract interface ByteInput<E> extends BooleanInput<E>{
+    public abstract void add(byte val);
+    public abstract void add(Byte val);
+    public abstract void set(byte val);
+    public abstract void set(Byte val);
+  }
+  public abstract interface CharInput<E> extends BooleanInput<E>{
+    public abstract void add(char val);
+    public abstract void add(Character val);
+    public abstract void set(char val);
+    public abstract void set(Character val);
+  }
+  public abstract interface ShortInput<E> extends ByteInput<E>{
+    public abstract void add(short val);
+    public abstract void add(Short val);
+    public abstract void set(short val);
+    public abstract void set(Short val);
+  }
+  public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>{
+    public abstract void add(int val);
+    public abstract void add(Integer val);
+    public abstract void set(int val);
+    public abstract void set(Integer val);
+  }
+  public abstract interface LongInput<E> extends IntInput<E>{
+    public abstract void add(long val);
+    public abstract void add(Long val);
+    public abstract void set(long val);
+    public abstract void set(Long val);
+  }
+  public abstract interface FloatInput<E> extends LongInput<E>{
+    public abstract void add(float val);
+    public abstract void add(Float val);
+    public abstract void set(float val);
+    public abstract void set(Float val);
   }
   public abstract interface OfRef<E> extends OmniListIterator<E>,OmniIterator.OfRef<E>{
     //@Override

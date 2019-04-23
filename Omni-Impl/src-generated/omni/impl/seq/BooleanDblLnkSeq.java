@@ -1524,8 +1524,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
           do{
             curr.tail=before;
             curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
+          }while((curr=curr.parent)!=null);
           break;
         }
       }
@@ -1544,8 +1543,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             }
             BooleanDblLnkNode newTail;
             for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
-              if(newTail.val^removeThis)
-              {
+              if(newTail.val^removeThis){
                 numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
                 break;
               }
@@ -1656,8 +1654,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfBoolean{
-      transient int currIndex;
-      transient BooleanDblLnkNode lastRet;
+      private transient int currIndex;
+      private transient BooleanDblLnkNode lastRet;
       private BidirectionalItr(UncheckedSubList parent){
         super(parent);
       }
@@ -2100,17 +2098,17 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     private static class BidirectionalItr
       extends AbstractBooleanItr
       implements OmniListIterator.OfBoolean{
-      transient final CheckedSubList parent;
-      transient int modCount;
-      transient BooleanDblLnkNode curr;
-      transient BooleanDblLnkNode lastRet;
-      transient int currIndex;
-      BidirectionalItr(CheckedSubList parent){
+      private transient final CheckedSubList parent;
+      private transient int modCount;
+      private transient BooleanDblLnkNode curr;
+      private transient BooleanDblLnkNode lastRet;
+      private transient int currIndex;
+      private BidirectionalItr(CheckedSubList parent){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=parent.head;
       }
-      BidirectionalItr(CheckedSubList parent,BooleanDblLnkNode curr,int currIndex){
+      private BidirectionalItr(CheckedSubList parent,BooleanDblLnkNode curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -3668,8 +3666,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             ++curr.modCount;
             curr.tail=before;
             curr.size-=numRemoved;
-          }
-          while((curr=curr.parent)!=null);
+          }while((curr=curr.parent)!=null);
           break;
         }
       }
@@ -3692,8 +3689,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             this.modCount=modCount;
             BooleanDblLnkNode newTail;
             for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
-              if(newTail.val^removeThis)
-              {
+              if(newTail.val^removeThis){
                 numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
                 break;
               }
@@ -5060,32 +5056,28 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         }
         throw new IllegalStateException();
       }
+      private void uncheckedForEachRemaining(int currIndex,BooleanConsumer action){
+        final int modCount=this.modCount;
+        final CheckedList parent;
+        try{
+          BooleanDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+        }
+        this.curr=null;
+        this.lastRet=parent.head;
+        this.currIndex=0;
+      }
       @Override public void forEachRemaining(BooleanConsumer action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList parent;
-          try{
-            BooleanDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
+        final int currIndex;
+        if((currIndex=this.currIndex)>0){
+          uncheckedForEachRemaining(currIndex,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList parent;
-          try{
-            BooleanDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action::accept);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
+        final int currIndex;
+        if((currIndex=this.currIndex)>0){
+          uncheckedForEachRemaining(currIndex,action::accept);
         }
       }
     }
@@ -6568,6 +6560,41 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         return false;
       }
     }
+    private static class DescendingItr extends AscendingItr{
+      private DescendingItr(UncheckedList parent){
+        super(parent,parent.tail);
+      }
+      @Override public void remove(){
+        final UncheckedList parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          BooleanDblLnkNode curr;
+          if((curr=this.curr)==null){
+            (curr=parent.head.next).prev=null;
+            parent.head=curr;
+          }else{
+            BooleanDblLnkNode lastRet;
+            if((lastRet=curr.next)==parent.tail){
+              parent.tail=curr;
+              curr.next=null;
+            }else{
+              curr.next=lastRet=lastRet.next;
+              lastRet.prev=curr;
+            }
+          }
+        }
+      }
+      @Override public boolean nextBoolean(){
+        final BooleanDblLnkNode curr;
+        this.curr=(curr=this.curr).prev;
+        return curr.val;
+      }
+      @Override void uncheckedForEachRemaining(BooleanDblLnkNode curr,BooleanConsumer action){
+        BooleanDblLnkNode.uncheckedForEachDescending(curr,action);
+      }
+    }
     private static class AscendingItr
       extends AbstractBooleanItr
     {
@@ -6611,70 +6638,28 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         this.curr=(curr=this.curr).next;
         return curr.val;
       }
+      void uncheckedForEachRemaining(BooleanDblLnkNode curr,BooleanConsumer action){
+        BooleanDblLnkNode.uncheckedForEachAscending(curr,action);
+        this.curr=null;
+      }
       @Override public void forEachRemaining(BooleanConsumer action){
         final BooleanDblLnkNode curr;
         if((curr=this.curr)!=null){
-          BooleanDblLnkNode.uncheckedForEachAscending(curr,action);
+          uncheckedForEachRemaining(curr,action);
           this.curr=null;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
         final BooleanDblLnkNode curr;
         if((curr=this.curr)!=null){
-          BooleanDblLnkNode.uncheckedForEachAscending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-    }
-    private static class DescendingItr extends AscendingItr{
-      private DescendingItr(UncheckedList parent){
-        super(parent,parent.tail);
-      }
-      @Override public void remove(){
-        final UncheckedList parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          BooleanDblLnkNode curr;
-          if((curr=this.curr)==null){
-            (curr=parent.head.next).prev=null;
-            parent.head=curr;
-          }else{
-            BooleanDblLnkNode lastRet;
-            if((lastRet=curr.next)==parent.tail){
-              parent.tail=curr;
-              curr.next=null;
-            }else{
-              curr.next=lastRet=lastRet.next;
-              lastRet.prev=curr;
-            }
-          }
-        }
-      }
-      @Override public boolean nextBoolean(){
-        final BooleanDblLnkNode curr;
-        this.curr=(curr=this.curr).prev;
-        return curr.val;
-      }
-      @Override public void forEachRemaining(BooleanConsumer action){
-        final BooleanDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          BooleanDblLnkNode.uncheckedForEachDescending(curr,action);
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Boolean> action){
-        final BooleanDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          BooleanDblLnkNode.uncheckedForEachDescending(curr,action::accept);
+          uncheckedForEachRemaining(curr,action::accept);
           this.curr=null;
         }
       }
     }
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfBoolean{
-      transient int currIndex;
-      transient BooleanDblLnkNode lastRet;
+      private transient int currIndex;
+      private transient BooleanDblLnkNode lastRet;
       private BidirectionalItr(UncheckedList parent){
         super(parent);
       }
@@ -6752,25 +6737,11 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         }
         this.lastRet=null;
       }
-      @Override public void forEachRemaining(BooleanConsumer action){
-        final BooleanDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          BooleanDblLnkNode.uncheckedForEachAscending(curr,action);
-          final UncheckedList parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-      @Override public void forEachRemaining(Consumer<? super Boolean> action){
-        final BooleanDblLnkNode curr;
-        if((curr=this.curr)!=null){
-          BooleanDblLnkNode.uncheckedForEachAscending(curr,action::accept);
-          final UncheckedList parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
+      @Override void uncheckedForEachRemaining(BooleanDblLnkNode curr,BooleanConsumer action){
+        BooleanDblLnkNode.uncheckedForEachAscending(curr,action);
+        final UncheckedList parent;
+        this.lastRet=(parent=this.parent).tail;
+        this.currIndex=parent.size;
       }
     }
   }

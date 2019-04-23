@@ -26,12 +26,39 @@ public interface OmniIterator<E> extends Iterator<E>
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
+  public abstract interface DoubleOutput<E> extends OmniIterator<E>{
+    public abstract double nextDouble();
+  }
+  public abstract interface FloatOutput<E> extends DoubleOutput<E>{
+    public abstract float nextFloat();
+  }
+  public abstract interface LongOutput<E> extends FloatOutput<E>{
+    public abstract long nextLong();
+  }
+  public abstract interface IntOutput<E> extends LongOutput<E>{
+    public abstract int nextInt();
+  }
+  public abstract interface ShortOutput<E> extends IntOutput<E>{
+    public abstract short nextShort();
+  }
+  public abstract interface CharOutput<E> extends IntOutput<E>{
+    public abstract char nextChar();
+  }
+  public abstract interface ByteOutput<E> extends ShortOutput<E>{
+    public abstract byte nextByte();
+  }
+  
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
 public abstract interface OfCLASSPREFIX extends OmniIterator<BOXEDTYPE>
 #IFSWITCH ARRTYPE==int,long,double
 ,PrimitiveIterator.OfCLASSPREFIX
 #ELSE
 ,PrimitiveIterator<BOXEDTYPE,CLASSPREFIXConsumer>
+#ENDIF
+#IFSWITCH ARRTYPE==boolean
+,CharOutput<BOXEDTYPE>,ByteOutput<BOXEDTYPE>
+#ELSEIFNOTSWITCH ARRTYPE==Object
+,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
   @Override
@@ -47,25 +74,25 @@ public abstract interface OfCLASSPREFIX extends OmniIterator<BOXEDTYPE>
   public abstract BOXEDTYPE next();
   
 #IFSWITCH ARRTYPE==boolean
-  public default byte nextByte(){
+  @Override public default byte nextByte(){
     return TypeUtil.castToByte(nextCLASSPREFIX());
   }
-  public default char nextChar(){
+  @Override public default char nextChar(){
     return TypeUtil.castToChar(nextCLASSPREFIX());
   }
-  public default double nextDouble(){
+  @Override public default double nextDouble(){
     return TypeUtil.castToDouble(nextCLASSPREFIX());
   }
-  public default float nextFloat(){
+  @Override public default float nextFloat(){
     return TypeUtil.castToFloat(nextCLASSPREFIX());
   }
-  public default int nextInt(){
+  @Override public default int nextInt(){
     return TypeUtil.castToByte(nextCLASSPREFIX());
   }
-  public default long nextLong(){
+  @Override public default long nextLong(){
     return TypeUtil.castToLong(nextCLASSPREFIX());
   }
-  public default short nextShort(){
+  @Override public default short nextShort(){
     return TypeUtil.castToByte(nextCLASSPREFIX());
   }
 #ELSEIFNOTSWITCH ARRTYPE==double
@@ -98,7 +125,7 @@ public abstract interface OfCLASSPREFIX extends OmniIterator<BOXEDTYPE>
   
 }
 #MACRODEF NextImpl<RETTYPE,METHODSUFFIX>()
-public default RETTYPE nextMETHODSUFFIX()
+@Override public default RETTYPE nextMETHODSUFFIX()
 {
   return nextCLASSPREFIX();
 }

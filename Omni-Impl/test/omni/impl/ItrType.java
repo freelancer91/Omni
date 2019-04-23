@@ -1,6 +1,6 @@
 package omni.impl;
 
 public enum ItrType{
-  Itr,
-  ListItr;
+    Itr,
+    ListItr,Descending,SubItr,SubListItr
 }

@@ -37,16 +37,16 @@ public enum CharOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Character.MIN_VALUE,((PeekAndPollIfc.CharInput)col).pollChar());
+        Assertions.assertEquals(Character.MIN_VALUE,((PeekAndPollIfc.CharOutput<?>)col).pollChar());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTochar(expectedVal),((PeekAndPollIfc.CharInput)col).pollChar());
+        Assertions.assertEquals(TypeConversionUtil.convertTochar(expectedVal),((PeekAndPollIfc.CharOutput<?>)col).pollChar());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Character.MIN_VALUE,((PeekAndPollIfc.CharInput)col).peekChar());
+        Assertions.assertEquals(Character.MIN_VALUE,((PeekAndPollIfc.CharOutput<?>)col).peekChar());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTochar(expectedVal),((PeekAndPollIfc.CharInput)col).peekChar());
+        Assertions.assertEquals(TypeConversionUtil.convertTochar(expectedVal),((PeekAndPollIfc.CharOutput<?>)col).peekChar());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfChar col,int expectedVal){
@@ -137,16 +137,16 @@ public enum CharOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).pollDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleOutput<?>)col).pollDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).pollDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).pollDouble());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).peekDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).peekDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfChar col,int expectedVal){
@@ -187,16 +187,16 @@ public enum CharOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatInput)col).pollFloat());
+        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatOutput<?>)col).pollFloat());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatInput)col).pollFloat());
+        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatOutput<?>)col).pollFloat());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatInput)col).peekFloat());
+        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatOutput<?>)col).peekFloat());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatInput)col).peekFloat());
+        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatOutput<?>)col).peekFloat());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfChar col,int expectedVal){
@@ -237,16 +237,16 @@ public enum CharOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Long.MIN_VALUE,((PeekAndPollIfc.LongInput)col).pollLong());
+        Assertions.assertEquals(Long.MIN_VALUE,((PeekAndPollIfc.LongOutput<?>)col).pollLong());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((PeekAndPollIfc.LongInput)col).pollLong());
+        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((PeekAndPollIfc.LongOutput<?>)col).pollLong());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Long.MIN_VALUE,((PeekAndPollIfc.LongInput)col).peekLong());
+        Assertions.assertEquals(Long.MIN_VALUE,((PeekAndPollIfc.LongOutput<?>)col).peekLong());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((PeekAndPollIfc.LongInput)col).peekLong());
+        Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedVal),((PeekAndPollIfc.LongOutput<?>)col).peekLong());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfChar col,int expectedVal){
@@ -287,16 +287,16 @@ public enum CharOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Integer.MIN_VALUE,((PeekAndPollIfc.IntInput)col).pollInt());
+        Assertions.assertEquals(Integer.MIN_VALUE,((PeekAndPollIfc.IntOutput<?>)col).pollInt());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((PeekAndPollIfc.IntInput)col).pollInt());
+        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((PeekAndPollIfc.IntOutput<?>)col).pollInt());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfChar col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Integer.MIN_VALUE,((PeekAndPollIfc.IntInput)col).peekInt());
+        Assertions.assertEquals(Integer.MIN_VALUE,((PeekAndPollIfc.IntOutput<?>)col).peekInt());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((PeekAndPollIfc.IntInput)col).peekInt());
+        Assertions.assertEquals(TypeConversionUtil.convertToint(expectedVal),((PeekAndPollIfc.IntOutput<?>)col).peekInt());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfChar col,int expectedVal){

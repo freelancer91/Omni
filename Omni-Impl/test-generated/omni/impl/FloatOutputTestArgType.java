@@ -37,16 +37,16 @@ public enum FloatOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfFloat col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatInput)col).pollFloat());
+        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatOutput<?>)col).pollFloat());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatInput)col).pollFloat());
+        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatOutput<?>)col).pollFloat());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfFloat col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatInput)col).peekFloat());
+        Assertions.assertEquals(Float.NaN,((PeekAndPollIfc.FloatOutput<?>)col).peekFloat());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatInput)col).peekFloat());
+        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedVal),((PeekAndPollIfc.FloatOutput<?>)col).peekFloat());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfFloat col,int expectedVal){
@@ -137,16 +137,16 @@ public enum FloatOutputTestArgType{
     }
     @Override public void verifyPoll(OmniCollection.OfFloat col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).pollDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleOutput<?>)col).pollDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).pollDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).pollDouble());
       }
     }
     @Override public void verifyPeek(OmniCollection.OfFloat col,int expectedSize,int expectedVal){
       if(expectedSize==0){
-        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleInput)col).peekDouble());
+        Assertions.assertEquals(Double.NaN,((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }else{
-        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleInput)col).peekDouble());
+        Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }
     }
     @Override public void verifyStackPop(OmniCollection.OfFloat col,int expectedVal){

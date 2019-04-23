@@ -440,8 +440,8 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF
     }
     private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
-      transient int currIndex;
-      transient $DNode$$<E>$ lastRet;
+      private transient int currIndex;
+      private transient $DNode$$<E>$ lastRet;
       private BidirectionalItr(UncheckedSubList$<E>$ parent){
         super(parent);
       }
@@ -667,17 +667,17 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       extends Abstract$ClassPrefix$Itr$<E>$
 #ENDIF
       implements OmniListIterator.Of$ClassPrefix$$<E>${
-      transient final CheckedSubList$<E>$ parent;
-      transient int modCount;
-      transient $DNode$$<E>$ curr;
-      transient $DNode$$<E>$ lastRet;
-      transient int currIndex;
-      BidirectionalItr(CheckedSubList$<E>$ parent){
+      private transient final CheckedSubList$<E>$ parent;
+      private transient int modCount;
+      private transient $DNode$$<E>$ curr;
+      private transient $DNode$$<E>$ lastRet;
+      private transient int currIndex;
+      private BidirectionalItr(CheckedSubList$<E>$ parent){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=parent.head;
       }
-      BidirectionalItr(CheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
+      private BidirectionalItr(CheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
         this.parent=parent;
         this.modCount=parent.modCount;
         this.curr=curr;
@@ -1691,33 +1691,29 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         }
         throw new IllegalStateException();
       }
+      private void uncheckedForEachRemaining(int currIndex,$TypeNameModifier$Consumer$<? super E>$ action){
+        final int modCount=this.modCount;
+        final CheckedList$<E>$ parent;
+        try{
+          $DNode$.uncheckedForEachDescending(this.curr,currIndex,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+        }
+        this.curr=null;
+        this.lastRet=parent.head;
+        this.currIndex=0;
+      }
       @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList$<E>$ parent;
-          try{
-            $DNode$.uncheckedForEachDescending(this.curr,currIndex,action);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
+        final int currIndex;
+        if((currIndex=this.currIndex)>0){
+          uncheckedForEachRemaining(currIndex,action);
         }
       }
 #IFNOT OfRef
       @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        if(currIndex>0){
-          final int modCount=this.modCount;
-          final CheckedList$<E>$ parent;
-          try{
-            $DNode$.uncheckedForEachDescending(this.curr,currIndex,action::accept);
-          }finally{
-            CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
-          }
-          this.curr=null;
-          this.lastRet=parent.head;
-          this.currIndex=0;
+        final int currIndex;
+        if((currIndex=this.currIndex)>0){
+          uncheckedForEachRemaining(currIndex,action::accept);
         }
       }
 #ENDIF  
@@ -1796,7 +1792,6 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         }
         this.lastRet=null;
       }
-
       @Override public void remove(){
         $DNode$$<E>$ lastRet;
         if((lastRet=this.lastRet)!=null){
@@ -2238,6 +2233,41 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
 #ENDIF
     }
+    private static class DescendingItr$<E>$ extends AscendingItr$<E>${
+      private DescendingItr(UncheckedList$<E>$ parent){
+        super(parent,parent.tail);
+      }
+      @Override public void remove(){
+        final UncheckedList$<E>$ parent;
+        if(--(parent=this.parent).size==0){
+          parent.head=null;
+          parent.tail=null;
+        }else{
+          $DNode$$<E>$ curr;
+          if((curr=this.curr)==null){
+            (curr=parent.head.next).prev=null;
+            parent.head=curr;
+          }else{
+            $DNode$$<E>$ lastRet;
+            if((lastRet=curr.next)==parent.tail){
+              parent.tail=curr;
+              curr.next=null;
+            }else{
+              curr.next=lastRet=lastRet.next;
+              lastRet.prev=curr;
+            }
+          }
+        }
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final $DNode$$<E>$ curr;
+        this.curr=(curr=this.curr).prev;
+        return curr.val;
+      }
+      @Override void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+        $DNode$.uncheckedForEachDescending(curr,action);
+      }
+    }
     private static class AscendingItr$<E>$
 #IF OfRef
       implements OmniIterator.Of$ClassPrefix$$<E>$
@@ -2285,10 +2315,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         this.curr=(curr=this.curr).next;
         return curr.val;
       }
+      void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+        $DNode$.uncheckedForEachAscending(curr,action);
+        this.curr=null;
+      }
       @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
         final $DNode$$<E>$ curr;
         if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action);
+          uncheckedForEachRemaining(curr,action);
           this.curr=null;
         }
       }
@@ -2296,63 +2330,15 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
         final $DNode$$<E>$ curr;
         if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action::accept);
-          this.curr=null;
-        }
-      }
-#ENDIF
-    }
-    private static class DescendingItr$<E>$ extends AscendingItr$<E>${
-      private DescendingItr(UncheckedList$<E>$ parent){
-        super(parent,parent.tail);
-      }
-      @Override public void remove(){
-        final UncheckedList$<E>$ parent;
-        if(--(parent=this.parent).size==0){
-          parent.head=null;
-          parent.tail=null;
-        }else{
-          $DNode$$<E>$ curr;
-          if((curr=this.curr)==null){
-            (curr=parent.head.next).prev=null;
-            parent.head=curr;
-          }else{
-            $DNode$$<E>$ lastRet;
-            if((lastRet=curr.next)==parent.tail){
-              parent.tail=curr;
-              curr.next=null;
-            }else{
-              curr.next=lastRet=lastRet.next;
-              lastRet.prev=curr;
-            }
-          }
-        }
-      }
-      @Override public $exposedType$ next$TypeNameModifier$(){
-        final $DNode$$<E>$ curr;
-        this.curr=(curr=this.curr).prev;
-        return curr.val;
-      }
-      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachDescending(curr,action);
-          this.curr=null;
-        }
-      }
-#IFNOT OfRef
-      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachDescending(curr,action::accept);
+          uncheckedForEachRemaining(curr,action::accept);
           this.curr=null;
         }
       }
 #ENDIF
     }
     private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
-      transient int currIndex;
-      transient $DNode$$<E>$ lastRet;
+      private transient int currIndex;
+      private transient $DNode$$<E>$ lastRet;
       private BidirectionalItr(UncheckedList$<E>$ parent){
         super(parent);
       }
@@ -2408,8 +2394,6 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       @Override public void set($exposedType$ val){
         lastRet.val=val;
       }
-      
-      
       @Override public void remove(){
         $DNode$$<E>$ lastRet;
         if((lastRet=this.lastRet).next==curr){
@@ -2432,28 +2416,12 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         }
         this.lastRet=null;
       }
-      @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action);
-          final UncheckedList$<E>$ parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
+      @Override void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
+        $DNode$.uncheckedForEachAscending(curr,action);
+        final UncheckedList$<E>$ parent;
+        this.lastRet=(parent=this.parent).tail;
+        this.currIndex=parent.size;
       }
-#IFNOT OfRef
-      @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
-        final $DNode$$<E>$ curr;
-        if((curr=this.curr)!=null){
-          $DNode$.uncheckedForEachAscending(curr,action::accept);
-          final UncheckedList$<E>$ parent;
-          this.lastRet=(parent=this.parent).tail;
-          this.currIndex=parent.size;
-          this.curr=null;
-        }
-      }
-#ENDIF
     }
   }
 }
@@ -4923,22 +4891,70 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ ret
   return false;
 }
 #ELSE
+  #IFSWITCH CHECKED==Checked
+private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,CHECKEDList$<E>$.ModCountChecker modCountChecker)
+{
+  if(numLeft!=0){
+    int numSurvivors;
+    if(numLeft>64){
+      long[] survivorSet;
+      numSurvivors=markSurvivors(newHead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+      modCountChecker.checkModCount();
+      if((numLeft-=numSurvivors)!=0){
+        pullSurvivorsDown(newHead,survivorSet,numSurvivors,numLeft);
+      }
+    }else{
+      final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
+      modCountChecker.checkModCount();
+      if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+        pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft);
+      }
+    }
+  }else{
+    modCountChecker.checkModCount();
+  }
+  return numLeft;
+}
+  #ENDIF
+
 private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
 ){
   #IFSWITCH CHECKED==Checked
-  int numLeft;
-  if((numLeft=size-2)!=0){
-    int numRemoved=2;
-    //TODO
-    
+  int numRemoved;
+  if((numRemoved=2)!=size){
+    var newHead=head.next;
+    do{
+      if(!filter.test(newHead.val)){
+        var newTail=tail.prev;
+        final CHECKEDList$<E>$ root=this.root;
+        for(--size;numRemoved!=size;++numRemoved,newTail=newTail.prev){
+          if(numRemoved==size){
+             CheckedCollection.checkModCount(modCount,root.modCount);
+             break;
+          }
+          if(!filter.test(newTail.val)){
+            numRemoved+=collapseBodyHelper(newHead,size-1-numRemoved,filter,root.new ModCountChecker(modCount));
+            break;
+          }
+        }
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        root.size-=numRemoved;
+        this.size=size+1-numRemoved;
+        bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,newTail,tail);
+        return;
+      }
+    }
+    while(++numRemoved!=size);
   }
   CHECKEDList$<E>$ root;
   CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
   root.modCount=++modCount;
   this.modCount=modCount;
+  root.size-=size;
   #ELSE
   $DNode$$<E>$ newHead;
   if((newHead=head.next)!=tail){
@@ -4978,8 +4994,22 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifi
   #ENDIF
 ){
 #IFSWITCH CHECKED==Checked
-  //TODO
-  return false;
+  for(int numLeft=size-2;numLeft!=0;--numLeft){
+    $DNode$$<E>$ prev;
+    if(filter.test((head=(prev=head).next).val)){
+      int numRemoved=1;
+      var root=this.root;
+      for(;;++numRemoved){
+        if(--numLeft==0){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          break;
+        }else if(!filter.test((head=head.next).val)){
+          numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
+          break;
+        }
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
 #ELSE
   for($DNode$$<E>$ prev;(head=(prev=head).next)!=tail;){
     if(filter.test(head.val)){
@@ -4990,16 +5020,18 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifi
           break;
         }
       }
+#ENDIF
       head.prev=prev;
-      prev.next=tail;
-      this.size-=numRemoved;
+      prev.next=head;
       root.size-=numRemoved;
       bubbleUpDecrementSize(numRemoved);
       return true;
     }
   }
-  return false;
+#IFSWITCH CHECKED==Checked
+  CheckedCollection.checkModCount(modCount,root.modCount);
 #ENDIF
+  return false;
 }
 #ENDIF
 #ENDDEF
@@ -5084,42 +5116,11 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
     }
     if(!filter.test(newHEAD.val)){
   #IFSWITCH CHECKED==Checked
-      if(--numLeft!=0){
-        int numSurvivors;
-        if(numLeft>64){
-          long[] survivorSet;
     #IFSWITCH HEAD==head
-          numSurvivors=markSurvivors(newhead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+      numRemoved+=collapseBodyHelper(newhead,--numLeft,filter,root.new ModCountChecker(modCount));
     #ELSE
-          numSurvivors=markSurvivors(head.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+      numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
     #ENDIF
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          if((numLeft-=numSurvivors)!=0){
-    #IFSWITCH HEAD==head
-            pullSurvivorsDown(newhead,survivorSet,numSurvivors,numLeft);
-    #ELSE
-            pullSurvivorsDown(head,survivorSet,numSurvivors,numLeft);
-    #ENDIF
-          }
-        }else{
-    #IFSWITCH HEAD==head
-          final long survivorWord=markSurvivors(newhead.next,numLeft,filter);
-    #ELSE
-          final long survivorWord=markSurvivors(head.next,numLeft,filter);
-    #ENDIF
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
-    #IFSWITCH HEAD==head
-            pullSurvivorsDown(newhead,survivorWord,numSurvivors,numLeft);
-    #ELSE
-            pullSurvivorsDown(head,survivorWord,numSurvivors,numLeft);
-    #ENDIF
-          }
-        }
-        numRemoved+=numLeft;
-      }else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
-      }
       break;
     }
   }

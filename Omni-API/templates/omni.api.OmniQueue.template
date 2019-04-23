@@ -18,26 +18,71 @@ public abstract interface OmniQueue extends OmniCollection
     public abstract boolean offer(boolean val);
   }
   
+  public abstract interface DoubleOutput<E> extends OmniQueue,OmniCollection.DoubleOutput<E>{
+    public abstract double doubleElement();
+    public abstract double removeDouble();
+  }
+  public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>{
+    public abstract float floatElement();
+    public abstract float removeFloat();
+  }
+  public abstract interface LongOutput<E> extends FloatOutput<E>,OmniCollection.LongOutput<E>{
+    public abstract long longElement();
+    public abstract long removeLong();
+  }
+  public abstract interface IntOutput<E> extends LongOutput<E>,OmniCollection.IntOutput<E>{
+    public abstract int intElement();
+    public abstract int removeInt();
+  }
+  public abstract interface ShortOutput<E> extends IntOutput<E>,OmniCollection.ShortOutput<E>{
+    public abstract short shortElement();
+    public abstract short removeShort();
+  }
+  public abstract interface CharOutput<E> extends IntOutput<E>,OmniCollection.CharOutput<E>{
+    public abstract char charElement();
+    public abstract char removeChar();
+  }
+  public abstract interface ByteOutput<E> extends ShortOutput<E>,OmniCollection.ByteOutput<E>{
+    public abstract byte byteElement();
+    public abstract byte removeByte();
+  }
+  public abstract interface BooleanInput extends OmniQueue,OmniCollection.BooleanInput{
+    public abstract boolean offer(boolean val);
+    public abstract boolean offer(Boolean val);
+  }
+  public abstract interface ByteInput extends BooleanInput,OmniCollection.ByteInput{
+    public abstract boolean offer(byte val);
+    public abstract boolean offer(Byte val);
+  }
+  public abstract interface CharInput extends BooleanInput,OmniCollection.CharInput{
+    public abstract boolean offer(char val);
+    public abstract boolean offer(Character val);
+  }
+  public abstract interface ShortInput extends ByteInput,OmniCollection.ShortInput{
+    public abstract boolean offer(short val);
+    public abstract boolean offer(Short val);
+  }
+  public abstract interface IntInput extends CharInput,ShortInput,OmniCollection.IntInput{
+    public abstract boolean offer(int val);
+    public abstract boolean offer(Integer val);
+  }
+  public abstract interface LongInput extends IntInput,OmniCollection.LongInput{
+    public abstract boolean offer(long val);
+    public abstract boolean offer(Long val);
+  }
+  public abstract interface FloatInput extends LongInput,OmniCollection.FloatInput{
+    public abstract boolean offer(float val);
+    public abstract boolean offer(Float val);
+  }
+  
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput
-#IFNOTSWITCH ARRTYPE==double
-,PeekAndPollIfc.DoubleInput
-  #IFNOTSWITCH ARRTYPE==float
-,PeekAndPollIfc.FloatInput
-    #IFNOTSWITCH ARRTYPE==long
-,PeekAndPollIfc.LongInput
-      #IFNOTSWITCH ARRTYPE==int
-,PeekAndPollIfc.IntInput
-        #IFNOTSWITCH ARRTYPE==char,short
-,PeekAndPollIfc.ShortInput
-          #IFNOTSWITCH ARRTYPE==byte
-,PeekAndPollIfc.ByteInput
-,PeekAndPollIfc.CharInput
-          #ENDIF
-        #ENDIF
-      #ENDIF
-    #ENDIF
-  #ENDIF
+public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>
+#IFSWITCH ARRTYPE==boolean
+,BooleanInput,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
+#ELSEIFSWITCH ARRTYPE==double
+,FloatInput,DoubleOutput<BOXEDTYPE>
+#ELSEIFNOTSWITCH ARRTYPE==Object
+,CLASSPREFIXInput,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
   public abstract ARRTYPE ARRTYPEElement();
@@ -146,6 +191,9 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection,OmniQ
     #ENDIF
     (val.booleanValue()));
   }
+  #IFNOTSWITCH ARRTYPE==byte,char,short
+  #MACRO OfferImpl(char,Character)
+  #ENDIF
   #IFNOTSWITCH ARRTYPE==byte,char
   #MACRO OfferImpl(byte,Byte)
     #IFNOTSWITCH ARRTYPE==short
@@ -178,7 +226,7 @@ public default boolean offer(PRIMITIVEINPUTTYPE val)
 }
 public default boolean offer(BOXEDINPUTTYPE val)
 {
-  return offer(val.ARRTYPEValue());
+  return offer((ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
 }
 #ENDDEF
 #MACRODEF ElementMethodImpls<RETTYPE,METHODSUFFIX>()

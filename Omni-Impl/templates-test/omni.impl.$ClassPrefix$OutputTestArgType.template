@@ -133,17 +133,17 @@ VALUE_NAME{
         #IFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertNull(((PeekAndPollIfc<?>)col).poll());
         #ELSE
-      Assertions.assertEquals(DEFAULT_VAL,((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).pollTYPENAMEMODIFIER());
+      Assertions.assertEquals(DEFAULT_VAL,((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
         #ENDIF
       #ENDIF
     }else{
 #IF OfBoolean
   #IFSWITCH VALUE_NAME==ARRAY_TYPE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).pollTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
   #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).poll());
   #ELSE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).pollTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
   #ENDIF
 #ELSEIF OfRef
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).poll());
@@ -151,7 +151,7 @@ VALUE_NAME{
   #IFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).poll());
   #ELSE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).pollTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
   #ENDIF
       
 #ENDIF
@@ -165,17 +165,17 @@ VALUE_NAME{
         #IFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertNull(((PeekAndPollIfc<?>)col).peek());
         #ELSE
-      Assertions.assertEquals(DEFAULT_VAL,((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).peekTYPENAMEMODIFIER());
+      Assertions.assertEquals(DEFAULT_VAL,((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
         #ENDIF
       #ENDIF
     }else{
 #IF OfBoolean
   #IFSWITCH VALUE_NAME==ARRAY_TYPE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).peekTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
   #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).peek());
   #ELSE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).peekTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
   #ENDIF
 #ELSEIF OfRef
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).peek());
@@ -183,7 +183,7 @@ VALUE_NAME{
   #IFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).peek());
   #ELSE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIERInput)col).peekTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
   #ENDIF
 #ENDIF
     }

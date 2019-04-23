@@ -3,14 +3,8 @@ import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
 public abstract interface OmniQueue extends OmniCollection
 {
-  public abstract interface OfBoolean extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfBoolean,PeekAndPollIfc<Boolean>,PeekAndPollIfc.BooleanInput
-  ,PeekAndPollIfc.DoubleInput
-  ,PeekAndPollIfc.FloatInput
-  ,PeekAndPollIfc.LongInput
-  ,PeekAndPollIfc.IntInput
-  ,PeekAndPollIfc.ShortInput
-  ,PeekAndPollIfc.ByteInput
-  ,PeekAndPollIfc.CharInput
+  public abstract interface OfBoolean extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>
+  ,BooleanInput,ByteOutput<Boolean>,CharOutput<Boolean>
   {
     public abstract boolean booleanElement();
     public abstract Boolean element();
@@ -62,12 +56,8 @@ public abstract interface OmniQueue extends OmniCollection
     public abstract boolean offer(boolean val);
     public abstract boolean offer(Boolean val);
   }
-  public abstract interface OfByte extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfByte,PeekAndPollIfc<Byte>,PeekAndPollIfc.ByteInput
-  ,PeekAndPollIfc.DoubleInput
-  ,PeekAndPollIfc.FloatInput
-  ,PeekAndPollIfc.LongInput
-  ,PeekAndPollIfc.IntInput
-  ,PeekAndPollIfc.ShortInput
+  public abstract interface OfByte extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfByte,PeekAndPollIfc.ByteOutput<Byte>
+  ,ByteInput,ByteOutput<Byte>
   {
     public abstract byte byteElement();
     public abstract Byte element();
@@ -129,11 +119,8 @@ public abstract interface OmniQueue extends OmniCollection
       (val.booleanValue()));
     }
   }
-  public abstract interface OfChar extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfChar,PeekAndPollIfc<Character>,PeekAndPollIfc.CharInput
-  ,PeekAndPollIfc.DoubleInput
-  ,PeekAndPollIfc.FloatInput
-  ,PeekAndPollIfc.LongInput
-  ,PeekAndPollIfc.IntInput
+  public abstract interface OfChar extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfChar,PeekAndPollIfc.CharOutput<Character>
+  ,CharInput,CharOutput<Character>
   {
     public abstract char charElement();
     public abstract Character element();
@@ -187,11 +174,8 @@ public abstract interface OmniQueue extends OmniCollection
       (val.booleanValue()));
     }
   }
-  public abstract interface OfShort extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfShort,PeekAndPollIfc<Short>,PeekAndPollIfc.ShortInput
-  ,PeekAndPollIfc.DoubleInput
-  ,PeekAndPollIfc.FloatInput
-  ,PeekAndPollIfc.LongInput
-  ,PeekAndPollIfc.IntInput
+  public abstract interface OfShort extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfShort,PeekAndPollIfc.ShortOutput<Short>
+  ,ShortInput,ShortOutput<Short>
   {
     public abstract short shortElement();
     public abstract Short element();
@@ -250,13 +234,11 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Byte val)
     {
-      return offer(val.shortValue());
+      return offer((short)val.byteValue());
     }
   }
-  public abstract interface OfInt extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfInt,PeekAndPollIfc<Integer>,PeekAndPollIfc.IntInput
-  ,PeekAndPollIfc.DoubleInput
-  ,PeekAndPollIfc.FloatInput
-  ,PeekAndPollIfc.LongInput
+  public abstract interface OfInt extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfInt,PeekAndPollIfc.IntOutput<Integer>
+  ,IntInput,IntOutput<Integer>
   {
     public abstract int intElement();
     public abstract Integer element();
@@ -301,13 +283,21 @@ public abstract interface OmniQueue extends OmniCollection
       castToByte
       (val.booleanValue()));
     }
+    public default boolean offer(char val)
+    {
+      return offer((int)val);
+    }
+    public default boolean offer(Character val)
+    {
+      return offer((int)val.charValue());
+    }
     public default boolean offer(byte val)
     {
       return offer((int)val);
     }
     public default boolean offer(Byte val)
     {
-      return offer(val.intValue());
+      return offer((int)val.byteValue());
     }
     public default boolean offer(short val)
     {
@@ -315,12 +305,11 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Short val)
     {
-      return offer(val.intValue());
+      return offer((int)val.shortValue());
     }
   }
-  public abstract interface OfLong extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfLong,PeekAndPollIfc<Long>,PeekAndPollIfc.LongInput
-  ,PeekAndPollIfc.DoubleInput
-  ,PeekAndPollIfc.FloatInput
+  public abstract interface OfLong extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfLong,PeekAndPollIfc.LongOutput<Long>
+  ,LongInput,LongOutput<Long>
   {
     public abstract long longElement();
     public abstract Long element();
@@ -357,13 +346,21 @@ public abstract interface OmniQueue extends OmniCollection
       castToLong
       (val.booleanValue()));
     }
+    public default boolean offer(char val)
+    {
+      return offer((long)val);
+    }
+    public default boolean offer(Character val)
+    {
+      return offer((long)val.charValue());
+    }
     public default boolean offer(byte val)
     {
       return offer((long)val);
     }
     public default boolean offer(Byte val)
     {
-      return offer(val.longValue());
+      return offer((long)val.byteValue());
     }
     public default boolean offer(short val)
     {
@@ -371,7 +368,7 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Short val)
     {
-      return offer(val.longValue());
+      return offer((long)val.shortValue());
     }
     public default boolean offer(int val)
     {
@@ -379,11 +376,11 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Integer val)
     {
-      return offer(val.longValue());
+      return offer((long)val.intValue());
     }
   }
-  public abstract interface OfFloat extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfFloat,PeekAndPollIfc<Float>,PeekAndPollIfc.FloatInput
-  ,PeekAndPollIfc.DoubleInput
+  public abstract interface OfFloat extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfFloat,PeekAndPollIfc.FloatOutput<Float>
+  ,FloatInput,FloatOutput<Float>
   {
     public abstract float floatElement();
     public abstract Float element();
@@ -412,13 +409,21 @@ public abstract interface OmniQueue extends OmniCollection
       castToFloat
       (val.booleanValue()));
     }
+    public default boolean offer(char val)
+    {
+      return offer((float)val);
+    }
+    public default boolean offer(Character val)
+    {
+      return offer((float)val.charValue());
+    }
     public default boolean offer(byte val)
     {
       return offer((float)val);
     }
     public default boolean offer(Byte val)
     {
-      return offer(val.floatValue());
+      return offer((float)val.byteValue());
     }
     public default boolean offer(short val)
     {
@@ -426,7 +431,7 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Short val)
     {
-      return offer(val.floatValue());
+      return offer((float)val.shortValue());
     }
     public default boolean offer(int val)
     {
@@ -434,7 +439,7 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Integer val)
     {
-      return offer(val.floatValue());
+      return offer((float)val.intValue());
     }
     public default boolean offer(long val)
     {
@@ -442,10 +447,11 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Long val)
     {
-      return offer(val.floatValue());
+      return offer((float)val.longValue());
     }
   }
-  public abstract interface OfDouble extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfDouble,PeekAndPollIfc<Double>,PeekAndPollIfc.DoubleInput
+  public abstract interface OfDouble extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfDouble,PeekAndPollIfc.DoubleOutput<Double>
+  ,FloatInput,DoubleOutput<Double>
   {
     public abstract double doubleElement();
     public abstract Double element();
@@ -466,13 +472,21 @@ public abstract interface OmniQueue extends OmniCollection
       castToDouble
       (val.booleanValue()));
     }
+    public default boolean offer(char val)
+    {
+      return offer((double)val);
+    }
+    public default boolean offer(Character val)
+    {
+      return offer((double)val.charValue());
+    }
     public default boolean offer(byte val)
     {
       return offer((double)val);
     }
     public default boolean offer(Byte val)
     {
-      return offer(val.doubleValue());
+      return offer((double)val.byteValue());
     }
     public default boolean offer(short val)
     {
@@ -480,7 +494,7 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Short val)
     {
-      return offer(val.doubleValue());
+      return offer((double)val.shortValue());
     }
     public default boolean offer(int val)
     {
@@ -488,7 +502,7 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Integer val)
     {
-      return offer(val.doubleValue());
+      return offer((double)val.intValue());
     }
     public default boolean offer(long val)
     {
@@ -496,7 +510,7 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Long val)
     {
-      return offer(val.doubleValue());
+      return offer((double)val.longValue());
     }
     public default boolean offer(float val)
     {
@@ -504,12 +518,68 @@ public abstract interface OmniQueue extends OmniCollection
     }
     public default boolean offer(Float val)
     {
-      return offer(val.doubleValue());
+      return offer((double)val.floatValue());
     }
   }
   public abstract interface OfPrimitive extends OmniQueue,OmniCollection.OfPrimitive
   {
     public abstract boolean offer(boolean val);
+  }
+  public abstract interface DoubleOutput<E> extends OmniQueue,OmniCollection.DoubleOutput<E>{
+    public abstract double doubleElement();
+    public abstract double removeDouble();
+  }
+  public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>{
+    public abstract float floatElement();
+    public abstract float removeFloat();
+  }
+  public abstract interface LongOutput<E> extends FloatOutput<E>,OmniCollection.LongOutput<E>{
+    public abstract long longElement();
+    public abstract long removeLong();
+  }
+  public abstract interface IntOutput<E> extends LongOutput<E>,OmniCollection.IntOutput<E>{
+    public abstract int intElement();
+    public abstract int removeInt();
+  }
+  public abstract interface ShortOutput<E> extends IntOutput<E>,OmniCollection.ShortOutput<E>{
+    public abstract short shortElement();
+    public abstract short removeShort();
+  }
+  public abstract interface CharOutput<E> extends IntOutput<E>,OmniCollection.CharOutput<E>{
+    public abstract char charElement();
+    public abstract char removeChar();
+  }
+  public abstract interface ByteOutput<E> extends ShortOutput<E>,OmniCollection.ByteOutput<E>{
+    public abstract byte byteElement();
+    public abstract byte removeByte();
+  }
+  public abstract interface BooleanInput extends OmniQueue,OmniCollection.BooleanInput{
+    public abstract boolean offer(boolean val);
+    public abstract boolean offer(Boolean val);
+  }
+  public abstract interface ByteInput extends BooleanInput,OmniCollection.ByteInput{
+    public abstract boolean offer(byte val);
+    public abstract boolean offer(Byte val);
+  }
+  public abstract interface CharInput extends BooleanInput,OmniCollection.CharInput{
+    public abstract boolean offer(char val);
+    public abstract boolean offer(Character val);
+  }
+  public abstract interface ShortInput extends ByteInput,OmniCollection.ShortInput{
+    public abstract boolean offer(short val);
+    public abstract boolean offer(Short val);
+  }
+  public abstract interface IntInput extends CharInput,ShortInput,OmniCollection.IntInput{
+    public abstract boolean offer(int val);
+    public abstract boolean offer(Integer val);
+  }
+  public abstract interface LongInput extends IntInput,OmniCollection.LongInput{
+    public abstract boolean offer(long val);
+    public abstract boolean offer(Long val);
+  }
+  public abstract interface FloatInput extends LongInput,OmniCollection.FloatInput{
+    public abstract boolean offer(float val);
+    public abstract boolean offer(Float val);
   }
   public abstract interface OfRef<E> extends OmniCollection,OmniQueue,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
   {
