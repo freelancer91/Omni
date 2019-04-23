@@ -316,25 +316,30 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
   #MACRO QueryMethods<indexOf,Root,false>()
   #MACRO QueryMethods<lastIndexOf,Root,false>()
 #IF OfBoolean
-  private static int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ newTail,$ArrayType$ removeThis){
-    int numRemoved=0;
-    outer: for($DNode$$<E>$ prev;(newHead=(prev=newHead).next)!=newTail;){
-      if(newHead.val==removeThis){
-        do{
-          ++numRemoved;
-          if((newHead=newHead.next)==newTail){
-            newHead.prev=prev;
-            prev.next=newHead;
-            break outer;
-          }
-        }while(newHead.val==removeThis);
-        newHead.prev=prev;
-        prev.next=newHead;
-      }
-    }
-    return numRemoved;
-  }
+  #MACRO CollapseBodyHelper(removeThis==,$ArrayType$ removeThis)
+#ELSE
+  #MACRO CollapseBodyHelper(filter.test,$TypeNameModifier$Predicate$<? super E>$ filter)
 #ENDIF
+#MACRODEF CollapseBodyHelper(TEST,PARAM)
+private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ newTail,PARAM){
+  int numRemoved=0;
+  outer:for($DNode$$<E>$ prev;(newHead=(prev=newHead).next)!=newTail;){
+    if(TEST(newHead.val)){
+      do{
+        ++numRemoved;
+        if((newHead=newHead.next)==newTail){
+          newHead.prev=prev;
+          prev.next=newHead;
+          break outer;
+        }
+      }while(TEST(newHead.val));
+      newHead.prev=prev;
+      prev.next=newHead;
+    }
+  }
+  return numRemoved;
+}
+#ENDDEF
   private static class UncheckedSubList$<E>$ extends $ClassPrefix$DblLnkSeq$<E>${
     private static final long serialVersionUID=1L;
     transient final UncheckedList$<E>$ root;
@@ -1329,7 +1334,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
     }
 #ELSE
     #MACRO ComparatorSortImpl<Unstable,Root,true>($Comparator$$<? super E>$,sorter)
-    private void pullSurvivorsDown($DNode$$<E>$ prev,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -1401,7 +1406,7 @@ public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
           numSurvivors=markSurvivors(prev.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=numSurvivors)!=0){
-            pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+            pullSurvivorsDown(prev,survivorSet,numSurvivors,numLeft);
           }
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);
@@ -4121,6 +4126,60 @@ private void bubbleUpIncrementSize(){
 #ENDIF
 #ENDDEF
 #MACRODEF SubListRemoveMethods<CHECKED>()
+#IFNOT OfBoolean
+  #IFSWITCH CHECKED==Checked
+private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
+  int wordOffset;
+  for(long word=survivorSet[wordOffset=0],marker=1L;;){
+    var curr=prev.next;
+    if((marker&word)==0){
+      do{
+        if(--numRemoved==0){
+          prev.next=curr=curr.next;
+          curr.prev=prev;
+          return;
+        }else if((marker<<=1)==0){
+          word=survivorSet[++wordOffset];
+          marker=1L;
+        }
+        curr=curr.next;
+      }while((marker&word)==0);
+      prev.next=curr;
+      curr.prev=prev;
+    }
+    if(--numSurvivors==0){
+      return;
+    }
+    if((marker<<=1)==0){
+       word=survivorSet[++wordOffset];
+       marker=1L;
+    }
+    prev=curr;
+  }
+}
+private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+  for(long marker=1L;;marker<<=1){
+    var curr=prev.next;
+    if((marker&word)==0){
+      do{
+        if(--numRemoved==0){
+          prev.next=curr=curr.next;
+          curr.prev=prev;
+          return;
+        }
+        curr=curr.next;
+      }while(((marker<<=1)&word)==0);
+      prev.next=curr;
+      curr.prev=prev;
+    }
+    if(--numSurvivors==0){
+      return;
+    }
+    prev=curr;
+  }
+}
+  #ENDIF
+#ENDIF
 private void bubbleUpPeelHead($DNode$$<E>$ newHead,$DNode$$<E>$ oldHead){
   var curr=parent;
   do{
@@ -4386,11 +4445,8 @@ private void peelHead($DNode$$<E>$ head){
   #ENDIF
 }
 #ENDIF
-
-
-#MACRO CollapseEnd(head,tail,next,prev)
-#MACRO CollapseEnd(tail,head,prev,next)
-
+#MACRO CollapseEnd<head>(tail,next,prev)
+#MACRO CollapseEnd<tail>(head,prev,next)
 private void bubbleUpCollapseHeadAndTail($DNode$$<E>$ oldHead,$DNode$$<E>$ newHead,int numRemoved,$DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
   this.head=newHead;
   this.tail=newTail;
@@ -4489,7 +4545,6 @@ private void bubbleUpCollapseHeadAndTail($DNode$$<E>$ oldHead,$DNode$$<E>$ newHe
   newHead.prev=before;
   newTail.next=after;
 }
-
 private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$<? super E>$ filter){
   $DNode$$<E>$ tail;
 #IFSWITCH CHECKED==Checked
@@ -4630,8 +4685,6 @@ private boolean uncheckedRemoveIf($DNode$$<E>$ head,$TypeNameModifier$Predicate$
 #ENDIF
   return false;
 }
-
-
 @Override public void clear(){
 #IFSWITCH CHECKED==Checked
   final CHECKEDList$<E>$ root;
@@ -4759,8 +4812,7 @@ private void bubbleUpClearTail($DNode$$<E>$ head, $DNode$$<E>$ before,int numRem
 #ENDIF
         curr.tail=before;
         curr.size-=numRemoved;
-      }
-      while((curr=curr.parent)!=null);
+      }while((curr=curr.parent)!=null);
       break;
     }
   }
@@ -4795,8 +4847,7 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$
   #ENDIF
         $DNode$$<E>$ newTail;
         for(newTail=tail.prev;newTail!=newHead;++numRemoved,newTail=newTail.prev){
-          if(newTail.val^removeThis)
-          {
+          if(newTail.val^removeThis){
             numRemoved+=collapseBodyHelper(newHead,newTail,removeThis);
             break;
           }
@@ -4877,19 +4928,82 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameMo
   ,int size,int modCount
   #ENDIF
 ){
-  //TODO
+  #IFSWITCH CHECKED==Checked
+  int numLeft;
+  if((numLeft=size-2)!=0){
+    int numRemoved=2;
+    //TODO
+    
+  }
+  CHECKEDList$<E>$ root;
+  CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+  root.modCount=++modCount;
+  this.modCount=modCount;
+  #ELSE
+  $DNode$$<E>$ newHead;
+  if((newHead=head.next)!=tail){
+    for(int numRemoved=2;;++numRemoved){
+      if(!filter.test(newHead.val)){
+        $DNode$$<E>$ prev;
+        outer: for(var curr=(prev=newHead).next;curr!=tail;curr=(prev=curr).next){
+          if(filter.test(curr.val)){
+            do{
+              ++numRemoved;
+              if((curr=curr.next)==tail){
+                break outer;
+              }
+            }while(filter.test(curr.val));
+            prev.next=curr;
+            curr.prev=prev;
+          }
+        }
+        this.size-=numRemoved;
+        root.size-=numRemoved; 
+        bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,prev,tail);
+        return;
+      }else if((newHead=newHead.next)==tail){
+        break;
+      }
+    }
+  }
+  CHECKEDList$<E>$ root;
+  int size;
+  (root=this.root).size-=(size=this.size);
+  #ENDIF
+  clearAllHelper(size,head,tail,root);
 }
 private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifier$Predicate$<? super E>$ filter
   #IFSWITCH CHECKED==Checked
   ,int size,int modCount
   #ENDIF
 ){
+#IFSWITCH CHECKED==Checked
   //TODO
   return false;
+#ELSE
+  for($DNode$$<E>$ prev;(head=(prev=head).next)!=tail;){
+    if(filter.test(head.val)){
+      int numRemoved=1;
+      for(;(head=head.next)!=tail;++numRemoved){
+        if(!filter.test(head.val)){
+          numRemoved+=collapseBodyHelper(head,tail,filter);
+          break;
+        }
+      }
+      head.prev=prev;
+      prev.next=tail;
+      this.size-=numRemoved;
+      root.size-=numRemoved;
+      bubbleUpDecrementSize(numRemoved);
+      return true;
+    }
+  }
+  return false;
+#ENDIF
 }
 #ENDIF
 #ENDDEF
-#MACRODEF CollapseEnd(HEAD,TAIL,NEXT,PREV)
+#MACRODEF CollapseEnd<HEAD>(TAIL,NEXT,PREV)
 #IF OfBoolean
 private int collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$ArrayType$ retainThis){
   int numRemoved=1;
@@ -4945,15 +5059,116 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
   ,int size,int modCount
   #ENDIF
 ){
-  //TODO
-#IFSWITCH CHECKED==Checked
-  
-#ELSE
+  #IFSWITCH CHECKED==Checked
+  int numRemoved;
+  int numLeft=size-(numRemoved=1)-1;
+  final CHECKEDList$<E>$ root=this.root;
+  #ELSE
+  int numRemoved=1;
+  #ENDIF
+  $DNode$$<E>$ newHEAD;
+  #IFNOTSWITCH CHECKED==Checked
+  outer:
+  #ENDIF
+  for(newHEAD=oldHEAD.NEXT;;
+  #IFSWITCH CHECKED==Checked
+  --numLeft,
+  #ENDIF
+  ++numRemoved,newHEAD=newHEAD.next){
+    if(newHEAD==TAIL)
+    {
+  #IFSWITCH CHECKED==Checked
+      CheckedCollection.checkModCount(modCount,root.modCount);
+  #ENDIF
+      break;
+    }
+    if(!filter.test(newHEAD.val)){
+  #IFSWITCH CHECKED==Checked
+      if(--numLeft!=0){
+        int numSurvivors;
+        if(numLeft>64){
+          long[] survivorSet;
+    #IFSWITCH HEAD==head
+          numSurvivors=markSurvivors(newhead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+    #ELSE
+          numSurvivors=markSurvivors(head.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+    #ENDIF
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          if((numLeft-=numSurvivors)!=0){
+    #IFSWITCH HEAD==head
+            pullSurvivorsDown(newhead,survivorSet,numSurvivors,numLeft);
+    #ELSE
+            pullSurvivorsDown(head,survivorSet,numSurvivors,numLeft);
+    #ENDIF
+          }
+        }else{
+    #IFSWITCH HEAD==head
+          final long survivorWord=markSurvivors(newhead.next,numLeft,filter);
+    #ELSE
+          final long survivorWord=markSurvivors(head.next,numLeft,filter);
+    #ENDIF
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+    #IFSWITCH HEAD==head
+            pullSurvivorsDown(newhead,survivorWord,numSurvivors,numLeft);
+    #ELSE
+            pullSurvivorsDown(head,survivorWord,numSurvivors,numLeft);
+    #ENDIF
+          }
+        }
+        numRemoved+=numLeft;
+      }else{
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      break;
+    }
+  }
+  #ELSE
+      $DNode$$<E>$ PREV,curr;
+      for(curr=(PREV=newHEAD).NEXT;curr!=TAIL;curr=(PREV=curr).NEXT){
+        if(filter.test(curr.val)){
+          do{
+            ++numRemoved;
+            if((curr=curr.NEXT)==TAIL){
+              curr.PREV=PREV;
+              PREV.NEXT=curr;
+              break outer;
+            }
+          }while(filter.test(curr.val));
+          curr.PREV=PREV;
+          PREV.NEXT=curr;
+        }
+      }
+      break;
+    }
+  }
+  CHECKEDList$<E>$ root;
+  (root=this.root).size-=numRemoved;
+  #ENDIF
+  #IFSWITCH CHECKED==Checked
+  root.modCount=++modCount;
+  this.modCount=modCount;
+  root.size-=numRemoved;
+  #ENDIF
+  this.size-=numRemoved;
+  this.HEAD=newHEAD;
+  $DNode$$<E>$ tmp;
+  if((tmp=oldHEAD.PREV)==null){
+    for(var parent=this.parent;parent!=null;
+      parent.HEAD=newHEAD,parent.size-=numRemoved,parent=parent.parent){}
+    root.HEAD=newHEAD;
+  }else{
+    for(var parent=this.parent;parent!=null;
+      parent.HEAD=newHEAD,parent.size-=numRemoved,parent=parent.parent){
+      if(parent.HEAD!=oldHEAD){
+        parent.bubbleUpDecrementSize(numRemoved);
+        break;
+      }
+    }
+    tmp.NEXT=newHEAD;
+  }
+  newHEAD.PREV=tmp;
 
-#ENDIF
-  
 }
 #ENDIF
-
-
 #ENDDEF

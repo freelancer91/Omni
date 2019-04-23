@@ -665,6 +665,24 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }//end val check
     return -1;
   }
+  private static  int collapseBodyHelper(LongDblLnkNode newHead,LongDblLnkNode newTail,LongPredicate filter){
+    int numRemoved=0;
+    outer:for(LongDblLnkNode prev;(newHead=(prev=newHead).next)!=newTail;){
+      if(filter.test(newHead.val)){
+        do{
+          ++numRemoved;
+          if((newHead=newHead.next)==newTail){
+            newHead.prev=prev;
+            prev.next=newHead;
+            break outer;
+          }
+        }while(filter.test(newHead.val));
+        newHead.prev=prev;
+        prev.next=newHead;
+      }
+    }
+    return numRemoved;
+  }
   private static class UncheckedSubList extends LongDblLnkSeq{
     private static final long serialVersionUID=1L;
     transient final UncheckedList root;
@@ -1024,11 +1042,105 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
     private void collapsehead(LongDblLnkNode oldhead,LongDblLnkNode tail,LongPredicate filter
     ){
-      //TODO
+      int numRemoved=1;
+      LongDblLnkNode newhead;
+      outer:
+      for(newhead=oldhead.next;;
+      ++numRemoved,newhead=newhead.next){
+        if(newhead==tail)
+        {
+          break;
+        }
+        if(!filter.test(newhead.val)){
+          LongDblLnkNode prev,curr;
+          for(curr=(prev=newhead).next;curr!=tail;curr=(prev=curr).next){
+            if(filter.test(curr.val)){
+              do{
+                ++numRemoved;
+                if((curr=curr.next)==tail){
+                  curr.prev=prev;
+                  prev.next=curr;
+                  break outer;
+                }
+              }while(filter.test(curr.val));
+              curr.prev=prev;
+              prev.next=curr;
+            }
+          }
+          break;
+        }
+      }
+      UncheckedList root;
+      (root=this.root).size-=numRemoved;
+      this.size-=numRemoved;
+      this.head=newhead;
+      LongDblLnkNode tmp;
+      if((tmp=oldhead.prev)==null){
+        for(var parent=this.parent;parent!=null;
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){}
+        root.head=newhead;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.head!=oldhead){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.next=newhead;
+      }
+      newhead.prev=tmp;
     }
     private void collapsetail(LongDblLnkNode oldtail,LongDblLnkNode head,LongPredicate filter
     ){
-      //TODO
+      int numRemoved=1;
+      LongDblLnkNode newtail;
+      outer:
+      for(newtail=oldtail.prev;;
+      ++numRemoved,newtail=newtail.next){
+        if(newtail==head)
+        {
+          break;
+        }
+        if(!filter.test(newtail.val)){
+          LongDblLnkNode next,curr;
+          for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
+            if(filter.test(curr.val)){
+              do{
+                ++numRemoved;
+                if((curr=curr.prev)==head){
+                  curr.next=next;
+                  next.prev=curr;
+                  break outer;
+                }
+              }while(filter.test(curr.val));
+              curr.next=next;
+              next.prev=curr;
+            }
+          }
+          break;
+        }
+      }
+      UncheckedList root;
+      (root=this.root).size-=numRemoved;
+      this.size-=numRemoved;
+      this.tail=newtail;
+      LongDblLnkNode tmp;
+      if((tmp=oldtail.next)==null){
+        for(var parent=this.parent;parent!=null;
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){}
+        root.tail=newtail;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.tail!=oldtail){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.prev=newtail;
+      }
+      newtail.next=tmp;
     }
     private void bubbleUpCollapseHeadAndTail(LongDblLnkNode oldHead,LongDblLnkNode newHead,int numRemoved,LongDblLnkNode newTail,LongDblLnkNode oldTail){
       this.head=newHead;
@@ -1235,11 +1347,58 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
     private void collapseHeadAndTail(LongDblLnkNode head,LongDblLnkNode tail,LongPredicate filter
     ){
-      //TODO
+      LongDblLnkNode newHead;
+      if((newHead=head.next)!=tail){
+        for(int numRemoved=2;;++numRemoved){
+          if(!filter.test(newHead.val)){
+            LongDblLnkNode prev;
+            outer: for(var curr=(prev=newHead).next;curr!=tail;curr=(prev=curr).next){
+              if(filter.test(curr.val)){
+                do{
+                  ++numRemoved;
+                  if((curr=curr.next)==tail){
+                    break outer;
+                  }
+                }while(filter.test(curr.val));
+                prev.next=curr;
+                curr.prev=prev;
+              }
+            }
+            this.size-=numRemoved;
+            root.size-=numRemoved; 
+            bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,prev,tail);
+            return;
+          }else if((newHead=newHead.next)==tail){
+            break;
+          }
+        }
+      }
+      UncheckedList root;
+      int size;
+      (root=this.root).size-=(size=this.size);
+      clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(LongDblLnkNode head,LongDblLnkNode tail,LongPredicate filter
     ){
-      //TODO
+      for(LongDblLnkNode prev;(head=(prev=head).next)!=tail;)
+      {
+        if(filter.test(head.val)){
+          int numRemoved=1;
+          for(;(head=head.next)!=tail;++numRemoved)
+          {
+            if(!filter.test(head.val)){
+              numRemoved+=collapseBodyHelper(head,tail,filter);
+              break;
+            }
+          }
+          head.prev=prev;
+          prev.next=tail;
+          this.size-=numRemoved;
+          root.size-=numRemoved;
+          bubbleUpDecrementSize(numRemoved);
+          return true;
+        }
+      }
       return false;
     }
     @Override public Object clone(){
@@ -2449,6 +2608,56 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
+    private static  void pullSurvivorsDown(LongDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
+      int wordOffset;
+      for(long word=survivorSet[wordOffset=0],marker=1L;;){
+        var curr=prev.next;
+        if((marker&word)==0){
+          do{
+            if(--numRemoved==0){
+              prev.next=curr=curr.next;
+              curr.prev=prev;
+              return;
+            }else if((marker<<=1)==0){
+              word=survivorSet[++wordOffset];
+              marker=1L;
+            }
+            curr=curr.next;
+          }while((marker&word)==0);
+          prev.next=curr;
+          curr.prev=prev;
+        }
+        if(--numSurvivors==0){
+          return;
+        }
+        if((marker<<=1)==0){
+           word=survivorSet[++wordOffset];
+           marker=1L;
+        }
+        prev=curr;
+      }
+    }
+    private static  void pullSurvivorsDown(LongDblLnkNode prev,long word,int numSurvivors,int numRemoved){
+      for(long marker=1L;;marker<<=1){
+        var curr=prev.next;
+        if((marker&word)==0){
+          do{
+            if(--numRemoved==0){
+              prev.next=curr=curr.next;
+              curr.prev=prev;
+              return;
+            }
+            curr=curr.next;
+          }while(((marker<<=1)&word)==0);
+          prev.next=curr;
+          curr.prev=prev;
+        }
+        if(--numSurvivors==0){
+          return;
+        }
+        prev=curr;
+      }
+    }
     private void bubbleUpPeelHead(LongDblLnkNode newHead,LongDblLnkNode oldHead){
       var curr=parent;
       do{
@@ -2677,12 +2886,124 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     private void collapsehead(LongDblLnkNode oldhead,LongDblLnkNode tail,LongPredicate filter
       ,int size,int modCount
     ){
-      //TODO
+      int numRemoved;
+      int numLeft=size-(numRemoved=1)-1;
+      final CheckedList root=this.root;
+      LongDblLnkNode newhead;
+      for(newhead=oldhead.next;;
+      --numLeft,
+      ++numRemoved,newhead=newhead.next){
+        if(newhead==tail)
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          break;
+        }
+        if(!filter.test(newhead.val)){
+          if(--numLeft!=0){
+            int numSurvivors;
+            if(numLeft>64){
+              long[] survivorSet;
+              numSurvivors=markSurvivors(newhead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              if((numLeft-=numSurvivors)!=0){
+                pullSurvivorsDown(newhead,survivorSet,numSurvivors,numLeft);
+              }
+            }else{
+              final long survivorWord=markSurvivors(newhead.next,numLeft,filter);
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+                pullSurvivorsDown(newhead,survivorWord,numSurvivors,numLeft);
+              }
+            }
+            numRemoved+=numLeft;
+          }else{
+            CheckedCollection.checkModCount(modCount,root.modCount);
+          }
+          break;
+        }
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      root.size-=numRemoved;
+      this.size-=numRemoved;
+      this.head=newhead;
+      LongDblLnkNode tmp;
+      if((tmp=oldhead.prev)==null){
+        for(var parent=this.parent;parent!=null;
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){}
+        root.head=newhead;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.head!=oldhead){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.next=newhead;
+      }
+      newhead.prev=tmp;
     }
     private void collapsetail(LongDblLnkNode oldtail,LongDblLnkNode head,LongPredicate filter
       ,int size,int modCount
     ){
-      //TODO
+      int numRemoved;
+      int numLeft=size-(numRemoved=1)-1;
+      final CheckedList root=this.root;
+      LongDblLnkNode newtail;
+      for(newtail=oldtail.prev;;
+      --numLeft,
+      ++numRemoved,newtail=newtail.next){
+        if(newtail==head)
+        {
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          break;
+        }
+        if(!filter.test(newtail.val)){
+          if(--numLeft!=0){
+            int numSurvivors;
+            if(numLeft>64){
+              long[] survivorSet;
+              numSurvivors=markSurvivors(head.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              if((numLeft-=numSurvivors)!=0){
+                pullSurvivorsDown(head,survivorSet,numSurvivors,numLeft);
+              }
+            }else{
+              final long survivorWord=markSurvivors(head.next,numLeft,filter);
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+                pullSurvivorsDown(head,survivorWord,numSurvivors,numLeft);
+              }
+            }
+            numRemoved+=numLeft;
+          }else{
+            CheckedCollection.checkModCount(modCount,root.modCount);
+          }
+          break;
+        }
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      root.size-=numRemoved;
+      this.size-=numRemoved;
+      this.tail=newtail;
+      LongDblLnkNode tmp;
+      if((tmp=oldtail.next)==null){
+        for(var parent=this.parent;parent!=null;
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){}
+        root.tail=newtail;
+      }else{
+        for(var parent=this.parent;parent!=null;
+          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+          if(parent.tail!=oldtail){
+            parent.bubbleUpDecrementSize(numRemoved);
+            break;
+          }
+        }
+        tmp.prev=newtail;
+      }
+      newtail.next=tmp;
     }
     private void bubbleUpCollapseHeadAndTail(LongDblLnkNode oldHead,LongDblLnkNode newHead,int numRemoved,LongDblLnkNode newTail,LongDblLnkNode oldTail){
       this.head=newHead;
@@ -2928,7 +3249,17 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     private void collapseHeadAndTail(LongDblLnkNode head,LongDblLnkNode tail,LongPredicate filter
       ,int size,int modCount
     ){
-      //TODO
+      int numLeft;
+      if((numLeft=size-2)!=0)
+      {
+        int numRemoved=2;
+        //TODO
+      }
+      CheckedList root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(LongDblLnkNode head,LongDblLnkNode tail,LongPredicate filter
       ,int size,int modCount
@@ -3740,7 +4071,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         LongDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
-    private void pullSurvivorsDown(LongDblLnkNode prev,LongPredicate filter,long[] survivorSet,int numSurvivors,int numRemoved){
+    private void pullSurvivorsDown(LongDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
@@ -3812,7 +4143,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           numSurvivors=markSurvivors(prev.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           CheckedCollection.checkModCount(modCount,this.modCount);
           if((numLeft-=numSurvivors)!=0){
-            pullSurvivorsDown(prev,filter,survivorSet,numSurvivors,numLeft);
+            pullSurvivorsDown(prev,survivorSet,numSurvivors,numLeft);
           }
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);

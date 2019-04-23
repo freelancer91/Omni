@@ -856,10 +856,10 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     }//end val check
     return -1;
   }
-  private static int collapseBodyHelper(BooleanDblLnkNode newHead,BooleanDblLnkNode newTail,boolean removeThis){
+  private static  int collapseBodyHelper(BooleanDblLnkNode newHead,BooleanDblLnkNode newTail,boolean removeThis){
     int numRemoved=0;
-    outer: for(BooleanDblLnkNode prev;(newHead=(prev=newHead).next)!=newTail;){
-      if(newHead.val==removeThis){
+    outer:for(BooleanDblLnkNode prev;(newHead=(prev=newHead).next)!=newTail;){
+      if(removeThis==(newHead.val)){
         do{
           ++numRemoved;
           if((newHead=newHead.next)==newTail){
@@ -867,7 +867,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             prev.next=newHead;
             break outer;
           }
-        }while(newHead.val==removeThis);
+        }while(removeThis==(newHead.val));
         newHead.prev=prev;
         prev.next=newHead;
       }
