@@ -72,6 +72,573 @@ public class $ClassPrefix$DblLnkSeqTest{
       this.rootType=rootType;
     }
   }
+  private static class $ClassPrefix$DblLnkSeqMonitor implements $ClassPrefix$SeqMonitor{
+    final NestedType nestedType;
+    final CheckedType checkedType;
+    final $ClassPrefix$DblLnkSeq[] seqs;
+    int[] preAllocs;
+    int[] postAllocs;
+    int expectedSeqSize;
+    int expectedParentSize;
+    int expectedRootSize;
+    int expectedSeqModCount;
+    int expectedParentModCount;
+    int expectedRootModCount;
+    
+    
+    $ClassPrefix$DblLnkSeqMonitor(NestedType nestedType,CheckedType checkedType){
+      this.nestedType=nestedType;
+      this.checkedType=checkedType;
+      if(nestedType==NestedType.SUBLIST)
+      {
+        
+      }
+      else
+      {
+      }
+    }
+    
+    
+    
+    
+    
+   
+  
+    public void verifyStructuralIntegrity(){
+      
+      //TODO
+    }
+   
+    
+  }
+  static enum QueryTester
+  {
+#IF OfRef
+    ObjectNonNull(true){
+      @Override boolean invokecontainsObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokecontainsBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokecontainsUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveValObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveValBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveValUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokeindexOfObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokeindexOfBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokeindexOfUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokelastIndexOfObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokelastIndexOfBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokelastIndexOfUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokesearchObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokesearchBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override int invokesearchUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override void addEqualsVal($ClassPrefix$DblLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override void addNotEqualsVal($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+        seqMonitor.seq.add(new Object());
+        ++seqMonitor.expectedSeqModCount;
+        ++seqMonitor.expectedParentModCount;
+        ++seqMonitor.expectedRootModCount;
+        ++seqMonitor.expectedSeqSize;
+        ++seqMonitor.expectedParentSize;
+        ++seqMonitor.expectedRootSize;
+      }
+      @Override boolean invokecontainsMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return seqMonitor.seq.contains(monitoredObject);
+      }
+      @Override boolean invokeremoveValMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        boolean ret=seqMonitor.seq.remove(monitoredObject);
+        if(ret){
+          ++seqMonitor.expectedSeqModCount;
+          ++seqMonitor.expectedParentModCount;
+          ++seqMonitor.expectedRootModCount;
+          --seqMonitor.expectedSeqSize;
+          --seqMonitor.expectedParentSize;
+          --seqMonitor.expectedRootSize;
+#IF OfRef
+          Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+#ENDIF
+        }
+        return ret;
+      }
+      @Override int invokeindexOfMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf(monitoredObject);
+      }
+      @Override int invokelastIndexOfMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf(monitoredObject);
+      }
+      @Override int invokesearchMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search(monitoredObject);
+      }
+      @Override int initContainsEnd($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        for(int i=0;i<99;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.seq.add(monitoredObject);
+        seqMonitor.expectedSeqModCount+=100;
+        seqMonitor.expectedParentModCount+=100;
+        seqMonitor.expectedRootModCount+=100;
+        seqMonitor.expectedSeqSize+=100;
+        seqMonitor.expectedParentSize+=100;
+        seqMonitor.expectedRootSize+=100;
+        return seqMonitor.expectedSeqSize-1;
+      }
+      @Override int initContainsMiddle($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        for(int i=0;i<50;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.seq.add(monitoredObject);
+        for(int i=51;i<100;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.expectedSeqModCount+=100;
+        seqMonitor.expectedParentModCount+=100;
+        seqMonitor.expectedRootModCount+=100;
+        seqMonitor.expectedSeqSize+=100;
+        seqMonitor.expectedParentSize+=100;
+        seqMonitor.expectedRootSize+=100;
+        return seqMonitor.expectedSeqSize/2;
+      }
+      @Override int initContainsBeginning($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        seqMonitor.seq.add(monitoredObject);
+        for(int i=1;i<100;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.expectedSeqModCount+=100;
+        seqMonitor.expectedParentModCount+=100;
+        seqMonitor.expectedRootModCount+=100;
+        seqMonitor.expectedSeqSize+=100;
+        seqMonitor.expectedParentSize+=100;
+        seqMonitor.expectedRootSize+=100;
+        return 0;
+      }
+      @Override int initContainsNearBeginning($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        for(int i=0;i<25;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.seq.add(monitoredObject);
+        for(int i=26;i<100;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.expectedSeqModCount+=100;
+        seqMonitor.expectedParentModCount+=100;
+        seqMonitor.expectedRootModCount+=100;
+        seqMonitor.expectedSeqSize+=100;
+        seqMonitor.expectedParentSize+=100;
+        seqMonitor.expectedRootSize+=100;
+        return seqMonitor.expectedSeqSize/4;
+      }
+      @Override int initContainsNearEnd($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        for(int i=0;i<75;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.seq.add(monitoredObject);
+        for(int i=76;i<100;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.expectedSeqModCount+=100;
+        seqMonitor.expectedParentModCount+=100;
+        seqMonitor.expectedRootModCount+=100;
+        seqMonitor.expectedSeqSize+=100;
+        seqMonitor.expectedParentSize+=100;
+        seqMonitor.expectedRootSize+=100;
+        return (seqMonitor.expectedSeqSize/4)*3;
+      }
+    },
+#ENDIF
+  #MACRO QueryTesterImpl<null,Boolean,Boolean>(null,false)
+  #MACRO QueryTesterImpl<null,Byte,Byte>(null,false)
+  #MACRO QueryTesterImpl<null,Character,Character>(null,false)
+  #MACRO QueryTesterImpl<null,Short,Short>(null,false)
+  #MACRO QueryTesterImpl<null,Integer,Integer>(null,false)
+  #MACRO QueryTesterImpl<null,Long,Long>(null,false)
+  #MACRO QueryTesterImpl<null,Float,Float>(null,false)
+  #MACRO QueryTesterImpl<null,Double,Double>(null,false)
+  #MACRO QueryTesterImpl<null,Object,Object>(null,false)
+  #MACRO QueryTesterImpl<false,Boolean,boolean>(false,true)
+  #MACRO QueryTesterImpl<true,Boolean,boolean>(true,false)
+  #MACRO QueryTesterImpl<0,Byte,byte>(0,true)
+  #MACRO QueryTesterImpl<pos1,Byte,byte>(1,false)
+  #MACRO QueryTesterImpl<pos2,Byte,byte>(2,false)
+  #MACRO QueryTesterImpl<neg1,Byte,byte>(-1,false)
+  #MACRO QueryTesterImpl<0,Character,char>(0,true)
+  #MACRO QueryTesterImpl<pos1,Character,char>(1,false)
+  #MACRO QueryTesterImpl<pos2,Character,char>(2,false)
+  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Character,char>(((char)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Character,char>(((char)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<0,Short,short>(0,true)
+  #MACRO QueryTesterImpl<pos1,Short,short>(1,false)
+  #MACRO QueryTesterImpl<pos2,Short,short>(2,false)
+  #MACRO QueryTesterImpl<neg1,Short,short>(-1,false)
+  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Short,short>(((short)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Short,short>(((short)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<0,Integer,int>(0,true)
+  #MACRO QueryTesterImpl<pos1,Integer,int>(1,false)
+  #MACRO QueryTesterImpl<pos2,Integer,int>(2,false)
+  #MACRO QueryTesterImpl<neg1,Integer,int>(-1,false)
+  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Integer,int>(((int)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Integer,int>(((int)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Integer,int>(((int)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Integer,int>(((int)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Integer,int>(((int)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Integer,int>(TypeUtil.MAX_SAFE_INT+1,false)
+  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Integer,int>(TypeUtil.MIN_SAFE_INT-1,false)
+  #MACRO QueryTesterImpl<0,Long,long>(0,true)
+  #MACRO QueryTesterImpl<pos1,Long,long>(1,false)
+  #MACRO QueryTesterImpl<pos2,Long,long>(2,false)
+  #MACRO QueryTesterImpl<neg1,Long,long>(-1,false)
+  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Long,long>(((long)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Long,long>(((long)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Long,long>(((long)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Long,long>(((long)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Long,long>(((long)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_INT)+1,false)
+  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_INT)-1,false)
+  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Long,long>(((long)Integer.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Long,long>(((long)Integer.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_SAFE_LONG_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_LONG)+1,false)
+  #MACRO QueryTesterImpl<MIN_SAFE_LONG_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_LONG)-1,false)
+  #MACRO QueryTesterImpl<pos0,Float,float>(0.0F,true)
+  #MACRO QueryTesterImpl<neg0,Float,float>(-0.0F,true)
+  #MACRO QueryTesterImpl<pos1,Float,float>(1,false)
+  #MACRO QueryTesterImpl<pos2,Float,float>(2,false)
+  #MACRO QueryTesterImpl<neg1,Float,float>(-1,false)
+  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Float,float>(((float)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Float,float>(((float)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Float,float>(((float)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Float,float>(((float)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Float,float>(((float)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Float,float>(((float)Integer.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Float,float>(((float)Integer.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_LONG_PLUS1,Float,float>(((float)Long.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_LONG_MINUS1,Float,float>(((float)Long.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MIN_FLOAT_VALUE,Float,float>(Float.MIN_VALUE,false)
+  #MACRO QueryTesterImpl<MAX_FLOAT_VALUE,Float,float>(Float.MAX_VALUE,false)
+  #MACRO QueryTesterImpl<NaN,Float,float>(Float.NaN,false)
+  #MACRO QueryTesterImpl<pos0,Double,double>(0.0D,true)
+  #MACRO QueryTesterImpl<neg0,Double,double>(-0.0D,true)
+  #MACRO QueryTesterImpl<pos1,Double,double>(1,false)
+  #MACRO QueryTesterImpl<pos2,Double,double>(2,false)
+  #MACRO QueryTesterImpl<neg1,Double,double>(-1,false)
+  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Double,double>(((double)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Double,double>(((double)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Double,double>(((double)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Double,double>(((double)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Double,double>(((double)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Double,double>(((double)TypeUtil.MAX_SAFE_INT)+1,false)
+  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Double,double>(((double)TypeUtil.MIN_SAFE_INT)-1,false)
+  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Double,double>(((double)Integer.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Double,double>(((double)Integer.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MAX_LONG_PLUS1,Double,double>(((double)Long.MAX_VALUE)+1,false)
+  #MACRO QueryTesterImpl<MIN_LONG_MINUS1,Double,double>(((double)Long.MIN_VALUE)-1,false)
+  #MACRO QueryTesterImpl<MIN_FLOAT_VALUE,Double,double>(Float.MIN_VALUE,false)
+  #MACRO QueryTesterImpl<MAX_FLOAT_VALUE,Double,double>(Float.MAX_VALUE,false)
+  #MACRO QueryTesterImpl<MIN_DOUBLE_VALUE,Double,double>(Double.MIN_VALUE,false)
+  #MACRO QueryTesterImpl<MAX_DOUBLE_VALUE,Double,double>(Double.MAX_VALUE,false)
+  #MACRO QueryTesterImpl<NaN,Double,double>(Double.NaN,false)
+  ;
+
+#MACRODEF QueryTesterImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
+BOXED_TYPEVALUE_NAME(false){
+  @Override boolean invokecontainsObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveValObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+    boolean ret=seqMonitor.seq.remove((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
+    if(ret){
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      --seqMonitor.expectedSeqSize;
+      --seqMonitor.expectedParentSize;
+      --seqMonitor.expectedRootSize;
+#IF OfRef
+      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+#ENDIF
+    }
+    return ret;
+  }
+  @Override int invokeindexOfObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokelastIndexOfObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokesearchObject($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokecontainsBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+#IFSWITCH BOXED_TYPE==Object
+  @Override boolean invokeremoveValBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+    boolean ret=seqMonitor.seq.remove((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
+    if(ret){
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      --seqMonitor.expectedSeqSize;
+      --seqMonitor.expectedParentSize;
+      --seqMonitor.expectedRootSize;
+  #IF OfRef
+      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+  #ENDIF
+    }
+    return ret;
+  }
+#ELSE
+  @Override boolean invokeremoveValBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+    boolean ret=seqMonitor.seq.removeVal((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
+    if(ret){
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      --seqMonitor.expectedSeqSize;
+      --seqMonitor.expectedParentSize;
+      --seqMonitor.expectedRootSize;
+  #IF OfRef
+      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+  #ENDIF
+    }
+    return ret;
+  }
+#ENDIF
+  @Override int invokeindexOfBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokelastIndexOfBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokesearchBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokecontainsUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+#IFSWITCH PRIMITIVE_TYPE==Object
+  @Override boolean invokeremoveValUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+    boolean ret=seqMonitor.seq.remove((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
+    if(ret){
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      --seqMonitor.expectedSeqSize;
+      --seqMonitor.expectedParentSize;
+      --seqMonitor.expectedRootSize;
+  #IF OfRef
+      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+  #ENDIF
+    }
+    return ret;
+  }
+#ELSE
+  @Override boolean invokeremoveValUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+    boolean ret=seqMonitor.seq.removeVal((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
+    if(ret){
+      ++seqMonitor.expectedSeqModCount;
+      ++seqMonitor.expectedParentModCount;
+      ++seqMonitor.expectedRootModCount;
+      --seqMonitor.expectedSeqSize;
+      --seqMonitor.expectedParentSize;
+      --seqMonitor.expectedRootSize;
+  #IF OfRef
+      Assertions.assertNull((($ClassPrefix$ArrSeq)seqMonitor.root).arr[seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+seqMonitor.expectedRootSize+seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc]);
+  #ENDIF
+    }
+    return ret;
+  }
+#ENDIF
+  @Override int invokeindexOfUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokelastIndexOfUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override int invokesearchUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  void addEqualsVal($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+#IF OfRef
+    seqMonitor.seq.add((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
+    ++seqMonitor.expectedSeqModCount;
+    ++seqMonitor.expectedParentModCount;
+    ++seqMonitor.expectedRootModCount;
+    ++seqMonitor.expectedSeqSize;
+    ++seqMonitor.expectedParentSize;
+    ++seqMonitor.expectedRootSize;
+#ELSE
+  #IFSWITCH VALUE_NAME==null
+    throw new UnsupportedOperationException();
+  #ELSE
+    #IF OfBoolean
+      #IFSWITCH PRIMITIVE_TYPE==boolean
+    seqMonitor.seq.add((boolean)(PRIMITIVE_VAL));
+      #ELSE
+        #IFSWITCH VALUE_NAME==pos1
+    seqMonitor.seq.add((boolean)(true));
+        #ELSE
+    seqMonitor.seq.add((boolean)((PRIMITIVE_VAL)==1));
+        #ENDIF
+      #ENDIF
+    #ELSE
+      #IFSWITCH PRIMITIVE_TYPE==boolean
+    seqMonitor.seq.add(($exposedType$)$queryCastBoolean$(PRIMITIVE_VAL));
+      #ELSE
+    seqMonitor.seq.add(($exposedType$)(PRIMITIVE_VAL));
+      #ENDIF
+    #ENDIF
+    ++seqMonitor.expectedSeqModCount;
+    ++seqMonitor.expectedParentModCount;
+    ++seqMonitor.expectedRootModCount;
+    ++seqMonitor.expectedSeqSize;
+    ++seqMonitor.expectedParentSize;
+    ++seqMonitor.expectedRootSize;
+  #ENDIF
+#ENDIF
+  }
+  void addNotEqualsVal($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+    #IF OfRef
+    seqMonitor.seq.add((Object)(boolean)NOT_EQUALS_VAL);
+    #ELSE
+    seqMonitor.seq.add((boolean)NOT_EQUALS_VAL);
+    #ENDIF
+    ++seqMonitor.expectedSeqModCount;
+    ++seqMonitor.expectedParentModCount;
+    ++seqMonitor.expectedRootModCount;
+    ++seqMonitor.expectedSeqSize;
+    ++seqMonitor.expectedParentSize;
+    ++seqMonitor.expectedRootSize;
+  }
+},
+#ENDDEF
+    
+    final boolean isObjectNonNull;
+    QueryTester(boolean isObjectNonNull){
+      this.isObjectNonNull=isObjectNonNull;
+    }
+    boolean invokecontains($ClassPrefix$DblLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokecontainsUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokecontainsBoxed(seqMonitor);
+        case ToObject:
+          return invokecontainsObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    boolean invokeremoveVal($ClassPrefix$DblLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokeremoveValUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokeremoveValBoxed(seqMonitor);
+        case ToObject:
+          return invokeremoveValObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    int invokeindexOf($ClassPrefix$DblLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokeindexOfUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokeindexOfBoxed(seqMonitor);
+        case ToObject:
+          return invokeindexOfObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    int invokelastIndexOf($ClassPrefix$DblLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokelastIndexOfUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokelastIndexOfBoxed(seqMonitor);
+        case ToObject:
+          return invokelastIndexOfObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    int invokesearch($ClassPrefix$DblLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
+      switch(queryCastType){
+        case Unboxed:
+          return invokesearchUnboxed(seqMonitor);
+        case ToBoxed:
+          return invokesearchBoxed(seqMonitor);
+        case ToObject:
+          return invokesearchObject(seqMonitor);
+        default:
+          throw new Error("Unknown queryCastType "+queryCastType);
+      }
+    }
+    
+    abstract boolean invokecontainsObject($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract boolean invokecontainsBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract boolean invokecontainsUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValObject($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract boolean invokeremoveValUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokeindexOfObject($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokeindexOfBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokeindexOfUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokelastIndexOfObject($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokelastIndexOfBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokelastIndexOfUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokesearchObject($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokesearchBoxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract int invokesearchUnboxed($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract void addEqualsVal($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    abstract void addNotEqualsVal($ClassPrefix$DblLnkSeqMonitor seqMonitor);
+    void initDoesNotContain($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+      for(int i=0;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+    }
+    int initContainsEnd($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0;i<99;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      return seqMonitor.expectedSeqSize-1;
+    }
+    int initContainsNearEnd($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0;i<75;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      for(int i=76;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return (seqMonitor.expectedSeqSize/4)*3;
+    }
+    int initContainsMiddle($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0;i<50;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      for(int i=51;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return seqMonitor.expectedSeqSize/2;
+    }
+    int initContainsNearBeginning($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0;i<25;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      for(int i=26;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return seqMonitor.expectedSeqSize/4;
+    }
+    int initContainsBeginning($ClassPrefix$DblLnkSeqMonitor seqMonitor){
+      addEqualsVal(seqMonitor);
+      for(int i=1;i<100;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return 0;
+    }
+#IF OfRef
+    boolean invokecontainsMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    boolean invokeremoveValMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int invokeindexOfMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int invokelastIndexOfMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int invokesearchMonitored($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int initContainsEnd($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int initContainsMiddle($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int initContainsBeginning($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int initContainsNearBeginning($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    int initContainsNearEnd($ClassPrefix$DblLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+
+#ENDIF
+  };
 
   @FunctionalInterface
   interface ArgBuilder{

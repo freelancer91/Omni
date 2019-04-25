@@ -138,13 +138,9 @@ public class RefSnglLnkSeqTest{
       }
     });
   }
-  @org.junit.jupiter.api.Test
-  public void testItrremove_void(){
-    getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrremove_voidHelper((RefSnglLnkSeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3],(SequenceLocation)args[4]);
-    });
-  }
-  private static void testItrremove_voidHelper
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.MethodSource("getItrremove_voidArgs")
+  public void testItrremove_void
   (RefSnglLnkSeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
@@ -154,8 +150,18 @@ public class RefSnglLnkSeqTest{
     switch(seqLocation){
       case BEGINNING:
         break;
+      case NEARBEGINNING:
+        for(int i=0,bound=numToAdd/4;i<bound;++i){
+          itrMonitor.iterateForward();
+        }
+        break;
       case MIDDLE:
         for(int i=0,bound=numToAdd/2;i<bound;++i){
+          itrMonitor.iterateForward();
+        }
+        break;
+      case NEAREND:
+        for(int i=0,bound=(numToAdd/4)*3;i<bound;++i){
           itrMonitor.iterateForward();
         }
         break;
@@ -197,8 +203,25 @@ public class RefSnglLnkSeqTest{
           seqMonitor.verifyStructuralIntegrity();
         }
         Assertions.assertFalse(itrMonitor.hasNext());
-        if(seqLocation==SequenceLocation.BEGINNING){
-          Assertions.assertTrue(seqMonitor.isEmpty());
+        switch(seqLocation){
+          case BEGINNING:
+            Assertions.assertTrue(seqMonitor.isEmpty());
+            Assertions.assertEquals(0,seqMonitor.seq.size());
+            break;
+          case NEARBEGINNING:
+            Assertions.assertEquals((numToAdd/4)-1,seqMonitor.seq.size());
+            break;
+          case MIDDLE:
+            Assertions.assertEquals((numToAdd/2)-1,seqMonitor.seq.size());
+            break;
+          case NEAREND:
+            Assertions.assertEquals(((numToAdd/4)*3)-1,seqMonitor.seq.size());
+            break;
+          case END:
+            Assertions.assertEquals((numToAdd)-1,seqMonitor.seq.size());
+            break;
+          default:
+            throw new Error("Unknown seqLocation "+seqLocation);
         }
         return;
       }else{
@@ -222,8 +245,14 @@ public class RefSnglLnkSeqTest{
               case BEGINNING:
                 verifyItr.verifyAscending(1,numToAdd-1);
                 break;
+              case NEARBEGINNING:
+                verifyItr.verifyAscending((numToAdd/4)-1).verifyAscending(numToAdd/4,(numToAdd-(numToAdd/4)));
+                break;
               case MIDDLE:
                 verifyItr.verifyAscending((numToAdd/2)-1).verifyAscending(numToAdd/2,numToAdd/2);
+                break;
+              case NEAREND:
+                verifyItr.verifyAscending(((numToAdd/4)*3)-1).verifyAscending((numToAdd/4)*3,(numToAdd-((numToAdd/4)*3)));
                 break;
               case END:
                 verifyItr.verifyAscending(numToAdd-1);
@@ -236,8 +265,14 @@ public class RefSnglLnkSeqTest{
               case BEGINNING:
                 verifyItr.verifyDescending(numToAdd-1);
                 break;
+              case NEARBEGINNING:
+                verifyItr.verifyDescending(numToAdd,(numToAdd/4)-1).verifyDescending(numToAdd-(numToAdd/4));
+                break;
               case MIDDLE:
                 verifyItr.verifyDescending(numToAdd,(numToAdd/2)-1).verifyDescending(numToAdd/2);
+                break;
+              case NEAREND:
+                verifyItr.verifyDescending(numToAdd,((numToAdd/4)*3)-1).verifyDescending(numToAdd-((numToAdd/4)*3));
                 break;
               case END:
                 verifyItr.verifyDescending(numToAdd,numToAdd-1);
@@ -748,8 +783,14 @@ public class RefSnglLnkSeqTest{
           case BEGINNING:
             numExpectedCalls=1+argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize);
             break;
+          case NEARBEGINNING:
+            numExpectedCalls=1+argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize);
+            break;
           case MIDDLE:
             numExpectedCalls=1+argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize);
+            break;
+          case NEAREND:
+            numExpectedCalls=1+argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize);
             break;
           case END:
             numExpectedCalls=1+argType.initContainsEnd(seqMonitor,monitoredObject,seqSize);
@@ -804,8 +845,14 @@ public class RefSnglLnkSeqTest{
           case BEGINNING:
             argType.initContainsBeginning(seqMonitor,seqSize);
             break;
+          case NEARBEGINNING:
+            argType.initContainsNearBeginning(seqMonitor,seqSize);
+            break;
           case MIDDLE:
             argType.initContainsMiddle(seqMonitor,seqSize);
+            break;
+          case NEAREND:
+            argType.initContainsNearEnd(seqMonitor,seqSize);
             break;
           case END:
             argType.initContainsEnd(seqMonitor,seqSize);
@@ -843,8 +890,14 @@ public class RefSnglLnkSeqTest{
           case BEGINNING:
             numExpectedCalls=1+argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize);
             break;
+          case NEARBEGINNING:
+            numExpectedCalls=1+argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize);
+            break;
           case MIDDLE:
             numExpectedCalls=1+argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize);
+            break;
+          case NEAREND:
+            numExpectedCalls=1+argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize);
             break;
           case END:
             numExpectedCalls=1+argType.initContainsEnd(seqMonitor,monitoredObject,seqSize);
@@ -883,8 +936,16 @@ public class RefSnglLnkSeqTest{
             expectedIndex=argType.initContainsBeginning(seqMonitor,seqSize);
             expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
             break;
+          case NEARBEGINNING:
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,seqSize);
+            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            break;
           case MIDDLE:
             expectedIndex=argType.initContainsMiddle(seqMonitor,seqSize);
+            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            break;
+          case NEAREND:
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,seqSize);
             expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
             break;
           case END:
@@ -925,21 +986,18 @@ public class RefSnglLnkSeqTest{
         switch(seqLocation){
           case BEGINNING:
             numExpectedCalls=1+argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize);
-            //if(!seqMonitor.nestedType.forwardIteration){
-            //  numExpectedCalls=seqMonitor.expectedSeqSize;
-            //}
+            break;
+          case NEARBEGINNING:
+            numExpectedCalls=1+argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize);
             break;
           case MIDDLE:
             numExpectedCalls=1+argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize);
-            //if(!seqMonitor.nestedType.forwardIteration){
-            //  numExpectedCalls=seqMonitor.expectedSeqSize-numExpectedCalls+1;
-            //}
+            break;
+          case NEAREND:
+            numExpectedCalls=1+argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize);
             break;
           case END:
             numExpectedCalls=1+argType.initContainsEnd(seqMonitor,monitoredObject,seqSize);
-            //if(!seqMonitor.nestedType.forwardIteration){
-            //  numExpectedCalls=1;
-            //}
             break;
           case IOBHI:
             argType.initDoesNotContain(seqMonitor,seqSize);
@@ -990,8 +1048,14 @@ public class RefSnglLnkSeqTest{
           case BEGINNING:
             argType.initContainsBeginning(seqMonitor,seqSize);
             break;
+          case NEARBEGINNING:
+            argType.initContainsNearBeginning(seqMonitor,seqSize);
+            break;
           case MIDDLE:
             argType.initContainsMiddle(seqMonitor,seqSize);
+            break;
+          case NEAREND:
+            argType.initContainsNearEnd(seqMonitor,seqSize);
             break;
           case END:
             argType.initContainsEnd(seqMonitor,seqSize);
@@ -1944,6 +2008,46 @@ public class RefSnglLnkSeqTest{
         else
         {
           return seqMonitor.expectedSeqSize-1;
+        }
+      }
+       @Override int initContainsNearBeginning(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        for(int i=0,bound=seqSize/4;i<bound;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.seq.add(monitoredObject);
+        for(int i=(seqSize/4)+1;i<seqSize;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.expectedSeqModCount+=seqSize;
+        seqMonitor.expectedSeqSize+=seqSize;
+        if(seqMonitor.nestedType.forwardIteration)
+        {
+          return seqMonitor.expectedSeqSize/4;
+        }
+        else
+        {
+          return ((seqMonitor.expectedSeqSize/4)*3)-1;
+        }
+      }
+      @Override int initContainsNearEnd(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
+        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+        for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.seq.add(monitoredObject);
+        for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
+          seqMonitor.seq.add(new Object());
+        }
+        seqMonitor.expectedSeqModCount+=seqSize;
+        seqMonitor.expectedSeqSize+=seqSize;
+        if(seqMonitor.nestedType.forwardIteration)
+        {
+          return (seqMonitor.expectedSeqSize/4)*3;
+        }
+        else
+        {
+          return (seqMonitor.expectedSeqSize/4)-1;
         }
       }
     },
@@ -5803,6 +5907,28 @@ public class RefSnglLnkSeqTest{
       }
       return seqMonitor.expectedSeqSize/2;
     }
+    int initContainsNearBeginning(RefSnglLnkSeqMonitor seqMonitor,int seqSize){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0,bound=seqSize/4;i<bound;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      for(int i=(seqSize/4)+1;i<seqSize;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return seqMonitor.expectedSeqSize/4;
+    }
+    int initContainsNearEnd(RefSnglLnkSeqMonitor seqMonitor,int seqSize){
+      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
+      for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      addEqualsVal(seqMonitor);
+      for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
+        addNotEqualsVal(seqMonitor);
+      }
+      return (seqMonitor.expectedSeqSize/4)*3;
+    }
     int initContainsBeginning(RefSnglLnkSeqMonitor seqMonitor,int seqSize){
       addEqualsVal(seqMonitor);
       for(int i=1;i<seqSize;++i){
@@ -5814,7 +5940,9 @@ public class RefSnglLnkSeqTest{
     boolean invokeremoveValMonitored(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     int invokesearchMonitored(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     int initContainsEnd(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
+    int initContainsNearBeginning(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
     int initContainsMiddle(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
+    int initContainsNearEnd(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
     int initContainsBeginning(RefSnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
   };
   static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
