@@ -731,7 +731,6 @@ static interface CLASSPREFIXArrSeq{
     static final Field rootField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","root");
     static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
     static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","rootOffset");
-    static final Field sizeField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","size");
     static int modCount(Object obj){
       return getIntValue(modCountField,obj);
     }
@@ -745,7 +744,7 @@ static interface CLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return getIntValue(sizeField,obj);
+      return ((omni.impl.seq.AbstractSeq)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -793,7 +792,6 @@ static interface CLASSPREFIXArrSeq{
     static final Field rootField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
     static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
     static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
-    static final Field sizeField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList","size");
     static omni.impl.seq.CLASSPREFIXArrSeq.UncheckedListTYPEPARAMETER root(Object obj){
       return (omni.impl.seq.CLASSPREFIXArrSeq.UncheckedListTYPEPARAMETER)getValue(rootField,obj);
     }
@@ -804,7 +802,7 @@ static interface CLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return getIntValue(sizeField,obj);
+      return ((omni.impl.seq.AbstractSeq)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");

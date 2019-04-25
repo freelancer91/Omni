@@ -84,7 +84,9 @@ interface FloatSeqMonitor
   }
   static enum SequenceLocation{
     BEGINNING(null,true),
+    NEARBEGINNING(null,false),
     MIDDLE(null,false),
+    NEAREND(null,false),
     END(null,false),
     IOBLO(IndexOutOfBoundsException.class,true),
     IOBHI(IndexOutOfBoundsException.class,true);
@@ -1361,6 +1363,51 @@ interface FloatSeqMonitor
     public SequenceVerificationItr verifyDescending(FloatInputTestArgType inputArgType,int length){
       return verifyDescending(length,inputArgType,length);
     }
+    public SequenceVerificationItr verifyNearBeginningInsertion(int length){
+      return verifyNearBeginningInsertion(FloatInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNearBeginningInsertion(FloatInputTestArgType inputArgType,final int length){
+      int v=3;
+      for(int i=0,bound=(length/4);i<bound;++i)
+      {
+        verifyIndexAndIterate(inputArgType,v);
+        v+=4;
+      }
+      v-=4;
+      for(int i=0,bound=(length-(length/4));i<bound;++i)
+      {
+        if((i%3)==0)
+        {
+          --v;
+        }
+        verifyIndexAndIterate(inputArgType,v);
+        --v;
+      }
+      return this;
+    }
+    public SequenceVerificationItr verifyNearEndInsertion(int length){
+      return verifyNearEndInsertion(FloatInputTestArgType.ARRAY_TYPE,length);
+    }
+    public SequenceVerificationItr verifyNearEndInsertion(FloatInputTestArgType inputArgType,final int length){
+      int v=0;
+      for(int i=0,bound=(length/4)*3;i<bound;)
+      {
+        verifyIndexAndIterate(inputArgType,v);
+        ++i;
+        if((i%3)==0)
+        {
+          ++v;
+        }
+        ++v;
+      }
+      --v;
+      for(int i=0,bound=(length-((length/4)*3));i<bound;++i)
+      {
+        verifyIndexAndIterate(inputArgType,v);
+        v-=4;
+      }
+      return this;
+    }
     public SequenceVerificationItr verifyMidPointInsertion(int length){
       return verifyMidPointInsertion(FloatInputTestArgType.ARRAY_TYPE,length);
     }
@@ -1421,8 +1468,12 @@ interface FloatSeqMonitor
           default:
             throw new Error("Unknown itr type "+itrType);
         }
+      case NEARBEGINNING:
+        return getListItrMonitor(getExpectedSeqSize()/4);
       case MIDDLE:
         return getListItrMonitor(getExpectedSeqSize()/2);
+      case NEAREND:
+        return getListItrMonitor((getExpectedSeqSize()/4)*3);
       case END:
         return getListItrMonitor(getExpectedSeqSize());
       default:
@@ -1433,8 +1484,12 @@ interface FloatSeqMonitor
     switch(seqLocation){
       case BEGINNING:
         return getListItrMonitor();
+      case NEARBEGINNING:
+        return getListItrMonitor(getExpectedSeqSize()/4);
       case MIDDLE:
         return getListItrMonitor(getExpectedSeqSize()/2);
+      case NEAREND:
+        return getListItrMonitor((getExpectedSeqSize()/4)*3);
       case END:
         return getListItrMonitor(getExpectedSeqSize());
       default:
