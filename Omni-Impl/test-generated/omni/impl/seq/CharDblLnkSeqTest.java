@@ -46,7 +46,7 @@ import omni.api.OmniDeque;
 @Tag("DblLnkSeq")
 @Execution(ExecutionMode.CONCURRENT)
 public class CharDblLnkSeqTest{
- static enum NestedType{
+  static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);
     final boolean rootType;
@@ -63,21 +63,12 @@ public class CharDblLnkSeqTest{
     final int[] expectedParentSizes;
     final int parentPreAlloc;
     final int parentPostAlloc;
-    SeqMonitor(CheckedType checkedType,NestedType nestedType)
-    {
+    SeqMonitor(CheckedType checkedType,NestedType nestedType){
       super(checkedType);
       this.nestedType=nestedType;
-      switch(nestedType)
-      {
+      switch(nestedType){
         case LISTDEQUE:
-          if(checkedType.checked)
-          {
-            this.seq=new CharDblLnkSeq.CheckedList();
-          }
-          else
-          {
-            this.seq=new CharDblLnkSeq.UncheckedList();
-          }
+          this.seq=checkedType.checked?new CharDblLnkSeq.CheckedList():new CharDblLnkSeq.UncheckedList();
           this.parentPreAlloc=0;
           this.parentPostAlloc=0;
           this.parents=EMPTY_PARENTS;
@@ -88,27 +79,18 @@ public class CharDblLnkSeqTest{
         case SUBLIST:
           var rootHead=new CharDblLnkNode(TypeConversionUtil.convertTochar(Integer.MIN_VALUE));
           var currHead=rootHead;
-          for(int i=1;i<10;++i)
-          {
+          for(int i=1;i<10;++i){
             currHead=currHead.next=new CharDblLnkNode(currHead,TypeConversionUtil.convertTochar(Integer.MIN_VALUE+i));
           }
           var rootTail=new CharDblLnkNode(TypeConversionUtil.convertTochar(Integer.MAX_VALUE));
           var currTail=rootTail;
-          for(int i=1;i<10;++i)
-          {
+          for(int i=1;i<10;++i){
             currTail=currTail.prev=new CharDblLnkNode(TypeConversionUtil.convertTochar(Integer.MAX_VALUE-i),currTail);
           }
           currHead.next=currTail;
           currTail.prev=currHead;
           CharDblLnkSeq root;
-          if(checkedType.checked)
-          {
-            root=new CharDblLnkSeq.CheckedList(rootHead,20,rootTail);
-          }
-          else
-          {
-            root=new CharDblLnkSeq.UncheckedList(rootHead,20,rootTail);
-          }
+          root=checkedType.checked?new CharDblLnkSeq.CheckedList(rootHead,20,rootTail):new CharDblLnkSeq.UncheckedList(rootHead,20,rootTail);
           this.parents=new CharDblLnkSeq[2];
           this.parents[1]=root;
           this.parents[0]=(CharDblLnkSeq)root.subList(5,15);
@@ -122,35 +104,23 @@ public class CharDblLnkSeqTest{
           throw new Error("Unknown nested type "+nestedType);
       }
     }
-    SeqMonitor(CheckedType checkedType,int[] parentPreAllocs,int[] parentPostAllocs)
-    {
+    SeqMonitor(CheckedType checkedType,int[] parentPreAllocs,int[] parentPostAllocs){
       super(checkedType);
       Assertions.assertEquals(parentPreAllocs.length,parentPostAllocs.length);
-      if(parentPreAllocs.length==0)
-      {
+      if(parentPreAllocs.length==0){
         this.parentPreAlloc=0;
         this.parentPostAlloc=0;
         this.nestedType=NestedType.LISTDEQUE;
-        if(checkedType.checked)
-        {
-          this.seq=new CharDblLnkSeq.CheckedList();
-        }
-        else
-        {
-          this.seq=new CharDblLnkSeq.UncheckedList();
-        }
+        this.seq=checkedType.checked?new CharDblLnkSeq.CheckedList():new CharDblLnkSeq.UncheckedList();
         this.parents=EMPTY_PARENTS;
         this.parentOffsets=OmniArray.OfInt.DEFAULT_ARR;
         this.expectedParentModCounts=OmniArray.OfInt.DEFAULT_ARR;
         this.expectedParentSizes=OmniArray.OfInt.DEFAULT_ARR;
-      }
-      else
-      {
+      }else{
         this.nestedType=NestedType.SUBLIST;
         int totalPreAlloc=0;
         int totalPostAlloc=0;
-        for(int i=0;i<parentPreAllocs.length;++i)
-        {
+        for(int i=0;i<parentPreAllocs.length;++i){
           totalPreAlloc+=parentPreAllocs[i];
           totalPostAlloc+=parentPostAllocs[i];
         }
@@ -160,61 +130,40 @@ public class CharDblLnkSeqTest{
         CharDblLnkNode rootTail=null;
         var currHead=rootHead;
         var currTail=rootTail;
-        if(totalPreAlloc!=0)
-        {
+        if(totalPreAlloc!=0){
           rootHead=new CharDblLnkNode(TypeConversionUtil.convertTochar(Integer.MIN_VALUE));
           currHead=rootHead;
-          for(int i=1;i<totalPreAlloc;++i)
-          {
+          for(int i=1;i<totalPreAlloc;++i){
             currHead=currHead.next=new CharDblLnkNode(currHead,TypeConversionUtil.convertTochar(Integer.MIN_VALUE+i));
           }
         }
-        if(totalPostAlloc!=0)
-        {
+        if(totalPostAlloc!=0){
           rootTail=new CharDblLnkNode(TypeConversionUtil.convertTochar(Integer.MAX_VALUE));
           currTail=rootTail;
-          for(int i=1;i<totalPreAlloc;++i)
-          {
+          for(int i=1;i<totalPreAlloc;++i){
             currTail=currTail.prev=new CharDblLnkNode(TypeConversionUtil.convertTochar(Integer.MAX_VALUE-i),currTail);
           }
         }
-        if(currHead!=null)
-        {
-          if(currTail!=null)
-          {
+        if(currHead!=null){
+          if(currTail!=null){
             currHead.next=currTail;
             currTail.prev=currHead;
-          }
-          else
-          {
+          }else{
             rootTail=currHead;
           }
-        }
-        else
-        {
-          if(currTail!=null)
-          {
-            rootHead=currTail;
-          }
+        }else if(currTail!=null){
+          rootHead=currTail;
         }
         CharDblLnkSeq root;
         int rootSize=totalPreAlloc+totalPostAlloc;
-        if(checkedType.checked)
-        {
-          root=new CharDblLnkSeq.CheckedList(rootHead,rootSize,rootTail);
-        }
-        else
-        {
-          root=new CharDblLnkSeq.UncheckedList(rootHead,rootSize,rootTail);
-        }
+        root=checkedType.checked?new CharDblLnkSeq.CheckedList(rootHead,rootSize,rootTail):new CharDblLnkSeq.UncheckedList(rootHead,rootSize,rootTail);
         this.parents=new CharDblLnkSeq[parentPreAllocs.length];
         this.parentOffsets=new int[parentPreAllocs.length];
         this.expectedParentModCounts=new int[parentPreAllocs.length];
         this.expectedParentSizes=new int[parentPreAllocs.length];
         this.expectedParentSizes[parentPreAllocs.length-1]=rootSize;
         this.parents[parentPreAllocs.length-1]=root;
-        for(int i=parentPreAllocs.length-1;--i>=0;)
-        {
+        for(int i=parentPreAllocs.length-1;--i>=0;){
           int fromIndex=parentPreAllocs[i+1];
           int toIndex=expectedParentSizes[i+1]-parentPostAllocs[i+1];
           parents[i]=(CharDblLnkSeq)parents[i+1].subList(fromIndex,toIndex);
@@ -228,88 +177,35 @@ public class CharDblLnkSeqTest{
         Assertions.assertEquals(0,this.expectedSeqSize);
       }
     }
-    AbstractItrMonitor getItrMonitor()
-    {
-      switch(nestedType)
-      {
+    AbstractItrMonitor getItrMonitor(){
+      switch(nestedType){
         case LISTDEQUE:
-          if(checkedType.checked)
-          {
-            return new CheckedAscendingItrMonitor();
-          }
-          else
-          {
-            return new UncheckedAscendingItrMonitor();
-          }
+          return checkedType.checked?new CheckedAscendingItrMonitor():new UncheckedAscendingItrMonitor();
         case SUBLIST:
-          if(checkedType.checked)
-          {
-            return new CheckedSubAscendingItrMonitor();
-          }
-          else
-          {
-            return  new UncheckedSubAscendingItrMonitor();
-          }
+          return checkedType.checked?new CheckedSubAscendingItrMonitor():new UncheckedSubAscendingItrMonitor();
         default:
           throw new Error("Unknown nested type "+nestedType);
       }
     }
     AbstractCharSeqMonitor.AbstractItrMonitor getDescendingItrMonitor(){
-      if(checkedType.checked)
-      {
-        return new CheckedDescendingItrMonitor();
-      }
-      else
-      {
-        return new UncheckedDescendingItrMonitor();
-      }
+      return checkedType.checked?new CheckedDescendingItrMonitor():new UncheckedDescendingItrMonitor();
     }
     AbstractCharSeqMonitor.AbstractItrMonitor getListItrMonitor(){
-      switch(nestedType)
-      {
+      switch(nestedType){
         case LISTDEQUE:
-          if(checkedType.checked)
-          {
-            return new CheckedBidirectionalItrMonitor();
-          }
-          else
-          {
-            return new UncheckedBidirectionalItrMonitor();
-          }
+          return checkedType.checked?new CheckedBidirectionalItrMonitor():new UncheckedBidirectionalItrMonitor();
         case SUBLIST:
-          if(checkedType.checked)
-          {
-            return new CheckedBidirectionalSubItrMonitor();
-          }
-          else
-          {
-            return  new UncheckedBidirectionalSubItrMonitor();
-          }
+          return checkedType.checked?new CheckedBidirectionalSubItrMonitor():new UncheckedBidirectionalSubItrMonitor();
         default:
           throw new Error("Unknown nested type "+nestedType);
       }
     }
     AbstractCharSeqMonitor.AbstractItrMonitor getListItrMonitor(int index){
-      switch(nestedType)
-      {
+      switch(nestedType){
         case LISTDEQUE:
-          if(checkedType.checked)
-          {
-            return new CheckedBidirectionalItrMonitor(index);
-          }
-          else
-          {
-            return new UncheckedBidirectionalItrMonitor(index);
-          }
+          return checkedType.checked?new CheckedBidirectionalItrMonitor(index):new UncheckedBidirectionalItrMonitor(index);
         case SUBLIST:
-          if(checkedType.checked)
-          {
-            return new CheckedBidirectionalSubItrMonitor(index);
-          }
-          else
-          {
-            return  new UncheckedBidirectionalSubItrMonitor(index);
-          }
+          return checkedType.checked?new CheckedBidirectionalSubItrMonitor(index):new UncheckedBidirectionalSubItrMonitor(index);
         default:
           throw new Error("Unknown nested type "+nestedType);
       }
@@ -317,8 +213,7 @@ public class CharDblLnkSeqTest{
     SequenceVerificationItr verifyPreAlloc(int expectedVal){
       int rootPreAlloc;
       CharDblLnkNode curr;
-      switch(nestedType)
-      {
+      switch(nestedType){
         case LISTDEQUE:
           curr=seq.head;
           rootPreAlloc=0;
@@ -339,8 +234,7 @@ public class CharDblLnkSeqTest{
     SequenceVerificationItr verifyPreAlloc(){
       int rootPreAlloc;
       CharDblLnkNode curr;
-      switch(nestedType)
-      {
+      switch(nestedType){
         case LISTDEQUE:
           curr=seq.head;
           rootPreAlloc=0;
@@ -358,45 +252,42 @@ public class CharDblLnkSeqTest{
       }
       return new DblLnkSeqVerificationItr(curr,this);
     }
-     void illegalAdd(PreModScenario preModScenario){
-       switch(preModScenario)
-       {
-         case ModSeq:
-           CharInputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
-           verifyAddition();
-           break;
-         case ModParent:
-           int index;
-           CharInputTestArgType.ARRAY_TYPE.callCollectionAdd(parents[index=parents.length-2],0);
-           ++expectedParentSizes[index];
-           ++expectedParentModCounts[index];
-           ++expectedParentSizes[++index];
-           ++expectedParentModCounts[++index];
-           break;
-         case ModRoot:
-           CharInputTestArgType.ARRAY_TYPE.callCollectionAdd(parents[index=parents.length-1],0);
-           ++expectedParentSizes[index];
-           ++expectedParentModCounts[index];
-         case NoMod:
-           break;
-         default:
-           throw new Error("Unknown preModScenario "+preModScenario);
-       }
+    void illegalAdd(PreModScenario preModScenario){
+      switch(preModScenario)
+      {
+        case ModSeq:
+          CharInputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
+          verifyAddition();
+          break;
+        case ModParent:
+          int index;
+          CharInputTestArgType.ARRAY_TYPE.callCollectionAdd(parents[index=parents.length-2],0);
+          ++expectedParentSizes[index];
+          ++expectedParentModCounts[index];
+          ++expectedParentSizes[++index];
+          ++expectedParentModCounts[++index];
+          break;
+        case ModRoot:
+          CharInputTestArgType.ARRAY_TYPE.callCollectionAdd(parents[index=parents.length-1],0);
+          ++expectedParentSizes[index];
+          ++expectedParentModCounts[index];
+        case NoMod:
+          break;
+        default:
+          throw new Error("Unknown preModScenario "+preModScenario);
+      }
     }
-    void verifyAddition()
-    {
+    void verifyAddition(){
       ++expectedSeqSize;
       ++expectedSeqModCount;
-      for(int i=0,bound=expectedParentModCounts.length;i<bound;++i)
-      {
+      for(int i=0,bound=expectedParentModCounts.length;i<bound;++i){
         ++expectedParentSizes[i];
         ++expectedParentModCounts[i];
       }
     }
     public String toString(){
       var builder=new StringBuilder("CharDblLnkSeq").append(checkedType.checked?"Checked":"Unchecked");
-      switch(nestedType)
-      {
+      switch(nestedType){
         case LISTDEQUE:
           builder.append("List{").append(expectedSeqSize);
           break;
@@ -409,62 +300,113 @@ public class CharDblLnkSeqTest{
       return builder.append('}').toString();
     }
     void verifyStructuralIntegrity(){
-    /*
-        switch(nestedType){
-          case STACK:
-            if(checkedType.checked){
-              Assertions.assertEquals(expectedRootModCount,FieldAndMethodAccessor.CharArrSeq.CheckedStack.modCount(root));
-            }
-            break;
-          case LIST:
-            if(checkedType.checked){
-              Assertions.assertEquals(expectedRootModCount,FieldAndMethodAccessor.CharArrSeq.CheckedList.modCount(root));
-            }
-            break;
-          case SUBLIST:
-            OmniList.OfChar actualSeqParent;
-            CharArrSeq actualSeqRoot;
-            int actualSeqSize;
-            OmniList.OfChar actualParentParent;
-            CharArrSeq  actualParentRoot;
-            int actualParentSize;
-            if(checkedType.checked){
-              actualSeqParent=(OmniList.OfChar)FieldAndMethodAccessor.CharArrSeq.CheckedSubList.parent(seq);
-              actualSeqRoot=(CharArrSeq)FieldAndMethodAccessor.CharArrSeq.CheckedSubList.root(seq);
-              actualSeqSize=FieldAndMethodAccessor.CharArrSeq.CheckedSubList.size(seq);
-              actualParentParent=(OmniList.OfChar)FieldAndMethodAccessor.CharArrSeq.CheckedSubList.parent(parent);
-              actualParentRoot=(CharArrSeq)FieldAndMethodAccessor.CharArrSeq.CheckedSubList.root(parent);
-              actualParentSize=FieldAndMethodAccessor.CharArrSeq.CheckedSubList.size(parent);
-              Assertions.assertEquals(expectedSeqModCount,FieldAndMethodAccessor.CharArrSeq.CheckedSubList.modCount(seq));
-              Assertions.assertEquals(expectedParentModCount,FieldAndMethodAccessor.CharArrSeq.CheckedSubList.modCount(parent));
-              Assertions.assertEquals(expectedRootModCount,FieldAndMethodAccessor.CharArrSeq.CheckedList.modCount(root));
-            }else{
-              actualSeqParent=(OmniList.OfChar)FieldAndMethodAccessor.CharArrSeq.UncheckedSubList.parent(seq);
-              actualSeqRoot=(CharArrSeq)FieldAndMethodAccessor.CharArrSeq.UncheckedSubList.root(seq);
-              actualSeqSize=FieldAndMethodAccessor.CharArrSeq.UncheckedSubList.size(seq);
-              actualParentParent=(OmniList.OfChar)FieldAndMethodAccessor.CharArrSeq.UncheckedSubList.parent(parent);
-              actualParentRoot=(CharArrSeq)FieldAndMethodAccessor.CharArrSeq.UncheckedSubList.root(parent);
-              actualParentSize=FieldAndMethodAccessor.CharArrSeq.UncheckedSubList.size(parent);
-            }
-            Assertions.assertSame(root,actualSeqRoot);
-            Assertions.assertSame(root,actualParentRoot);
-            Assertions.assertSame(parent,actualSeqParent);
-            Assertions.assertNull(actualParentParent);
-            Assertions.assertEquals(expectedSeqSize,actualSeqSize);
-            Assertions.assertEquals(expectedParentSize+parentPreAlloc+parentPostAlloc,actualParentSize);
-            break;
-          default:
-            throw new Error("Unknown nestedType "+nestedType);
+      Assertions.assertEquals(expectedSeqSize,seq.size);
+      switch(nestedType){
+        case LISTDEQUE:{
+          if(checkedType.checked){
+            Assertions.assertEquals(expectedSeqModCount,FieldAndMethodAccessor.CharDblLnkSeq.CheckedList.modCount(seq));
+          }
+          var head=seq.head;
+          var tail=seq.tail;
+          Assertions.assertNull(head.prev);
+          Assertions.assertNull(tail.next);
+          var curr=head;
+          for(int count=expectedSeqSize;--count>=0;){
+            var next=curr.next;
+            Assertions.assertSame(next.prev,curr);
+            curr=next;
+          }
+          Assertions.assertSame(curr,tail);
+          break;
         }
-        Assertions.assertEquals(expectedRootSize+parentPreAlloc+parentPostAlloc+rootPreAlloc+rootPostAlloc,FieldAndMethodAccessor.CharArrSeq.size(root));
-      */
-      //TODO
-       throw new UnsupportedOperationException();
+        case SUBLIST:{
+          if(checkedType.checked){
+            Assertions.assertEquals(expectedSeqModCount,FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.modCount(seq));
+            if(parents.length==1){
+              Assertions.assertNull(FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.parent(seq));
+            }else{
+              Assertions.assertSame(parents[0],FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.parent(seq));
+            }
+            Assertions.assertSame(parents[parents.length-1],FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.root(seq));
+          }else{
+            if(parents.length==1){
+              Assertions.assertNull(FieldAndMethodAccessor.CharDblLnkSeq.UncheckedSubList.parent(seq));
+            }else{
+              Assertions.assertSame(parents[0],FieldAndMethodAccessor.CharDblLnkSeq.UncheckedSubList.parent(seq));
+            }
+            Assertions.assertSame(parents[parents.length-1],FieldAndMethodAccessor.CharDblLnkSeq.UncheckedSubList.root(seq));
+          }
+          int parentIndex=parents.length-1;
+          CharDblLnkSeq root=parents[parentIndex];
+          var head=root.head;
+          var tail=root.tail;
+          Assertions.assertNull(head.prev);
+          Assertions.assertNull(tail.next);
+          var curr=head;
+          for(;;){
+            Assertions.assertEquals(expectedParentSizes[parentIndex],parents[parentIndex].size);
+            int currParentOffset=parentOffsets[parentIndex];
+            //TODO verify fields
+            for(;--currParentOffset>=0;){
+              var next=curr.next;
+              Assertions.assertSame(next.prev,curr);
+              curr=next;
+            }
+            if(checkedType.checked){
+              Assertions.assertEquals(expectedParentModCounts[parentIndex],parentIndex==parents.length-1?FieldAndMethodAccessor.CharDblLnkSeq.CheckedList.modCount(parents[parentIndex]):FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.modCount(parents[parentIndex]));
+            }
+            if(parentIndex==0){
+              Assertions.assertSame(seq.head,curr);
+              break;
+            }else{
+              Assertions.assertSame(parents[--parentIndex].head,curr);
+            }
+            if(checkedType.checked){
+              if(parentIndex==parents.length-2){
+                Assertions.assertNull(FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.parent(parents[parentIndex]));
+              }else{
+                Assertions.assertSame(parents[parentIndex+1],FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.parent(parents[parentIndex]));
+              }
+              Assertions.assertSame(parents[parents.length-1],FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.root(parents[parentIndex]));
+            }else{
+              if(parentIndex==parents.length-2){
+                Assertions.assertNull(FieldAndMethodAccessor.CharDblLnkSeq.UncheckedSubList.parent(parents[parentIndex]));
+              }else{
+                Assertions.assertSame(parents[parentIndex+1],FieldAndMethodAccessor.CharDblLnkSeq.UncheckedSubList.parent(parents[parentIndex]));
+              }
+              Assertions.assertSame(parents[parents.length-1],FieldAndMethodAccessor.CharDblLnkSeq.UncheckedSubList.root(parents[parentIndex]));
+            }
+          }
+          for(int count=expectedSeqSize;--count>=0;){
+            var next=curr.next;
+            Assertions.assertSame(next.prev,curr);
+            curr=next;
+          }
+          Assertions.assertSame(seq.tail,curr);
+          int currChildSize=expectedSeqSize;
+          for(;;){
+            int currParentSize=expectedParentSizes[parentIndex];
+            int currPostAlloc=currParentSize-currChildSize-parentOffsets[parentIndex];
+            for(;--currPostAlloc>=0;){
+              var next=curr.next;
+              Assertions.assertSame(next.prev,curr);
+              curr=next;
+            }
+            Assertions.assertSame(parents[parentIndex].tail,curr);
+            if(++parentIndex==parents.length){
+              break;
+            }
+            currChildSize=currParentSize;
+          }
+          break;
+        }
+        default:
+          throw new Error("Unknown nestedType "+nestedType);
+      }
     }
     void verifyFunctionalModification(){
       ++expectedSeqModCount;
-      for(int i=0,bound=expectedParentModCounts.length;i<bound;++i)
-      {
+      for(int i=0,bound=expectedParentModCounts.length;i<bound;++i){
         ++expectedParentModCounts[i];
       }
     }
@@ -474,17 +416,13 @@ public class CharDblLnkSeqTest{
       if(seqSize!=0){
         expectedSeqSize=0;
         ++expectedSeqModCount;
-        for(int i=0,bound=expectedParentModCounts.length;i<bound;++i)
-        {
+        for(int i=0,bound=expectedParentModCounts.length;i<bound;++i){
           expectedParentSizes[i]-=seqSize;
           ++expectedParentModCounts[i];
         }
       }
     }
     void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfChar clone){
-    //TODO
-    throw new UnsupportedOperationException();
-    /*
       boolean retVal;
       if(functionCallType==FunctionCallType.Boxed){
         retVal=seq.removeIf((Predicate)pred);
@@ -494,17 +432,16 @@ public class CharDblLnkSeqTest{
         retVal=seq.removeIf((CharPredicate)pred);
       }
       if(retVal){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
+        verifyFunctionalModification();
         int numRemoved;
         numRemoved=pred.numRemoved;
         for(var removedVal:pred.removedVals){
           Assertions.assertFalse(seq.contains(removedVal));
         }
         expectedSeqSize-=numRemoved;
-        expectedParentSize-=numRemoved;
-        expectedRootSize-=numRemoved;
+        for(int i=0,bound=parents.length;i<bound;++i){
+          expectedParentSizes[i]-=numRemoved;
+        }
         if(expectedNumRemoved!=-1){
           Assertions.assertEquals(expectedNumRemoved,numRemoved);
         }
@@ -517,7 +454,6 @@ public class CharDblLnkSeqTest{
         }
       }
       verifyStructuralIntegrity();
-      */
     }
     void writeObject(ObjectOutputStream oos) throws IOException{
       //TODO
@@ -581,30 +517,26 @@ public class CharDblLnkSeqTest{
     void verifyRemoval(){
       --expectedSeqSize;
       ++expectedSeqModCount;
-      for(int i=0,bound=expectedParentModCounts.length;i<bound;++i)
-      {
+      for(int i=0,bound=expectedParentModCounts.length;i<bound;++i){
         --expectedParentSizes[i];
         ++expectedParentModCounts[i];
       }
     }
-     private int getRootPostAlloc(){
-        var expectedParentSizes=this.expectedParentSizes;
-        switch(expectedParentSizes.length)
-        {
-          default:
-            return expectedParentSizes[expectedParentSizes.length-1]-expectedParentSizes[expectedParentSizes.length-2]-parentOffsets[parentOffsets.length-1];
-          case 1:
-            return expectedParentSizes[0]-expectedSeqSize-parentOffsets[0];
-          case 0:
-           return 0;
-        }
+    private int getRootPostAlloc(){
+      var expectedParentSizes=this.expectedParentSizes;
+      switch(expectedParentSizes.length){
+        default:
+          return expectedParentSizes[expectedParentSizes.length-1]-expectedParentSizes[expectedParentSizes.length-2]-parentOffsets[parentOffsets.length-1];
+        case 1:
+          return expectedParentSizes[0]-expectedSeqSize-parentOffsets[0];
+        case 0:
+         return 0;
       }
-    private static class DblLnkSeqVerificationItr extends SequenceVerificationItr
-    {
+    }
+    private static class DblLnkSeqVerificationItr extends SequenceVerificationItr{
       CharDblLnkNode curr;
       final SeqMonitor seqMonitor;
-      private DblLnkSeqVerificationItr(CharDblLnkNode curr,SeqMonitor seqMonitor)
-      {
+      private DblLnkSeqVerificationItr(CharDblLnkNode curr,SeqMonitor seqMonitor){
         this.seqMonitor=seqMonitor;
         this.curr=curr;
       }
@@ -657,17 +589,13 @@ public class CharDblLnkSeqTest{
         return this;
       }
     }
-    class UncheckedSubAscendingItrMonitor extends UncheckedAscendingItrMonitor
-    {
+    class UncheckedSubAscendingItrMonitor extends UncheckedAscendingItrMonitor{
       UncheckedSubAscendingItrMonitor(){
         super();
       }
       CharDblLnkNode getNewCurr(){
-        if(expectedCurr!=null)
-        {
-          if(expectedCurr!=seq.tail){
-            return expectedCurr.next;
-          }
+        if(expectedCurr!=null && expectedCurr!=seq.tail){
+          return expectedCurr.next;
         }
         return null;
       }
@@ -686,11 +614,9 @@ public class CharDblLnkSeqTest{
         this.expectedCurr=expectedCurr;
       }
       void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
-        if(functionCallType==FunctionCallType.Boxed)
-        {
+        if(functionCallType==FunctionCallType.Boxed){
           itr.forEachRemaining((Consumer)action);
-        }
-        else
+        }else
         {
           itr.forEachRemaining((CharConsumer)action);
         }
@@ -700,11 +626,7 @@ public class CharDblLnkSeqTest{
         return SeqMonitor.this;
       }
       CharDblLnkNode getNewCurr(){
-        if(expectedCurr!=null)
-        {
-          return expectedCurr.next;
-        }
-        return null;
+        return expectedCurr!=null?expectedCurr.next:null;
       }
       void verifyNext(int expectedVal,CharOutputTestArgType outputType){
         var newCurr=getNewCurr();
@@ -730,12 +652,7 @@ public class CharDblLnkSeqTest{
         super(ItrType.DescendingItr,((OmniDeque.OfChar)seq).descendingIterator(),seq.tail);
       }
       CharDblLnkNode getNewCurr(){
-        CharDblLnkNode newCurr=null;
-        if(expectedCurr!=null)
-        {
-          newCurr=expectedCurr.prev;
-        }
-        return newCurr;
+        return expectedCurr!=null?expectedCurr.prev:null;
       }
       void verifyIteratorState(){
         Assertions.assertSame(FieldAndMethodAccessor.CharDblLnkSeq.UncheckedList.DescendingItr.curr(itr),expectedCurr);
@@ -756,7 +673,7 @@ public class CharDblLnkSeqTest{
         expectedCurr=newCurr;
         --expectedCurrIndex;
       }
-       void iterateForward(){
+      void iterateForward(){
         var newCurr=getNewCurr();
         itr.nextChar();
         expectedLastRet=expectedCurr;
@@ -776,24 +693,20 @@ public class CharDblLnkSeqTest{
         Assertions.assertSame(FieldAndMethodAccessor.CharDblLnkSeq.CheckedList.DescendingItr.parent(itr),seq);
       }
       void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
-        if(functionCallType==FunctionCallType.Boxed)
-        {
+        if(functionCallType==FunctionCallType.Boxed){
           itr.forEachRemaining((Consumer)action);
-        }
-        else
+        }else
         {
           itr.forEachRemaining((CharConsumer)action);
         }
-        if(expectedCurrIndex>0)
-        {
+        if(expectedCurrIndex>0){
           this.expectedLastRet=seq.head;
           this.expectedCurrIndex=0;
           this.expectedCurr=null;
         }
       }
     }
-    class UncheckedBidirectionalSubItrMonitor extends UncheckedBidirectionalItrMonitor
-    {
+    class UncheckedBidirectionalSubItrMonitor extends UncheckedBidirectionalItrMonitor{
       UncheckedBidirectionalSubItrMonitor(){
         super();
       }
@@ -831,8 +744,7 @@ public class CharDblLnkSeqTest{
         this.expectedCurr=seq.head;
         this.expectedCurrIndex=0;
       }
-      UncheckedBidirectionalItrMonitor(ItrType itrType,OmniIterator.OfChar itr,int currIndex)
-      {
+      UncheckedBidirectionalItrMonitor(ItrType itrType,OmniIterator.OfChar itr,int currIndex){
         super(itrType,itr,expectedSeqModCount);
         this.expectedCurrIndex=currIndex;
         int parentSize=expectedSeqSize;
@@ -855,17 +767,10 @@ public class CharDblLnkSeqTest{
         this(ItrType.ListItr,seq.listIterator(index),index);
       }
       CharDblLnkNode getNewNextNode(){
-        if(expectedCurr==null)
-        {
-          return null;
-        }
-        return expectedCurr.next;
+        return expectedCurr==null?null:expectedCurr.next;
       }
       CharDblLnkNode getNewPrevNode(){
-        if(expectedCurr==null){
-          return seq.tail;
-        }
-        return expectedCurr.prev;
+        return expectedCurr==null?seq.tail:expectedCurr.prev;
       }
       void iterateReverse(){
         CharDblLnkNode newLastRet=getNewPrevNode();
@@ -957,11 +862,7 @@ public class CharDblLnkSeqTest{
         super(index);
       }
       CharDblLnkNode getNewNextNode(){
-        if(expectedCurr!=null &&expectedCurrIndex<expectedSeqSize)
-        {
-          return expectedCurr.next;
-        }
-        return null;
+        return expectedCurr!=null &&expectedCurrIndex<expectedSeqSize?expectedCurr.next:null;
       }
       void verifyIteratorState(){
         Assertions.assertEquals(FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.AscendingItr.currIndex(itr),expectedCurrIndex);
@@ -983,13 +884,7 @@ public class CharDblLnkSeqTest{
         ++expectedItrModCount;
       }
       CharDblLnkNode getNewPrevNode(){
-        if(expectedCurrIndex!=0){
-          if(expectedCurr==null){
-            return seq.tail;
-          }
-          return expectedCurr.prev;
-        }
-        return null;
+        return expectedCurrIndex!=0?expectedCurr==null?seq.tail:expectedCurr.prev:null;
       }
       void verifyIteratorState(){
         Assertions.assertEquals(FieldAndMethodAccessor.CharDblLnkSeq.CheckedList.BidirectionalItr.currIndex(itr),expectedCurrIndex);
@@ -1042,8 +937,7 @@ public class CharDblLnkSeqTest{
       for(var nestedType:NestedType.values()){
         for(var checkedType:CheckedType.values()){
           for(var preModScenario:PreModScenario.values()){
-            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario.appliesToSubList && !nestedType.rootType))
-            {
+            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario.appliesToSubList && !nestedType.rootType)){
               argBuilder.buildArgs(streamBuilder,nestedType,checkedType,preModScenario);
             }
           }
