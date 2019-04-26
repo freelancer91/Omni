@@ -1,6 +1,5 @@
 package omni.impl.seq;
 import omni.util.TypeConversionUtil;
-import omni.util.TypeUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.FloatInputTestArgType;
 import omni.impl.FloatOutputTestArgType;
@@ -16,26 +15,23 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import java.util.Comparator;
-import omni.function.FloatComparator;
-import java.util.function.UnaryOperator;
-import omni.function.FloatUnaryOperator;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import omni.impl.seq.FloatSeqMonitor.CheckedType;
-import omni.impl.seq.FloatSeqMonitor.PreModScenario;
-import omni.impl.seq.FloatSeqMonitor.SequenceLocation;
-import omni.impl.seq.FloatSeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.FloatSeqMonitor.ListItrSetScenario;
-import omni.impl.seq.FloatSeqMonitor.ItrType;
-import omni.impl.seq.FloatSeqMonitor.IterationScenario;
-import omni.impl.seq.FloatSeqMonitor.ItrRemoveScenario;
-import omni.impl.seq.FloatSeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.FloatSeqMonitor.MonitoredComparatorGen;
-import omni.impl.seq.FloatSeqMonitor.MonitoredRemoveIfPredicateGen;
+import omni.impl.seq.AbstractFloatSeqMonitor.CheckedType;
+import omni.impl.seq.AbstractFloatSeqMonitor.PreModScenario;
+import omni.impl.seq.AbstractFloatSeqMonitor.SequenceLocation;
+import omni.impl.seq.AbstractFloatSeqMonitor.SequenceContentsScenario;
+import omni.impl.seq.AbstractFloatSeqMonitor.ListItrSetScenario;
+import omni.impl.seq.AbstractFloatSeqMonitor.ItrType;
+import omni.impl.seq.AbstractFloatSeqMonitor.IterationScenario;
+import omni.impl.seq.AbstractFloatSeqMonitor.ItrRemoveScenario;
+import omni.impl.seq.AbstractFloatSeqMonitor.MonitoredFunctionGen;
+import omni.impl.seq.AbstractFloatSeqMonitor.MonitoredComparatorGen;
+import omni.impl.seq.AbstractFloatSeqMonitor.MonitoredRemoveIfPredicateGen;
+import omni.impl.seq.AbstractFloatSeqMonitor.QueryTester;
 import java.nio.file.Files;
 import org.junit.jupiter.api.Tag;
-import omni.impl.seq.FloatSeqMonitor.SequenceVerificationItr;
+import omni.impl.seq.AbstractFloatSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import java.util.ArrayList;
@@ -43,7 +39,6 @@ import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import omni.api.OmniStack;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
 @SuppressWarnings({"rawtypes","unchecked"})
@@ -67,7 +62,7 @@ public class FloatArrSeqTest{
               }
               for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
                 for(double threshold:thresholdArr){
-                  streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+                  streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
                 }
               }
             }
@@ -79,12 +74,12 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
     getremoveIf_PredicateArgs().parallel().map(Arguments::get).forEach(args->{
-      testremoveIf_PredicateHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredRemoveIfPredicateGen)args[2],(double)args[3],(long)args[4],(FunctionCallType)args[5],(int)args[6]
+      testremoveIf_PredicateHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredRemoveIfPredicateGen)args[2],(double)args[3],(long)args[4],(FunctionCallType)args[5],(int)args[6]
       );
     });
   }
   private static void testremoveIf_PredicateHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
   ){
     for(int i=0;i<seqSize;++i){
       seqMonitor.add(i);
@@ -167,12 +162,12 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testhashCode_void(){
     gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testhashCode_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+      testhashCode_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
       );
     });
   }
   private static void testhashCode_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
   ){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     {
@@ -194,7 +189,7 @@ public class FloatArrSeqTest{
       }
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.hashCode());
-      verifyThrowCondition(seqMonitor,numToAdd,preModScenario
+      seqMonitor.verifyThrowCondition(numToAdd,preModScenario
       );
     }
     seqMonitor.verifyStructuralIntegrity();
@@ -209,8 +204,8 @@ public class FloatArrSeqTest{
               for(var seqContentsScenario:SequenceContentsScenario.values()){
                 for(var seqLocation:SequenceLocation.values()){
                   if((seqLocation==SequenceLocation.BEGINNING && seqContentsScenario.nonEmpty) || (checkedType.checked && seqLocation.expectedException!=null)){
-                    builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Unboxed));
-                    builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Boxed));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Unboxed));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Boxed));
                   }
                 }
               }
@@ -224,11 +219,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListset_int_val(){
     getListset_int_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListset_int_valHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FunctionCallType)args[4]);
+        testListset_int_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testListset_int_valHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FunctionCallType functionCallType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FunctionCallType functionCallType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -285,7 +280,7 @@ public class FloatArrSeqTest{
                 for(var seqLocation:SequenceLocation.values()){
                   if((seqLocation==SequenceLocation.BEGINNING && seqContentsScenario.nonEmpty) || (checkedType.checked && seqLocation.expectedException!=null)){
                     for(var outputArgType:FloatOutputTestArgType.values()){
-                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,outputArgType));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,outputArgType));
                     }
                   }
                 }
@@ -300,11 +295,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListget_int(){
     getListget_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListget_intHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FloatOutputTestArgType)args[4]);
+        testListget_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FloatOutputTestArgType)args[4]);
     });
   }
   private static void testListget_intHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FloatOutputTestArgType outputArgType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FloatOutputTestArgType outputArgType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -351,7 +346,7 @@ public class FloatArrSeqTest{
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(int seqSize=0;seqSize<=15;seqSize+=5){
         for(int arrSize=0;arrSize<=20;arrSize+=5){
-          streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqSize,arrSize));
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,arrSize));
         }
       }
     });
@@ -359,11 +354,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoArray_ObjectArray(){
     gettoArray_ObjectArrayArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_ObjectArrayHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(int)args[3]);
+        testtoArray_ObjectArrayHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(int)args[3]);
     });
   }
   private static void testtoArray_ObjectArrayHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,int seqSize,int arrSize){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int seqSize,int arrSize){
     for(int i=0;i<seqSize;++i){
       seqMonitor.add(i);
     }
@@ -401,7 +396,7 @@ public class FloatArrSeqTest{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
           for(var seqContentsScenario:SequenceContentsScenario.values()){
-            streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
           }
         }
       }   
@@ -410,11 +405,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoArray_IntFunction(){
     gettoArray_IntFunctionArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_IntFunctionHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+        testtoArray_IntFunctionHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
     });
   }
   private static void testtoArray_IntFunctionHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -487,7 +482,7 @@ public class FloatArrSeqTest{
                   if(checkedType.checked || fromIndex>=0){
                     for(int toIndex=-1;toIndex<=seqSize+2;++toIndex){
                       if(checkedType.checked || (toIndex>=fromIndex && toIndex<=seqSize)){
-                        builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqSize,fromIndex,toIndex));
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,fromIndex,toIndex));
                       }
                     }
                   }
@@ -503,11 +498,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListsubList_int_int(){
     getListsubList_int_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListsubList_int_intHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(int)args[3],(int)args[4]);
+        testListsubList_int_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(int)args[3],(int)args[4]);
     });
   }
   private static void testListsubList_int_intHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,int seqSize,int fromIndex,int toIndex){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int seqSize,int fromIndex,int toIndex){
     for(int i=0;i<seqSize;++i){
       seqMonitor.add(i);
     }
@@ -554,8 +549,8 @@ public class FloatArrSeqTest{
               for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
                 if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
                   for(var seqContentsScenario:SequenceContentsScenario.values()){
-                    builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
-                    builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
                   }
                 }
               }   
@@ -569,11 +564,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListreplaceAll_UnaryOperator(){
     getListreplaceAll_UnaryOperatorArgs().parallel().map(Arguments::get).forEach(args->{
-        testListreplaceAll_UnaryOperatorHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+        testListreplaceAll_UnaryOperatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testListreplaceAll_UnaryOperatorHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -745,17 +740,17 @@ public class FloatArrSeqTest{
   }
   static Stream<Arguments> getiterator_voidArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-      streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario));
+      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario));
     });
   }
   @org.junit.jupiter.api.Test
   public void testiterator_void(){
     getiterator_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testiterator_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1]);
+        testiterator_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1]);
     });
   }
   private static void testiterator_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
@@ -781,7 +776,7 @@ public class FloatArrSeqTest{
         for(var checkedType:CheckedType.values()){
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
-              builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario));
+              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario));
             }
           }
         }
@@ -792,11 +787,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListlistIterator_void(){
     getListlistIterator_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListlistIterator_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1]);
+        testListlistIterator_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1]);
     });
   }
   private static void testListlistIterator_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
@@ -820,7 +815,7 @@ public class FloatArrSeqTest{
             if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
               for(var seqLocation:SequenceLocation.values()){
                 if(seqLocation.expectedException!=null && checkedType.checked)
-                  builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqLocation));
+                  builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation));
               }
             }
           }
@@ -832,11 +827,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListlistIterator_int(){
     getListlistIterator_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListlistIterator_intHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2]);
+        testListlistIterator_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2]);
     });
   }
   private static void testListlistIterator_intHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
@@ -915,7 +910,7 @@ public class FloatArrSeqTest{
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(var seqContentsScenario:SequenceContentsScenario.values()){
         for(var outputArgType:FloatOutputTestArgType.values()){
-          streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,outputArgType));
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,outputArgType));
         }
       }
     });
@@ -923,11 +918,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoArray_void(){
     gettoArray_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(FloatOutputTestArgType)args[3]);
+        testtoArray_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(FloatOutputTestArgType)args[3]);
     });
   }
   private static void testtoArray_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,FloatOutputTestArgType outputArgType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,FloatOutputTestArgType outputArgType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -953,7 +948,7 @@ public class FloatArrSeqTest{
                   for(var seqContentsScenario:SequenceContentsScenario.values()){
                     if(seqContentsScenario.nonEmpty || (seqLocation==SequenceLocation.IOBHI)){
                       for(var outputArgType:FloatOutputTestArgType.values()){
-                        builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqContentsScenario,outputArgType));
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqContentsScenario,outputArgType));
                       }
                     }
                   }
@@ -969,11 +964,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListremoveAt_int(){
     getListremoveAt_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListremoveAt_intHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2],(SequenceContentsScenario)args[3],(FloatOutputTestArgType)args[4]);
+        testListremoveAt_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2],(SequenceContentsScenario)args[3],(FloatOutputTestArgType)args[4]);
     });
   }
   private static void testListremoveAt_intHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,FloatOutputTestArgType outputArgType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,FloatOutputTestArgType outputArgType){
     int numToAdd=seqContentsScenario.nonEmpty?120:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -1083,11 +1078,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListstableDescendingSort_void(){
     getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
-        testListstableDescendingSort_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
+        testListstableDescendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
     });
   }
   private static void testListstableDescendingSort_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
     monitoredComparatorGen.initReverse(seqMonitor,seqContentsScenario,preModScenario);
     if(preModScenario.expectedException==null){
       if(monitoredComparatorGen.expectedException==null || !seqContentsScenario.nonEmpty){
@@ -1103,11 +1098,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testclone_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testclone_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testclone_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
     });
   }
   private static void testclone_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -1158,11 +1153,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testsize_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testsize_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testsize_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
     });
   }
   private static void testsize_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       Assertions.assertEquals(i,seqMonitor.seq.size());
@@ -1188,11 +1183,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testisEmpty_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testisEmpty_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testisEmpty_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
     });
   }
   private static void testisEmpty_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       Assertions.assertEquals(i==0,seqMonitor.seq.isEmpty());
@@ -1218,11 +1213,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testclear_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testclear_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testclear_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
     });
   }
   private static void testclear_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -1241,11 +1236,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testStackpeek_void(){
     getStackpollpeekAndpop_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testStackpeek_voidHelper((FloatArrSeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
+        testStackpeek_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
     });
   }
   private static void testStackpeek_voidHelper
-  (FloatArrSeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
+  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
     for(int i=0;i<100;){
       outputArgType.verifyPeek(seqMonitor.seq,i,i);
       seqMonitor.verifyStructuralIntegrity();
@@ -1255,11 +1250,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testStackpop_void(){
     getStackpollpeekAndpop_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testStackpop_voidHelper((FloatArrSeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
+        testStackpop_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
     });
   }
   private static void testStackpop_voidHelper
-  (FloatArrSeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
+  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
@@ -1275,11 +1270,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testStackpoll_void(){
     getStackpollpeekAndpop_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testStackpoll_voidHelper((FloatArrSeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
+        testStackpoll_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
     });
   }
   private static void testStackpoll_voidHelper
-  (FloatArrSeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
+  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
@@ -1293,11 +1288,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListstableAscendingSort_void(){
     getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
-        testListstableAscendingSort_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
+        testListstableAscendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
     });
   }
   private static void testListstableAscendingSort_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
     monitoredComparatorGen.init(seqMonitor,seqContentsScenario,preModScenario);
     if(preModScenario.expectedException==null){
       if(monitoredComparatorGen.expectedException==null || !seqContentsScenario.nonEmpty){
@@ -1320,7 +1315,7 @@ public class FloatArrSeqTest{
               for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
                 if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
                   for(var sequenceContentsScenario:SequenceContentsScenario.values()){
-                    builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario));
                   }
                 }
               }
@@ -1334,11 +1329,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListunstableSort_Comparator(){
     getListunstableSort_ComparatorArgs().parallel().map(Arguments::get).forEach(args->{
-        testListunstableSort_ComparatorHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
+        testListunstableSort_ComparatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
     });
   }
   private static void testListunstableSort_ComparatorHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
     monitoredComparatorGen.init(seqMonitor,seqContentsScenario,preModScenario);
     var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
     if(preModScenario.expectedException==null){
@@ -1363,7 +1358,7 @@ public class FloatArrSeqTest{
                 if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
                   for(var sequenceContentsScenario:SequenceContentsScenario.values()){
                     for(var functionCallType:FunctionCallType.values()){
-                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario,functionCallType));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario,functionCallType));
                     }
                   }
                 }
@@ -1378,11 +1373,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListsort_Comparator(){
     getListsort_ComparatorArgs().parallel().map(Arguments::get).forEach(args->{
-        testListsort_ComparatorHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+        testListsort_ComparatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testListsort_ComparatorHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
     monitoredComparatorGen.init(seqMonitor,seqContentsScenario,preModScenario);
     var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
     if(preModScenario.expectedException==null){
@@ -1399,33 +1394,33 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testremoveVal_val(){
     getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testremoveVal_valHelper((FloatArrSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testremoveVal_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testremoveVal_valHelper
-  (FloatArrSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
   ){
     if(seqContentsScenario.nonEmpty){
       {
         switch(seqLocation){
           case BEGINNING:
-            argType.initContainsBeginning(seqMonitor);
+            argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case NEARBEGINNING:
-            argType.initContainsNearBeginning(seqMonitor);
+            argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case MIDDLE:
-            argType.initContainsMiddle(seqMonitor);
+            argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case NEAREND:
-            argType.initContainsNearEnd(seqMonitor);
+            argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case END:
-            argType.initContainsEnd(seqMonitor);
+            argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor);
+            argType.initDoesNotContain(seqMonitor,100);
             break;
           default:
             throw new Error("Unknown seqLocation "+seqLocation);
@@ -1463,39 +1458,34 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testsearch_val(){
     getQueryStackArguments().parallel().map(Arguments::get).forEach(args->{
-        testsearch_valHelper((FloatArrSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testsearch_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testsearch_valHelper
-  (FloatArrSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
   ){
     int expectedIndex;
     if(seqContentsScenario.nonEmpty){
       {
         switch(seqLocation){
           case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor);
-            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            expectedIndex=argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor);
-            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor);
-            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            expectedIndex=argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor);
-            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor);
-            expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+            expectedIndex=argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor);
+            argType.initDoesNotContain(seqMonitor,100);
             expectedIndex=-1;
             break;
           default:
@@ -1513,34 +1503,34 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testlastIndexOf_val(){
     getQueryListArguments().parallel().map(Arguments::get).forEach(args->{
-        testlastIndexOf_valHelper((FloatArrSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testlastIndexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testlastIndexOf_valHelper
-  (FloatArrSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
   ){
     int expectedIndex;
     if(seqContentsScenario.nonEmpty){
       {
         switch(seqLocation){
           case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor);
+            expectedIndex=argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor);
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor);
+            expectedIndex=argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor);
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor);
+            expectedIndex=argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor);
+            argType.initDoesNotContain(seqMonitor,100);
             expectedIndex=-1;
             break;
           default:
@@ -1577,34 +1567,34 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testindexOf_val(){
     getQueryListArguments().parallel().map(Arguments::get).forEach(args->{
-        testindexOf_valHelper((FloatArrSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testindexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testindexOf_valHelper
-  (FloatArrSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
   ){
     int expectedIndex;
     if(seqContentsScenario.nonEmpty){
       {
         switch(seqLocation){
           case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor);
+            expectedIndex=argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor);
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor);
+            expectedIndex=argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor);
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor);
+            expectedIndex=argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor);
+            argType.initDoesNotContain(seqMonitor,100);
             expectedIndex=-1;
             break;
           default:
@@ -1641,33 +1631,33 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testcontains_val(){
     getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testcontains_valHelper((FloatArrSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testcontains_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testcontains_valHelper
-  (FloatArrSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
   ){
     if(seqContentsScenario.nonEmpty){
       {
         switch(seqLocation){
           case BEGINNING:
-            argType.initContainsBeginning(seqMonitor);
+            argType.initContainsBeginning(seqMonitor,100,true);
             break;
           case NEARBEGINNING:
-            argType.initContainsNearBeginning(seqMonitor);
+            argType.initContainsNearBeginning(seqMonitor,100,true);
             break;
           case MIDDLE:
-            argType.initContainsMiddle(seqMonitor);
+            argType.initContainsMiddle(seqMonitor,100,true);
             break;
           case NEAREND:
-            argType.initContainsNearEnd(seqMonitor);
+            argType.initContainsNearEnd(seqMonitor,100,true);
             break;
           case END:
-            argType.initContainsEnd(seqMonitor);
+            argType.initContainsEnd(seqMonitor,100,true);
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor);
+            argType.initDoesNotContain(seqMonitor,100);
             break;
           default:
             throw new Error("Unknown seqLocation "+seqLocation);
@@ -1703,7 +1693,7 @@ public class FloatArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var inputArgType:FloatInputTestArgType.values()){
         for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-          builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.STACK,checkedType,initialCapacity),inputArgType));
+          builder.accept(Arguments.of(new SeqMonitor(NestedType.STACK,checkedType,initialCapacity),inputArgType));
         }
       }
     }
@@ -1712,11 +1702,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testStackpush_val(){
     getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testStackpush_valHelper((FloatArrSeqMonitor)args[0],(FloatInputTestArgType)args[1]);
+        testStackpush_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1]);
     });
   }
   private static void testStackpush_valHelper
-  (FloatArrSeqMonitor seqMonitor,FloatInputTestArgType inputArgType){
+  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType){
     for(int i=0;i<100;++i){
       seqMonitor.push(i,inputArgType);
       seqMonitor.verifyStructuralIntegrity();
@@ -1731,14 +1721,14 @@ public class FloatArrSeqTest{
             switch(nestedType){
               case LIST:
               case STACK:
-                streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,preModScenario,seqContentsScenario));
+                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,preModScenario,seqContentsScenario));
                 break;
               case SUBLIST:
                 for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
                   for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
                     for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
                       for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                        streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,preModScenario,seqContentsScenario));
+                        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,preModScenario,seqContentsScenario));
                       }
                     }
                   }
@@ -1755,11 +1745,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testadd_val(){
     getadd_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testadd_valHelper((FloatArrSeqMonitor)args[0],(FloatInputTestArgType)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3]);
+        testadd_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3]);
     });
   }
   private static void testadd_valHelper
-  (FloatArrSeqMonitor seqMonitor,FloatInputTestArgType inputArgType,PreModScenario preModScenario,SequenceContentsScenario sequenceContentsScenario){
+  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType,PreModScenario preModScenario,SequenceContentsScenario sequenceContentsScenario){
     int numToAdd=sequenceContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -1791,7 +1781,7 @@ public class FloatArrSeqTest{
                   for(var seqContentsScenario:SequenceContentsScenario.values()){
                     if(seqContentsScenario.nonEmpty || seqLocation.expectedException!=null){
                       for(var inputArgType:FloatInputTestArgType.values()){
-                        builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqContentsScenario));
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqContentsScenario));
                       }
                     }
                   }
@@ -1807,11 +1797,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListput_int_val(){
     getListput_int_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListput_int_valHelper((FloatArrSeqMonitor)args[0],(FloatInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(SequenceContentsScenario)args[4]);
+        testListput_int_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(SequenceContentsScenario)args[4]);
     });
   }
   private static void testListput_int_valHelper
-  (FloatArrSeqMonitor seqMonitor,FloatInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -1881,14 +1871,14 @@ public class FloatArrSeqTest{
                         for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
                           switch(nestedType){
                             case LIST:
-                              builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,seqLocation,preModScenario,seqContentsScenario));
+                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,seqLocation,preModScenario,seqContentsScenario));
                               break;
                             case SUBLIST:
                               for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
                                 for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
                                   for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
                                     for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,seqLocation,preModScenario,seqContentsScenario));
+                                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,seqLocation,preModScenario,seqContentsScenario));
                                     }
                                   }
                                 }
@@ -1913,11 +1903,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListadd_int_val(){
     getListadd_int_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListadd_int_valHelper((FloatArrSeqMonitor)args[0],(FloatInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(SequenceContentsScenario)args[4]);
+        testListadd_int_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(SequenceContentsScenario)args[4]);
     });
   }
   private static void testListadd_int_valHelper
-  (FloatArrSeqMonitor seqMonitor,FloatInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
+  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2019,8 +2009,8 @@ public class FloatArrSeqTest{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
           for(var seqContentsScenario:SequenceContentsScenario.values()){
-            streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
-            streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
           }
         }
       }
@@ -2029,11 +2019,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testforEach_Consumer(){
     getforEach_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-        testforEach_ConsumerHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+        testforEach_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testforEach_ConsumerHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2188,10 +2178,10 @@ public class FloatArrSeqTest{
             for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
               if((monitoredFunctionGen.expectedException==null || checkedType.checked) && (!nestedType.rootType || (preModScenario.appliesToRootItr&&monitoredFunctionGen.appliesToRootItr))){
                 for(var itrType:ItrType.values()){
-                  if(itrType==ItrType.Itr || nestedType.forwardIteration){
+                  if(itrType!=ItrType.DescendingItr && (itrType==ItrType.Itr || nestedType.forwardIteration)){
                     for(var seqContentsScenario:SequenceContentsScenario.values()){
-                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqContentsScenario,FunctionCallType.Unboxed));
-                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqContentsScenario,FunctionCallType.Boxed));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqContentsScenario,FunctionCallType.Unboxed));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqContentsScenario,FunctionCallType.Boxed));
                     }
                   }
                 }
@@ -2206,11 +2196,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testItrforEachRemaining_Consumer(){
     getItrforEachRemaining_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrforEachRemaining_ConsumerHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(ItrType)args[3],(SequenceContentsScenario)args[4],(FunctionCallType)args[5]);
+        testItrforEachRemaining_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(ItrType)args[3],(SequenceContentsScenario)args[4],(FunctionCallType)args[5]);
     });
   }
   private static void testItrforEachRemaining_ConsumerHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,ItrType itrType,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,ItrType itrType,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2424,7 +2414,7 @@ public class FloatArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var nestedType:NestedType.values()){
         if(nestedType!=NestedType.STACK){
-          builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType)));
+          builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType)));
         }
       }  
     }
@@ -2433,11 +2423,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListItrpreviousIndex_void_And_ListItrnextIndex_void(){
     getListItrpreviousIndex_void_And_ListItrnextIndex_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testListItrpreviousIndex_void_And_ListItrnextIndex_voidHelper((FloatArrSeqMonitor)args[0]);
+        testListItrpreviousIndex_void_And_ListItrnextIndex_voidHelper((SeqMonitor)args[0]);
     });
   }
   private static void testListItrpreviousIndex_void_And_ListItrnextIndex_voidHelper
-  (FloatArrSeqMonitor seqMonitor){
+  (SeqMonitor seqMonitor){
     int numToAdd=100;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2469,12 +2459,12 @@ public class FloatArrSeqTest{
               for(var preModScenario:PreModScenario.values()){
                 if(checkedType.checked || preModScenario.expectedException==null){
                   for(var itrType:ItrType.values()){
-                    if(itrType==ItrType.ListItr || removeScenario.validWithForwardItr){
+                    if(itrType!=ItrType.DescendingItr && (itrType==ItrType.ListItr || removeScenario.validWithForwardItr)){
                       for(var nestedType:NestedType.values()){
                         if((itrType==ItrType.Itr || nestedType!=NestedType.STACK) && (!nestedType.rootType || preModScenario.appliesToRootItr)){
                           for(var sequenceLocation:SequenceLocation.values()){
                             if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (sequenceContentsScenario.nonEmpty && nestedType!=NestedType.STACK))){
-                              builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),removeScenario,preModScenario,sequenceContentsScenario,itrType,sequenceLocation));
+                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,sequenceContentsScenario,itrType,sequenceLocation));
                             }
                           }
                         }
@@ -2493,11 +2483,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testItrremove_void(){
     getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrremove_voidHelper((FloatArrSeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
+        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
     });
   }
   private static void testItrremove_voidHelper
-  (FloatArrSeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,ItrType itrType,SequenceLocation seqLocation){
+  (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,ItrType itrType,SequenceLocation seqLocation){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2793,9 +2783,9 @@ public class FloatArrSeqTest{
             if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
               for(var outputType:FloatOutputTestArgType.values()){
                 if(itrScenario.preModScenario.appliesToRootItr){
-                  builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.LIST,checkedType),itrScenario,seqContentsScenario,outputType));
+                  builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType),itrScenario,seqContentsScenario,outputType));
                 }
-                builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqContentsScenario,outputType));
+                builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqContentsScenario,outputType));
               }
             }
           }
@@ -2807,11 +2797,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListItrprevious_void(){
     getListItrprevious_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testListItrprevious_voidHelper((FloatArrSeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],(FloatOutputTestArgType)args[3]);
+        testListItrprevious_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],(FloatOutputTestArgType)args[3]);
     });
   }
   private static void testListItrprevious_voidHelper
-  (FloatArrSeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,FloatOutputTestArgType outputType){
+  (SeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,FloatOutputTestArgType outputType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2857,10 +2847,12 @@ public class FloatArrSeqTest{
           for(var seqContentsScenario:SequenceContentsScenario.values()){
             if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
               for(var itrType:ItrType.values()){
-                for(var nestedType:NestedType.values()){
-                  if((nestedType!=NestedType.STACK || itrType!=ItrType.ListItr) && (itrScenario.preModScenario.appliesToRootItr || !nestedType.rootType)){
-                    for(var outputType:FloatOutputTestArgType.values()){
-                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),itrScenario,seqContentsScenario,itrType,outputType));
+                if(itrType!=ItrType.DescendingItr){
+                  for(var nestedType:NestedType.values()){
+                    if((nestedType!=NestedType.STACK || itrType!=ItrType.ListItr) && (itrScenario.preModScenario.appliesToRootItr || !nestedType.rootType)){
+                      for(var outputType:FloatOutputTestArgType.values()){
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),itrScenario,seqContentsScenario,itrType,outputType));
+                      }
                     }
                   }
                 }
@@ -2875,11 +2867,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testItrnext_void(){
     getItrnext_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrnext_voidHelper((FloatArrSeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],(ItrType)args[3],(FloatOutputTestArgType)args[4]);
+        testItrnext_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],(ItrType)args[3],(FloatOutputTestArgType)args[4]);
     });
   }
   private static void testItrnext_voidHelper
-  (FloatArrSeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,ItrType itrType,FloatOutputTestArgType outputType){
+  (SeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,ItrType itrType,FloatOutputTestArgType outputType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -2926,9 +2918,9 @@ public class FloatArrSeqTest{
         if(checkedType.checked || listItrSetScenario.expectedException==null){
           for(var inputArgType:FloatInputTestArgType.values()){
             if(listItrSetScenario.preModScenario.appliesToRootItr){
-              builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.LIST,checkedType),listItrSetScenario,inputArgType));
+              builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType),listItrSetScenario,inputArgType));
             }
-            builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.SUBLIST,checkedType),listItrSetScenario,inputArgType));
+            builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType),listItrSetScenario,inputArgType));
           }
         }
       }
@@ -2938,11 +2930,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListItrset_val(){
     getListItrset_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListItrset_valHelper((FloatArrSeqMonitor)args[0],(ListItrSetScenario)args[1],(FloatInputTestArgType)args[2]);
+        testListItrset_valHelper((SeqMonitor)args[0],(ListItrSetScenario)args[1],(FloatInputTestArgType)args[2]);
     });
   }
   private static void testListItrset_valHelper
-  (FloatArrSeqMonitor seqMonitor,ListItrSetScenario listItrSetScenario,FloatInputTestArgType inputArgType){
+  (SeqMonitor seqMonitor,ListItrSetScenario listItrSetScenario,FloatInputTestArgType inputArgType){
     int numToAdd=100;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -3023,14 +3015,14 @@ public class FloatArrSeqTest{
                 for(var inputArgType:FloatInputTestArgType.values()){
                   if(preModScenario.appliesToRootItr){
                     for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-                        builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.LIST,checkedType,initialCapacity),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+                        builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType,initialCapacity),preModScenario,seqContentsScenario,seqLocation,inputArgType));
                     }
                   }
                   for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
                     for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
                       for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
                         for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                          builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+                          builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),preModScenario,seqContentsScenario,seqLocation,inputArgType));
                         }
                       }
                     }
@@ -3047,11 +3039,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListItradd_val(){
     getListItradd_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListItradd_valHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FloatInputTestArgType)args[4]);
+        testListItradd_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FloatInputTestArgType)args[4]);
     });
   }
   private static void testListItradd_valHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FloatInputTestArgType inputArgType){
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FloatInputTestArgType inputArgType){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -3143,12 +3135,12 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoString_void(){
     gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testtoString_voidHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+      testtoString_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
       );
     });
   }
   private static void testtoString_voidHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
   ){
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     {
@@ -3170,7 +3162,7 @@ public class FloatArrSeqTest{
       }
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toString());
-      verifyThrowCondition(seqMonitor,numToAdd,preModScenario
+      seqMonitor.verifyThrowCondition(numToAdd,preModScenario
       );
     }
     seqMonitor.verifyStructuralIntegrity();
@@ -3186,7 +3178,7 @@ public class FloatArrSeqTest{
     }
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){
-        builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType,seqLength,arr)));
+        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,seqLength,arr)));
       }
     }
     return builder.build();
@@ -3195,7 +3187,7 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.params.ParameterizedTest
   @org.junit.jupiter.params.provider.MethodSource("getMASSIVEtoString_voidArgs")
   public void testMASSIVEtoString_void
-  (FloatArrSeqMonitor seqMonitor){
+  (SeqMonitor seqMonitor){
     seqMonitor.verifyMASSIVEString();
   }
   static Stream<Arguments> getreadAndwriteObjectArgs(){
@@ -3203,7 +3195,7 @@ public class FloatArrSeqTest{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
           for(var seqContentsScenario:SequenceContentsScenario.values()){
-            streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
           }
         }
       }
@@ -3212,11 +3204,11 @@ public class FloatArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testreadAndwriteObject(){
     getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
-        testreadAndwriteObjectHelper((FloatArrSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+        testreadAndwriteObjectHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
     });
   }
   private static void testreadAndwriteObjectHelper
-  (FloatArrSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
   {
     int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
@@ -3289,7 +3281,7 @@ public class FloatArrSeqTest{
       return streamBuilder.build();
     }
   }
-  private static class FloatArrSeqMonitor implements FloatSeqMonitor{
+  private static class SeqMonitor extends AbstractFloatSeqMonitor{
     static final int DEFAULT_PRE_AND_POST_ALLOC=5;
     private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,float[] arr){
       for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
@@ -3306,7 +3298,6 @@ public class FloatArrSeqTest{
       }
     }
     final NestedType nestedType;
-    final CheckedType checkedType;
     final int initialCapacity;
     final int rootPreAlloc;
     final int parentPreAlloc;
@@ -3314,16 +3305,13 @@ public class FloatArrSeqTest{
     final int rootPostAlloc;
     final FloatArrSeq root;
     final OmniCollection.OfFloat parent;
-    final OmniCollection.OfFloat seq;
     int expectedRootSize;
     int expectedParentSize;
-    int expectedSeqSize;
     int expectedRootModCount;
     int expectedParentModCount;
-    int expectedSeqModCount;
-    FloatArrSeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,float[] arr){
+    SeqMonitor(NestedType nestedType,CheckedType checkedType,int seqLength,float[] arr){
+      super(checkedType);
       this.nestedType=nestedType;
-      this.checkedType=checkedType;
       this.expectedRootSize=seqLength;
       this.expectedParentSize=seqLength;
       this.expectedSeqSize=seqLength;
@@ -3357,9 +3345,9 @@ public class FloatArrSeqTest{
         this.seq=((OmniList.OfFloat)parent).subList(parentPreAlloc,seqLength-rootPreAlloc-parentPostAlloc-rootPostAlloc);
       }
     }
-    FloatArrSeqMonitor(final NestedType nestedType,final CheckedType checkedType){
+    SeqMonitor(final NestedType nestedType,final CheckedType checkedType){
+      super(checkedType);
       this.nestedType=nestedType;
-      this.checkedType=checkedType;
       this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
       if(nestedType==NestedType.SUBLIST){
         this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
@@ -3396,12 +3384,12 @@ public class FloatArrSeqTest{
         this.seq=root;
       }
     }
-    FloatArrSeqMonitor(final NestedType nestedType,final CheckedType checkedType,final int initialCapacity){
+    SeqMonitor(final NestedType nestedType,final CheckedType checkedType,final int initialCapacity){
       this(nestedType,checkedType,initialCapacity,0,0,0,0);
     }
-    FloatArrSeqMonitor(final NestedType nestedType,final CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
+    SeqMonitor(final NestedType nestedType,CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
+      super(checkedType);
       this.nestedType=nestedType;
-      this.checkedType=checkedType;
       this.initialCapacity=initialCapacity;
       this.rootPreAlloc=rootPreAlloc;
       this.parentPreAlloc=parentPreAlloc;
@@ -3445,16 +3433,15 @@ public class FloatArrSeqTest{
           throw new Error("Unknown nestedType "+nestedType);
       }
     }
-    class UncheckedArrSeqItrMonitor implements ItrMonitor{
-      final OmniIterator.OfFloat itr;
+    class UncheckedArrSeqItrMonitor extends AbstractFloatSeqMonitor.AbstractItrMonitor{
       int expectedCursor;
       int expectedLastRet;
-      private UncheckedArrSeqItrMonitor(OmniIterator.OfFloat itr,int expectedCursor){
-        this.itr=itr;
+      private UncheckedArrSeqItrMonitor(ItrType itrType,OmniIterator.OfFloat itr,int expectedCursor){
+        super(itrType,itr,expectedSeqModCount);
         this.expectedCursor=expectedCursor;
         this.expectedLastRet=-1;
       }
-      public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
+      void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
         int expectedBound=nestedType.forwardIteration?expectedSeqSize:0;
         if(functionCallType==FunctionCallType.Boxed){
           itr.forEachRemaining((Consumer)action);
@@ -3474,29 +3461,14 @@ public class FloatArrSeqTest{
           }
         }
       }
-      public void iterateReverse(){
+      void iterateReverse(){
         ((OmniListIterator.OfFloat)itr).previousFloat();
         expectedLastRet=--expectedCursor;
       }
-      public FloatSeqMonitor getSeqMonitor(){
-        return FloatArrSeqMonitor.this;
+      SeqMonitor getSeqMonitor(){
+        return SeqMonitor.this;
       }
-      public void set(int v,FloatInputTestArgType inputArgType){
-         inputArgType.callListItrSet((OmniListIterator.OfFloat)itr,v);
-      }
-      public boolean hasNext(){
-        return itr.hasNext();
-      }
-      public boolean hasPrevious(){
-        return ((OmniListIterator.OfFloat)itr).hasPrevious();
-      }
-      public int nextIndex(){
-        return ((OmniListIterator.OfFloat)itr).nextIndex();
-      }
-      public int previousIndex(){
-        return ((OmniListIterator.OfFloat)itr).previousIndex();
-      }
-      @Override public void verifyIteratorState(){
+      @Override void verifyIteratorState(){
         int actualCursor;
         Object actualParent;
         switch(nestedType){
@@ -3518,52 +3490,40 @@ public class FloatArrSeqTest{
         Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
         Assertions.assertSame(seq,actualParent);
       }
-      @Override public void add(int v,FloatInputTestArgType inputArgType){
+      @Override void add(int v,FloatInputTestArgType inputArgType){
         inputArgType.callListItrAdd((OmniListIterator.OfFloat)itr,v);
         ++expectedCursor;
-        ++expectedRootModCount;
-        ++expectedParentModCount;
-        ++expectedSeqModCount;
-        ++expectedRootSize;
-        ++expectedParentSize;
-        ++expectedSeqSize;
+        verifyAddition();
         expectedLastRet=-1;
       }
-      @Override public void iterateForward(){
+      @Override void iterateForward(){
         itr.nextFloat();
         expectedLastRet=nestedType==NestedType.STACK
           ?--expectedCursor
           :expectedCursor++;
       }
-      @Override public void verifyNext(int expectedVal,FloatOutputTestArgType outputType){
+      @Override void verifyNext(int expectedVal,FloatOutputTestArgType outputType){
         outputType.verifyItrNext(itr,expectedVal);
         expectedLastRet=nestedType==NestedType.STACK
           ?--expectedCursor
           :expectedCursor++;
       }
-      @Override public void verifyPrevious(int expectedVal,FloatOutputTestArgType outputType){
+      @Override void verifyPrevious(int expectedVal,FloatOutputTestArgType outputType){
         outputType.verifyItrPrevious(itr,expectedVal);
         expectedLastRet=--expectedCursor;
       }
-      @Override public void remove(){
+      @Override void remove(){
         itr.remove();
-        --expectedRootSize;
-        ++expectedRootModCount;
-        --expectedParentSize;
-        ++expectedParentModCount;
-        --expectedSeqSize;
-        ++expectedSeqModCount;
+        verifyRemoval();
         expectedCursor=expectedLastRet;
         expectedLastRet=-1;
       }
     }
     class CheckedArrSeqItrMonitor extends UncheckedArrSeqItrMonitor{
-      int expectedItrModCount;
-      private CheckedArrSeqItrMonitor(OmniIterator.OfFloat itr,int expectedCursor){
-        super(itr,expectedCursor);
-        this.expectedItrModCount=expectedRootModCount;
+      private CheckedArrSeqItrMonitor(ItrType itrType,OmniIterator.OfFloat itr,int expectedCursor){
+        super(itrType,itr,expectedCursor);
       }
-      @Override public void verifyIteratorState(){
+      @Override void verifyIteratorState(){
         int actualCursor;
         Object actualParent;
         switch(nestedType){
@@ -3591,62 +3551,65 @@ public class FloatArrSeqTest{
         Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
         Assertions.assertSame(seq,actualParent);
       }
-      @Override public void add(int v,FloatInputTestArgType inputArgType){
+      @Override void add(int v,FloatInputTestArgType inputArgType){
         super.add(v,inputArgType);
         ++expectedItrModCount;
       }
-      @Override public void remove(){
+      @Override void remove(){
         super.remove();
         ++expectedItrModCount;
       }
     }
-    public UncheckedArrSeqItrMonitor getItrMonitor(){
+    UncheckedArrSeqItrMonitor getItrMonitor(){
       var itr=seq.iterator();
       int expectedCursor=nestedType==NestedType.STACK?root.size:0;
       return checkedType.checked
-        ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
-        :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
+        ?new CheckedArrSeqItrMonitor(ItrType.Itr,itr,expectedCursor)
+        :new UncheckedArrSeqItrMonitor(ItrType.Itr,itr,expectedCursor);
     }
-    public UncheckedArrSeqItrMonitor getListItrMonitor(){
+    UncheckedArrSeqItrMonitor getListItrMonitor(){
       var itr=((OmniList.OfFloat)seq).listIterator();
       return checkedType.checked
-        ?new CheckedArrSeqItrMonitor(itr,0)
-        :new UncheckedArrSeqItrMonitor(itr,0);
+        ?new CheckedArrSeqItrMonitor(ItrType.ListItr,itr,0)
+        :new UncheckedArrSeqItrMonitor(ItrType.ListItr,itr,0);
     }
-    public UncheckedArrSeqItrMonitor getListItrMonitor(int index){
+    UncheckedArrSeqItrMonitor getListItrMonitor(int index){
       var itr=((OmniList.OfFloat)seq).listIterator(index);
       return checkedType.checked
-        ?new CheckedArrSeqItrMonitor(itr,index)
-        :new UncheckedArrSeqItrMonitor(itr,index);
+        ?new CheckedArrSeqItrMonitor(ItrType.ListItr,itr,index)
+        :new UncheckedArrSeqItrMonitor(ItrType.ListItr,itr,index);
     }
     private static class ArrSeqSequenceVerificationItr extends SequenceVerificationItr{
       final float[] arr;
       int offset;
-      final FloatArrSeqMonitor seqMonitor;
-      private ArrSeqSequenceVerificationItr(FloatArrSeqMonitor seqMonitor,int offset,float[] arr){
+      final SeqMonitor seqMonitor;
+      private ArrSeqSequenceVerificationItr(SeqMonitor seqMonitor,int offset,float[] arr){
         this.seqMonitor=seqMonitor;
         this.arr=arr;
         this.offset=offset;
       }
-      @Override public SequenceVerificationItr verifyPostAlloc(int expectedVal){
+      SequenceVerificationItr verifyNaturalAscending(int v,FloatInputTestArgType inputArgType,int length){
+        return verifyAscending(v,inputArgType,length);
+      }
+      @Override SequenceVerificationItr verifyPostAlloc(int expectedVal){
         for(int i=0,bound=seqMonitor.parentPostAlloc+seqMonitor.rootPostAlloc;i<bound;++i){
           verifyIndexAndIterate(FloatInputTestArgType.ARRAY_TYPE,expectedVal);
         }
         return this;
       }
-      @Override public void verifyLiteralIndexAndIterate(float val){
+      @Override void verifyLiteralIndexAndIterate(float val){
         Assertions.assertEquals(val,arr[offset++]);
       }
-      @Override public void verifyIndexAndIterate(FloatInputTestArgType inputArgType,int val){
+      @Override void verifyIndexAndIterate(FloatInputTestArgType inputArgType,int val){
         inputArgType.verifyVal(val,arr[offset++]);
       }
-      @Override public SequenceVerificationItr getPositiveOffset(int i){
+      @Override SequenceVerificationItr getPositiveOffset(int i){
         if(i<0){
           throw new Error("offset cannot be negative: "+i);
         }
         return new ArrSeqSequenceVerificationItr(seqMonitor,i+offset,arr);
       }
-      @Override public SequenceVerificationItr skip(int i){
+      @Override SequenceVerificationItr skip(int i){
         if(i<0){
           throw new Error("offset cannot be negative: "+i);
         }
@@ -3657,23 +3620,20 @@ public class FloatArrSeqTest{
         final ArrSeqSequenceVerificationItr that;
         return val==this || (val instanceof ArrSeqSequenceVerificationItr && (that=(ArrSeqSequenceVerificationItr)val).arr==this.arr && that.offset==this.offset);
       }
-      @Override public SequenceVerificationItr verifyRootPostAlloc(){
+      @Override SequenceVerificationItr verifyRootPostAlloc(){
         for(int i=0,v=Integer.MAX_VALUE-seqMonitor.rootPostAlloc;i<seqMonitor.rootPostAlloc;++i,++v){
           verifyIndexAndIterate(FloatInputTestArgType.ARRAY_TYPE,v);
         }
         return this;
       }
-      @Override public SequenceVerificationItr verifyParentPostAlloc(){
+      @Override SequenceVerificationItr verifyParentPostAlloc(){
         for(int i=0,v=Integer.MAX_VALUE-seqMonitor.rootPostAlloc-seqMonitor.parentPostAlloc;i<seqMonitor.parentPostAlloc;++i,++v){
           verifyIndexAndIterate(FloatInputTestArgType.ARRAY_TYPE,v);
         }
         return this;
       }
     }
-    public int getExpectedSeqSize(){
-      return this.expectedSeqSize;
-    }
-    public SequenceVerificationItr verifyPreAlloc(int expectedVal){
+    SequenceVerificationItr verifyPreAlloc(int expectedVal){
       var arr=root.arr;
       int offset=0;
       for(int bound=offset+rootPreAlloc+parentPreAlloc;offset<bound;++offset){
@@ -3681,7 +3641,7 @@ public class FloatArrSeqTest{
       }
       return new ArrSeqSequenceVerificationItr(this,offset,arr);
     }
-    public SequenceVerificationItr verifyPreAlloc(){
+    SequenceVerificationItr verifyPreAlloc(){
       var arr=root.arr;
       int offset=0;
       for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
@@ -3689,7 +3649,7 @@ public class FloatArrSeqTest{
       }
       return new ArrSeqSequenceVerificationItr(this,offset,arr);
     }
-    public void illegalAdd(PreModScenario preModScenario){
+    void illegalAdd(PreModScenario preModScenario){
       switch(preModScenario){
         case ModSeq:
           FloatInputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
@@ -3718,38 +3678,14 @@ public class FloatArrSeqTest{
           throw new Error("Unknown preModScenario "+preModScenario);
       }
     }
-    public void add(int index,int val,FloatInputTestArgType inputArgType){
-      inputArgType.callListAdd(seq,index,val);
-      ++expectedRootSize;
-      ++expectedParentSize;
+    void verifyAddition()
+    {
       ++expectedSeqSize;
-      ++expectedRootModCount;
-      ++expectedParentModCount;
-      ++expectedSeqModCount;
-    }
-    public boolean add(int val,FloatInputTestArgType inputArgType){
-      boolean ret=inputArgType.callCollectionAdd(seq,val);
-      if(ret){
-        ++expectedRootSize;
-        ++expectedParentSize;
-        ++expectedSeqSize;
-        ++expectedRootModCount;
-        ++expectedParentModCount;
-        ++expectedSeqModCount;
-      }
-      return ret;
-    }
-    public void push(int val,FloatInputTestArgType inputArgType){
-      inputArgType.callStackPush(seq,val);
-      ++expectedRootSize;
       ++expectedParentSize;
-      ++expectedSeqSize;
-      ++expectedRootModCount;
-      ++expectedParentModCount;
+      ++expectedRootSize;
       ++expectedSeqModCount;
-    }
-    public void put(int index,int val,FloatInputTestArgType inputArgType){
-      inputArgType.callListPut(seq,index,val);
+      ++expectedParentModCount;
+      ++expectedRootModCount;
     }
     public String toString(){
       var builder=new StringBuilder("FloatArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
@@ -3768,7 +3704,7 @@ public class FloatArrSeqTest{
       }
       return builder.append('}').toString();
     }
-    public void verifyStructuralIntegrity(){
+    void verifyStructuralIntegrity(){
         switch(nestedType){
           case STACK:
             if(checkedType.checked){
@@ -3817,85 +3753,12 @@ public class FloatArrSeqTest{
         }
         Assertions.assertEquals(expectedRootSize+parentPreAlloc+parentPostAlloc+rootPreAlloc+rootPostAlloc,FieldAndMethodAccessor.FloatArrSeq.size(root));
     }
-    public boolean isEmpty(){
-      return seq.isEmpty();
+    void verifyFunctionalModification(){
+       ++expectedSeqModCount;
+       ++expectedParentModCount;
+       ++expectedRootModCount;
     }
-    public void forEach(MonitoredConsumer action,FunctionCallType functionCallType){
-      if(functionCallType==FunctionCallType.Boxed){
-        seq.forEach((Consumer)action);
-      }else
-      {
-        seq.forEach((FloatConsumer)action);
-      }
-    }
-    public void unstableSort(MonitoredComparator sorter){
-      int seqSize=expectedSeqSize;
-      ((OmniList.OfFloat)seq).unstableSort((FloatComparator)sorter);
-      if(seqSize>1){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    public void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
-      int seqSize=expectedSeqSize;
-      if(functionCallType==FunctionCallType.Boxed){
-        ((OmniList.OfFloat)seq).replaceAll((UnaryOperator)operator);
-      }else
-      {
-        ((OmniList.OfFloat)seq).replaceAll((FloatUnaryOperator)operator);
-      }
-      if(seqSize!=0){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    public void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
-      int seqSize=expectedSeqSize;
-      if(functionCallType==FunctionCallType.Boxed){
-        ((OmniList.OfFloat)seq).sort((Comparator)sorter);
-      }else
-      {
-        ((OmniList.OfFloat)seq).sort((FloatComparator)sorter);
-      }
-      if(seqSize>1){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    public void stableAscendingSort(){
-      int seqSize=expectedSeqSize;
-      ((OmniList.OfFloat)seq).stableAscendingSort();
-      if(seqSize>1){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    public void stableDescendingSort(){
-      int seqSize=expectedSeqSize;
-      ((OmniList.OfFloat)seq).stableDescendingSort();
-      if(seqSize>1){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    public void removeAt(int expectedVal,FloatOutputTestArgType outputType,int index){
-      outputType.verifyListRemoveAt(seq,index,expectedVal);
-      --expectedSeqSize;
-      --expectedParentSize;
-      --expectedRootSize;
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
-    public void get(int expectedVal,FloatOutputTestArgType outputType,int index){
-      outputType.verifyListGet(seq,index,expectedVal);
-    }
-    public void clear(){
+    void clear(){
       int seqSize=expectedSeqSize;
       seq.clear();
       if(seqSize!=0){
@@ -3907,36 +3770,7 @@ public class FloatArrSeqTest{
         ++expectedRootModCount;
       }
     }
-    public void pop(int expectedVal,FloatOutputTestArgType outputType){
-      outputType.verifyStackPop(seq,expectedVal);
-      --expectedSeqSize;
-      --expectedParentSize;
-      --expectedRootSize;
-      ++expectedSeqModCount;
-      ++expectedParentModCount;
-      ++expectedRootModCount;
-    }
-    public void poll(int expectedVal,FloatOutputTestArgType outputType){
-      outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
-      if(expectedSeqSize!=0){
-        --expectedSeqSize;
-        --expectedParentSize;
-        --expectedRootSize;
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    public void verifySet(int index,int val,int expectedRet,FunctionCallType functionCallType){
-      if(functionCallType==FunctionCallType.Boxed){
-        Assertions.assertEquals(TypeConversionUtil.convertToFloat(expectedRet),((OmniList.OfFloat)seq).set(index,TypeConversionUtil.convertToFloat(val)));
-      }
-      else
-      {
-        Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedRet),((OmniList.OfFloat)seq).set(index,TypeConversionUtil.convertTofloat(val)));
-      }
-    }
-    public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfFloat clone){
+    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfFloat clone){
       boolean retVal;
       if(functionCallType==FunctionCallType.Boxed){
         retVal=seq.removeIf((Predicate)pred);
@@ -3970,7 +3804,7 @@ public class FloatArrSeqTest{
       }
       verifyStructuralIntegrity();
     }
-    public void writeObject(ObjectOutputStream oos) throws IOException{
+    void writeObject(ObjectOutputStream oos) throws IOException{
       switch(nestedType){
         case LIST:
           if(checkedType.checked){
@@ -3997,7 +3831,7 @@ public class FloatArrSeqTest{
           throw new Error("unknown nested type "+nestedType);
       }
     }
-    public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
+    Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
       switch(nestedType){
         case LIST:
           if(checkedType.checked){
@@ -4021,8 +3855,13 @@ public class FloatArrSeqTest{
           throw new Error("unknown nested type "+nestedType);
       }
     }
-    public String callToString(){
-      return seq.toString();
+    void verifyRemoval(){
+        ++expectedSeqModCount;
+        ++expectedParentModCount;
+        ++expectedRootModCount;
+        --expectedSeqSize;
+        --expectedParentSize;
+        --expectedRootSize;
     }
   }
   static enum NestedType{
@@ -4034,6217 +3873,6 @@ public class FloatArrSeqTest{
     NestedType(boolean rootType,boolean forwardIteration){
       this.rootType=rootType;
       this.forwardIteration=forwardIteration;
-    }
-  }
-  static enum QueryTester
-  {
-  Booleannull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Boolean)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Boolean)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Boolean)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Boolean)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Boolean)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(Boolean)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Boolean)(Boolean)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Boolean)(Boolean)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Boolean)(Boolean)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Boolean)(Boolean)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Boolean)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Boolean)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Boolean)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Boolean)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Bytenull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Byte)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Byte)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Byte)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Byte)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Byte)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(Byte)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Byte)(Byte)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(Byte)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(Byte)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(Byte)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Byte)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Characternull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Character)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Character)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Character)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Character)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Character)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(Character)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(Character)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(Character)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(Character)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(Character)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Shortnull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Short)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Short)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Short)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Short)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Short)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(Short)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(Short)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(Short)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(Short)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(Short)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Integernull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Integer)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Integer)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Integer)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Integer)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Integer)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(Integer)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(Integer)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(Integer)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(Integer)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(Integer)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Longnull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Long)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Long)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Long)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Long)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Long)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(Long)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(Long)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(Long)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(Long)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(Long)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Floatnull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Float)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Float)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Float)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Float)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Float)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(Float)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(Float)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(Float)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(Float)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(Float)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Doublenull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Double)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Double)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Double)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Double)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Double)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(Double)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(Double)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(Double)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(Double)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(Double)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Objectnull(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Object)(null));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Object)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Object)(null));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Object)(null));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Object)(null));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Object)(null));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(Object)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(Object)(null));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(Object)(null));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(Object)(null));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(null));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(null));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(null));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(null));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(null));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      throw new UnsupportedOperationException();
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Booleanfalse(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(boolean)(false));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(boolean)(false));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(boolean)(false));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(boolean)(false));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(boolean)(false));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(boolean)(false));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Boolean)(boolean)(false));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Boolean)(boolean)(false));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Boolean)(boolean)(false));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Boolean)(boolean)(false));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((boolean)(false));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((boolean)(false));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((boolean)(false));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((boolean)(false));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((boolean)(false));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)TypeUtil.castToFloat(false));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Booleantrue(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(boolean)(true));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(boolean)(true));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(boolean)(true));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(boolean)(true));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(boolean)(true));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(boolean)(true));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Boolean)(boolean)(true));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Boolean)(boolean)(true));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Boolean)(boolean)(true));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Boolean)(boolean)(true));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((boolean)(true));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((boolean)(true));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((boolean)(true));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((boolean)(true));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((boolean)(true));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)TypeUtil.castToFloat(true));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Byte0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(0));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(byte)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(byte)(0));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(byte)(0));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(byte)(0));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(0));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(byte)(0));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(byte)(0));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(byte)(0));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(0));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((byte)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(0));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(0));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(0));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Bytepos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(byte)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(byte)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(byte)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(byte)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(byte)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(byte)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(byte)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((byte)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Bytepos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(byte)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(byte)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(byte)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(byte)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(byte)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(byte)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(byte)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((byte)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Byteneg1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(byte)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(byte)(-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(byte)(-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(byte)(-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Byte)(byte)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(byte)(-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(byte)(-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(byte)(-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((byte)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Character0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(0));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(char)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(char)(0));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(char)(0));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(char)(0));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(0));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(char)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(char)(0));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(char)(0));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(char)(0));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(0));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((char)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(0));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(0));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(0));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Characterpos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(char)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(char)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(char)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(char)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(char)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(char)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(char)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(char)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((char)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Characterpos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(char)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(char)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(char)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(char)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(char)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(char)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(char)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(char)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((char)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  CharacterMAX_BYTE_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(char)(((char)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(char)(((char)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(char)(((char)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(((char)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((char)(((char)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(((char)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(((char)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(((char)Byte.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((char)Byte.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  CharacterMAX_SHORT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(char)(((char)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Character)(char)(((char)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(char)(((char)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(((char)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((char)(((char)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(((char)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(((char)Short.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(((char)Short.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((char)Short.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Short0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(0));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(short)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(short)(0));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(short)(0));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(short)(0));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(0));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(short)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(short)(0));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(short)(0));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(short)(0));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(0));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((short)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(0));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(0));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(0));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Shortpos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(short)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(short)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(short)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(short)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(short)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(short)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(short)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(short)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((short)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Shortpos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(short)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(short)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(short)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(short)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(short)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(short)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(short)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(short)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((short)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Shortneg1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(short)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(short)(-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(short)(-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(short)(-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(short)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(short)(-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(short)(-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(short)(-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((short)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  ShortMAX_BYTE_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(short)(((short)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(short)(((short)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(short)(((short)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(((short)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((short)(((short)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(((short)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(((short)Byte.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((short)Byte.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  ShortMIN_BYTE_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(short)(((short)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Short)(short)(((short)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(short)(((short)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(((short)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((short)(((short)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(((short)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(((short)Byte.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((short)Byte.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Integer0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(0));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(0));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(0));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(0));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(0));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(0));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(0));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(0));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(0));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(0));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(0));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(0));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Integerpos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Integerpos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Integerneg1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMAX_BYTE_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(((int)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Byte.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((int)Byte.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMIN_BYTE_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(((int)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Byte.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((int)Byte.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMAX_SHORT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(((int)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(((int)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Short.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Short.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((int)Short.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMIN_SHORT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(((int)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(((int)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Short.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Short.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((int)Short.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMAX_CHAR_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(((int)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(((int)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(((int)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(((int)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Character.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Character.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((int)Character.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMAX_SAFE_INT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(TypeUtil.MAX_SAFE_INT+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(TypeUtil.MAX_SAFE_INT+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(TypeUtil.MAX_SAFE_INT+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(TypeUtil.MAX_SAFE_INT+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  IntegerMIN_SAFE_INT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(int)(TypeUtil.MIN_SAFE_INT-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((int)(TypeUtil.MIN_SAFE_INT-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(TypeUtil.MIN_SAFE_INT-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(TypeUtil.MIN_SAFE_INT-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Long0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(0));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(0));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(0));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(0));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(0));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(0));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(0));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(0));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(0));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(0));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(0));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(0));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(0));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Longpos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Longpos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Longneg1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMAX_BYTE_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Byte.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Byte.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMIN_BYTE_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Byte.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Byte.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMAX_SHORT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Short.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Short.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Short.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMIN_SHORT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Short.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Short.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Short.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMAX_CHAR_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Character.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Character.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Character.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMAX_SAFE_INT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MAX_SAFE_INT)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)TypeUtil.MAX_SAFE_INT)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMIN_SAFE_INT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MIN_SAFE_INT)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)TypeUtil.MIN_SAFE_INT)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMAX_INT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Integer.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Integer.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Integer.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMIN_INT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)Integer.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Integer.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)Integer.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMAX_SAFE_LONG_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)TypeUtil.MAX_SAFE_LONG)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  LongMIN_SAFE_LONG_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((long)TypeUtil.MIN_SAFE_LONG)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Floatpos0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(0.0F));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(0.0F));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(0.0F));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(0.0F));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(0.0F));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(0.0F));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(0.0F));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(0.0F));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(0.0F));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(0.0F));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(0.0F));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(0.0F));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(0.0F));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(0.0F));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(0.0F));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0.0F));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Floatneg0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(-0.0F));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(-0.0F));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(-0.0F));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(-0.0F));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(-0.0F));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(-0.0F));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(-0.0F));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(-0.0F));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(-0.0F));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(-0.0F));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(-0.0F));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(-0.0F));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(-0.0F));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(-0.0F));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(-0.0F));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-0.0F));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Floatpos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Floatpos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Floatneg1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMAX_BYTE_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Byte.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Byte.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMIN_BYTE_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Byte.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Byte.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMAX_SHORT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Short.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Short.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Short.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMIN_SHORT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Short.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Short.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Short.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMAX_CHAR_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Character.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Character.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Character.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMAX_INT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Integer.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Integer.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Integer.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMIN_INT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Integer.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Integer.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Integer.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMAX_LONG_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Long.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Long.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Long.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Long.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Long.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Long.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Long.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Long.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Long.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMIN_LONG_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(((float)Long.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(((float)Long.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(((float)Long.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Long.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(((float)Long.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Long.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Long.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Long.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((float)Long.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMIN_FLOAT_VALUE(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.MIN_VALUE));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(Float.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(Float.MIN_VALUE));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(Float.MIN_VALUE));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(Float.MIN_VALUE));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.MIN_VALUE));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(Float.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(Float.MIN_VALUE));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(Float.MIN_VALUE));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(Float.MIN_VALUE));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.MIN_VALUE));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(Float.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(Float.MIN_VALUE));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(Float.MIN_VALUE));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(Float.MIN_VALUE));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Float.MIN_VALUE));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatMAX_FLOAT_VALUE(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.MAX_VALUE));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(Float.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(Float.MAX_VALUE));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(Float.MAX_VALUE));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(Float.MAX_VALUE));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.MAX_VALUE));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(Float.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(Float.MAX_VALUE));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(Float.MAX_VALUE));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(Float.MAX_VALUE));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.MAX_VALUE));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(Float.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(Float.MAX_VALUE));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(Float.MAX_VALUE));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(Float.MAX_VALUE));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Float.MAX_VALUE));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  FloatNaN(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.NaN));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(float)(Float.NaN));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(float)(Float.NaN));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(float)(Float.NaN));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(float)(Float.NaN));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.NaN));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Float)(float)(Float.NaN));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(float)(Float.NaN));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(float)(Float.NaN));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(float)(Float.NaN));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.NaN));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((float)(Float.NaN));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(Float.NaN));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(Float.NaN));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(Float.NaN));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Float.NaN));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Doublepos0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(0.0D));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(0.0D));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(0.0D));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(0.0D));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(0.0D));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(0.0D));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(0.0D));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(0.0D));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(0.0D));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(0.0D));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(0.0D));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(0.0D));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(0.0D));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(0.0D));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(0.0D));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(0.0D));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Doubleneg0(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(-0.0D));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(-0.0D));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(-0.0D));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(-0.0D));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(-0.0D));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(-0.0D));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(-0.0D));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(-0.0D));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(-0.0D));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(-0.0D));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(-0.0D));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(-0.0D));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(-0.0D));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(-0.0D));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(-0.0D));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-0.0D));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)true);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Doublepos1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Doublepos2(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(2));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(2));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(2));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(2));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(2));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(2));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(2));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(2));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(2));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(2));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(2));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(2));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(2));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(2));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  Doubleneg1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_BYTE_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Byte.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Byte.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Byte.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Byte.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Byte.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Byte.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_BYTE_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Byte.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Byte.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Byte.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Byte.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Byte.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Byte.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_SHORT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Short.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Short.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Short.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Short.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Short.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Short.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Short.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_SHORT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Short.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Short.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Short.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Short.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Short.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Short.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Short.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_CHAR_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Character.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Character.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Character.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Character.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Character.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Character.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Character.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_SAFE_INT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)TypeUtil.MAX_SAFE_INT)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)TypeUtil.MAX_SAFE_INT)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_SAFE_INT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)TypeUtil.MIN_SAFE_INT)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)TypeUtil.MIN_SAFE_INT)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_INT_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Integer.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Integer.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Integer.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Integer.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Integer.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Integer.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_INT_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Integer.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Integer.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Integer.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Integer.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Integer.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Integer.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_LONG_PLUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Long.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Long.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Long.MAX_VALUE)+1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Long.MAX_VALUE)+1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Long.MAX_VALUE)+1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Long.MAX_VALUE)+1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Long.MAX_VALUE)+1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Long.MAX_VALUE)+1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Long.MAX_VALUE)+1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_LONG_MINUS1(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(((double)Long.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(((double)Long.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(((double)Long.MIN_VALUE)-1));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Long.MIN_VALUE)-1));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(((double)Long.MIN_VALUE)-1));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Long.MIN_VALUE)-1));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Long.MIN_VALUE)-1));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Long.MIN_VALUE)-1));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(((double)Long.MIN_VALUE)-1));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_FLOAT_VALUE(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Float.MIN_VALUE));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(Float.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(Float.MIN_VALUE));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(Float.MIN_VALUE));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(Float.MIN_VALUE));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Float.MIN_VALUE));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Float.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(Float.MIN_VALUE));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(Float.MIN_VALUE));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(Float.MIN_VALUE));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Float.MIN_VALUE));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(Float.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Float.MIN_VALUE));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Float.MIN_VALUE));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Float.MIN_VALUE));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Float.MIN_VALUE));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_FLOAT_VALUE(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Float.MAX_VALUE));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(Float.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(Float.MAX_VALUE));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(Float.MAX_VALUE));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(Float.MAX_VALUE));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Float.MAX_VALUE));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Float.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(Float.MAX_VALUE));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(Float.MAX_VALUE));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(Float.MAX_VALUE));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Float.MAX_VALUE));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(Float.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Float.MAX_VALUE));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Float.MAX_VALUE));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Float.MAX_VALUE));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Float.MAX_VALUE));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMIN_DOUBLE_VALUE(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.MIN_VALUE));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(Double.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(Double.MIN_VALUE));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(Double.MIN_VALUE));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(Double.MIN_VALUE));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.MIN_VALUE));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Double.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(Double.MIN_VALUE));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(Double.MIN_VALUE));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(Double.MIN_VALUE));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.MIN_VALUE));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(Double.MIN_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Double.MIN_VALUE));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Double.MIN_VALUE));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Double.MIN_VALUE));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Double.MIN_VALUE));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleMAX_DOUBLE_VALUE(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.MAX_VALUE));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(Double.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(Double.MAX_VALUE));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(Double.MAX_VALUE));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(Double.MAX_VALUE));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.MAX_VALUE));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Double.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(Double.MAX_VALUE));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(Double.MAX_VALUE));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(Double.MAX_VALUE));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.MAX_VALUE));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(Double.MAX_VALUE));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Double.MAX_VALUE));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Double.MAX_VALUE));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Double.MAX_VALUE));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Double.MAX_VALUE));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  DoubleNaN(false){
-    @Override boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.NaN));}
-    @Override boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.remove((Object)(double)(Double.NaN));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(double)(Double.NaN));}
-    @Override int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(double)(Double.NaN));}
-    @Override int invokesearchObject(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(double)(Double.NaN));}
-    @Override boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.NaN));}
-    @Override boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((Double)(double)(Double.NaN));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(double)(Double.NaN));}
-    @Override int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(double)(Double.NaN));}
-    @Override int invokesearchBoxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(double)(Double.NaN));}
-    @Override boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.NaN));}
-    @Override boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor){
-      boolean ret=seqMonitor.seq.removeVal((double)(Double.NaN));
-      if(ret){
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedParentModCount;
-        ++seqMonitor.expectedRootModCount;
-        --seqMonitor.expectedSeqSize;
-        --seqMonitor.expectedParentSize;
-        --seqMonitor.expectedRootSize;
-      }
-      return ret;
-    }
-    @Override int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Double.NaN));}
-    @Override int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Double.NaN));}
-    @Override int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Double.NaN));}
-    void addEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((float)(Double.NaN));
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-    void addNotEqualsVal(FloatArrSeqMonitor seqMonitor){
-      seqMonitor.seq.add((boolean)false);
-      ++seqMonitor.expectedSeqModCount;
-      ++seqMonitor.expectedParentModCount;
-      ++seqMonitor.expectedRootModCount;
-      ++seqMonitor.expectedSeqSize;
-      ++seqMonitor.expectedParentSize;
-      ++seqMonitor.expectedRootSize;
-    }
-  },
-  ;
-    final boolean isObjectNonNull;
-    QueryTester(boolean isObjectNonNull){
-      this.isObjectNonNull=isObjectNonNull;
-    }
-    boolean invokecontains(FloatArrSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokecontainsUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokecontainsBoxed(seqMonitor);
-        case ToObject:
-          return invokecontainsObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    boolean invokeremoveVal(FloatArrSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokeremoveValUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokeremoveValBoxed(seqMonitor);
-        case ToObject:
-          return invokeremoveValObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokeindexOf(FloatArrSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokeindexOfUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokeindexOfBoxed(seqMonitor);
-        case ToObject:
-          return invokeindexOfObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokelastIndexOf(FloatArrSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokelastIndexOfUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokelastIndexOfBoxed(seqMonitor);
-        case ToObject:
-          return invokelastIndexOfObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokesearch(FloatArrSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokesearchUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokesearchBoxed(seqMonitor);
-        case ToObject:
-          return invokesearchObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    abstract boolean invokecontainsObject(FloatArrSeqMonitor seqMonitor);
-    abstract boolean invokecontainsBoxed(FloatArrSeqMonitor seqMonitor);
-    abstract boolean invokecontainsUnboxed(FloatArrSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValObject(FloatArrSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValBoxed(FloatArrSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValUnboxed(FloatArrSeqMonitor seqMonitor);
-    abstract int invokeindexOfObject(FloatArrSeqMonitor seqMonitor);
-    abstract int invokeindexOfBoxed(FloatArrSeqMonitor seqMonitor);
-    abstract int invokeindexOfUnboxed(FloatArrSeqMonitor seqMonitor);
-    abstract int invokelastIndexOfObject(FloatArrSeqMonitor seqMonitor);
-    abstract int invokelastIndexOfBoxed(FloatArrSeqMonitor seqMonitor);
-    abstract int invokelastIndexOfUnboxed(FloatArrSeqMonitor seqMonitor);
-    abstract int invokesearchObject(FloatArrSeqMonitor seqMonitor);
-    abstract int invokesearchBoxed(FloatArrSeqMonitor seqMonitor);
-    abstract int invokesearchUnboxed(FloatArrSeqMonitor seqMonitor);
-    abstract void addEqualsVal(FloatArrSeqMonitor seqMonitor);
-    abstract void addNotEqualsVal(FloatArrSeqMonitor seqMonitor);
-    void initDoesNotContain(FloatArrSeqMonitor seqMonitor){
-      for(int i=0;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-    }
-    int initContainsEnd(FloatArrSeqMonitor seqMonitor){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<99;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      return seqMonitor.expectedSeqSize-1;
-    }
-    int initContainsNearEnd(FloatArrSeqMonitor seqMonitor){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<75;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=76;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return (seqMonitor.expectedSeqSize/4)*3;
-    }
-    int initContainsMiddle(FloatArrSeqMonitor seqMonitor){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<50;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=51;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return seqMonitor.expectedSeqSize/2;
-    }
-    int initContainsNearBeginning(FloatArrSeqMonitor seqMonitor){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<25;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=26;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return seqMonitor.expectedSeqSize/4;
-    }
-    int initContainsBeginning(FloatArrSeqMonitor seqMonitor){
-      addEqualsVal(seqMonitor);
-      for(int i=1;i<100;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return 0;
-    }
-  };
-  private static void verifyThrowCondition(FloatArrSeqMonitor seqMonitor,int numToAdd,PreModScenario preModScenario
-  ){
-     var verifyItr=seqMonitor.verifyPreAlloc();
-    {
-      verifyItr.verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
     }
   }
   static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
@@ -10362,7 +3990,7 @@ public class FloatArrSeqTest{
                         }
                         //these values must necessarily return false
                       }
-                      builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqContentsScenario,preModScenario));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqContentsScenario,preModScenario));
                     }
                   }
                 }
@@ -10401,7 +4029,7 @@ public class FloatArrSeqTest{
               for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
                 if(monitoredComparatorGen.nullComparator && ((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null))){
                   for(var sequenceContentsScenario:SequenceContentsScenario.values()){
-                    builder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario));
                   }
                 }
               }
@@ -10415,7 +4043,7 @@ public class FloatArrSeqTest{
   static Stream<Arguments> getBasicCollectionTestArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(var seqContentsScenario:SequenceContentsScenario.values()){
-        streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario));
+        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario));
       }
     });
   }
@@ -10423,7 +4051,7 @@ public class FloatArrSeqTest{
     Stream.Builder<Arguments> builder=Stream.builder();
     for(var checkedType:CheckedType.values()){
       for(var outputArgType:FloatOutputTestArgType.values()){
-        builder.accept(Arguments.of(new FloatArrSeqMonitor(NestedType.STACK,checkedType),outputArgType));
+        builder.accept(Arguments.of(new SeqMonitor(NestedType.STACK,checkedType),outputArgType));
       }
     }
     return builder.build();
@@ -10431,7 +4059,7 @@ public class FloatArrSeqTest{
   static Stream<Arguments> gettoStringAndhashCode_voidArgs(){
    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
      for(var seqContentsScenario:SequenceContentsScenario.values()){
-       streamBuilder.accept(Arguments.of(new FloatArrSeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario));
+       streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario));
      }
    });
   }

@@ -122,10 +122,25 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
   }
   private LongDblLnkNode getNode(int index,int size){
-    int tailDist;
-    if((tailDist=size-index)<index){
+    if((size-=index)<=index){
       //the node is closer to the tail
-      return LongDblLnkNode.iterateDescending(tail,tailDist-1);
+      return LongDblLnkNode.iterateDescending(tail,size-1);
+    }else{
+      //the node is closer to the head
+      return LongDblLnkNode.iterateAscending(head,index);
+    }
+  }
+  private LongDblLnkNode getItrNode(int index,int size){
+    if((size-=index)<=index){
+      //the node is closer to the tail
+      switch(size){
+      case 0:
+        return null;
+      case 1:
+        return tail;
+      default:
+        return LongDblLnkNode.uncheckedIterateDescending(tail,size-1);
+      }
     }else{
       //the node is closer to the head
       return LongDblLnkNode.iterateAscending(head,index);
@@ -1518,7 +1533,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
             if((parent=currList.parent)==null){
               //all parents were empty, insert in the root
               ((LongDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
-              this.curr=newNode.next;
               return;
             }
           }while((size=++(currList=parent).size)==1);
@@ -1588,7 +1602,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           final LongDblLnkNode lastRet;
           LongDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action);
           this.lastRet=lastRet;
-          this.curr=lastRet.next;
+          this.curr=null;
           this.currIndex=bound;
         }
       }
@@ -1599,7 +1613,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           final LongDblLnkNode lastRet;
           LongDblLnkNode.uncheckedForEachAscending(this.curr,lastRet=parent.tail,action::accept);
           this.lastRet=lastRet;
-          this.curr=lastRet.next;
+          this.curr=null;
           this.currIndex=bound;
         }
       }
@@ -1611,7 +1625,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this);
     }
     @Override public OmniListIterator.OfLong listIterator(int index){
-      return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,this.size),index);
+      return new BidirectionalItr(this,((LongDblLnkSeq)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
       final int tailDist,subListSize=toIndex-fromIndex;
@@ -1855,7 +1869,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,size),index);
+      return new BidirectionalItr(this,((LongDblLnkSeq)this).getItrNode(index,size),index);
     }
     private static class BidirectionalItr
       extends AbstractLongItr
@@ -1932,9 +1946,8 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount);
           }
-          LongDblLnkNode lastRet;
-          this.lastRet=lastRet=parent.tail;
-          this.curr=lastRet.next;
+          this.lastRet=parent.tail;
+          this.curr=null;
           this.currIndex=size;
         }
       }
@@ -1948,9 +1961,8 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           }finally{
             CheckedCollection.checkModCount(modCount,parent.root.modCount);
           }
-          LongDblLnkNode lastRet;
-          this.lastRet=lastRet=parent.tail;
-          this.curr=lastRet.next;
+          this.lastRet=parent.tail;
+          this.curr=null;
           this.currIndex=size;
         }
       }
@@ -2007,7 +2019,6 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
             if((parent=currList.parent)==null){
               //all parents were empty, insert in the root
               ((LongDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
-              this.curr=newNode.next;
               return;
             }
           }while((size=++(currList=parent).size)==1);
@@ -4252,7 +4263,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,size),index);
+      return new BidirectionalItr(this,((LongDblLnkSeq)this).getItrNode(index,size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
       int tailDist;
@@ -5019,7 +5030,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this);
     }
     @Override public OmniListIterator.OfLong listIterator(int index){
-      return new BidirectionalItr(this,((LongDblLnkSeq)this).getNode(index,this.size),index);
+      return new BidirectionalItr(this,((LongDblLnkSeq)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
       final int tailDist,subListSize=toIndex-fromIndex;

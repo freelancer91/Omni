@@ -28,13 +28,10 @@ import java.util.stream.Stream;
 import omni.util.OmniArray;
 #ENDIF
 import omni.impl.$SNode$;
-import omni.api.OmniIterator;
 import java.util.function.Predicate;
 import omni.impl.FunctionCallType;
 import omni.impl.QueryCastType;
 import java.io.File;
-import omni.api.OmniStack;
-import omni.util.TypeUtil;
 import org.junit.jupiter.api.Tag;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
@@ -43,20 +40,21 @@ import java.io.ObjectInputStream;
 import java.io.Externalizable;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.CheckedType;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.PreModScenario;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceLocation;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceContentsScenario;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.IterationScenario;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.ItrRemoveScenario;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredRemoveIfPredicateGen;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.CheckedType;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.PreModScenario;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceLocation;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceContentsScenario;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.IterationScenario;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.ItrRemoveScenario;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredRemoveIfPredicateGen;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.QueryTester;
 import java.nio.file.Files;
 #IF OfRef
-import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObjectGen;
-import omni.impl.seq.$ClassPrefix$SeqMonitor.MonitoredObject;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredObjectGen;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredObject;
 #ENDIF
-import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceVerificationItr;
+import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
@@ -67,7 +65,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
 #MACRODEF TestMethods(PARALLEL)
 #MACRO testConstructor_void<PARALLEL>()
 #MACRO testItrnext_void<PARALLEL>()
-#MACRO testItrremove_void<false>()
+#MACRO testItrremove_void<PARALLEL>()
 #MACRO testItrforEachRemaining_Consumer<PARALLEL>()
 #MACRO testforEach_Consumer<PARALLEL>()
 #MACRO testremoveIf_Predicate<PARALLEL>()
@@ -109,7 +107,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
   static Stream<Arguments> getPeekPollAndPopArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
       for(var outputType:$ClassPrefix$OutputTestArgType.values()){
-        streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),outputType));
+        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),outputType));
       }
     });
   }
@@ -119,27 +117,23 @@ public class $ClassPrefix$SnglLnkSeqTest{
   #IF OfRef
        for(var monitoredObjectGen:MonitoredObjectGen.values()){
          if(monitoredObjectGen.expectedException==null || (checkedType.checked && monitoredObjectGen.appliesToRoot)){
-           streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),seqSize,monitoredObjectGen));
+           streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize,monitoredObjectGen));
          }
        }
   #ELSE
-       streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),seqSize));
+       streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize));
   #ENDIF
      }
    });
   }
-  private static class $ClassPrefix$SnglLnkSeqMonitor implements $ClassPrefix$SeqMonitor{
+  private static class SeqMonitor extends Abstract$ClassPrefix$SeqMonitor<$ClassPrefix$SnglLnkSeq>{
     
     
     NestedType nestedType;
-    CheckedType checkedType;
-    final $ClassPrefix$SnglLnkSeq seq;
-    int expectedSeqSize;
-    int expectedSeqModCount;
 #IFNOT OfRef,OfDouble,OfChar
-    $ClassPrefix$SnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType,$SNode$ head,int seqSize,$SNode$ tail){
+    SeqMonitor(NestedType nestedType,CheckedType checkedType,$SNode$ head,int seqSize,$SNode$ tail){
+      super(checkedType);
       this.nestedType=nestedType;
-      this.checkedType=checkedType;
       this.expectedSeqSize=seqSize;
       switch(nestedType){
         case QUEUE:
@@ -153,9 +147,9 @@ public class $ClassPrefix$SnglLnkSeqTest{
       }
     }
 #ENDIF
-    $ClassPrefix$SnglLnkSeqMonitor(NestedType nestedType,CheckedType checkedType){
+    SeqMonitor(NestedType nestedType,CheckedType checkedType){
+      super(checkedType);
       this.nestedType=nestedType;
-      this.checkedType=checkedType;
       switch(nestedType){
         case QUEUE:
           this.seq=checkedType.checked?new $ClassPrefix$SnglLnkSeq.CheckedQueue():new $ClassPrefix$SnglLnkSeq.UncheckedQueue();
@@ -167,10 +161,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
           throw new Error("unknown nested type "+nestedType);
       }
     }
-    public int getExpectedSeqSize(){
-      return this.expectedSeqSize;
-    }
-    public void illegalAdd(PreModScenario preModScenario){
+    void illegalAdd(PreModScenario preModScenario){
       switch(preModScenario){
         case ModSeq:
           $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
@@ -183,38 +174,14 @@ public class $ClassPrefix$SnglLnkSeqTest{
           throw new Error("Unknown preModScenario "+preModScenario);
       }
     }
-  #IF OfRef
-    public boolean add(Object obj){
-      boolean ret=seq.add(obj);
-      if(ret)
-      {
-        ++expectedSeqSize;
-        ++expectedSeqModCount;
-      }
-      return ret;
-    }
-  #ENDIF
-    public boolean add(int val,$ClassPrefix$InputTestArgType inputArgType){
-      boolean ret=inputArgType.callCollectionAdd(seq,val);
-      if(ret){
-        ++expectedSeqSize;
-        ++expectedSeqModCount;
-      }
-      return ret;
-    }
-    public boolean offer(int val,$ClassPrefix$InputTestArgType inputArgType){
-      boolean ret=inputArgType.callQueueOffer(seq,val);
-      if(ret){
-        ++expectedSeqSize;
-        ++expectedSeqModCount;
-      }
-      return ret;
-    }
-    public void push(int val,$ClassPrefix$InputTestArgType inputArgType){
-      inputArgType.callStackPush(seq,val);
+    void verifyAddition()
+    {
       ++expectedSeqSize;
       ++expectedSeqModCount;
     }
+    
+   
+   
     public String toString(){
       StringBuilder builder=new StringBuilder();
       builder.append("$ClassPrefix$SnglLnkSeq.").append(checkedType.checked?"Checked":"Unchecked");
@@ -230,20 +197,8 @@ public class $ClassPrefix$SnglLnkSeqTest{
       }
       return builder.toString();
     }
-    public boolean isEmpty(){
-      return seq.isEmpty();
-    }
-    public void forEach(MonitoredConsumer action,FunctionCallType functionCallType){
-  #IFNOT OfRef
-      if(functionCallType==FunctionCallType.Boxed){
-        seq.forEach((Consumer)action);
-      }else
-  #ENDIF
-      {
-        seq.forEach(($TypeNameModifier$Consumer)action);
-      }
-    }
-    public void clear(){
+   
+    void clear(){
       int seqSize=expectedSeqSize;
       seq.clear();
       if(seqSize!=0){
@@ -251,30 +206,8 @@ public class $ClassPrefix$SnglLnkSeqTest{
         ++expectedSeqModCount;
       }
     }
-    public void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-      switch(nestedType)
-      {
-        case QUEUE:
-          outputType.verifyQueueRemove(seq,expectedVal);
-          break;
-        case STACK:
-          outputType.verifyStackPop(seq,expectedVal);
-          break; 
-        default:
-          throw new Error("Unknown nested type "+nestedType);
-      }
-     
-      --expectedSeqSize;
-      ++expectedSeqModCount;
-    }
-    public void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-      outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
-      if(expectedSeqSize!=0){
-        --expectedSeqSize;
-        ++expectedSeqModCount;
-      }
-    }
-    public void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
+   
+    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
   #IF OfBoolean
       int seqSize=expectedSeqSize;
   #ENDIF
@@ -337,13 +270,19 @@ public class $ClassPrefix$SnglLnkSeqTest{
       }
       verifyStructuralIntegrity();
     }
-    public void writeObject(ObjectOutputStream oos) throws IOException{
+    void writeObject(ObjectOutputStream oos) throws IOException{
       ((Externalizable)seq).writeExternal(oos);
     }
-    public Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
+    Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
       return ois.readObject();
     }
-    public void verifyStructuralIntegrity(){
+    void verifyRemoval(){
+      ++expectedSeqModCount;
+      --expectedSeqSize;
+    }
+    
+    
+    void verifyStructuralIntegrity(){
       Assertions.assertEquals(expectedSeqSize,seq.size);
       if(checkedType.checked){
         switch(nestedType){
@@ -369,16 +308,15 @@ public class $ClassPrefix$SnglLnkSeqTest{
         Assertions.assertNull(node.next);
       }
     }
-    class UncheckedSnglLnkSeqItrMonitor implements ItrMonitor{
-      final OmniIterator.Of$ClassPrefix$ itr;
+    class UncheckedSnglLnkSeqItrMonitor extends Abstract$ClassPrefix$SeqMonitor.AbstractItrMonitor{
       $SNode$ expectedPrev;
       $SNode$ expectedCurr;
       $SNode$ expectedNext;
       UncheckedSnglLnkSeqItrMonitor(){
+        super(ItrType.Itr,seq.iterator(),expectedSeqModCount);
         this.expectedNext=seq.head;
-        this.itr=seq.iterator();
       }
-      public void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
+      void forEachRemaining(MonitoredConsumer action,FunctionCallType functionCallType){
   #IFNOT OfRef
         if(functionCallType==FunctionCallType.Boxed){
           itr.forEachRemaining((Consumer)action);
@@ -398,17 +336,17 @@ public class $ClassPrefix$SnglLnkSeqTest{
           this.expectedNext=null;
         }
       }
-      public $ClassPrefix$SeqMonitor getSeqMonitor(){
-        return $ClassPrefix$SnglLnkSeqMonitor.this;
+      SeqMonitor getSeqMonitor(){
+        return SeqMonitor.this;
       }
-      public void verifyNext(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+      void verifyNext(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
         outputType.verifyItrNext(itr,expectedVal);
         final $SNode$ expectedNext;
         this.expectedNext=(expectedNext=this.expectedNext).next;
         this.expectedPrev=this.expectedCurr;
         this.expectedCurr=expectedNext;
       }
-      public void verifyIteratorState(){
+      void verifyIteratorState(){
         Assertions.assertSame(expectedPrev,FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.AbstractItr.prev(itr));
         Assertions.assertSame(expectedCurr,FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.AbstractItr.curr(itr));
         Assertions.assertSame(expectedNext,FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.AbstractItr.next(itr));
@@ -438,31 +376,25 @@ public class $ClassPrefix$SnglLnkSeqTest{
             throw new Error("Unknown nested type "+nestedType);
         }
       }
-      public void iterateForward(){
+      void iterateForward(){
         itr.next();
         final $SNode$ expectedNext;
         this.expectedNext=(expectedNext=this.expectedNext).next;
         this.expectedPrev=this.expectedCurr;
         this.expectedCurr=expectedNext;
       }
-      public void remove(){
+      void remove(){
         itr.remove();
-        --expectedSeqSize;
-        ++expectedSeqModCount;
+        verifyRemoval();
         this.expectedCurr=this.expectedPrev;
-      }
-      public boolean hasNext(){
-        return itr.hasNext();
       }
     }
     class CheckedSnglLnkSeqItrMonitor extends UncheckedSnglLnkSeqItrMonitor
     {
-      int expectedItrModCount;
       private CheckedSnglLnkSeqItrMonitor(){
         super();
-        this.expectedItrModCount=expectedSeqModCount;
       }
-      public void verifyIteratorState(){
+      void verifyIteratorState(){
         Assertions.assertSame(expectedPrev,FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.AbstractItr.prev(itr));
         Assertions.assertSame(expectedCurr,FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.AbstractItr.curr(itr));
         Assertions.assertSame(expectedNext,FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.AbstractItr.next(itr));
@@ -495,23 +427,23 @@ public class $ClassPrefix$SnglLnkSeqTest{
         }
         
       }
-      @Override public void remove(){
+      @Override void remove(){
         super.remove();
         ++expectedItrModCount;
       }
     }
     private static class SnglLnkSeqSequenceVerificationItr extends SequenceVerificationItr{
       $SNode$ curr;
-      final $ClassPrefix$SnglLnkSeqMonitor seqMonitor;
-      private SnglLnkSeqSequenceVerificationItr($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$SNode$ curr){
+      final SeqMonitor seqMonitor;
+      private SnglLnkSeqSequenceVerificationItr(SeqMonitor seqMonitor,$SNode$ curr){
         this.seqMonitor=seqMonitor;
         this.curr=curr;
       }
-      @Override public SequenceVerificationItr verifyPostAlloc(int expectedVal){
+      @Override SequenceVerificationItr verifyPostAlloc(int expectedVal){
         Assertions.assertNull(curr);
         return this;
       }
-      @Override public void verifyLiteralIndexAndIterate($ArrayType$ val){
+      @Override void verifyLiteralIndexAndIterate($ArrayType$ val){
   #IF OfRef
         Assertions.assertSame(val,curr.val);
   #ELSE
@@ -520,7 +452,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
         curr=curr.next;
       }
   #IF OfRef
-      @Override public void verifyIndexAndIterate(MonitoredObject monitoredObject){
+      @Override void verifyIndexAndIterate(MonitoredObject monitoredObject){
         Object v;
         if((v=curr.val) instanceof MonitoredObject){
           Assertions.assertEquals(monitoredObject.compareVal,((MonitoredObject)v).compareVal);
@@ -530,11 +462,11 @@ public class $ClassPrefix$SnglLnkSeqTest{
         curr=curr.next;
       }
   #ENDIF
-      @Override public void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val){
+      @Override void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val){
         inputArgType.verifyVal(val,curr.val);
         curr=curr.next;
       }
-      @Override public SequenceVerificationItr getPositiveOffset(int i){
+      @Override SequenceVerificationItr getPositiveOffset(int i){
         if(i<0){
           throw new Error("offset cannot be negative: "+i);
         }
@@ -547,7 +479,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
         
         return new SnglLnkSeqSequenceVerificationItr(seqMonitor,currCopy);
       }
-      @Override public SequenceVerificationItr skip(int i){
+      @Override SequenceVerificationItr skip(int i){
         if(i<0){
           throw new Error("offset cannot be negative: "+i);
         }
@@ -562,20 +494,20 @@ public class $ClassPrefix$SnglLnkSeqTest{
         final SnglLnkSeqSequenceVerificationItr that;
         return val==this || (val instanceof SnglLnkSeqSequenceVerificationItr && (that=(SnglLnkSeqSequenceVerificationItr)val).seqMonitor.seq==this.seqMonitor.seq && that.curr==this.curr);
       }
-      @Override public SequenceVerificationItr verifyRootPostAlloc(){
+      @Override SequenceVerificationItr verifyRootPostAlloc(){
         Assertions.assertNull(curr);
         return this;
       }
-      @Override public SequenceVerificationItr verifyParentPostAlloc(){
+      @Override SequenceVerificationItr verifyParentPostAlloc(){
         Assertions.assertNull(curr);
         return this;
       }
-      @Override public SequenceVerificationItr verifyPostAlloc(){
+      @Override SequenceVerificationItr verifyPostAlloc(){
         Assertions.assertNull(curr);
         return this;
       
       }
-      @Override public SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
+      @Override SequenceVerificationItr verifyPostAlloc(PreModScenario preModScenario){
         if(seqMonitor.nestedType.forwardIteration && preModScenario==PreModScenario.ModSeq){
           verifyIllegalAdd();
         }
@@ -583,7 +515,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
         return this;
       
       }
-      public SequenceVerificationItr verifyNaturalAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length)
+      SequenceVerificationItr verifyNaturalAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length)
       {
         if(seqMonitor.nestedType.forwardIteration)
         {
@@ -597,12 +529,12 @@ public class $ClassPrefix$SnglLnkSeqTest{
      
       
     }
-    public UncheckedSnglLnkSeqItrMonitor getItrMonitor(){
+    UncheckedSnglLnkSeqItrMonitor getItrMonitor(){
       return checkedType.checked
         ?new CheckedSnglLnkSeqItrMonitor()
         :new UncheckedSnglLnkSeqItrMonitor();
     }
-    public SequenceVerificationItr verifyPreAlloc(PreModScenario preModScenario){
+    SequenceVerificationItr verifyPreAlloc(PreModScenario preModScenario){
       var verifyItr=new SnglLnkSeqSequenceVerificationItr(this,seq.head);
       if(!nestedType.forwardIteration && preModScenario==PreModScenario.ModSeq){
         verifyItr.verifyIllegalAdd();
@@ -610,17 +542,16 @@ public class $ClassPrefix$SnglLnkSeqTest{
       return verifyItr;
     }
     
-    public SequenceVerificationItr verifyPreAlloc(){
+    SequenceVerificationItr verifyPreAlloc(){
       return new SnglLnkSeqSequenceVerificationItr(this,seq.head);
     }
-    public SequenceVerificationItr verifyPreAlloc(int expectedVal){
+    SequenceVerificationItr verifyPreAlloc(int expectedVal){
       return new SnglLnkSeqSequenceVerificationItr(this,seq.head);
     }
     
-    public String callToString(){
-      return seq.toString();
+    void verifyFunctionalModification(){
+      ++expectedSeqModCount;
     }
-    
   }
   static enum NestedType{
     QUEUE(true),
@@ -630,444 +561,7 @@ public class $ClassPrefix$SnglLnkSeqTest{
       this.forwardIteration=forwardIteration;
     }
   }
-  static enum QueryTester
-  {
-#IF OfRef
-    ObjectNonNull(true){
-      @Override boolean invokecontainsObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokecontainsBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokecontainsUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override int invokesearchUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override void addEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
-      @Override void addNotEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-        seqMonitor.seq.add(new Object());
-        ++seqMonitor.expectedSeqModCount;
-        ++seqMonitor.expectedSeqSize;
-      }
-      @Override boolean invokecontainsMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        return seqMonitor.seq.contains(monitoredObject);
-      }
-      @Override boolean invokeremoveValMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        boolean ret=seqMonitor.seq.remove(monitoredObject);
-        if(ret){
-          ++seqMonitor.expectedSeqModCount;
-          --seqMonitor.expectedSeqSize;
-        }
-        return ret;
-      }
-      @Override int invokesearchMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){
-        return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search(monitoredObject);
-      }
-      @Override int initContainsEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0;i<seqSize-1;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.seq.add(monitoredObject);
-        seqMonitor.expectedSeqModCount+=seqSize;
-        seqMonitor.expectedSeqSize+=seqSize;
-        if(seqMonitor.nestedType.forwardIteration)
-        {
-          return seqMonitor.expectedSeqSize-1;
-        }
-        else
-        {
-          return 0;
-        }
-        
-      }
-      @Override int initContainsMiddle($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/2;i<bound;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.seq.add(monitoredObject);
-        for(int i=(seqSize/2)+1;i<seqSize;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.expectedSeqModCount+=seqSize;
-        seqMonitor.expectedSeqSize+=seqSize;
-        if(seqMonitor.nestedType.forwardIteration)
-        {
-          return seqMonitor.expectedSeqSize/2;
-        }
-        else
-        {
-          return (seqMonitor.expectedSeqSize/2)-1;
-        }
-        
-      }
-      @Override int initContainsBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        seqMonitor.seq.add(monitoredObject);
-        for(int i=1;i<seqSize;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.expectedSeqModCount+=seqSize;
-        seqMonitor.expectedSeqSize+=seqSize;
-        if(seqMonitor.nestedType.forwardIteration)
-        {
-          return 0;
-        }
-        else
-        {
-          return seqMonitor.expectedSeqSize-1;
-        }
-      }
-       @Override int initContainsNearBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/4;i<bound;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.seq.add(monitoredObject);
-        for(int i=(seqSize/4)+1;i<seqSize;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.expectedSeqModCount+=seqSize;
-        seqMonitor.expectedSeqSize+=seqSize;
-        if(seqMonitor.nestedType.forwardIteration)
-        {
-          return seqMonitor.expectedSeqSize/4;
-        }
-        else
-        {
-          return ((seqMonitor.expectedSeqSize/4)*3)-1;
-        }
-      }
-      @Override int initContainsNearEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){
-        Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.seq.add(monitoredObject);
-        for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
-          seqMonitor.seq.add(new Object());
-        }
-        seqMonitor.expectedSeqModCount+=seqSize;
-        seqMonitor.expectedSeqSize+=seqSize;
-        if(seqMonitor.nestedType.forwardIteration)
-        {
-          return (seqMonitor.expectedSeqSize/4)*3;
-        }
-        else
-        {
-          return (seqMonitor.expectedSeqSize/4)-1;
-        }
-      }
-      
-    },
-#ENDIF
-  #MACRO QueryTesterImpl<null,Boolean,Boolean>(null,false)
-  #MACRO QueryTesterImpl<null,Byte,Byte>(null,false)
-  #MACRO QueryTesterImpl<null,Character,Character>(null,false)
-  #MACRO QueryTesterImpl<null,Short,Short>(null,false)
-  #MACRO QueryTesterImpl<null,Integer,Integer>(null,false)
-  #MACRO QueryTesterImpl<null,Long,Long>(null,false)
-  #MACRO QueryTesterImpl<null,Float,Float>(null,false)
-  #MACRO QueryTesterImpl<null,Double,Double>(null,false)
-  #MACRO QueryTesterImpl<null,Object,Object>(null,false)
-  #MACRO QueryTesterImpl<false,Boolean,boolean>(false,true)
-  #MACRO QueryTesterImpl<true,Boolean,boolean>(true,false)
-  #MACRO QueryTesterImpl<0,Byte,byte>(0,true)
-  #MACRO QueryTesterImpl<pos1,Byte,byte>(1,false)
-  #MACRO QueryTesterImpl<pos2,Byte,byte>(2,false)
-  #MACRO QueryTesterImpl<neg1,Byte,byte>(-1,false)
-  #MACRO QueryTesterImpl<0,Character,char>(0,true)
-  #MACRO QueryTesterImpl<pos1,Character,char>(1,false)
-  #MACRO QueryTesterImpl<pos2,Character,char>(2,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Character,char>(((char)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Character,char>(((char)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<0,Short,short>(0,true)
-  #MACRO QueryTesterImpl<pos1,Short,short>(1,false)
-  #MACRO QueryTesterImpl<pos2,Short,short>(2,false)
-  #MACRO QueryTesterImpl<neg1,Short,short>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Short,short>(((short)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Short,short>(((short)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<0,Integer,int>(0,true)
-  #MACRO QueryTesterImpl<pos1,Integer,int>(1,false)
-  #MACRO QueryTesterImpl<pos2,Integer,int>(2,false)
-  #MACRO QueryTesterImpl<neg1,Integer,int>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Integer,int>(((int)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Integer,int>(((int)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Integer,int>(((int)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Integer,int>(((int)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Integer,int>(((int)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Integer,int>(TypeUtil.MAX_SAFE_INT+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Integer,int>(TypeUtil.MIN_SAFE_INT-1,false)
-  #MACRO QueryTesterImpl<0,Long,long>(0,true)
-  #MACRO QueryTesterImpl<pos1,Long,long>(1,false)
-  #MACRO QueryTesterImpl<pos2,Long,long>(2,false)
-  #MACRO QueryTesterImpl<neg1,Long,long>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Long,long>(((long)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Long,long>(((long)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Long,long>(((long)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Long,long>(((long)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Long,long>(((long)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_INT)+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_INT)-1,false)
-  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Long,long>(((long)Integer.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Long,long>(((long)Integer.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_LONG_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_LONG)+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_LONG_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_LONG)-1,false)
-  #MACRO QueryTesterImpl<pos0,Float,float>(0.0F,true)
-  #MACRO QueryTesterImpl<neg0,Float,float>(-0.0F,true)
-  #MACRO QueryTesterImpl<pos1,Float,float>(1,false)
-  #MACRO QueryTesterImpl<pos2,Float,float>(2,false)
-  #MACRO QueryTesterImpl<neg1,Float,float>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Float,float>(((float)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Float,float>(((float)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Float,float>(((float)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Float,float>(((float)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Float,float>(((float)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Float,float>(((float)Integer.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Float,float>(((float)Integer.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_LONG_PLUS1,Float,float>(((float)Long.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_LONG_MINUS1,Float,float>(((float)Long.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MIN_FLOAT_VALUE,Float,float>(Float.MIN_VALUE,false)
-  #MACRO QueryTesterImpl<MAX_FLOAT_VALUE,Float,float>(Float.MAX_VALUE,false)
-  #MACRO QueryTesterImpl<NaN,Float,float>(Float.NaN,false)
-  #MACRO QueryTesterImpl<pos0,Double,double>(0.0D,true)
-  #MACRO QueryTesterImpl<neg0,Double,double>(-0.0D,true)
-  #MACRO QueryTesterImpl<pos1,Double,double>(1,false)
-  #MACRO QueryTesterImpl<pos2,Double,double>(2,false)
-  #MACRO QueryTesterImpl<neg1,Double,double>(-1,false)
-  #MACRO QueryTesterImpl<MAX_BYTE_PLUS1,Double,double>(((double)Byte.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_BYTE_MINUS1,Double,double>(((double)Byte.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_SHORT_PLUS1,Double,double>(((double)Short.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_SHORT_MINUS1,Double,double>(((double)Short.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_CHAR_PLUS1,Double,double>(((double)Character.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MAX_SAFE_INT_PLUS1,Double,double>(((double)TypeUtil.MAX_SAFE_INT)+1,false)
-  #MACRO QueryTesterImpl<MIN_SAFE_INT_MINUS1,Double,double>(((double)TypeUtil.MIN_SAFE_INT)-1,false)
-  #MACRO QueryTesterImpl<MAX_INT_PLUS1,Double,double>(((double)Integer.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_INT_MINUS1,Double,double>(((double)Integer.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MAX_LONG_PLUS1,Double,double>(((double)Long.MAX_VALUE)+1,false)
-  #MACRO QueryTesterImpl<MIN_LONG_MINUS1,Double,double>(((double)Long.MIN_VALUE)-1,false)
-  #MACRO QueryTesterImpl<MIN_FLOAT_VALUE,Double,double>(Float.MIN_VALUE,false)
-  #MACRO QueryTesterImpl<MAX_FLOAT_VALUE,Double,double>(Float.MAX_VALUE,false)
-  #MACRO QueryTesterImpl<MIN_DOUBLE_VALUE,Double,double>(Double.MIN_VALUE,false)
-  #MACRO QueryTesterImpl<MAX_DOUBLE_VALUE,Double,double>(Double.MAX_VALUE,false)
-  #MACRO QueryTesterImpl<NaN,Double,double>(Double.NaN,false)
-  ;
 
-#MACRODEF QueryTesterImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
-BOXED_TYPEVALUE_NAME(false){
-  @Override boolean invokecontainsObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokeremoveValObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.remove((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      --seqMonitor.expectedSeqSize;
-    }
-    return ret;
-  }
-  @Override int invokesearchObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokecontainsBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-#IFSWITCH BOXED_TYPE==Object
-  @Override boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.remove((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      --seqMonitor.expectedSeqSize;
-    }
-    return ret;
-  }
-#ELSE
-  @Override boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.removeVal((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      --seqMonitor.expectedSeqSize;
-    }
-    return ret;
-  }
-#ENDIF
-  @Override int invokesearchBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  @Override boolean invokecontainsUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return seqMonitor.seq.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-#IFSWITCH PRIMITIVE_TYPE==Object
-  @Override boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.remove((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      --seqMonitor.expectedSeqSize;
-    }
-    return ret;
-  }
-#ELSE
-  @Override boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-    boolean ret=seqMonitor.seq.removeVal((PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    if(ret){
-      ++seqMonitor.expectedSeqModCount;
-      --seqMonitor.expectedSeqSize;
-    }
-    return ret;
-  }
-#ENDIF
-  @Override int invokesearchUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  void addEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-#IF OfRef
-    seqMonitor.seq.add((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
-    ++seqMonitor.expectedSeqModCount;
-    ++seqMonitor.expectedSeqSize;
-#ELSE
-  #IFSWITCH VALUE_NAME==null
-    throw new UnsupportedOperationException();
-  #ELSE
-    #IF OfBoolean
-      #IFSWITCH PRIMITIVE_TYPE==boolean
-    seqMonitor.seq.add((boolean)(PRIMITIVE_VAL));
-      #ELSE
-        #IFSWITCH VALUE_NAME==pos1
-    seqMonitor.seq.add((boolean)(true));
-        #ELSE
-    seqMonitor.seq.add((boolean)((PRIMITIVE_VAL)==1));
-        #ENDIF
-      #ENDIF
-    #ELSE
-      #IFSWITCH PRIMITIVE_TYPE==boolean
-    seqMonitor.seq.add(($exposedType$)$queryCastBoolean$(PRIMITIVE_VAL));
-      #ELSE
-    seqMonitor.seq.add(($exposedType$)(PRIMITIVE_VAL));
-      #ENDIF
-    #ENDIF
-    ++seqMonitor.expectedSeqModCount;
-    ++seqMonitor.expectedSeqSize;
-  #ENDIF
-#ENDIF
-  }
-  void addNotEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
-    #IF OfRef
-    seqMonitor.seq.add((Object)(boolean)NOT_EQUALS_VAL);
-    #ELSE
-    seqMonitor.seq.add((boolean)NOT_EQUALS_VAL);
-    #ENDIF
-    ++seqMonitor.expectedSeqModCount;
-    ++seqMonitor.expectedSeqSize;
-  }
-},
-#ENDDEF
-    
-    final boolean isObjectNonNull;
-    QueryTester(boolean isObjectNonNull){
-      this.isObjectNonNull=isObjectNonNull;
-    }
-    boolean invokecontains($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokecontainsUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokecontainsBoxed(seqMonitor);
-        case ToObject:
-          return invokecontainsObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    boolean invokeremoveVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokeremoveValUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokeremoveValBoxed(seqMonitor);
-        case ToObject:
-          return invokeremoveValObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    int invokesearch($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryCastType queryCastType){
-      switch(queryCastType){
-        case Unboxed:
-          return invokesearchUnboxed(seqMonitor);
-        case ToBoxed:
-          return invokesearchBoxed(seqMonitor);
-        case ToObject:
-          return invokesearchObject(seqMonitor);
-        default:
-          throw new Error("Unknown queryCastType "+queryCastType);
-      }
-    }
-    
-    abstract boolean invokecontainsObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract boolean invokecontainsBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract boolean invokecontainsUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract boolean invokeremoveValUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract int invokesearchObject($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract int invokesearchBoxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract int invokesearchUnboxed($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract void addEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    abstract void addNotEqualsVal($ClassPrefix$SnglLnkSeqMonitor seqMonitor);
-    void initDoesNotContain($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
-      for(int i=0;i<seqSize;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-    }
-    int initContainsEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0;i<seqSize-1;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      return seqMonitor.expectedSeqSize-1;
-    }
-    int initContainsMiddle($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0,bound=seqSize/2;i<bound;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=(seqSize/2)+1;i<seqSize;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return seqMonitor.expectedSeqSize/2;
-    }
-    int initContainsNearBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0,bound=seqSize/4;i<bound;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=(seqSize/4)+1;i<seqSize;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return seqMonitor.expectedSeqSize/4;
-    }
-    int initContainsNearEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
-      Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-      for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      addEqualsVal(seqMonitor);
-      for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return (seqMonitor.expectedSeqSize/4)*3;
-    }
-    int initContainsBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize){
-      addEqualsVal(seqMonitor);
-      for(int i=1;i<seqSize;++i){
-        addNotEqualsVal(seqMonitor);
-      }
-      return 0;
-    }
-#IF OfRef
-    boolean invokecontainsMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    boolean invokeremoveValMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int invokesearchMonitored($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
-    int initContainsEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
-    int initContainsNearBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
-    int initContainsMiddle($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
-    int initContainsNearEnd($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
-    int initContainsBeginning($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize){throw new UnsupportedOperationException();}
-#ENDIF
-  };
-  
   static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
     for(var checkedType:CheckedType.values()){
       for(var seqLocation:SequenceLocation.values()){
@@ -1263,13 +757,13 @@ BOXED_TYPEVALUE_NAME(false){
                       if(!monitoredObjectGen.appliesToRoot || monitoredObjectGen.expectedException==null){
                         continue;
                       }
-                      builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,monitoredObjectGen));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,monitoredObjectGen));
                     }
                   }else{
-                    builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,null));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,null));
                   }
 #ELSE
-                  builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize));
+                  builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize));
 #ENDIF
                 }
               }
@@ -1294,12 +788,12 @@ BOXED_TYPEVALUE_NAME(false){
   static Stream<Arguments> getBasicCollectionTestArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
       for(int seqSize:new int[]{0,1,100}){
-        streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),seqSize));
+        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize));
       }
     });
   }
 #IF OfRef
-  private static int verifyThrowCondition($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd,MonitoredObject monitoredObject,MonitoredObjectGen monitoredObjectGen){
+  private static int verifyThrowCondition(SeqMonitor seqMonitor,int numToAdd,MonitoredObject monitoredObject,MonitoredObjectGen monitoredObjectGen){
     int numExpectedCalls=numToAdd;
     var verifyItr=seqMonitor.verifyPreAlloc();
     if(seqMonitor.nestedType.forwardIteration){
@@ -1349,7 +843,7 @@ BOXED_TYPEVALUE_NAME(false){
 @org.junit.jupiter.api.Test
 public void testhashCode_void(){
   gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-    testhashCode_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1]
+    testhashCode_voidHelper((SeqMonitor)args[0],(int)args[1]
 #IF OfRef
     ,(MonitoredObjectGen)args[2]
 #ENDIF
@@ -1362,7 +856,7 @@ private static void testhashCode_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("gettoStringAndhashCode_voidArgs")
 public void testhashCode_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd
+(SeqMonitor seqMonitor,int numToAdd
 #IF OfRef
 ,MonitoredObjectGen monitoredObjectGen
 #ENDIF
@@ -1427,7 +921,7 @@ static Stream<Arguments> getMASSIVEtoString_voidArgs(){
   }
   for(var nestedType:NestedType.values()){
     for(var checkedType:CheckedType.values()){
-      builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType,head,seqLength,tail)));
+      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,head,seqLength,tail)));
     }
   }
   return builder.build();
@@ -1436,7 +930,7 @@ static Stream<Arguments> getMASSIVEtoString_voidArgs(){
 @org.junit.jupiter.params.ParameterizedTest
 @org.junit.jupiter.params.provider.MethodSource("getMASSIVEtoString_voidArgs")
 public void testMASSIVEtoString_void
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
+(SeqMonitor seqMonitor){
   seqMonitor.verifyMASSIVEString();
 }
 #ENDIF
@@ -1447,7 +941,7 @@ static Stream<Arguments> gettoArray_IntFunctionArgs(){
     for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
       if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&monitoredFunctionGen.appliesToRoot){
         for(int seqSize:new int[]{0,1,100}){
-          streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize));
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize));
         }
       }
     }   
@@ -1457,7 +951,7 @@ static Stream<Arguments> gettoArray_IntFunctionArgs(){
 @org.junit.jupiter.api.Test
 public void testtoArray_IntFunction(){
   gettoArray_IntFunctionArgs().parallel().map(Arguments::get).forEach(args->{
-      testtoArray_IntFunctionHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]);
+      testtoArray_IntFunctionHelper((SeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]);
   });
 }
 private static void testtoArray_IntFunctionHelper
@@ -1466,7 +960,7 @@ private static void testtoArray_IntFunctionHelper
 @org.junit.jupiter.params.provider.MethodSource("gettoArray_IntFunctionArgs")
 public void testtoArray_IntFunction
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd){
+(SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd){
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
   }
@@ -1511,7 +1005,7 @@ static Stream<Arguments> gettoArray_ObjectArrayArgs(){
   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
     for(int seqSize=0;seqSize<=15;seqSize+=5){
       for(int arrSize=0;arrSize<=20;arrSize+=5){
-        streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),seqSize,arrSize));
+        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize,arrSize));
       }
     }
   });
@@ -1520,7 +1014,7 @@ static Stream<Arguments> gettoArray_ObjectArrayArgs(){
 @org.junit.jupiter.api.Test
 public void testtoArray_ObjectArray(){
   gettoArray_ObjectArrayArgs().parallel().map(Arguments::get).forEach(args->{
-      testtoArray_ObjectArrayHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1],(int)args[2]);
+      testtoArray_ObjectArrayHelper((SeqMonitor)args[0],(int)args[1],(int)args[2]);
   });
 }
 private static void testtoArray_ObjectArrayHelper
@@ -1529,7 +1023,7 @@ private static void testtoArray_ObjectArrayHelper
 @org.junit.jupiter.params.provider.MethodSource("gettoArray_ObjectArrayArgs")
 public void testtoArray_ObjectArray
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int seqSize,int arrSize){
+(SeqMonitor seqMonitor,int seqSize,int arrSize){
   for(int i=0;i<seqSize;++i){
     seqMonitor.add(i);
   }
@@ -1580,7 +1074,7 @@ static Stream<Arguments> getQueueelement_voidArgs(){
   Stream.Builder<Arguments> builder=Stream.builder();
   for(var checkedType:CheckedType.values()){
     for(var outputType:$ClassPrefix$OutputTestArgType.values()){
-      builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(NestedType.QUEUE,checkedType),outputType));
+      builder.accept(Arguments.of(new SeqMonitor(NestedType.QUEUE,checkedType),outputType));
     }
   }
   return builder.build();
@@ -1589,7 +1083,7 @@ static Stream<Arguments> getQueueelement_voidArgs(){
 @org.junit.jupiter.api.Test
 public void testQueueelement_void(){
   getQueueelement_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testQueueelement_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
+      testQueueelement_voidHelper((SeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
   });
 }
 private static void testQueueelement_voidHelper
@@ -1598,7 +1092,7 @@ private static void testQueueelement_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getQueueelement_voidArgs")
 public void testQueueelement_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
   for(int i=0;i<100;++i){
     seqMonitor.add(i);
   }
@@ -1618,7 +1112,7 @@ public void testQueueelement_void
 @org.junit.jupiter.api.Test
 public void testclear_void(){
   getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-      testclear_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1]);
+      testclear_voidHelper((SeqMonitor)args[0],(int)args[1]);
   });
 }
 private static void testclear_voidHelper
@@ -1627,7 +1121,7 @@ private static void testclear_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getBasicCollectionTestArgs")
 public void testclear_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd){
+(SeqMonitor seqMonitor,int numToAdd){
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
   }
@@ -1642,7 +1136,7 @@ static Stream<Arguments> gettoArray_voidArgs(){
   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
     for(int seqSize:new int[]{0,1,100}){
       for(var outputArgType:$ClassPrefix$OutputTestArgType.values()){
-        streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),seqSize,outputArgType));
+        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize,outputArgType));
       }
     }
   });
@@ -1651,7 +1145,7 @@ static Stream<Arguments> gettoArray_voidArgs(){
 @org.junit.jupiter.api.Test
 public void testtoArray_void(){
   gettoArray_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testtoArray_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1],($ClassPrefix$OutputTestArgType)args[2]);
+      testtoArray_voidHelper((SeqMonitor)args[0],(int)args[1],($ClassPrefix$OutputTestArgType)args[2]);
   });
 }
 private static void testtoArray_voidHelper
@@ -1660,7 +1154,7 @@ private static void testtoArray_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("gettoArray_voidArgs")
 public void testtoArray_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd,$ClassPrefix$OutputTestArgType outputArgType){
+(SeqMonitor seqMonitor,int numToAdd,$ClassPrefix$OutputTestArgType outputArgType){
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
   }
@@ -1675,14 +1169,14 @@ static Stream<Arguments> getreadAndwriteObjectArgs(){
     for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
       if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(monitoredFunctionGen.appliesToRoot)){
         for(int seqSize:new int[]{0,1,100}){
-          streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize
 #IF OfBoolean
             ,0
 #ENDIF
           ));
 #IF OfBoolean
           if(seqSize!=0){
-            streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize,1));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize,1));
           }
 #ENDIF
         }
@@ -1694,7 +1188,7 @@ static Stream<Arguments> getreadAndwriteObjectArgs(){
 @org.junit.jupiter.api.Test
 public void testreadAndwriteObject(){
   getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
-      testreadAndwriteObjectHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]
+      testreadAndwriteObjectHelper((SeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]
 #IF OfBoolean
       ,(int)args[3]
 #ENDIF
@@ -1707,7 +1201,7 @@ private static void testreadAndwriteObjectHelper
 @org.junit.jupiter.params.provider.MethodSource("getreadAndwriteObjectArgs")
 public void testreadAndwriteObject
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd
+(SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd
 #IF OfBoolean
 ,int initVal
 #ENDIF
@@ -1782,7 +1276,7 @@ public void testreadAndwriteObject
 @org.junit.jupiter.api.Test
 public void testpop_void(){
   getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
-      testpop_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
+      testpop_voidHelper((SeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
   });
 }
 private static void testpop_voidHelper
@@ -1791,7 +1285,7 @@ private static void testpop_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getPeekPollAndPopArgs")
 public void testpop_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
   for(int i=0;i<100;++i){
     seqMonitor.add(i);
   }
@@ -1817,7 +1311,7 @@ public void testpop_void
 @org.junit.jupiter.api.Test
 public void testpeek_void(){
   getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
-      testpeek_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
+      testpeek_voidHelper((SeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
   });
 }
 private static void testpeek_voidHelper
@@ -1826,7 +1320,7 @@ private static void testpeek_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getPeekPollAndPopArgs")
 public void testpeek_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
   if(seqMonitor.nestedType.forwardIteration){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
@@ -1852,7 +1346,7 @@ public void testpeek_void
 @org.junit.jupiter.api.Test
 public void testpoll_void(){
   getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
-      testpoll_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
+      testpoll_voidHelper((SeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
   });
 }
 private static void testpoll_voidHelper
@@ -1861,7 +1355,7 @@ private static void testpoll_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getPeekPollAndPopArgs")
 public void testpoll_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
   for(int i=0;i<100;++i){
     seqMonitor.add(i);
   }
@@ -1885,7 +1379,7 @@ public void testpoll_void
 @org.junit.jupiter.api.Test
 public void testremoveVal_val(){
   getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-      testremoveVal_valHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
+      testremoveVal_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
 #IF OfRef
         ,(MonitoredObjectGen)args[5]
 #ENDIF
@@ -1898,7 +1392,7 @@ private static void testremoveVal_valHelper
 @org.junit.jupiter.params.provider.MethodSource("getQueryCollectionArguments")
 public void testremoveVal_val
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+(SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
 #IF OfRef
   ,MonitoredObjectGen monitoredObjectGen
 #ENDIF
@@ -1910,19 +1404,19 @@ public void testremoveVal_val
       final var monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
       switch(seqLocation){
         case BEGINNING:
-          numExpectedCalls=1+argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEARBEGINNING:
-          numExpectedCalls=1+argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case MIDDLE:
-          numExpectedCalls=1+argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEAREND:
-          numExpectedCalls=1+argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case END:
-          numExpectedCalls=1+argType.initContainsEnd(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsEnd(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case IOBHI:
           argType.initDoesNotContain(seqMonitor,seqSize);
@@ -1972,19 +1466,19 @@ public void testremoveVal_val
     {
       switch(seqLocation){
         case BEGINNING:
-          argType.initContainsBeginning(seqMonitor,seqSize);
+          argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEARBEGINNING:
-          argType.initContainsNearBeginning(seqMonitor,seqSize);
+          argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case MIDDLE:
-          argType.initContainsMiddle(seqMonitor,seqSize);
+          argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEAREND:
-          argType.initContainsNearEnd(seqMonitor,seqSize);
+          argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case END:
-          argType.initContainsEnd(seqMonitor,seqSize);
+          argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case IOBHI:
           argType.initDoesNotContain(seqMonitor,seqSize);
@@ -2008,7 +1502,7 @@ public void testremoveVal_val
 @org.junit.jupiter.api.Test
 public void testsearch_val(){
   getQueryStackArguments().parallel().map(Arguments::get).forEach(args->{
-      testsearch_valHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
+      testsearch_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
 #IF OfRef
         ,(MonitoredObjectGen)args[5]
 #ENDIF
@@ -2021,7 +1515,7 @@ private static void testsearch_valHelper
 @org.junit.jupiter.params.provider.MethodSource("getQueryStackArguments")
 public void testsearch_val
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+(SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
 #IF OfRef
   ,MonitoredObjectGen monitoredObjectGen
 #ENDIF
@@ -2034,19 +1528,19 @@ public void testsearch_val
       final var monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
       switch(seqLocation){
         case BEGINNING:
-          numExpectedCalls=1+argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEARBEGINNING:
-          numExpectedCalls=1+argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case MIDDLE:
-          numExpectedCalls=1+argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEAREND:
-          numExpectedCalls=1+argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case END:
-          numExpectedCalls=1+argType.initContainsEnd(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsEnd(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case IOBHI:
           argType.initDoesNotContain(seqMonitor,seqSize);
@@ -2080,24 +1574,19 @@ public void testsearch_val
     {
       switch(seqLocation){
         case BEGINNING:
-          expectedIndex=argType.initContainsBeginning(seqMonitor,seqSize);
-          expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+          expectedIndex=argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEARBEGINNING:
-          expectedIndex=argType.initContainsNearBeginning(seqMonitor,seqSize);
-          expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+          expectedIndex=argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case MIDDLE:
-          expectedIndex=argType.initContainsMiddle(seqMonitor,seqSize);
-          expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+          expectedIndex=argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEAREND:
-          expectedIndex=argType.initContainsNearEnd(seqMonitor,seqSize);
-          expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+          expectedIndex=argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case END:
-          expectedIndex=argType.initContainsEnd(seqMonitor,seqSize);
-          expectedIndex=seqMonitor.expectedSeqSize-expectedIndex;
+          expectedIndex=argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case IOBHI:
           argType.initDoesNotContain(seqMonitor,seqSize);
@@ -2120,7 +1609,7 @@ public void testsearch_val
 @org.junit.jupiter.api.Test
 public void testcontains_val(){
   getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-      testcontains_valHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
+      testcontains_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
 #IF OfRef
         ,(MonitoredObjectGen)args[5]
 #ENDIF
@@ -2133,7 +1622,7 @@ private static void testcontains_valHelper
 @org.junit.jupiter.params.provider.MethodSource("getQueryCollectionArguments")
 public void testcontains_val
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+(SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
 #IF OfRef
   ,MonitoredObjectGen monitoredObjectGen
 #ENDIF
@@ -2145,19 +1634,19 @@ public void testcontains_val
       final var monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
       switch(seqLocation){
         case BEGINNING:
-          numExpectedCalls=1+argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsBeginning(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEARBEGINNING:
-          numExpectedCalls=1+argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsNearBeginning(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case MIDDLE:
-          numExpectedCalls=1+argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsMiddle(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEAREND:
-          numExpectedCalls=1+argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsNearEnd(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case END:
-          numExpectedCalls=1+argType.initContainsEnd(seqMonitor,monitoredObject,seqSize);
+          numExpectedCalls=argType.initContainsEnd(seqMonitor,monitoredObject,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case IOBHI:
           argType.initDoesNotContain(seqMonitor,seqSize);
@@ -2208,19 +1697,19 @@ public void testcontains_val
     {
       switch(seqLocation){
         case BEGINNING:
-          argType.initContainsBeginning(seqMonitor,seqSize);
+          argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEARBEGINNING:
-          argType.initContainsNearBeginning(seqMonitor,seqSize);
+          argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case MIDDLE:
-          argType.initContainsMiddle(seqMonitor,seqSize);
+          argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case NEAREND:
-          argType.initContainsNearEnd(seqMonitor,seqSize);
+          argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case END:
-          argType.initContainsEnd(seqMonitor,seqSize);
+          argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
           break;
         case IOBHI:
           argType.initDoesNotContain(seqMonitor,seqSize);
@@ -2240,7 +1729,7 @@ static Stream<Arguments> getStackpush_valArgs(){
   Stream.Builder<Arguments> builder=Stream.builder();
   for(var checkedType:CheckedType.values()){
     for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
-      builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(NestedType.STACK,checkedType),inputArgType));
+      builder.accept(Arguments.of(new SeqMonitor(NestedType.STACK,checkedType),inputArgType));
     }
   }
   return builder.build();
@@ -2249,7 +1738,7 @@ static Stream<Arguments> getStackpush_valArgs(){
 @org.junit.jupiter.api.Test
 public void testStackpush_val(){
   getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
-      testStackpush_valHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$InputTestArgType)args[1]);
+      testStackpush_valHelper((SeqMonitor)args[0],($ClassPrefix$InputTestArgType)args[1]);
   });
 }
 private static void testStackpush_valHelper
@@ -2258,7 +1747,7 @@ private static void testStackpush_valHelper
 @org.junit.jupiter.params.provider.MethodSource("getStackpush_valArgs")
 public void testStackpush_val
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$InputTestArgType inputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$InputTestArgType inputArgType){
   for(int i=0;i<100;++i){
     seqMonitor.push(i,inputArgType);
     seqMonitor.verifyStructuralIntegrity();
@@ -2271,7 +1760,7 @@ static Stream<Arguments> getQueueoffer_valArgs(){
   Stream.Builder<Arguments> builder=Stream.builder();
   for(var checkedType:CheckedType.values()){
     for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
-      builder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(NestedType.QUEUE,checkedType),inputArgType));
+      builder.accept(Arguments.of(new SeqMonitor(NestedType.QUEUE,checkedType),inputArgType));
     }
   }
   return builder.build();
@@ -2280,7 +1769,7 @@ static Stream<Arguments> getQueueoffer_valArgs(){
 @org.junit.jupiter.api.Test
 public void testQueueoffer_val(){
   getQueueoffer_valArgs().parallel().map(Arguments::get).forEach(args->{
-      testQueueoffer_valHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$InputTestArgType)args[1]);
+      testQueueoffer_valHelper((SeqMonitor)args[0],($ClassPrefix$InputTestArgType)args[1]);
   });
 }
 private static void testQueueoffer_valHelper
@@ -2289,7 +1778,7 @@ private static void testQueueoffer_valHelper
 @org.junit.jupiter.params.provider.MethodSource("getQueueoffer_valArgs")
 public void testadd_val
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$InputTestArgType inputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$InputTestArgType inputArgType){
   for(int i=0;i<100;++i){
     Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
     seqMonitor.verifyStructuralIntegrity();
@@ -2301,7 +1790,7 @@ public void testadd_val
 static Stream<Arguments> getadd_valArgs(){
   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
     for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
-      streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),inputArgType));
+      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType));
     }
   });
 }
@@ -2309,7 +1798,7 @@ static Stream<Arguments> getadd_valArgs(){
 @org.junit.jupiter.api.Test
 public void testadd_val(){
   getadd_valArgs().parallel().map(Arguments::get).forEach(args->{
-      testadd_valHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],($ClassPrefix$InputTestArgType)args[1]);
+      testadd_valHelper((SeqMonitor)args[0],($ClassPrefix$InputTestArgType)args[1]);
   });
 }
 private static void testadd_valHelper
@@ -2318,7 +1807,7 @@ private static void testadd_valHelper
 @org.junit.jupiter.params.provider.MethodSource("getadd_valArgs")
 public void testadd_val
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,$ClassPrefix$InputTestArgType inputArgType){
+(SeqMonitor seqMonitor,$ClassPrefix$InputTestArgType inputArgType){
   for(int i=0;i<100;++i){
     Assertions.assertTrue(seqMonitor.add(i,inputArgType));
     seqMonitor.verifyStructuralIntegrity();
@@ -2331,7 +1820,7 @@ public void testadd_val
 @org.junit.jupiter.api.Test
 public void testisEmpty_void(){
   getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-      testisEmpty_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1]);
+      testisEmpty_voidHelper((SeqMonitor)args[0],(int)args[1]);
   });
 }
 private static void testisEmpty_voidHelper
@@ -2340,7 +1829,7 @@ private static void testisEmpty_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getBasicCollectionTestArgs")
 public void testisEmpty_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd){
+(SeqMonitor seqMonitor,int numToAdd){
   for(int i=0;i<numToAdd;++i){
     Assertions.assertEquals(i==0,seqMonitor.seq.isEmpty());
     seqMonitor.verifyStructuralIntegrity();
@@ -2363,7 +1852,7 @@ public void testisEmpty_void
 @org.junit.jupiter.api.Test
 public void testsize_void(){
   getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-      testsize_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1]);
+      testsize_voidHelper((SeqMonitor)args[0],(int)args[1]);
   });
 }
 private static void testsize_voidHelper
@@ -2372,7 +1861,7 @@ private static void testsize_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getBasicCollectionTestArgs")
 public void testsize_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd){
+(SeqMonitor seqMonitor,int numToAdd){
   for(int i=0;i<numToAdd;++i){
     Assertions.assertEquals(i,seqMonitor.seq.size());
     seqMonitor.verifyStructuralIntegrity();
@@ -2395,7 +1884,7 @@ public void testsize_void
 @org.junit.jupiter.api.Test
 public void testclone_void(){
   getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-      testclone_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1]);
+      testclone_voidHelper((SeqMonitor)args[0],(int)args[1]);
   });
 }
 private static void testclone_voidHelper
@@ -2404,7 +1893,7 @@ private static void testclone_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getBasicCollectionTestArgs")
 public void testclone_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd){
+(SeqMonitor seqMonitor,int numToAdd){
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
   }
@@ -2492,7 +1981,7 @@ static Stream<Arguments> getremoveIf_PredicateArgs(){
             for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
               for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
                 for(int initVal=0;initVal<=1;++initVal){
-                  streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,initVal,period));
+                  streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,initVal,period));
                 }
                 if(period>=seqSize){
                   break;
@@ -2514,7 +2003,7 @@ static Stream<Arguments> getremoveIf_PredicateArgs(){
             for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
               for(double threshold:thresholdArr)
               {
-                streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
               }
             }
           }
@@ -2528,7 +2017,7 @@ static Stream<Arguments> getremoveIf_PredicateArgs(){
 @org.junit.jupiter.api.Test
 public void testremoveIf_Predicate(){
   getremoveIf_PredicateArgs().parallel().map(Arguments::get).forEach(args->{
-    testremoveIf_PredicateHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(MonitoredRemoveIfPredicateGen)args[1],(double)args[2],(long)args[3],(FunctionCallType)args[4],(int)args[5]
+    testremoveIf_PredicateHelper((SeqMonitor)args[0],(MonitoredRemoveIfPredicateGen)args[1],(double)args[2],(long)args[3],(FunctionCallType)args[4],(int)args[5]
 #IF OfBoolean
     ,(int)args[6],(int)args[7]
 #ENDIF
@@ -2541,7 +2030,7 @@ private static void testremoveIf_PredicateHelper
 @org.junit.jupiter.params.provider.MethodSource("getremoveIf_PredicateArgs")
 public void testremoveIf_Predicate
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
+(SeqMonitor seqMonitor,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
 #IF OfBoolean
 ,int initVal,int period
 #ENDIF
@@ -2610,9 +2099,9 @@ static Stream<Arguments> getforEach_ConsumerArgs(){
     for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
       if(monitoredFunctionGen.appliesToRoot&&(checkedType.checked || monitoredFunctionGen.expectedException==null)){
         for(var seqContentsScenario:SequenceContentsScenario.values()){
-          streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
 #IFNOT OfRef
-          streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
 #ENDIF
         }
       }
@@ -2623,7 +2112,7 @@ static Stream<Arguments> getforEach_ConsumerArgs(){
 @org.junit.jupiter.api.Test
 public void testforEach_Consumer(){
   getforEach_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-      testforEach_ConsumerHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(MonitoredFunctionGen)args[1],(SequenceContentsScenario)args[2],(FunctionCallType)args[3]);
+      testforEach_ConsumerHelper((SeqMonitor)args[0],(MonitoredFunctionGen)args[1],(SequenceContentsScenario)args[2],(FunctionCallType)args[3]);
   });
 }
 private static void testforEach_ConsumerHelper
@@ -2632,7 +2121,7 @@ private static void testforEach_ConsumerHelper
 @org.junit.jupiter.params.provider.MethodSource("getforEach_ConsumerArgs")
 public void testforEach_Consumer
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+(SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
   int numToAdd=seqContentsScenario.nonEmpty?100:0;
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
@@ -2692,9 +2181,9 @@ static Stream<Arguments> getItrforEachRemaining_ConsumerArgs(){
         for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
           if((monitoredFunctionGen.expectedException==null || checkedType.checked) && (preModScenario.appliesToRootItr&&monitoredFunctionGen.appliesToRootItr)){
             for(var seqContentsScenario:SequenceContentsScenario.values()){
-              streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
+              streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
 #IFNOT OfRef
-              streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+              streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
 #ENDIF
             }
           }
@@ -2707,7 +2196,7 @@ static Stream<Arguments> getItrforEachRemaining_ConsumerArgs(){
 @org.junit.jupiter.api.Test
 public void testItrforEachRemaining_Consumer(){
   getItrforEachRemaining_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-      testItrforEachRemaining_ConsumerHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+      testItrforEachRemaining_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
   });
 }
 private static void testItrforEachRemaining_ConsumerHelper
@@ -2716,7 +2205,7 @@ private static void testItrforEachRemaining_ConsumerHelper
 @org.junit.jupiter.params.provider.MethodSource("getItrforEachRemaining_ConsumerArgs")
 public void testItrforEachRemaining_Consumer
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
   int numToAdd=seqContentsScenario.nonEmpty?100:0;
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
@@ -2857,7 +2346,7 @@ static Stream<Arguments> getItrremove_voidArgs(){
               if(preModScenario.appliesToRootItr && (checkedType.checked || preModScenario.expectedException==null)){
                 for(var seqLocation:SequenceLocation.values()){
                   if(seqLocation.expectedException==null && (sequenceContentsScenario.nonEmpty || seqLocation==SequenceLocation.BEGINNING) && (seqLocation!=SequenceLocation.END || removeScenario!=ItrRemoveScenario.PostInit) && (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING)){
-                    streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),removeScenario,preModScenario,sequenceContentsScenario,seqLocation));
+                    streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,sequenceContentsScenario,seqLocation));
                   }
                 }
               }
@@ -2872,7 +2361,7 @@ static Stream<Arguments> getItrremove_voidArgs(){
 @org.junit.jupiter.api.Test
 public void testItrremove_void(){
   getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testItrremove_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3],(SequenceLocation)args[4]);
+      testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3],(SequenceLocation)args[4]);
   });
 }
 private static void testItrremove_voidHelper
@@ -2881,7 +2370,7 @@ private static void testItrremove_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getItrremove_voidArgs")
 public void testItrremove_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation){
+(SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation){
   int numToAdd=seqContentsScenario.nonEmpty?100:0;
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
@@ -3038,7 +2527,7 @@ static Stream<Arguments> getItrnext_voidArgs(){
           if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
             if(itrScenario.preModScenario.appliesToRootItr){
               for(var outputType:$ClassPrefix$OutputTestArgType.values()){
-                streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType),itrScenario,seqContentsScenario,outputType));
+                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),itrScenario,seqContentsScenario,outputType));
               }
             }
           }
@@ -3051,7 +2540,7 @@ static Stream<Arguments> getItrnext_voidArgs(){
 @org.junit.jupiter.api.Test
 public void testItrnext_void(){
   getItrnext_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testItrnext_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],($ClassPrefix$OutputTestArgType)args[3]);
+      testItrnext_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],($ClassPrefix$OutputTestArgType)args[3]);
   });
 }
 private static void testItrnext_voidHelper
@@ -3060,7 +2549,7 @@ private static void testItrnext_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getItrnext_voidArgs")
 public void testItrnext_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,$ClassPrefix$OutputTestArgType outputType){
+(SeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,$ClassPrefix$OutputTestArgType outputType){
   int numToAdd=seqContentsScenario.nonEmpty?100:0;
   for(int i=0;i<numToAdd;++i){
     seqMonitor.add(i);
@@ -3096,14 +2585,14 @@ public void testItrnext_void
 #MACRODEF testConstructor_void<PARALLEL>()
 static Stream<Arguments> getConstructor_voidArgs(){
   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-    streamBuilder.accept(Arguments.of(new $ClassPrefix$SnglLnkSeqMonitor(nestedType,checkedType)));
+    streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType)));
   });
 }
 #IFSWITCH PARALLEL==true
 @org.junit.jupiter.api.Test
 public void testConstructor_void(){
   getConstructor_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testConstructor_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0]);
+      testConstructor_voidHelper((SeqMonitor)args[0]);
   });
 }
 private static void testConstructor_voidHelper
@@ -3112,7 +2601,7 @@ private static void testConstructor_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("getConstructor_voidArgs")
 public void testConstructor_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor){
+(SeqMonitor seqMonitor){
   if(seqMonitor.checkedType.checked){
     Assertions.assertEquals(0,seqMonitor.nestedType==NestedType.QUEUE?FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.modCount(seqMonitor.seq):FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.modCount(seqMonitor.seq));
   }
@@ -3125,7 +2614,7 @@ public void testConstructor_void
 @org.junit.jupiter.api.Test
 public void testtoString_void(){
   gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-    testtoString_voidHelper(($ClassPrefix$SnglLnkSeqMonitor)args[0],(int)args[1]
+    testtoString_voidHelper((SeqMonitor)args[0],(int)args[1]
 #IF OfRef
     ,(MonitoredObjectGen)args[2]
 #ENDIF
@@ -3138,7 +2627,7 @@ private static void testtoString_voidHelper
 @org.junit.jupiter.params.provider.MethodSource("gettoStringAndhashCode_voidArgs")
 public void testtoString_void
 #ENDIF
-($ClassPrefix$SnglLnkSeqMonitor seqMonitor,int numToAdd
+(SeqMonitor seqMonitor,int numToAdd
 #IF OfRef
 ,MonitoredObjectGen monitoredObjectGen
 #ENDIF
