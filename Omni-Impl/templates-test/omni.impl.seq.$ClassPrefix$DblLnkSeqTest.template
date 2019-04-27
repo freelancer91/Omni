@@ -45,7 +45,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.CheckedType;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.PreModScenario;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceLocation;
-import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceContentsScenario;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.IterationScenario;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
@@ -64,6 +63,95 @@ import omni.api.OmniDeque;
 @Tag("DblLnkSeq")
 @Execution(ExecutionMode.CONCURRENT)
 public class $ClassPrefix$DblLnkSeqTest{
+
+@FunctionalInterface
+  interface ArgBuilder{
+    void buildArgs(Stream.Builder<Arguments> streamBuilder,NestedType nestedType,CheckedType checkedType);
+    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
+      Stream.Builder<Arguments> streamBuilder=Stream.builder();
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
+          argBuilder.buildArgs(streamBuilder,nestedType,checkedType);
+        }
+      }
+      return streamBuilder.build();
+    }
+  }
+  
+#MACRODEF TestMethods(PARALLEL)
+#MACRO testConstructor_void<PARALLEL>()
+#MACRO testConstructor_Node_int_Node<PARALLEL>()
+#MACRO testsize_void<PARALLEL>()
+#ENDDEF
+#MACRODEF testsize_void<PARALLEL>()
+
+#ENDDEF
+#MACRODEF testConstructor_Node_int_Node<PARALLEL>()
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.EnumSource(CheckedType.class)
+public void testConstructor_void(CheckedType checkedType){
+  var head=new $DNode$(TypeConversionUtil.convertTo$ArrayType$(1));
+  var tail=new $DNode$(TypeConversionUtil.convertTo$ArrayType$(2));
+  head.next=tail;
+  tail.prev=head;
+  int seqSize=2;
+  switch(checkedType){
+    case CHECKED:{
+      var seq=new $ClassPrefix$DblLnkSeq.CheckedList(head,seqSize,tail);
+      Assertions.assertSame(head,seq.head);
+      Assertions.assertSame(tail,seq.tail);
+      Assertions.assertEquals(seqSize,seq.size);
+      Assertions.assertNull(seq.head.prev);
+      Assertions.assertNull(seq.tail.next):
+      Assertions.assertSame(seq.head.next,seq.tail);
+      Assertions.assertSame(seq.tail.prev,seq.head);
+      Assertions.assertEquals(0,seq.modCount);
+      break;
+    }
+    case UNCHECKED:{
+      var seq=new $ClassPrefix$DblLnkSeq.UncheckedList(head,seqSize,tail);
+      Assertions.assertSame(head,seq.head);
+      Assertions.assertSame(tail,seq.tail);
+      Assertions.assertEquals(seqSize,seq.size);
+      Assertions.assertNull(seq.head.prev);
+      Assertions.assertNull(seq.tail.next):
+      Assertions.assertSame(seq.head.next,seq.tail);
+      Assertions.assertSame(seq.tail.prev,seq.head);
+      break;
+    }
+    default:
+      throw new Error("Unknown checked type "+checkedType);
+  }
+}
+#ENDDEF
+#MACRODEF testConstructor_void<PARALLEL>()
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.EnumSource(CheckedType.class)
+public void testConstructor_void(CheckedType checkedType){
+  switch(checkedType){
+    case CHECKED:{
+      var seq=new $ClassPrefix$DblLnkSeq.CheckedList();
+      Assertions.assertNull(seq.head);
+      Assertions.assertNull(seq.tail);
+      Assertions.assertEquals(0,seq.size);
+      Assertions.assertEquals(0,seq.modCount);
+      break;
+    }
+    case UNCHECKED:{
+      var seq=new $ClassPrefix$DblLnkSeq.UncheckedList();
+      Assertions.assertNull(seq.head);
+      Assertions.assertNull(seq.tail);
+      Assertions.assertEquals(0,seq.size);
+      break;
+    }
+    default:
+      throw new Error("Unknown checked type "+checkedType);
+  }
+}
+#ENDDEF
+
+
+
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);
@@ -455,143 +543,31 @@ public class $ClassPrefix$DblLnkSeqTest{
         ++expectedParentModCounts[i];
       }
     }
-    void clear(){
-    int seqSize=expectedSeqSize;
-      seq.clear();
-      if(seqSize!=0){
-        expectedSeqSize=0;
-        ++expectedSeqModCount;
-        for(int i=0,bound=expectedParentModCounts.length;i<bound;++i){
-          expectedParentSizes[i]-=seqSize;
-          ++expectedParentModCounts[i];
-        }
+    void verifyBatchRemove(int numRemoved){
+      expectedSeqSize-=numRemoved;
+      for(int i=0,bound=parents.length;i<bound;++i){
+        expectedParentSizes[i]-=numRemoved;
       }
-    }
-    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
-
-#IF OfRef,OfBoolean
-      int seqSize=expectedSeqSize;
-#ENDIF
-      boolean retVal;
-#IFNOT OfRef
-      if(functionCallType==FunctionCallType.Boxed){
-        retVal=seq.removeIf((Predicate)pred);
-      }
-      else
-#ENDIF
-      {
-        retVal=seq.removeIf(($TypeNameModifier$Predicate)pred);
-      }
-      if(retVal){
-        verifyFunctionalModification();
-        int numRemoved;
-#IF OfBoolean
-        int numTrue=0,numFalse=0;
-        var cloneItr=clone.iterator();
-        while(cloneItr.hasNext()){
-          if(cloneItr.next$TypeNameModifier$()){
-            ++numTrue;
-          }else{
-            ++numFalse;
-          }
-        }
-        if(pred.removedVals.contains(true)){
-          if(pred.removedVals.contains(false)){
-            numRemoved=seqSize;
-            Assertions.assertTrue(seq.isEmpty());
-          }else{
-            numRemoved=numTrue;
-            Assertions.assertFalse(seq.contains(true));
-          }
-        }else{
-          numRemoved=numFalse;
-          Assertions.assertFalse(seq.contains(false));
-        }
-#ELSE
-        numRemoved=pred.numRemoved;
-        for(var removedVal:pred.removedVals){
-          Assertions.assertFalse(seq.contains(removedVal));
-        }
-#ENDIF
-        expectedSeqSize-=numRemoved;
-        for(int i=0,bound=parents.length;i<bound;++i){
-          expectedParentSizes[i]-=numRemoved;
-        }
-        if(expectedNumRemoved!=-1){
-          Assertions.assertEquals(expectedNumRemoved,numRemoved);
-        }
-      }else{
-        Assertions.assertEquals(expectedSeqSize,clone.size());
-        var seqItr=seq.iterator();
-        var cloneItr=clone.iterator();
-        for(int i=0;i<expectedSeqSize;++i){
-#IF OfRef
-          Assertions.assertSame(seqItr.next(),cloneItr.next());
-#ELSE
-          Assertions.assertEquals(seqItr.next$TypeNameModifier$(),cloneItr.next$TypeNameModifier$());
-#ENDIF
-        }
-      }
-      verifyStructuralIntegrity();
     }
     void writeObject(ObjectOutputStream oos) throws IOException{
-      //TODO
-      throw new UnsupportedOperationException();
-    /*
       switch(nestedType){
-        case LIST:
+        case LISTDEQUE:
           if(checkedType.checked){
-            FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedList.writeObject(seq,oos);
+            FieldAndMethodAccessor.$ClassPrefix$DblLnkSeq.CheckedList.writeObject(seq,oos);
           }else{
-            FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedList.writeObject(seq,oos);
-          }
-          break;
-        case STACK:
-          if(checkedType.checked){
-            FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedStack.writeObject(seq,oos);
-          }else{
-            FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedStack.writeObject(seq,oos);
+            FieldAndMethodAccessor.$ClassPrefix$DblLnkSeq.UncheckedList.writeObject(seq,oos);
           }
           break;
         case SUBLIST:
           if(checkedType.checked){
-            FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedSubList.writeObject(seq,oos);
+            FieldAndMethodAccessor.$ClassPrefix$DblLnkSeq.CheckedSubList.writeObject(seq,oos);
           }else{
-            FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.writeObject(seq,oos);
+            FieldAndMethodAccessor.$ClassPrefix$DblLnkSeq.UncheckedSubList.writeObject(seq,oos);
           }
           break;
         default:
           throw new Error("unknown nested type "+nestedType);
       }
-      */
-    }
-    Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //TODO
-      throw new UnsupportedOperationException();
-    /*
-      switch(nestedType){
-        case LIST:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedList.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedList.readObject(seq,ois);
-          }
-        case STACK:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedStack.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedStack.readObject(seq,ois);
-          }
-        case SUBLIST:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.CheckedSubList.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.readObject(seq,ois);
-          }
-        default:
-          throw new Error("unknown nested type "+nestedType);
-      }
-      */
     }
     void verifyRemoval(){
       --expectedSeqSize;
@@ -622,6 +598,7 @@ public class $ClassPrefix$DblLnkSeqTest{
       SequenceVerificationItr verifyNaturalAscending(int v,$ClassPrefix$InputTestArgType inputArgType,int length){
         return verifyAscending(v,inputArgType,length);
       }
+      
       @Override SequenceVerificationItr verifyPostAlloc(int expectedVal){
         for(int i=0,bound=seqMonitor.parentPostAlloc+seqMonitor.getRootPostAlloc();i<bound;++i){
           verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,expectedVal);
@@ -644,28 +621,29 @@ public class $ClassPrefix$DblLnkSeqTest{
         Object v;
         Assertions.assertEquals(monitoredObject.compareVal,(v=curr.val) instanceof MonitoredObject?((MonitoredObject)v).compareVal:(Object)v);
       }
+      @Override void reverseAndVerifyIndex(MonitoredObject monitoredObject){
+        Object v;
+        Assertions.assertEquals(monitoredObject.compareVal,(v=(curr=curr.prev).val) instanceof MonitoredObject?((MonitoredObject)v).compareVal:(Object)v);
+      }
 #ENDIF
+      @Override void reverseAndVerifyIndex($ClassPrefix$InputTestArgType inputArgType,int val){
+        inputArgType.verifyVal(val,(curr=curr.prev).val);
+      }
       @Override void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val){
         $DNode$ curr;
         this.curr=(curr=this.curr).next;
         inputArgType.verifyVal(val,curr.val);
       }
-      @Override SequenceVerificationItr getPositiveOffset(int i){
-        if(i<0){
-          throw new Error("offset cannot be negative: "+i);
-        }
-        return new DblLnkSeqVerificationItr($DNode$.iterateAscending(this.curr,i),seqMonitor);
+      @Override SequenceVerificationItr getOffset(int i){
+        return new DblLnkSeqVerificationItr(i<0?$DNode$.uncheckedIterateDescending(this.curr,i):$DNode$.iterateAscending(this.curr,i),seqMonitor);
       }
       @Override SequenceVerificationItr skip(int i){
-        if(i<0){
-          throw new Error("offset cannot be negative: "+i);
-        }
-        this.curr=$DNode$.iterateAscending(this.curr,i);
+        $DNode$ curr;
+        this.curr=i<0?$DNode$.uncheckedIterateDescending(this.curr,i):$DNode$.iterateAscending(this.curr,i);
         return this;
       }
       @Override public boolean equals(Object val){
-        final DblLnkSeqVerificationItr that;
-        return val==this || (val instanceof DblLnkSeqVerificationItr && (that=(DblLnkSeqVerificationItr)val).curr==this.curr);
+        return val==this || (val instanceof DblLnkSeqVerificationItr && ((DblLnkSeqVerificationItr)val).curr==this.curr);
       }
       @Override SequenceVerificationItr verifyRootPostAlloc(){
         for(int i=0,rootPostAlloc=seqMonitor.getRootPostAlloc(),v=Integer.MAX_VALUE-rootPostAlloc;i<rootPostAlloc;++i,++v){
@@ -1028,23 +1006,6 @@ public class $ClassPrefix$DblLnkSeqTest{
           this.expectedCurr=null;
         }
       }
-    }
-  }
-  @FunctionalInterface
-  interface ArgBuilder{
-    void buildArgs(Stream.Builder<Arguments> streamBuilder,NestedType nestedType,CheckedType checkedType,PreModScenario preModScenario);
-    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
-      Stream.Builder<Arguments> streamBuilder=Stream.builder();
-      for(var nestedType:NestedType.values()){
-        for(var checkedType:CheckedType.values()){
-          for(var preModScenario:PreModScenario.values()){
-            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario.appliesToSubList && !nestedType.rootType)){
-              argBuilder.buildArgs(streamBuilder,nestedType,checkedType,preModScenario);
-            }
-          }
-        }
-      }
-      return streamBuilder.build();
     }
   }
 }

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import omni.impl.seq.AbstractBooleanSeqMonitor.CheckedType;
 import omni.impl.seq.AbstractBooleanSeqMonitor.PreModScenario;
 import omni.impl.seq.AbstractBooleanSeqMonitor.SequenceLocation;
-import omni.impl.seq.AbstractBooleanSeqMonitor.SequenceContentsScenario;
 import omni.impl.seq.AbstractBooleanSeqMonitor.ListItrSetScenario;
 import omni.impl.seq.AbstractBooleanSeqMonitor.ItrType;
 import omni.impl.seq.AbstractBooleanSeqMonitor.IterationScenario;
@@ -38,9 +37,7 @@ import java.util.ArrayList;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import omni.function.BooleanConsumer;
-import omni.function.BooleanPredicate;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Execution(ExecutionMode.CONCURRENT)
 @Tag("ArrSeqTest")
@@ -129,6 +126,7 @@ public class BooleanArrSeqTest{
     if(preModScenario.expectedException==null){
       if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
         seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
+        seqMonitor.verifyStructuralIntegrity();
         seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
         return;
       }else{
@@ -137,6 +135,7 @@ public class BooleanArrSeqTest{
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
     }
+    seqMonitor.verifyStructuralIntegrity();
     var verifyItr=seqMonitor.verifyPreAlloc();
     if(seqMonitor.nestedType.forwardIteration){
       var cloneItr=clone.iterator();
@@ -181,14 +180,13 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testhashCode_void(){
     gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testhashCode_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+      testhashCode_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]
       );
     });
   }
   private static void testhashCode_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd
   ){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
     {
       for(int i=0;i<numToAdd;++i){
         seqMonitor.add(i);
@@ -220,11 +218,11 @@ public class BooleanArrSeqTest{
         for(var checkedType:CheckedType.values()){
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
-              for(var seqContentsScenario:SequenceContentsScenario.values()){
+              for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
                 for(var seqLocation:SequenceLocation.values()){
-                  if((seqLocation==SequenceLocation.BEGINNING && seqContentsScenario.nonEmpty) || (checkedType.checked && seqLocation.expectedException!=null)){
-                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Unboxed));
-                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,FunctionCallType.Boxed));
+                  if((seqLocation==SequenceLocation.BEGINNING && seqSize!=0) || (checkedType.checked && seqLocation.expectedException!=null)){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Unboxed));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Boxed));
                   }
                 }
               }
@@ -238,12 +236,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListset_int_val(){
     getListset_int_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListset_int_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(FunctionCallType)args[4]);
+        testListset_int_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(SequenceLocation)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testListset_int_valHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,FunctionCallType functionCallType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -295,11 +292,11 @@ public class BooleanArrSeqTest{
         for(var checkedType:CheckedType.values()){
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
-              for(var seqContentsScenario:SequenceContentsScenario.values()){
+              for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
                 for(var seqLocation:SequenceLocation.values()){
-                  if((seqLocation==SequenceLocation.BEGINNING && seqContentsScenario.nonEmpty) || (checkedType.checked && seqLocation.expectedException!=null)){
+                  if((seqLocation==SequenceLocation.BEGINNING && seqSize!=0) || (checkedType.checked && seqLocation.expectedException!=null)){
                     for(var outputArgType:BooleanOutputTestArgType.values()){
-                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,seqLocation,outputArgType));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,outputArgType));
                     }
                   }
                 }
@@ -314,12 +311,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListget_int(){
     getListget_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListget_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(BooleanOutputTestArgType)args[4]);
+        testListget_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(SequenceLocation)args[3],(BooleanOutputTestArgType)args[4]);
     });
   }
   private static void testListget_intHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,BooleanOutputTestArgType outputArgType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,BooleanOutputTestArgType outputArgType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -414,8 +410,8 @@ public class BooleanArrSeqTest{
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
+          for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize));
           }
         }
       }   
@@ -424,12 +420,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoArray_IntFunction(){
     gettoArray_IntFunctionArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_IntFunctionHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+        testtoArray_IntFunctionHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3]);
     });
   }
   private static void testtoArray_IntFunctionHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -567,9 +562,9 @@ public class BooleanArrSeqTest{
             if(preModScenario!=PreModScenario.ModSeq&&(preModScenario.expectedException==null||(!nestedType.rootType&&checkedType.checked))){
               for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
                 if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
-                  for(var seqContentsScenario:SequenceContentsScenario.values()){
-                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
-                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+                  for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
                   }
                 }
               }   
@@ -583,12 +578,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListreplaceAll_UnaryOperator(){
     getListreplaceAll_UnaryOperatorArgs().parallel().map(Arguments::get).forEach(args->{
-        testListreplaceAll_UnaryOperatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+        testListreplaceAll_UnaryOperatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testListreplaceAll_UnaryOperatorHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -596,7 +590,7 @@ public class BooleanArrSeqTest{
     var monitoredUnaryOperator=monitoredFunctionGen.getMonitoredUnaryOperator(seqMonitor);
     int numExpectedIteratedValues;
     if(preModScenario.expectedException==null){
-      if(monitoredFunctionGen.expectedException==null || !seqContentsScenario.nonEmpty){
+      if(monitoredFunctionGen.expectedException==null || numToAdd==0){
         seqMonitor.replaceAll(monitoredUnaryOperator,functionCallType);
         seqMonitor.verifyStructuralIntegrity();
         seqMonitor.verifyPreAlloc().verifyAscending(1,numToAdd).verifyPostAlloc(preModScenario);
@@ -927,9 +921,9 @@ public class BooleanArrSeqTest{
   }
   static Stream<Arguments> gettoArray_voidArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-      for(var seqContentsScenario:SequenceContentsScenario.values()){
+      for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
         for(var outputArgType:BooleanOutputTestArgType.values()){
-          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario,outputArgType));
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,outputArgType));
         }
       }
     });
@@ -937,12 +931,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoArray_void(){
     gettoArray_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(BooleanOutputTestArgType)args[3]);
+        testtoArray_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(BooleanOutputTestArgType)args[3]);
     });
   }
   private static void testtoArray_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,BooleanOutputTestArgType outputArgType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,BooleanOutputTestArgType outputArgType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -964,10 +957,11 @@ public class BooleanArrSeqTest{
             if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (!nestedType.rootType && checkedType.checked))){
               for(var seqLocation:SequenceLocation.values()){
                 if(checkedType.checked || seqLocation.expectedException==null){
-                  for(var seqContentsScenario:SequenceContentsScenario.values()){
-                    if(seqContentsScenario.nonEmpty || (seqLocation==SequenceLocation.IOBHI)){
+                  for(int seqSize=0;seqSize<100;++seqSize){
+                  //for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                    if(seqSize!=0|| (seqLocation==SequenceLocation.IOBHI)){
                       for(var outputArgType:BooleanOutputTestArgType.values()){
-                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqContentsScenario,outputArgType));
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqSize,outputArgType));
                       }
                     }
                   }
@@ -983,12 +977,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListremoveAt_int(){
     getListremoveAt_intArgs().parallel().map(Arguments::get).forEach(args->{
-        testListremoveAt_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2],(SequenceContentsScenario)args[3],(BooleanOutputTestArgType)args[4]);
+        testListremoveAt_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2],(int)args[3],(BooleanOutputTestArgType)args[4]);
     });
   }
   private static void testListremoveAt_intHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,BooleanOutputTestArgType outputArgType){
-    int numToAdd=seqContentsScenario.nonEmpty?120:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation,int numToAdd,BooleanOutputTestArgType outputArgType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -1006,10 +999,7 @@ public class BooleanArrSeqTest{
         break;
       case BEGINNING:
         if(expectedException==null){
-          for(int i=0;i<numToAdd;++i){
-            seqMonitor.removeAt(i,outputArgType,0);
-            seqMonitor.verifyStructuralIntegrity();
-          }
+          seqMonitor.verifyBeginningRemoveAt(outputArgType);
           expectedSize=0;
         }else{
           Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(0,outputArgType,0));
@@ -1018,17 +1008,7 @@ public class BooleanArrSeqTest{
         break;
       case NEARBEGINNING:
         if(expectedException==null){
-          for(int i=0,expectedLo=numToAdd/4,expectedHi=numToAdd/4;i<numToAdd;++i){
-            if((i&3)==1)
-            {
-              seqMonitor.removeAt(--expectedLo,outputArgType,(numToAdd-i)/4);
-            }
-            else
-            {
-              seqMonitor.removeAt(expectedHi++,outputArgType,(numToAdd-i)/4);
-            }
-            seqMonitor.verifyStructuralIntegrity();
-          }
+          seqMonitor.verifyNearBeginningRemoveAt(outputArgType);
           expectedSize=0;
         }else{
           Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd/4,outputArgType,numToAdd/4));
@@ -1037,14 +1017,7 @@ public class BooleanArrSeqTest{
         break;
       case MIDDLE:
         if(expectedException==null){
-          for(int i=0,expectedLo=numToAdd/2,expectedHi=numToAdd/2;i<numToAdd;++i){
-            if((i&1)==0){
-              seqMonitor.removeAt(expectedHi++,outputArgType,(numToAdd-i)/2);
-            }else{
-              seqMonitor.removeAt(--expectedLo,outputArgType,(numToAdd-i)/2);
-            }
-            seqMonitor.verifyStructuralIntegrity();
-          }
+          seqMonitor.verifyMiddleRemoveAt(outputArgType);
           expectedSize=0;
         }else{
           Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd/2,outputArgType,numToAdd/2));
@@ -1053,24 +1026,7 @@ public class BooleanArrSeqTest{
         break;
       case NEAREND:
         if(expectedException==null){
-          for(int i=0,expectedLo=((numToAdd/4)*3)+2,expectedHi=(numToAdd/4)*3;i<numToAdd;++i){
-            switch((i%4))
-            {
-              case 0:
-                seqMonitor.removeAt(expectedHi++,outputArgType,((numToAdd-i)/4)*3);
-                break;
-              case 1:
-                seqMonitor.removeAt(expectedLo-=5,outputArgType,((numToAdd-i)/4)*3);
-                break;
-              case 2:
-                seqMonitor.removeAt(++expectedLo,outputArgType,((numToAdd-i)/4)*3);
-                break;
-              case 3:
-                seqMonitor.removeAt(++expectedLo,outputArgType,((numToAdd-i)/4)*3);
-                break;
-            }
-            seqMonitor.verifyStructuralIntegrity();
-          }
+          seqMonitor.verifyNearEndRemoveAt(outputArgType);
           expectedSize=0;
         }else{
           Assertions.assertThrows(expectedException,()->seqMonitor.removeAt((numToAdd/4)*3,outputArgType,(numToAdd/4)*3));
@@ -1079,10 +1035,7 @@ public class BooleanArrSeqTest{
         break;
       case END:
         if(expectedException==null){
-          for(int i=0;i<numToAdd;++i){
-            seqMonitor.removeAt(numToAdd-i-1,outputArgType,numToAdd-i-1);
-            seqMonitor.verifyStructuralIntegrity();
-          }
+          seqMonitor.verifyEndRemoveAt(outputArgType);
           expectedSize=0;
         }else{
           Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd-1,outputArgType,numToAdd-1));
@@ -1097,14 +1050,14 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListstableDescendingSort_void(){
     getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
-        testListstableDescendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
+        testListstableDescendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
     });
   }
   private static void testListstableDescendingSort_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
-    monitoredComparatorGen.initReverse(seqMonitor,seqContentsScenario,preModScenario);
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.initReverse(seqMonitor,numToAdd,preModScenario);
     if(preModScenario.expectedException==null){
-      if(monitoredComparatorGen.expectedException==null || !seqContentsScenario.nonEmpty){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
         seqMonitor.stableDescendingSort();
       }else{
         Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.stableDescendingSort());
@@ -1112,17 +1065,16 @@ public class BooleanArrSeqTest{
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.stableDescendingSort());
     }
-    monitoredComparatorGen.assertReverseSorted(seqMonitor,seqContentsScenario,preModScenario);
+    monitoredComparatorGen.assertReverseSorted(seqMonitor,numToAdd,preModScenario);
   }
   @org.junit.jupiter.api.Test
   public void testclone_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testclone_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testclone_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]);
     });
   }
   private static void testclone_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -1172,12 +1124,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testsize_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testsize_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testsize_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]);
     });
   }
   private static void testsize_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       Assertions.assertEquals(i,seqMonitor.seq.size());
       seqMonitor.verifyStructuralIntegrity();
@@ -1202,12 +1153,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testisEmpty_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testisEmpty_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testisEmpty_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]);
     });
   }
   private static void testisEmpty_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       Assertions.assertEquals(i==0,seqMonitor.seq.isEmpty());
       seqMonitor.verifyStructuralIntegrity();
@@ -1232,12 +1182,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testclear_void(){
     getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testclear_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]);
+        testclear_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]);
     });
   }
   private static void testclear_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -1307,14 +1256,14 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListstableAscendingSort_void(){
     getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
-        testListstableAscendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3]);
+        testListstableAscendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
     });
   }
   private static void testListstableAscendingSort_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario){
-    monitoredComparatorGen.init(seqMonitor,seqContentsScenario,preModScenario);
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
     if(preModScenario.expectedException==null){
-      if(monitoredComparatorGen.expectedException==null || !seqContentsScenario.nonEmpty){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
         seqMonitor.stableAscendingSort();
       }else{
         Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.stableAscendingSort());
@@ -1322,7 +1271,7 @@ public class BooleanArrSeqTest{
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.stableAscendingSort());
     }
-    monitoredComparatorGen.assertSorted(seqMonitor,seqContentsScenario,preModScenario);
+    monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
   }
   static Stream<Arguments> getListsort_ComparatorArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
@@ -1333,9 +1282,9 @@ public class BooleanArrSeqTest{
             if((checkedType.checked || preModScenario.expectedException==null) && ((nestedType.rootType && preModScenario.expectedException==null)||(!nestedType.rootType && preModScenario.appliesToSubList))){
               for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
                 if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
-                  for(var sequenceContentsScenario:SequenceContentsScenario.values()){
+                  for(int seqSize:new int[]{0,2}){
                     for(var functionCallType:FunctionCallType.values()){
-                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario,functionCallType));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize,functionCallType));
                     }
                   }
                 }
@@ -1350,15 +1299,15 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListsort_Comparator(){
     getListsort_ComparatorArgs().parallel().map(Arguments::get).forEach(args->{
-        testListsort_ComparatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+        testListsort_ComparatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testListsort_ComparatorHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
-    monitoredComparatorGen.init(seqMonitor,seqContentsScenario,preModScenario);
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd,FunctionCallType functionCallType){
+    monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
     var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
     if(preModScenario.expectedException==null){
-      if(monitoredComparatorGen.expectedException==null || !seqContentsScenario.nonEmpty){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
         seqMonitor.sort(sorter,functionCallType);
       }else{
         Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.sort(sorter,functionCallType));
@@ -1366,38 +1315,38 @@ public class BooleanArrSeqTest{
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.sort(sorter,functionCallType));
     }
-    monitoredComparatorGen.assertSorted(seqMonitor,seqContentsScenario,preModScenario);
+    monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
   }
   @org.junit.jupiter.api.Test
   public void testremoveVal_val(){
     getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testremoveVal_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testremoveVal_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testremoveVal_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
   ){
-    if(seqContentsScenario.nonEmpty){
+    if(numToAdd!=0){
       {
         switch(seqLocation){
           case BEGINNING:
-            argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            argType.initContainsBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case NEARBEGINNING:
-            argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            argType.initContainsNearBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case MIDDLE:
-            argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            argType.initContainsMiddle(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case NEAREND:
-            argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            argType.initContainsNearEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case END:
-            argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            argType.initContainsEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor,100);
+            argType.initDoesNotContain(seqMonitor,numToAdd);
             break;
           default:
             throw new Error("Unknown seqLocation "+seqLocation);
@@ -1435,34 +1384,34 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testsearch_val(){
     getQueryStackArguments().parallel().map(Arguments::get).forEach(args->{
-        testsearch_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testsearch_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testsearch_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
   ){
     int expectedIndex;
-    if(seqContentsScenario.nonEmpty){
+    if(numToAdd!=0){
       {
         switch(seqLocation){
           case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            expectedIndex=argType.initContainsBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            expectedIndex=argType.initContainsMiddle(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration);
+            expectedIndex=argType.initContainsEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration);
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor,100);
+            argType.initDoesNotContain(seqMonitor,numToAdd);
             expectedIndex=-1;
             break;
           default:
@@ -1480,34 +1429,34 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testlastIndexOf_val(){
     getQueryListArguments().parallel().map(Arguments::get).forEach(args->{
-        testlastIndexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testlastIndexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testlastIndexOf_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
   ){
     int expectedIndex;
-    if(seqContentsScenario.nonEmpty){
+    if(numToAdd!=0){
       {
         switch(seqLocation){
           case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsMiddle(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor,100);
+            argType.initDoesNotContain(seqMonitor,numToAdd);
             expectedIndex=-1;
             break;
           default:
@@ -1544,34 +1493,34 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testindexOf_val(){
     getQueryListArguments().parallel().map(Arguments::get).forEach(args->{
-        testindexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testindexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testindexOf_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
   ){
     int expectedIndex;
-    if(seqContentsScenario.nonEmpty){
+    if(numToAdd!=0){
       {
         switch(seqLocation){
           case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsNearBeginning(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsMiddle(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsNearEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor,100,seqMonitor.nestedType.forwardIteration)-1;
+            expectedIndex=argType.initContainsEnd(seqMonitor,numToAdd,seqMonitor.nestedType.forwardIteration)-1;
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor,100);
+            argType.initDoesNotContain(seqMonitor,numToAdd);
             expectedIndex=-1;
             break;
           default:
@@ -1608,33 +1557,33 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testcontains_val(){
     getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testcontains_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(SequenceContentsScenario)args[4],(PreModScenario)args[5]
+        testcontains_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
         );
     });
   }
   private static void testcontains_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario 
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
   ){
-    if(seqContentsScenario.nonEmpty){
+    if(numToAdd!=0){
       {
         switch(seqLocation){
           case BEGINNING:
-            argType.initContainsBeginning(seqMonitor,100,true);
+            argType.initContainsBeginning(seqMonitor,numToAdd,true);
             break;
           case NEARBEGINNING:
-            argType.initContainsNearBeginning(seqMonitor,100,true);
+            argType.initContainsNearBeginning(seqMonitor,numToAdd,true);
             break;
           case MIDDLE:
-            argType.initContainsMiddle(seqMonitor,100,true);
+            argType.initContainsMiddle(seqMonitor,numToAdd,true);
             break;
           case NEAREND:
-            argType.initContainsNearEnd(seqMonitor,100,true);
+            argType.initContainsNearEnd(seqMonitor,numToAdd,true);
             break;
           case END:
-            argType.initContainsEnd(seqMonitor,100,true);
+            argType.initContainsEnd(seqMonitor,numToAdd,true);
             break;
           case IOBHI:
-            argType.initDoesNotContain(seqMonitor,100);
+            argType.initDoesNotContain(seqMonitor,numToAdd);
             break;
           default:
             throw new Error("Unknown seqLocation "+seqLocation);
@@ -1692,20 +1641,20 @@ public class BooleanArrSeqTest{
   }
   static Stream<Arguments> getadd_valArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-      for(var seqContentsScenario:SequenceContentsScenario.values()){
+      for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
         for(var inputArgType:BooleanInputTestArgType.values()){
           for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
             switch(nestedType){
               case LIST:
               case STACK:
-                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,preModScenario,seqContentsScenario));
+                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,preModScenario,seqSize));
                 break;
               case SUBLIST:
                 for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
                   for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
                     for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
                       for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,preModScenario,seqContentsScenario));
+                        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,preModScenario,seqSize));
                       }
                     }
                   }
@@ -1722,12 +1671,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testadd_val(){
     getadd_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testadd_valHelper((SeqMonitor)args[0],(BooleanInputTestArgType)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3]);
+        testadd_valHelper((SeqMonitor)args[0],(BooleanInputTestArgType)args[1],(PreModScenario)args[2],(int)args[3]);
     });
   }
   private static void testadd_valHelper
-  (SeqMonitor seqMonitor,BooleanInputTestArgType inputArgType,PreModScenario preModScenario,SequenceContentsScenario sequenceContentsScenario){
-    int numToAdd=sequenceContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,BooleanInputTestArgType inputArgType,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -1755,10 +1703,10 @@ public class BooleanArrSeqTest{
             if((checkedType.checked || seqLocation.expectedException==null) && seqLocation.validForEmpty){
               for(var preModScenario:PreModScenario.values()){
                 if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
-                  for(var seqContentsScenario:SequenceContentsScenario.values()){
-                    if(seqContentsScenario.nonEmpty || seqLocation.expectedException!=null){
+                  for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                    if(seqSize!=0 || seqLocation.expectedException!=null){
                       for(var inputArgType:BooleanInputTestArgType.values()){
-                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqContentsScenario));
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqSize));
                       }
                     }
                   }
@@ -1771,15 +1719,10 @@ public class BooleanArrSeqTest{
     }
     return builder.build();
   }
-  @org.junit.jupiter.api.Test
-  public void testListput_int_val(){
-    getListput_int_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListput_int_valHelper((SeqMonitor)args[0],(BooleanInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(SequenceContentsScenario)args[4]);
-    });
-  }
-  private static void testListput_int_valHelper
-  (SeqMonitor seqMonitor,BooleanInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.MethodSource("getListput_int_valArgs")
+  public void testListput_int_val
+  (SeqMonitor seqMonitor,BooleanInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -1842,20 +1785,21 @@ public class BooleanArrSeqTest{
             if(checkedType.checked || seqLocation.expectedException==null){
               for(var preModScenario:PreModScenario.values()){
                 if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
-                  for(var seqContentsScenario:SequenceContentsScenario.values()){
-                    if(seqContentsScenario.nonEmpty || seqLocation.validForEmpty){
+                  for(int seqSize=0;seqSize<100;++seqSize){
+                  //for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                    if(seqSize!=0 || seqLocation.validForEmpty){
                       for(var inputArgType:BooleanInputTestArgType.values()){
                         for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
                           switch(nestedType){
                             case LIST:
-                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,seqLocation,preModScenario,seqContentsScenario));
+                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity),inputArgType,seqLocation,preModScenario,seqSize));
                               break;
                             case SUBLIST:
                               for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
                                 for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
                                   for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
                                     for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,seqLocation,preModScenario,seqContentsScenario));
+                                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,seqLocation,preModScenario,seqSize));
                                     }
                                   }
                                 }
@@ -1880,14 +1824,15 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListadd_int_val(){
     getListadd_int_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListadd_int_valHelper((SeqMonitor)args[0],(BooleanInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(SequenceContentsScenario)args[4]);
+        testListadd_int_valHelper((SeqMonitor)args[0],(BooleanInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(int)args[4]);
     });
   }
   private static void testListadd_int_valHelper
-  (SeqMonitor seqMonitor,BooleanInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
+  (SeqMonitor seqMonitor,BooleanInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,int numToAdd){
+    if(preModScenario.expectedException!=null || seqLocation.expectedException!=null){
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
     }
     seqMonitor.illegalAdd(preModScenario);
     SequenceVerificationItr verifyItr;
@@ -1904,46 +1849,40 @@ public class BooleanArrSeqTest{
           verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
           break;
         case BEGINNING:
-          for(int i=0;i<100;++i){
+          for(int i=0;i<numToAdd;++i){
             seqMonitor.add(0,i,inputArgType);
             seqMonitor.verifyStructuralIntegrity();
           }
-          verifyItr=seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,100).verifyAscending(numToAdd);
+          verifyItr=seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,numToAdd);
           break;
         case NEARBEGINNING:
-          for(int i=0;i<100;++i){
-            seqMonitor.add((i+numToAdd)/4,i,inputArgType);
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(seqMonitor.expectedSeqSize>>2,i,inputArgType);
             seqMonitor.verifyStructuralIntegrity();
           }
-          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending((numToAdd/4)).verifyNearBeginningInsertion(inputArgType,100).verifyAscending((numToAdd/4),numToAdd-((numToAdd/4)));
+          verifyItr=seqMonitor.verifyPreAlloc().verifyNearBeginningInsertion(inputArgType,numToAdd);
           break;
         case MIDDLE:
-          for(int i=0;i<100;++i){
-            seqMonitor.add((i+numToAdd)/2,i,inputArgType);
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(seqMonitor.expectedSeqSize>>1,i,inputArgType);
             seqMonitor.verifyStructuralIntegrity();
           }
-          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd/2).verifyMidPointInsertion(inputArgType,100).verifyAscending(numToAdd/2,numToAdd-(numToAdd/2));
+          verifyItr=seqMonitor.verifyPreAlloc().verifyMidPointInsertion(inputArgType,numToAdd);
           break;
         case NEAREND:
-          int insertionIndex=(numToAdd/4)*3;
-          for(int i=0;i<100;){
-            seqMonitor.add(insertionIndex,i,inputArgType);
-            ++i;
-            ++insertionIndex;
-            if((i&3)==0)
-            {
-              --insertionIndex;
-            }
+          int insertionIndex=0;
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(seqMonitor.expectedSeqSize-(seqMonitor.expectedSeqSize>>2),i,inputArgType);
             seqMonitor.verifyStructuralIntegrity();
           }
-          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending((numToAdd/4)*3).verifyNearEndInsertion(inputArgType,100).verifyAscending((numToAdd/4)*3,numToAdd-((numToAdd/4)*3));
+          verifyItr=seqMonitor.verifyPreAlloc().verifyNearEndInsertion(inputArgType,numToAdd);
           break;
         case END:
-          for(int i=0;i<100;++i){
-            seqMonitor.add(i+numToAdd,i,inputArgType);
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(i,i,inputArgType);
             seqMonitor.verifyStructuralIntegrity();
           }
-          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyAscending(inputArgType,100);
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(inputArgType,numToAdd);
           break;
         default:
           throw new Error("Unknown seqLocation "+seqLocation);
@@ -1955,22 +1894,22 @@ public class BooleanArrSeqTest{
           insertionIndex=-1;
           break;
         case IOBHI:
-           insertionIndex=numToAdd+1;
+           insertionIndex=seqMonitor.expectedSeqSize+1;
           break;
         case BEGINNING:
           insertionIndex=0;
           break;
         case NEARBEGINNING:
-          insertionIndex=numToAdd/4;
+          insertionIndex=seqMonitor.expectedSeqSize>>2;;
           break;
         case MIDDLE:
-          insertionIndex=numToAdd/2;
+          insertionIndex=seqMonitor.expectedSeqSize>>1;
           break;
         case NEAREND:
-          insertionIndex=(numToAdd/4)*3;
+          insertionIndex=seqMonitor.expectedSeqSize-(seqMonitor.expectedSeqSize>>2);
           break;
         case END:
-          insertionIndex=numToAdd;
+          insertionIndex=seqMonitor.expectedSeqSize;
           break;
         default:
           throw new Error("Unknown seqLocation "+seqLocation);
@@ -1985,9 +1924,9 @@ public class BooleanArrSeqTest{
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Unboxed));
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario,FunctionCallType.Boxed));
+          for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
           }
         }
       }
@@ -1996,12 +1935,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testforEach_Consumer(){
     getforEach_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-        testforEach_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3],(FunctionCallType)args[4]);
+        testforEach_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3],(FunctionCallType)args[4]);
     });
   }
   private static void testforEach_ConsumerHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -2009,7 +1947,7 @@ public class BooleanArrSeqTest{
     var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(seqMonitor);
     int numExpectedIteratedValues;
     if(preModScenario.expectedException==null){
-      if(monitoredFunctionGen.expectedException==null || !seqContentsScenario.nonEmpty){
+      if(monitoredFunctionGen.expectedException==null || numToAdd==0){
         seqMonitor.forEach(monitoredConsumer,functionCallType);
         seqMonitor.verifyStructuralIntegrity();
         seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
@@ -2156,9 +2094,9 @@ public class BooleanArrSeqTest{
               if((monitoredFunctionGen.expectedException==null || checkedType.checked) && (!nestedType.rootType || (preModScenario.appliesToRootItr&&monitoredFunctionGen.appliesToRootItr))){
                 for(var itrType:ItrType.values()){
                   if(itrType!=ItrType.DescendingItr && (itrType==ItrType.Itr || nestedType.forwardIteration)){
-                    for(var seqContentsScenario:SequenceContentsScenario.values()){
-                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqContentsScenario,FunctionCallType.Unboxed));
-                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqContentsScenario,FunctionCallType.Boxed));
+                    for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Unboxed));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Boxed));
                     }
                   }
                 }
@@ -2173,12 +2111,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testItrforEachRemaining_Consumer(){
     getItrforEachRemaining_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrforEachRemaining_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(ItrType)args[3],(SequenceContentsScenario)args[4],(FunctionCallType)args[5]);
+        testItrforEachRemaining_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(ItrType)args[3],(int)args[4],(FunctionCallType)args[5]);
     });
   }
   private static void testItrforEachRemaining_ConsumerHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,ItrType itrType,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,ItrType itrType,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -2186,8 +2123,8 @@ public class BooleanArrSeqTest{
     seqMonitor.illegalAdd(preModScenario);
     var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(itrMonitor);
     int numExpectedIteratedValues;
-    if(preModScenario.expectedException==null || (!seqContentsScenario.nonEmpty && (preModScenario!=PreModScenario.ModSeq || !seqMonitor.nestedType.forwardIteration))){
-      if(monitoredFunctionGen.expectedException==null || (!seqContentsScenario.nonEmpty && (preModScenario!=PreModScenario.ModSeq || !seqMonitor.nestedType.forwardIteration))){
+    if(preModScenario.expectedException==null || (numToAdd==0 && (preModScenario!=PreModScenario.ModSeq || !seqMonitor.nestedType.forwardIteration))){
+      if(monitoredFunctionGen.expectedException==null || (numToAdd==0 && (preModScenario!=PreModScenario.ModSeq || !seqMonitor.nestedType.forwardIteration))){
         itrMonitor.forEachRemaining(monitoredConsumer,functionCallType);
         itrMonitor.verifyIteratorState();
         seqMonitor.verifyStructuralIntegrity();
@@ -2431,8 +2368,8 @@ public class BooleanArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var removeScenario:ItrRemoveScenario.values()){
         if(checkedType.checked || removeScenario.expectedException==null){
-          for(var sequenceContentsScenario:SequenceContentsScenario.values()){
-            if(sequenceContentsScenario.nonEmpty || removeScenario.validWithEmptySeq){
+          for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+            if(seqSize!=0 || removeScenario.validWithEmptySeq){
               for(var preModScenario:PreModScenario.values()){
                 if(checkedType.checked || preModScenario.expectedException==null){
                   for(var itrType:ItrType.values()){
@@ -2440,8 +2377,8 @@ public class BooleanArrSeqTest{
                       for(var nestedType:NestedType.values()){
                         if((itrType==ItrType.Itr || nestedType!=NestedType.STACK) && (!nestedType.rootType || preModScenario.appliesToRootItr)){
                           for(var sequenceLocation:SequenceLocation.values()){
-                            if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (sequenceContentsScenario.nonEmpty && nestedType!=NestedType.STACK))){
-                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,sequenceContentsScenario,itrType,sequenceLocation));
+                            if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (seqSize!=0 && nestedType!=NestedType.STACK))){
+                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,seqSize,itrType,sequenceLocation));
                             }
                           }
                         }
@@ -2460,48 +2397,120 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testItrremove_void(){
     getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(SequenceContentsScenario)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
+        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(int)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
     });
   }
   private static void testItrremove_voidHelper
-  (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,ItrType itrType,SequenceLocation seqLocation){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,int numToAdd,ItrType itrType,SequenceLocation seqLocation){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
     var itrMonitor=seqMonitor.getItrMonitor(seqLocation,itrType);
+    int numIterated;
+    boolean hasLastRet=false;
+    switch(seqLocation){
+      case BEGINNING:
+        if(seqMonitor.nestedType.forwardIteration){
+          numIterated=0;
+        }else{
+          numIterated=numToAdd;
+        }
+        break;
+      case NEARBEGINNING:
+        numIterated=seqMonitor.expectedSeqSize/4;
+        break;
+      case MIDDLE:
+        numIterated=seqMonitor.expectedSeqSize/2;
+        break;
+      case NEAREND:
+        numIterated=(seqMonitor.expectedSeqSize/4)*3;
+        break;
+      case END:
+        numIterated=seqMonitor.expectedSeqSize;
+        break;
+      default:
+        throw new Error("Unknown seq location "+seqLocation);
+    }
     switch(removeScenario){
       case PostNext:
-        if(seqLocation==SequenceLocation.END){
+        if(seqLocation==SequenceLocation.END && itrMonitor.hasPrevious()){
+          hasLastRet=true;
+          --numIterated;
           itrMonitor.iterateReverse();
         }
-        itrMonitor.iterateForward();
+        if(itrMonitor.hasNext()){
+          hasLastRet=true;
+          if(seqMonitor.nestedType.forwardIteration){
+            ++numIterated;
+          }else{
+            --numIterated;
+          }
+          itrMonitor.iterateForward();
+        }
         break;
       case PostPrevious:
-        if(seqLocation==SequenceLocation.BEGINNING){
+        if(seqLocation==SequenceLocation.BEGINNING && itrMonitor.hasNext()){
+           hasLastRet=true;
+           ++numIterated;
            itrMonitor.iterateForward();
         }
-        itrMonitor.iterateReverse();
+        if(itrMonitor.hasPrevious()){
+          hasLastRet=true;
+          --numIterated;
+          itrMonitor.iterateReverse();
+        }
         break;
       case PostAdd:
         itrMonitor.add(0);
+        hasLastRet=false;
         break;
       case PostRemove:
-        if(seqLocation==SequenceLocation.END){
+        if(seqLocation==SequenceLocation.END && itrMonitor.hasPrevious()){
+          --numIterated;
           itrMonitor.iterateReverse();
-        }else{
+          hasLastRet=true;
+        }else if(itrMonitor.hasNext()){
+          if(!seqMonitor.nestedType.forwardIteration){
+            --numIterated;
+          }
           itrMonitor.iterateForward();
+          hasLastRet=true;
         }
         itrMonitor.remove();
+        hasLastRet=false;
       case PostInit:
         break;
       default:
          throw new Error("unknown remove scenario "+removeScenario);
     }
+    if(removeScenario.expectedException==null && preModScenario.expectedException!=null && !hasLastRet){
+      if(itrMonitor.hasNext()){
+        ++numIterated;
+        itrMonitor.iterateForward();
+      }else{
+        --numIterated;
+        itrMonitor.iterateReverse();
+      }
+      hasLastRet=true;
+    }
     seqMonitor.illegalAdd(preModScenario);
     SequenceVerificationItr verifyItr;
     if(removeScenario.expectedException==null){
       if(preModScenario.expectedException==null){
+        if(!hasLastRet){
+          if(itrMonitor.hasNext()){
+            if(seqMonitor.nestedType.forwardIteration){
+              ++numIterated;
+            }else{
+              --numIterated;
+            }
+            itrMonitor.iterateForward();
+          }else{
+            --numIterated;
+            itrMonitor.iterateReverse();
+          }
+          hasLastRet=true;
+        }
         itrMonitor.remove();
         itrMonitor.verifyIteratorState();
         seqMonitor.verifyStructuralIntegrity();
@@ -2700,50 +2709,10 @@ public class BooleanArrSeqTest{
           verifyItr.verifyAscending(numToAdd);
           break;
         case PostAdd:
-          switch(seqLocation){
-            case BEGINNING:
-              verifyItr.verifyIllegalAdd().verifyAscending(numToAdd);
-              break;
-            case NEARBEGINNING:
-              verifyItr.verifyAscending(numToAdd/4).verifyIllegalAdd().verifyAscending(numToAdd/4,numToAdd-(numToAdd/4));
-              break;
-            case MIDDLE:
-              verifyItr.verifyAscending(numToAdd/2).verifyIllegalAdd().verifyAscending(numToAdd/2,numToAdd-(numToAdd/2));
-              break;
-            case NEAREND:
-              verifyItr.verifyAscending((numToAdd/4)*3).verifyIllegalAdd().verifyAscending((numToAdd/4)*3,numToAdd-((numToAdd/4)*3));
-              break;
-            case END:
-              verifyItr.verifyAscending(numToAdd).verifyIllegalAdd();
-              break;
-            default:
-              throw new Error("Unknown sequence location "+seqLocation);
-          }
+          verifyItr.verifyAscending(numIterated).verifyIllegalAdd().verifyAscending(numIterated,numToAdd-(numIterated));
           break;
         case PostRemove:
-          switch(seqLocation){
-            case BEGINNING:
-              if(seqMonitor.nestedType.forwardIteration){
-                verifyItr.verifyAscending(1,numToAdd-1);
-              }else{
-                verifyItr.verifyAscending(numToAdd-1);
-              }
-              break;
-            case NEARBEGINNING:
-              verifyItr.verifyAscending(numToAdd/4).verifyAscending((numToAdd/4)+1,numToAdd-(numToAdd/4)-1);
-              break;
-            case MIDDLE:
-              verifyItr.verifyAscending(numToAdd/2).verifyAscending((numToAdd/2)+1,numToAdd-(numToAdd/2)-1);
-              break;
-            case NEAREND:
-              verifyItr.verifyAscending((numToAdd/4)*3).verifyAscending(((numToAdd/4)*3)+1,numToAdd-((numToAdd/4)*3)-1);
-              break;
-            case END:
-              verifyItr.verifyAscending(numToAdd-1);
-              break;
-            default:
-              throw new Error("Unknown sequence location "+seqLocation);
-          }
+          verifyItr.verifyAscending(numIterated).verifyAscending(numIterated+1,numToAdd-(numIterated+1));
           break;
         default:
           throw new Error("unknown remove scenario "+removeScenario);
@@ -2756,13 +2725,13 @@ public class BooleanArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var itrScenario:IterationScenario.values()){
         if(checkedType.checked || itrScenario==IterationScenario.NoMod){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
+          for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+            if(seqSize!=0 || itrScenario.validWithEmptySeq){
               for(var outputType:BooleanOutputTestArgType.values()){
                 if(itrScenario.preModScenario.appliesToRootItr){
-                  builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType),itrScenario,seqContentsScenario,outputType));
+                  builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType),itrScenario,seqSize,outputType));
                 }
-                builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqContentsScenario,outputType));
+                builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqSize,outputType));
               }
             }
           }
@@ -2774,12 +2743,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListItrprevious_void(){
     getListItrprevious_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testListItrprevious_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],(BooleanOutputTestArgType)args[3]);
+        testListItrprevious_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(int)args[2],(BooleanOutputTestArgType)args[3]);
     });
   }
   private static void testListItrprevious_voidHelper
-  (SeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,BooleanOutputTestArgType outputType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,IterationScenario itrScenario,int numToAdd,BooleanOutputTestArgType outputType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -2821,14 +2789,14 @@ public class BooleanArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var itrScenario:IterationScenario.values()){
         if(checkedType.checked || itrScenario==IterationScenario.NoMod){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            if(seqContentsScenario.nonEmpty || itrScenario.validWithEmptySeq){
+          for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+            if(seqSize!=0 || itrScenario.validWithEmptySeq){
               for(var itrType:ItrType.values()){
                 if(itrType!=ItrType.DescendingItr){
                   for(var nestedType:NestedType.values()){
                     if((nestedType!=NestedType.STACK || itrType!=ItrType.ListItr) && (itrScenario.preModScenario.appliesToRootItr || !nestedType.rootType)){
                       for(var outputType:BooleanOutputTestArgType.values()){
-                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),itrScenario,seqContentsScenario,itrType,outputType));
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),itrScenario,seqSize,itrType,outputType));
                       }
                     }
                   }
@@ -2844,12 +2812,11 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testItrnext_void(){
     getItrnext_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrnext_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(SequenceContentsScenario)args[2],(ItrType)args[3],(BooleanOutputTestArgType)args[4]);
+        testItrnext_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(int)args[2],(ItrType)args[3],(BooleanOutputTestArgType)args[4]);
     });
   }
   private static void testItrnext_voidHelper
-  (SeqMonitor seqMonitor,IterationScenario itrScenario,SequenceContentsScenario seqContentsScenario,ItrType itrType,BooleanOutputTestArgType outputType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+  (SeqMonitor seqMonitor,IterationScenario itrScenario,int numToAdd,ItrType itrType,BooleanOutputTestArgType outputType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -2986,20 +2953,21 @@ public class BooleanArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var preModScenario:PreModScenario.values()){
         if(checkedType.checked || preModScenario.expectedException==null){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
+          for(int seqSize=0;seqSize<100;++seqSize){
+          //for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
             for(var seqLocation:SequenceLocation.values()){
               if(seqLocation.expectedException==null){
                 for(var inputArgType:BooleanInputTestArgType.values()){
                   if(preModScenario.appliesToRootItr){
                     for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-                        builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType,initialCapacity),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+                        builder.accept(Arguments.of(new SeqMonitor(NestedType.LIST,checkedType,initialCapacity),preModScenario,seqSize,seqLocation,inputArgType));
                     }
                   }
                   for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
                     for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
                       for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
                         for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                          builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+                          builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),preModScenario,seqSize,seqLocation,inputArgType));
                         }
                       }
                     }
@@ -3016,14 +2984,15 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testListItradd_val(){
     getListItradd_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testListItradd_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2],(SequenceLocation)args[3],(BooleanInputTestArgType)args[4]);
+        testListItradd_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(SequenceLocation)args[3],(BooleanInputTestArgType)args[4]);
     });
   }
   private static void testListItradd_valHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocation,BooleanInputTestArgType inputArgType){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,BooleanInputTestArgType inputArgType){
+    if(preModScenario.expectedException!=null || seqLocation.expectedException!=null){
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
     }
     var itrMonitor=seqMonitor.getListItrMonitor(seqLocation);
     seqMonitor.illegalAdd(preModScenario);
@@ -3031,7 +3000,7 @@ public class BooleanArrSeqTest{
     if(preModScenario.expectedException==null){
       switch(seqLocation){
         case BEGINNING:
-          for(int i=0;i<100;++i){
+          for(int i=0;i<numToAdd;++i){
             itrMonitor.add(i,inputArgType);
             itrMonitor.verifyIteratorState();
             itrMonitor.iterateReverse();
@@ -3039,39 +3008,46 @@ public class BooleanArrSeqTest{
           }
           break;
         case NEARBEGINNING:
-          for(int i=0;i<100;){
+          int currIndex=0;
+          for(int i=0;i<numToAdd;++i){
             itrMonitor.add(i,inputArgType);
+            ++currIndex;
             itrMonitor.verifyIteratorState();
-            ++i;
-            if((i&3)!=0){
+            for(int bound=seqMonitor.expectedSeqSize/4;currIndex>bound;--currIndex)
+            {
               itrMonitor.iterateReverse();
             }
             seqMonitor.verifyStructuralIntegrity();
           }
           break;
         case MIDDLE:
-          for(int i=0;i<100;++i){
+          currIndex=0;
+          for(int i=0;i<numToAdd;++i){
             itrMonitor.add(i,inputArgType);
+            ++currIndex;
             itrMonitor.verifyIteratorState();
-            if((i&1)==0){
+            for(int bound=seqMonitor.expectedSeqSize/2;currIndex>bound;--currIndex)
+            {
               itrMonitor.iterateReverse();
             }
             seqMonitor.verifyStructuralIntegrity();
           }
           break;
         case NEAREND:
-          for(int i=0;i<100;){
+          currIndex=0;
+          for(int i=0;i<numToAdd;++i){
             itrMonitor.add(i,inputArgType);
+            ++currIndex;
             itrMonitor.verifyIteratorState();
-            ++i;
-            if((i&3)==0){
+            for(int bound=seqMonitor.expectedSeqSize-(seqMonitor.expectedSeqSize/4);currIndex>bound;--currIndex)
+            {
               itrMonitor.iterateReverse();
             }
             seqMonitor.verifyStructuralIntegrity();
           }
           break;
         case END:
-          for(int i=0;i<100;++i){
+          for(int i=0;i<numToAdd;++i){
             itrMonitor.add(i,inputArgType);
             itrMonitor.verifyIteratorState();
             seqMonitor.verifyStructuralIntegrity();
@@ -3083,19 +3059,19 @@ public class BooleanArrSeqTest{
       verifyItr=seqMonitor.verifyPreAlloc();
       switch(seqLocation){
         case BEGINNING:
-          verifyItr.verifyDescending(inputArgType,100).verifyAscending(numToAdd);
+          verifyItr.verifyDescending(inputArgType,numToAdd);
           break;
         case NEARBEGINNING:
-          verifyItr.verifyAscending(numToAdd/4).verifyNearBeginningInsertion(inputArgType,100).verifyAscending(numToAdd/4,(numToAdd-(numToAdd/4)));
+          verifyItr.verifyNearBeginningInsertion(inputArgType,numToAdd);
           break;
         case MIDDLE:
-          verifyItr.verifyAscending(numToAdd/2).verifyMidPointInsertion(inputArgType,100).verifyAscending(numToAdd/2,numToAdd-(numToAdd/2));
+          verifyItr.verifyMidPointInsertion(inputArgType,numToAdd);
           break;
         case NEAREND:
-          verifyItr.verifyAscending((numToAdd/4)*3).verifyNearEndInsertion(inputArgType,100).verifyAscending((numToAdd/4)*3,(numToAdd-((numToAdd/4)*3)));
+          verifyItr.verifyNearEndInsertion(inputArgType,numToAdd);
           break;
         case END:
-          verifyItr.verifyAscending(numToAdd).verifyAscending(inputArgType,100);
+          verifyItr.verifyAscending(inputArgType,numToAdd);
           break;
         default:
           throw new Error("Unknown sequence location scenario "+seqLocation);
@@ -3112,14 +3088,13 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testtoString_void(){
     gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testtoString_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceContentsScenario)args[2]
+      testtoString_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]
       );
     });
   }
   private static void testtoString_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd
   ){
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
     {
       for(int i=0;i<numToAdd;++i){
         seqMonitor.add(i);
@@ -3171,8 +3146,8 @@ public class BooleanArrSeqTest{
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
-          for(var seqContentsScenario:SequenceContentsScenario.values()){
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqContentsScenario));
+          for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize));
           }
         }
       }
@@ -3181,13 +3156,12 @@ public class BooleanArrSeqTest{
   @org.junit.jupiter.api.Test
   public void testreadAndwriteObject(){
     getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
-        testreadAndwriteObjectHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(SequenceContentsScenario)args[3]);
+        testreadAndwriteObjectHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3]);
     });
   }
   private static void testreadAndwriteObjectHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,SequenceContentsScenario seqContentsScenario)
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd)
   {
-    int numToAdd=seqContentsScenario.nonEmpty?100:0;
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -3577,19 +3551,16 @@ public class BooleanArrSeqTest{
       @Override void verifyLiteralIndexAndIterate(boolean val){
         Assertions.assertEquals(val,arr[offset++]);
       }
+      @Override void reverseAndVerifyIndex(BooleanInputTestArgType inputArgType,int val){
+        inputArgType.verifyVal(val,arr[--offset]);
+      }
       @Override void verifyIndexAndIterate(BooleanInputTestArgType inputArgType,int val){
         inputArgType.verifyVal(val,arr[offset++]);
       }
-      @Override SequenceVerificationItr getPositiveOffset(int i){
-        if(i<0){
-          throw new Error("offset cannot be negative: "+i);
-        }
+      @Override SequenceVerificationItr getOffset(int i){
         return new ArrSeqSequenceVerificationItr(seqMonitor,i+offset,arr);
       }
       @Override SequenceVerificationItr skip(int i){
-        if(i<0){
-          throw new Error("offset cannot be negative: "+i);
-        }
         this.offset+=i;
         return this;
       }
@@ -3735,69 +3706,11 @@ public class BooleanArrSeqTest{
        ++expectedParentModCount;
        ++expectedRootModCount;
     }
-    void clear(){
-      int seqSize=expectedSeqSize;
-      seq.clear();
-      if(seqSize!=0){
-        expectedSeqSize=0;
-        expectedParentSize=0;
-        expectedRootSize=0;
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-      }
-    }
-    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfBoolean clone){
-      int seqSize=expectedSeqSize;
-      boolean retVal;
-      if(functionCallType==FunctionCallType.Boxed){
-        retVal=seq.removeIf((Predicate)pred);
-      }
-      else
-      {
-        retVal=seq.removeIf((BooleanPredicate)pred);
-      }
-      if(retVal){
-        ++expectedSeqModCount;
-        ++expectedParentModCount;
-        ++expectedRootModCount;
-        int numRemoved;
-        int numTrue=0,numFalse=0;
-        var cloneItr=clone.iterator();
-        while(cloneItr.hasNext()){
-          if(cloneItr.nextBoolean()){
-            ++numTrue;
-          }else{
-            ++numFalse;
-          }
-        }
-        if(pred.removedVals.contains(true)){
-          if(pred.removedVals.contains(false)){
-            numRemoved=seqSize;
-            Assertions.assertTrue(seq.isEmpty());
-          }else{
-            numRemoved=numTrue;
-            Assertions.assertFalse(seq.contains(true));
-          }
-        }else{
-          numRemoved=numFalse;
-          Assertions.assertFalse(seq.contains(false));
-        }
-        expectedSeqSize-=numRemoved;
-        expectedParentSize-=numRemoved;
-        expectedRootSize-=numRemoved;
-        if(expectedNumRemoved!=-1){
-          Assertions.assertEquals(expectedNumRemoved,numRemoved);
-        }
-      }else{
-        Assertions.assertEquals(expectedSeqSize,clone.size());
-        var seqItr=seq.iterator();
-        var cloneItr=clone.iterator();
-        for(int i=0;i<expectedSeqSize;++i){
-          Assertions.assertEquals(seqItr.nextBoolean(),cloneItr.nextBoolean());
-        }
-      }
-      verifyStructuralIntegrity();
+    void verifyBatchRemove(int numRemoved)
+    {
+      expectedSeqSize-=numRemoved;
+      expectedParentSize-=numRemoved;
+      expectedRootSize-=numRemoved;
     }
     void writeObject(ObjectOutputStream oos) throws IOException{
       switch(nestedType){
@@ -3822,30 +3735,6 @@ public class BooleanArrSeqTest{
             FieldAndMethodAccessor.BooleanArrSeq.UncheckedSubList.writeObject(seq,oos);
           }
           break;
-        default:
-          throw new Error("unknown nested type "+nestedType);
-      }
-    }
-    Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      switch(nestedType){
-        case LIST:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.BooleanArrSeq.CheckedList.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.readObject(seq,ois);
-          }
-        case STACK:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.BooleanArrSeq.CheckedStack.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.BooleanArrSeq.UncheckedStack.readObject(seq,ois);
-          }
-        case SUBLIST:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.BooleanArrSeq.UncheckedSubList.readObject(seq,ois);
-          }
         default:
           throw new Error("unknown nested type "+nestedType);
       }
@@ -3876,8 +3765,8 @@ public class BooleanArrSeqTest{
         if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
           for(var seqLocation:SequenceLocation.values()){
             if(seqLocation!=SequenceLocation.IOBLO){
-              for(var seqContentsScenario:SequenceContentsScenario.values()){
-                if(seqLocation==SequenceLocation.IOBHI || seqContentsScenario.nonEmpty){
+              for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                if(seqLocation==SequenceLocation.IOBHI || seqSize!=0){
                   for(var argType:QueryTester.values()){
                     for(var queryCastType:QueryCastType.values()){
                       switch(argType){
@@ -3889,12 +3778,12 @@ public class BooleanArrSeqTest{
                         case Longnull:
                         case Floatnull:
                         case Doublenull:
-                          if(queryCastType!=QueryCastType.ToBoxed || (seqContentsScenario.nonEmpty && seqLocation.expectedException==null)){
+                          if(queryCastType!=QueryCastType.ToBoxed || (seqSize!=0 && seqLocation.expectedException==null)){
                             continue;
                           }
                           break;
                         case Objectnull:
-                          if(queryCastType!=QueryCastType.ToObject || (seqContentsScenario.nonEmpty && seqLocation.expectedException==null)){
+                          if(queryCastType!=QueryCastType.ToObject || (seqSize!=0 && seqLocation.expectedException==null)){
                             continue;
                           }
                           break;
@@ -3919,12 +3808,12 @@ public class BooleanArrSeqTest{
                         //these input values cannot potentially return true
                         break;
                         default:
-                        if(seqContentsScenario.nonEmpty && seqLocation.expectedException==null){
+                        if(seqSize!=0 && seqLocation.expectedException==null){
                           continue;
                         }
                         //these values must necessarily return false
                       }
-                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqContentsScenario,preModScenario));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario));
                     }
                   }
                 }
@@ -3962,8 +3851,8 @@ public class BooleanArrSeqTest{
             if((checkedType.checked || preModScenario.expectedException==null) && ((nestedType.rootType && preModScenario.expectedException==null)||(!nestedType.rootType && preModScenario.appliesToSubList))){
               for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
                 if(monitoredComparatorGen.nullComparator && ((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null))){
-                  for(var sequenceContentsScenario:SequenceContentsScenario.values()){
-                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,sequenceContentsScenario));
+                  for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize));
                   }
                 }
               }
@@ -3976,8 +3865,8 @@ public class BooleanArrSeqTest{
   }
   static Stream<Arguments> getBasicCollectionTestArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-      for(var seqContentsScenario:SequenceContentsScenario.values()){
-        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario));
+      for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
       }
     });
   }
@@ -3992,8 +3881,8 @@ public class BooleanArrSeqTest{
   }
   static Stream<Arguments> gettoStringAndhashCode_voidArgs(){
    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-     for(var seqContentsScenario:SequenceContentsScenario.values()){
-       streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqContentsScenario));
+     for(int seqSize:AbstractBooleanSeqMonitor.FIB_SEQ){
+       streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
      }
    });
   }

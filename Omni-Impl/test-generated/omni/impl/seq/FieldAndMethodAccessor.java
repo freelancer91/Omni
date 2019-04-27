@@ -95,6 +95,7 @@ final class FieldAndMethodAccessor{
       throw new ExceptionInInitializerError(e);
     }
   }
+  /*
   private static Object readObjectHelper(Object obj,ObjectInputStream ois,Method readResolveMethod) throws IOException,ClassNotFoundException{
     Object replacement=ois.readObject();
     try{
@@ -113,6 +114,7 @@ final class FieldAndMethodAccessor{
       throw new Error(e);
     }
   }
+  */
   private static void writeObjectHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod) throws IOException{
     Object replacement=null;
     try{
@@ -171,6 +173,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.RefDblLnkSeq<?>)obj).tail;
     }
     interface UncheckedList extends RefDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.UncheckedList<?>)obj).size;
       }
@@ -216,6 +221,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.RefDblLnkSeq.CheckedList<?>)obj).size;
       }
@@ -345,9 +353,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -422,6 +430,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).head;
     }
     interface UncheckedStack extends RefSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
@@ -445,6 +456,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends RefSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
@@ -471,6 +485,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq<?>)obj).size;
       }
@@ -501,6 +518,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static RefSnglLnkNode<?> tail(Object obj){
         return ((omni.impl.seq.RefSnglLnkSeq.CheckedQueue<?>)obj).tail;
       }
@@ -559,10 +579,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.RefArrSeq<?>)obj).size;
       }
@@ -596,10 +616,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.RefArrSeq<?>)obj).size;
       }
@@ -646,10 +666,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.RefArrSeq<?>)obj).size;
       }
@@ -671,10 +691,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.RefArrSeq<?>)obj).size;
       }
@@ -710,9 +730,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -772,9 +792,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -825,6 +845,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.BooleanDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends BooleanDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.UncheckedList)obj).size;
       }
@@ -870,6 +893,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanDblLnkSeq.CheckedList)obj).size;
       }
@@ -999,9 +1025,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -1076,6 +1102,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.BooleanSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends BooleanSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
@@ -1099,6 +1128,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends BooleanSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
@@ -1125,6 +1157,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq)obj).size;
       }
@@ -1155,6 +1190,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static BooleanSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.BooleanSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -1213,10 +1251,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanArrSeq)obj).size;
       }
@@ -1250,10 +1288,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanArrSeq)obj).size;
       }
@@ -1300,10 +1338,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanArrSeq)obj).size;
       }
@@ -1325,10 +1363,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.BooleanArrSeq)obj).size;
       }
@@ -1364,9 +1402,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -1426,9 +1464,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -1479,6 +1517,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.ByteDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends ByteDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.UncheckedList)obj).size;
       }
@@ -1524,6 +1565,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ByteDblLnkSeq.CheckedList)obj).size;
       }
@@ -1653,9 +1697,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -1730,6 +1774,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.ByteSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends ByteSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
@@ -1753,6 +1800,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends ByteSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
@@ -1779,6 +1829,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq)obj).size;
       }
@@ -1809,6 +1862,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static ByteSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.ByteSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -1867,10 +1923,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ByteArrSeq)obj).size;
       }
@@ -1904,10 +1960,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ByteArrSeq)obj).size;
       }
@@ -1954,10 +2010,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ByteArrSeq)obj).size;
       }
@@ -1979,10 +2035,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ByteArrSeq)obj).size;
       }
@@ -2018,9 +2074,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -2080,9 +2136,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -2133,6 +2189,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.CharDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends CharDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.UncheckedList)obj).size;
       }
@@ -2178,6 +2237,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.CharDblLnkSeq.CheckedList)obj).size;
       }
@@ -2307,9 +2369,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -2384,6 +2446,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.CharSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends CharSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
@@ -2407,6 +2472,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends CharSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
@@ -2433,6 +2501,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq)obj).size;
       }
@@ -2463,6 +2534,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static CharSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.CharSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -2521,10 +2595,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.CharArrSeq)obj).size;
       }
@@ -2558,10 +2632,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.CharArrSeq)obj).size;
       }
@@ -2608,10 +2682,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.CharArrSeq)obj).size;
       }
@@ -2633,10 +2707,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.CharArrSeq)obj).size;
       }
@@ -2672,9 +2746,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -2734,9 +2808,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -2787,6 +2861,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.ShortDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends ShortDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.UncheckedList)obj).size;
       }
@@ -2832,6 +2909,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ShortDblLnkSeq.CheckedList)obj).size;
       }
@@ -2961,9 +3041,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -3038,6 +3118,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.ShortSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends ShortSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
@@ -3061,6 +3144,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends ShortSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
@@ -3087,6 +3173,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq)obj).size;
       }
@@ -3117,6 +3206,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static ShortSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.ShortSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -3175,10 +3267,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ShortArrSeq)obj).size;
       }
@@ -3212,10 +3304,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ShortArrSeq)obj).size;
       }
@@ -3262,10 +3354,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ShortArrSeq)obj).size;
       }
@@ -3287,10 +3379,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.ShortArrSeq)obj).size;
       }
@@ -3326,9 +3418,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -3388,9 +3480,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -3441,6 +3533,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.IntDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends IntDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.UncheckedList)obj).size;
       }
@@ -3486,6 +3581,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.IntDblLnkSeq.CheckedList)obj).size;
       }
@@ -3615,9 +3713,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -3692,6 +3790,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.IntSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends IntSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
@@ -3715,6 +3816,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends IntSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
@@ -3741,6 +3845,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq)obj).size;
       }
@@ -3771,6 +3878,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static IntSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.IntSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -3829,10 +3939,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.IntArrSeq)obj).size;
       }
@@ -3866,10 +3976,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.IntArrSeq)obj).size;
       }
@@ -3916,10 +4026,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.IntArrSeq)obj).size;
       }
@@ -3941,10 +4051,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.IntArrSeq)obj).size;
       }
@@ -3980,9 +4090,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -4042,9 +4152,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -4095,6 +4205,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.LongDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends LongDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.UncheckedList)obj).size;
       }
@@ -4140,6 +4253,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.LongDblLnkSeq.CheckedList)obj).size;
       }
@@ -4269,9 +4385,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -4346,6 +4462,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.LongSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends LongSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
@@ -4369,6 +4488,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends LongSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
@@ -4395,6 +4517,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq)obj).size;
       }
@@ -4425,6 +4550,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static LongSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.LongSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -4483,10 +4611,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.LongArrSeq)obj).size;
       }
@@ -4520,10 +4648,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.LongArrSeq)obj).size;
       }
@@ -4570,10 +4698,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.LongArrSeq)obj).size;
       }
@@ -4595,10 +4723,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.LongArrSeq)obj).size;
       }
@@ -4634,9 +4762,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -4696,9 +4824,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -4749,6 +4877,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.FloatDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends FloatDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.UncheckedList)obj).size;
       }
@@ -4794,6 +4925,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.FloatDblLnkSeq.CheckedList)obj).size;
       }
@@ -4923,9 +5057,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -5000,6 +5134,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.FloatSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends FloatSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
@@ -5023,6 +5160,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends FloatSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
@@ -5049,6 +5189,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq)obj).size;
       }
@@ -5079,6 +5222,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static FloatSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.FloatSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -5137,10 +5283,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.FloatArrSeq)obj).size;
       }
@@ -5174,10 +5320,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.FloatArrSeq)obj).size;
       }
@@ -5224,10 +5370,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.FloatArrSeq)obj).size;
       }
@@ -5249,10 +5395,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.FloatArrSeq)obj).size;
       }
@@ -5288,9 +5434,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -5350,9 +5496,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -5403,6 +5549,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.DoubleDblLnkSeq)obj).tail;
     }
     interface UncheckedList extends DoubleDblLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.UncheckedList)obj).size;
       }
@@ -5448,6 +5597,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedList extends UncheckedList {
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleDblLnkSeq.CheckedList)obj).size;
       }
@@ -5577,9 +5729,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -5654,6 +5806,9 @@ final class FieldAndMethodAccessor{
       return ((omni.impl.seq.DoubleSnglLnkSeq)obj).head;
     }
     interface UncheckedStack extends DoubleSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
@@ -5677,6 +5832,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface UncheckedQueue extends DoubleSnglLnkSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
@@ -5703,6 +5861,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq)obj).size;
       }
@@ -5733,6 +5894,9 @@ final class FieldAndMethodAccessor{
       }
     }
     interface CheckedQueue extends UncheckedQueue{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
       public static DoubleSnglLnkNode tail(Object obj){
         return ((omni.impl.seq.DoubleSnglLnkSeq.CheckedQueue)obj).tail;
       }
@@ -5791,10 +5955,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleArrSeq)obj).size;
       }
@@ -5828,10 +5992,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleArrSeq)obj).size;
       }
@@ -5878,10 +6042,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleArrSeq)obj).size;
       }
@@ -5903,10 +6067,10 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         ((Externalizable)obj).writeExternal(oos);
       }
-      public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-        ((Externalizable)obj).readExternal(oos);
-        return obj;
-      }
+      //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
+      //  ((Externalizable)obj).readExternal(oos);
+      //  return obj;
+      //}
       public static int size(Object obj){
         return ((omni.impl.seq.DoubleArrSeq)obj).size;
       }
@@ -5942,9 +6106,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field modCountField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
@@ -6004,9 +6168,9 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-        return readObjectHelper(obj,ois,readResolveMethod);
-      }
+      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
+      //  return readObjectHelper(obj,ois,readResolveMethod);
+      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");

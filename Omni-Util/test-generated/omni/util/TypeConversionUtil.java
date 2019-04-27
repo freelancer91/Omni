@@ -122,4 +122,43 @@ public final class TypeConversionUtil
   {
     return TypeUtil.castToByte(convertToboolean(val));
   }
+  public static short convertToshortbyte(int val){
+    return (byte)val;
+  }
+  public static long convertTolongbyte(int val){
+    return (byte)val;
+  }
+  public static float convertTofloatbyte(int val){
+    return (byte)val;
+  }
+  public static double convertTodoublebyte(int val){
+    return (byte)val;
+  }
+  public static int convertTointbyte(int val){
+    return (byte)val;
+  }
+  public static long convertTolongchar(int val){
+    return (char)val;
+  }
+  public static int convertTointchar(int val){
+    return (char)val;
+  }
+  public static float convertTofloatchar(int val){
+    return (char)val;
+  }
+  public static double convertTodoublechar(int val){
+    return (char)val;
+  }
+  public static long convertTolongshort(int val){
+    return (short)val;
+  }
+  public static int convertTointshort(int val){
+    return (short)val;
+  }
+  public static float convertTofloatshort(int val){
+    return (short)val;
+  }
+  public static double convertTodoubleshort(int val){
+    return (short)val;
+  }
 }

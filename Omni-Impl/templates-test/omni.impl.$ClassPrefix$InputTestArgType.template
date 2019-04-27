@@ -74,7 +74,22 @@ VALUE_NAME{
   public void callListAdd(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert){((OmniList.Of$ClassPrefix$)seq).add(index,TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public void callStackPush(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){((OmniStack.Of$ClassPrefix$)seq).push(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public boolean callCollectionAdd(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){return seq.add(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+//#IF OfByte,OfChar
+//  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE,PRIMITIVE_BOOLEAN,BOXED_BOOLEAN
+//  public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedValToConvert),actualVal);}
+//  #ELSE
+//  public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedValToConvert),actualVal);}
+//  #ENDIF
+//#ELSEIF OfShort
+//  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE,PRIMITIVE_BOOLEAN,BOXED_BOOLEAN,PRIMITIVE_BYTE,BOXED_BYTE
+//  public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedValToConvert),actualVal);}
+//  #ELSE
+//  public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedValToConvert),actualVal);}
+//  #ENDIF
+//#ELSE
+//TODO fix this
   public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedValToConvert),actualVal);}
+//#ENDIF
 }
 #ENDDEF
     public abstract boolean callQueueOffer(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);

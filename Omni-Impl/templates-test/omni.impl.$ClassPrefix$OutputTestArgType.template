@@ -58,35 +58,35 @@ public enum $ClassPrefix$OutputTestArgType{
 #MACRODEF OutputTestArgTypeImpl<VALUE_NAME>(OUTPUTTYPE,TYPENAMEMODIFIER,DEFAULT_VAL,DEFAULTARR,ELEMENTMETHOD)
 VALUE_NAME{
   @Override public void verifyItrPrevious(OmniIterator.Of$ClassPrefix$ itr,int valToConvert){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
   #ENDIF
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
 #ENDIF
   }
   @Override public void verifyItrNext(OmniIterator.Of$ClassPrefix$ itr,int valToConvert){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),itr.nextTYPENAMEMODIFIER());
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),itr.nextTYPENAMEMODIFIER());
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(valToConvert),itr.nextTYPENAMEMODIFIER());
   #ENDIF
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),itr.nextTYPENAMEMODIFIER());
 #ENDIF
   }
   @Override public void verifyListRemoveAt(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).removeTYPENAMEMODIFIERAt(index));
   #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).remove(index));
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),((OmniList.Of$ClassPrefix$)col).removeTYPENAMEMODIFIERAt(index));
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(valToConvert),((OmniList.Of$ClassPrefix$)col).removeTYPENAMEMODIFIERAt(index));
   #ENDIF
 #ELSEIF OfRef
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).remove(index));
@@ -99,11 +99,11 @@ VALUE_NAME{
 #ENDIF
   }
   @Override public void verifyListGet(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
   #ENDIF
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniList.Of$ClassPrefix$)col).getTYPENAMEMODIFIER(index));
@@ -137,13 +137,13 @@ VALUE_NAME{
         #ENDIF
       #ENDIF
     }else{
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
   #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).poll());
   #ELSE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).pollTYPENAMEMODIFIER());
   #ENDIF
 #ELSEIF OfRef
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).poll());
@@ -169,13 +169,13 @@ VALUE_NAME{
         #ENDIF
       #ENDIF
     }else{
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
   #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).peek());
   #ELSE
-      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((PeekAndPollIfc.TYPENAMEMODIFIEROutput<?>)col).peekTYPENAMEMODIFIER());
   #ENDIF
 #ELSEIF OfRef
       Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((PeekAndPollIfc<?>)col).peek());
@@ -189,11 +189,11 @@ VALUE_NAME{
     }
   }
   @Override public void verifyStackPop(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
   #ENDIF
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
@@ -201,11 +201,11 @@ VALUE_NAME{
 
   }
   @Override public void verifyQueueElement(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniQueue.Of$ClassPrefix$)col).ELEMENTMETHOD());
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((OmniQueue.Of$ClassPrefix$)col).ELEMENTMETHOD());
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniQueue.Of$ClassPrefix$)col).ELEMENTMETHOD());
   #ENDIF
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniQueue.Of$ClassPrefix$)col).ELEMENTMETHOD());
@@ -213,11 +213,11 @@ VALUE_NAME{
 
   }
   @Override public void verifyQueueRemove(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
-#IF OfBoolean
+#IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniQueue.Of$ClassPrefix$)col).removeTYPENAMEMODIFIER());
   #ELSE
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(expectedVal),((OmniQueue.Of$ClassPrefix$)col).removeTYPENAMEMODIFIER());
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniQueue.Of$ClassPrefix$)col).removeTYPENAMEMODIFIER());
   #ENDIF
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniQueue.Of$ClassPrefix$)col).removeTYPENAMEMODIFIER());

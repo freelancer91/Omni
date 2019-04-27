@@ -31,7 +31,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import omni.impl.seq.AbstractByteSeqMonitor.CheckedType;
 import omni.impl.seq.AbstractByteSeqMonitor.PreModScenario;
 import omni.impl.seq.AbstractByteSeqMonitor.SequenceLocation;
-import omni.impl.seq.AbstractByteSeqMonitor.SequenceContentsScenario;
 import omni.impl.seq.AbstractByteSeqMonitor.IterationScenario;
 import omni.impl.seq.AbstractByteSeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.AbstractByteSeqMonitor.MonitoredFunctionGen;
@@ -46,6 +45,19 @@ import omni.api.OmniDeque;
 @Tag("DblLnkSeq")
 @Execution(ExecutionMode.CONCURRENT)
 public class ByteDblLnkSeqTest{
+@FunctionalInterface
+  interface ArgBuilder{
+    void buildArgs(Stream.Builder<Arguments> streamBuilder,NestedType nestedType,CheckedType checkedType);
+    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
+      Stream.Builder<Arguments> streamBuilder=Stream.builder();
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
+          argBuilder.buildArgs(streamBuilder,nestedType,checkedType);
+        }
+      }
+      return streamBuilder.build();
+    }
+  }
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);
@@ -435,109 +447,31 @@ public class ByteDblLnkSeqTest{
         ++expectedParentModCounts[i];
       }
     }
-    void clear(){
-    int seqSize=expectedSeqSize;
-      seq.clear();
-      if(seqSize!=0){
-        expectedSeqSize=0;
-        ++expectedSeqModCount;
-        for(int i=0,bound=expectedParentModCounts.length;i<bound;++i){
-          expectedParentSizes[i]-=seqSize;
-          ++expectedParentModCounts[i];
-        }
+    void verifyBatchRemove(int numRemoved){
+      expectedSeqSize-=numRemoved;
+      for(int i=0,bound=parents.length;i<bound;++i){
+        expectedParentSizes[i]-=numRemoved;
       }
-    }
-    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfByte clone){
-      boolean retVal;
-      if(functionCallType==FunctionCallType.Boxed){
-        retVal=seq.removeIf((Predicate)pred);
-      }
-      else
-      {
-        retVal=seq.removeIf((BytePredicate)pred);
-      }
-      if(retVal){
-        verifyFunctionalModification();
-        int numRemoved;
-        numRemoved=pred.numRemoved;
-        for(var removedVal:pred.removedVals){
-          Assertions.assertFalse(seq.contains(removedVal));
-        }
-        expectedSeqSize-=numRemoved;
-        for(int i=0,bound=parents.length;i<bound;++i){
-          expectedParentSizes[i]-=numRemoved;
-        }
-        if(expectedNumRemoved!=-1){
-          Assertions.assertEquals(expectedNumRemoved,numRemoved);
-        }
-      }else{
-        Assertions.assertEquals(expectedSeqSize,clone.size());
-        var seqItr=seq.iterator();
-        var cloneItr=clone.iterator();
-        for(int i=0;i<expectedSeqSize;++i){
-          Assertions.assertEquals(seqItr.nextByte(),cloneItr.nextByte());
-        }
-      }
-      verifyStructuralIntegrity();
     }
     void writeObject(ObjectOutputStream oos) throws IOException{
-      //TODO
-      throw new UnsupportedOperationException();
-    /*
       switch(nestedType){
-        case LIST:
+        case LISTDEQUE:
           if(checkedType.checked){
-            FieldAndMethodAccessor.ByteArrSeq.CheckedList.writeObject(seq,oos);
+            FieldAndMethodAccessor.ByteDblLnkSeq.CheckedList.writeObject(seq,oos);
           }else{
-            FieldAndMethodAccessor.ByteArrSeq.UncheckedList.writeObject(seq,oos);
-          }
-          break;
-        case STACK:
-          if(checkedType.checked){
-            FieldAndMethodAccessor.ByteArrSeq.CheckedStack.writeObject(seq,oos);
-          }else{
-            FieldAndMethodAccessor.ByteArrSeq.UncheckedStack.writeObject(seq,oos);
+            FieldAndMethodAccessor.ByteDblLnkSeq.UncheckedList.writeObject(seq,oos);
           }
           break;
         case SUBLIST:
           if(checkedType.checked){
-            FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.writeObject(seq,oos);
+            FieldAndMethodAccessor.ByteDblLnkSeq.CheckedSubList.writeObject(seq,oos);
           }else{
-            FieldAndMethodAccessor.ByteArrSeq.UncheckedSubList.writeObject(seq,oos);
+            FieldAndMethodAccessor.ByteDblLnkSeq.UncheckedSubList.writeObject(seq,oos);
           }
           break;
         default:
           throw new Error("unknown nested type "+nestedType);
       }
-      */
-    }
-    Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //TODO
-      throw new UnsupportedOperationException();
-    /*
-      switch(nestedType){
-        case LIST:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.ByteArrSeq.CheckedList.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.ByteArrSeq.UncheckedList.readObject(seq,ois);
-          }
-        case STACK:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.ByteArrSeq.CheckedStack.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.ByteArrSeq.UncheckedStack.readObject(seq,ois);
-          }
-        case SUBLIST:
-          if(checkedType.checked){
-            return FieldAndMethodAccessor.ByteArrSeq.CheckedSubList.readObject(seq,ois);
-          }else{
-            return FieldAndMethodAccessor.ByteArrSeq.UncheckedSubList.readObject(seq,ois);
-          }
-        default:
-          throw new Error("unknown nested type "+nestedType);
-      }
-      */
     }
     void verifyRemoval(){
       --expectedSeqSize;
@@ -579,27 +513,24 @@ public class ByteDblLnkSeqTest{
         this.curr=(curr=this.curr).next;
         Assertions.assertEquals(val,curr.val);
       }
+      @Override void reverseAndVerifyIndex(ByteInputTestArgType inputArgType,int val){
+        inputArgType.verifyVal(val,(curr=curr.prev).val);
+      }
       @Override void verifyIndexAndIterate(ByteInputTestArgType inputArgType,int val){
         ByteDblLnkNode curr;
         this.curr=(curr=this.curr).next;
         inputArgType.verifyVal(val,curr.val);
       }
-      @Override SequenceVerificationItr getPositiveOffset(int i){
-        if(i<0){
-          throw new Error("offset cannot be negative: "+i);
-        }
-        return new DblLnkSeqVerificationItr(ByteDblLnkNode.iterateAscending(this.curr,i),seqMonitor);
+      @Override SequenceVerificationItr getOffset(int i){
+        return new DblLnkSeqVerificationItr(i<0?ByteDblLnkNode.uncheckedIterateDescending(this.curr,i):ByteDblLnkNode.iterateAscending(this.curr,i),seqMonitor);
       }
       @Override SequenceVerificationItr skip(int i){
-        if(i<0){
-          throw new Error("offset cannot be negative: "+i);
-        }
-        this.curr=ByteDblLnkNode.iterateAscending(this.curr,i);
+        ByteDblLnkNode curr;
+        this.curr=i<0?ByteDblLnkNode.uncheckedIterateDescending(this.curr,i):ByteDblLnkNode.iterateAscending(this.curr,i);
         return this;
       }
       @Override public boolean equals(Object val){
-        final DblLnkSeqVerificationItr that;
-        return val==this || (val instanceof DblLnkSeqVerificationItr && (that=(DblLnkSeqVerificationItr)val).curr==this.curr);
+        return val==this || (val instanceof DblLnkSeqVerificationItr && ((DblLnkSeqVerificationItr)val).curr==this.curr);
       }
       @Override SequenceVerificationItr verifyRootPostAlloc(){
         for(int i=0,rootPostAlloc=seqMonitor.getRootPostAlloc(),v=Integer.MAX_VALUE-rootPostAlloc;i<rootPostAlloc;++i,++v){
@@ -952,23 +883,6 @@ public class ByteDblLnkSeqTest{
           this.expectedCurr=null;
         }
       }
-    }
-  }
-  @FunctionalInterface
-  interface ArgBuilder{
-    void buildArgs(Stream.Builder<Arguments> streamBuilder,NestedType nestedType,CheckedType checkedType,PreModScenario preModScenario);
-    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
-      Stream.Builder<Arguments> streamBuilder=Stream.builder();
-      for(var nestedType:NestedType.values()){
-        for(var checkedType:CheckedType.values()){
-          for(var preModScenario:PreModScenario.values()){
-            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario.appliesToSubList && !nestedType.rootType)){
-              argBuilder.buildArgs(streamBuilder,nestedType,checkedType,preModScenario);
-            }
-          }
-        }
-      }
-      return streamBuilder.build();
     }
   }
 }

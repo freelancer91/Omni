@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.HashSet;
 import omni.api.OmniCollection;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Random;
 import omni.api.OmniIterator;
@@ -35,6 +34,15 @@ import omni.api.OmniDeque;
 @SuppressWarnings({"rawtypes","unchecked"})
 abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
 {
+  static final int[] FIB_SEQ=new int[12];
+  static{
+    FIB_SEQ[0]=0;
+    FIB_SEQ[1]=1;
+    FIB_SEQ[2]=2;
+    for(int i=3;i<FIB_SEQ.length;++i){
+      FIB_SEQ[i]=FIB_SEQ[i-1]+FIB_SEQ[i-2];
+    }
+  }
   final CheckedType checkedType;
   SEQ seq;
   int expectedSeqSize;
@@ -56,14 +64,12 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
   abstract SequenceVerificationItr verifyPreAlloc();
   abstract void illegalAdd(PreModScenario preModScenario);
   abstract void verifyAddition();
-  abstract void clear();
-  abstract void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfBoolean clone);
   abstract void writeObject(ObjectOutputStream oos) throws IOException;
-  abstract Object readObject(ObjectInputStream ois) throws IOException,ClassNotFoundException;
   abstract void verifyRemoval();
   abstract void verifyStructuralIntegrity();
   abstract void verifyFunctionalModification();
   abstract AbstractItrMonitor getItrMonitor();
+  abstract void verifyBatchRemove(int numRemoved);
   AbstractItrMonitor getItrMonitor(ItrType itrType){
     switch(itrType){
       case Itr:
@@ -74,6 +80,260 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         return getDescendingItrMonitor();
       default:
         throw new Error("unknown itr type "+itrType);
+    }
+  }
+  //TODO clean this up
+  void verifyNearBeginningRemoveAt(BooleanOutputTestArgType outputArgType){
+    switch(expectedSeqSize&3)
+    {
+      case 0:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize>>2),expectedHi=(seqSize>>2)-1;seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 1:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 2:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          default:
+            removeAt(--expectedLo,outputArgType,seqSize>>2);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+      case 1:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize>>2),expectedHi=(seqSize>>2)-1;seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 1:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 2:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          default:
+            removeAt(--expectedLo,outputArgType,seqSize>>2);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+      case 2:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize>>2),expectedHi=(seqSize>>2)-1;seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 1:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 2:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          default:
+            removeAt(--expectedLo,outputArgType,seqSize>>2);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+      case 3:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize>>2)+1,expectedHi=(seqSize>>2);seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 1:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          case 2:
+            removeAt(++expectedHi,outputArgType,seqSize>>2);
+            break;
+          default:
+            removeAt(--expectedLo,outputArgType,seqSize>>2);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+    }
+  }
+  //TODO clean this up
+  void verifyMiddleRemoveAt(BooleanOutputTestArgType outputArgType){
+    if((expectedSeqSize&1)==0)
+    {
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize>>1),expectedHi=(seqSize>>1)-1;seqSize>0;--seqSize){
+        if((seqSize&1)==0){
+          removeAt(++expectedHi,outputArgType,seqSize>>1);
+        }else{
+          removeAt(--expectedLo,outputArgType,seqSize>>1);
+        }
+      }
+    }
+    else
+    {
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize>>1)+1,expectedHi=(seqSize>>1);seqSize>0;--seqSize){
+        if((seqSize&1)==0){
+          removeAt(++expectedHi,outputArgType,seqSize>>1);
+        }else{
+          removeAt(--expectedLo,outputArgType,seqSize>>1);
+        }
+      }
+    }
+  }
+  //TODO clean this up
+  void verifyNearEndRemoveAt(BooleanOutputTestArgType outputArgType){
+    switch(expectedSeqSize&3)
+    {
+      case 0:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize-(seqSize>>2)),expectedHi=(seqSize-(seqSize>>2)-1);seqSize>0;--seqSize){
+        switch(seqSize&3){
+           case 0:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 1:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 2:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          default:
+            removeAt(++expectedHi,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+      case 1:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize-(seqSize>>2)),expectedHi=(seqSize-(seqSize>>2)-1);seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 1:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 2:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          default:
+            removeAt(++expectedHi,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+      case 2:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize-(seqSize>>2)),expectedHi=(seqSize-(seqSize>>2)-1);seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 1:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 2:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          default:
+            removeAt(++expectedHi,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+      case 3:
+      for(int seqSize=expectedSeqSize,expectedLo=(seqSize-(seqSize>>2)-1),expectedHi=(seqSize-(seqSize>>2)-2);seqSize>0;--seqSize){
+        switch(seqSize&3){
+          case 0:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 1:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          case 2:
+            removeAt(--expectedLo,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+          default:
+            removeAt(++expectedHi,outputArgType,seqSize-(seqSize>>2)-1);
+            break;
+        }
+        verifyStructuralIntegrity();
+      }
+      break;
+    }
+  }
+  void verifyBeginningRemoveAt(BooleanOutputTestArgType outputArgType){
+    for(int expected=0,seqSize=expectedSeqSize;expected<seqSize;++expected){
+      removeAt(expected,outputArgType,0);
+      verifyStructuralIntegrity();
+    }
+  }
+  void verifyEndRemoveAt(BooleanOutputTestArgType outputArgType){
+    for(int seqSize=expectedSeqSize;--seqSize>=0;){
+      removeAt(seqSize,outputArgType,seqSize);
+      verifyStructuralIntegrity();
+    }
+  }
+  void clear(){
+    int seqSize=expectedSeqSize;
+    seq.clear();
+    if(seqSize!=0){
+      verifyBatchRemove(seqSize);
+      verifyFunctionalModification();
+    }
+  }
+  void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfBoolean clone){
+    int seqSize=expectedSeqSize;
+    boolean retVal;
+    if(functionCallType==FunctionCallType.Boxed){
+      retVal=seq.removeIf((Predicate)pred);
+    }
+    else
+    {
+      retVal=seq.removeIf((BooleanPredicate)pred);
+    }
+    if(retVal){
+      verifyFunctionalModification();
+      int numRemoved;
+      int numTrue=0,numFalse=0;
+      var cloneItr=clone.iterator();
+      while(cloneItr.hasNext()){
+        if(cloneItr.nextBoolean()){
+          ++numTrue;
+        }else{
+          ++numFalse;
+        }
+      }
+      if(pred.removedVals.contains(true)){
+        if(pred.removedVals.contains(false)){
+          numRemoved=seqSize;
+          Assertions.assertTrue(seq.isEmpty());
+        }else{
+          numRemoved=numTrue;
+          Assertions.assertFalse(seq.contains(true));
+        }
+      }else{
+        numRemoved=numFalse;
+        Assertions.assertFalse(seq.contains(false));
+      }
+      verifyBatchRemove(numRemoved);
+      if(expectedNumRemoved!=-1){
+        Assertions.assertEquals(expectedNumRemoved,numRemoved);
+      }
+    }else{
+      Assertions.assertEquals(expectedSeqSize,clone.size());
+      var seqItr=seq.iterator();
+      var cloneItr=clone.iterator();
+      for(int i=0;i<expectedSeqSize;++i){
+        Assertions.assertEquals(seqItr.nextBoolean(),cloneItr.nextBoolean());
+      }
     }
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
@@ -449,11 +709,11 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
     for(int i=0;i<numThreads-1;++i){
       final int thisThreadOffset=threadOffset;
       final int thisThreadBound=thisThreadOffset+threadSpan;
-      final var thisThreadVerifyItr=verifyItr.getPositiveOffset(thisThreadOffset);
+      final var thisThreadVerifyItr=verifyItr.getOffset(thisThreadOffset);
       threadOffset=thisThreadBound;
       (threads[i]=new Thread(()->verifyLargeStr(string,thisThreadOffset,thisThreadBound,thisThreadVerifyItr))).start();
     }
-    verifyLargeStr(string,threadOffset,threadOffset+threadSpan,verifyItr.getPositiveOffset(threadOffset));
+    verifyLargeStr(string,threadOffset,threadOffset+threadSpan,verifyItr.getOffset(threadOffset));
     try{
       for(int i=0;i<numThreads-1;++i){
         threads[i].join();
@@ -521,7 +781,7 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
   abstract static class SequenceVerificationItr{
     abstract void verifyLiteralIndexAndIterate(boolean val);
     abstract void verifyIndexAndIterate(BooleanInputTestArgType inputArgType,int val);
-    abstract SequenceVerificationItr getPositiveOffset(int i);
+    abstract SequenceVerificationItr getOffset(int i);
     abstract SequenceVerificationItr skip(int i);
     abstract SequenceVerificationItr verifyPostAlloc(int expectedVal);
     abstract SequenceVerificationItr verifyParentPostAlloc();
@@ -533,6 +793,9 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyIndexAndIterate(inputArgType,v);
       }
       return this;
+    }
+    void reverseAndVerifyIndex(BooleanInputTestArgType inputArgType,int val){
+      throw new UnsupportedOperationException();
     }
     void verifyIndexAndIterate(int val){
       verifyIndexAndIterate(BooleanInputTestArgType.ARRAY_TYPE,val);
@@ -578,21 +841,80 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       return verifyNearBeginningInsertion(BooleanInputTestArgType.ARRAY_TYPE,length);
     }
     SequenceVerificationItr verifyNearBeginningInsertion(BooleanInputTestArgType inputArgType,final int length){
-      int v=3;
-      for(int i=0,bound=(length/4);i<bound;++i)
+      switch(length&3)
       {
-        verifyIndexAndIterate(inputArgType,v);
-        v+=4;
-      }
-      v-=4;
-      for(int i=0,bound=(length-(length/4));i<bound;++i)
-      {
-        if((i%3)==0)
+        case 0:
         {
-          --v;
-        }
-        verifyIndexAndIterate(inputArgType,v);
-        --v;
+          skip(length>>2);
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-1;lo>=0;lo-=4)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+          }
+          for(int hi=length-2,i=0;hi>=0;--hi){
+            verifyIndexAndIterate(inputArgType,hi);
+            if(++i==3)
+            {
+              i=0;
+              --hi;
+            }
+          }
+          break;
+        }  
+        case 1:
+        {
+          skip(length>>2);
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-2;lo>=0;lo-=4)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+          }
+          for(int hi=length-1,i=2;hi>=0;--hi){
+            verifyIndexAndIterate(inputArgType,hi);
+            if(++i==3)
+            {
+              i=0;
+              --hi;
+            }
+          }
+          break;
+        }  
+        case 2:
+        {
+          skip(length>>2);
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-3;lo>=0;lo-=4)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+          }
+          for(int hi=length-1,i=1;hi>=0;--hi){
+            verifyIndexAndIterate(inputArgType,hi);
+            if(++i==3)
+            {
+              i=0;
+              --hi;
+            }
+          }
+          break;
+        }  
+        default:
+        {
+          skip(length>>2);
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-4;lo>=0;lo-=4)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+          }
+          for(int hi=length-1,i=0;hi>=0;--hi){
+            verifyIndexAndIterate(inputArgType,hi);
+            if(++i==3)
+            {
+              i=0;
+              --hi;
+            }
+          }
+          break;
+        }  
       }
       return this;
     }
@@ -600,22 +922,80 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       return verifyNearEndInsertion(BooleanInputTestArgType.ARRAY_TYPE,length);
     }
     SequenceVerificationItr verifyNearEndInsertion(BooleanInputTestArgType inputArgType,final int length){
-      int v=0;
-      for(int i=0,bound=(length/4)*3;i<bound;)
+      switch(length&3)
       {
-        verifyIndexAndIterate(inputArgType,v);
-        ++i;
-        if((i%3)==0)
+        case 0:
         {
-          ++v;
-        }
-        ++v;
-      }
-      --v;
-      for(int i=0,bound=(length-((length/4)*3));i<bound;++i)
-      {
-        verifyIndexAndIterate(inputArgType,v);
-        v-=4;
+          skip(length-(length>>2));
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-2,i=0;lo>=0;--lo)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+            if(++i==3)
+            {
+              i=0;
+              --lo;
+            }
+          }
+          for(int hi=length-1;hi>=0;hi-=4){
+            verifyIndexAndIterate(inputArgType,hi);
+          }
+          break;
+        }  
+        case 1:
+        {
+          skip(length-(length>>2));
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-1,i=2;lo>=0;--lo)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+            if(++i==3)
+            {
+              i=0;
+              --lo;
+            }
+          }
+          for(int hi=length-2;hi>=0;hi-=4){
+            verifyIndexAndIterate(inputArgType,hi);
+          }
+          break;
+        }  
+        case 2:
+        {
+          skip(length-(length>>2));
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-1,i=1;lo>=0;--lo)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+            if(++i==3)
+            {
+              i=0;
+              --lo;
+            }
+          }
+          for(int hi=length-3;hi>=0;hi-=4){
+            verifyIndexAndIterate(inputArgType,hi);
+          }
+          break;
+        }  
+        default:
+        {
+          skip(length-(length>>2));
+          SequenceVerificationItr loItr=getOffset(0);
+          for(int lo=length-1,i=0;lo>=0;--lo)
+          {
+            loItr.reverseAndVerifyIndex(inputArgType,lo);
+            if(++i==3)
+            {
+              i=0;
+              --lo;
+            }
+          }
+          for(int hi=length-4;hi>=0;hi-=4){
+            verifyIndexAndIterate(inputArgType,hi);
+          }
+          break;
+        }  
       }
       return this;
     }
@@ -623,12 +1003,29 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       return verifyMidPointInsertion(BooleanInputTestArgType.ARRAY_TYPE,length);
     }
     SequenceVerificationItr verifyMidPointInsertion(BooleanInputTestArgType inputArgType,final int length){
-      int i=0;
-      for(int v=1,halfLength=length/2;i<halfLength;++i,v+=2){
-        verifyIndexAndIterate(inputArgType,v);
+      if((length&1)==0)
+      {
+        skip((length>>1));
+        SequenceVerificationItr loItr=getOffset(0);
+        for(int lo=length-1;lo>=0;lo-=2)
+        {
+          loItr.reverseAndVerifyIndex(inputArgType,lo);
+        }
+        for(int hi=length-2;hi>=0;hi-=2){
+          verifyIndexAndIterate(inputArgType,hi);
+        }
       }
-      for(int v=length-2;i<length;++i,v-=2){
-        verifyIndexAndIterate(inputArgType,v);
+      else
+      {
+        skip((length>>1));
+        SequenceVerificationItr loItr=getOffset(0);
+        for(int lo=length-2;lo>=0;lo-=2)
+        {
+          loItr.reverseAndVerifyIndex(inputArgType,lo);
+        }
+        for(int hi=length-1;hi>=0;hi-=2){
+          verifyIndexAndIterate(inputArgType,hi);
+        }
       }
       return this;
     }
@@ -744,14 +1141,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
     final boolean checked;
     CheckedType(boolean checked){
       this.checked=checked;
-    }
-  }
-  static enum SequenceContentsScenario{
-    EMPTY(false),
-    NONEMPTY(true);
-    final boolean nonEmpty;
-    SequenceContentsScenario(boolean nonEmpty){
-      this.nonEmpty=nonEmpty;
     }
   }
   static enum MonitoredRemoveIfPredicateGen
@@ -1866,16 +2255,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
     void initReverseHelper(AbstractBooleanSeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
     }
-    void init(AbstractBooleanSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
-      if(seqContentsScenario.nonEmpty){
+    void init(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
+      if(seqSize!=0){
         initHelper(seqMonitor);
       }else{
         seqMonitor.add(1);
       }
       seqMonitor.illegalAdd(preModScenario);
     }
-    void initReverse(AbstractBooleanSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
-      if(seqContentsScenario.nonEmpty){
+    void initReverse(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
+      if(seqSize!=0){
         initReverseHelper(seqMonitor);
       }else{
         seqMonitor.add(1);
@@ -1886,20 +2275,20 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       throw new UnsupportedOperationException();
     }
     abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
-    void assertSorted(AbstractBooleanSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+    void assertSorted(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
-      if(seqContentsScenario.nonEmpty){
+      if(seqSize!=0){
         assertSortedHelper(verifyItr,preModScenario);
       }else{
         verifyItr.verifyIndexAndIterate(1);
         verifyItr.verifyPostAlloc(preModScenario);
       }
     }
-    void assertReverseSorted(AbstractBooleanSeqMonitor seqMonitor,SequenceContentsScenario seqContentsScenario,PreModScenario preModScenario){
+    void assertReverseSorted(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
-      if(seqContentsScenario.nonEmpty){
+      if(seqSize!=0){
         assertReverseSortedHelper(verifyItr,preModScenario);
       }else{
         verifyItr.verifyIndexAndIterate(1);
@@ -4453,11 +4842,11 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         }
         if(forwardIteration)
         {
-          return seqMonitor.expectedSeqSize/2+1;
+          return seqSize/2+1;
         }
         else
         {
-          return (seqMonitor.expectedSeqSize/2);
+          return seqMonitor.expectedSeqSize-(seqSize/2);
         }
       }
       int initContainsNearBeginning(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
@@ -4471,11 +4860,11 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         }
         if(forwardIteration)
         {
-          return (seqMonitor.expectedSeqSize/4)+1;
+          return (seqSize/4)+1;
         }
         else
         {
-          return ((seqMonitor.expectedSeqSize/4)*3);
+          return seqMonitor.expectedSeqSize-((seqSize/4));
         }
       }
       int initContainsNearEnd(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
@@ -4489,11 +4878,11 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         }
         if(forwardIteration)
         {
-          return ((seqMonitor.expectedSeqSize/4)*3)+1;
+          return ((seqSize/4)*3)+1;
         }
         else
         {
-          return (seqMonitor.expectedSeqSize/4);
+          return (seqMonitor.expectedSeqSize)-(seqSize/4)*3;
         }
       }
       int initContainsBeginning(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
