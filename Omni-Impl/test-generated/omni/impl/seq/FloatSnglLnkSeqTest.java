@@ -34,7 +34,7 @@ import omni.impl.seq.AbstractFloatSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
-@Tag("SnglLnkSeq")
+@Tag("SnglLnkSeqTest")
 @Execution(ExecutionMode.CONCURRENT)
 public class FloatSnglLnkSeqTest{
   static Stream<Arguments> getConstructor_voidArgs(){

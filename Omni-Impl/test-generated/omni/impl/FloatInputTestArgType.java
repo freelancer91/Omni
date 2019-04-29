@@ -59,7 +59,7 @@ public enum FloatInputTestArgType{
     public void callListAdd(OmniCollection.OfFloat seq,int index,int valToConvert){((OmniList.OfFloat)seq).add(index,TypeConversionUtil.convertTobyte(valToConvert));}
     public void callStackPush(OmniCollection.OfFloat seq,int valToConvert){((OmniStack.OfFloat)seq).push(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfFloat seq,int valToConvert){return seq.add(TypeConversionUtil.convertTobyte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_BYTE{
@@ -70,7 +70,7 @@ public enum FloatInputTestArgType{
     public void callListAdd(OmniCollection.OfFloat seq,int index,int valToConvert){((OmniList.OfFloat)seq).add(index,TypeConversionUtil.convertToByte(valToConvert));}
     public void callStackPush(OmniCollection.OfFloat seq,int valToConvert){((OmniStack.OfFloat)seq).push(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfFloat seq,int valToConvert){return seq.add(TypeConversionUtil.convertToByte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedValToConvert),actualVal);}
   }
   ,
   PRIMTIVE_SHORT{
@@ -92,7 +92,7 @@ public enum FloatInputTestArgType{
     public void callListAdd(OmniCollection.OfFloat seq,int index,int valToConvert){((OmniList.OfFloat)seq).add(index,TypeConversionUtil.convertToShort(valToConvert));}
     public void callStackPush(OmniCollection.OfFloat seq,int valToConvert){((OmniStack.OfFloat)seq).push(TypeConversionUtil.convertToShort(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfFloat seq,int valToConvert){return seq.add(TypeConversionUtil.convertToShort(valToConvert));}
-    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloatshort(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_CHAR{
@@ -103,7 +103,7 @@ public enum FloatInputTestArgType{
     public void callListAdd(OmniCollection.OfFloat seq,int index,int valToConvert){((OmniList.OfFloat)seq).add(index,TypeConversionUtil.convertTochar(valToConvert));}
     public void callStackPush(OmniCollection.OfFloat seq,int valToConvert){((OmniStack.OfFloat)seq).push(TypeConversionUtil.convertTochar(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfFloat seq,int valToConvert){return seq.add(TypeConversionUtil.convertTochar(valToConvert));}
-    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloatchar(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_CHAR{
@@ -114,7 +114,7 @@ public enum FloatInputTestArgType{
     public void callListAdd(OmniCollection.OfFloat seq,int index,int valToConvert){((OmniList.OfFloat)seq).add(index,TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callStackPush(OmniCollection.OfFloat seq,int valToConvert){((OmniStack.OfFloat)seq).push(TypeConversionUtil.convertToCharacter(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfFloat seq,int valToConvert){return seq.add(TypeConversionUtil.convertToCharacter(valToConvert));}
-    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloat(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,float actualVal){Assertions.assertEquals(TypeConversionUtil.convertTofloatchar(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_INT{

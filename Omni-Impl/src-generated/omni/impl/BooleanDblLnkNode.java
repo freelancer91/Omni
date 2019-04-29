@@ -162,7 +162,7 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
   ,boolean val
   ){
     int index=1;
-    for(;val!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;val!=(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf (BooleanDblLnkNode head,BooleanDblLnkNode tail

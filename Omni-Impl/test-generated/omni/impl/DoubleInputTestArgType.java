@@ -59,7 +59,7 @@ public enum DoubleInputTestArgType{
     public void callListAdd(OmniCollection.OfDouble seq,int index,int valToConvert){((OmniList.OfDouble)seq).add(index,TypeConversionUtil.convertTobyte(valToConvert));}
     public void callStackPush(OmniCollection.OfDouble seq,int valToConvert){((OmniStack.OfDouble)seq).push(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfDouble seq,int valToConvert){return seq.add(TypeConversionUtil.convertTobyte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_BYTE{
@@ -70,7 +70,7 @@ public enum DoubleInputTestArgType{
     public void callListAdd(OmniCollection.OfDouble seq,int index,int valToConvert){((OmniList.OfDouble)seq).add(index,TypeConversionUtil.convertToByte(valToConvert));}
     public void callStackPush(OmniCollection.OfDouble seq,int valToConvert){((OmniStack.OfDouble)seq).push(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfDouble seq,int valToConvert){return seq.add(TypeConversionUtil.convertToByte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedValToConvert),actualVal);}
   }
   ,
   PRIMTIVE_SHORT{
@@ -92,7 +92,7 @@ public enum DoubleInputTestArgType{
     public void callListAdd(OmniCollection.OfDouble seq,int index,int valToConvert){((OmniList.OfDouble)seq).add(index,TypeConversionUtil.convertToShort(valToConvert));}
     public void callStackPush(OmniCollection.OfDouble seq,int valToConvert){((OmniStack.OfDouble)seq).push(TypeConversionUtil.convertToShort(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfDouble seq,int valToConvert){return seq.add(TypeConversionUtil.convertToShort(valToConvert));}
-    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodoubleshort(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_CHAR{
@@ -103,7 +103,7 @@ public enum DoubleInputTestArgType{
     public void callListAdd(OmniCollection.OfDouble seq,int index,int valToConvert){((OmniList.OfDouble)seq).add(index,TypeConversionUtil.convertTochar(valToConvert));}
     public void callStackPush(OmniCollection.OfDouble seq,int valToConvert){((OmniStack.OfDouble)seq).push(TypeConversionUtil.convertTochar(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfDouble seq,int valToConvert){return seq.add(TypeConversionUtil.convertTochar(valToConvert));}
-    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodoublechar(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_CHAR{
@@ -114,7 +114,7 @@ public enum DoubleInputTestArgType{
     public void callListAdd(OmniCollection.OfDouble seq,int index,int valToConvert){((OmniList.OfDouble)seq).add(index,TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callStackPush(OmniCollection.OfDouble seq,int valToConvert){((OmniStack.OfDouble)seq).push(TypeConversionUtil.convertToCharacter(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfDouble seq,int valToConvert){return seq.add(TypeConversionUtil.convertToCharacter(valToConvert));}
-    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodoublechar(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_INT{

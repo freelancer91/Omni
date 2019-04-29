@@ -2239,7 +2239,7 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>
       throw new UnsupportedOperationException();
     }
     void init(AbstractIntSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
-      if(seqSize!=0){
+      if(seqSize>1){
         initHelper(seqMonitor);
       }else{
         seqMonitor.add(1);
@@ -2247,7 +2247,7 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>
       seqMonitor.illegalAdd(preModScenario);
     }
     void initReverse(AbstractIntSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
-      if(seqSize!=0){
+      if(seqSize>1){
         initReverseHelper(seqMonitor);
       }else{
         seqMonitor.add(1);
@@ -2261,7 +2261,7 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>
     void assertSorted(AbstractIntSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
-      if(seqSize!=0){
+      if(seqSize>1){
         assertSortedHelper(verifyItr,preModScenario);
       }else{
         verifyItr.verifyIndexAndIterate(1);
@@ -2271,7 +2271,7 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>
     void assertReverseSorted(AbstractIntSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
-      if(seqSize!=0){
+      if(seqSize>1){
         assertReverseSortedHelper(verifyItr,preModScenario);
       }else{
         verifyItr.verifyIndexAndIterate(1);

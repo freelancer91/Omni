@@ -178,7 +178,7 @@ public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
   ,Object nonNull
   ){
     int index=1;
-    for(;!nonNull.equals(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;!nonNull.equals(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static <E> int uncheckedindexOfNonNull(RefDblLnkNode<E> head,RefDblLnkNode<E> tail
@@ -202,7 +202,7 @@ public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
   public static <E> int uncheckedsearchNull(RefDblLnkNode<E> head
   ){
     int index=1;
-    for(;null!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;null!=(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static <E> int uncheckedindexOfNull(RefDblLnkNode<E> head,RefDblLnkNode<E> tail
@@ -226,7 +226,7 @@ public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
   ,Predicate<? super E> pred
   ){
     int index=1;
-    for(;!pred.test(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;!pred.test(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static <E> int uncheckedindexOf (RefDblLnkNode<E> head,RefDblLnkNode<E> tail

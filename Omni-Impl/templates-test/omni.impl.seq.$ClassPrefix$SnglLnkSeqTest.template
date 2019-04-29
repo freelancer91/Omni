@@ -53,7 +53,7 @@ import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
-@Tag("SnglLnkSeq")
+@Tag("SnglLnkSeqTest")
 @Execution(ExecutionMode.CONCURRENT)
 public class $ClassPrefix$SnglLnkSeqTest{
   #MACRO TestMethods(true)

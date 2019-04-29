@@ -59,7 +59,7 @@ public enum LongInputTestArgType{
     public void callListAdd(OmniCollection.OfLong seq,int index,int valToConvert){((OmniList.OfLong)seq).add(index,TypeConversionUtil.convertTobyte(valToConvert));}
     public void callStackPush(OmniCollection.OfLong seq,int valToConvert){((OmniStack.OfLong)seq).push(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfLong seq,int valToConvert){return seq.add(TypeConversionUtil.convertTobyte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_BYTE{
@@ -70,7 +70,7 @@ public enum LongInputTestArgType{
     public void callListAdd(OmniCollection.OfLong seq,int index,int valToConvert){((OmniList.OfLong)seq).add(index,TypeConversionUtil.convertToByte(valToConvert));}
     public void callStackPush(OmniCollection.OfLong seq,int valToConvert){((OmniStack.OfLong)seq).push(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfLong seq,int valToConvert){return seq.add(TypeConversionUtil.convertToByte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedValToConvert),actualVal);}
   }
   ,
   PRIMTIVE_SHORT{
@@ -92,7 +92,7 @@ public enum LongInputTestArgType{
     public void callListAdd(OmniCollection.OfLong seq,int index,int valToConvert){((OmniList.OfLong)seq).add(index,TypeConversionUtil.convertToShort(valToConvert));}
     public void callStackPush(OmniCollection.OfLong seq,int valToConvert){((OmniStack.OfLong)seq).push(TypeConversionUtil.convertToShort(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfLong seq,int valToConvert){return seq.add(TypeConversionUtil.convertToShort(valToConvert));}
-    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolongshort(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_CHAR{
@@ -103,7 +103,7 @@ public enum LongInputTestArgType{
     public void callListAdd(OmniCollection.OfLong seq,int index,int valToConvert){((OmniList.OfLong)seq).add(index,TypeConversionUtil.convertTochar(valToConvert));}
     public void callStackPush(OmniCollection.OfLong seq,int valToConvert){((OmniStack.OfLong)seq).push(TypeConversionUtil.convertTochar(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfLong seq,int valToConvert){return seq.add(TypeConversionUtil.convertTochar(valToConvert));}
-    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolongchar(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_CHAR{
@@ -114,7 +114,7 @@ public enum LongInputTestArgType{
     public void callListAdd(OmniCollection.OfLong seq,int index,int valToConvert){((OmniList.OfLong)seq).add(index,TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callStackPush(OmniCollection.OfLong seq,int valToConvert){((OmniStack.OfLong)seq).push(TypeConversionUtil.convertToCharacter(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfLong seq,int valToConvert){return seq.add(TypeConversionUtil.convertToCharacter(valToConvert));}
-    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolong(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,long actualVal){Assertions.assertEquals(TypeConversionUtil.convertTolongchar(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_INT{

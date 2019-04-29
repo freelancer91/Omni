@@ -938,8 +938,7 @@ public class ShortArrSeqTest{
             if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (!nestedType.rootType && checkedType.checked))){
               for(var seqLocation:SequenceLocation.values()){
                 if(checkedType.checked || seqLocation.expectedException==null){
-                  for(int seqSize=0;seqSize<100;++seqSize){
-                  //for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+                  for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
                     if(seqSize!=0|| (seqLocation==SequenceLocation.IOBHI)){
                       for(var outputArgType:ShortOutputTestArgType.values()){
                         builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqSize,outputArgType));
@@ -1772,9 +1771,13 @@ public class ShortArrSeqTest{
     }
     return builder.build();
   }
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getListput_int_valArgs")
-  public void testListput_int_val
+  @org.junit.jupiter.api.Test
+  public void testListput_int_val(){
+    getListput_int_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testListput_int_valHelper((SeqMonitor)args[0],(ShortInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(int)args[4]);
+    });
+  }
+  private static void testListput_int_valHelper
   (SeqMonitor seqMonitor,ShortInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
@@ -1838,8 +1841,7 @@ public class ShortArrSeqTest{
             if(checkedType.checked || seqLocation.expectedException==null){
               for(var preModScenario:PreModScenario.values()){
                 if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
-                  for(int seqSize=0;seqSize<100;++seqSize){
-                  //for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+                  for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
                     if(seqSize!=0 || seqLocation.validForEmpty){
                       for(var inputArgType:ShortInputTestArgType.values()){
                         for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
@@ -1923,7 +1925,6 @@ public class ShortArrSeqTest{
           verifyItr=seqMonitor.verifyPreAlloc().verifyMidPointInsertion(inputArgType,numToAdd);
           break;
         case NEAREND:
-          int insertionIndex=0;
           for(int i=0;i<numToAdd;++i){
             seqMonitor.add(seqMonitor.expectedSeqSize-(seqMonitor.expectedSeqSize>>2),i,inputArgType);
             seqMonitor.verifyStructuralIntegrity();
@@ -3006,8 +3007,7 @@ public class ShortArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var preModScenario:PreModScenario.values()){
         if(checkedType.checked || preModScenario.expectedException==null){
-          for(int seqSize=0;seqSize<100;++seqSize){
-          //for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+          for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
             for(var seqLocation:SequenceLocation.values()){
               if(seqLocation.expectedException==null){
                 for(var inputArgType:ShortInputTestArgType.values()){

@@ -3205,7 +3205,7 @@ boolean METHODNAME(INPUTTYPE obj)
       throw new UnsupportedOperationException();
     }
     void init(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
-      if(seqSize!=0){
+      if(seqSize>1){
         initHelper(seqMonitor);
       }else{
         seqMonitor.add(1);
@@ -3213,7 +3213,7 @@ boolean METHODNAME(INPUTTYPE obj)
       seqMonitor.illegalAdd(preModScenario);
     }
     void initReverse(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
-      if(seqSize!=0){
+      if(seqSize>1){
         initReverseHelper(seqMonitor);
       }else{
         seqMonitor.add(1);
@@ -3227,7 +3227,7 @@ boolean METHODNAME(INPUTTYPE obj)
     void assertSorted(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
-      if(seqSize!=0){
+      if(seqSize>1){
         assertSortedHelper(verifyItr,preModScenario);
       }else{
         verifyItr.verifyIndexAndIterate(1);
@@ -3237,7 +3237,7 @@ boolean METHODNAME(INPUTTYPE obj)
     void assertReverseSorted(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
-      if(seqSize!=0){
+      if(seqSize>1){
         assertReverseSortedHelper(verifyItr,preModScenario);
       }else{
         verifyItr.verifyIndexAndIterate(1);
@@ -3717,5 +3717,4 @@ BOXED_TYPEVALUE_NAME(false){
     int initContainsBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){throw new UnsupportedOperationException();}
 #ENDIF
   }
-
 }

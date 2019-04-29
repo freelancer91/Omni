@@ -34,7 +34,7 @@ import omni.impl.seq.AbstractShortSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
-@Tag("SnglLnkSeq")
+@Tag("SnglLnkSeqTest")
 @Execution(ExecutionMode.CONCURRENT)
 public class ShortSnglLnkSeqTest{
   static Stream<Arguments> getConstructor_voidArgs(){

@@ -59,7 +59,7 @@ public enum IntInputTestArgType{
     public void callListAdd(OmniCollection.OfInt seq,int index,int valToConvert){((OmniList.OfInt)seq).add(index,TypeConversionUtil.convertTobyte(valToConvert));}
     public void callStackPush(OmniCollection.OfInt seq,int valToConvert){((OmniStack.OfInt)seq).push(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfInt seq,int valToConvert){return seq.add(TypeConversionUtil.convertTobyte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertToint(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_BYTE{
@@ -70,7 +70,7 @@ public enum IntInputTestArgType{
     public void callListAdd(OmniCollection.OfInt seq,int index,int valToConvert){((OmniList.OfInt)seq).add(index,TypeConversionUtil.convertToByte(valToConvert));}
     public void callStackPush(OmniCollection.OfInt seq,int valToConvert){((OmniStack.OfInt)seq).push(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfInt seq,int valToConvert){return seq.add(TypeConversionUtil.convertToByte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertToint(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedValToConvert),actualVal);}
   }
   ,
   PRIMTIVE_SHORT{
@@ -92,7 +92,7 @@ public enum IntInputTestArgType{
     public void callListAdd(OmniCollection.OfInt seq,int index,int valToConvert){((OmniList.OfInt)seq).add(index,TypeConversionUtil.convertToShort(valToConvert));}
     public void callStackPush(OmniCollection.OfInt seq,int valToConvert){((OmniStack.OfInt)seq).push(TypeConversionUtil.convertToShort(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfInt seq,int valToConvert){return seq.add(TypeConversionUtil.convertToShort(valToConvert));}
-    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertToint(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertTointshort(expectedValToConvert),actualVal);}
   }
   ,
   PRIMITIVE_CHAR{
@@ -103,7 +103,7 @@ public enum IntInputTestArgType{
     public void callListAdd(OmniCollection.OfInt seq,int index,int valToConvert){((OmniList.OfInt)seq).add(index,TypeConversionUtil.convertTochar(valToConvert));}
     public void callStackPush(OmniCollection.OfInt seq,int valToConvert){((OmniStack.OfInt)seq).push(TypeConversionUtil.convertTochar(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfInt seq,int valToConvert){return seq.add(TypeConversionUtil.convertTochar(valToConvert));}
-    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertToint(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertTointchar(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_CHAR{
@@ -114,7 +114,7 @@ public enum IntInputTestArgType{
     public void callListAdd(OmniCollection.OfInt seq,int index,int valToConvert){((OmniList.OfInt)seq).add(index,TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callStackPush(OmniCollection.OfInt seq,int valToConvert){((OmniStack.OfInt)seq).push(TypeConversionUtil.convertToCharacter(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfInt seq,int valToConvert){return seq.add(TypeConversionUtil.convertToCharacter(valToConvert));}
-    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertToint(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,int actualVal){Assertions.assertEquals(TypeConversionUtil.convertTointchar(expectedValToConvert),actualVal);}
   }
   ;
     public abstract boolean callQueueOffer(OmniCollection.OfInt seq,int valToConvert);

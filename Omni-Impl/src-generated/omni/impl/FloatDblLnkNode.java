@@ -162,7 +162,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
   ,int bits
   ){
     int index=1;
-    for(;bits!=Float.floatToRawIntBits(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;bits!=Float.floatToRawIntBits(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOfBits(FloatDblLnkNode head,FloatDblLnkNode tail
@@ -186,7 +186,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
   public static  int uncheckedsearch0(FloatDblLnkNode head
   ){
     int index=1;
-    for(;0!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;0!=(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf0(FloatDblLnkNode head,FloatDblLnkNode tail
@@ -208,7 +208,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
   public static  int uncheckedsearchNaN(FloatDblLnkNode head
   ){
     int index=1;
-    for(;!Float.isNaN(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;!Float.isNaN(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOfNaN(FloatDblLnkNode head,FloatDblLnkNode tail

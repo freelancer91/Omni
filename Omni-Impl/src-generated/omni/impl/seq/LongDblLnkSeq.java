@@ -62,7 +62,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
   }
   private void insertNode(int index,LongDblLnkNode newNode){
     int tailDist;
-    if((tailDist=++this.size-index)<=index){
+    if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
       var tail=this.tail;
       if(tailDist==1){
@@ -715,147 +715,158 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       this.parent=parent;
       this.parentOffset=parentOffset;
     }
+    private UncheckedSubList(UncheckedList root,int rootOffset){
+      super();
+      this.root=root;
+      this.parent=null;
+      this.parentOffset=rootOffset;
+    }
+    private UncheckedSubList(UncheckedSubList parent,int parentOffset){
+      super();
+      this.root=parent.root;
+      this.parent=parent;
+      this.parentOffset=parentOffset;
+    }
     private Object writeReplace(){
       return new UncheckedList(this.head,this.size,this.tail);
     }
-    private void bubbleUpAppend(LongDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpAppend(LongDblLnkNode newNode,LongDblLnkNode oldTail){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.tail!=oldTail){
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
-    private void bubbleUpPrepend(LongDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.head=newNode;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpPrepend(LongDblLnkNode newNode,LongDblLnkNode oldHead){
-      for(var curr=this;;){
-        curr.head=newNode;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.head!=oldHead){
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
     private void bubbleUpIncrementSize(){
-      for(var curr=parent;curr!=null;
-      ++curr.size,curr=curr.parent){}
-    }
-    @Override public void add(int index,long val){
-      int size;
-      UncheckedSubList curr;
-      final var newNode=new LongDblLnkNode(val);
-      if((size=++(curr=this).size)==1){
-        //initialize this list
-        UncheckedSubList parent;
-        do{
-          curr.head=newNode;
-          curr.tail=newNode;
-          if((parent=curr.parent)==null){
-            //all parents were empty, insert in the root
-            ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
-            return;
-          }
-        }
-        while((size=++(curr=parent).size)==1);
+      for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
       }
-      final UncheckedList root;
-      ++(root=this.root).size;
-      LongDblLnkNode before,after;
-      if((size-=index)<index){
-        //the insertion point is closer to the tail
+    }
+    private void bubbleUpAppend(LongDblLnkNode oldTail,LongDblLnkNode newTail){
+      oldTail.next=newTail;
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
+        ++currList.size;
+        if(currList.tail!=oldTail){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpAppend(LongDblLnkNode newTail){
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode oldHead,LongDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
+        ++currList.size;
+        if(currList.head!=oldHead){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
+      }
+    }
+    private void bubbleUpRootInit(LongDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        parent.size=1;
+        parent.head=newNode;
+        parent.tail=newNode;
+      }
+    }
+    private void bubbleUpInitHelper(int index,int size,LongDblLnkNode newNode){
+      LongDblLnkNode after,before;   
+      if((size-=index)<=index){
+        before=this.tail;
         if(size==1){
-          //the insertion point IS the tail
-          if((after=(before=curr.tail).next)==null){
-            //there are no nodes after this list
-            curr.bubbleUpAppend(newNode);
+          if((after=before.next)==null){
+            this.bubbleUpAppend(newNode);
             root.tail=newNode;
           }else{
-            //there are nodes after this list
-            curr.bubbleUpAppend(newNode,before);
+            this.bubbleUpAppend(before,newNode);
             after.prev=newNode;
           }
         }else{
-          //iterate from the tail and insert
-          before=(after=LongDblLnkNode.iterateDescending(curr.tail,size-1)).prev;
+          this.bubbleUpIncrementSize();
+          before=(after=LongDblLnkNode.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
-          curr.bubbleUpIncrementSize();
         }
-        before.next=newNode;
+        before.next=newNode;        
       }else{
-        //the insertion point is closer to the head
+        after=this.head;
         if(index==0){
-          //the insertion point IS the tail
-          if((before=(after=curr.head).prev)==null){
-            //there are no nodes before this list
-            curr.bubbleUpPrepend(newNode);
+          if((before=after.prev)==null){
+            this.bubbleUpPrepend(newNode);
             root.head=newNode;
           }else{
-            //there are nodes before this list
-            curr.bubbleUpPrepend(newNode,after);
+            this.bubbleUpPrepend(after,newNode);
             before.next=newNode;
           }
         }else{
-          //iterate from the head and insert
-          after=(before=LongDblLnkNode.iterateAscending(curr.head,index-1)).next;
-          before.next=newNode;
-          curr.bubbleUpIncrementSize();
+          this.bubbleUpIncrementSize();
+          after=(before=LongDblLnkNode.uncheckedIterateAscending(after,index)).next;
+          before.prev=newNode;
         }
         after.prev=newNode;
       }
       newNode.next=after;
       newNode.prev=before;
     }
-    @Override void addLast(long val){
-      final UncheckedList root=this.root;
-      var newNode=new LongDblLnkNode(val);
-      UncheckedSubList parent,curr=this;
-      for(;++curr.size==1;curr=parent){
-        curr.head=newNode;
-        curr.tail=newNode;
-        if((parent=curr.parent)==null){
-          //all parents were empty, insert in the root
-          ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+    private void bubbleUpInit(LongDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      UncheckedSubList curr;
+      for(var currParent=(curr=this).parent;currParent!=null;currParent=(curr=currParent).parent){
+        int parentSize;
+        if((parentSize=++currParent.size)!=1){
+          currParent.bubbleUpInitHelper(curr.parentOffset,parentSize,newNode);
           return;
         }
+        currParent.head=newNode;
+        currParent.tail=newNode;
       }
-      LongDblLnkNode oldTail,after;
-      if((after=(oldTail=curr.tail).next)==null){
-        curr.bubbleUpAppend(newNode);
-        root.tail=newNode;
+      ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+    }
+    @Override public void add(int index,long val){
+      final UncheckedList root;
+      final var newNode=new LongDblLnkNode(val);
+      if(++(root=this.root).size!=1){
+        final int currSize;
+        if((currSize=++this.size)!=1){
+          bubbleUpInitHelper(index,currSize,newNode);
+        }else{
+          bubbleUpInit(newNode);
+        }
       }else{
-        curr.bubbleUpAppend(newNode,oldTail);
-        after.prev=newNode;
+        bubbleUpRootInit(newNode);
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
       }
-      ++root.size;
-      newNode.next=after;
-      oldTail.next=newNode;
-      newNode.prev=oldTail;
+    }
+    @Override void addLast(long val){
+      final UncheckedList root;
+      if(++(root=this.root).size!=1){
+        if(++this.size!=1){
+          LongDblLnkNode currTail,after;
+          if((after=(currTail=this.tail).next)==null){
+            currTail.next=currTail=new LongDblLnkNode(currTail,val);
+            bubbleUpAppend(currTail);
+            root.tail=currTail;
+          }else{
+            bubbleUpAppend(currTail,currTail=new LongDblLnkNode(currTail,val,after));
+            after.prev=currTail;
+          }
+        }else{
+          bubbleUpInit(new LongDblLnkNode(val));
+        }
+      }else{
+        LongDblLnkNode newNode;
+        bubbleUpRootInit(newNode=new LongDblLnkNode(val));
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
+      }
     }
     @Override public boolean equals(Object val){
       //TODO
@@ -1519,58 +1530,41 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         lastRet.val=val;
       }
       @Override public void add(long val){
-        int size;
-        UncheckedSubList currList;
-        final var newNode=new LongDblLnkNode(val);
-        this.lastRet=null;
-        if((size=++(currList=this.parent).size)==1){
-          ++currIndex;
-          //initialize the list
-          UncheckedSubList parent;
-          do{
-            currList.head=newNode;
-            currList.tail=newNode;
-            if((parent=currList.parent)==null){
-              //all parents were empty, insert in the root
-              ((LongDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
-              return;
-            }
-          }while((size=++(currList=parent).size)==1);
-        }
+        final UncheckedSubList currList;
         final UncheckedList root;
-        ++(root=currList.root).size;
-        LongDblLnkNode after,before;
-        int currIndex;
-        if((currIndex=++this.currIndex)==size){
-          //the insertion point IS the tail
-          if((after=(before=currList.tail).next)==null){
-            //there are no nodes after this list
-            currList.bubbleUpAppend(newNode);
-            root.tail=newNode;
-          }else{
-            //there are nodes after this list
-            currList.bubbleUpAppend(newNode,before);
-            after.prev=newNode;
-          }
-        }else{
-          if(currIndex==1){
-            //the insertion point IS the head
-            if((before=(after=currList.head).prev)==null){
-              //there are no nodes before this list
-              currList.bubbleUpPrepend(newNode);
-              root.tail=newNode;
+        this.lastRet=null;
+        ++currIndex;
+        if(++(root=(currList=this.parent).root).size!=1){
+          if(++currList.size!=1){
+            LongDblLnkNode after,before,newNode;
+            if((after=this.curr)!=null){
+              if((before=after.prev)!=null){
+                currList.bubbleUpIncrementSize();
+                before.next=newNode=new LongDblLnkNode(before,val,after);
+              }else{
+                currList.bubbleUpPrepend(newNode=new LongDblLnkNode(val,after));
+                root.head=newNode;
+              }
+              after.prev=newNode;
             }else{
-              //there are nodes before this list
-              currList.bubbleUpPrepend(newNode,after);
+              if((after=(before=currList.tail).next)!=null){
+                currList.bubbleUpAppend(before,newNode=new LongDblLnkNode(before,val,after));
+                after.prev=newNode;
+              }else{
+                currList.bubbleUpAppend(newNode=new LongDblLnkNode(before,val));
+                root.tail=newNode;
+              }
               before.next=newNode;
             }
           }else{
-            newNode.next=after=curr;
-            newNode.prev=before=after.prev;
-            after.prev=newNode;
-            before.next=newNode;
-            currList.bubbleUpIncrementSize();
+            currList.bubbleUpInit(new LongDblLnkNode(val));
           }
+        }else{
+          LongDblLnkNode newNode;
+          currList.bubbleUpRootInit(newNode=new LongDblLnkNode(val));
+          currList.size=1;
+          root.head=newNode;
+          root.tail=newNode;
         }
       }
       @Override public void remove(){
@@ -1628,16 +1622,20 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this,((LongDblLnkSeq)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
-      final int tailDist,subListSize=toIndex-fromIndex;
-      final LongDblLnkNode subListHead,subListTail;
-      if((tailDist=this.size-toIndex)<=fromIndex){
-        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=toIndex-fromIndex)!=0){
+        int tailDist;
+        final LongDblLnkNode subListHead,subListTail;
+        if((tailDist=this.size-toIndex)<=fromIndex){
+          subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new UncheckedSubList(this,fromIndex);
     }
     @Override public boolean removeVal(boolean val){
       {
@@ -1766,7 +1764,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       }//end val check
       return false;
     }
-    private boolean uncheckedremoveVal(LongDblLnkNode head
+    boolean uncheckedremoveVal(LongDblLnkNode head
     ,long val
     ){
       if(val==(head.val)){
@@ -1817,7 +1815,21 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       this.parentOffset=parentOffset;
       this.modCount=parent.modCount;
     }
-    private boolean uncheckedremoveVal(LongDblLnkNode head
+    private CheckedSubList(CheckedList root,int rootOffset){
+      super();
+      this.root=root;
+      this.parent=null;
+      this.parentOffset=rootOffset;
+      this.modCount=root.modCount;
+    }
+    private CheckedSubList(CheckedSubList parent,int parentOffset){
+      super();
+      this.root=parent.root;
+      this.parent=parent;
+      this.parentOffset=parentOffset;
+      this.modCount=parent.modCount;
+    }
+    boolean uncheckedremoveVal(LongDblLnkNode head
     ,long val
     ){
       int modCount;
@@ -1834,23 +1846,19 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
             peelHead(head);
           }
           return true;
-        }else{
-          for(final var tail=this.tail;tail!=head;){
-            if(val==((head=head.next).val)){
-              root.modCount=++modCount;
-              --root.size;
-              this.modCount=modCount;
-              this.size=size-1;
-              if(head==tail){
-                peelTail(head);
-              }else{
-                LongDblLnkNode before,after;
-                (before=head.prev).next=(after=head.next);
-                after.prev=before;
-                bubbleUpDecrementSize();
-              }
-              return true;
+        }
+        for(LongDblLnkNode prev;(head=(prev=head).next)!=null;){
+          if(val==(head.val)){
+            this.modCount=modCount+1;
+            if((head=head.next)==null){
+              this.head=prev;
+              prev.next=null;
+            }else{
+              head.prev=prev;
+              prev.next=head;
             }
+            --this.size;
+            return true;
           }
         }
       }
@@ -1999,79 +2007,65 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         throw new IllegalStateException();
       }
       @Override public void add(long val){
-        CheckedSubList currList;
-        CheckedList root;
+        final CheckedSubList currList;
+        final CheckedList root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=(currList=this.parent).root).modCount);
         root.modCount=++modCount;
         this.modCount=modCount;
         currList.modCount=modCount;
-        int size;
-        final var newNode=new LongDblLnkNode(val);
         this.lastRet=null;
-        if((size=++currList.size)==1){
-          ++currIndex;
-          //initialize the list
-          CheckedSubList parent;
-          do{
-            currList.head=newNode;
-            currList.tail=newNode;
-            if((parent=currList.parent)==null){
-              //all parents were empty, insert in the root
-              ((LongDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
-              return;
-            }
-          }while((size=++(currList=parent).size)==1);
-        }
-        ++root.size;
-        LongDblLnkNode after,before;
-        int currIndex;
-        if((currIndex=++this.currIndex)==size){
-          //the insertion point IS the tail
-          if((after=(before=currList.tail).next)==null){
-            //there are no nodes after this list
-            currList.bubbleUpAppend(newNode);
-            root.tail=newNode;
-          }else{
-            //there are nodes after this list
-            currList.bubbleUpAppend(newNode,before);
-            after.prev=newNode;
-          }
-        }else{
-          if(currIndex==1){
-            //the insertion point IS the head
-            if((before=(after=currList.head).prev)==null){
-              //there are no nodes before this list
-              currList.bubbleUpPrepend(newNode);
-              root.tail=newNode;
+        ++currIndex;
+        if(++root.size!=1){
+          if(++currList.size!=1){
+            LongDblLnkNode after,before,newNode;
+            if((after=this.curr)!=null){
+              if((before=after.prev)!=null){
+                currList.bubbleUpIncrementSize();
+                before.next=newNode=new LongDblLnkNode(before,val,after);
+              }else{
+                currList.bubbleUpPrepend(newNode=new LongDblLnkNode(val,after));
+                root.head=newNode;
+              }
+              after.prev=newNode;
             }else{
-              //there are nodes before this list
-              currList.bubbleUpPrepend(newNode,after);
+              if((after=(before=currList.tail).next)!=null){
+                currList.bubbleUpAppend(before,newNode=new LongDblLnkNode(before,val,after));
+                after.prev=newNode;
+              }else{
+                currList.bubbleUpAppend(newNode=new LongDblLnkNode(before,val));
+                root.tail=newNode;
+              }
               before.next=newNode;
             }
           }else{
-            newNode.next=after=curr;
-            newNode.prev=before=after.prev;
-            after.prev=newNode;
-            before.next=newNode;
-            currList.bubbleUpIncrementSize();
+            currList.bubbleUpInit(new LongDblLnkNode(val));
           }
+        }else{
+          LongDblLnkNode newNode;
+          currList.bubbleUpRootInit(newNode=new LongDblLnkNode(val));
+          currList.size=1;
+          root.head=newNode;
+          root.tail=newNode;
         }
       }
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
       CheckedCollection.checkModCount(modCount,root.modCount);
       int tailDist;
-      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
-      final LongDblLnkNode subListHead,subListTail;
-      if((tailDist-=toIndex)<=fromIndex){
-        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
+        final LongDblLnkNode subListHead,subListTail;
+        if((tailDist-=toIndex)<=fromIndex){
+          subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new CheckedSubList(this,fromIndex);
     }
     @Override public Object clone(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -3303,164 +3297,161 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    private void bubbleUpAppend(LongDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpAppend(LongDblLnkNode newNode,LongDblLnkNode oldTail){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.tail!=oldTail){
-          ++curr.modCount;
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
-    private void bubbleUpPrepend(LongDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.head=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpPrepend(LongDblLnkNode newNode,LongDblLnkNode oldHead){
-      for(var curr=this;;){
-        curr.head=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.head!=oldHead){
-          ++curr.modCount;
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
     private void bubbleUpIncrementSize(){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      ++curr.size,curr=curr.parent){}
-    }
-    @Override public void add(int index,long val){
-      int size;
-      CheckedSubList curr;
-      final CheckedList root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      CheckedCollection.checkLo(index);
-      CheckedCollection.checkWriteHi(index,size=this.size);
-      root.modCount=++modCount;
-      (curr=this).size=++size;
-      final var newNode=new LongDblLnkNode(val);
-      if(size==1){
-        //initialize this list
-        CheckedSubList parent;
-        do{
-          curr.head=newNode;
-          curr.tail=newNode;
-          curr.modCount=modCount;
-          if((parent=curr.parent)==null){
-            //all parents were empty, insert in the root
-            ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
-            return;
-          }
-        }
-        while((size=++(curr=parent).size)==1);
+      for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
+        ++curr.modCount;
       }
-      ++root.size;
-      LongDblLnkNode before,after;
-      if((size-=index)<index){
-        //the insertion point is closer to the tail
+    }
+    private void bubbleUpAppend(LongDblLnkNode oldTail,LongDblLnkNode newTail){
+      oldTail.next=newTail;
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
+        ++currList.modCount;
+        ++currList.size;
+        if(currList.tail!=oldTail){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpAppend(LongDblLnkNode newTail){
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
+        ++currList.modCount;
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode oldHead,LongDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
+        ++currList.modCount;
+        ++currList.size;
+        if(currList.head!=oldHead){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpPrepend(LongDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
+        ++currList.modCount;
+      }
+    }
+    private void bubbleUpRootInit(LongDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        ++parent.modCount;
+        parent.size=1;
+        parent.head=newNode;
+        parent.tail=newNode;
+      }
+    }
+    private void bubbleUpInitHelper(int index,int size,LongDblLnkNode newNode){
+      LongDblLnkNode after,before;   
+      if((size-=index)<=index){
+        before=this.tail;
         if(size==1){
-          //the insertion point IS the tail
-          if((after=(before=curr.tail).next)==null){
-            //there are no nodes after this list
-            curr.bubbleUpAppend(newNode);
+          if((after=before.next)==null){
+            this.bubbleUpAppend(newNode);
             root.tail=newNode;
           }else{
-            //there are nodes after this list
-            curr.bubbleUpAppend(newNode,before);
+            this.bubbleUpAppend(before,newNode);
             after.prev=newNode;
           }
         }else{
-          //iterate from the tail and insert
-          before=(after=LongDblLnkNode.iterateDescending(curr.tail,size-1)).prev;
+          this.bubbleUpIncrementSize();
+          before=(after=LongDblLnkNode.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
-          curr.modCount=modCount;
-          curr.bubbleUpIncrementSize();
         }
-        before.next=newNode;
+        before.next=newNode;        
       }else{
-        //the insertion point is closer to the head
+        after=this.head;
         if(index==0){
-          //the insertion point IS the tail
-          if((before=(after=curr.head).prev)==null){
-            //there are no nodes before this list
-            curr.bubbleUpPrepend(newNode);
+          if((before=after.prev)==null){
+            this.bubbleUpPrepend(newNode);
             root.head=newNode;
           }else{
-            //there are nodes before this list
-            curr.bubbleUpPrepend(newNode,after);
+            this.bubbleUpPrepend(after,newNode);
             before.next=newNode;
           }
         }else{
-          //iterate from the head and insert
-          after=(before=LongDblLnkNode.iterateAscending(curr.head,index-1)).next;
-          before.next=newNode;
-          curr.modCount=modCount;
-          curr.bubbleUpIncrementSize();
+          this.bubbleUpIncrementSize();
+          after=(before=LongDblLnkNode.uncheckedIterateAscending(after,index)).next;
+          before.prev=newNode;
         }
         after.prev=newNode;
       }
       newNode.next=after;
       newNode.prev=before;
     }
+    private void bubbleUpInit(LongDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      CheckedSubList curr;
+      for(var currParent=(curr=this).parent;currParent!=null;currParent=(curr=currParent).parent){
+        ++currParent.modCount;
+        int parentSize;
+        if((parentSize=++currParent.size)!=1){
+          currParent.bubbleUpInitHelper(curr.parentOffset,parentSize,newNode);
+          return;
+        }
+        currParent.head=newNode;
+        currParent.tail=newNode;
+      }
+      ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+    }
+    @Override public void add(int index,long val){
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      int currSize;
+      CheckedCollection.checkWriteHi(index,currSize=this.size);
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      final var newNode=new LongDblLnkNode(val);
+      if(++root.size!=1){
+        this.size=++currSize;
+        if(currSize!=1){    
+          bubbleUpInitHelper(index,currSize,newNode);
+        }else{
+          bubbleUpInit(newNode);
+        }
+      }else{
+        bubbleUpRootInit(newNode);
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
+      }
+    }
     @Override void addLast(long val){
       final CheckedList root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       root.modCount=++modCount;
-      var newNode=new LongDblLnkNode(val);
-      CheckedSubList parent,curr=this;
-      for(;++curr.size==1;curr=parent){
-        curr.head=newNode;
-        curr.tail=newNode;
-        curr.modCount=modCount;
-        if((parent=curr.parent)==null){
-          //all parents were empty, insert in the root
-          ((LongDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
-          return;
+      this.modCount=modCount;
+      if(++root.size!=1){
+        if(++this.size!=1){
+          LongDblLnkNode currTail,after;
+          if((after=(currTail=this.tail).next)==null){
+            currTail.next=currTail=new LongDblLnkNode(currTail,val);
+            bubbleUpAppend(currTail);
+            root.tail=currTail;
+          }else{
+            bubbleUpAppend(currTail,currTail=new LongDblLnkNode(currTail,val,after));
+            after.prev=currTail;
+          }
+        }else{
+          bubbleUpInit(new LongDblLnkNode(val));
         }
-      }
-      LongDblLnkNode oldTail,after;
-      if((after=(oldTail=curr.tail).next)==null){
-        curr.bubbleUpAppend(newNode);
-        root.tail=newNode;
       }else{
-        curr.bubbleUpAppend(newNode,oldTail);
-        after.prev=newNode;
+        LongDblLnkNode newNode;
+        bubbleUpRootInit(newNode=new LongDblLnkNode(val));
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
       }
-      ++root.size;
-      newNode.next=after;
-      oldTail.next=newNode;
-      newNode.prev=oldTail;
     }
     @Override public long set(int index,long val){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -3868,7 +3859,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       this.size=++size;
-      if((size-=index)<index){
+      if((size-=index)<=index){
         //the insertion point is closer to the tail
         var tail=this.tail;
         if(size==1){
@@ -3878,7 +3869,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }else{
           //iterate from the tail and insert
           LongDblLnkNode before;
-          (before=(tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).next=before=new LongDblLnkNode(before,val,tail);
+          (before=(tail=LongDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new LongDblLnkNode(before,val,tail);
           tail.prev=before;
         }
       }else{
@@ -4267,16 +4258,19 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
       int tailDist;
-      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
-      final LongDblLnkNode subListHead,subListTail;
-      if((tailDist-=toIndex)<=fromIndex){
-        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
+        final LongDblLnkNode subListHead,subListTail;
+        if((tailDist-=toIndex)<=fromIndex){
+          subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new CheckedSubList(this,fromIndex);
     } 
     boolean uncheckedremoveLastOccurrence(LongDblLnkNode tail
     ,long val
@@ -4316,7 +4310,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     ){
       {
         if(val==(head.val)){
-          this.modCount=modCount+1;
+          ++this.modCount;
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -4328,7 +4322,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }
         for(LongDblLnkNode prev;(head=(prev=head).next)!=null;){
           if(val==(head.val)){
-            this.modCount=modCount+1;
+            ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -4776,7 +4770,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
     }
     @Override public void add(int index,long val){
       int size;
-      if((size=++this.size-index)<index){
+      if((size=++this.size-index)<=index){
         //the insertion point is closer to the tail
         var tail=this.tail;
         if(size==1){
@@ -4786,7 +4780,7 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         }else{
           //iterate from the tail and insert
           LongDblLnkNode before;
-          (before=(tail=LongDblLnkNode.iterateDescending(tail,size-1)).prev).next=before=new LongDblLnkNode(before,val,tail);
+          (before=(tail=LongDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new LongDblLnkNode(before,val,tail);
           tail.prev=before;
         }
       }else{
@@ -5033,16 +5027,20 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this,((LongDblLnkSeq)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
-      final int tailDist,subListSize=toIndex-fromIndex;
-      final LongDblLnkNode subListHead,subListTail;
-      if((tailDist=this.size-toIndex)<=fromIndex){
-        subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=toIndex-fromIndex)!=0){
+        final int tailDist;
+        final LongDblLnkNode subListHead,subListTail;
+        if((tailDist=this.size-toIndex)<=fromIndex){
+          subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new UncheckedSubList(this,fromIndex);
     }
     @Override public long getLastLong(){
       return tail.val;

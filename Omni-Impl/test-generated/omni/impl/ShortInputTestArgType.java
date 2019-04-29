@@ -59,7 +59,7 @@ public enum ShortInputTestArgType{
     public void callListAdd(OmniCollection.OfShort seq,int index,int valToConvert){((OmniList.OfShort)seq).add(index,TypeConversionUtil.convertTobyte(valToConvert));}
     public void callStackPush(OmniCollection.OfShort seq,int valToConvert){((OmniStack.OfShort)seq).push(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfShort seq,int valToConvert){return seq.add(TypeConversionUtil.convertTobyte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,short actualVal){Assertions.assertEquals(TypeConversionUtil.convertToshort(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,short actualVal){Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedValToConvert),actualVal);}
   }
   ,
   BOXED_BYTE{
@@ -70,7 +70,7 @@ public enum ShortInputTestArgType{
     public void callListAdd(OmniCollection.OfShort seq,int index,int valToConvert){((OmniList.OfShort)seq).add(index,TypeConversionUtil.convertToByte(valToConvert));}
     public void callStackPush(OmniCollection.OfShort seq,int valToConvert){((OmniStack.OfShort)seq).push(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callCollectionAdd(OmniCollection.OfShort seq,int valToConvert){return seq.add(TypeConversionUtil.convertToByte(valToConvert));}
-    public void verifyVal(int expectedValToConvert,short actualVal){Assertions.assertEquals(TypeConversionUtil.convertToshort(expectedValToConvert),actualVal);}
+    public void verifyVal(int expectedValToConvert,short actualVal){Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedValToConvert),actualVal);}
   }
   ;
     public abstract boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert);

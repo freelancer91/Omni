@@ -34,7 +34,7 @@ import omni.impl.seq.AbstractByteSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
-@Tag("SnglLnkSeq")
+@Tag("SnglLnkSeqTest")
 @Execution(ExecutionMode.CONCURRENT)
 public class ByteSnglLnkSeqTest{
   static Stream<Arguments> getConstructor_voidArgs(){

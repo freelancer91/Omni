@@ -161,7 +161,7 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
   ,int val
   ){
     int index=1;
-    for(;val!=(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+    for(;val!=(head.val);++index){if((head=head.next)==null){return -1;}}
     return index;
   }
   public static  int uncheckedindexOf (ByteDblLnkNode head,ByteDblLnkNode tail

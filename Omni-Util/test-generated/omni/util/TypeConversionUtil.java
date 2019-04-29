@@ -90,75 +90,67 @@ public final class TypeConversionUtil
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
-  public static Integer convertToObject(int val)
-  {
+  public static Integer convertToObject(int val){
     return new Integer(val);
   }
-  public static double convertTodoubleboolean(int val)
-  {
+  public static double convertTodoubleboolean(int val){
     return TypeUtil.castToDouble(convertToboolean(val));
   }
-  public static float convertTofloatboolean(int val)
-  {
+  public static float convertTofloatboolean(int val){
     return TypeUtil.castToFloat(convertToboolean(val));
   }
-  public static long convertTolongboolean(int val)
-  {
+  public static long convertTolongboolean(int val){
     return TypeUtil.castToLong(convertToboolean(val));
   }
-  public static int convertTointboolean(int val)
-  {
+  public static int convertTointboolean(int val){
     return TypeUtil.castToByte(convertToboolean(val));
   }
-  public static short convertToshortboolean(int val)
-  {
+  public static short convertToshortboolean(int val){
     return TypeUtil.castToByte(convertToboolean(val));
   }
-  public static char convertTocharboolean(int val)
-  {
+  public static char convertTocharboolean(int val){
     return TypeUtil.castToChar(convertToboolean(val));
   }
-  public static byte convertTobyteboolean(int val)
-  {
+  public static byte convertTobyteboolean(int val){
     return TypeUtil.castToByte(convertToboolean(val));
   }
-  public static short convertToshortbyte(int val){
-    return (byte)val;
-  }
-  public static long convertTolongbyte(int val){
-    return (byte)val;
+  public static double convertTodoublebyte(int val){
+    return (double)(byte)val;
   }
   public static float convertTofloatbyte(int val){
-    return (byte)val;
+    return (float)(byte)val;
   }
-  public static double convertTodoublebyte(int val){
-    return (byte)val;
+  public static long convertTolongbyte(int val){
+    return (long)(byte)val;
   }
   public static int convertTointbyte(int val){
-    return (byte)val;
+    return (int)(byte)val;
   }
-  public static long convertTolongchar(int val){
-    return (char)val;
-  }
-  public static int convertTointchar(int val){
-    return (char)val;
-  }
-  public static float convertTofloatchar(int val){
-    return (char)val;
+  public static short convertToshortbyte(int val){
+    return (short)(byte)val;
   }
   public static double convertTodoublechar(int val){
-    return (char)val;
+    return (double)(char)val;
   }
-  public static long convertTolongshort(int val){
-    return (short)val;
+  public static float convertTofloatchar(int val){
+    return (float)(char)val;
   }
-  public static int convertTointshort(int val){
-    return (short)val;
+  public static long convertTolongchar(int val){
+    return (long)(char)val;
   }
-  public static float convertTofloatshort(int val){
-    return (short)val;
+  public static int convertTointchar(int val){
+    return (int)(char)val;
   }
   public static double convertTodoubleshort(int val){
-    return (short)val;
+    return (double)(short)val;
+  }
+  public static float convertTofloatshort(int val){
+    return (float)(short)val;
+  }
+  public static long convertTolongshort(int val){
+    return (long)(short)val;
+  }
+  public static int convertTointshort(int val){
+    return (int)(short)val;
   }
 }

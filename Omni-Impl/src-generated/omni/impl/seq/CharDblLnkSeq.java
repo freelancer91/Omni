@@ -61,7 +61,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
   }
   private void insertNode(int index,CharDblLnkNode newNode){
     int tailDist;
-    if((tailDist=++this.size-index)<=index){
+    if((tailDist=this.size-index)<=index){
       //the insertion point is closer to the tail
       var tail=this.tail;
       if(tailDist==1){
@@ -833,147 +833,158 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       this.parent=parent;
       this.parentOffset=parentOffset;
     }
+    private UncheckedSubList(UncheckedList root,int rootOffset){
+      super();
+      this.root=root;
+      this.parent=null;
+      this.parentOffset=rootOffset;
+    }
+    private UncheckedSubList(UncheckedSubList parent,int parentOffset){
+      super();
+      this.root=parent.root;
+      this.parent=parent;
+      this.parentOffset=parentOffset;
+    }
     private Object writeReplace(){
       return new UncheckedList(this.head,this.size,this.tail);
     }
-    private void bubbleUpAppend(CharDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpAppend(CharDblLnkNode newNode,CharDblLnkNode oldTail){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.tail!=oldTail){
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
-    private void bubbleUpPrepend(CharDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.head=newNode;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpPrepend(CharDblLnkNode newNode,CharDblLnkNode oldHead){
-      for(var curr=this;;){
-        curr.head=newNode;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.head!=oldHead){
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
     private void bubbleUpIncrementSize(){
-      for(var curr=parent;curr!=null;
-      ++curr.size,curr=curr.parent){}
-    }
-    @Override public void add(int index,char val){
-      int size;
-      UncheckedSubList curr;
-      final var newNode=new CharDblLnkNode(val);
-      if((size=++(curr=this).size)==1){
-        //initialize this list
-        UncheckedSubList parent;
-        do{
-          curr.head=newNode;
-          curr.tail=newNode;
-          if((parent=curr.parent)==null){
-            //all parents were empty, insert in the root
-            ((CharDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
-            return;
-          }
-        }
-        while((size=++(curr=parent).size)==1);
+      for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
       }
-      final UncheckedList root;
-      ++(root=this.root).size;
-      CharDblLnkNode before,after;
-      if((size-=index)<index){
-        //the insertion point is closer to the tail
+    }
+    private void bubbleUpAppend(CharDblLnkNode oldTail,CharDblLnkNode newTail){
+      oldTail.next=newTail;
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
+        ++currList.size;
+        if(currList.tail!=oldTail){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpAppend(CharDblLnkNode newTail){
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
+      }
+    }
+    private void bubbleUpPrepend(CharDblLnkNode oldHead,CharDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
+        ++currList.size;
+        if(currList.head!=oldHead){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpPrepend(CharDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
+      }
+    }
+    private void bubbleUpRootInit(CharDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        parent.size=1;
+        parent.head=newNode;
+        parent.tail=newNode;
+      }
+    }
+    private void bubbleUpInitHelper(int index,int size,CharDblLnkNode newNode){
+      CharDblLnkNode after,before;   
+      if((size-=index)<=index){
+        before=this.tail;
         if(size==1){
-          //the insertion point IS the tail
-          if((after=(before=curr.tail).next)==null){
-            //there are no nodes after this list
-            curr.bubbleUpAppend(newNode);
+          if((after=before.next)==null){
+            this.bubbleUpAppend(newNode);
             root.tail=newNode;
           }else{
-            //there are nodes after this list
-            curr.bubbleUpAppend(newNode,before);
+            this.bubbleUpAppend(before,newNode);
             after.prev=newNode;
           }
         }else{
-          //iterate from the tail and insert
-          before=(after=CharDblLnkNode.iterateDescending(curr.tail,size-1)).prev;
+          this.bubbleUpIncrementSize();
+          before=(after=CharDblLnkNode.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
-          curr.bubbleUpIncrementSize();
         }
-        before.next=newNode;
+        before.next=newNode;        
       }else{
-        //the insertion point is closer to the head
+        after=this.head;
         if(index==0){
-          //the insertion point IS the tail
-          if((before=(after=curr.head).prev)==null){
-            //there are no nodes before this list
-            curr.bubbleUpPrepend(newNode);
+          if((before=after.prev)==null){
+            this.bubbleUpPrepend(newNode);
             root.head=newNode;
           }else{
-            //there are nodes before this list
-            curr.bubbleUpPrepend(newNode,after);
+            this.bubbleUpPrepend(after,newNode);
             before.next=newNode;
           }
         }else{
-          //iterate from the head and insert
-          after=(before=CharDblLnkNode.iterateAscending(curr.head,index-1)).next;
-          before.next=newNode;
-          curr.bubbleUpIncrementSize();
+          this.bubbleUpIncrementSize();
+          after=(before=CharDblLnkNode.uncheckedIterateAscending(after,index)).next;
+          before.prev=newNode;
         }
         after.prev=newNode;
       }
       newNode.next=after;
       newNode.prev=before;
     }
-    @Override void addLast(char val){
-      final UncheckedList root=this.root;
-      var newNode=new CharDblLnkNode(val);
-      UncheckedSubList parent,curr=this;
-      for(;++curr.size==1;curr=parent){
-        curr.head=newNode;
-        curr.tail=newNode;
-        if((parent=curr.parent)==null){
-          //all parents were empty, insert in the root
-          ((CharDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+    private void bubbleUpInit(CharDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      UncheckedSubList curr;
+      for(var currParent=(curr=this).parent;currParent!=null;currParent=(curr=currParent).parent){
+        int parentSize;
+        if((parentSize=++currParent.size)!=1){
+          currParent.bubbleUpInitHelper(curr.parentOffset,parentSize,newNode);
           return;
         }
+        currParent.head=newNode;
+        currParent.tail=newNode;
       }
-      CharDblLnkNode oldTail,after;
-      if((after=(oldTail=curr.tail).next)==null){
-        curr.bubbleUpAppend(newNode);
-        root.tail=newNode;
+      ((CharDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+    }
+    @Override public void add(int index,char val){
+      final UncheckedList root;
+      final var newNode=new CharDblLnkNode(val);
+      if(++(root=this.root).size!=1){
+        final int currSize;
+        if((currSize=++this.size)!=1){
+          bubbleUpInitHelper(index,currSize,newNode);
+        }else{
+          bubbleUpInit(newNode);
+        }
       }else{
-        curr.bubbleUpAppend(newNode,oldTail);
-        after.prev=newNode;
+        bubbleUpRootInit(newNode);
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
       }
-      ++root.size;
-      newNode.next=after;
-      oldTail.next=newNode;
-      newNode.prev=oldTail;
+    }
+    @Override void addLast(char val){
+      final UncheckedList root;
+      if(++(root=this.root).size!=1){
+        if(++this.size!=1){
+          CharDblLnkNode currTail,after;
+          if((after=(currTail=this.tail).next)==null){
+            currTail.next=currTail=new CharDblLnkNode(currTail,val);
+            bubbleUpAppend(currTail);
+            root.tail=currTail;
+          }else{
+            bubbleUpAppend(currTail,currTail=new CharDblLnkNode(currTail,val,after));
+            after.prev=currTail;
+          }
+        }else{
+          bubbleUpInit(new CharDblLnkNode(val));
+        }
+      }else{
+        CharDblLnkNode newNode;
+        bubbleUpRootInit(newNode=new CharDblLnkNode(val));
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
+      }
     }
     @Override public boolean equals(Object val){
       //TODO
@@ -1637,58 +1648,41 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
         lastRet.val=val;
       }
       @Override public void add(char val){
-        int size;
-        UncheckedSubList currList;
-        final var newNode=new CharDblLnkNode(val);
-        this.lastRet=null;
-        if((size=++(currList=this.parent).size)==1){
-          ++currIndex;
-          //initialize the list
-          UncheckedSubList parent;
-          do{
-            currList.head=newNode;
-            currList.tail=newNode;
-            if((parent=currList.parent)==null){
-              //all parents were empty, insert in the root
-              ((CharDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
-              return;
-            }
-          }while((size=++(currList=parent).size)==1);
-        }
+        final UncheckedSubList currList;
         final UncheckedList root;
-        ++(root=currList.root).size;
-        CharDblLnkNode after,before;
-        int currIndex;
-        if((currIndex=++this.currIndex)==size){
-          //the insertion point IS the tail
-          if((after=(before=currList.tail).next)==null){
-            //there are no nodes after this list
-            currList.bubbleUpAppend(newNode);
-            root.tail=newNode;
-          }else{
-            //there are nodes after this list
-            currList.bubbleUpAppend(newNode,before);
-            after.prev=newNode;
-          }
-        }else{
-          if(currIndex==1){
-            //the insertion point IS the head
-            if((before=(after=currList.head).prev)==null){
-              //there are no nodes before this list
-              currList.bubbleUpPrepend(newNode);
-              root.tail=newNode;
+        this.lastRet=null;
+        ++currIndex;
+        if(++(root=(currList=this.parent).root).size!=1){
+          if(++currList.size!=1){
+            CharDblLnkNode after,before,newNode;
+            if((after=this.curr)!=null){
+              if((before=after.prev)!=null){
+                currList.bubbleUpIncrementSize();
+                before.next=newNode=new CharDblLnkNode(before,val,after);
+              }else{
+                currList.bubbleUpPrepend(newNode=new CharDblLnkNode(val,after));
+                root.head=newNode;
+              }
+              after.prev=newNode;
             }else{
-              //there are nodes before this list
-              currList.bubbleUpPrepend(newNode,after);
+              if((after=(before=currList.tail).next)!=null){
+                currList.bubbleUpAppend(before,newNode=new CharDblLnkNode(before,val,after));
+                after.prev=newNode;
+              }else{
+                currList.bubbleUpAppend(newNode=new CharDblLnkNode(before,val));
+                root.tail=newNode;
+              }
               before.next=newNode;
             }
           }else{
-            newNode.next=after=curr;
-            newNode.prev=before=after.prev;
-            after.prev=newNode;
-            before.next=newNode;
-            currList.bubbleUpIncrementSize();
+            currList.bubbleUpInit(new CharDblLnkNode(val));
           }
+        }else{
+          CharDblLnkNode newNode;
+          currList.bubbleUpRootInit(newNode=new CharDblLnkNode(val));
+          currList.size=1;
+          root.head=newNode;
+          root.tail=newNode;
         }
       }
       @Override public void remove(){
@@ -1746,16 +1740,20 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this,((CharDblLnkSeq)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfChar subList(int fromIndex,int toIndex){
-      final int tailDist,subListSize=toIndex-fromIndex;
-      final CharDblLnkNode subListHead,subListTail;
-      if((tailDist=this.size-toIndex)<=fromIndex){
-        subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?CharDblLnkNode.iterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?CharDblLnkNode.iterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=toIndex-fromIndex)!=0){
+        int tailDist;
+        final CharDblLnkNode subListHead,subListTail;
+        if((tailDist=this.size-toIndex)<=fromIndex){
+          subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?CharDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?CharDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new UncheckedSubList(this,fromIndex);
     }
     @Override public boolean removeVal(boolean val){
       {
@@ -1913,7 +1911,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       }//end val check
       return false;
     }
-    private boolean uncheckedremoveVal(CharDblLnkNode head
+    boolean uncheckedremoveVal(CharDblLnkNode head
     ,int val
     ){
       if(val==(head.val)){
@@ -1964,7 +1962,21 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       this.parentOffset=parentOffset;
       this.modCount=parent.modCount;
     }
-    private boolean uncheckedremoveVal(CharDblLnkNode head
+    private CheckedSubList(CheckedList root,int rootOffset){
+      super();
+      this.root=root;
+      this.parent=null;
+      this.parentOffset=rootOffset;
+      this.modCount=root.modCount;
+    }
+    private CheckedSubList(CheckedSubList parent,int parentOffset){
+      super();
+      this.root=parent.root;
+      this.parent=parent;
+      this.parentOffset=parentOffset;
+      this.modCount=parent.modCount;
+    }
+    boolean uncheckedremoveVal(CharDblLnkNode head
     ,int val
     ){
       int modCount;
@@ -1981,23 +1993,19 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
             peelHead(head);
           }
           return true;
-        }else{
-          for(final var tail=this.tail;tail!=head;){
-            if(val==((head=head.next).val)){
-              root.modCount=++modCount;
-              --root.size;
-              this.modCount=modCount;
-              this.size=size-1;
-              if(head==tail){
-                peelTail(head);
-              }else{
-                CharDblLnkNode before,after;
-                (before=head.prev).next=(after=head.next);
-                after.prev=before;
-                bubbleUpDecrementSize();
-              }
-              return true;
+        }
+        for(CharDblLnkNode prev;(head=(prev=head).next)!=null;){
+          if(val==(head.val)){
+            this.modCount=modCount+1;
+            if((head=head.next)==null){
+              this.head=prev;
+              prev.next=null;
+            }else{
+              head.prev=prev;
+              prev.next=head;
             }
+            --this.size;
+            return true;
           }
         }
       }
@@ -2146,79 +2154,65 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
         throw new IllegalStateException();
       }
       @Override public void add(char val){
-        CheckedSubList currList;
-        CheckedList root;
+        final CheckedSubList currList;
+        final CheckedList root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=(currList=this.parent).root).modCount);
         root.modCount=++modCount;
         this.modCount=modCount;
         currList.modCount=modCount;
-        int size;
-        final var newNode=new CharDblLnkNode(val);
         this.lastRet=null;
-        if((size=++currList.size)==1){
-          ++currIndex;
-          //initialize the list
-          CheckedSubList parent;
-          do{
-            currList.head=newNode;
-            currList.tail=newNode;
-            if((parent=currList.parent)==null){
-              //all parents were empty, insert in the root
-              ((CharDblLnkSeq)currList.root).insertNode(currList.parentOffset,newNode);
-              return;
-            }
-          }while((size=++(currList=parent).size)==1);
-        }
-        ++root.size;
-        CharDblLnkNode after,before;
-        int currIndex;
-        if((currIndex=++this.currIndex)==size){
-          //the insertion point IS the tail
-          if((after=(before=currList.tail).next)==null){
-            //there are no nodes after this list
-            currList.bubbleUpAppend(newNode);
-            root.tail=newNode;
-          }else{
-            //there are nodes after this list
-            currList.bubbleUpAppend(newNode,before);
-            after.prev=newNode;
-          }
-        }else{
-          if(currIndex==1){
-            //the insertion point IS the head
-            if((before=(after=currList.head).prev)==null){
-              //there are no nodes before this list
-              currList.bubbleUpPrepend(newNode);
-              root.tail=newNode;
+        ++currIndex;
+        if(++root.size!=1){
+          if(++currList.size!=1){
+            CharDblLnkNode after,before,newNode;
+            if((after=this.curr)!=null){
+              if((before=after.prev)!=null){
+                currList.bubbleUpIncrementSize();
+                before.next=newNode=new CharDblLnkNode(before,val,after);
+              }else{
+                currList.bubbleUpPrepend(newNode=new CharDblLnkNode(val,after));
+                root.head=newNode;
+              }
+              after.prev=newNode;
             }else{
-              //there are nodes before this list
-              currList.bubbleUpPrepend(newNode,after);
+              if((after=(before=currList.tail).next)!=null){
+                currList.bubbleUpAppend(before,newNode=new CharDblLnkNode(before,val,after));
+                after.prev=newNode;
+              }else{
+                currList.bubbleUpAppend(newNode=new CharDblLnkNode(before,val));
+                root.tail=newNode;
+              }
               before.next=newNode;
             }
           }else{
-            newNode.next=after=curr;
-            newNode.prev=before=after.prev;
-            after.prev=newNode;
-            before.next=newNode;
-            currList.bubbleUpIncrementSize();
+            currList.bubbleUpInit(new CharDblLnkNode(val));
           }
+        }else{
+          CharDblLnkNode newNode;
+          currList.bubbleUpRootInit(newNode=new CharDblLnkNode(val));
+          currList.size=1;
+          root.head=newNode;
+          root.tail=newNode;
         }
       }
     }
     @Override public OmniList.OfChar subList(int fromIndex,int toIndex){
       CheckedCollection.checkModCount(modCount,root.modCount);
       int tailDist;
-      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
-      final CharDblLnkNode subListHead,subListTail;
-      if((tailDist-=toIndex)<=fromIndex){
-        subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?CharDblLnkNode.iterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?CharDblLnkNode.iterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
+        final CharDblLnkNode subListHead,subListTail;
+        if((tailDist-=toIndex)<=fromIndex){
+          subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?CharDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?CharDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new CheckedSubList(this,fromIndex);
     }
     @Override public Object clone(){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -3594,164 +3588,161 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    private void bubbleUpAppend(CharDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpAppend(CharDblLnkNode newNode,CharDblLnkNode oldTail){
-      for(var curr=this;;){
-        curr.tail=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.tail!=oldTail){
-          ++curr.modCount;
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
-    private void bubbleUpPrepend(CharDblLnkNode newNode){
-      for(var curr=this;;){
-        curr.head=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          break;
-        }
-        ++curr.size;
-      }
-    }
-    private void bubbleUpPrepend(CharDblLnkNode newNode,CharDblLnkNode oldHead){
-      for(var curr=this;;){
-        curr.head=newNode;
-        ++curr.modCount;
-        if((curr=curr.parent)==null){
-          return;
-        }
-        ++curr.size;
-        if(curr.head!=oldHead){
-          ++curr.modCount;
-          curr.bubbleUpIncrementSize();
-          return;
-        }
-      }
-    }
     private void bubbleUpIncrementSize(){
-      for(var curr=parent;curr!=null;
-      ++curr.modCount,
-      ++curr.size,curr=curr.parent){}
-    }
-    @Override public void add(int index,char val){
-      int size;
-      CheckedSubList curr;
-      final CheckedList root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      CheckedCollection.checkLo(index);
-      CheckedCollection.checkWriteHi(index,size=this.size);
-      root.modCount=++modCount;
-      (curr=this).size=++size;
-      final var newNode=new CharDblLnkNode(val);
-      if(size==1){
-        //initialize this list
-        CheckedSubList parent;
-        do{
-          curr.head=newNode;
-          curr.tail=newNode;
-          curr.modCount=modCount;
-          if((parent=curr.parent)==null){
-            //all parents were empty, insert in the root
-            ((CharDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
-            return;
-          }
-        }
-        while((size=++(curr=parent).size)==1);
+      for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
+        ++curr.modCount;
       }
-      ++root.size;
-      CharDblLnkNode before,after;
-      if((size-=index)<index){
-        //the insertion point is closer to the tail
+    }
+    private void bubbleUpAppend(CharDblLnkNode oldTail,CharDblLnkNode newTail){
+      oldTail.next=newTail;
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;currList.tail=newTail,currList=currList.parent){
+        ++currList.modCount;
+        ++currList.size;
+        if(currList.tail!=oldTail){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpAppend(CharDblLnkNode newTail){
+      this.tail=newTail;
+      for(var currList=parent;currList!=null;++currList.size,currList.tail=newTail,currList=currList.parent){
+        ++currList.modCount;
+      }
+    }
+    private void bubbleUpPrepend(CharDblLnkNode oldHead,CharDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;currList.head=newHead,currList=currList.parent){
+        ++currList.modCount;
+        ++currList.size;
+        if(currList.head!=oldHead){
+          currList.bubbleUpIncrementSize();
+          return;
+        }
+      }
+    }
+    private void bubbleUpPrepend(CharDblLnkNode newHead){
+      this.head=newHead;
+      for(var currList=parent;currList!=null;++currList.size,currList.head=newHead,currList=currList.parent){
+        ++currList.modCount;
+      }
+    }
+    private void bubbleUpRootInit(CharDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      for(var parent=this.parent;parent!=null;parent=parent.parent){
+        ++parent.modCount;
+        parent.size=1;
+        parent.head=newNode;
+        parent.tail=newNode;
+      }
+    }
+    private void bubbleUpInitHelper(int index,int size,CharDblLnkNode newNode){
+      CharDblLnkNode after,before;   
+      if((size-=index)<=index){
+        before=this.tail;
         if(size==1){
-          //the insertion point IS the tail
-          if((after=(before=curr.tail).next)==null){
-            //there are no nodes after this list
-            curr.bubbleUpAppend(newNode);
+          if((after=before.next)==null){
+            this.bubbleUpAppend(newNode);
             root.tail=newNode;
           }else{
-            //there are nodes after this list
-            curr.bubbleUpAppend(newNode,before);
+            this.bubbleUpAppend(before,newNode);
             after.prev=newNode;
           }
         }else{
-          //iterate from the tail and insert
-          before=(after=CharDblLnkNode.iterateDescending(curr.tail,size-1)).prev;
+          this.bubbleUpIncrementSize();
+          before=(after=CharDblLnkNode.iterateDescending(before,size-2)).prev;
           after.prev=newNode;
-          curr.modCount=modCount;
-          curr.bubbleUpIncrementSize();
         }
-        before.next=newNode;
+        before.next=newNode;        
       }else{
-        //the insertion point is closer to the head
+        after=this.head;
         if(index==0){
-          //the insertion point IS the tail
-          if((before=(after=curr.head).prev)==null){
-            //there are no nodes before this list
-            curr.bubbleUpPrepend(newNode);
+          if((before=after.prev)==null){
+            this.bubbleUpPrepend(newNode);
             root.head=newNode;
           }else{
-            //there are nodes before this list
-            curr.bubbleUpPrepend(newNode,after);
+            this.bubbleUpPrepend(after,newNode);
             before.next=newNode;
           }
         }else{
-          //iterate from the head and insert
-          after=(before=CharDblLnkNode.iterateAscending(curr.head,index-1)).next;
-          before.next=newNode;
-          curr.modCount=modCount;
-          curr.bubbleUpIncrementSize();
+          this.bubbleUpIncrementSize();
+          after=(before=CharDblLnkNode.uncheckedIterateAscending(after,index)).next;
+          before.prev=newNode;
         }
         after.prev=newNode;
       }
       newNode.next=after;
       newNode.prev=before;
     }
+    private void bubbleUpInit(CharDblLnkNode newNode){
+      this.head=newNode;
+      this.tail=newNode;
+      CheckedSubList curr;
+      for(var currParent=(curr=this).parent;currParent!=null;currParent=(curr=currParent).parent){
+        ++currParent.modCount;
+        int parentSize;
+        if((parentSize=++currParent.size)!=1){
+          currParent.bubbleUpInitHelper(curr.parentOffset,parentSize,newNode);
+          return;
+        }
+        currParent.head=newNode;
+        currParent.tail=newNode;
+      }
+      ((CharDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
+    }
+    @Override public void add(int index,char val){
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      int currSize;
+      CheckedCollection.checkWriteHi(index,currSize=this.size);
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      final var newNode=new CharDblLnkNode(val);
+      if(++root.size!=1){
+        this.size=++currSize;
+        if(currSize!=1){    
+          bubbleUpInitHelper(index,currSize,newNode);
+        }else{
+          bubbleUpInit(newNode);
+        }
+      }else{
+        bubbleUpRootInit(newNode);
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
+      }
+    }
     @Override void addLast(char val){
       final CheckedList root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       root.modCount=++modCount;
-      var newNode=new CharDblLnkNode(val);
-      CheckedSubList parent,curr=this;
-      for(;++curr.size==1;curr=parent){
-        curr.head=newNode;
-        curr.tail=newNode;
-        curr.modCount=modCount;
-        if((parent=curr.parent)==null){
-          //all parents were empty, insert in the root
-          ((CharDblLnkSeq)root).insertNode(curr.parentOffset,newNode);
-          return;
+      this.modCount=modCount;
+      if(++root.size!=1){
+        if(++this.size!=1){
+          CharDblLnkNode currTail,after;
+          if((after=(currTail=this.tail).next)==null){
+            currTail.next=currTail=new CharDblLnkNode(currTail,val);
+            bubbleUpAppend(currTail);
+            root.tail=currTail;
+          }else{
+            bubbleUpAppend(currTail,currTail=new CharDblLnkNode(currTail,val,after));
+            after.prev=currTail;
+          }
+        }else{
+          bubbleUpInit(new CharDblLnkNode(val));
         }
-      }
-      CharDblLnkNode oldTail,after;
-      if((after=(oldTail=curr.tail).next)==null){
-        curr.bubbleUpAppend(newNode);
-        root.tail=newNode;
       }else{
-        curr.bubbleUpAppend(newNode,oldTail);
-        after.prev=newNode;
+        CharDblLnkNode newNode;
+        bubbleUpRootInit(newNode=new CharDblLnkNode(val));
+        this.size=1;
+        root.head=newNode;
+        root.tail=newNode;
       }
-      ++root.size;
-      newNode.next=after;
-      oldTail.next=newNode;
-      newNode.prev=oldTail;
     }
     @Override public char set(int index,char val){
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4167,7 +4158,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       this.size=++size;
-      if((size-=index)<index){
+      if((size-=index)<=index){
         //the insertion point is closer to the tail
         var tail=this.tail;
         if(size==1){
@@ -4177,7 +4168,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
         }else{
           //iterate from the tail and insert
           CharDblLnkNode before;
-          (before=(tail=CharDblLnkNode.iterateDescending(tail,size-1)).prev).next=before=new CharDblLnkNode(before,val,tail);
+          (before=(tail=CharDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new CharDblLnkNode(before,val,tail);
           tail.prev=before;
         }
       }else{
@@ -4566,16 +4557,19 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
     }
     @Override public OmniList.OfChar subList(int fromIndex,int toIndex){
       int tailDist;
-      final int subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size);
-      final CharDblLnkNode subListHead,subListTail;
-      if((tailDist-=toIndex)<=fromIndex){
-        subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?CharDblLnkNode.iterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?CharDblLnkNode.iterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=CheckedCollection.checkSubListRange(fromIndex,toIndex,tailDist=this.size))!=0){
+        final CharDblLnkNode subListHead,subListTail;
+        if((tailDist-=toIndex)<=fromIndex){
+          subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?CharDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?CharDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new CheckedSubList(this,fromIndex);
     } 
     boolean uncheckedremoveLastOccurrence(CharDblLnkNode tail
     ,int val
@@ -4615,7 +4609,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
     ){
       {
         if(val==(head.val)){
-          this.modCount=modCount+1;
+          ++this.modCount;
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -4627,7 +4621,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
         }
         for(CharDblLnkNode prev;(head=(prev=head).next)!=null;){
           if(val==(head.val)){
-            this.modCount=modCount+1;
+            ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -5139,7 +5133,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
     }
     @Override public void add(int index,char val){
       int size;
-      if((size=++this.size-index)<index){
+      if((size=++this.size-index)<=index){
         //the insertion point is closer to the tail
         var tail=this.tail;
         if(size==1){
@@ -5149,7 +5143,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
         }else{
           //iterate from the tail and insert
           CharDblLnkNode before;
-          (before=(tail=CharDblLnkNode.iterateDescending(tail,size-1)).prev).next=before=new CharDblLnkNode(before,val,tail);
+          (before=(tail=CharDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new CharDblLnkNode(before,val,tail);
           tail.prev=before;
         }
       }else{
@@ -5425,16 +5419,20 @@ public abstract class CharDblLnkSeq extends AbstractSeq implements
       return new BidirectionalItr(this,((CharDblLnkSeq)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfChar subList(int fromIndex,int toIndex){
-      final int tailDist,subListSize=toIndex-fromIndex;
-      final CharDblLnkNode subListHead,subListTail;
-      if((tailDist=this.size-toIndex)<=fromIndex){
-        subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
-        subListHead=subListSize<=fromIndex?CharDblLnkNode.iterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
-      }else{
-        subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
-        subListTail=subListSize<=tailDist?CharDblLnkNode.iterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+      final int subListSize;
+      if((subListSize=toIndex-fromIndex)!=0){
+        final int tailDist;
+        final CharDblLnkNode subListHead,subListTail;
+        if((tailDist=this.size-toIndex)<=fromIndex){
+          subListTail=CharDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListHead=subListSize<=fromIndex?CharDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):CharDblLnkNode.iterateAscending(this.head,fromIndex);
+        }else{
+          subListHead=CharDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListTail=subListSize<=tailDist?CharDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):CharDblLnkNode.iterateDescending(this.tail,tailDist);
+        }
+        return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
+      return new UncheckedSubList(this,fromIndex);
     }
     @Override public char getLastChar(){
       return tail.val;

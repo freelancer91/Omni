@@ -322,7 +322,7 @@ public static $<E>$ int uncheckedsearchSUFFIX($DNode$$<E>$ head
 #MACRO UncheckedQueryParam()
 ){
   int index=1;
-  for(;TEST(head.val);++index,head=head.next){if((head=head.next)==null){return -1;}}
+  for(;TEST(head.val);++index){if((head=head.next)==null){return -1;}}
   return index;
 }
 public static $<E>$ int uncheckedindexOfSUFFIX($DNode$$<E>$ head,$DNode$$<E>$ tail
