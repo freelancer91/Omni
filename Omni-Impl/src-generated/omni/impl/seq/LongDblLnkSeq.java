@@ -804,8 +804,8 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=LongDblLnkNode.uncheckedIterateAscending(after,index)).next;
-          before.prev=newNode;
+          after=(before=LongDblLnkNode.iterateAscending(after,index-1)).next;
+          before.next=newNode;
         }
         after.prev=newNode;
       }
@@ -958,11 +958,12 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
+        after.prev=before;
         if(before==null){
-          after.prev=null;
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          before.next=after;
           var curr=parent;
           do{
             if(curr.head!=lastNode){
@@ -1628,10 +1629,10 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         final LongDblLnkNode subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
           subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize-1):LongDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize-1):LongDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -2058,10 +2059,10 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         final LongDblLnkNode subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
           subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize-1):LongDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize-1):LongDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -2753,11 +2754,12 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
+        after.prev=before;
         if(before==null){
-          after.prev=null;
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          before.next=after;
           var curr=parent;
           do{
             if(curr.head!=lastNode){
@@ -3377,8 +3379,8 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=LongDblLnkNode.uncheckedIterateAscending(after,index)).next;
-          before.prev=newNode;
+          after=(before=LongDblLnkNode.iterateAscending(after,index-1)).next;
+          before.next=newNode;
         }
         after.prev=newNode;
       }
@@ -4263,10 +4265,10 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         final LongDblLnkNode subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
           subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize-1):LongDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize-1):LongDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -5033,10 +5035,10 @@ public abstract class LongDblLnkSeq extends AbstractSeq implements
         final LongDblLnkNode subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
           subListTail=LongDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?LongDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):LongDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?LongDblLnkNode.iterateDescending(subListTail,subListSize-1):LongDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=LongDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?LongDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):LongDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?LongDblLnkNode.iterateAscending(subListHead,subListSize-1):LongDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }

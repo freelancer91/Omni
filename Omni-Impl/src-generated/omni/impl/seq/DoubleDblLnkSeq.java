@@ -894,8 +894,8 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=DoubleDblLnkNode.uncheckedIterateAscending(after,index)).next;
-          before.prev=newNode;
+          after=(before=DoubleDblLnkNode.iterateAscending(after,index-1)).next;
+          before.next=newNode;
         }
         after.prev=newNode;
       }
@@ -1048,11 +1048,12 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
+        after.prev=before;
         if(before==null){
-          after.prev=null;
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          before.next=after;
           var curr=parent;
           do{
             if(curr.head!=lastNode){
@@ -1718,10 +1719,10 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         final DoubleDblLnkNode subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
           subListTail=DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.iterateDescending(subListTail,subListSize-1):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?DoubleDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?DoubleDblLnkNode.iterateAscending(subListHead,subListSize-1):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -2328,10 +2329,10 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         final DoubleDblLnkNode subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
           subListTail=DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.iterateDescending(subListTail,subListSize-1):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?DoubleDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?DoubleDblLnkNode.iterateAscending(subListHead,subListSize-1):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -3199,11 +3200,12 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
+        after.prev=before;
         if(before==null){
-          after.prev=null;
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          before.next=after;
           var curr=parent;
           do{
             if(curr.head!=lastNode){
@@ -3823,8 +3825,8 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
           }
         }else{
           this.bubbleUpIncrementSize();
-          after=(before=DoubleDblLnkNode.uncheckedIterateAscending(after,index)).next;
-          before.prev=newNode;
+          after=(before=DoubleDblLnkNode.iterateAscending(after,index-1)).next;
+          before.next=newNode;
         }
         after.prev=newNode;
       }
@@ -4701,10 +4703,10 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         final DoubleDblLnkNode subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
           subListTail=DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.iterateDescending(subListTail,subListSize-1):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?DoubleDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?DoubleDblLnkNode.iterateAscending(subListHead,subListSize-1):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -5645,10 +5647,10 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         final DoubleDblLnkNode subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
           subListTail=DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.uncheckedIterateDescending(subListTail,subListSize):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?DoubleDblLnkNode.iterateDescending(subListTail,subListSize-1):DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=DoubleDblLnkNode.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?DoubleDblLnkNode.uncheckedIterateAscending(subListHead,subListSize):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?DoubleDblLnkNode.iterateAscending(subListHead,subListSize-1):DoubleDblLnkNode.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList(this,fromIndex,subListHead,subListSize,subListTail);
       }

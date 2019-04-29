@@ -607,10 +607,10 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final $DNode$$<E>$ subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
           subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.uncheckedIterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.uncheckedIterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -872,10 +872,10 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final $DNode$$<E>$ subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
           subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.uncheckedIterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.uncheckedIterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -1549,10 +1549,10 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final $DNode$$<E>$ subListHead,subListTail;
         if((tailDist-=toIndex)<=fromIndex){
           subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.uncheckedIterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.uncheckedIterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
         }
         return new CheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -1987,10 +1987,10 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final $DNode$$<E>$ subListHead,subListTail;
         if((tailDist=this.size-toIndex)<=fromIndex){
           subListTail=$DNode$.iterateDescending(this.tail,tailDist);
-          subListHead=subListSize<=fromIndex?$DNode$.uncheckedIterateDescending(subListTail,subListSize):$DNode$.iterateAscending(this.head,fromIndex);
+          subListHead=subListSize<=fromIndex?$DNode$.iterateDescending(subListTail,subListSize-1):$DNode$.iterateAscending(this.head,fromIndex);
         }else{
           subListHead=$DNode$.iterateAscending(this.head,fromIndex);
-          subListTail=subListSize<=tailDist?$DNode$.uncheckedIterateAscending(subListHead,subListSize):$DNode$.iterateDescending(this.tail,tailDist);
+          subListTail=subListSize<=tailDist?$DNode$.iterateAscending(subListHead,subListSize-1):$DNode$.iterateDescending(this.tail,tailDist);
         }
         return new UncheckedSubList$<E>$(this,fromIndex,subListHead,subListSize,subListTail);
       }
@@ -3908,8 +3908,8 @@ private void bubbleUpInitHelper(int index,int size,$DNode$$<E>$ newNode){
       }
     }else{
       this.bubbleUpIncrementSize();
-      after=(before=$DNode$.uncheckedIterateAscending(after,index)).next;
-      before.prev=newNode;
+      after=(before=$DNode$.iterateAscending(after,index-1)).next;
+      before.next=newNode;
     }
     after.prev=newNode;
   }
@@ -3985,7 +3985,6 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
       }else{
         bubbleUpAppend(currTail,currTail=new $DNode$$<E>$(currTail,val,after));
         after.prev=currTail;
-        
       }
     }else{
       bubbleUpInit(new $DNode$$<E>$(val));
@@ -4337,13 +4336,15 @@ private void removeLastNode($DNode$$<E>$ lastNode){
       bubbleUpPeelTail(before,lastNode);
     }
   }else{
+    after.prev=before;
     if(before==null){
-      after.prev=null;
       bubbleUpPeelHead(after,lastNode);
       root.head=after;
     }else{
+      before.next=after;
       var curr=parent;
       do{
+        
         if(curr.head!=lastNode){
           do{
             if(curr.tail!=lastNode){
