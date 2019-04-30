@@ -76,19 +76,15 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       }
     }else{
       //the insertion point is closer to the head
-      ShortDblLnkNode head;
-      if((head=this.head)==null){
-        //the root was empty, so initialize it
-        this.head=newNode;
-        this.tail=newNode;
-      }else if(index==0){
+      if(index==0){
         //the insertion point IS the head
-        head.prev=newNode;
+        ShortDblLnkNode head;
+        (head=this.head).prev=newNode;
         newNode.next=head;
         this.head=newNode;
       }else{
         //iterate from the root's head 
-        iterateAscendingAndInsert(index,head,newNode);
+        iterateAscendingAndInsert(index,this.head,newNode);
       }
     }
   }
@@ -1663,17 +1659,22 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         ++currIndex;
         if(++(root=(currList=this.parent).root).size!=1){
           if(++currList.size!=1){
-            ShortDblLnkNode after,before,newNode;
+            ShortDblLnkNode after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                currList.bubbleUpIncrementSize();
-                before.next=newNode=new ShortDblLnkNode(before,val,after);
+                before.next=before=new ShortDblLnkNode(before,val,after);
+                if(after==currList.head){
+                  currList.bubbleUpPrepend(after,before);
+                }else{
+                  currList.bubbleUpIncrementSize();
+                }
               }else{
-                currList.bubbleUpPrepend(newNode=new ShortDblLnkNode(val,after));
-                root.head=newNode;
+                currList.bubbleUpPrepend(before=new ShortDblLnkNode(val,after));
+                root.head=before;
               }
-              after.prev=newNode;
+              after.prev=before;
             }else{
+              ShortDblLnkNode newNode;
               if((after=(before=currList.tail).next)!=null){
                 currList.bubbleUpAppend(before,newNode=new ShortDblLnkNode(before,val,after));
                 after.prev=newNode;
@@ -2073,6 +2074,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         if((currIndex=this.currIndex)!=0){
           ShortDblLnkNode curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.curr=curr;
           this.currIndex=currIndex-1;
           return curr.val;
         }
@@ -2173,17 +2175,22 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         ++currIndex;
         if(++root.size!=1){
           if(++currList.size!=1){
-            ShortDblLnkNode after,before,newNode;
+            ShortDblLnkNode after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                currList.bubbleUpIncrementSize();
-                before.next=newNode=new ShortDblLnkNode(before,val,after);
+                before.next=before=new ShortDblLnkNode(before,val,after);
+                if(after==currList.head){
+                  currList.bubbleUpPrepend(after,before);
+                }else{
+                  currList.bubbleUpIncrementSize();
+                }
               }else{
-                currList.bubbleUpPrepend(newNode=new ShortDblLnkNode(val,after));
-                root.head=newNode;
+                currList.bubbleUpPrepend(before=new ShortDblLnkNode(val,after));
+                root.head=before;
               }
-              after.prev=newNode;
+              after.prev=before;
             }else{
+              ShortDblLnkNode newNode;
               if((after=(before=currList.tail).next)!=null){
                 currList.bubbleUpAppend(before,newNode=new ShortDblLnkNode(before,val,after));
                 after.prev=newNode;
@@ -4946,6 +4953,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         if((currIndex=this.currIndex)!=0){
           ShortDblLnkNode curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.curr=curr;
           this.currIndex=currIndex-1;
           return curr.val;
         }
@@ -4987,6 +4995,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         }else{
           if(currIndex==1){
             (newNode=parent.head).prev=newNode=new ShortDblLnkNode(val,newNode);
+            parent.head=newNode;
           }else{
             final ShortDblLnkNode tmp;
             (newNode=curr).prev=newNode=new ShortDblLnkNode(tmp=newNode.prev,val,newNode);
@@ -6304,6 +6313,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         }else{
           if(currIndex==1){
             (newNode=parent.head).prev=newNode=new ShortDblLnkNode(val,newNode);
+            parent.head=newNode;
           }else{
             final ShortDblLnkNode tmp;
             (newNode=curr).prev=newNode=new ShortDblLnkNode(tmp=newNode.prev,val,newNode);

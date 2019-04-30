@@ -76,19 +76,15 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
       }
     }else{
       //the insertion point is closer to the head
-      IntDblLnkNode head;
-      if((head=this.head)==null){
-        //the root was empty, so initialize it
-        this.head=newNode;
-        this.tail=newNode;
-      }else if(index==0){
+      if(index==0){
         //the insertion point IS the head
-        head.prev=newNode;
+        IntDblLnkNode head;
+        (head=this.head).prev=newNode;
         newNode.next=head;
         this.head=newNode;
       }else{
         //iterate from the root's head 
-        iterateAscendingAndInsert(index,head,newNode);
+        iterateAscendingAndInsert(index,this.head,newNode);
       }
     }
   }
@@ -1570,17 +1566,22 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
         ++currIndex;
         if(++(root=(currList=this.parent).root).size!=1){
           if(++currList.size!=1){
-            IntDblLnkNode after,before,newNode;
+            IntDblLnkNode after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                currList.bubbleUpIncrementSize();
-                before.next=newNode=new IntDblLnkNode(before,val,after);
+                before.next=before=new IntDblLnkNode(before,val,after);
+                if(after==currList.head){
+                  currList.bubbleUpPrepend(after,before);
+                }else{
+                  currList.bubbleUpIncrementSize();
+                }
               }else{
-                currList.bubbleUpPrepend(newNode=new IntDblLnkNode(val,after));
-                root.head=newNode;
+                currList.bubbleUpPrepend(before=new IntDblLnkNode(val,after));
+                root.head=before;
               }
-              after.prev=newNode;
+              after.prev=before;
             }else{
+              IntDblLnkNode newNode;
               if((after=(before=currList.tail).next)!=null){
                 currList.bubbleUpAppend(before,newNode=new IntDblLnkNode(before,val,after));
                 after.prev=newNode;
@@ -1960,6 +1961,7 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
         if((currIndex=this.currIndex)!=0){
           IntDblLnkNode curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.curr=curr;
           this.currIndex=currIndex-1;
           return curr.val;
         }
@@ -2060,17 +2062,22 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
         ++currIndex;
         if(++root.size!=1){
           if(++currList.size!=1){
-            IntDblLnkNode after,before,newNode;
+            IntDblLnkNode after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                currList.bubbleUpIncrementSize();
-                before.next=newNode=new IntDblLnkNode(before,val,after);
+                before.next=before=new IntDblLnkNode(before,val,after);
+                if(after==currList.head){
+                  currList.bubbleUpPrepend(after,before);
+                }else{
+                  currList.bubbleUpIncrementSize();
+                }
               }else{
-                currList.bubbleUpPrepend(newNode=new IntDblLnkNode(val,after));
-                root.head=newNode;
+                currList.bubbleUpPrepend(before=new IntDblLnkNode(val,after));
+                root.head=before;
               }
-              after.prev=newNode;
+              after.prev=before;
             }else{
+              IntDblLnkNode newNode;
               if((after=(before=currList.tail).next)!=null){
                 currList.bubbleUpAppend(before,newNode=new IntDblLnkNode(before,val,after));
                 after.prev=newNode;
@@ -4687,6 +4694,7 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
         if((currIndex=this.currIndex)!=0){
           IntDblLnkNode curr;
           this.lastRet=curr=(curr=this.curr)==null?parent.tail:curr.prev;
+          this.curr=curr;
           this.currIndex=currIndex-1;
           return curr.val;
         }
@@ -4728,6 +4736,7 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
         }else{
           if(currIndex==1){
             (newNode=parent.head).prev=newNode=new IntDblLnkNode(val,newNode);
+            parent.head=newNode;
           }else{
             final IntDblLnkNode tmp;
             (newNode=curr).prev=newNode=new IntDblLnkNode(tmp=newNode.prev,val,newNode);
@@ -5917,6 +5926,7 @@ public abstract class IntDblLnkSeq extends AbstractSeq implements
         }else{
           if(currIndex==1){
             (newNode=parent.head).prev=newNode=new IntDblLnkNode(val,newNode);
+            parent.head=newNode;
           }else{
             final IntDblLnkNode tmp;
             (newNode=curr).prev=newNode=new IntDblLnkNode(tmp=newNode.prev,val,newNode);
