@@ -565,7 +565,152 @@ public class ByteDblLnkSeqTest{
     seqMonitor.verifyStructuralIntegrity();
     seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc(preModScenario);
   }
-  //#MACRO testListadd_int_val<true>()
+  static Stream<Arguments> getListadd_int_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var seqLocation:SequenceLocation.values()){
+          if(checkedType.checked || seqLocation.expectedException==null){
+            for(var preModScenario:PreModScenario.values()){
+              if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
+                for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
+                  if(seqSize!=0 || seqLocation.validForEmpty){
+                    for(var inputArgType:ByteInputTestArgType.values()){
+                      switch(nestedType){
+                        case LISTDEQUE:
+                          builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqSize));
+                          break;
+                        case SUBLIST:
+                          int[] preAllocs=new int[4];
+                          int[] postAllocs=new int[4];
+                          for(int preAllocBits=0;preAllocBits<(1<<4);++preAllocBits)
+                          {
+                            for(int marker=1,index=0;marker<(1<<4);marker<<=1,++index)
+                            {
+                              preAllocs[index]=(preAllocBits&marker)!=0?5:0;
+                            }
+                            for(int postAllocBits=0;postAllocBits<(1<<4);++postAllocBits)
+                            {
+                              for(int marker=1,index=0;marker<(1<<4);marker<<=1,++index)
+                              {
+                                postAllocs[index]=(postAllocBits&marker)!=0?5:0;
+                              }
+                              builder.accept(Arguments.of(new SeqMonitor(checkedType,preAllocs,postAllocs),inputArgType,seqLocation,preModScenario,seqSize));
+                            }
+                          }
+                          break;
+                        default:
+                          throw new Error("Unknown nested type "+nestedType);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListadd_int_val(){
+    getListadd_int_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testListadd_int_valHelper((SeqMonitor)args[0],(ByteInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(int)args[4]);
+    });
+  }
+  private static void testListadd_int_valHelper
+  (SeqMonitor seqMonitor,ByteInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,int numToAdd){
+    if(preModScenario.expectedException!=null || seqLocation.expectedException!=null){
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    SequenceVerificationItr verifyItr;
+    if(preModScenario.expectedException==null){
+      switch(seqLocation){
+        case IOBLO:
+          Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.add(-1,0,inputArgType));
+          seqMonitor.verifyStructuralIntegrity();
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          break;
+        case IOBHI:
+          Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.add(numToAdd+1,0,inputArgType));
+          seqMonitor.verifyStructuralIntegrity();
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          break;
+        case BEGINNING:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(0,i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,numToAdd);
+          break;
+        case NEARBEGINNING:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(seqMonitor.expectedSeqSize>>2,i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyNearBeginningInsertion(inputArgType,numToAdd);
+          break;
+        case MIDDLE:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(seqMonitor.expectedSeqSize>>1,i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyMidPointInsertion(inputArgType,numToAdd);
+          break;
+        case NEAREND:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(seqMonitor.expectedSeqSize-(seqMonitor.expectedSeqSize>>2),i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyNearEndInsertion(inputArgType,numToAdd);
+          break;
+        case END:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.add(i,i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(inputArgType,numToAdd);
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+    }else{
+      final int insertionIndex;
+      switch(seqLocation){
+        case IOBLO:
+          insertionIndex=-1;
+          break;
+        case IOBHI:
+           insertionIndex=seqMonitor.expectedSeqSize+1;
+          break;
+        case BEGINNING:
+          insertionIndex=0;
+          break;
+        case NEARBEGINNING:
+          insertionIndex=seqMonitor.expectedSeqSize>>2;;
+          break;
+        case MIDDLE:
+          insertionIndex=seqMonitor.expectedSeqSize>>1;
+          break;
+        case NEAREND:
+          insertionIndex=seqMonitor.expectedSeqSize-(seqMonitor.expectedSeqSize>>2);
+          break;
+        case END:
+          insertionIndex=seqMonitor.expectedSeqSize;
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.add(insertionIndex,0,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+      verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+    }
+    verifyItr.verifyPostAlloc(preModScenario);
+  }
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);
@@ -1479,9 +1624,6 @@ public class ByteDblLnkSeqTest{
     static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
       Stream.Builder<Arguments> streamBuilder=Stream.builder();
       for(var nestedType:NestedType.values()){
-        //if(nestedType==NestedType.SUBLIST){
-        //  continue;
-        //}
         for(var checkedType:CheckedType.values()){
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
@@ -1583,7 +1725,7 @@ public class ByteDblLnkSeqTest{
   static Stream<Arguments> getQueryListArguments(){
     Stream.Builder<Arguments> builder=Stream.builder();
     buildQueryArguments(builder,NestedType.LISTDEQUE);
-    //buildQueryArguments(builder,NestedType.SUBLIST);
+    buildQueryArguments(builder,NestedType.SUBLIST);
     return builder.build();
   }
   static Stream<Arguments> getQueryCollectionArguments(){

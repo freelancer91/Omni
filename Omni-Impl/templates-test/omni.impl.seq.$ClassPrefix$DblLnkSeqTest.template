@@ -78,42 +78,46 @@ public class $ClassPrefix$DblLnkSeqTest{
 #MACRO testlastIndexOf_val<PARALLEL>()
 #MACRO testsearch_val<PARALLEL>()
 #MACRO testremoveVal_val<PARALLEL>()
-//#MACRO testListadd_int_val<PARALLEL>()
+#MACRO testListadd_int_val<PARALLEL>()
 #ENDDEF
 
 #MACRODEF testListadd_int_val<PARALLEL>()
 static Stream<Arguments> getListadd_int_valArgs(){
   Stream.Builder<Arguments> builder=Stream.builder();
   for(var nestedType:NestedType.values()){
-    //if(nestedType.forwardIteration){
-      for(var checkedType:CheckedType.values()){
-        for(var seqLocation:SequenceLocation.values()){
-          if(checkedType.checked || seqLocation.expectedException==null){
-            for(var preModScenario:PreModScenario.values()){
-              if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
-                for(int seqSize:Abstract$ClassPrefix$SeqMonitor.FIB_SEQ){
-                  if(seqSize!=0 || seqLocation.validForEmpty){
-                    for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
-                      //for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-                        switch(nestedType){
-                          case LISTDEQUE:
-                            builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqSize));
-                            break;
-                          case SUBLIST:
-                            //for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-                            //  for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-                            //    for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-                            //      for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-                            //        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,initialCapacity,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),inputArgType,seqLocation,preModScenario,seqSize));
-                            //      }
-                            //    }
-                            //  }
-                            //}
-                            break;
-                          default:
-                            throw new Error("Unknown nested type "+nestedType);
+    for(var checkedType:CheckedType.values()){
+      for(var seqLocation:SequenceLocation.values()){
+        if(checkedType.checked || seqLocation.expectedException==null){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
+              for(int seqSize:Abstract$ClassPrefix$SeqMonitor.FIB_SEQ){
+                if(seqSize!=0 || seqLocation.validForEmpty){
+                  for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
+                    switch(nestedType){
+                      case LISTDEQUE:
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqSize));
+                        break;
+                      case SUBLIST:
+                        int[] preAllocs=new int[4];
+                        int[] postAllocs=new int[4];
+                        for(int preAllocBits=0;preAllocBits<(1<<4);++preAllocBits)
+                        {
+                          for(int marker=1,index=0;marker<(1<<4);marker<<=1,++index)
+                          {
+                            preAllocs[index]=(preAllocBits&marker)!=0?5:0;
+                          }
+                          for(int postAllocBits=0;postAllocBits<(1<<4);++postAllocBits)
+                          {
+                            for(int marker=1,index=0;marker<(1<<4);marker<<=1,++index)
+                            {
+                              postAllocs[index]=(postAllocBits&marker)!=0?5:0;
+                            }
+                            builder.accept(Arguments.of(new SeqMonitor(checkedType,preAllocs,postAllocs),inputArgType,seqLocation,preModScenario,seqSize));
+                          }
                         }
-                      //}
+                        break;
+                      default:
+                        throw new Error("Unknown nested type "+nestedType);
                     }
                   }
                 }
@@ -122,7 +126,7 @@ static Stream<Arguments> getListadd_int_valArgs(){
           }
         }
       }
-    //}
+    }
   }
   return builder.build();
 }
@@ -2338,9 +2342,6 @@ public void testConstructor_void(CheckedType checkedType){
     static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
       Stream.Builder<Arguments> streamBuilder=Stream.builder();
       for(var nestedType:NestedType.values()){
-        //if(nestedType==NestedType.SUBLIST){
-        //  continue;
-        //}
         for(var checkedType:CheckedType.values()){
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
@@ -2577,7 +2578,7 @@ public void testConstructor_void(CheckedType checkedType){
   static Stream<Arguments> getQueryListArguments(){
     Stream.Builder<Arguments> builder=Stream.builder();
     buildQueryArguments(builder,NestedType.LISTDEQUE);
-    //buildQueryArguments(builder,NestedType.SUBLIST);
+    buildQueryArguments(builder,NestedType.SUBLIST);
     return builder.build();
   }
   static Stream<Arguments> getQueryCollectionArguments(){
