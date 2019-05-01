@@ -1299,7 +1299,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     private int collapsetail(BooleanDblLnkNode oldtail,BooleanDblLnkNode head,boolean retainThis){
       int numRemoved=1;
       BooleanDblLnkNode newtail;
-      outer:for(newtail=oldtail.prev;newtail!=head;++numRemoved,newtail=newtail.next){
+      outer:for(newtail=oldtail.prev;newtail!=head;++numRemoved,newtail=newtail.prev){
         if(newtail.val==retainThis){
           BooleanDblLnkNode next,curr;
           for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
@@ -1342,7 +1342,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       this.head=newHead;
       this.tail=newTail;
       final BooleanDblLnkNode after,before=oldHead.prev;
-      if((after=oldHead.next)==null){
+      if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
           parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
@@ -3385,7 +3385,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     private int collapsetail(BooleanDblLnkNode oldtail,BooleanDblLnkNode head,boolean retainThis){
       int numRemoved=1;
       BooleanDblLnkNode newtail;
-      outer:for(newtail=oldtail.prev;newtail!=head;++numRemoved,newtail=newtail.next){
+      outer:for(newtail=oldtail.prev;newtail!=head;++numRemoved,newtail=newtail.prev){
         if(newtail.val==retainThis){
           BooleanDblLnkNode next,curr;
           for(curr=(next=newtail).prev;curr!=head;curr=(next=curr).prev){
@@ -3430,7 +3430,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       this.head=newHead;
       this.tail=newTail;
       final BooleanDblLnkNode after,before=oldHead.prev;
-      if((after=oldHead.next)==null){
+      if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
           ++parent.modCount,

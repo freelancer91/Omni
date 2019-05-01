@@ -4184,15 +4184,15 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
 #MACRODEF SubListRemoveMethods<CHECKED>()
 #IFNOT OfBoolean
   #IFSWITCH CHECKED==Checked
-private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet,int numSurvivors,int numRemoved){
+private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,$DNode$$<E>$ next,long[] survivorSet,int numSurvivors,int numRemoved){
   int wordOffset;
   for(long word=survivorSet[wordOffset=0],marker=1L;;){
     var curr=prev.next;
     if((marker&word)==0){
       do{
         if(--numRemoved==0){
-          prev.next=curr=curr.next;
-          curr.prev=prev;
+          prev.next=curr=next;
+          next.prev=prev;
           return;
         }else if((marker<<=1)==0){
           word=survivorSet[++wordOffset];
@@ -4204,6 +4204,11 @@ private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet
       curr.prev=prev;
     }
     if(--numSurvivors==0){
+      if(numRemoved!=0)
+      {
+        curr.next=next;
+        next.prev=curr;
+      }
       return;
     }
     if((marker<<=1)==0){
@@ -4213,14 +4218,14 @@ private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long[] survivorSet
     prev=curr;
   }
 }
-private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long word,int numSurvivors,int numRemoved){
+private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,$DNode$$<E>$ next,long word,int numSurvivors,int numRemoved){
   for(long marker=1L;;marker<<=1){
     var curr=prev.next;
     if((marker&word)==0){
       do{
         if(--numRemoved==0){
-          prev.next=curr=curr.next;
-          curr.prev=prev;
+          prev.next=next;
+          next.prev=prev;
           return;
         }
         curr=curr.next;
@@ -4229,6 +4234,10 @@ private static $<E>$ void pullSurvivorsDown($DNode$$<E>$ prev,long word,int numS
       curr.prev=prev;
     }
     if(--numSurvivors==0){
+      if(numRemoved!=0){
+        curr.next=next;
+        next.prev=curr;
+      }
       return;
     }
     prev=curr;
@@ -4509,7 +4518,7 @@ private void bubbleUpCollapseHeadAndTail($DNode$$<E>$ oldHead,$DNode$$<E>$ newHe
   this.head=newHead;
   this.tail=newTail;
   final $DNode$$<E>$ after,before=oldHead.prev;
-  if((after=oldHead.next)==null){
+  if((after=oldTail.next)==null){
     if(before==null){
       for(var parent=this.parent;parent!=null;
 #IFSWITCH CHECKED==Checked
@@ -4983,7 +4992,7 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$ArrayType$ ret
 }
 #ELSE
   #IFSWITCH CHECKED==Checked
-private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,CHECKEDList$<E>$.ModCountChecker modCountChecker)
+private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ newTail,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter,CHECKEDList$<E>$.ModCountChecker modCountChecker)
 {
   if(numLeft!=0){
     int numSurvivors;
@@ -4992,13 +5001,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,int numLeft,$Ty
       numSurvivors=markSurvivors(newHead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
       modCountChecker.checkModCount();
       if((numLeft-=numSurvivors)!=0){
-        pullSurvivorsDown(newHead,survivorSet,numSurvivors,numLeft);
+        pullSurvivorsDown(newHead,newTail,survivorSet,numSurvivors,numLeft);
       }
     }else{
       final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
       modCountChecker.checkModCount();
       if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
-        pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft);
+        pullSurvivorsDown(newHead,newTail,survivorWord,numSurvivors,numLeft);
       }
     }
   }else{
@@ -5027,7 +5036,7 @@ private void collapseHeadAndTail($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameMo
              break;
           }
           if(!filter.test(newTail.val)){
-            numRemoved+=collapseBodyHelper(newHead,size-1-numRemoved,filter,root.new ModCountChecker(modCount));
+            numRemoved+=collapseBodyHelper(newHead,newTail,size-1-numRemoved,filter,root.new ModCountChecker(modCount));
             break;
           }
         }
@@ -5095,7 +5104,7 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifi
           CheckedCollection.checkModCount(modCount,root.modCount);
           break;
         }else if(!filter.test((head=head.next).val)){
-          numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
+          numRemoved+=collapseBodyHelper(head,tail,--numLeft,filter,root.new ModCountChecker(modCount));
           break;
         }
       }
@@ -5131,7 +5140,7 @@ private boolean collapseBody($DNode$$<E>$ head,$DNode$$<E>$ tail,$TypeNameModifi
 private int collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$ArrayType$ retainThis){
   int numRemoved=1;
   $DNode$$<E>$ newHEAD;
-  outer:for(newHEAD=oldHEAD.NEXT;newHEAD!=TAIL;++numRemoved,newHEAD=newHEAD.next){
+  outer:for(newHEAD=oldHEAD.NEXT;newHEAD!=TAIL;++numRemoved,newHEAD=newHEAD.NEXT){
     if(newHEAD.val==retainThis){
       $DNode$$<E>$ PREV,curr;
       for(curr=(PREV=newHEAD).NEXT;curr!=TAIL;curr=(PREV=curr).NEXT){
@@ -5197,20 +5206,21 @@ private void collapseHEAD($DNode$$<E>$ oldHEAD,$DNode$$<E>$ TAIL,$TypeNameModifi
   #IFSWITCH CHECKED==Checked
   --numLeft,
   #ENDIF
-  ++numRemoved,newHEAD=newHEAD.next){
-    if(newHEAD==TAIL)
-    {
+  ++numRemoved,newHEAD=newHEAD.NEXT){ 
   #IFSWITCH CHECKED==Checked
+    if(numLeft==0){
       CheckedCollection.checkModCount(modCount,root.modCount);
+  #ELSE
+    if(newHEAD==TAIL){
   #ENDIF
       break;
     }
     if(!filter.test(newHEAD.val)){
   #IFSWITCH CHECKED==Checked
     #IFSWITCH HEAD==head
-      numRemoved+=collapseBodyHelper(newhead,--numLeft,filter,root.new ModCountChecker(modCount));
+      numRemoved+=collapseBodyHelper(newhead,TAIL,--numLeft,filter,root.new ModCountChecker(modCount));
     #ELSE
-      numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
+      numRemoved+=collapseBodyHelper(head,newtail,--numLeft,filter,root.new ModCountChecker(modCount));
     #ENDIF
       break;
     }

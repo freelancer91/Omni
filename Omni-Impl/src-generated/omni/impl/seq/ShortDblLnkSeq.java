@@ -1195,9 +1195,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       ShortDblLnkNode newhead;
       outer:
       for(newhead=oldhead.next;;
-      ++numRemoved,newhead=newhead.next){
-        if(newhead==tail)
-        {
+      ++numRemoved,newhead=newhead.next){ 
+        if(newhead==tail){
           break;
         }
         if(!filter.test(newhead.val)){
@@ -1246,9 +1245,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       ShortDblLnkNode newtail;
       outer:
       for(newtail=oldtail.prev;;
-      ++numRemoved,newtail=newtail.next){
-        if(newtail==head)
-        {
+      ++numRemoved,newtail=newtail.prev){ 
+        if(newtail==head){
           break;
         }
         if(!filter.test(newtail.val)){
@@ -1295,7 +1293,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       this.head=newHead;
       this.tail=newTail;
       final ShortDblLnkNode after,before=oldHead.prev;
-      if((after=oldHead.next)==null){
+      if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
           parent.size-=numRemoved,parent.head=newHead,parent.tail=newTail,parent=parent.parent){}
@@ -2913,15 +2911,15 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    private static  void pullSurvivorsDown(ShortDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
+    private static  void pullSurvivorsDown(ShortDblLnkNode prev,ShortDblLnkNode next,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=curr=curr.next;
-              curr.prev=prev;
+              prev.next=curr=next;
+              next.prev=prev;
               return;
             }else if((marker<<=1)==0){
               word=survivorSet[++wordOffset];
@@ -2933,6 +2931,11 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           curr.prev=prev;
         }
         if(--numSurvivors==0){
+          if(numRemoved!=0)
+          {
+            curr.next=next;
+            next.prev=curr;
+          }
           return;
         }
         if((marker<<=1)==0){
@@ -2942,14 +2945,14 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         prev=curr;
       }
     }
-    private static  void pullSurvivorsDown(ShortDblLnkNode prev,long word,int numSurvivors,int numRemoved){
+    private static  void pullSurvivorsDown(ShortDblLnkNode prev,ShortDblLnkNode next,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=curr=curr.next;
-              curr.prev=prev;
+              prev.next=next;
+              next.prev=prev;
               return;
             }
             curr=curr.next;
@@ -2958,6 +2961,10 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           curr.prev=prev;
         }
         if(--numSurvivors==0){
+          if(numRemoved!=0){
+            curr.next=next;
+            next.prev=curr;
+          }
           return;
         }
         prev=curr;
@@ -3198,14 +3205,13 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       ShortDblLnkNode newhead;
       for(newhead=oldhead.next;;
       --numLeft,
-      ++numRemoved,newhead=newhead.next){
-        if(newhead==tail)
-        {
+      ++numRemoved,newhead=newhead.next){ 
+        if(numLeft==0){
           CheckedCollection.checkModCount(modCount,root.modCount);
           break;
         }
         if(!filter.test(newhead.val)){
-          numRemoved+=collapseBodyHelper(newhead,--numLeft,filter,root.new ModCountChecker(modCount));
+          numRemoved+=collapseBodyHelper(newhead,tail,--numLeft,filter,root.new ModCountChecker(modCount));
           break;
         }
       }
@@ -3240,14 +3246,13 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       ShortDblLnkNode newtail;
       for(newtail=oldtail.prev;;
       --numLeft,
-      ++numRemoved,newtail=newtail.next){
-        if(newtail==head)
-        {
+      ++numRemoved,newtail=newtail.prev){ 
+        if(numLeft==0){
           CheckedCollection.checkModCount(modCount,root.modCount);
           break;
         }
         if(!filter.test(newtail.val)){
-          numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
+          numRemoved+=collapseBodyHelper(head,newtail,--numLeft,filter,root.new ModCountChecker(modCount));
           break;
         }
       }
@@ -3277,7 +3282,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       this.head=newHead;
       this.tail=newTail;
       final ShortDblLnkNode after,before=oldHead.prev;
-      if((after=oldHead.next)==null){
+      if((after=oldTail.next)==null){
         if(before==null){
           for(var parent=this.parent;parent!=null;
           ++parent.modCount,
@@ -3513,7 +3518,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         }
       }
     }
-    private static  int collapseBodyHelper(ShortDblLnkNode newHead,int numLeft,ShortPredicate filter,CheckedList.ModCountChecker modCountChecker)
+    private static  int collapseBodyHelper(ShortDblLnkNode newHead,ShortDblLnkNode newTail,int numLeft,ShortPredicate filter,CheckedList.ModCountChecker modCountChecker)
     {
       if(numLeft!=0){
         int numSurvivors;
@@ -3522,13 +3527,13 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           numSurvivors=markSurvivors(newHead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           modCountChecker.checkModCount();
           if((numLeft-=numSurvivors)!=0){
-            pullSurvivorsDown(newHead,survivorSet,numSurvivors,numLeft);
+            pullSurvivorsDown(newHead,newTail,survivorSet,numSurvivors,numLeft);
           }
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
           if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
-            pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft);
+            pullSurvivorsDown(newHead,newTail,survivorWord,numSurvivors,numLeft);
           }
         }
       }else{
@@ -3552,7 +3557,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
                  break;
               }
               if(!filter.test(newTail.val)){
-                numRemoved+=collapseBodyHelper(newHead,size-1-numRemoved,filter,root.new ModCountChecker(modCount));
+                numRemoved+=collapseBodyHelper(newHead,newTail,size-1-numRemoved,filter,root.new ModCountChecker(modCount));
                 break;
               }
             }
@@ -3586,7 +3591,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
               CheckedCollection.checkModCount(modCount,root.modCount);
               break;
             }else if(!filter.test((head=head.next).val)){
-              numRemoved+=collapseBodyHelper(head,--numLeft,filter,root.new ModCountChecker(modCount));
+              numRemoved+=collapseBodyHelper(head,tail,--numLeft,filter,root.new ModCountChecker(modCount));
               break;
             }
           }
