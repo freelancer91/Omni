@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.DoubleStream;
 import omni.util.OmniArray;
 import omni.impl.FloatDblLnkNode;
 import omni.api.OmniIterator;
@@ -791,43 +793,59 @@ public class FloatDblLnkSeqTest{
     }
     verifyItr.verifyPostAlloc(preModScenario);
   }
-  static Stream<Arguments> getremoveIf_PredicateArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-      if(nestedType!=NestedType.SUBLIST || !checkedType.checked || preModScenario.expectedException!=null){
-        return;
-      }
-      for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
-        if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredRemoveIfPredicateGen.appliesToRoot))){
-          for(var functionCallType:FunctionCallType.values()){
-            for(int seqSize=0;seqSize<=100;seqSize+=10){
-              double[] thresholdArr;
-              long randSeedBound;
-              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
-                thresholdArr=new double[]{0.5};
-                randSeedBound=0;
-              }else{
-                thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
-                randSeedBound=100;
-              }
-              for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
-                for(double threshold:thresholdArr){
-                  streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
-                }
-              }
-            }
-          }
-        }
-      }
-   });
-  }
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
-    getremoveIf_PredicateArgs()
-    //.parallel()
-    .map(Arguments::get).forEach(args->{
-      testremoveIf_PredicateHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredRemoveIfPredicateGen)args[2],(double)args[3],(long)args[4],(FunctionCallType)args[5],(int)args[6]
-      );
-    });
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var functionCallType:FunctionCallType.values()){
+          Stream.of(PreModScenario.values()).filter(preModScenario->preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod))
+          //.parallel()
+          .forEach(preModScenario->{
+            Stream.of(MonitoredRemoveIfPredicateGen.values()).filter(monitoredRemoveIfPredicateGen->(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredRemoveIfPredicateGen.appliesToRoot))))
+            //.parallel()
+            .forEach(monitoredRemoveIfPredicateGen->{
+              IntStream.iterate(0,seqSize->seqSize+10).limit(11)
+              //.parallel()
+              .forEach(seqSize->{
+                System.out.println("FloatDblLnkSeq.testremoveIf_Predicate<"+nestedType+","+checkedType+","+functionCallType+","+preModScenario+","+monitoredRemoveIfPredicateGen+","+seqSize+">");
+                double[] thresholdArr;
+                long randSeedBound;
+                if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+                  thresholdArr=new double[]{0.5};
+                  randSeedBound=0;
+                }else{
+                  thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
+                  randSeedBound=100;
+                }
+                LongStream.rangeClosed(0,randSeedBound)
+                  //.parallel()
+                  .forEach(randSeed->{
+                    DoubleStream.of(thresholdArr)
+                    //.parallel()
+                    .forEach(threshold->{
+                    switch(nestedType){
+                      case SUBLIST:
+                        if(functionCallType==FunctionCallType.Unboxed && monitoredRemoveIfPredicateGen.expectedException==null && preModScenario.expectedException==null){
+                          IntStream.rangeClosed(1,3)
+                          //.parallel()
+                          .forEach(parentsLength->{
+                            if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ThrowModParent)){
+                              runSubListTests(checkedType,true,parentsLength,seqMonitor->testremoveIf_PredicateHelper(seqMonitor,preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+                            }
+                          });
+                          break;
+                        }
+                      case LISTDEQUE:
+                        testremoveIf_PredicateHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize);
+                    }
+                  });
+                });
+              });
+            });
+          });
+        }
+      }
+    }
   }
   private static void testremoveIf_PredicateHelper
   (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize

@@ -1060,42 +1060,42 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       return false;
     }
     private void bubbleUpPeelHead(BooleanDblLnkNode newHead,BooleanDblLnkNode oldHead){
-      var curr=parent;
-      do{
-        if(curr.head!=oldHead){
+      newHead.prev=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.tail!=oldHead){
           curr.bubbleUpPeelHead(newHead);
           break;
         }
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelHead(BooleanDblLnkNode newHead){
       var curr=this;
       do{
         curr.head=newHead;
         --curr.size; 
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void bubbleUpPeelTail(BooleanDblLnkNode newTail,BooleanDblLnkNode oldTail){
-      var curr=parent;
-      do{
-        if(curr.tail!=oldTail){
+      newTail.next=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.head!=oldTail){
           curr.bubbleUpPeelTail(newTail);
           break;
         }
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelTail(BooleanDblLnkNode newTail){
       var curr=this;
       do{
         curr.tail=newTail;
         --curr.size;
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void uncheckedBubbleUpDecrementSize(){
       var curr=this;
@@ -1141,18 +1141,16 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
           curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
           root.head=null;
         }else{
-          before.next=null;
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
-        after.prev=before;
         if(before==null){
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          after.prev=before;
           before.next=after;
-          var curr=parent;
-          do{
+          for(var curr=parent;curr!=null;curr=curr.parent){
             if(curr.head!=lastNode){
               do{
                 if(curr.tail!=lastNode){
@@ -1161,8 +1159,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
                 }
                 --curr.size;
                 curr.tail=before;
-              }
-              while((curr=curr.parent)!=null);
+              }while((curr=curr.parent)!=null);
               break;
             }
             if(curr.tail!=lastNode){
@@ -1183,7 +1180,6 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             curr.tail=null;
             curr.size=0;
           }
-          while((curr=curr.parent)!=null);
         }
       }
       this.head=null;
@@ -1287,6 +1283,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         for(var parent=this.parent;parent!=null;
           parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
           if(parent.head!=oldhead){
+            parent.size-=numRemoved;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
@@ -1329,6 +1326,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         for(var parent=this.parent;parent!=null;
           parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
           if(parent.tail!=oldtail){
+            parent.size-=numRemoved;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
@@ -1384,6 +1382,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             if(parent.head!=oldHead){
               do{
                 if(parent.tail!=oldTail){
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -1400,6 +1399,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
                   break;
                 }
                 if(parent.head!=oldHead){
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -1498,10 +1498,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
     }
     private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
+      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){
+      }
     }
     private void bubbleUpClearBody(BooleanDblLnkNode before,BooleanDblLnkNode head,int numRemoved,BooleanDblLnkNode tail,BooleanDblLnkNode after){
       for(var curr=parent;curr!=null;
@@ -1514,6 +1512,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
               return;
             }
           }
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }else if(curr.tail!=tail){
@@ -1524,6 +1523,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
               return;
             }
           }while(curr.head==head);
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }
@@ -3113,9 +3113,9 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
     private void bubbleUpPeelHead(BooleanDblLnkNode newHead,BooleanDblLnkNode oldHead){
-      var curr=parent;
-      do{
-        if(curr.head!=oldHead){
+      newHead.prev=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.tail!=oldHead){
           curr.bubbleUpPeelHead(newHead);
           break;
         }
@@ -3123,7 +3123,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelHead(BooleanDblLnkNode newHead){
       var curr=this;
@@ -3131,12 +3131,12 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         ++curr.modCount;
         curr.head=newHead;
         --curr.size; 
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void bubbleUpPeelTail(BooleanDblLnkNode newTail,BooleanDblLnkNode oldTail){
-      var curr=parent;
-      do{
-        if(curr.tail!=oldTail){
+      newTail.next=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.head!=oldTail){
           curr.bubbleUpPeelTail(newTail);
           break;
         }
@@ -3144,7 +3144,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelTail(BooleanDblLnkNode newTail){
       var curr=this;
@@ -3152,7 +3152,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
         ++curr.modCount;
         curr.tail=newTail;
         --curr.size;
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void uncheckedBubbleUpDecrementSize(){
       var curr=this;
@@ -3202,18 +3202,16 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
           curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
           root.head=null;
         }else{
-          before.next=null;
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
-        after.prev=before;
         if(before==null){
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          after.prev=before;
           before.next=after;
-          var curr=parent;
-          do{
+          for(var curr=parent;curr!=null;curr=curr.parent){
             if(curr.head!=lastNode){
               do{
                 if(curr.tail!=lastNode){
@@ -3223,8 +3221,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
                 ++curr.modCount;
                 --curr.size;
                 curr.tail=before;
-              }
-              while((curr=curr.parent)!=null);
+              }while((curr=curr.parent)!=null);
               break;
             }
             if(curr.tail!=lastNode){
@@ -3247,7 +3244,6 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             curr.tail=null;
             curr.size=0;
           }
-          while((curr=curr.parent)!=null);
         }
       }
       this.head=null;
@@ -3373,6 +3369,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
           ++parent.modCount,
           parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
           if(parent.head!=oldhead){
+            parent.size-=numRemoved;
+            ++parent.modCount;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
@@ -3417,6 +3415,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
           ++parent.modCount,
           parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
           if(parent.tail!=oldtail){
+            parent.size-=numRemoved;
+            ++parent.modCount;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
@@ -3478,6 +3478,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
             if(parent.head!=oldHead){
               do{
                 if(parent.tail!=oldTail){
+                  ++parent.modCount;
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -3496,6 +3498,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
                   break;
                 }
                 if(parent.head!=oldHead){
+                  ++parent.modCount;
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -3624,11 +3628,9 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
     }
     private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
+      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){
         ++curr.modCount;
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpClearBody(BooleanDblLnkNode before,BooleanDblLnkNode head,int numRemoved,BooleanDblLnkNode tail,BooleanDblLnkNode after){
       for(var curr=parent;curr!=null;
@@ -3643,6 +3645,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
               return;
             }
           }
+          ++curr.modCount;
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }else if(curr.tail!=tail){
@@ -3654,6 +3658,8 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
               return;
             }
           }while(curr.head==head);
+          ++curr.modCount;
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }

@@ -995,42 +995,42 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       return false;
     }
     private void bubbleUpPeelHead(ShortDblLnkNode newHead,ShortDblLnkNode oldHead){
-      var curr=parent;
-      do{
-        if(curr.head!=oldHead){
+      newHead.prev=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.tail!=oldHead){
           curr.bubbleUpPeelHead(newHead);
           break;
         }
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelHead(ShortDblLnkNode newHead){
       var curr=this;
       do{
         curr.head=newHead;
         --curr.size; 
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void bubbleUpPeelTail(ShortDblLnkNode newTail,ShortDblLnkNode oldTail){
-      var curr=parent;
-      do{
-        if(curr.tail!=oldTail){
+      newTail.next=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.head!=oldTail){
           curr.bubbleUpPeelTail(newTail);
           break;
         }
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelTail(ShortDblLnkNode newTail){
       var curr=this;
       do{
         curr.tail=newTail;
         --curr.size;
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void uncheckedBubbleUpDecrementSize(){
       var curr=this;
@@ -1076,18 +1076,16 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
           root.head=null;
         }else{
-          before.next=null;
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
-        after.prev=before;
         if(before==null){
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          after.prev=before;
           before.next=after;
-          var curr=parent;
-          do{
+          for(var curr=parent;curr!=null;curr=curr.parent){
             if(curr.head!=lastNode){
               do{
                 if(curr.tail!=lastNode){
@@ -1096,8 +1094,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
                 }
                 --curr.size;
                 curr.tail=before;
-              }
-              while((curr=curr.parent)!=null);
+              }while((curr=curr.parent)!=null);
               break;
             }
             if(curr.tail!=lastNode){
@@ -1118,7 +1115,6 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
             curr.tail=null;
             curr.size=0;
           }
-          while((curr=curr.parent)!=null);
         }
       }
       this.head=null;
@@ -1224,13 +1220,13 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       this.head=newhead;
       ShortDblLnkNode tmp;
       if((tmp=oldhead.prev)==null){
-        for(var parent=this.parent;parent!=null;
-          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){}
+        for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+        }
         root.head=newhead;
       }else{
-        for(var parent=this.parent;parent!=null;
-          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+        for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
           if(parent.head!=oldhead){
+            parent.size-=numRemoved;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
@@ -1274,13 +1270,13 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       this.tail=newtail;
       ShortDblLnkNode tmp;
       if((tmp=oldtail.next)==null){
-        for(var parent=this.parent;parent!=null;
-          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){}
+        for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+        }
         root.tail=newtail;
       }else{
-        for(var parent=this.parent;parent!=null;
-          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+        for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
           if(parent.tail!=oldtail){
+            parent.size-=numRemoved;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
@@ -1335,6 +1331,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
             if(parent.head!=oldHead){
               do{
                 if(parent.tail!=oldTail){
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -1351,6 +1348,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
                   break;
                 }
                 if(parent.head!=oldHead){
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -1436,10 +1434,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
     }
     private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
+      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){
+      }
     }
     private void bubbleUpClearBody(ShortDblLnkNode before,ShortDblLnkNode head,int numRemoved,ShortDblLnkNode tail,ShortDblLnkNode after){
       for(var curr=parent;curr!=null;
@@ -1452,6 +1448,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
               return;
             }
           }
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }else if(curr.tail!=tail){
@@ -1462,6 +1459,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
               return;
             }
           }while(curr.head==head);
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }
@@ -1538,6 +1536,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           head.prev=prev;
           prev.next=head;
           root.size-=numRemoved;
+          this.size=size-numRemoved;
           bubbleUpDecrementSize(numRemoved);
           return true;
         }
@@ -2911,16 +2910,16 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
     private Object writeReplace(){
       return new SerializableSubList(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
-    private static  void pullSurvivorsDown(ShortDblLnkNode prev,ShortDblLnkNode next,long[] survivorSet,int numSurvivors,int numRemoved){
+    private static  ShortDblLnkNode pullSurvivorsDown(ShortDblLnkNode prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
       for(long word=survivorSet[wordOffset=0],marker=1L;;){
         var curr=prev.next;
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=curr=next;
-              next.prev=prev;
-              return;
+              prev.next=curr=curr.next;
+              curr.prev=prev;
+              return null;
             }else if((marker<<=1)==0){
               word=survivorSet[++wordOffset];
               marker=1L;
@@ -2931,12 +2930,10 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           curr.prev=prev;
         }
         if(--numSurvivors==0){
-          if(numRemoved!=0)
-          {
-            curr.next=next;
-            next.prev=curr;
+          if(numRemoved!=0){
+            return curr;
           }
-          return;
+          return null;
         }
         if((marker<<=1)==0){
            word=survivorSet[++wordOffset];
@@ -2945,15 +2942,15 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         prev=curr;
       }
     }
-    private static  void pullSurvivorsDown(ShortDblLnkNode prev,ShortDblLnkNode next,long word,int numSurvivors,int numRemoved){
+    private static  ShortDblLnkNode pullSurvivorsDown(ShortDblLnkNode prev,long word,int numSurvivors,int numRemoved){
       for(long marker=1L;;marker<<=1){
         var curr=prev.next;
         if((marker&word)==0){
           do{
             if(--numRemoved==0){
-              prev.next=next;
-              next.prev=prev;
-              return;
+              prev.next=curr=curr.next;
+              curr.prev=prev;
+              return null;
             }
             curr=curr.next;
           }while(((marker<<=1)&word)==0);
@@ -2962,18 +2959,17 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         }
         if(--numSurvivors==0){
           if(numRemoved!=0){
-            curr.next=next;
-            next.prev=curr;
+            return curr;
           }
-          return;
+          return null;
         }
         prev=curr;
       }
     }
     private void bubbleUpPeelHead(ShortDblLnkNode newHead,ShortDblLnkNode oldHead){
-      var curr=parent;
-      do{
-        if(curr.head!=oldHead){
+      newHead.prev=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.tail!=oldHead){
           curr.bubbleUpPeelHead(newHead);
           break;
         }
@@ -2981,7 +2977,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelHead(ShortDblLnkNode newHead){
       var curr=this;
@@ -2989,12 +2985,12 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         ++curr.modCount;
         curr.head=newHead;
         --curr.size; 
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void bubbleUpPeelTail(ShortDblLnkNode newTail,ShortDblLnkNode oldTail){
-      var curr=parent;
-      do{
-        if(curr.tail!=oldTail){
+      newTail.next=null;
+      for(var curr=parent;curr!=null;curr=curr.parent){
+        if(curr.head!=oldTail){
           curr.bubbleUpPeelTail(newTail);
           break;
         }
@@ -3002,7 +2998,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         curr.size=0;
         curr.head=null;
         curr.tail=null;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpPeelTail(ShortDblLnkNode newTail){
       var curr=this;
@@ -3010,7 +3006,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
         ++curr.modCount;
         curr.tail=newTail;
         --curr.size;
-      }while((curr=curr.parent)==null);
+      }while((curr=curr.parent)!=null);
     }
     private void uncheckedBubbleUpDecrementSize(){
       var curr=this;
@@ -3060,18 +3056,16 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
           root.head=null;
         }else{
-          before.next=null;
           bubbleUpPeelTail(before,lastNode);
         }
       }else{
-        after.prev=before;
         if(before==null){
           bubbleUpPeelHead(after,lastNode);
           root.head=after;
         }else{
+          after.prev=before;
           before.next=after;
-          var curr=parent;
-          do{
+          for(var curr=parent;curr!=null;curr=curr.parent){
             if(curr.head!=lastNode){
               do{
                 if(curr.tail!=lastNode){
@@ -3081,8 +3075,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
                 ++curr.modCount;
                 --curr.size;
                 curr.tail=before;
-              }
-              while((curr=curr.parent)!=null);
+              }while((curr=curr.parent)!=null);
               break;
             }
             if(curr.tail!=lastNode){
@@ -3105,7 +3098,6 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
             curr.tail=null;
             curr.size=0;
           }
-          while((curr=curr.parent)!=null);
         }
       }
       this.head=null;
@@ -3222,16 +3214,19 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       this.head=newhead;
       ShortDblLnkNode tmp;
       if((tmp=oldhead.prev)==null){
-        for(var parent=this.parent;parent!=null;
-          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){}
+        for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+            ++parent.modCount;
+        }
         root.head=newhead;
       }else{
-        for(var parent=this.parent;parent!=null;
-          parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
+        for(var parent=this.parent;parent!=null;parent.head=newhead,parent.size-=numRemoved,parent=parent.parent){
           if(parent.head!=oldhead){
+            ++parent.modCount;
+            parent.size-=numRemoved;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
+          ++parent.modCount;
         }
         tmp.next=newhead;
       }
@@ -3263,16 +3258,19 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       this.tail=newtail;
       ShortDblLnkNode tmp;
       if((tmp=oldtail.next)==null){
-        for(var parent=this.parent;parent!=null;
-          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){}
+        for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+            ++parent.modCount;
+        }
         root.tail=newtail;
       }else{
-        for(var parent=this.parent;parent!=null;
-          parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
+        for(var parent=this.parent;parent!=null;parent.tail=newtail,parent.size-=numRemoved,parent=parent.parent){
           if(parent.tail!=oldtail){
+            ++parent.modCount;
+            parent.size-=numRemoved;
             parent.bubbleUpDecrementSize(numRemoved);
             break;
           }
+          ++parent.modCount;
         }
         tmp.prev=newtail;
       }
@@ -3330,6 +3328,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
             if(parent.head!=oldHead){
               do{
                 if(parent.tail!=oldTail){
+                  ++parent.modCount;
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -3348,6 +3348,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
                   break;
                 }
                 if(parent.head!=oldHead){
+                  ++parent.modCount;
+                  parent.size-=numRemoved;
                   parent.bubbleUpDecrementSize(numRemoved);
                   break;
                 }
@@ -3455,11 +3457,9 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
       curr.head=null,curr.tail=null,curr.size=0,curr=curr.parent){}
     }
     private void bubbleUpDecrementSize(int numRemoved){
-      var curr=this;
-      do{
+      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){
         ++curr.modCount;
-        curr.size-=numRemoved;
-      }while((curr=curr.parent)!=null);
+      }
     }
     private void bubbleUpClearBody(ShortDblLnkNode before,ShortDblLnkNode head,int numRemoved,ShortDblLnkNode tail,ShortDblLnkNode after){
       for(var curr=parent;curr!=null;
@@ -3474,6 +3474,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
               return;
             }
           }
+          ++curr.modCount;
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }else if(curr.tail!=tail){
@@ -3485,6 +3487,8 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
               return;
             }
           }while(curr.head==head);
+          ++curr.modCount;
+          curr.size-=numRemoved;
           curr.bubbleUpDecrementSize(numRemoved);
           return;
         }
@@ -3527,13 +3531,19 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           numSurvivors=markSurvivors(newHead.next,numLeft,filter,survivorSet=new long[(numLeft-1>>6)+1]);
           modCountChecker.checkModCount();
           if((numLeft-=numSurvivors)!=0){
-            pullSurvivorsDown(newHead,newTail,survivorSet,numSurvivors,numLeft);
+            if((newHead=pullSurvivorsDown(newHead,survivorSet,numSurvivors,numLeft))!=null){
+              newHead.next=newTail;
+              newTail.prev=newHead;
+            }
           }
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
           if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
-            pullSurvivorsDown(newHead,newTail,survivorWord,numSurvivors,numLeft);
+            if((newHead=pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft))!=null){
+              newHead.next=newTail;
+              newTail.prev=newHead;
+            }
           }
         }
       }else{
@@ -3546,12 +3556,11 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
     ){
       int numRemoved;
       if((numRemoved=2)!=size){
-        var newHead=head.next;
-        do{
+        for(var newHead=head.next;;newHead=newHead.next){
           if(!filter.test(newHead.val)){
             var newTail=tail.prev;
             final CheckedList root=this.root;
-            for(--size;numRemoved!=size;++numRemoved,newTail=newTail.prev){
+            for(--size;;++numRemoved,newTail=newTail.prev){
               if(numRemoved==size){
                  CheckedCollection.checkModCount(modCount,root.modCount);
                  break;
@@ -3568,8 +3577,10 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
             bubbleUpCollapseHeadAndTail(head,newHead,numRemoved,newTail,tail);
             return;
           }
+          if(++numRemoved==size){
+            break;
+          }
         }
-        while(++numRemoved!=size);
       }
       CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
@@ -3587,10 +3598,11 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           int numRemoved=1;
           var root=this.root;
           for(;;++numRemoved){
+            head=head.next;
             if(--numLeft==0){
               CheckedCollection.checkModCount(modCount,root.modCount);
               break;
-            }else if(!filter.test((head=head.next).val)){
+            }else if(!filter.test(head.val)){
               numRemoved+=collapseBodyHelper(head,tail,--numLeft,filter,root.new ModCountChecker(modCount));
               break;
             }
@@ -3600,6 +3612,7 @@ public abstract class ShortDblLnkSeq extends AbstractSeq implements
           head.prev=prev;
           prev.next=head;
           root.size-=numRemoved;
+          this.size=size-numRemoved;
           bubbleUpDecrementSize(numRemoved);
           return true;
         }
