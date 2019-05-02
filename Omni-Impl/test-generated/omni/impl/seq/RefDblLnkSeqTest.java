@@ -186,7 +186,7 @@ public class RefDblLnkSeqTest{
                       .parallel()
                       .forEach(parentsLength->{
                         if(parentsLength!=1 || preModScenario!=PreModScenario.ModParent){
-                          runSubListTests(checkedType,true,parentsLength,seqMonitor->testadd_valHelper(seqMonitor,inputArgType,preModScenario,finalSeqSize));
+                          runSubListTests(false,checkedType,true,parentsLength,seqMonitor->testadd_valHelper(seqMonitor,inputArgType,preModScenario,finalSeqSize));
                         }
                       });
                       break;
@@ -974,7 +974,7 @@ public class RefDblLnkSeqTest{
                             .parallel()
                             .forEach(parentsLength->{
                               if(parentsLength!=1 || preModScenario!=PreModScenario.ModParent){
-                                runSubListTests(checkedType,true,parentsLength,seqMonitor->testListadd_int_valHelper(seqMonitor,inputArgType,seqLocation,preModScenario,finalSeqSize));
+                                runSubListTests(false,checkedType,true,parentsLength,seqMonitor->testListadd_int_valHelper(seqMonitor,inputArgType,seqLocation,preModScenario,finalSeqSize));
                               }
                             });
                             break;
@@ -1109,7 +1109,7 @@ public class RefDblLnkSeqTest{
                           .parallel()
                           .forEach(parentsLength->{
                             if(parentsLength!=1 || preModScenario!=PreModScenario.ModParent){
-                              runSubListTests(checkedType,true,parentsLength,seqMonitor->testListItradd_valHelper(seqMonitor,preModScenario,finalSeqSize,seqLocation,inputArgType));
+                              runSubListTests(false,checkedType,true,parentsLength,seqMonitor->testListItradd_valHelper(seqMonitor,preModScenario,finalSeqSize,seqLocation,inputArgType));
                             }
                           });
                           break;
@@ -1226,6 +1226,7 @@ public class RefDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
+    final int[] seqSizes=new int[]{0,1,2,3,4,5,10,20,30,40,50,60,70,80,90,100};
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){
         for(var functionCallType:FunctionCallType.values()){
@@ -1238,7 +1239,7 @@ public class RefDblLnkSeqTest{
             Stream.of(MonitoredRemoveIfPredicateGen.values()).filter(monitoredRemoveIfPredicateGen->(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredRemoveIfPredicateGen.appliesToRoot))))
             //.parallel()
             .forEach(monitoredRemoveIfPredicateGen->{
-              IntStream.iterate(0,seqSize->seqSize+10).limit(11)
+              IntStream.of(seqSizes)
               //.parallel()
               .forEach(seqSize->{
                 System.out.println("RefDblLnkSeq.testremoveIf_Predicate<"+nestedType+","+checkedType+","+functionCallType+","+preModScenario+","+monitoredRemoveIfPredicateGen+","+seqSize+">");
@@ -1251,9 +1252,11 @@ public class RefDblLnkSeqTest{
                   thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
                   randSeedBound=100;
                 }
-                LongStream.rangeClosed(0,randSeedBound)
-                  //.parallel()
-                  .forEach(randSeed->{
+                var randStream=LongStream.rangeClosed(0,randSeedBound);
+                if(randSeedBound!=0){
+                  randStream=randStream.parallel();
+                }
+                randStream.forEach(randSeed->{
                     DoubleStream.of(thresholdArr)
                     //.parallel()
                     .forEach(threshold->{
@@ -1264,7 +1267,7 @@ public class RefDblLnkSeqTest{
                           //.parallel()
                           .forEach(parentsLength->{
                             if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ThrowModParent)){
-                              runSubListTests(checkedType,true,parentsLength,seqMonitor->testremoveIf_PredicateHelper(seqMonitor,preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+                              runSubListTests(true,checkedType,randSeedBound==0?true:false,parentsLength,seqMonitor->testremoveIf_PredicateHelper(seqMonitor,preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
                             }
                           });
                           break;
@@ -1357,79 +1360,81 @@ public class RefDblLnkSeqTest{
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
   }
-  private static void runSubListTests(CheckedType checkedType,boolean parallel,int parentLength,Consumer<? super SeqMonitor> testMethod){
-    var preAllocStream=IntStream.range(0,1<<(parentLength<<1));
-    if(parallel){
-      preAllocStream=preAllocStream.parallel();
-    }
-    preAllocStream.forEach(preAllocBits->{
-      int[] preAllocs=new int[parentLength];
-      for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
-        int preAlloc;
-        switch(marker&preAllocBits){
-          case 0b00:
-            preAlloc=0;
-            break;
-          case 0b01:
-            preAlloc=2;
-            break;
-          case 0b10:
-            preAlloc=4;
-            break;
-          default:
-            preAlloc=6;
-        }
-        preAllocs[index]=preAlloc;
-      }
-      var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
+  private static void runSubListTests(boolean quickTest,CheckedType checkedType,boolean parallel,int parentLength,Consumer<? super SeqMonitor> testMethod){
+    if(quickTest){
+      var preAllocStream=IntStream.range(0,1<<(parentLength));
       if(parallel){
-        postAllocStream=postAllocStream.parallel();
+        preAllocStream=preAllocStream.parallel();
       }
-      postAllocStream.forEach(postAllocBits->{
-        int[] postAllocs=new int[parentLength];
+      preAllocStream.forEach(preAllocBits->{
+        int[] preAllocs=new int[parentLength];
+        for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
+          preAllocs[index]=(marker&preAllocBits)!=0?5:0;
+        }
+        var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
+        if(parallel){
+          postAllocStream=postAllocStream.parallel();
+        }
+        postAllocStream.forEach(postAllocBits->{
+          int[] postAllocs=new int[parentLength];
+          for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
+            postAllocs[index]=(marker&postAllocBits)!=0?5:0;
+          }
+          //System.out.println(Arrays.toString(preAllocs)+","+Arrays.toString(postAllocs));
+          testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
+        });
+      });
+    }else{
+      var preAllocStream=IntStream.range(0,1<<(parentLength<<1));
+      if(parallel){
+        preAllocStream=preAllocStream.parallel();
+      }
+      preAllocStream.forEach(preAllocBits->{
+        int[] preAllocs=new int[parentLength];
         for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
-          int postAlloc;
-          switch(marker&postAllocBits){
+          int preAlloc;
+          switch(marker&preAllocBits){
             case 0b00:
-              postAlloc=0;
+              preAlloc=0;
               break;
             case 0b01:
-              postAlloc=2;
+              preAlloc=2;
               break;
             case 0b10:
-              postAlloc=4;
+              preAlloc=4;
               break;
             default:
-              postAlloc=6;
+              preAlloc=6;
           }
-          postAllocs[index]=postAlloc;
+          preAllocs[index]=preAlloc;
         }
-        testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
+        var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
+        if(parallel){
+          postAllocStream=postAllocStream.parallel();
+        }
+        postAllocStream.forEach(postAllocBits->{
+          int[] postAllocs=new int[parentLength];
+          for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
+            int postAlloc;
+            switch(marker&postAllocBits){
+              case 0b00:
+                postAlloc=0;
+                break;
+              case 0b01:
+                postAlloc=2;
+                break;
+              case 0b10:
+                postAlloc=4;
+                break;
+              default:
+                postAlloc=6;
+            }
+            postAllocs[index]=postAlloc;
+          }
+          testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
+        });
       });
-    });
-  /*
-    var preAllocStream=IntStream.range(0,1<<parentLength);
-    if(parallel){
-      preAllocStream=preAllocStream.parallel();
     }
-    preAllocStream.forEach(preAllocBits->{
-      int[] preAllocs=new int[parentLength];
-      for(int index=0,marker=1;index<parentLength;marker<<=1,++index){
-        preAllocs[index]=(preAllocBits&marker)!=0?5:0;
-      }
-      var postAllocStream=IntStream.range(0,1<<parentLength);
-      if(parallel){
-        postAllocStream=postAllocStream.parallel();
-      }
-      postAllocStream.forEach(postAllocBits->{
-        int[] postAllocs=new int[parentLength];
-        for(int index=0,marker=1;index<parentLength;marker<<=1,++index){
-          postAllocs[index]=(postAllocBits&marker)!=0?5:0;
-        }
-        testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
-      });
-    });
-    */
   }
   static enum NestedType{
     LISTDEQUE(true),
