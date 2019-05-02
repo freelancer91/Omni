@@ -1161,6 +1161,7 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>
         };
       }
     },
+    //TODO come up with a quicker way to test than using random sequences
     Random(null,true,true){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractDoubleSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
         return new MonitoredRemoveIfPredicate(){

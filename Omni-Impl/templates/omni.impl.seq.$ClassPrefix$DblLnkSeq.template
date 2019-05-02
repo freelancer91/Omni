@@ -546,9 +546,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         }
       }
       @Override public void remove(){
-        $DNode$$<E>$ lastRet;
-        if((lastRet=this.lastRet).next==curr){
+        $DNode$$<E>$ lastRet,curr;
+        if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
+        }else{
+          this.curr=curr;
         }
         UncheckedSubList$<E>$ parent;
         if(--(parent=this.parent).size==0){
@@ -560,11 +562,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
             if(lastRet==parent.head){
               parent.peelHead(lastRet);
             }else{
-              $DNode$.eraseNode(lastRet);
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
               parent.bubbleUpDecrementSize();
             }
           }
         }
+        this.lastRet=null;
         --parent.root.size;
       }
       @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
@@ -741,7 +745,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return currIndex<parent.size;
       }
       @Override public boolean hasPrevious(){
-        return currIndex>0;
+        return currIndex!=0;
       }
       @Override public int nextIndex(){
         return this.currIndex;
@@ -800,8 +804,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           root.modCount=++modCount;
           this.modCount=modCount;
           parent.modCount=modCount;
-          if(lastRet.next==curr){
+          $DNode$$<E>$ curr;
+          if((curr=lastRet.next)==this.curr){
             --currIndex;
+          }else{
+            this.curr=curr;
           }
           if(--(parent=this.parent).size==0){
             parent.removeLastNode(parent.tail);
@@ -812,12 +819,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
               if(lastRet==parent.head){
                 parent.peelHead(lastRet);
               }else{
-                $DNode$.eraseNode(lastRet);
+                curr.prev=lastRet=lastRet.prev;
+                lastRet.next=curr;
                 parent.bubbleUpDecrementSize();
               }
             }
           }
           --root.size;
+          this.lastRet=null;
           return;
         }
         throw new IllegalStateException();
@@ -1822,8 +1831,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
-          if(lastRet.next==curr){
+          $DNode$$<E>$ curr;
+          if((curr=lastRet.next)==this.curr){
             --currIndex;
+          }else{
+            this.curr=curr;
           }
           if(--parent.size==0){
             parent.head=null;
@@ -1833,10 +1845,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
               parent.tail=lastRet=lastRet.prev;
               lastRet.next=null;
             }else if(lastRet==parent.head){
-              parent.head=lastRet=lastRet.next;
-              lastRet.prev=null;
+              parent.head=curr;
+              curr.prev=null;
             }else{
-              $DNode$.eraseNode(lastRet);
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
             }
           }
           this.lastRet=null;
@@ -2387,7 +2400,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         return curr.val;
       }
       @Override public boolean hasPrevious(){
-        return curr.prev!=null;
+        return currIndex>0;
       }
       @Override public int nextIndex(){
         return currIndex;
@@ -2422,9 +2435,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         lastRet.val=val;
       }
       @Override public void remove(){
-        $DNode$$<E>$ lastRet;
-        if((lastRet=this.lastRet).next==curr){
+        $DNode$$<E>$ lastRet,curr;
+        if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
+        }else{
+          this.curr=curr;
         }
         final UncheckedList$<E>$ parent;
         if(--(parent=this.parent).size==0){
@@ -2435,10 +2450,11 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
             parent.tail=lastRet=lastRet.prev;
             lastRet.next=null;
           }else if(lastRet==parent.head){
-            parent.head=lastRet=lastRet.next;
-            lastRet.prev=null;
+            parent.head=curr;
+            curr.prev=null;
           }else{
-            $DNode$.eraseNode(lastRet);
+            curr.prev=lastRet=lastRet.prev;
+            lastRet.next=curr;
           }
         }
         this.lastRet=null;
@@ -3408,8 +3424,8 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
       CheckedCollection.checkModCount(modCount,root.modCount);
     #ENDIF
       root.modCount=++modCount;
-      --root.size;
       this.modCount=modCount;
+      --root.size;
       if(--this.size==0){
         removeLastNode(head);
       }else{
@@ -3418,35 +3434,39 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
       return true;
     }
     #IFSWITCH SUFFIX==NonNull
-    int size,numLeft=(size=this.size-1);
-    for(;numLeft!=0;--numLeft){
+    for(int size=this.size-1,numLeft=size;numLeft!=0;--numLeft){
       $DNode$$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
-        CheckedCollection.checkModCount(modCount,this.modCount);
-        this.modCount=modCount+1;
-        if(numLeft==1){
-          this.tail=prev;
-          prev.next=null;
-        }else{
-          head.prev=prev;
-          prev.next=head;
-        }
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        --root.size;
         this.size=size;
+        if(numLeft==1){
+          peelTail(prev,head);
+        }else{
+          prev.next=head=head.next;
+          head.prev=prev;
+          bubbleUpDecrementSize();
+        }
         return true;
       }
     }
     #ELSE
-    for($DNode$$<E>$ prev;(head=(prev=head).next)!=null;){
-      if(POSTEST(head.val)){
-        this.modCount=modCount+1;
-        if((head=head.next)==null){
-          this.head=prev;
-          prev.next=null;
-        }else{
-          head.prev=prev;
-          prev.next=head;
-        }
+    for(final var tail=this.tail;head!=tail;){
+      $DNode$$<E>$ prev;
+      if(POSTEST((head=(prev=head).next).val)){
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        --root.size;
         --this.size;
+        if(head==tail){
+          peelTail(prev,head);
+        }else{
+          prev.next=head=head.next;
+          head.prev=prev;
+          bubbleUpDecrementSize();
+        }
         return true;
       }
     }
@@ -3471,15 +3491,15 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     return true;
   }else{
     for(final var tail=this.tail;tail!=head;){
-      if(POSTEST((head=head.next).val)){
+      $DNode$$<E>$ prev;
+      if(POSTEST((head=(prev=head).next).val)){
         --root.size;
         --this.size;
         if(head==tail){
-          peelTail(head);
+          peelTail(prev,head);
         }else{
-          $DNode$$<E>$ before,after;
-          (before=head.prev).next=(after=head.next);
-          after.prev=before;
+          prev.next=head=head.next;
+          head.prev=prev;
           bubbleUpDecrementSize();
         }
         return true;
@@ -4098,7 +4118,7 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
     }else{
       //iterate from the head
       $DNode$$<E>$ after;
-      ret=(after=(head=$DNode$.iterateAscending(head,index)).next).val;
+      ret=(after=(head=$DNode$.iterateAscending(head,index-1)).next).val;
       (after=after.next).prev=head;
       head.next=after;
     }
@@ -4204,10 +4224,7 @@ private static $<E>$ $DNode$$<E>$ pullSurvivorsDown($DNode$$<E>$ prev,long[] sur
       curr.prev=prev;
     }
     if(--numSurvivors==0){
-      if(numRemoved!=0){
-        return curr;
-      }
-      return null;
+      return curr;
     }
     if((marker<<=1)==0){
        word=survivorSet[++wordOffset];
@@ -4232,10 +4249,7 @@ private static $<E>$ $DNode$$<E>$ pullSurvivorsDown($DNode$$<E>$ prev,long word,
       curr.prev=prev;
     }
     if(--numSurvivors==0){
-      if(numRemoved!=0){
-        return curr;
-      }
-      return null;
+      return curr;
     }
     prev=curr;
   }
@@ -4306,6 +4320,31 @@ private void bubbleUpDecrementSize(){
    if((parent=this.parent)!=null){
      parent.uncheckedBubbleUpDecrementSize();
    }
+}
+private void peelTail($DNode$$<E>$ newTail,$DNode$$<E>$ oldTail){
+  this.tail=newTail;
+  $DNode$$<E>$ after;
+  if((after=oldTail.next)==null){
+    final CHECKEDSubList$<E>$ parent;
+    if((parent=this.parent)!=null){
+      parent.bubbleUpPeelTail(newTail);
+    }
+    root.tail=newTail;
+  }else{
+    after.prev=newTail;
+    for(var curr=parent;curr!=null;curr=curr.parent){
+      if(curr.tail!=oldTail){
+        curr.uncheckedBubbleUpDecrementSize();
+        break;
+      }
+#IFSWITCH CHECKED==Checked
+      ++curr.modCount;
+#ENDIF
+      --curr.size;
+      curr.tail=newTail;
+    }
+  }
+  newTail.next=after;
 }
 private void peelTail($DNode$$<E>$ tail){
   $DNode$$<E>$ after,before;
@@ -4467,7 +4506,7 @@ private void peelHead($DNode$$<E>$ head){
       peelHead(head);
     }else{
       $DNode$$<E>$ after;
-      ret=(after=( head=$DNode$.iterateAscending(head,index)).next).val;
+      ret=(after=(head=$DNode$.iterateAscending(head,index-1)).next).val;
       (after=after.next).prev=head;
       head.next=after;
       bubbleUpDecrementSize();

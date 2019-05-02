@@ -65,7 +65,7 @@ public class IntDblLnkNode implements Comparable<IntDblLnkNode>
   public static  void uncheckedForEachAscending(IntDblLnkNode node,int size,IntConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -73,7 +73,7 @@ public class IntDblLnkNode implements Comparable<IntDblLnkNode>
   public static  void uncheckedReplaceAll(IntDblLnkNode node,int size,IntUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsInt(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -113,7 +113,7 @@ public class IntDblLnkNode implements Comparable<IntDblLnkNode>
   public static  void uncheckedForEachDescending(IntDblLnkNode node,int size,IntConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

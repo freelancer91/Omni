@@ -66,7 +66,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
   public static  void uncheckedForEachAscending(FloatDblLnkNode node,int size,FloatConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -74,7 +74,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
   public static  void uncheckedReplaceAll(FloatDblLnkNode node,int size,FloatUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsFloat(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -114,7 +114,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
   public static  void uncheckedForEachDescending(FloatDblLnkNode node,int size,FloatConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

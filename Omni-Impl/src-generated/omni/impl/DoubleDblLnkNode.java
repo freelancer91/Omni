@@ -56,7 +56,7 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
   public static  void uncheckedForEachAscending(DoubleDblLnkNode node,int size,DoubleConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -64,7 +64,7 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
   public static  void uncheckedReplaceAll(DoubleDblLnkNode node,int size,DoubleUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsDouble(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -104,7 +104,7 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
   public static  void uncheckedForEachDescending(DoubleDblLnkNode node,int size,DoubleConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

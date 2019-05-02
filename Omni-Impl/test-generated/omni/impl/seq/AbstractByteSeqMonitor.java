@@ -1161,6 +1161,7 @@ abstract class AbstractByteSeqMonitor<SEQ extends OmniCollection.OfByte>
         };
       }
     },
+    //TODO come up with a quicker way to test than using random sequences
     Random(null,true,true){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
         return new MonitoredRemoveIfPredicate(){

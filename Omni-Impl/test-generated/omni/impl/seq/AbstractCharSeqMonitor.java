@@ -1161,6 +1161,7 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>
         };
       }
     },
+    //TODO come up with a quicker way to test than using random sequences
     Random(null,true,true){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractCharSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
         return new MonitoredRemoveIfPredicate(){

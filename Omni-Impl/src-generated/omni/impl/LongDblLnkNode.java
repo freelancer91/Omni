@@ -65,7 +65,7 @@ public class LongDblLnkNode implements Comparable<LongDblLnkNode>
   public static  void uncheckedForEachAscending(LongDblLnkNode node,int size,LongConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -73,7 +73,7 @@ public class LongDblLnkNode implements Comparable<LongDblLnkNode>
   public static  void uncheckedReplaceAll(LongDblLnkNode node,int size,LongUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsLong(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -113,7 +113,7 @@ public class LongDblLnkNode implements Comparable<LongDblLnkNode>
   public static  void uncheckedForEachDescending(LongDblLnkNode node,int size,LongConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

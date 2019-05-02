@@ -1137,6 +1137,28 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
          parent.uncheckedBubbleUpDecrementSize();
        }
     }
+    private void peelTail(FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+      this.tail=newTail;
+      FloatDblLnkNode after;
+      if((after=oldTail.next)==null){
+        final UncheckedSubList parent;
+        if((parent=this.parent)!=null){
+          parent.bubbleUpPeelTail(newTail);
+        }
+        root.tail=newTail;
+      }else{
+        after.prev=newTail;
+        for(var curr=parent;curr!=null;curr=curr.parent){
+          if(curr.tail!=oldTail){
+            curr.uncheckedBubbleUpDecrementSize();
+            break;
+          }
+          --curr.size;
+          curr.tail=newTail;
+        }
+      }
+      newTail.next=after;
+    }
     private void peelTail(FloatDblLnkNode tail){
       FloatDblLnkNode after,before;
       (before=tail.prev).next=(after=tail.next);
@@ -1261,7 +1283,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           peelHead(head);
         }else{
           FloatDblLnkNode after;
-          ret=(after=( head=FloatDblLnkNode.iterateAscending(head,index)).next).val;
+          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
           bubbleUpDecrementSize();
@@ -1786,9 +1808,11 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         }
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet;
-        if((lastRet=this.lastRet).next==curr){
+        FloatDblLnkNode lastRet,curr;
+        if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
+        }else{
+          this.curr=curr;
         }
         UncheckedSubList parent;
         if(--(parent=this.parent).size==0){
@@ -1800,11 +1824,13 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
             if(lastRet==parent.head){
               parent.peelHead(lastRet);
             }else{
-              FloatDblLnkNode.eraseNode(lastRet);
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
               parent.bubbleUpDecrementSize();
             }
           }
         }
+        this.lastRet=null;
         --parent.root.size;
       }
       @Override public void forEachRemaining(FloatConsumer action){
@@ -2065,15 +2091,15 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          if(bits==Float.floatToRawIntBits((head=head.next).val)){
+          FloatDblLnkNode prev;
+          if(bits==Float.floatToRawIntBits((head=(prev=head).next).val)){
             --root.size;
             --this.size;
             if(head==tail){
-              peelTail(head);
+              peelTail(prev,head);
             }else{
-              FloatDblLnkNode before,after;
-              (before=head.prev).next=(after=head.next);
-              after.prev=before;
+              prev.next=head=head.next;
+              head.prev=prev;
               bubbleUpDecrementSize();
             }
             return true;
@@ -2094,15 +2120,15 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          if(0==((head=head.next).val)){
+          FloatDblLnkNode prev;
+          if(0==((head=(prev=head).next).val)){
             --root.size;
             --this.size;
             if(head==tail){
-              peelTail(head);
+              peelTail(prev,head);
             }else{
-              FloatDblLnkNode before,after;
-              (before=head.prev).next=(after=head.next);
-              after.prev=before;
+              prev.next=head=head.next;
+              head.prev=prev;
               bubbleUpDecrementSize();
             }
             return true;
@@ -2123,15 +2149,15 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         return true;
       }else{
         for(final var tail=this.tail;tail!=head;){
-          if(Float.isNaN((head=head.next).val)){
+          FloatDblLnkNode prev;
+          if(Float.isNaN((head=(prev=head).next).val)){
             --root.size;
             --this.size;
             if(head==tail){
-              peelTail(head);
+              peelTail(prev,head);
             }else{
-              FloatDblLnkNode before,after;
-              (before=head.prev).next=(after=head.next);
-              after.prev=before;
+              prev.next=head=head.next;
+              head.prev=prev;
               bubbleUpDecrementSize();
             }
             return true;
@@ -2184,8 +2210,8 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       {
         if(bits==Float.floatToRawIntBits(head.val)){
           root.modCount=++modCount;
-          --root.size;
           this.modCount=modCount;
+          --root.size;
           if(--this.size==0){
             removeLastNode(head);
           }else{
@@ -2193,17 +2219,20 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(bits==Float.floatToRawIntBits(head.val)){
-            this.modCount=modCount+1;
-            if((head=head.next)==null){
-              this.head=prev;
-              prev.next=null;
-            }else{
-              head.prev=prev;
-              prev.next=head;
-            }
+        for(final var tail=this.tail;head!=tail;){
+          FloatDblLnkNode prev;
+          if(bits==Float.floatToRawIntBits((head=(prev=head).next).val)){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            --root.size;
             --this.size;
+            if(head==tail){
+              peelTail(prev,head);
+            }else{
+              prev.next=head=head.next;
+              head.prev=prev;
+              bubbleUpDecrementSize();
+            }
             return true;
           }
         }
@@ -2218,8 +2247,8 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       {
         if(0==(head.val)){
           root.modCount=++modCount;
-          --root.size;
           this.modCount=modCount;
+          --root.size;
           if(--this.size==0){
             removeLastNode(head);
           }else{
@@ -2227,17 +2256,20 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(0==(head.val)){
-            this.modCount=modCount+1;
-            if((head=head.next)==null){
-              this.head=prev;
-              prev.next=null;
-            }else{
-              head.prev=prev;
-              prev.next=head;
-            }
+        for(final var tail=this.tail;head!=tail;){
+          FloatDblLnkNode prev;
+          if(0==((head=(prev=head).next).val)){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            --root.size;
             --this.size;
+            if(head==tail){
+              peelTail(prev,head);
+            }else{
+              prev.next=head=head.next;
+              head.prev=prev;
+              bubbleUpDecrementSize();
+            }
             return true;
           }
         }
@@ -2252,8 +2284,8 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       {
         if(Float.isNaN(head.val)){
           root.modCount=++modCount;
-          --root.size;
           this.modCount=modCount;
+          --root.size;
           if(--this.size==0){
             removeLastNode(head);
           }else{
@@ -2261,17 +2293,20 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           }
           return true;
         }
-        for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(Float.isNaN(head.val)){
-            this.modCount=modCount+1;
-            if((head=head.next)==null){
-              this.head=prev;
-              prev.next=null;
-            }else{
-              head.prev=prev;
-              prev.next=head;
-            }
+        for(final var tail=this.tail;head!=tail;){
+          FloatDblLnkNode prev;
+          if(Float.isNaN((head=(prev=head).next).val)){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            --root.size;
             --this.size;
+            if(head==tail){
+              peelTail(prev,head);
+            }else{
+              prev.next=head=head.next;
+              head.prev=prev;
+              bubbleUpDecrementSize();
+            }
             return true;
           }
         }
@@ -2342,7 +2377,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         return currIndex<parent.size;
       }
       @Override public boolean hasPrevious(){
-        return currIndex>0;
+        return currIndex!=0;
       }
       @Override public int nextIndex(){
         return this.currIndex;
@@ -2399,8 +2434,11 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           root.modCount=++modCount;
           this.modCount=modCount;
           parent.modCount=modCount;
-          if(lastRet.next==curr){
+          FloatDblLnkNode curr;
+          if((curr=lastRet.next)==this.curr){
             --currIndex;
+          }else{
+            this.curr=curr;
           }
           if(--(parent=this.parent).size==0){
             parent.removeLastNode(parent.tail);
@@ -2411,12 +2449,14 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
               if(lastRet==parent.head){
                 parent.peelHead(lastRet);
               }else{
-                FloatDblLnkNode.eraseNode(lastRet);
+                curr.prev=lastRet=lastRet.prev;
+                lastRet.next=curr;
                 parent.bubbleUpDecrementSize();
               }
             }
           }
           --root.size;
+          this.lastRet=null;
           return;
         }
         throw new IllegalStateException();
@@ -3353,10 +3393,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           curr.prev=prev;
         }
         if(--numSurvivors==0){
-          if(numRemoved!=0){
-            return curr;
-          }
-          return null;
+          return curr;
         }
         if((marker<<=1)==0){
            word=survivorSet[++wordOffset];
@@ -3381,10 +3418,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           curr.prev=prev;
         }
         if(--numSurvivors==0){
-          if(numRemoved!=0){
-            return curr;
-          }
-          return null;
+          return curr;
         }
         prev=curr;
       }
@@ -3443,6 +3477,29 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
        if((parent=this.parent)!=null){
          parent.uncheckedBubbleUpDecrementSize();
        }
+    }
+    private void peelTail(FloatDblLnkNode newTail,FloatDblLnkNode oldTail){
+      this.tail=newTail;
+      FloatDblLnkNode after;
+      if((after=oldTail.next)==null){
+        final CheckedSubList parent;
+        if((parent=this.parent)!=null){
+          parent.bubbleUpPeelTail(newTail);
+        }
+        root.tail=newTail;
+      }else{
+        after.prev=newTail;
+        for(var curr=parent;curr!=null;curr=curr.parent){
+          if(curr.tail!=oldTail){
+            curr.uncheckedBubbleUpDecrementSize();
+            break;
+          }
+          ++curr.modCount;
+          --curr.size;
+          curr.tail=newTail;
+        }
+      }
+      newTail.next=after;
     }
     private void peelTail(FloatDblLnkNode tail){
       FloatDblLnkNode after,before;
@@ -3584,7 +3641,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           peelHead(head);
         }else{
           FloatDblLnkNode after;
-          ret=(after=( head=FloatDblLnkNode.iterateAscending(head,index)).next).val;
+          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
           bubbleUpDecrementSize();
@@ -4588,7 +4645,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         }else{
           //iterate from the head
           FloatDblLnkNode after;
-          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index)).next).val;
+          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
         }
@@ -5471,8 +5528,11 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           CheckedCollection.checkModCount(modCount=this.modCount,(parent=this.parent).modCount);
           parent.modCount=++modCount;
           this.modCount=modCount;
-          if(lastRet.next==curr){
+          FloatDblLnkNode curr;
+          if((curr=lastRet.next)==this.curr){
             --currIndex;
+          }else{
+            this.curr=curr;
           }
           if(--parent.size==0){
             parent.head=null;
@@ -5482,10 +5542,11 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
               parent.tail=lastRet=lastRet.prev;
               lastRet.next=null;
             }else if(lastRet==parent.head){
-              parent.head=lastRet=lastRet.next;
-              lastRet.prev=null;
+              parent.head=curr;
+              curr.prev=null;
             }else{
-              FloatDblLnkNode.eraseNode(lastRet);
+              curr.prev=lastRet=lastRet.prev;
+              lastRet.next=curr;
             }
           }
           this.lastRet=null;
@@ -5599,7 +5660,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         }else{
           //iterate from the head
           FloatDblLnkNode after;
-          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index)).next).val;
+          ret=(after=(head=FloatDblLnkNode.iterateAscending(head,index-1)).next).val;
           (after=after.next).prev=head;
           head.next=after;
         }
@@ -6856,7 +6917,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         return curr.val;
       }
       @Override public boolean hasPrevious(){
-        return curr.prev!=null;
+        return currIndex>0;
       }
       @Override public int nextIndex(){
         return currIndex;
@@ -6891,9 +6952,11 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
         lastRet.val=val;
       }
       @Override public void remove(){
-        FloatDblLnkNode lastRet;
-        if((lastRet=this.lastRet).next==curr){
+        FloatDblLnkNode lastRet,curr;
+        if((curr=(lastRet=this.lastRet).next)==this.curr){
           --currIndex;
+        }else{
+          this.curr=curr;
         }
         final UncheckedList parent;
         if(--(parent=this.parent).size==0){
@@ -6904,10 +6967,11 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
             parent.tail=lastRet=lastRet.prev;
             lastRet.next=null;
           }else if(lastRet==parent.head){
-            parent.head=lastRet=lastRet.next;
-            lastRet.prev=null;
+            parent.head=curr;
+            curr.prev=null;
           }else{
-            FloatDblLnkNode.eraseNode(lastRet);
+            curr.prev=lastRet=lastRet.prev;
+            lastRet.next=curr;
           }
         }
         this.lastRet=null;

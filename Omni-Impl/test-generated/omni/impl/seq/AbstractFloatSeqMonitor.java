@@ -1161,6 +1161,7 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>
         };
       }
     },
+    //TODO come up with a quicker way to test than using random sequences
     Random(null,true,true){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractFloatSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
         return new MonitoredRemoveIfPredicate(){

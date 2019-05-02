@@ -66,7 +66,7 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
   public static  void uncheckedForEachAscending(BooleanDblLnkNode node,int size,BooleanConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -74,7 +74,7 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
   public static  void uncheckedReplaceAll(BooleanDblLnkNode node,int size,BooleanPredicate operator){
     for(;;node=node.next){
       node.val=operator.test(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -114,7 +114,7 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
   public static  void uncheckedForEachDescending(BooleanDblLnkNode node,int size,BooleanConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

@@ -691,8 +691,6 @@ public class $ClassPrefix$ArrSeqTest{
         Assertions.assertNull((($ClassPrefix$ArrSeq)root).arr[rootPreAlloc+parentPreAlloc+expectedRootSize+parentPostAlloc+rootPostAlloc]);
 #ENDIF
     }
-  
-
   }
   static enum NestedType{
     LIST(true,true),
@@ -705,9 +703,6 @@ public class $ClassPrefix$ArrSeqTest{
       this.forwardIteration=forwardIteration;
     }
   }
-
- 
-
   static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
     for(var checkedType:CheckedType.values()){
       for(var preModScenario:PreModScenario.values()){

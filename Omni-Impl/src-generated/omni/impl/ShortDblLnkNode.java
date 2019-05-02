@@ -65,7 +65,7 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
   public static  void uncheckedForEachAscending(ShortDblLnkNode node,int size,ShortConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -73,7 +73,7 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
   public static  void uncheckedReplaceAll(ShortDblLnkNode node,int size,ShortUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsShort(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -113,7 +113,7 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
   public static  void uncheckedForEachDescending(ShortDblLnkNode node,int size,ShortConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

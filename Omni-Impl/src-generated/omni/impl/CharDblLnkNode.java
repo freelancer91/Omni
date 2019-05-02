@@ -56,7 +56,7 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
   public static  void uncheckedForEachAscending(CharDblLnkNode node,int size,CharConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -64,7 +64,7 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
   public static  void uncheckedReplaceAll(CharDblLnkNode node,int size,CharUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsChar(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -104,7 +104,7 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
   public static  void uncheckedForEachDescending(CharDblLnkNode node,int size,CharConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

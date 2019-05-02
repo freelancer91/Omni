@@ -65,7 +65,7 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
   public static  void uncheckedForEachAscending(ByteDblLnkNode node,int size,ByteConsumer action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -73,7 +73,7 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
   public static  void uncheckedReplaceAll(ByteDblLnkNode node,int size,ByteUnaryOperator operator){
     for(;;node=node.next){
       node.val=operator.applyAsByte(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -113,7 +113,7 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
   public static  void uncheckedForEachDescending(ByteDblLnkNode node,int size,ByteConsumer action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }

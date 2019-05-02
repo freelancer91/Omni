@@ -37,9 +37,11 @@ import omni.impl.seq.AbstractShortSeqMonitor.PreModScenario;
 import omni.impl.seq.AbstractShortSeqMonitor.SequenceLocation;
 import omni.impl.seq.AbstractShortSeqMonitor.IterationScenario;
 import omni.impl.seq.AbstractShortSeqMonitor.ItrRemoveScenario;
+import omni.impl.seq.AbstractShortSeqMonitor.ListItrSetScenario;
 import omni.impl.seq.AbstractShortSeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.AbstractShortSeqMonitor.MonitoredRemoveIfPredicateGen;
 import omni.impl.seq.AbstractShortSeqMonitor.QueryTester;
+import omni.impl.seq.AbstractShortSeqMonitor.ItrType;
 import java.nio.file.Files;
 import omni.impl.seq.AbstractShortSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
@@ -175,7 +177,6 @@ public class ShortDblLnkSeqTest{
           if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
             for(int seqSize=0;seqSize<=10;++seqSize){
               final int finalSeqSize=seqSize;
-              //System.out.println("ShortDblLnkSeqTest.testadd_val<"+nestedType+","+checkedType+","+preModScenario+","+seqSize+">");
               Stream.of(ShortInputTestArgType.values())
               .parallel()
               .forEach(inputArgType->{
@@ -226,10 +227,13 @@ public class ShortDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testcontains_val(){
-    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testcontains_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
+    for(var nestedType:NestedType.values()){
+      runQueryTests(true,nestedType,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      )->{
+        testcontains_valHelper(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
         );
-    });
+      });
+    }
   }
   private static void testcontains_valHelper
   (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
@@ -296,10 +300,13 @@ public class ShortDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testindexOf_val(){
-    getQueryListArguments().parallel().map(Arguments::get).forEach(args->{
-        testindexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
+    for(var nestedType:NestedType.values()){
+      runQueryTests(true,nestedType,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      )->{
+        testindexOf_valHelper(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
         );
-    });
+      });
+    }
   }
   private static void testindexOf_valHelper
   (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
@@ -370,10 +377,13 @@ public class ShortDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testlastIndexOf_val(){
-    getQueryListArguments().parallel().map(Arguments::get).forEach(args->{
-        testlastIndexOf_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
+    for(var nestedType:NestedType.values()){
+      runQueryTests(true,nestedType,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      )->{
+        testlastIndexOf_valHelper(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
         );
-    });
+      });
+    }
   }
   private static void testlastIndexOf_valHelper
   (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
@@ -444,9 +454,10 @@ public class ShortDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testsearch_val(){
-    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testsearch_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
-        );
+    runQueryTests(true,NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+    )->{
+      testsearch_valHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
+      );
     });
   }
   private static void testsearch_valHelper
@@ -489,10 +500,31 @@ public class ShortDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testremoveVal_val(){
-    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testremoveVal_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4],(PreModScenario)args[5]
-        );
-    });
+    for(var nestedType:NestedType.values()){
+      runQueryTests(true,nestedType,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      )->{
+        switch(nestedType){
+          case SUBLIST:
+            if(preModScenario.expectedException==null && (seqLocation==SequenceLocation.BEGINNING||seqLocation==SequenceLocation.END)
+            ){
+              for(int parentsLength=1;parentsLength<=3;++parentsLength){
+                if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent
+                 )){
+                  runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testremoveVal_valHelper(seqMonitor,argType,queryCastType,seqLocation,seqSize,preModScenario
+                  ));
+                }
+              }
+              break;
+            }
+          case LISTDEQUE:
+            testremoveVal_valHelper(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
+            );
+            break;
+          default:
+            throw new Error("Unknown nested type "+nestedType);
+        }
+      });
+    }
   }
   private static void testremoveVal_valHelper
   (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd,PreModScenario preModScenario 
@@ -562,20 +594,17 @@ public class ShortDblLnkSeqTest{
                 for(int seqSize=0;seqSize<=10;++seqSize){
                   if(seqSize!=0 || seqLocation.validForEmpty){
                     final int finalSeqSize=seqSize;
-                    //System.out.println("ShortDblLnkSeqTest.testListadd_int_val<"+nestedType+","+checkedType+","+preModScenario+","+seqSize+","+seqLocation+">");
                     Stream.of(ShortInputTestArgType.values())
                     .parallel()
                     .forEach(inputArgType->{
                       switch(nestedType){
                         case SUBLIST:
                           if(inputArgType==ShortInputTestArgType.ARRAY_TYPE){
-                            IntStream.rangeClosed(1,3)
-                            .parallel()
-                            .forEach(parentsLength->{
+                            for(int parentsLength=1;parentsLength<=3;++parentsLength){
                               if(parentsLength!=1 || preModScenario!=PreModScenario.ModParent){
                                 runSubListTests(false,checkedType,true,parentsLength,seqMonitor->testListadd_int_valHelper(seqMonitor,inputArgType,seqLocation,preModScenario,finalSeqSize));
                               }
-                            });
+                            }
                             break;
                           }
                         case LISTDEQUE:
@@ -696,21 +725,17 @@ public class ShortDblLnkSeqTest{
               final int finalSeqSize=seqSize;
               for(var seqLocation:SequenceLocation.values()){
                 if(seqLocation.expectedException==null){
-                  //System.out.println("ShortDblLnkSeqTest.testListItradd_val<"+nestedType+","+checkedType+","+preModScenario+","+seqSize+","+seqLocation+">");
                   Stream.of(ShortInputTestArgType.values())
                   .parallel()
                   .forEach(inputArgType->{
                     switch(nestedType){
                       case SUBLIST:
-                        if(inputArgType==ShortInputTestArgType.ARRAY_TYPE)
-                        {
-                          IntStream.rangeClosed(1,3)
-                          .parallel()
-                          .forEach(parentsLength->{
+                        if(inputArgType==ShortInputTestArgType.ARRAY_TYPE){
+                          for(int parentsLength=1;parentsLength<=3;++parentsLength){
                             if(parentsLength!=1 || preModScenario!=PreModScenario.ModParent){
                               runSubListTests(false,checkedType,true,parentsLength,seqMonitor->testListItradd_valHelper(seqMonitor,preModScenario,finalSeqSize,seqLocation,inputArgType));
                             }
-                          });
+                          }
                           break;
                         }
                       case LISTDEQUE:
@@ -829,15 +854,15 @@ public class ShortDblLnkSeqTest{
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){
         for(var functionCallType:FunctionCallType.values()){
-          Stream.of(PreModScenario.values()).filter(preModScenario->preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod))
-          //.parallel()
-          .forEach(preModScenario->{
-            Stream.of(MonitoredRemoveIfPredicateGen.values()).filter(monitoredRemoveIfPredicateGen->(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredRemoveIfPredicateGen.appliesToRoot))))
-            //.parallel()
-            .forEach(monitoredRemoveIfPredicateGen->{
-              IntStream.of(seqSizes)
-              //.parallel()
-              .forEach(seqSize->{
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario==PreModScenario.ModSeq || (preModScenario.expectedException!=null && !checkedType.checked) || (nestedType.rootType && preModScenario!=PreModScenario.NoMod)){
+              continue;
+            }
+            for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
+              if(monitoredRemoveIfPredicateGen.expectedException!=null && (!checkedType.checked || (nestedType.rootType && !monitoredRemoveIfPredicateGen.appliesToRoot))){
+                continue;
+              }
+              for(int seqSize:seqSizes){
                 System.out.println("ShortDblLnkSeq.testremoveIf_Predicate<"+nestedType+","+checkedType+","+functionCallType+","+preModScenario+","+monitoredRemoveIfPredicateGen+","+seqSize+">");
                 double[] thresholdArr;
                 long randSeedBound;
@@ -853,29 +878,25 @@ public class ShortDblLnkSeqTest{
                   randStream=randStream.parallel();
                 }
                 randStream.forEach(randSeed->{
-                    DoubleStream.of(thresholdArr)
-                    //.parallel()
-                    .forEach(threshold->{
+                  for(var threshold:thresholdArr){
                     switch(nestedType){
                       case SUBLIST:
                         if(functionCallType==FunctionCallType.Unboxed && monitoredRemoveIfPredicateGen.expectedException==null && preModScenario.expectedException==null){
-                          IntStream.rangeClosed(1,3)
-                          //.parallel()
-                          .forEach(parentsLength->{
+                          for(int parentsLength=1;parentsLength<=3;++parentsLength){
                             if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ThrowModParent)){
                               runSubListTests(true,checkedType,randSeedBound==0?true:false,parentsLength,seqMonitor->testremoveIf_PredicateHelper(seqMonitor,preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
                             }
-                          });
+                          }
                           break;
                         }
                       case LISTDEQUE:
                         testremoveIf_PredicateHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize);
                     }
-                  });
+                  }
                 });
-              });
-            });
-          });
+              }
+            }
+          }
         }
       }
     }
@@ -956,86 +977,1188 @@ public class ShortDblLnkSeqTest{
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
   }
-  private static void runSubListTests(boolean quickTest,CheckedType checkedType,boolean parallel,int parentLength,Consumer<? super SeqMonitor> testMethod){
-    if(quickTest){
-      var preAllocStream=IntStream.range(0,1<<(parentLength));
-      if(parallel){
-        preAllocStream=preAllocStream.parallel();
-      }
-      preAllocStream.forEach(preAllocBits->{
-        int[] preAllocs=new int[parentLength];
-        for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
-          preAllocs[index]=(marker&preAllocBits)!=0?5:0;
-        }
-        var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
-        if(parallel){
-          postAllocStream=postAllocStream.parallel();
-        }
-        postAllocStream.forEach(postAllocBits->{
-          int[] postAllocs=new int[parentLength];
-          for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
-            postAllocs[index]=(marker&postAllocBits)!=0?5:0;
+  @org.junit.jupiter.api.Test
+  public void testListremoveAt_int(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (!nestedType.rootType && checkedType.checked))){
+            for(var seqLocation:SequenceLocation.values()){
+              if(checkedType.checked || seqLocation.expectedException==null){
+                for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+                  if(seqSize!=0|| (seqLocation==SequenceLocation.IOBHI)){
+                    for(var outputArgType:ShortOutputTestArgType.values()){
+                      switch(nestedType){
+                        case SUBLIST:
+                          if(preModScenario.expectedException==null && seqLocation==SequenceLocation.BEGINNING || seqLocation==SequenceLocation.END){
+                            for(int parentsLength=1;parentsLength<=3;++parentsLength){
+                              if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent)){
+                                runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testListremoveAt_intHelper(seqMonitor,preModScenario,seqLocation,seqSize,outputArgType));
+                              }
+                            }
+                            break;
+                          }
+                        case LISTDEQUE:
+                          testListremoveAt_intHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqSize,outputArgType);
+                          break;
+                        default:
+                          throw new Error("Unknown nested type "+nestedType);
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
-          //System.out.println(Arrays.toString(preAllocs)+","+Arrays.toString(postAllocs));
-          testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
-        });
-      });
-    }else{
-      var preAllocStream=IntStream.range(0,1<<(parentLength<<1));
-      if(parallel){
-        preAllocStream=preAllocStream.parallel();
+        }
       }
-      preAllocStream.forEach(preAllocBits->{
-        int[] preAllocs=new int[parentLength];
-        for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
-          int preAlloc;
-          switch(marker&preAllocBits){
-            case 0b00:
-              preAlloc=0;
+    }
+  }
+  private static void testListremoveAt_intHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation,int numToAdd,ShortOutputTestArgType outputArgType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    int expectedSize=numToAdd;
+    seqMonitor.illegalAdd(preModScenario);
+    Class<? extends Throwable> expectedException=preModScenario.expectedException==null?seqLocation.expectedException:preModScenario.expectedException;
+    switch(seqLocation){
+      case IOBLO:
+        Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(0,outputArgType,-1));
+        seqMonitor.verifyStructuralIntegrity();
+        break;
+      case IOBHI:
+        Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd,outputArgType,-1));
+        seqMonitor.verifyStructuralIntegrity();
+        break;
+      case BEGINNING:
+        if(expectedException==null){
+          seqMonitor.verifyBeginningRemoveAt(outputArgType);
+          expectedSize=0;
+        }else{
+          Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(0,outputArgType,0));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        break;
+      case NEARBEGINNING:
+        if(expectedException==null){
+          seqMonitor.verifyNearBeginningRemoveAt(outputArgType);
+          expectedSize=0;
+        }else{
+          Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd/4,outputArgType,numToAdd/4));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        break;
+      case MIDDLE:
+        if(expectedException==null){
+          seqMonitor.verifyMiddleRemoveAt(outputArgType);
+          expectedSize=0;
+        }else{
+          Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd/2,outputArgType,numToAdd/2));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        break;
+      case NEAREND:
+        if(expectedException==null){
+          seqMonitor.verifyNearEndRemoveAt(outputArgType);
+          expectedSize=0;
+        }else{
+          Assertions.assertThrows(expectedException,()->seqMonitor.removeAt((numToAdd/4)*3,outputArgType,(numToAdd/4)*3));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        break;
+      case END:
+        if(expectedException==null){
+          seqMonitor.verifyEndRemoveAt(outputArgType);
+          expectedSize=0;
+        }else{
+          Assertions.assertThrows(expectedException,()->seqMonitor.removeAt(numToAdd-1,outputArgType,numToAdd-1));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        break;
+      default:
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+    seqMonitor.verifyPreAlloc().verifyAscending(expectedSize).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getItrforEachRemaining_ConsumerArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var nestedType:NestedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(checkedType.checked || preModScenario.expectedException==null){
+            for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+              if((monitoredFunctionGen.expectedException==null || checkedType.checked) && (!nestedType.rootType || (preModScenario.appliesToRootItr&&monitoredFunctionGen.appliesToRootItr))){
+                for(var itrType:ItrType.values()){
+                  if((itrType!=ItrType.DescendingItr||nestedType.rootType)){
+                    for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Unboxed));
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Boxed));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testItrforEachRemaining_Consumer(){
+    getItrforEachRemaining_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
+        testItrforEachRemaining_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(ItrType)args[3],(int)args[4],(FunctionCallType)args[5]);
+    });
+  }
+  private static void testItrforEachRemaining_ConsumerHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,ItrType itrType,int numToAdd,FunctionCallType functionCallType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getItrMonitor(itrType);
+    seqMonitor.illegalAdd(preModScenario);
+    var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(itrMonitor);
+    int numExpectedIteratedValues;
+    if(preModScenario.expectedException==null || (numToAdd==0 && (itrType==ItrType.DescendingItr || preModScenario!=PreModScenario.ModSeq))){
+      if(monitoredFunctionGen.expectedException==null || (numToAdd==0)){
+        itrMonitor.forEachRemaining(monitoredConsumer,functionCallType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+        numExpectedIteratedValues=numToAdd;
+      }else{
+        Assertions.assertThrows(monitoredFunctionGen.expectedException,()->itrMonitor.forEachRemaining(monitoredConsumer,functionCallType));
+        seqMonitor.verifyStructuralIntegrity();
+        itrMonitor.verifyIteratorState();
+        switch(monitoredFunctionGen){
+          case ThrowModItr:
+            numExpectedIteratedValues=1;
+            if(itrType!=ItrType.DescendingItr){
+              seqMonitor.verifyPreAlloc().verifyAscending(1,numToAdd-1).verifyPostAlloc();
+            }else{
+              seqMonitor.verifyPreAlloc().verifyAscending(numToAdd-1).verifyPostAlloc();
+            }
+            break;
+          case ModItr:
+            numExpectedIteratedValues=numToAdd;
+            seqMonitor.verifyPreAlloc().verifyPostAlloc();
+            break;
+          case Throw:
+            numExpectedIteratedValues=1;
+            seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+            break;
+          case ModSeq:
+            numExpectedIteratedValues=numToAdd;
+            var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyPostAlloc();
+            break;
+          case ModParent:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyParentPostAlloc();
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            break;
+          case ThrowModSeq:
+            numExpectedIteratedValues=1;
+            seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(PreModScenario.ModSeq);
+            break;
+          case ThrowModParent:
+            numExpectedIteratedValues=1;
+            seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ThrowModRoot:
+            numExpectedIteratedValues=1;
+            seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(PreModScenario.ModRoot);
+            break;
+          default:
+            throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
+        }
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.forEachRemaining(monitoredConsumer,functionCallType));
+      seqMonitor.verifyStructuralIntegrity();
+      itrMonitor.verifyIteratorState();
+      switch(monitoredFunctionGen){
+        case ThrowModItr:
+          if(itrType!=ItrType.DescendingItr && numToAdd==0 && preModScenario==PreModScenario.ModSeq){
+            numExpectedIteratedValues=0;
+          }else{
+            numExpectedIteratedValues=1;
+          }
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          break;
+        case ModItr:
+          if(itrType!=ItrType.DescendingItr && numToAdd==0 && preModScenario==PreModScenario.ModSeq){
+            numExpectedIteratedValues=0;
+          }else{
+            numExpectedIteratedValues=1;
+          }
+          //verification in tis situation is tricky. Just skip it
+          break;
+        case NoThrow:
+          numExpectedIteratedValues=numToAdd;
+          if(preModScenario==PreModScenario.ModSeq && numToAdd!=0 && itrType!=ItrType.DescendingItr)
+          {
+            ++numExpectedIteratedValues;
+          }
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          break;
+        case Throw:
+          if(itrType!=ItrType.DescendingItr && numToAdd==0 && preModScenario==PreModScenario.ModSeq){
+            numExpectedIteratedValues=0;
+          }else{
+            numExpectedIteratedValues=1;
+          }
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          break;
+        case ModSeq:
+          var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          if(preModScenario==PreModScenario.ModSeq){
+            numExpectedIteratedValues=numToAdd;
+            if(itrType!=ItrType.DescendingItr && numToAdd!=0){
+              ++numExpectedIteratedValues;
+            }
+            for(int i=0;i<numExpectedIteratedValues;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+          }else{
+            numExpectedIteratedValues=1;
+          }
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case ModParent:
+          switch(preModScenario){
+            case ModRoot:
+              numExpectedIteratedValues=1;
+              seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
               break;
-            case 0b01:
-              preAlloc=2;
+            case ModParent:
+              numExpectedIteratedValues=numToAdd;
+              verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyParentPostAlloc();
+              for(int i=0;i<numExpectedIteratedValues+1;++i){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
               break;
-            case 0b10:
-              preAlloc=4;
+            case ModSeq:
+              numExpectedIteratedValues=numToAdd+1;
+              verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyIllegalAdd().verifyParentPostAlloc();
+              if(numToAdd!=0){
+                for(int i=0;i<numExpectedIteratedValues;++i){
+                  verifyItr.verifyIllegalAdd();
+                }
+              }else{
+                numExpectedIteratedValues=0;
+              }
+              verifyItr.verifyRootPostAlloc();
               break;
             default:
-              preAlloc=6;
+              throw new Error("Unknown preModScenario "+preModScenario);
           }
-          preAllocs[index]=preAlloc;
+          break;
+        case ModRoot:
+          numExpectedIteratedValues=numToAdd;
+          if(preModScenario==PreModScenario.ModSeq){
+            ++numExpectedIteratedValues;
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          if(numToAdd!=0)
+          {
+            if(preModScenario!=PreModScenario.ModSeq){
+               for(int i=0;i<numExpectedIteratedValues;++i){
+                verifyItr.verifyIllegalAdd();
+              }
+            }
+          }else{
+            if(preModScenario==PreModScenario.ModSeq){
+              numExpectedIteratedValues=0;
+            }
+          }
+          break;
+        case ThrowModSeq:
+          numExpectedIteratedValues=1;
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          if(preModScenario==PreModScenario.ModSeq){
+            if(numToAdd==0)
+            {
+              numExpectedIteratedValues=0;
+            }
+            else if(itrType!=ItrType.DescendingItr)
+            {
+              verifyItr.verifyIllegalAdd();
+            }
+          }
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case ThrowModParent:
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          numExpectedIteratedValues=1;
+          switch(preModScenario){
+            case ModSeq:
+              verifyItr.verifyIllegalAdd();
+              if(numToAdd!=0)
+              {
+                verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+              }
+              else
+              {
+                numExpectedIteratedValues=0;
+                verifyItr.verifyPostAlloc();
+              }
+              break;
+            case ModParent:
+              verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+              break;
+            case ModRoot:
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ThrowModRoot:
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+          if(preModScenario!=PreModScenario.ModSeq || numToAdd!=0)
+          {
+            verifyItr.verifyIllegalAdd();
+            numExpectedIteratedValues=1;
+          }else{
+            numExpectedIteratedValues=0;
+          }
+          break;
+        default:
+          throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
+      }
+    }
+    Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
+    switch(monitoredFunctionGen){
+      case ModItr:
+      case ThrowModItr:{
+        if(preModScenario==PreModScenario.NoMod && numToAdd!=0){
+          break;
         }
-        var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
-        if(parallel){
-          postAllocStream=postAllocStream.parallel();
+        //those scenarios are kinda tricky.
+        //just skip this step of verification
+      }
+      default:{
+        if(itrType!=ItrType.DescendingItr){
+          var currNode=seqMonitor.seq.head;
+          for(var encounteredValue:monitoredConsumer.encounteredValues){
+            Assertions.assertEquals(encounteredValue,(Object)currNode.val);
+            currNode=currNode.next;
+          }
+        }else{
+          var currNode=seqMonitor.seq.tail;
+          if(preModScenario==PreModScenario.ModSeq && numToAdd!=0){
+            currNode=currNode.prev;
+          }
+          if(monitoredFunctionGen==MonitoredFunctionGen.ModSeq){
+            for(int i=0;i<numToAdd;++i){
+              currNode=currNode.prev;
+            }
+          }
+          else if(monitoredFunctionGen==MonitoredFunctionGen.ThrowModSeq && numToAdd!=0){
+            currNode=currNode.prev;
+          }
+          for(var encounteredValue:monitoredConsumer.encounteredValues){
+            Assertions.assertEquals(encounteredValue,(Object)currNode.val);
+            currNode=currNode.prev;
+          }
         }
-        postAllocStream.forEach(postAllocBits->{
-          int[] postAllocs=new int[parentLength];
-          for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
-            int postAlloc;
-            switch(marker&postAllocBits){
-              case 0b00:
-                postAlloc=0;
+      }
+    }
+  }
+  static Stream<Arguments> getItrremove_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var removeScenario:ItrRemoveScenario.values()){
+        if(checkedType.checked || removeScenario.expectedException==null){
+          for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+            if(seqSize!=0 || removeScenario.validWithEmptySeq){
+              for(var preModScenario:PreModScenario.values()){
+                if(checkedType.checked || preModScenario.expectedException==null){
+                  for(var itrType:ItrType.values()){
+                    if((itrType==ItrType.ListItr || removeScenario.validWithForwardItr)){
+                      for(var nestedType:NestedType.values()){
+                        if(((itrType!=ItrType.DescendingItr || nestedType.rootType)) && (!nestedType.rootType || preModScenario.appliesToRootItr)){
+                          for(var sequenceLocation:SequenceLocation.values()){
+                            if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (seqSize!=0 && itrType!=ItrType.DescendingItr))){
+                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,seqSize,itrType,sequenceLocation));
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testItrremove_void(){
+    getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(int)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
+    });
+  }
+  private static void testItrremove_voidHelper
+  (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,int numToAdd,ItrType itrType,SequenceLocation seqLocation){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getItrMonitor(seqLocation,itrType);
+    int numIterated;
+    boolean hasLastRet=false;
+    switch(seqLocation){
+      case BEGINNING:
+        if(itrType!=ItrType.DescendingItr){
+          numIterated=0;
+        }else{
+          numIterated=numToAdd;
+        }
+        break;
+      case NEARBEGINNING:
+        numIterated=seqMonitor.expectedSeqSize/4;
+        break;
+      case MIDDLE:
+        numIterated=seqMonitor.expectedSeqSize/2;
+        break;
+      case NEAREND:
+        numIterated=(seqMonitor.expectedSeqSize/4)*3;
+        break;
+      case END:
+        numIterated=seqMonitor.expectedSeqSize;
+        break;
+      default:
+        throw new Error("Unknown seq location "+seqLocation);
+    }
+    switch(removeScenario){
+      case PostNext:
+        if(seqLocation==SequenceLocation.END && itrMonitor.hasPrevious()){
+          hasLastRet=true;
+          --numIterated;
+          itrMonitor.iterateReverse();
+        }
+        if(itrMonitor.hasNext()){
+          hasLastRet=true;
+          if(itrType!=ItrType.DescendingItr){
+            ++numIterated;
+          }else{
+            --numIterated;
+          }
+          itrMonitor.iterateForward();
+        }
+        break;
+      case PostPrevious:
+        if(seqLocation==SequenceLocation.BEGINNING && itrMonitor.hasNext()){
+           hasLastRet=true;
+           ++numIterated;
+           itrMonitor.iterateForward();
+        }
+        if(itrMonitor.hasPrevious()){
+          hasLastRet=true;
+          --numIterated;
+          itrMonitor.iterateReverse();
+        }
+        break;
+      case PostAdd:
+        itrMonitor.add(0);
+        hasLastRet=false;
+        break;
+      case PostRemove:
+        if(seqLocation==SequenceLocation.END && itrMonitor.hasPrevious()){
+          --numIterated;
+          itrMonitor.iterateReverse();
+          hasLastRet=true;
+        }else if(itrMonitor.hasNext()){
+          if(itrType==ItrType.DescendingItr){
+            --numIterated;
+          }
+          itrMonitor.iterateForward();
+          hasLastRet=true;
+        }
+        itrMonitor.remove();
+        hasLastRet=false;
+      case PostInit:
+        break;
+      default:
+         throw new Error("unknown remove scenario "+removeScenario);
+    }
+    if(removeScenario.expectedException==null && preModScenario.expectedException!=null && !hasLastRet){
+      if(itrMonitor.hasNext()){
+        ++numIterated;
+        itrMonitor.iterateForward();
+      }else{
+        --numIterated;
+        itrMonitor.iterateReverse();
+      }
+      hasLastRet=true;
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    SequenceVerificationItr verifyItr;
+    if(removeScenario.expectedException==null){
+      if(preModScenario.expectedException==null){
+        if(!hasLastRet){
+          if(itrMonitor.hasNext()){
+            if(itrType!=ItrType.DescendingItr){
+              ++numIterated;
+            }else{
+              --numIterated;
+            }
+            itrMonitor.iterateForward();
+          }else{
+            --numIterated;
+            itrMonitor.iterateReverse();
+          }
+          hasLastRet=true;
+        }
+        itrMonitor.remove();
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        switch(removeScenario){
+          case PostNext:
+            switch(seqLocation){
+              case BEGINNING:
+                while(itrMonitor.hasNext()){
+                  itrMonitor.iterateForward();
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
                 break;
-              case 0b01:
-                postAlloc=2;
+              case NEARBEGINNING:
+                 for(int j=1;;++j){
+                  if(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                  }
+                  if((j&3)!=0){
+                    if(itrMonitor.hasPrevious()){
+                      itrMonitor.iterateReverse();
+                    }
+                  }
+                  if(itrMonitor.hasNext()){
+                    itrMonitor.iterateForward();
+                  }else{
+                    if(!itrMonitor.hasPrevious()){
+                      break;
+                    }
+                    itrMonitor.iterateReverse();
+                  }
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
                 break;
-              case 0b10:
-                postAlloc=4;
+              case MIDDLE:
+                for(int j=1;;++j){
+                  if(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                  }
+                  if((j&1)!=0){
+                    if(itrMonitor.hasPrevious()){
+                      itrMonitor.iterateReverse();
+                    }
+                  }
+                  if(itrMonitor.hasNext()){
+                    itrMonitor.iterateForward();
+                  }else{
+                    if(!itrMonitor.hasPrevious()){
+                      break;
+                    }
+                    itrMonitor.iterateReverse();
+                  }
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              case NEAREND:
+                for(int j=1;;++j){
+                  if(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                  }
+                  if((j&3)==0){
+                    if(itrMonitor.hasPrevious()){
+                      itrMonitor.iterateReverse();
+                    }
+                  }
+                  if(itrMonitor.hasNext()){
+                    itrMonitor.iterateForward();
+                  }else{
+                    if(!itrMonitor.hasPrevious()){
+                      break;
+                    }
+                    itrMonitor.iterateReverse();
+                  }
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              case END:
+                for(;;){
+                  if(!itrMonitor.hasPrevious()){
+                    break;
+                  }
+                  itrMonitor.iterateReverse();
+                  itrMonitor.iterateForward();
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
                 break;
               default:
-                postAlloc=6;
+                throw new Error("Unknown sequence location "+seqLocation);
             }
-            postAllocs[index]=postAlloc;
+            break;
+          case PostPrevious:
+            switch(seqLocation){
+              case BEGINNING:
+                while(itrMonitor.hasNext()){
+                  itrMonitor.iterateForward();
+                  itrMonitor.iterateReverse();
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              case NEARBEGINNING:
+                for(int j=1;;++j){
+                  if((j&3)==0 && itrMonitor.hasNext()){
+                    itrMonitor.iterateForward();
+                  }
+                  if(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                  }else{
+                    if(!itrMonitor.hasNext()){
+                      break;
+                    }
+                    itrMonitor.iterateForward();
+                  }            
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              case MIDDLE:
+                for(int j=1;;++j){
+                  if((j&1)!=0 && itrMonitor.hasNext()){
+                    itrMonitor.iterateForward();
+                  }
+                  if(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                  }else{
+                    if(!itrMonitor.hasNext()){
+                      break;
+                    }
+                    itrMonitor.iterateForward();
+                  }            
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              case NEAREND:
+                for(int j=1;;++j){
+                  if((j&3)!=0 && itrMonitor.hasNext()){
+                    itrMonitor.iterateForward();
+                  }
+                  if(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                  }else{
+                    if(!itrMonitor.hasNext()){
+                      break;
+                    }
+                    itrMonitor.iterateForward();
+                  }            
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              case END:
+                while(itrMonitor.hasPrevious()){
+                  itrMonitor.iterateReverse();
+                  itrMonitor.remove();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                }
+                break;
+              default:
+                throw new Error("Unknown sequence location "+seqLocation);
+            }
+            break;
+          default:
+            throw new Error("unknown remove scenario "+removeScenario);
+        }
+        Assertions.assertFalse(itrMonitor.hasNext());
+        Assertions.assertTrue(seqMonitor.isEmpty());
+        verifyItr=seqMonitor.verifyPreAlloc();
+      }else{
+        Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.remove());
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+      }
+    }else{
+      Assertions.assertThrows(removeScenario.expectedException,()->itrMonitor.remove());
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      verifyItr=seqMonitor.verifyPreAlloc();
+      switch(removeScenario){
+        case PostInit:
+          verifyItr.verifyAscending(numToAdd);
+          break;
+        case PostAdd:
+          verifyItr.verifyAscending(numIterated).verifyIllegalAdd().verifyAscending(numIterated,numToAdd-(numIterated));
+          break;
+        case PostRemove:
+          verifyItr.verifyAscending(numIterated).verifyAscending(numIterated+1,numToAdd-(numIterated+1));
+          break;
+        default:
+          throw new Error("unknown remove scenario "+removeScenario);
+      }
+    }
+    verifyItr.verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getListItrpreviousIndex_void_And_ListItrnextIndex_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var nestedType:NestedType.values()){
+        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType)));
+      }  
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.MethodSource("getListItrpreviousIndex_void_And_ListItrnextIndex_voidArgs")
+  public void testListItrpreviousIndex_void_And_ListItrnextIndex_void
+  (SeqMonitor seqMonitor){
+    int numToAdd=100;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getListItrMonitor();
+    for(int i=0;i<numToAdd;++i){
+      Assertions.assertEquals(i,itrMonitor.nextIndex());
+      Assertions.assertEquals(i-1,itrMonitor.previousIndex());
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      itrMonitor.iterateForward();
+    }
+    for(int i=numToAdd;i>0;){
+      Assertions.assertEquals(i,itrMonitor.nextIndex());
+      Assertions.assertEquals(--i,itrMonitor.previousIndex());
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      itrMonitor.iterateReverse();
+    }
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+  }
+  static Stream<Arguments> getListItrset_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var listItrSetScenario:ListItrSetScenario.values()){
+        if(checkedType.checked || listItrSetScenario.expectedException==null){
+          for(var inputArgType:ShortInputTestArgType.values()){
+            if(listItrSetScenario.preModScenario.appliesToRootItr){
+              builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType),listItrSetScenario,inputArgType));
+            }
+            builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType),listItrSetScenario,inputArgType));
           }
-          testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
-        });
-      });
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListItrset_val(){
+    getListItrset_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testListItrset_valHelper((SeqMonitor)args[0],(ListItrSetScenario)args[1],(ShortInputTestArgType)args[2]);
+    });
+  }
+  private static void testListItrset_valHelper
+  (SeqMonitor seqMonitor,ListItrSetScenario listItrSetScenario,ShortInputTestArgType inputArgType){
+    int numToAdd=100;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getListItrMonitor();
+    switch(listItrSetScenario){
+      case PostAddThrowISE:
+      case PostAddThrowISESupercedesModRootCME:
+      case PostAddThrowISESupercedesModParentCME:
+      case PostAddThrowISESupercedesModSeqCME:
+        itrMonitor.add(0);
+        break;
+      case PostRemoveThrowISE:
+      case PostRemoveThrowISESupercedesModRootCME:
+      case PostRemoveThrowISESupercedesModParentCME:
+      case PostRemoveThrowISESupercedesModSeqCME:
+        itrMonitor.iterateForward();
+        itrMonitor.remove();
+        break;
+      default:
+        itrMonitor.iterateForward();
+      case ThrowISE:
+      case ThrowISESupercedesModRootCME:
+      case ThrowISESupercedesModParentCME:
+      case ThrowISESupercedesModSeqCME:
+    }
+    seqMonitor.illegalAdd(listItrSetScenario.preModScenario);
+    SequenceVerificationItr verifyItr;
+    if(listItrSetScenario.expectedException==null){
+      for(int j=0;j<numToAdd;++j){
+        itrMonitor.set(numToAdd-j-1,inputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        if(!itrMonitor.hasNext()){
+          break;
+        }
+        itrMonitor.iterateForward();
+      }
+      seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,numToAdd).verifyPostAlloc();
+      for(int j=0;j<numToAdd;++j){
+        itrMonitor.iterateReverse();
+        itrMonitor.set(numToAdd-j-1,inputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(inputArgType,numToAdd);
+    }else{
+      Assertions.assertThrows(listItrSetScenario.expectedException,()->itrMonitor.set(0));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      verifyItr=seqMonitor.verifyPreAlloc();
+      switch(listItrSetScenario){
+        case PostRemoveThrowISE:
+        case PostRemoveThrowISESupercedesModRootCME:
+        case PostRemoveThrowISESupercedesModParentCME:
+        case PostRemoveThrowISESupercedesModSeqCME:
+          verifyItr.verifyAscending(1,numToAdd-1);
+          break;
+        case PostAddThrowISE:
+        case PostAddThrowISESupercedesModRootCME:
+        case PostAddThrowISESupercedesModParentCME:
+        case PostAddThrowISESupercedesModSeqCME:
+          verifyItr.verifyIllegalAdd();
+        default:
+          verifyItr.verifyAscending(numToAdd);
+      }
+    }
+    verifyItr.verifyPostAlloc(listItrSetScenario.preModScenario);
+  }
+  static Stream<Arguments> getItrnext_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var itrScenario:IterationScenario.values()){
+        if(checkedType.checked || itrScenario==IterationScenario.NoMod){
+          for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+            if(seqSize!=0 || itrScenario.validWithEmptySeq){
+              for(var itrType:ItrType.values()){
+                for(var nestedType:NestedType.values()){
+                  if((itrType!=ItrType.DescendingItr || nestedType.rootType) && (itrScenario.preModScenario.appliesToRootItr || !nestedType.rootType)){
+                    for(var outputType:ShortOutputTestArgType.values()){
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),itrScenario,seqSize,itrType,outputType));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testItrnext_void(){
+    getItrnext_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testItrnext_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(int)args[2],(ItrType)args[3],(ShortOutputTestArgType)args[4]);
+    });
+  }
+  private static void testItrnext_voidHelper
+  (SeqMonitor seqMonitor,IterationScenario itrScenario,int numToAdd,ItrType itrType,ShortOutputTestArgType outputType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getItrMonitor(itrType);
+    switch(itrScenario){
+      case NoMod:
+      case ModSeqSupercedesThrowNSEE:
+      case ModParentSupercedesThrowNSEE:
+      case ModRootSupercedesThrowNSEE:
+        for(int i=0;;++i){
+          if(itrType==ItrType.ListItr){
+            Assertions.assertEquals(i,itrMonitor.nextIndex());
+            Assertions.assertEquals(i-1,itrMonitor.previousIndex());
+          }
+          if(i==numToAdd){
+            Assertions.assertFalse(itrMonitor.hasNext());
+            break;
+          }
+          Assertions.assertTrue(itrMonitor.hasNext());
+          itrMonitor.verifyNext(itrType==ItrType.DescendingItr?numToAdd-i-1:i,outputType);
+          itrMonitor.verifyIteratorState();
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      case ModSeq:
+      case ModParent:
+      case ModRoot:  
+        break;
+      default:
+        throw new Error("unknown itr scenario "+itrScenario);
+    }
+    if(seqMonitor.checkedType.checked){
+      seqMonitor.illegalAdd(itrScenario.preModScenario);
+      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+    }
+    itrMonitor.verifyIteratorState();
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
+  }
+  static Stream<Arguments> getListItrprevious_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var itrScenario:IterationScenario.values()){
+        if(checkedType.checked || itrScenario==IterationScenario.NoMod){
+          for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+            if(seqSize!=0 || itrScenario.validWithEmptySeq){
+              for(var outputType:ShortOutputTestArgType.values()){
+                if(itrScenario.preModScenario.appliesToRootItr){
+                  builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType),itrScenario,seqSize,outputType));
+                }
+                builder.accept(Arguments.of(new SeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqSize,outputType));
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListItrprevious_void(){
+    getListItrprevious_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testListItrprevious_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(int)args[2],(ShortOutputTestArgType)args[3]);
+    });
+  }
+  private static void testListItrprevious_voidHelper
+  (SeqMonitor seqMonitor,IterationScenario itrScenario,int numToAdd,ShortOutputTestArgType outputType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var itrMonitor=seqMonitor.getListItrMonitor(numToAdd);
+    switch(itrScenario){
+      case NoMod:
+      case ModSeqSupercedesThrowNSEE:
+      case ModParentSupercedesThrowNSEE:
+      case ModRootSupercedesThrowNSEE:
+        for(int i=0;;++i){
+          Assertions.assertEquals(numToAdd-i,itrMonitor.nextIndex());
+          Assertions.assertEquals(numToAdd-i-1,itrMonitor.previousIndex());
+          if(i==numToAdd){
+            Assertions.assertFalse(itrMonitor.hasPrevious());
+            break;
+          }
+          Assertions.assertTrue(itrMonitor.hasPrevious());
+          itrMonitor.verifyPrevious(numToAdd-i-1,outputType);
+          itrMonitor.verifyIteratorState();
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      case ModSeq:
+      case ModParent:
+      case ModRoot:  
+        break;
+      default:
+        throw new Error("unknown itr scenario "+itrScenario);
+    }
+    if(seqMonitor.checkedType.checked){
+      seqMonitor.illegalAdd(itrScenario.preModScenario);
+      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateReverse());
+    }
+    itrMonitor.verifyIteratorState();
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
+  }
+  static Stream<Arguments> getforEach_ConsumerArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+          for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
+          }
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testforEach_Consumer(){
+    getforEach_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
+        testforEach_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3],(FunctionCallType)args[4]);
+    });
+  }
+  private static void testforEach_ConsumerHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(seqMonitor);
+    int numExpectedIteratedValues;
+    if(preModScenario.expectedException==null){
+      if(monitoredFunctionGen.expectedException==null || numToAdd==0){
+        seqMonitor.forEach(monitoredConsumer,functionCallType);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+        numExpectedIteratedValues=numToAdd;
+      }else{
+        Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.forEach(monitoredConsumer,functionCallType));
+        seqMonitor.verifyStructuralIntegrity();
+        var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+        switch(monitoredFunctionGen){
+          case Throw:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc();
+            break;
+          case ModSeq:
+            numExpectedIteratedValues=numToAdd;
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyPostAlloc();
+            break;
+          case ModParent:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr.verifyParentPostAlloc();
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr.verifyPostAlloc();
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            break;
+          case ThrowModSeq:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc(PreModScenario.ModSeq);
+            break;
+          case ThrowModParent:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ThrowModRoot:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc(PreModScenario.ModRoot);
+            break;
+          default:
+            throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
+        }
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.forEach(monitoredConsumer,functionCallType));
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+      switch(monitoredFunctionGen){
+        case NoThrow:
+          numExpectedIteratedValues=numToAdd;
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case Throw:
+        case ModSeq:
+          numExpectedIteratedValues=numToAdd==0?0:1;
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case ModParent:
+          switch(preModScenario){
+            case ModRoot:
+              numExpectedIteratedValues=numToAdd==0?0:1;
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            case ModParent:
+              numExpectedIteratedValues=numToAdd;
+              verifyItr.verifyParentPostAlloc();
+              for(int i=0;i<numExpectedIteratedValues+1;++i){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ModRoot:
+          numExpectedIteratedValues=numToAdd;
+          verifyItr.verifyPostAlloc(preModScenario);
+          for(int i=0;i<numExpectedIteratedValues;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case ThrowModSeq:
+          verifyItr.verifyPostAlloc(preModScenario);
+          numExpectedIteratedValues=numToAdd==0?0:1;
+          break;
+        case ThrowModParent:
+          numExpectedIteratedValues=numToAdd==0?0:1;
+          switch(preModScenario){
+            case ModParent:
+              verifyItr.verifyParentPostAlloc();
+              for(int i=0;i<numExpectedIteratedValues;++i){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyIllegalAdd().verifyRootPostAlloc();
+              break;
+            case ModRoot:
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ThrowModRoot:
+          numExpectedIteratedValues=numToAdd==0?0:1;
+          verifyItr.verifyPostAlloc(preModScenario);
+          for(int i=0;i<numExpectedIteratedValues;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        default:
+          throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
+      }
+    }
+    Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
+    var currNode=seqMonitor.seq.head;
+    for(var encounteredValue:monitoredConsumer.encounteredValues){
+      Assertions.assertEquals(encounteredValue,(Object)currNode.val);
+      currNode=currNode.next;
     }
   }
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);
     final boolean rootType;
+    final boolean forwardIteration=true;
     NestedType(boolean rootType){
       this.rootType=rootType;
     }
@@ -1735,7 +2858,7 @@ public class ShortDblLnkSeqTest{
         if(expectedCurrIndex<parentSize){
           this.expectedLastRet=newLastRet;
           this.expectedCurrIndex=parentSize;
-          this.expectedCurr=newLastRet.next;
+          this.expectedCurr=null;
         }
       }
       void verifyIteratorState(){
@@ -1834,13 +2957,19 @@ public class ShortDblLnkSeqTest{
       }
       void remove(){
         int newCurrIndex=this.expectedCurrIndex;
-        if(expectedLastRet!=null && expectedLastRet.next==expectedCurr){
-          --newCurrIndex;
+        var newCurr=expectedCurr;
+        if(expectedLastRet!=null){
+          if(expectedLastRet.next==newCurr){
+            --newCurrIndex;
+          }else{
+            newCurr=expectedLastRet.next;
+          }
         }
         itr.remove();
         verifyRemoval();
         this.expectedCurrIndex=newCurrIndex;
         this.expectedLastRet=null;
+        this.expectedCurr=newCurr;
       }
       void verifyIteratorState(){
         Assertions.assertEquals(FieldAndMethodAccessor.ShortDblLnkSeq.UncheckedList.BidirectionalItr.currIndex(itr),expectedCurrIndex);
@@ -1956,98 +3085,109 @@ public class ShortDblLnkSeqTest{
       return streamBuilder.build();
     }
   }
-  static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
+  static void runQueryTests(boolean parallel,NestedType nestedType,QueryTest queryTest){
     for(var checkedType:CheckedType.values()){
       for(var preModScenario:PreModScenario.values()){
         if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
-          for(var seqLocation:SequenceLocation.values()){
-            if(seqLocation!=SequenceLocation.IOBLO){
-              for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
-                if(seqLocation==SequenceLocation.IOBHI || seqSize!=0){
-                  for(var argType:QueryTester.values()){
-                    for(var queryCastType:QueryCastType.values()){
-                      switch(argType){
-                        case Booleannull:
-                        case Bytenull:
-                        case Characternull:
-                        case Shortnull:
-                        case Integernull:
-                        case Longnull:
-                        case Floatnull:
-                        case Doublenull:
-                          if(queryCastType!=QueryCastType.ToBoxed || (seqSize!=0 && seqLocation.expectedException==null)){
-                            continue;
-                          }
-                          break;
-                        case Objectnull:
-                          if(queryCastType!=QueryCastType.ToObject || (seqSize!=0 && seqLocation.expectedException==null)){
-                            continue;
-                          }
-                          break;
-                        case Booleanfalse:
-                        case Byte0:
-                        case Character0:
-                        case Short0:
-                        case Integer0:
-                        case Long0:
-                        case Floatpos0:
-                        case Floatneg0:
-                        case Doublepos0:
-                        case Doubleneg0:
-                        case Booleantrue:
-                        case Bytepos1:
-                        case Characterpos1:
-                        case Shortpos1:
-                        case Integerpos1:
-                        case Longpos1:
-                        case Floatpos1:
-                        case Doublepos1:
-                        //values beyond the range of boolean
-                        case Bytepos2:
-                        case Characterpos2:
-                        case Shortpos2:
-                        case Integerpos2:
-                        case Longpos2:
-                        case Floatpos2:
-                        case Doublepos2:
-                        //negative values beyond the range of char
-                        case Byteneg1:
-                        case Shortneg1:
-                        case Integerneg1:
-                        case Longneg1:
-                        case Floatneg1:
-                        case Doubleneg1:
-                        //negative values beyond the range of byte
-                        case ShortMIN_BYTE_MINUS1:
-                        case IntegerMIN_BYTE_MINUS1:
-                        case LongMIN_BYTE_MINUS1:
-                        case FloatMIN_BYTE_MINUS1:
-                        case DoubleMIN_BYTE_MINUS1:
-                        //positive values out of the range of byte
-                        case CharacterMAX_BYTE_PLUS1:
-                        case ShortMAX_BYTE_PLUS1:
-                        case IntegerMAX_BYTE_PLUS1:
-                        case LongMAX_BYTE_PLUS1:
-                        case FloatMAX_BYTE_PLUS1:
-                        case DoubleMAX_BYTE_PLUS1:
-                        //these input values cannot potentially return true
-                        break;
-                        default:
-                        if(seqSize!=0 && seqLocation.expectedException==null){
-                          continue;
-                        }
-                        //these values must necessarily return false
-                      }
-                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario));
-                    }
+          var seqLocationStream=Stream.of(SequenceLocation.values()).filter(seqLocation->seqLocation!=SequenceLocation.IOBLO);
+          if(parallel){
+            seqLocationStream=seqLocationStream.parallel();
+          }
+          seqLocationStream.forEach(seqLocation->{
+            for(int seqSize:AbstractShortSeqMonitor.FIB_SEQ){
+              if(seqLocation==SequenceLocation.IOBHI || seqSize!=0){
+                for(var queryCastType:QueryCastType.values()){
+                  var argTypeStream=Stream.of(QueryTester.values());
+                  if(parallel){
+                    argTypeStream=argTypeStream.parallel();
                   }
+                  argTypeStream.forEach(argType->{
+                    switch(argType){
+                      case Booleannull:
+                      case Bytenull:
+                      case Characternull:
+                      case Shortnull:
+                      case Integernull:
+                      case Longnull:
+                      case Floatnull:
+                      case Doublenull:
+                        if(queryCastType!=QueryCastType.ToBoxed || (seqSize!=0 && seqLocation.expectedException==null)){
+                          return;
+                        }
+                        break;
+                      case Objectnull:
+                        if(queryCastType!=QueryCastType.ToObject || (seqSize!=0 && seqLocation.expectedException==null)){
+                          return;
+                        }
+                        break;
+                      case Booleanfalse:
+                      case Byte0:
+                      case Character0:
+                      case Short0:
+                      case Integer0:
+                      case Long0:
+                      case Floatpos0:
+                      case Floatneg0:
+                      case Doublepos0:
+                      case Doubleneg0:
+                      case Booleantrue:
+                      case Bytepos1:
+                      case Characterpos1:
+                      case Shortpos1:
+                      case Integerpos1:
+                      case Longpos1:
+                      case Floatpos1:
+                      case Doublepos1:
+                      //values beyond the range of boolean
+                      case Bytepos2:
+                      case Characterpos2:
+                      case Shortpos2:
+                      case Integerpos2:
+                      case Longpos2:
+                      case Floatpos2:
+                      case Doublepos2:
+                      //negative values beyond the range of char
+                      case Byteneg1:
+                      case Shortneg1:
+                      case Integerneg1:
+                      case Longneg1:
+                      case Floatneg1:
+                      case Doubleneg1:
+                      //negative values beyond the range of byte
+                      case ShortMIN_BYTE_MINUS1:
+                      case IntegerMIN_BYTE_MINUS1:
+                      case LongMIN_BYTE_MINUS1:
+                      case FloatMIN_BYTE_MINUS1:
+                      case DoubleMIN_BYTE_MINUS1:
+                      //positive values out of the range of byte
+                      case CharacterMAX_BYTE_PLUS1:
+                      case ShortMAX_BYTE_PLUS1:
+                      case IntegerMAX_BYTE_PLUS1:
+                      case LongMAX_BYTE_PLUS1:
+                      case FloatMAX_BYTE_PLUS1:
+                      case DoubleMAX_BYTE_PLUS1:
+                      //these input values cannot potentially return true
+                      break;
+                      default:
+                      if(seqSize!=0 && seqLocation.expectedException==null){
+                        return;
+                      }
+                      //these values must necessarily return false
+                    }
+                    queryTest.runTest(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario);
+                  });
                 }
               }
             }
-          }
+          });
         }
       }
     }
+  }
+  interface QueryTest
+  {
+    void runTest(CheckedType checkedType,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize,PreModScenario preModScenario
+    );
   }
   static Stream<Arguments> getBasicCollectionTestArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
@@ -2056,15 +3196,80 @@ public class ShortDblLnkSeqTest{
       }
     });
   }
-  static Stream<Arguments> getQueryListArguments(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    buildQueryArguments(builder,NestedType.LISTDEQUE);
-    buildQueryArguments(builder,NestedType.SUBLIST);
-    return builder.build();
-  }
-  static Stream<Arguments> getQueryCollectionArguments(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    buildQueryArguments(builder,NestedType.LISTDEQUE);
-    return builder.build();
+  private static void runSubListTests(boolean quickTest,CheckedType checkedType,boolean parallel,int parentLength,Consumer<? super SeqMonitor> testMethod){
+    if(quickTest){
+      var preAllocStream=IntStream.range(0,1<<(parentLength));
+      if(parallel){
+        preAllocStream=preAllocStream.parallel();
+      }
+      preAllocStream.forEach(preAllocBits->{
+        int[] preAllocs=new int[parentLength];
+        for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
+          preAllocs[index]=(marker&preAllocBits)!=0?5:0;
+        }
+        var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
+        if(parallel){
+          postAllocStream=postAllocStream.parallel();
+        }
+        postAllocStream.forEach(postAllocBits->{
+          int[] postAllocs=new int[parentLength];
+          for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
+            postAllocs[index]=(marker&postAllocBits)!=0?5:0;
+          }
+          //System.out.println(Arrays.toString(preAllocs)+","+Arrays.toString(postAllocs));
+          testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
+        });
+      });
+    }else{
+      var preAllocStream=IntStream.range(0,1<<(parentLength<<1));
+      if(parallel){
+        preAllocStream=preAllocStream.parallel();
+      }
+      preAllocStream.forEach(preAllocBits->{
+        int[] preAllocs=new int[parentLength];
+        for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
+          int preAlloc;
+          switch(marker&preAllocBits){
+            case 0b00:
+              preAlloc=0;
+              break;
+            case 0b01:
+              preAlloc=2;
+              break;
+            case 0b10:
+              preAlloc=4;
+              break;
+            default:
+              preAlloc=6;
+          }
+          preAllocs[index]=preAlloc;
+        }
+        var postAllocStream=IntStream.range(0,1<<(parentLength<<1));
+        if(parallel){
+          postAllocStream=postAllocStream.parallel();
+        }
+        postAllocStream.forEach(postAllocBits->{
+          int[] postAllocs=new int[parentLength];
+          for(int index=0,marker=0b11;index<parentLength;marker<<=2,++index){
+            int postAlloc;
+            switch(marker&postAllocBits){
+              case 0b00:
+                postAlloc=0;
+                break;
+              case 0b01:
+                postAlloc=2;
+                break;
+              case 0b10:
+                postAlloc=4;
+                break;
+              default:
+                postAlloc=6;
+            }
+            postAllocs[index]=postAlloc;
+          }
+          testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs));
+        });
+      });
+    }
   }
 }

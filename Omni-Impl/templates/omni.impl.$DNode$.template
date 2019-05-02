@@ -144,7 +144,7 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
   public static $<E>$ void uncheckedForEachAscending($DNode$$<E>$ node,int size,$TypeNameModifier$Consumer$<? super E>$ action){
     for(;;node=node.next){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -152,7 +152,7 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
   public static $<E>$ void uncheckedReplaceAll($DNode$$<E>$ node,int size,$UnaryOperator$$<E>$ operator){
     for(;;node=node.next){
       node.val=operator.$applyMethod$(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
@@ -192,7 +192,7 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
   public static $<E>$ void uncheckedForEachDescending($DNode$$<E>$ node,int size,$TypeNameModifier$Consumer$<? super E>$ action){
     for(;;node=node.prev){
       action.accept(node.val);
-      if(--size!=0){
+      if(--size==0){
         return;
       }
     }
