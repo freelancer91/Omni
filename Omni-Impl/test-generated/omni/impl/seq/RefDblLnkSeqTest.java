@@ -879,11 +879,11 @@ public class RefDblLnkSeqTest{
         switch(monitoredObjectGen){
           case ModSeq:
             if(preModScenario==PreModScenario.NoMod){
-              for(int i=0;i<numExpectedCalls;++i){
-                verifyItr.verifyIllegalAdd();
-              }
               if(seqLocation==SequenceLocation.IOBHI){
                 ++numExpectedCalls;
+              }
+              for(int i=0;i<numExpectedCalls;++i){
+                verifyItr.verifyIllegalAdd();
               }
             }else{
               numExpectedCalls=1;

@@ -401,6 +401,7 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
             throw new Error("Unknown itr type "+itrType);
         }
       case NEARBEGINNING:
+        //TODO make these different iterator types
         return getListItrMonitor(getExpectedSeqSize()/4);
       case MIDDLE:
         return getListItrMonitor(getExpectedSeqSize()/2);

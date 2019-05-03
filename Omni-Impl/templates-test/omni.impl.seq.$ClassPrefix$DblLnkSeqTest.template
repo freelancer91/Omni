@@ -95,6 +95,23 @@ public class $ClassPrefix$DblLnkSeqTest{
 #MACRO testItrnext_void<PARALLEL>()
 #MACRO testListItrprevious_void<PARALLEL>()
 #MACRO testforEach_Consumer<PARALLEL>()
+#MACRO testclone_void<PARALLEL>()
+#MACRO testclear_void<PARALLEL>()
+#MACRO testreadwriteObject<PARALLEL>()
+#MACRO testtoString_void<PARALLEL>()
+//TODO test sort
+#ENDDEF
+#MACRODEF testtoString_void<PARALLEL>()
+//TODO
+#ENDDEF
+#MACRODEF testreadwriteObject<PARALLEL>()
+//TODO
+#ENDDEF
+#MACRODEF testclone_void<PARALLEL>()
+//TODO
+#ENDDEF
+#MACRODEF testclear_void<PARALLEL>()
+//TODO
 #ENDDEF
 #MACRODEF testListItrset_val<PARALLEL>()
 static Stream<Arguments> getListItrset_valArgs(){
@@ -2701,12 +2718,13 @@ private static void testremoveVal_valHelper
       switch(monitoredObjectGen){
         case ModSeq:
           if(preModScenario==PreModScenario.NoMod){
-            for(int i=0;i<numExpectedCalls;++i){
-              verifyItr.verifyIllegalAdd();
-            }
             if(seqLocation==SequenceLocation.IOBHI){
               ++numExpectedCalls;
             }
+            for(int i=0;i<numExpectedCalls;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            
           }else{
             numExpectedCalls=1;
           }
