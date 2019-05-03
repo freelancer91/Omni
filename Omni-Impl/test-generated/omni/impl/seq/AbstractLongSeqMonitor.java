@@ -320,29 +320,44 @@ abstract class AbstractLongSeqMonitor<SEQ extends OmniCollection.OfLong>
     }
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
+    int offset;
     switch(seqLocation){
       case BEGINNING:
-        switch(itrType){
-          case ListItr:
-            return getListItrMonitor();
-          case Itr:
-            return getItrMonitor();
-          case DescendingItr:
-            return getDescendingItrMonitor();
-          default:
-            throw new Error("Unknown itr type "+itrType);
-        }
+        offset=0;
+        break;
       case NEARBEGINNING:
-        return getListItrMonitor(getExpectedSeqSize()/4);
+        offset=getExpectedSeqSize()>>2;
+        break;
       case MIDDLE:
-        return getListItrMonitor(getExpectedSeqSize()/2);
+        offset=getExpectedSeqSize()>>1;
+        break;
       case NEAREND:
-        return getListItrMonitor((getExpectedSeqSize()/4)*3);
+        offset=(getExpectedSeqSize()>>2)*3;
+        break;
       case END:
-        return getListItrMonitor(getExpectedSeqSize());
+        offset=getExpectedSeqSize();
+        break;
       default:
-        throw new Error("Unknown sequence location "+seqLocation);
-    } 
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+    AbstractItrMonitor itrMonitor;
+    switch (itrType){
+      case ListItr:
+        return getListItrMonitor(offset);
+      case Itr:
+        itrMonitor=getItrMonitor();
+        break;
+      case DescendingItr:
+        itrMonitor=getDescendingItrMonitor();
+        break;
+      default:
+        throw new Error("Unknown itrType "+itrType);
+    }
+    for(int i=0;i<offset;++i)
+    {
+      itrMonitor.iterateForward();
+    }
+    return itrMonitor;
   }
   AbstractItrMonitor getListItrMonitor(SequenceLocation seqLocation){
     switch(seqLocation){

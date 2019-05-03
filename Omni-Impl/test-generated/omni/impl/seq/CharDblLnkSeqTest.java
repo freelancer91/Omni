@@ -1399,12 +1399,16 @@ public class CharDblLnkSeqTest{
               for(var preModScenario:PreModScenario.values()){
                 if(checkedType.checked || preModScenario.expectedException==null){
                   for(var itrType:ItrType.values()){
-                    if((itrType==ItrType.ListItr || removeScenario.validWithForwardItr)){
+                    if(itrType==ItrType.ListItr || (removeScenario!=ItrRemoveScenario.PostAdd && removeScenario!=ItrRemoveScenario.PostPrevious))
+                    {
                       for(var nestedType:NestedType.values()){
-                        if(((itrType!=ItrType.DescendingItr || nestedType.rootType)) && (!nestedType.rootType || preModScenario.appliesToRootItr)){
-                          for(var sequenceLocation:SequenceLocation.values()){
-                            if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (seqSize!=0 && itrType!=ItrType.DescendingItr))){
-                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,seqSize,itrType,sequenceLocation));
+                        if((!nestedType.rootType || (preModScenario!=PreModScenario.ModParent && preModScenario!=PreModScenario.ModRoot)) && (nestedType.rootType || itrType!=ItrType.DescendingItr))
+                        {
+                          for(var seqLocation:SequenceLocation.values()){
+                            if(seqLocation.expectedException==null && (itrType==ItrType.ListItr || (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING))
+                            )
+                            {
+                              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,seqSize,itrType,seqLocation));
                             }
                           }
                         }
@@ -1432,293 +1436,379 @@ public class CharDblLnkSeqTest{
       seqMonitor.add(i);
     }
     var itrMonitor=seqMonitor.getItrMonitor(seqLocation,itrType);
-    int numIterated;
-    boolean hasLastRet=false;
+    int numBefore;
     switch(seqLocation){
       case BEGINNING:
-        if(itrType!=ItrType.DescendingItr){
-          numIterated=0;
-        }else{
-          numIterated=numToAdd;
-        }
+        numBefore=0;
         break;
       case NEARBEGINNING:
-        numIterated=seqMonitor.expectedSeqSize/4;
+        numBefore=numToAdd>>2;
         break;
       case MIDDLE:
-        numIterated=seqMonitor.expectedSeqSize/2;
+        numBefore=numToAdd>>1;
         break;
       case NEAREND:
-        numIterated=(seqMonitor.expectedSeqSize/4)*3;
+        numBefore=(numToAdd>>2)*3;
         break;
       case END:
-        numIterated=seqMonitor.expectedSeqSize;
+        numBefore=numToAdd;
         break;
       default:
-        throw new Error("Unknown seq location "+seqLocation);
+        throw new Error("Unknown seqLocation "+seqLocation);
     }
+    boolean hasLastRet;
+    switch(itrType){
+      case Itr:
+        hasLastRet=numBefore>0;
+        break;
+      case ListItr:
+        hasLastRet=false;
+        break;
+      case DescendingItr:
+        numBefore=numToAdd-numBefore;
+        hasLastRet=numBefore<numToAdd;
+        break;
+      default:
+        throw new Error("Unknown itrType "+itrType);
+    }
+    int numAfter=numToAdd-numBefore;
     switch(removeScenario){
       case PostNext:
-        if(seqLocation==SequenceLocation.END && itrMonitor.hasPrevious()){
-          hasLastRet=true;
-          --numIterated;
-          itrMonitor.iterateReverse();
-        }
-        if(itrMonitor.hasNext()){
-          hasLastRet=true;
-          if(itrType!=ItrType.DescendingItr){
-            ++numIterated;
+        if(!hasLastRet){
+          if(itrMonitor.hasNext()){
+            itrMonitor.iterateForward();
+            if(itrType==ItrType.DescendingItr){
+              --numBefore;
+              --numAfter;
+            }
+            hasLastRet=true;
+            break;
+          }
+        }else{
+          if(itrType==ItrType.Itr){
+            --numBefore;
           }else{
-            --numIterated;
+            --numAfter;
+          }
+          break;
+        }
+      case PostPrevious:
+        if(itrType!=ItrType.ListItr){
+          throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} must be ListItr");
+        }
+        if(!itrMonitor.hasPrevious()){
+          if(!itrMonitor.hasNext()){
+            throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} hasPrevious returned false");
           }
           itrMonitor.iterateForward();
         }
-        break;
-      case PostPrevious:
-        if(seqLocation==SequenceLocation.BEGINNING && itrMonitor.hasNext()){
-           hasLastRet=true;
-           ++numIterated;
-           itrMonitor.iterateForward();
-        }
-        if(itrMonitor.hasPrevious()){
-          hasLastRet=true;
-          --numIterated;
-          itrMonitor.iterateReverse();
-        }
+        itrMonitor.iterateReverse();
+        --numBefore;
+        --numAfter;
+        hasLastRet=true;
         break;
       case PostAdd:
+        if(itrType!=ItrType.ListItr){
+          throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} must be ListItr");
+        }
         itrMonitor.add(0);
         hasLastRet=false;
         break;
       case PostRemove:
-        if(seqLocation==SequenceLocation.END && itrMonitor.hasPrevious()){
-          --numIterated;
-          itrMonitor.iterateReverse();
-          hasLastRet=true;
-        }else if(itrMonitor.hasNext()){
-          if(itrType==ItrType.DescendingItr){
-            --numIterated;
+        if(!hasLastRet){
+          if(itrMonitor.hasNext()){
+            itrMonitor.iterateForward();
+            if(itrType==ItrType.DescendingItr){
+              --numBefore;
+            }else{
+              --numAfter;
+            }
+          }else{
+            if(itrType!=ItrType.ListItr){
+              throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} must be ListItr");
+            }
+            if(!itrMonitor.hasPrevious()){
+              throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} hasPrevious returned false");
+            }
+            itrMonitor.iterateReverse();
+            itrMonitor.iterateForward();
+            --numBefore;
           }
-          itrMonitor.iterateForward();
-          hasLastRet=true;
+        }else if(itrType==ItrType.Itr){
+          --numBefore;
+        }else if(itrType==ItrType.DescendingItr){
+          --numAfter;
         }
         itrMonitor.remove();
         hasLastRet=false;
+        break;
       case PostInit:
+        if(itrType!=ItrType.ListItr && seqLocation!=SequenceLocation.BEGINNING){
+          throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} hasPrevious returned false");
+        }
         break;
       default:
-         throw new Error("unknown remove scenario "+removeScenario);
-    }
-    if(removeScenario.expectedException==null && preModScenario.expectedException!=null && !hasLastRet){
-      if(itrMonitor.hasNext()){
-        ++numIterated;
-        itrMonitor.iterateForward();
-      }else{
-        --numIterated;
-        itrMonitor.iterateReverse();
-      }
-      hasLastRet=true;
+        throw new Error("Unknown removeScenario "+removeScenario);
     }
     seqMonitor.illegalAdd(preModScenario);
     SequenceVerificationItr verifyItr;
     if(removeScenario.expectedException==null){
       if(preModScenario.expectedException==null){
-        if(!hasLastRet){
-          if(itrMonitor.hasNext()){
-            if(itrType!=ItrType.DescendingItr){
-              ++numIterated;
-            }else{
-              --numIterated;
-            }
-            itrMonitor.iterateForward();
-          }else{
-            --numIterated;
-            itrMonitor.iterateReverse();
-          }
-          hasLastRet=true;
-        }
         itrMonitor.remove();
         itrMonitor.verifyIteratorState();
         seqMonitor.verifyStructuralIntegrity();
-        switch(removeScenario){
-          case PostNext:
-            switch(seqLocation){
-              case BEGINNING:
-                while(itrMonitor.hasNext()){
-                  itrMonitor.iterateForward();
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case NEARBEGINNING:
-                 for(int j=1;;++j){
-                  if(itrMonitor.hasPrevious()){
-                    itrMonitor.iterateReverse();
-                  }
-                  if((j&3)!=0){
-                    if(itrMonitor.hasPrevious()){
-                      itrMonitor.iterateReverse();
-                    }
-                  }
-                  if(itrMonitor.hasNext()){
+        if(itrType==ItrType.ListItr){
+          switch(removeScenario){
+            case PostNext:
+              switch(seqLocation){
+                case BEGINNING:
+                  while(itrMonitor.hasNext()){
                     itrMonitor.iterateForward();
-                  }else{
-                    if(!itrMonitor.hasPrevious()){
-                      break;
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
+                  }
+                  break;
+                case NEARBEGINNING:
+                  for(;;){
+                    if(numBefore*3<numAfter){
+                      if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        --numAfter;
+                      }else if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        itrMonitor.iterateForward();
+                        --numBefore;
+                      }else{
+                        break;
+                      }
+                    }else{
+                      if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        itrMonitor.iterateForward();
+                        --numBefore;
+                      }else if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        --numAfter;
+                      }
                     }
-                    itrMonitor.iterateReverse();
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
                   }
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case MIDDLE:
-                for(int j=1;;++j){
-                  if(itrMonitor.hasPrevious()){
-                    itrMonitor.iterateReverse();
-                  }
-                  if((j&1)!=0){
-                    if(itrMonitor.hasPrevious()){
-                      itrMonitor.iterateReverse();
+                  break;
+                case MIDDLE:
+                  for(;;){
+                    if(numBefore<numAfter){
+                      if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        --numAfter;
+                      }else if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        itrMonitor.iterateForward();
+                        --numBefore;
+                      }else{
+                        break;
+                      }
+                    }else{
+                      if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        itrMonitor.iterateForward();
+                        --numBefore;
+                      }else if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        --numAfter;
+                      }
                     }
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
                   }
-                  if(itrMonitor.hasNext()){
+                  break;
+                case NEAREND:
+                  for(;;){
+                    if(numBefore<numAfter*3){
+                      if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        --numAfter;
+                      }else if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        itrMonitor.iterateForward();
+                        --numBefore;
+                      }else{
+                        break;
+                      }
+                    }else{
+                      if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        itrMonitor.iterateForward();
+                        --numBefore;
+                      }else if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        --numAfter;
+                      }
+                    }
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
+                  }
+                  break;
+                case END:
+                  while(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
                     itrMonitor.iterateForward();
-                  }else{
-                    if(!itrMonitor.hasPrevious()){
-                      break;
-                    }
-                    itrMonitor.iterateReverse();
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
                   }
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case NEAREND:
-                for(int j=1;;++j){
-                  if(itrMonitor.hasPrevious()){
-                    itrMonitor.iterateReverse();
-                  }
-                  if((j&3)==0){
-                    if(itrMonitor.hasPrevious()){
-                      itrMonitor.iterateReverse();
-                    }
-                  }
-                  if(itrMonitor.hasNext()){
+                  break;
+                default:
+                  throw new Error("Unknown seqLocation "+seqLocation);
+              }
+              break;
+            case PostPrevious:
+              switch(seqLocation){
+                case BEGINNING:
+                  while(itrMonitor.hasNext()){
                     itrMonitor.iterateForward();
-                  }else{
-                    if(!itrMonitor.hasPrevious()){
-                      break;
-                    }
                     itrMonitor.iterateReverse();
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
                   }
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case END:
-                for(;;){
-                  if(!itrMonitor.hasPrevious()){
-                    break;
+                  break;
+                case NEARBEGINNING:
+                  for(;;){
+                    if(numBefore*3<numAfter){
+                      if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        itrMonitor.iterateReverse();
+                        --numAfter;
+                      }else if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        --numBefore;
+                      }else{
+                        break;
+                      }
+                    }else{
+                      if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        --numBefore;
+                      }else if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        itrMonitor.iterateReverse();
+                        --numAfter;
+                      }else{
+                        break;
+                      }
+                    }
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
                   }
-                  itrMonitor.iterateReverse();
-                  itrMonitor.iterateForward();
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              default:
-                throw new Error("Unknown sequence location "+seqLocation);
-            }
+                  break;
+                case MIDDLE:
+                  for(;;){
+                    if(numBefore<numAfter){
+                      if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        itrMonitor.iterateReverse();
+                        --numAfter;
+                      }else if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        --numBefore;
+                      }else{
+                        break;
+                      }
+                    }else{
+                      if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        --numBefore;
+                      }else if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        itrMonitor.iterateReverse();
+                        --numAfter;
+                      }else{
+                        break;
+                      }
+                    }
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
+                  }
+                  break;
+                case NEAREND:
+                  for(;;){
+                    if(numBefore<numAfter*3){
+                      if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        itrMonitor.iterateReverse();
+                        --numAfter;
+                      }else if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        --numBefore;
+                      }else{
+                        break;
+                      }
+                    }else{
+                      if(itrMonitor.hasPrevious()){
+                        itrMonitor.iterateReverse();
+                        --numBefore;
+                      }else if(itrMonitor.hasNext()){
+                        itrMonitor.iterateForward();
+                        itrMonitor.iterateReverse();
+                        --numAfter;
+                      }else{
+                        break;
+                      }
+                    }
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
+                  }
+                  break;
+                case END:
+                  while(itrMonitor.hasPrevious()){
+                    itrMonitor.iterateReverse();
+                    itrMonitor.remove();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
+                  }
+                  break;
+                default:
+                  throw new Error("Unknown seqLocation "+seqLocation);
+              }
+              break;
+            default:
+              throw new Error("Unknown removeScenario "+removeScenario);
+          }
+          Assertions.assertTrue(seqMonitor.isEmpty());
+        }else{
+          while(itrMonitor.hasNext()){
+            itrMonitor.iterateForward();
+            itrMonitor.remove();
+            itrMonitor.verifyIteratorState();
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          if(itrType==ItrType.Itr){
+            Assertions.assertTrue(numBefore!=0 || seqMonitor.isEmpty());
+          }else{
+            Assertions.assertTrue(numAfter!=0 || seqMonitor.isEmpty());
+          }
+        }
+        verifyItr=seqMonitor.verifyPreAlloc();
+        switch(itrType){
+          case ListItr:
             break;
-          case PostPrevious:
-            switch(seqLocation){
-              case BEGINNING:
-                while(itrMonitor.hasNext()){
-                  itrMonitor.iterateForward();
-                  itrMonitor.iterateReverse();
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case NEARBEGINNING:
-                for(int j=1;;++j){
-                  if((j&3)==0 && itrMonitor.hasNext()){
-                    itrMonitor.iterateForward();
-                  }
-                  if(itrMonitor.hasPrevious()){
-                    itrMonitor.iterateReverse();
-                  }else{
-                    if(!itrMonitor.hasNext()){
-                      break;
-                    }
-                    itrMonitor.iterateForward();
-                  }            
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case MIDDLE:
-                for(int j=1;;++j){
-                  if((j&1)!=0 && itrMonitor.hasNext()){
-                    itrMonitor.iterateForward();
-                  }
-                  if(itrMonitor.hasPrevious()){
-                    itrMonitor.iterateReverse();
-                  }else{
-                    if(!itrMonitor.hasNext()){
-                      break;
-                    }
-                    itrMonitor.iterateForward();
-                  }            
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case NEAREND:
-                for(int j=1;;++j){
-                  if((j&3)!=0 && itrMonitor.hasNext()){
-                    itrMonitor.iterateForward();
-                  }
-                  if(itrMonitor.hasPrevious()){
-                    itrMonitor.iterateReverse();
-                  }else{
-                    if(!itrMonitor.hasNext()){
-                      break;
-                    }
-                    itrMonitor.iterateForward();
-                  }            
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              case END:
-                while(itrMonitor.hasPrevious()){
-                  itrMonitor.iterateReverse();
-                  itrMonitor.remove();
-                  itrMonitor.verifyIteratorState();
-                  seqMonitor.verifyStructuralIntegrity();
-                }
-                break;
-              default:
-                throw new Error("Unknown sequence location "+seqLocation);
-            }
+          case Itr:
+            verifyItr.verifyAscending(numBefore);
+            break;
+          case DescendingItr:
+            verifyItr.verifyAscending(numBefore+1,numAfter);
             break;
           default:
-            throw new Error("unknown remove scenario "+removeScenario);
+            throw new Error("Unknown itrType "+itrType);
         }
-        Assertions.assertFalse(itrMonitor.hasNext());
-        Assertions.assertTrue(seqMonitor.isEmpty());
-        verifyItr=seqMonitor.verifyPreAlloc();
       }else{
         Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.remove());
         itrMonitor.verifyIteratorState();
@@ -1735,13 +1825,16 @@ public class CharDblLnkSeqTest{
           verifyItr.verifyAscending(numToAdd);
           break;
         case PostAdd:
-          verifyItr.verifyAscending(numIterated).verifyIllegalAdd().verifyAscending(numIterated,numToAdd-(numIterated));
+          verifyItr.verifyAscending(numBefore);
+          verifyItr.verifyIllegalAdd();
+          verifyItr.verifyAscending(numBefore,numAfter);
           break;
         case PostRemove:
-          verifyItr.verifyAscending(numIterated).verifyAscending(numIterated+1,numToAdd-(numIterated+1));
+          verifyItr.verifyAscending(numBefore);
+          verifyItr.verifyAscending(numBefore+1,numAfter);
           break;
         default:
-          throw new Error("unknown remove scenario "+removeScenario);
+          throw new Error("Unknown removeScenario "+removeScenario);
       }
     }
     verifyItr.verifyPostAlloc(preModScenario);
@@ -2163,6 +2256,11 @@ public class CharDblLnkSeqTest{
       currNode=currNode.next;
     }
   }
+  //TODO
+  //TODO
+  //TODO
+  //TODO
+  //TODO test sort
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);

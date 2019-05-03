@@ -2392,7 +2392,8 @@ public class DoubleArrSeqTest{
     for(var checkedType:CheckedType.values()){
       for(var removeScenario:ItrRemoveScenario.values()){
         if(checkedType.checked || removeScenario.expectedException==null){
-          for(int seqSize:AbstractDoubleSeqMonitor.FIB_SEQ){
+          for(int seqSize=0;seqSize<=100;++seqSize){
+          //for(int seqSize:AbstractDoubleSeqMonitor.FIB_SEQ){
             if(seqSize!=0 || removeScenario.validWithEmptySeq){
               for(var preModScenario:PreModScenario.values()){
                 if(checkedType.checked || preModScenario.expectedException==null){
@@ -2401,7 +2402,7 @@ public class DoubleArrSeqTest{
                       for(var nestedType:NestedType.values()){
                         if((itrType==ItrType.Itr || nestedType!=NestedType.STACK) && (!nestedType.rootType || preModScenario.appliesToRootItr)){
                           for(var sequenceLocation:SequenceLocation.values()){
-                            if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (seqSize!=0 && nestedType!=NestedType.STACK))){
+                            if(sequenceLocation.expectedException==null && (sequenceLocation==SequenceLocation.BEGINNING || (seqSize!=0 && itrType!=ItrType.Itr))){
                               builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,seqSize,itrType,sequenceLocation));
                             }
                           }
@@ -2418,13 +2419,9 @@ public class DoubleArrSeqTest{
     }
     return builder.build();
   }
-  @org.junit.jupiter.api.Test
-  public void testItrremove_void(){
-    getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(int)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
-    });
-  }
-  private static void testItrremove_voidHelper
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.MethodSource("getItrremove_voidArgs")
+  public void testItrremove_void
   (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,int numToAdd,ItrType itrType,SequenceLocation seqLocation){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
