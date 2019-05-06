@@ -3361,6 +3361,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
   #IFSWITCH CHECKED==true
     #IFSWITCH SUFFIX==NonNull
   int modCount=this.modCount;
+  int size=this.size;
   try{
     if(POSTEST(head.val)){
       CheckedCollection.checkModCount(modCount,this.modCount);
@@ -3372,9 +3373,10 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
         this.head=head=head.next;
         head.prev=null;
       }
+      this.size=size;
       return true;
     }
-    int size,numLeft=(size=this.size-1);
+    int numLeft=--size;
     for(;numLeft!=0;--numLeft){
       $DNode$$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
@@ -3458,6 +3460,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
     #IFSWITCH SUFFIX==NonNull
   int modCount=this.modCount;
   final var root=this.root;
+  int size=this.size;
   try
     #ELSE
   int modCount;
@@ -3480,7 +3483,7 @@ boolean uncheckedremoveValSUFFIX($DNode$$<E>$ head
       return true;
     }
     #IFSWITCH SUFFIX==NonNull
-    for(int size=this.size-1,numLeft=size;numLeft!=0;--numLeft){
+    for(int numLeft=--size;numLeft!=0;--numLeft){
       $DNode$$<E>$ prev;
       if(POSTEST((head=(prev=head).next).val)){
         CheckedCollection.checkModCount(modCount,root.modCount);
@@ -3564,6 +3567,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
   int modCount=this.modCount;
+  int size=this.size;
   try
   #ENDIF
 #ENDIF
@@ -3582,15 +3586,18 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
         this.tail=tail;
         tail.next=null;
       }
+#IFSWITCH SUFFIX==NonNull
+      this.size=size-1;
+#ELSE
       --this.size;
+#ENDIF
       return true;
     }
 #IFSWITCH CHECKED==true
   #IFSWITCH SUFFIX==NonNull
-    int size,numLeft=(size=this.size-1);
+    int numLeft=--size;
     for(;numLeft!=0;--numLeft){
       $DNode$$<E>$ next;
-      tail=(next=tail).prev;
       if(POSTEST((tail=(next=tail).prev).val)){
         CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
@@ -3599,7 +3606,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
           this.head=next;
           next.prev=null;
         }else{
-          tail.next=next;
+          (tail=tail.prev).next=next;
           next.prev=tail;
         }
         this.size=size;

@@ -55,6 +55,7 @@ import omni.impl.QueryCastType;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniStack;
 import omni.api.OmniList;
+import omni.api.OmniDeque;
 @SuppressWarnings({"rawtypes","unchecked"})
 abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$ClassPrefix$>{
   static final int[] FIB_SEQ=new int[12];
@@ -481,15 +482,15 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
     verifyRemoval();
   }
   void pollFirst(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyPollFirst(seq,expectedSeqSize,expectedVal);
+    outputType.verifyDequePollFirst(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
-      verifyRemoveVal();
+      verifyRemoval();
     }
   }
   void pollLast(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    outputType.verifyPollLast(seq,expectedSeqSize,expectedVal);
+    outputType.verifyDequePollLast(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
-      verifyRemoveVal();
+      verifyRemoval();
     }
   }
   void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
@@ -757,6 +758,24 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
   #MACRO RemoveObject(float,removeVal)
   #MACRO RemoveObject(double,removeVal)
 #MACRODEF RemoveObject(INPUTTYPE,METHODNAME)
+boolean removeFirstOccurrence(INPUTTYPE obj)
+{
+  boolean ret=((OmniDeque.Of$ClassPrefix$)seq).removeFirstOccurrence(obj);
+  if(ret)
+  {
+    verifyRemoval();
+  }
+  return ret;
+}
+boolean removeLastOccurrence(INPUTTYPE obj)
+{
+  boolean ret=((OmniDeque.Of$ClassPrefix$)seq).removeLastOccurrence(obj);
+  if(ret)
+  {
+    verifyRemoval();
+  }
+  return ret;
+}
 boolean METHODNAME(INPUTTYPE obj)
 {
   boolean ret=seq.METHODNAME(obj);
@@ -3977,6 +3996,12 @@ boolean METHODNAME(INPUTTYPE obj)
   {
 #IF OfRef
   ObjectNonNull(true){
+      @Override boolean invokeremoveFirstOccurrenceObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveLastOccurrenceObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveLastOccurrenceBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override boolean invokecontainsObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override boolean invokecontainsBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override boolean invokecontainsUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
@@ -4002,6 +4027,12 @@ boolean METHODNAME(INPUTTYPE obj)
       @Override boolean invokeremoveValMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return seqMonitor.remove(monitoredObject);
       }
+      @Override boolean invokeremoveFirstOccurrenceMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return seqMonitor.removeFirstOccurrence(monitoredObject);
+      }
+      @Override boolean invokeremoveLastOccurrenceMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return seqMonitor.removeLastOccurrence(monitoredObject);
+      }
       @Override int invokeindexOfMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf(monitoredObject);
       }
@@ -4011,7 +4042,7 @@ boolean METHODNAME(INPUTTYPE obj)
       @Override int invokesearchMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search(monitoredObject);
       }
-       @Override int initContainsEnd(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
+      @Override int initContainsEnd(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
         for(int i=0;i<seqSize-1;++i){
           seqMonitor.addVal(new Object());
@@ -4059,7 +4090,7 @@ boolean METHODNAME(INPUTTYPE obj)
           return seqMonitor.expectedSeqSize;
         }
       }
-       @Override int initContainsNearBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
+      @Override int initContainsNearBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
         for(int i=0,bound=seqSize/4;i<bound;++i){
           seqMonitor.addVal(new Object());
@@ -4190,11 +4221,15 @@ boolean METHODNAME(INPUTTYPE obj)
     ;
 #MACRODEF QueryTesterImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
 BOXED_TYPEVALUE_NAME(false){
+  @Override boolean invokeremoveFirstOccurrenceObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveLastOccurrenceObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override boolean invokecontainsObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override boolean invokeremoveValObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.remove((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokesearchObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokeindexOfObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokelastIndexOfObject(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveFirstOccurrenceBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveLastOccurrenceBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override boolean invokecontainsBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.seq.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override boolean invokeremoveValBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){
     #IFSWITCH BOXED_TYPE==Object
@@ -4206,6 +4241,8 @@ BOXED_TYPEVALUE_NAME(false){
   @Override int invokesearchBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokeindexOfBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokelastIndexOfBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveFirstOccurrenceUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override boolean invokeremoveLastOccurrenceUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override boolean invokecontainsUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return seqMonitor.seq.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override boolean invokeremoveValUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){
     #IFSWITCH PRIMITIVE_TYPE==Object
@@ -4259,6 +4296,30 @@ BOXED_TYPEVALUE_NAME(false){
       final boolean isObjectNonNull;
       QueryTester(boolean isObjectNonNull){
         this.isObjectNonNull=isObjectNonNull;
+      }
+      boolean invokeremoveFirstOccurrence(Abstract$ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
+        switch(queryCastType){
+          case Unboxed:
+            return invokeremoveFirstOccurrenceUnboxed(seqMonitor);
+          case ToBoxed:
+            return invokeremoveFirstOccurrenceBoxed(seqMonitor);
+          case ToObject:
+            return invokeremoveFirstOccurrenceObject(seqMonitor);
+          default:
+            throw new Error("Unknown queryCastType "+queryCastType);
+        }
+      }
+      boolean invokeremoveLastOccurrence(Abstract$ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
+        switch(queryCastType){
+          case Unboxed:
+            return invokeremoveLastOccurrenceUnboxed(seqMonitor);
+          case ToBoxed:
+            return invokeremoveLastOccurrenceBoxed(seqMonitor);
+          case ToObject:
+            return invokeremoveLastOccurrenceObject(seqMonitor);
+          default:
+            throw new Error("Unknown queryCastType "+queryCastType);
+        }
       }
       boolean invokecontains(Abstract$ClassPrefix$SeqMonitor seqMonitor,QueryCastType queryCastType){
         switch(queryCastType){
@@ -4320,7 +4381,12 @@ BOXED_TYPEVALUE_NAME(false){
             throw new Error("Unknown queryCastType "+queryCastType);
         }
       }
-      
+      abstract boolean invokeremoveFirstOccurrenceObject(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+      abstract boolean invokeremoveFirstOccurrenceBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+      abstract boolean invokeremoveFirstOccurrenceUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+      abstract boolean invokeremoveLastOccurrenceObject(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+      abstract boolean invokeremoveLastOccurrenceBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+      abstract boolean invokeremoveLastOccurrenceUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
       abstract boolean invokecontainsObject(Abstract$ClassPrefix$SeqMonitor seqMonitor);
       abstract boolean invokecontainsBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
       abstract boolean invokecontainsUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
@@ -4429,6 +4495,8 @@ BOXED_TYPEVALUE_NAME(false){
         }
       }
 #IF OfRef
+    boolean invokeremoveLastOccurrenceMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    boolean invokeremoveFirstOccurrenceMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     boolean invokecontainsMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     boolean invokeremoveValMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     int invokesearchMonitored(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}

@@ -2297,6 +2297,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     ){
       int modCount=this.modCount;
       final var root=this.root;
+      int size=this.size;
       try
       {
         if(nonNull.equals(head.val)){
@@ -2311,7 +2312,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
           }
           return true;
         }
-        for(int size=this.size-1,numLeft=size;numLeft!=0;--numLeft){
+        for(int numLeft=--size;numLeft!=0;--numLeft){
           RefDblLnkNode<E> prev;
           if(nonNull.equals((head=(prev=head).next).val)){
             CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5433,6 +5434,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     ,Object nonNull
     ){
       int modCount=this.modCount;
+      int size=this.size;
       try
       {
         if(nonNull.equals(tail.val)){
@@ -5445,13 +5447,12 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
             this.tail=tail;
             tail.next=null;
           }
-          --this.size;
+          this.size=size-1;
           return true;
         }
-        int size,numLeft=(size=this.size-1);
+        int numLeft=--size;
         for(;numLeft!=0;--numLeft){
           RefDblLnkNode<E> next;
-          tail=(next=tail).prev;
           if(nonNull.equals((tail=(next=tail).prev).val)){
             CheckedCollection.checkModCount(modCount,this.modCount);
             this.modCount=modCount+1;
@@ -5460,7 +5461,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
               this.head=next;
               next.prev=null;
             }else{
-              tail.next=next;
+              (tail=tail.prev).next=next;
               next.prev=tail;
             }
             this.size=size;
@@ -5545,6 +5546,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     ,Object nonNull
     ){
       int modCount=this.modCount;
+      int size=this.size;
       try{
         if(nonNull.equals(head.val)){
           CheckedCollection.checkModCount(modCount,this.modCount);
@@ -5556,9 +5558,10 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
             this.head=head=head.next;
             head.prev=null;
           }
+          this.size=size;
           return true;
         }
-        int size,numLeft=(size=this.size-1);
+        int numLeft=--size;
         for(;numLeft!=0;--numLeft){
           RefDblLnkNode<E> prev;
           if(nonNull.equals((head=(prev=head).next).val)){
@@ -6906,7 +6909,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
             this.tail=tail;
             tail.next=null;
           }
-          --this.size;
+          this.size=size-1;
           return true;
         }
         for(RefDblLnkNode<E> next;(tail=(next=tail).prev)!=null;){

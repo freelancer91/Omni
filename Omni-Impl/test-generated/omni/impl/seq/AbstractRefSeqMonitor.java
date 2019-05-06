@@ -26,6 +26,7 @@ import omni.impl.QueryCastType;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniStack;
 import omni.api.OmniList;
+import omni.api.OmniDeque;
 @SuppressWarnings({"rawtypes","unchecked"})
 abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
   static final int[] FIB_SEQ=new int[12];
@@ -391,15 +392,57 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     outputType.verifyQueueRemove(seq,expectedVal);
     verifyRemoval();
   }
+  void removeFirst(int expectedVal,RefOutputTestArgType outputType){
+    outputType.verifyDequeRemoveFirst(seq,expectedVal);
+    verifyRemoval();
+  }
+  void removeLast(int expectedVal,RefOutputTestArgType outputType){
+    outputType.verifyDequeRemoveLast(seq,expectedVal);
+    verifyRemoval();
+  }
   void pop(int expectedVal,RefOutputTestArgType outputType){
     outputType.verifyStackPop(seq,expectedVal);
     verifyRemoval();
+  }
+  void pollFirst(int expectedVal,RefOutputTestArgType outputType){
+    outputType.verifyDequePollFirst(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      verifyRemoval();
+    }
+  }
+  void pollLast(int expectedVal,RefOutputTestArgType outputType){
+    outputType.verifyDequePollLast(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      verifyRemoval();
+    }
   }
   void poll(int expectedVal,RefOutputTestArgType outputType){
     outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       verifyRemoval();
     }
+  }
+  void addLast(int val,RefInputTestArgType inputArgType){
+    inputArgType.callDequeAddLast(seq,val);
+    verifyAddition();
+  }
+  void addFirst(int val,RefInputTestArgType inputArgType){
+    inputArgType.callDequeAddFirst(seq,val);
+    verifyAddition();
+  }
+  boolean offerLast(int val,RefInputTestArgType inputArgType){
+    boolean ret=inputArgType.callDequeOfferLast(seq,val);
+    if(ret){
+      verifyAddition();
+    }
+    return ret;
+  }
+  boolean offerFirst(int val,RefInputTestArgType inputArgType){
+    boolean ret=inputArgType.callDequeOfferFirst(seq,val);
+    if(ret){
+      verifyAddition();
+    }
+    return ret;
   }
   boolean offer(int val,RefInputTestArgType inputArgType){
     boolean ret=inputArgType.callQueueOffer(seq,val);
@@ -588,9 +631,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
      verifyFunctionalModification();
     }
   }
+  boolean removeFirstOccurrence(Object obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Object obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean remove(Object obj)
   {
     boolean ret=seq.remove(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(Boolean obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Boolean obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -606,9 +685,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(Byte obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Byte obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(Byte obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(Character obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Character obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -624,9 +739,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(Short obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Short obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(Short obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(Integer obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Integer obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -642,9 +793,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(Long obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Long obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(Long obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(Float obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Float obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -660,9 +847,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(Double obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(Double obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(Double obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(boolean obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(boolean obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -678,9 +901,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(byte obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(byte obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(byte obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(char obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(char obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -696,9 +955,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(short obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(short obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(short obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(int obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(int obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -714,6 +1009,24 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(long obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(long obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(long obj)
   {
     boolean ret=seq.removeVal(obj);
@@ -723,9 +1036,45 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
     }
     return ret;
   }
+  boolean removeFirstOccurrence(float obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(float obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
   boolean removeVal(float obj)
   {
     boolean ret=seq.removeVal(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeFirstOccurrence(double obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeFirstOccurrence(obj);
+    if(ret)
+    {
+      verifyRemoval();
+    }
+    return ret;
+  }
+  boolean removeLastOccurrence(double obj)
+  {
+    boolean ret=((OmniDeque.OfRef)seq).removeLastOccurrence(obj);
     if(ret)
     {
       verifyRemoval();
@@ -3747,6 +4096,12 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
   static enum QueryTester
   {
   ObjectNonNull(true){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){throw new UnsupportedOperationException();}
@@ -3772,6 +4127,12 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override boolean invokeremoveValMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return seqMonitor.remove(monitoredObject);
       }
+      @Override boolean invokeremoveFirstOccurrenceMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return seqMonitor.removeFirstOccurrence(monitoredObject);
+      }
+      @Override boolean invokeremoveLastOccurrenceMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){
+        return seqMonitor.removeLastOccurrence(monitoredObject);
+      }
       @Override int invokeindexOfMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return ((OmniList.OfRef)seqMonitor.seq).indexOf(monitoredObject);
       }
@@ -3781,7 +4142,7 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){
         return ((OmniStack.OfRef)seqMonitor.seq).search(monitoredObject);
       }
-       @Override int initContainsEnd(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
+      @Override int initContainsEnd(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
         for(int i=0;i<seqSize-1;++i){
           seqMonitor.addVal(new Object());
@@ -3829,7 +4190,7 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
           return seqMonitor.expectedSeqSize;
         }
       }
-       @Override int initContainsNearBeginning(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
+      @Override int initContainsNearBeginning(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
         for(int i=0,bound=seqSize/4;i<bound;++i){
           seqMonitor.addVal(new Object());
@@ -3867,11 +4228,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Booleannull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Boolean)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Boolean)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Boolean)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Boolean)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Boolean)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Boolean)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Boolean)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Boolean)(Boolean)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Boolean)(Boolean)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(Boolean)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Boolean)(Boolean)(null));
@@ -3879,6 +4244,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Boolean)(Boolean)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Boolean)(Boolean)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Boolean)(Boolean)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Boolean)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Boolean)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Boolean)(null));
@@ -3894,11 +4261,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Bytenull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Byte)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Byte)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Byte)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Byte)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Byte)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Byte)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Byte)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Byte)(Byte)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Byte)(Byte)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(Byte)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Byte)(Byte)(null));
@@ -3906,6 +4277,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Byte)(Byte)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Byte)(Byte)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Byte)(Byte)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Byte)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Byte)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Byte)(null));
@@ -3921,11 +4294,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Characternull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Character)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Character)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Character)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Character)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Character)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Character)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Character)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(Character)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(Character)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(Character)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(Character)(null));
@@ -3933,6 +4310,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Character)(Character)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Character)(Character)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Character)(Character)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(null));
@@ -3948,11 +4327,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Shortnull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Short)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Short)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Short)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Short)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Short)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Short)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Short)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(Short)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(Short)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(Short)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(Short)(null));
@@ -3960,6 +4343,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(Short)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(Short)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(Short)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(null));
@@ -3975,11 +4360,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Integernull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Integer)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Integer)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Integer)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Integer)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Integer)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Integer)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Integer)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(Integer)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(Integer)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(Integer)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(Integer)(null));
@@ -3987,6 +4376,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(Integer)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(Integer)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(Integer)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(null));
@@ -4002,11 +4393,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Longnull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Long)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Long)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Long)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Long)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Long)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Long)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Long)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(Long)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(Long)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(Long)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(Long)(null));
@@ -4014,6 +4409,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(Long)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(Long)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(Long)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(null));
@@ -4029,11 +4426,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Floatnull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Float)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Float)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Float)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Float)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Float)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Float)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Float)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(Float)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(Float)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(Float)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(Float)(null));
@@ -4041,6 +4442,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(Float)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(Float)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(Float)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(null));
@@ -4056,11 +4459,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Doublenull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Double)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Double)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Double)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Double)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Double)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Double)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Double)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(Double)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(Double)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(Double)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(Double)(null));
@@ -4068,6 +4475,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(Double)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(Double)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(Double)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(null));
@@ -4083,11 +4492,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Objectnull(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Object)(null));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Object)(null));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Object)(null));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(Object)(null));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Object)(null));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Object)(null));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Object)(null));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(Object)(null));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(Object)(null));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(Object)(null));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.remove((Object)(Object)(null));
@@ -4095,6 +4508,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(Object)(null));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(Object)(null));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(Object)(null));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(null));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(null));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(null));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.remove((Object)(null));
@@ -4110,11 +4525,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Booleanfalse(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(boolean)(false));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(boolean)(false));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(boolean)(false));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(boolean)(false));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(boolean)(false));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(boolean)(false));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(boolean)(false));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Boolean)(boolean)(false));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Boolean)(boolean)(false));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(boolean)(false));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Boolean)(boolean)(false));
@@ -4122,6 +4541,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Boolean)(boolean)(false));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Boolean)(boolean)(false));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Boolean)(boolean)(false));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((boolean)(false));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((boolean)(false));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((boolean)(false));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((boolean)(false));
@@ -4137,11 +4558,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Booleantrue(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(boolean)(true));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(boolean)(true));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(boolean)(true));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(boolean)(true));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(boolean)(true));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(boolean)(true));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(boolean)(true));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Boolean)(boolean)(true));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Boolean)(boolean)(true));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Boolean)(boolean)(true));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Boolean)(boolean)(true));
@@ -4149,6 +4574,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Boolean)(boolean)(true));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Boolean)(boolean)(true));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Boolean)(boolean)(true));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((boolean)(true));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((boolean)(true));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((boolean)(true));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((boolean)(true));
@@ -4164,11 +4591,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Byte0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(byte)(0));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(byte)(0));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(0));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(byte)(0));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(byte)(0));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(byte)(0));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(byte)(0));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Byte)(byte)(0));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Byte)(byte)(0));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(0));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Byte)(byte)(0));
@@ -4176,6 +4607,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Byte)(byte)(0));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Byte)(byte)(0));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Byte)(byte)(0));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((byte)(0));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((byte)(0));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(0));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((byte)(0));
@@ -4191,11 +4624,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Bytepos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(byte)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(byte)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(byte)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(byte)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(byte)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(byte)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Byte)(byte)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Byte)(byte)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Byte)(byte)(1));
@@ -4203,6 +4640,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Byte)(byte)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Byte)(byte)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Byte)(byte)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((byte)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((byte)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((byte)(1));
@@ -4218,11 +4657,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Bytepos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(byte)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(byte)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(byte)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(byte)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(byte)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(byte)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Byte)(byte)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Byte)(byte)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Byte)(byte)(2));
@@ -4230,6 +4673,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Byte)(byte)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Byte)(byte)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Byte)(byte)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((byte)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((byte)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((byte)(2));
@@ -4245,11 +4690,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Byteneg1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(byte)(-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(byte)(-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(byte)(-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(byte)(-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(byte)(-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(byte)(-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(byte)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Byte)(byte)(-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Byte)(byte)(-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Byte)(byte)(-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Byte)(byte)(-1));
@@ -4257,6 +4706,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Byte)(byte)(-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Byte)(byte)(-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Byte)(byte)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((byte)(-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((byte)(-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((byte)(-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((byte)(-1));
@@ -4272,11 +4723,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Character0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(char)(0));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(char)(0));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(0));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(char)(0));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(char)(0));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(char)(0));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(char)(0));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(char)(0));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(char)(0));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(0));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(char)(0));
@@ -4284,6 +4739,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Character)(char)(0));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Character)(char)(0));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Character)(char)(0));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((char)(0));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((char)(0));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(0));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((char)(0));
@@ -4299,11 +4756,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Characterpos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(char)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(char)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(char)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(char)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(char)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(char)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(char)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(char)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(char)(1));
@@ -4311,6 +4772,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Character)(char)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Character)(char)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Character)(char)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((char)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((char)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((char)(1));
@@ -4326,11 +4789,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Characterpos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(char)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(char)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(char)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(char)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(char)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(char)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(char)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(char)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(char)(2));
@@ -4338,6 +4805,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Character)(char)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Character)(char)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Character)(char)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((char)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((char)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((char)(2));
@@ -4353,11 +4822,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     CharacterMAX_BYTE_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(char)(((char)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(char)(((char)Byte.MAX_VALUE)+1));
@@ -4365,6 +4838,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Character)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Character)(char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Character)(char)(((char)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((char)(((char)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((char)(((char)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(((char)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((char)(((char)Byte.MAX_VALUE)+1));
@@ -4380,11 +4855,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     CharacterMAX_SHORT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(char)(((char)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(char)(((char)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(char)(((char)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Character)(char)(((char)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Character)(char)(((char)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Character)(char)(((char)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Character)(char)(((char)Short.MAX_VALUE)+1));
@@ -4392,6 +4871,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Character)(char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Character)(char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Character)(char)(((char)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((char)(((char)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((char)(((char)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((char)(((char)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((char)(((char)Short.MAX_VALUE)+1));
@@ -4407,11 +4888,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Short0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(short)(0));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(short)(0));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(0));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(short)(0));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(short)(0));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(short)(0));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(short)(0));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(short)(0));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(short)(0));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(0));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(short)(0));
@@ -4419,6 +4904,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(short)(0));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(short)(0));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(short)(0));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((short)(0));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((short)(0));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(0));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((short)(0));
@@ -4434,11 +4921,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Shortpos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(short)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(short)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(short)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(short)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(short)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(short)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(short)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(short)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(short)(1));
@@ -4446,6 +4937,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(short)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(short)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(short)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((short)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((short)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((short)(1));
@@ -4461,11 +4954,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Shortpos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(short)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(short)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(short)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(short)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(short)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(short)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(short)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(short)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(short)(2));
@@ -4473,6 +4970,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(short)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(short)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(short)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((short)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((short)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((short)(2));
@@ -4488,11 +4987,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Shortneg1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(short)(-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(short)(-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(short)(-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(short)(-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(short)(-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(short)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(short)(-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(short)(-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(short)(-1));
@@ -4500,6 +5003,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(short)(-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(short)(-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(short)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((short)(-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((short)(-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((short)(-1));
@@ -4515,11 +5020,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     ShortMAX_BYTE_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(short)(((short)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(short)(((short)Byte.MAX_VALUE)+1));
@@ -4527,6 +5036,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(short)(((short)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((short)(((short)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((short)(((short)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(((short)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((short)(((short)Byte.MAX_VALUE)+1));
@@ -4542,11 +5053,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     ShortMIN_BYTE_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Short)(short)(((short)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Short)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Short)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Short)(short)(((short)Byte.MIN_VALUE)-1));
@@ -4554,6 +5069,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Short)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Short)(short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Short)(short)(((short)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((short)(((short)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((short)(((short)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((short)(((short)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((short)(((short)Byte.MIN_VALUE)-1));
@@ -4569,11 +5086,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Integer0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(0));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(0));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(0));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(0));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(0));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(0));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(0));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(0));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(0));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(0));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(0));
@@ -4581,6 +5102,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(0));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(0));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(0));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(0));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(0));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(0));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(0));
@@ -4596,11 +5119,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Integerpos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(1));
@@ -4608,6 +5135,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(1));
@@ -4623,11 +5152,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Integerpos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(2));
@@ -4635,6 +5168,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(2));
@@ -4650,11 +5185,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Integerneg1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(-1));
@@ -4662,6 +5201,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(-1));
@@ -4677,11 +5218,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMAX_BYTE_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(((int)Byte.MAX_VALUE)+1));
@@ -4689,6 +5234,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(((int)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(((int)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(((int)Byte.MAX_VALUE)+1));
@@ -4704,11 +5251,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMIN_BYTE_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(((int)Byte.MIN_VALUE)-1));
@@ -4716,6 +5267,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(((int)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(((int)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(((int)Byte.MIN_VALUE)-1));
@@ -4731,11 +5284,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMAX_SHORT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(((int)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(((int)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(((int)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(((int)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(((int)Short.MAX_VALUE)+1));
@@ -4743,6 +5300,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(((int)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(((int)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(((int)Short.MAX_VALUE)+1));
@@ -4758,11 +5317,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMIN_SHORT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(((int)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(((int)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(((int)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(((int)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(((int)Short.MIN_VALUE)-1));
@@ -4770,6 +5333,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(((int)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(((int)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(((int)Short.MIN_VALUE)-1));
@@ -4785,11 +5350,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMAX_CHAR_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(((int)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(((int)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(((int)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(((int)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(((int)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(((int)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(((int)Character.MAX_VALUE)+1));
@@ -4797,6 +5366,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(((int)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(((int)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(((int)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(((int)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(((int)Character.MAX_VALUE)+1));
@@ -4812,11 +5383,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMAX_SAFE_INT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));
@@ -4824,6 +5399,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(TypeUtil.MAX_SAFE_INT+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(TypeUtil.MAX_SAFE_INT+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(TypeUtil.MAX_SAFE_INT+1));
@@ -4839,11 +5416,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     IntegerMIN_SAFE_INT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));
@@ -4851,6 +5432,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Integer)(int)(TypeUtil.MIN_SAFE_INT-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((int)(TypeUtil.MIN_SAFE_INT-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((int)(TypeUtil.MIN_SAFE_INT-1));
@@ -4866,11 +5449,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Long0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(0));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(0));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(0));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(0));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(0));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(0));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(0));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(0));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(0));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(0));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(0));
@@ -4878,6 +5465,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(0));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(0));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(0));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(0));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(0));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(0));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(0));
@@ -4893,11 +5482,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Longpos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(1));
@@ -4905,6 +5498,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(1));
@@ -4920,11 +5515,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Longpos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(2));
@@ -4932,6 +5531,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(2));
@@ -4947,11 +5548,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Longneg1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(-1));
@@ -4959,6 +5564,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(-1));
@@ -4974,11 +5581,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMAX_BYTE_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Byte.MAX_VALUE)+1));
@@ -4986,6 +5597,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Byte.MAX_VALUE)+1));
@@ -5001,11 +5614,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMIN_BYTE_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Byte.MIN_VALUE)-1));
@@ -5013,6 +5630,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Byte.MIN_VALUE)-1));
@@ -5028,11 +5647,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMAX_SHORT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Short.MAX_VALUE)+1));
@@ -5040,6 +5663,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Short.MAX_VALUE)+1));
@@ -5055,11 +5680,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMIN_SHORT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Short.MIN_VALUE)-1));
@@ -5067,6 +5696,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Short.MIN_VALUE)-1));
@@ -5082,11 +5713,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMAX_CHAR_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Character.MAX_VALUE)+1));
@@ -5094,6 +5729,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Character.MAX_VALUE)+1));
@@ -5109,11 +5746,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMAX_SAFE_INT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));
@@ -5121,6 +5762,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)TypeUtil.MAX_SAFE_INT)+1));
@@ -5136,11 +5779,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMIN_SAFE_INT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));
@@ -5148,6 +5795,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)TypeUtil.MIN_SAFE_INT)-1));
@@ -5163,11 +5812,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMAX_INT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Integer.MAX_VALUE)+1));
@@ -5175,6 +5828,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Integer.MAX_VALUE)+1));
@@ -5190,11 +5845,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMIN_INT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)Integer.MIN_VALUE)-1));
@@ -5202,6 +5861,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)Integer.MIN_VALUE)-1));
@@ -5217,11 +5878,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMAX_SAFE_LONG_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
@@ -5229,6 +5894,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));
@@ -5244,11 +5911,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     LongMIN_SAFE_LONG_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
@@ -5256,6 +5927,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Long)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));
@@ -5271,11 +5944,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Floatpos0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(0.0F));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(0.0F));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(0.0F));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(0.0F));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(0.0F));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(0.0F));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(0.0F));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(0.0F));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(0.0F));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(0.0F));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(0.0F));
@@ -5283,6 +5960,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(0.0F));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(0.0F));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(0.0F));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(0.0F));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(0.0F));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(0.0F));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(0.0F));
@@ -5298,11 +5977,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Floatneg0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(-0.0F));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(-0.0F));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(-0.0F));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(-0.0F));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(-0.0F));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(-0.0F));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(-0.0F));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(-0.0F));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(-0.0F));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(-0.0F));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(-0.0F));
@@ -5310,6 +5993,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(-0.0F));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(-0.0F));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(-0.0F));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(-0.0F));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(-0.0F));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(-0.0F));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(-0.0F));
@@ -5325,11 +6010,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Floatpos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(1));
@@ -5337,6 +6026,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(1));
@@ -5352,11 +6043,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Floatpos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(2));
@@ -5364,6 +6059,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(2));
@@ -5379,11 +6076,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Floatneg1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(-1));
@@ -5391,6 +6092,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(-1));
@@ -5406,11 +6109,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMAX_BYTE_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Byte.MAX_VALUE)+1));
@@ -5418,6 +6125,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Byte.MAX_VALUE)+1));
@@ -5433,11 +6142,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMIN_BYTE_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Byte.MIN_VALUE)-1));
@@ -5445,6 +6158,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Byte.MIN_VALUE)-1));
@@ -5460,11 +6175,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMAX_SHORT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Short.MAX_VALUE)+1));
@@ -5472,6 +6191,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Short.MAX_VALUE)+1));
@@ -5487,11 +6208,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMIN_SHORT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Short.MIN_VALUE)-1));
@@ -5499,6 +6224,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Short.MIN_VALUE)-1));
@@ -5514,11 +6241,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMAX_CHAR_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Character.MAX_VALUE)+1));
@@ -5526,6 +6257,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Character.MAX_VALUE)+1));
@@ -5541,11 +6274,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMAX_INT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Integer.MAX_VALUE)+1));
@@ -5553,6 +6290,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Integer.MAX_VALUE)+1));
@@ -5568,11 +6307,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMIN_INT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Integer.MIN_VALUE)-1));
@@ -5580,6 +6323,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Integer.MIN_VALUE)-1));
@@ -5595,11 +6340,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMAX_LONG_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Long.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Long.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Long.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Long.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Long.MAX_VALUE)+1));
@@ -5607,6 +6356,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Long.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Long.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Long.MAX_VALUE)+1));
@@ -5622,11 +6373,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMIN_LONG_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(((float)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(((float)Long.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(((float)Long.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(((float)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(((float)Long.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(((float)Long.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(((float)Long.MIN_VALUE)-1));
@@ -5634,6 +6389,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(((float)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(((float)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(((float)Long.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(((float)Long.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(((float)Long.MIN_VALUE)-1));
@@ -5649,11 +6406,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMIN_FLOAT_VALUE(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(Float.MIN_VALUE));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.MIN_VALUE));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(Float.MIN_VALUE));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(Float.MIN_VALUE));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(Float.MIN_VALUE));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.MIN_VALUE));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(Float.MIN_VALUE));
@@ -5661,6 +6422,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(Float.MIN_VALUE));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(Float.MIN_VALUE));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.MIN_VALUE));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(Float.MIN_VALUE));
@@ -5676,11 +6439,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatMAX_FLOAT_VALUE(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(Float.MAX_VALUE));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.MAX_VALUE));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(Float.MAX_VALUE));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(Float.MAX_VALUE));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(Float.MAX_VALUE));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.MAX_VALUE));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(Float.MAX_VALUE));
@@ -5688,6 +6455,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(Float.MAX_VALUE));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(Float.MAX_VALUE));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.MAX_VALUE));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(Float.MAX_VALUE));
@@ -5703,11 +6472,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     FloatNaN(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(float)(Float.NaN));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(float)(Float.NaN));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(float)(Float.NaN));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(float)(Float.NaN));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(float)(Float.NaN));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(float)(Float.NaN));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(float)(Float.NaN));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Float)(float)(Float.NaN));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Float)(float)(Float.NaN));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Float)(float)(Float.NaN));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Float)(float)(Float.NaN));
@@ -5715,6 +6488,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Float)(float)(Float.NaN));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Float)(float)(Float.NaN));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Float)(float)(Float.NaN));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((float)(Float.NaN));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((float)(Float.NaN));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((float)(Float.NaN));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((float)(Float.NaN));
@@ -5730,11 +6505,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Doublepos0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(0.0D));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(0.0D));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(0.0D));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(0.0D));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(0.0D));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(0.0D));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(0.0D));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(0.0D));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(0.0D));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(0.0D));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(0.0D));
@@ -5742,6 +6521,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(0.0D));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(0.0D));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(0.0D));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(0.0D));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(0.0D));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(0.0D));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(0.0D));
@@ -5757,11 +6538,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Doubleneg0(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(-0.0D));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(-0.0D));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(-0.0D));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(-0.0D));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(-0.0D));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(-0.0D));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(-0.0D));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(-0.0D));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(-0.0D));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(-0.0D));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(-0.0D));
@@ -5769,6 +6554,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(-0.0D));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(-0.0D));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(-0.0D));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(-0.0D));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(-0.0D));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(-0.0D));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(-0.0D));
@@ -5784,11 +6571,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Doublepos1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(1));
@@ -5796,6 +6587,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(1));
@@ -5811,11 +6604,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Doublepos2(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(2));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(2));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(2));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(2));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(2));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(2));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(2));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(2));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(2));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(2));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(2));
@@ -5823,6 +6620,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(2));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(2));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(2));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(2));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(2));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(2));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(2));
@@ -5838,11 +6637,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     Doubleneg1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(-1));
@@ -5850,6 +6653,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(-1));
@@ -5865,11 +6670,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_BYTE_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Byte.MAX_VALUE)+1));
@@ -5877,6 +6686,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Byte.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Byte.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Byte.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Byte.MAX_VALUE)+1));
@@ -5892,11 +6703,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_BYTE_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Byte.MIN_VALUE)-1));
@@ -5904,6 +6719,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Byte.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Byte.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Byte.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Byte.MIN_VALUE)-1));
@@ -5919,11 +6736,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_SHORT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Short.MAX_VALUE)+1));
@@ -5931,6 +6752,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Short.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Short.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Short.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Short.MAX_VALUE)+1));
@@ -5946,11 +6769,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_SHORT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Short.MIN_VALUE)-1));
@@ -5958,6 +6785,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Short.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Short.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Short.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Short.MIN_VALUE)-1));
@@ -5973,11 +6802,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_CHAR_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Character.MAX_VALUE)+1));
@@ -5985,6 +6818,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Character.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Character.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Character.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Character.MAX_VALUE)+1));
@@ -6000,11 +6835,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_SAFE_INT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));
@@ -6012,6 +6851,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)TypeUtil.MAX_SAFE_INT)+1));
@@ -6027,11 +6868,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_SAFE_INT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));
@@ -6039,6 +6884,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)TypeUtil.MIN_SAFE_INT)-1));
@@ -6054,11 +6901,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_INT_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Integer.MAX_VALUE)+1));
@@ -6066,6 +6917,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Integer.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Integer.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Integer.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Integer.MAX_VALUE)+1));
@@ -6081,11 +6934,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_INT_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Integer.MIN_VALUE)-1));
@@ -6093,6 +6950,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Integer.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Integer.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Integer.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Integer.MIN_VALUE)-1));
@@ -6108,11 +6967,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_LONG_PLUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Long.MAX_VALUE)+1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Long.MAX_VALUE)+1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Long.MAX_VALUE)+1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Long.MAX_VALUE)+1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Long.MAX_VALUE)+1));
@@ -6120,6 +6983,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Long.MAX_VALUE)+1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Long.MAX_VALUE)+1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Long.MAX_VALUE)+1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Long.MAX_VALUE)+1));
@@ -6135,11 +7000,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_LONG_MINUS1(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(((double)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(((double)Long.MIN_VALUE)-1));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(((double)Long.MIN_VALUE)-1));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(((double)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(((double)Long.MIN_VALUE)-1));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(((double)Long.MIN_VALUE)-1));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(((double)Long.MIN_VALUE)-1));
@@ -6147,6 +7016,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(((double)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(((double)Long.MIN_VALUE)-1));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(((double)Long.MIN_VALUE)-1));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(((double)Long.MIN_VALUE)-1));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(((double)Long.MIN_VALUE)-1));
@@ -6162,11 +7033,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_FLOAT_VALUE(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(Float.MIN_VALUE));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Float.MIN_VALUE));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(Float.MIN_VALUE));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(Float.MIN_VALUE));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(Float.MIN_VALUE));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Float.MIN_VALUE));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(Float.MIN_VALUE));
@@ -6174,6 +7049,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(Float.MIN_VALUE));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(Float.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(Float.MIN_VALUE));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Float.MIN_VALUE));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(Float.MIN_VALUE));
@@ -6189,11 +7066,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_FLOAT_VALUE(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(Float.MAX_VALUE));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Float.MAX_VALUE));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(Float.MAX_VALUE));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(Float.MAX_VALUE));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(Float.MAX_VALUE));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Float.MAX_VALUE));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(Float.MAX_VALUE));
@@ -6201,6 +7082,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(Float.MAX_VALUE));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(Float.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(Float.MAX_VALUE));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Float.MAX_VALUE));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(Float.MAX_VALUE));
@@ -6216,11 +7099,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMIN_DOUBLE_VALUE(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(Double.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(Double.MIN_VALUE));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.MIN_VALUE));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(Double.MIN_VALUE));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(Double.MIN_VALUE));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(Double.MIN_VALUE));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(Double.MIN_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(Double.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(Double.MIN_VALUE));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.MIN_VALUE));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(Double.MIN_VALUE));
@@ -6228,6 +7115,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(Double.MIN_VALUE));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(Double.MIN_VALUE));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(Double.MIN_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(Double.MIN_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(Double.MIN_VALUE));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.MIN_VALUE));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(Double.MIN_VALUE));
@@ -6243,11 +7132,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleMAX_DOUBLE_VALUE(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(Double.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(Double.MAX_VALUE));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.MAX_VALUE));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(Double.MAX_VALUE));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(Double.MAX_VALUE));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(Double.MAX_VALUE));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(Double.MAX_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(Double.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(Double.MAX_VALUE));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.MAX_VALUE));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(Double.MAX_VALUE));
@@ -6255,6 +7148,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(Double.MAX_VALUE));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(Double.MAX_VALUE));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(Double.MAX_VALUE));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(Double.MAX_VALUE));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(Double.MAX_VALUE));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.MAX_VALUE));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(Double.MAX_VALUE));
@@ -6270,11 +7165,15 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
     },
     DoubleNaN(false){
+      @Override boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Object)(double)(Double.NaN));}
+      @Override boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Object)(double)(Double.NaN));}
       @Override boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Object)(double)(Double.NaN));}
       @Override boolean invokeremoveValObject(AbstractRefSeqMonitor seqMonitor){return seqMonitor.remove((Object)(double)(Double.NaN));}
       @Override int invokesearchObject(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Object)(double)(Double.NaN));}
       @Override int invokeindexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Object)(double)(Double.NaN));}
       @Override int invokelastIndexOfObject(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Object)(double)(Double.NaN));}
+      @Override boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((Double)(double)(Double.NaN));}
+      @Override boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((Double)(double)(Double.NaN));}
       @Override boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((Double)(double)(Double.NaN));}
       @Override boolean invokeremoveValBoxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((Double)(double)(Double.NaN));
@@ -6282,6 +7181,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       @Override int invokesearchBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniStack.OfRef)seqMonitor.seq).search((Double)(double)(Double.NaN));}
       @Override int invokeindexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).indexOf((Double)(double)(Double.NaN));}
       @Override int invokelastIndexOfBoxed(AbstractRefSeqMonitor seqMonitor){return ((OmniList.OfRef)seqMonitor.seq).lastIndexOf((Double)(double)(Double.NaN));}
+      @Override boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeFirstOccurrence((double)(Double.NaN));}
+      @Override boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.removeLastOccurrence((double)(Double.NaN));}
       @Override boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor){return seqMonitor.seq.contains((double)(Double.NaN));}
       @Override boolean invokeremoveValUnboxed(AbstractRefSeqMonitor seqMonitor){
         return seqMonitor.removeVal((double)(Double.NaN));
@@ -6300,6 +7201,30 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       final boolean isObjectNonNull;
       QueryTester(boolean isObjectNonNull){
         this.isObjectNonNull=isObjectNonNull;
+      }
+      boolean invokeremoveFirstOccurrence(AbstractRefSeqMonitor seqMonitor,QueryCastType queryCastType){
+        switch(queryCastType){
+          case Unboxed:
+            return invokeremoveFirstOccurrenceUnboxed(seqMonitor);
+          case ToBoxed:
+            return invokeremoveFirstOccurrenceBoxed(seqMonitor);
+          case ToObject:
+            return invokeremoveFirstOccurrenceObject(seqMonitor);
+          default:
+            throw new Error("Unknown queryCastType "+queryCastType);
+        }
+      }
+      boolean invokeremoveLastOccurrence(AbstractRefSeqMonitor seqMonitor,QueryCastType queryCastType){
+        switch(queryCastType){
+          case Unboxed:
+            return invokeremoveLastOccurrenceUnboxed(seqMonitor);
+          case ToBoxed:
+            return invokeremoveLastOccurrenceBoxed(seqMonitor);
+          case ToObject:
+            return invokeremoveLastOccurrenceObject(seqMonitor);
+          default:
+            throw new Error("Unknown queryCastType "+queryCastType);
+        }
       }
       boolean invokecontains(AbstractRefSeqMonitor seqMonitor,QueryCastType queryCastType){
         switch(queryCastType){
@@ -6361,6 +7286,12 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
             throw new Error("Unknown queryCastType "+queryCastType);
         }
       }
+      abstract boolean invokeremoveFirstOccurrenceObject(AbstractRefSeqMonitor seqMonitor);
+      abstract boolean invokeremoveFirstOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor);
+      abstract boolean invokeremoveFirstOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor);
+      abstract boolean invokeremoveLastOccurrenceObject(AbstractRefSeqMonitor seqMonitor);
+      abstract boolean invokeremoveLastOccurrenceBoxed(AbstractRefSeqMonitor seqMonitor);
+      abstract boolean invokeremoveLastOccurrenceUnboxed(AbstractRefSeqMonitor seqMonitor);
       abstract boolean invokecontainsObject(AbstractRefSeqMonitor seqMonitor);
       abstract boolean invokecontainsBoxed(AbstractRefSeqMonitor seqMonitor);
       abstract boolean invokecontainsUnboxed(AbstractRefSeqMonitor seqMonitor);
@@ -6466,6 +7397,8 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
           return seqMonitor.expectedSeqSize;
         }
       }
+    boolean invokeremoveLastOccurrenceMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
+    boolean invokeremoveFirstOccurrenceMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     boolean invokecontainsMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     boolean invokeremoveValMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}
     int invokesearchMonitored(AbstractRefSeqMonitor seqMonitor,MonitoredObject monitoredObject){throw new UnsupportedOperationException();}

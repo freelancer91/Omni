@@ -2766,30 +2766,27 @@ public class LongDblLnkSeqTest{
     seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc(preModScenario);
   }
   static Stream<Arguments> getdescendingIterator_voidArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
-      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario));
-    });
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType)));
+    }
+    return builder.build();
   }
   @org.junit.jupiter.api.Test
   public void testdescendingIterator_void(){
     getdescendingIterator_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testiterator_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1]);
+        testdescendingIterator_voidHelper((SeqMonitor)args[0]);
     });
   }
   private static void testdescendingIterator_voidHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario){
+  (SeqMonitor seqMonitor){
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
-    seqMonitor.illegalAdd(preModScenario);
-    if(preModScenario.expectedException==null){
-      var itrMonitor=seqMonitor.getDescendingItrMonitor();
-      itrMonitor.verifyIteratorState();
-    }else{
-      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.getItrMonitor());
-    }
+    var itrMonitor=seqMonitor.getDescendingItrMonitor();
+    itrMonitor.verifyIteratorState();
     seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc(preModScenario);
+    seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc();
   }
   @org.junit.jupiter.api.Test
   public void testhashCode_void(){
@@ -3519,7 +3516,7 @@ public class LongDblLnkSeqTest{
         }catch(Exception e){
           Assertions.fail(e);
         }
-        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+        seqMonitor.verifyPreAlloc().verifyAscending(initVal,numToAdd).verifyPostAlloc(preModScenario);
         OmniCollection.OfLong readCol=null;
         try(var ois=new ObjectInputStream(new FileInputStream(file));){
           readCol=(OmniCollection.OfLong)ois.readObject();
@@ -3529,12 +3526,12 @@ public class LongDblLnkSeqTest{
         }
         var itr=readCol.iterator();
         if(seqMonitor.nestedType.forwardIteration){
-          for(int i=0;i<numToAdd;++i){
-            Assertions.assertEquals(TypeConversionUtil.convertTolong(i),itr.nextLong());
+          for(int i=0,v=initVal;i<numToAdd;++i,++v){
+            Assertions.assertEquals(TypeConversionUtil.convertTolong(v),itr.nextLong());
           }
         }else{
-          for(int i=0;i<numToAdd;++i){
-            Assertions.assertEquals(TypeConversionUtil.convertTolong(numToAdd-i-1),itr.nextLong());
+          for(int i=0,v=initVal;i<numToAdd;++i,++v){
+            Assertions.assertEquals(TypeConversionUtil.convertTolong(numToAdd+initVal-v-1),itr.nextLong());
           }
         }
         Assertions.assertFalse(itr.hasNext());
@@ -3729,7 +3726,99 @@ public class LongDblLnkSeqTest{
       seqMonitor.verifyStructuralIntegrity();
     }
   }
-  //TODO test removeLastOccurrence
+  @org.junit.jupiter.api.Test
+  public void testremoveFirstOccurrence_val(){
+      runQueryTests(true,NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      )->{
+            testremoveFirstOccurrence_valHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),argType,queryCastType,seqLocation,seqSize
+            );
+      });
+  }
+  private static void testremoveFirstOccurrence_valHelper
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd
+  ){
+    if(numToAdd!=0){
+      {
+        switch(seqLocation){
+          case BEGINNING:
+            argType.initContainsBeginning(seqMonitor,numToAdd,true);
+            break;
+          case NEARBEGINNING:
+            argType.initContainsNearBeginning(seqMonitor,numToAdd,true);
+            break;
+          case MIDDLE:
+            argType.initContainsMiddle(seqMonitor,numToAdd,true);
+            break;
+          case NEAREND:
+            argType.initContainsNearEnd(seqMonitor,numToAdd,true);
+            break;
+          case END:
+            argType.initContainsEnd(seqMonitor,numToAdd,true);
+            break;
+          case IOBHI:
+            argType.initDoesNotContain(seqMonitor,numToAdd);
+            break;
+          default:
+            throw new Error("Unknown seqLocation "+seqLocation);
+        }
+      }
+    }
+    int seqSize=seqMonitor.expectedSeqSize;
+    boolean expectedResult;
+    Assertions.assertEquals(expectedResult=seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveFirstOccurrence(seqMonitor,queryCastType));
+    if(expectedResult){
+      --seqSize;
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveLastOccurrence_val(){
+      runQueryTests(false,NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      )->{
+            testremoveLastOccurrence_valHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),argType,queryCastType,seqLocation,seqSize
+            );
+      });
+  }
+  private static void testremoveLastOccurrence_valHelper
+  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int numToAdd
+  ){
+    if(numToAdd!=0){
+      {
+        switch(seqLocation){
+          case BEGINNING:
+            argType.initContainsBeginning(seqMonitor,numToAdd,true);
+            break;
+          case NEARBEGINNING:
+            argType.initContainsNearBeginning(seqMonitor,numToAdd,true);
+            break;
+          case MIDDLE:
+            argType.initContainsMiddle(seqMonitor,numToAdd,true);
+            break;
+          case NEAREND:
+            argType.initContainsNearEnd(seqMonitor,numToAdd,true);
+            break;
+          case END:
+            argType.initContainsEnd(seqMonitor,numToAdd,true);
+            break;
+          case IOBHI:
+            argType.initDoesNotContain(seqMonitor,numToAdd);
+            break;
+          default:
+            throw new Error("Unknown seqLocation "+seqLocation);
+        }
+      }
+    }
+    int seqSize=seqMonitor.expectedSeqSize;
+    boolean expectedResult;
+    Assertions.assertEquals(expectedResult=seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveLastOccurrence(seqMonitor,queryCastType));
+    if(expectedResult){
+      --seqSize;
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+  }
+  //TODO test removeFirstOccurrence/removeLastOccurrence
   //TODO test pollLast/peekLast
   //TODO test pollFirst/peekFirst
   //TODO test offerFirst/offerLast
