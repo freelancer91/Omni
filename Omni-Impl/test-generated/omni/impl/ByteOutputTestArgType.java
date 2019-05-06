@@ -4,6 +4,7 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.OmniArray;
@@ -49,6 +50,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((PeekAndPollIfc.ByteOutput<?>)col).peekByte());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfByte)col).pollLastByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).pollLastByte());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfByte)col).pollFirstByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).pollFirstByte());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfByte)col).peekLastByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).peekLastByte());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfByte)col).peekFirstByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).peekFirstByte());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniStack.OfByte)col).popByte());
     }
@@ -57,6 +86,18 @@ public enum ByteOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniQueue.OfByte)col).removeByte());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).removeFirstByte());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).removeLastByte());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).getFirstByte());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(expectedVal),((OmniDeque.OfByte)col).getLastByte());
     }
   }
   ,
@@ -99,6 +140,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((PeekAndPollIfc<?>)col).peek());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfByte)col).pollLast());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).pollLast());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfByte)col).pollFirst());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).pollFirst());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfByte)col).peekLast());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).peekLast());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfByte)col).peekFirst());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).peekFirst());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniStack.OfByte)col).pop());
     }
@@ -107,6 +176,18 @@ public enum ByteOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniQueue.OfByte)col).remove());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).removeFirst());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).removeLast());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).getFirst());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToByte(expectedVal),((OmniDeque.OfByte)col).getLast());
     }
   }
   ,
@@ -149,6 +230,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfByte)col).pollLastDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).pollLastDouble());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfByte)col).pollFirstDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).pollFirstDouble());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfByte)col).peekLastDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).peekLastDouble());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfByte)col).peekFirstDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).peekFirstDouble());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniStack.OfByte)col).popDouble());
     }
@@ -157,6 +266,18 @@ public enum ByteOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniQueue.OfByte)col).removeDouble());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).removeFirstDouble());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).removeLastDouble());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).getFirstDouble());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoublebyte(expectedVal),((OmniDeque.OfByte)col).getLastDouble());
     }
   }
   ,
@@ -199,6 +320,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((PeekAndPollIfc.FloatOutput<?>)col).peekFloat());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfByte)col).pollLastFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).pollLastFloat());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfByte)col).pollFirstFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).pollFirstFloat());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfByte)col).peekLastFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).peekLastFloat());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfByte)col).peekFirstFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).peekFirstFloat());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniStack.OfByte)col).popFloat());
     }
@@ -207,6 +356,18 @@ public enum ByteOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniQueue.OfByte)col).removeFloat());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).removeFirstFloat());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).removeLastFloat());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).getFirstFloat());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatbyte(expectedVal),((OmniDeque.OfByte)col).getLastFloat());
     }
   }
   ,
@@ -249,6 +410,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((PeekAndPollIfc.LongOutput<?>)col).peekLong());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfByte)col).pollLastLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).pollLastLong());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfByte)col).pollFirstLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).pollFirstLong());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfByte)col).peekLastLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).peekLastLong());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfByte)col).peekFirstLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).peekFirstLong());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniStack.OfByte)col).popLong());
     }
@@ -257,6 +446,18 @@ public enum ByteOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniQueue.OfByte)col).removeLong());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).removeFirstLong());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).removeLastLong());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).getFirstLong());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongbyte(expectedVal),((OmniDeque.OfByte)col).getLastLong());
     }
   }
   ,
@@ -299,6 +500,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((PeekAndPollIfc.IntOutput<?>)col).peekInt());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfByte)col).pollLastInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).pollLastInt());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfByte)col).pollFirstInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).pollFirstInt());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfByte)col).peekLastInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).peekLastInt());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfByte)col).peekFirstInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).peekFirstInt());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniStack.OfByte)col).popInt());
     }
@@ -307,6 +536,18 @@ public enum ByteOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniQueue.OfByte)col).removeInt());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).removeFirstInt());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).removeLastInt());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).getFirstInt());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointbyte(expectedVal),((OmniDeque.OfByte)col).getLastInt());
     }
   }
   ,
@@ -349,6 +590,34 @@ public enum ByteOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((PeekAndPollIfc.ShortOutput<?>)col).peekShort());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfByte)col).pollLastShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).pollLastShort());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfByte)col).pollFirstShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).pollFirstShort());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfByte)col).peekLastShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).peekLastShort());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfByte)col).peekFirstShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).peekFirstShort());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniStack.OfByte)col).popShort());
     }
@@ -358,8 +627,28 @@ public enum ByteOutputTestArgType{
     @Override public void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniQueue.OfByte)col).removeShort());
     }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).removeFirstShort());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).removeLastShort());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).getFirstShort());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedVal),((OmniDeque.OfByte)col).getLastShort());
+    }
   }
   ;
+  public abstract void verifyDequePeekLast(OmniCollection.OfByte col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePollLast(OmniCollection.OfByte col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePeekFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePollFirst(OmniCollection.OfByte col,int expectedSize,int expectedVal);
+  public abstract void verifyDequeRemoveLast(OmniCollection.OfByte col,int expectedVal);
+  public abstract void verifyDequeRemoveFirst(OmniCollection.OfByte col,int expectedVal);
+  public abstract void verifyDequeGetLast(OmniCollection.OfByte col,int expectedVal);
+  public abstract void verifyDequeGetFirst(OmniCollection.OfByte col,int expectedVal);
   public abstract void verifyItrPrevious(OmniIterator.OfByte itr,int valToConvert);
   public abstract void verifyItrNext(OmniIterator.OfByte itr,int valToConvert);
   public abstract void verifyListRemoveAt(OmniCollection.OfByte col,int index,int valToConvert);
@@ -370,5 +659,4 @@ public enum ByteOutputTestArgType{
   public abstract void verifyQueueRemove(OmniCollection.OfByte col,int expectedVal);
   public abstract void verifyQueueElement(OmniCollection.OfByte col,int expectedVal);
   public abstract void verifyPeek(OmniCollection.OfByte col,int expectedSize,int expectedVal);
-  //TODO other method tests
 }

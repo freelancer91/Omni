@@ -40,6 +40,7 @@ import omni.impl.seq.AbstractRefSeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.AbstractRefSeqMonitor.MonitoredRemoveIfPredicateGen;
 import omni.impl.seq.AbstractRefSeqMonitor.QueryTester;
 import omni.impl.seq.AbstractRefSeqMonitor.ItrType;
+import omni.impl.seq.AbstractRefSeqMonitor.MonitoredComparatorGen;
 import java.nio.file.Files;
 import omni.impl.seq.AbstractRefSeqMonitor.MonitoredObjectGen;
 import omni.impl.seq.AbstractRefSeqMonitor.MonitoredObject;
@@ -48,6 +49,8 @@ import omni.api.OmniCollection;
 import omni.api.OmniListIterator;
 import java.util.ArrayList;
 import omni.api.OmniDeque;
+import omni.api.OmniList;
+import java.util.Comparator;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("DblLnkSeqTest")
 @Execution(ExecutionMode.CONCURRENT)
@@ -2250,9 +2253,13 @@ public class RefDblLnkSeqTest{
     }
     return builder.build();
   }
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getListItrpreviousIndex_void_And_ListItrnextIndex_voidArgs")
-  public void testListItrpreviousIndex_void_And_ListItrnextIndex_void
+  @org.junit.jupiter.api.Test
+  public void testListItrpreviousIndex_void_And_ListItrnextIndex_void(){
+    getListItrpreviousIndex_void_And_ListItrnextIndex_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testListItrpreviousIndex_void_And_ListItrnextIndex_voidHelper((SeqMonitor)args[0]);
+    });
+  }
+  private static void testListItrpreviousIndex_void_And_ListItrnextIndex_voidHelper
   (SeqMonitor seqMonitor){
     int numToAdd=100;
     for(int i=0;i<numToAdd;++i){
@@ -2657,11 +2664,1534 @@ public class RefDblLnkSeqTest{
       currNode=currNode.next;
     }
   }
-  //TODO
-  //TODO
-  //TODO
-  //TODO
-  //TODO test sort
+  static Stream<Arguments> getListreplaceAll_UnaryOperatorArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var nestedType:NestedType.values()){
+        if(nestedType.forwardIteration){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario!=PreModScenario.ModSeq&&(preModScenario.expectedException==null||(!nestedType.rootType&&checkedType.checked))){
+              for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+                if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+                  for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+                  }
+                }
+              }   
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListreplaceAll_UnaryOperator(){
+    getListreplaceAll_UnaryOperatorArgs().parallel().map(Arguments::get).forEach(args->{
+        testListreplaceAll_UnaryOperatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3],(FunctionCallType)args[4]);
+    });
+  }
+  private static void testListreplaceAll_UnaryOperatorHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    var monitoredUnaryOperator=monitoredFunctionGen.getMonitoredUnaryOperator(seqMonitor);
+    int numExpectedIteratedValues;
+    if(preModScenario.expectedException==null && (monitoredFunctionGen.expectedException==null||numToAdd==0)){
+        seqMonitor.replaceAll(monitoredUnaryOperator,functionCallType);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.verifyPreAlloc().verifyAscending(1,numToAdd).verifyPostAlloc(preModScenario);
+        numExpectedIteratedValues=numToAdd;
+    }else{
+      Class<? extends Throwable> expectedException=preModScenario.expectedException==null?monitoredFunctionGen.expectedException:preModScenario.expectedException;
+      Assertions.assertThrows(expectedException,()->seqMonitor.replaceAll(monitoredUnaryOperator,functionCallType));
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      switch(monitoredFunctionGen){
+        case NoThrow:
+          numExpectedIteratedValues=numToAdd;
+          verifyItr.verifyAscending(1,numToAdd);
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case Throw:
+          numExpectedIteratedValues=Math.min(numToAdd,1);
+          verifyItr.verifyAscending(numToAdd);
+          verifyItr.verifyPostAlloc(preModScenario);
+          break;
+        case ModSeq:
+          numExpectedIteratedValues=numToAdd;
+          switch(preModScenario){
+            case ModParent:
+              verifyItr.verifyAscending(numToAdd);
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            case ModRoot:
+              verifyItr.verifyAscending(numToAdd);
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            case NoMod:
+            case ModSeq:
+              verifyItr.verifyAscending(1,numToAdd);
+              for(int i=0;i<numToAdd;++i){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ModParent:
+          numExpectedIteratedValues=numToAdd;
+          switch(preModScenario){
+            case ModRoot:
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              verifyItr.verifyAscending(numToAdd);
+              if(preModScenario==PreModScenario.ModSeq){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyParentPostAlloc();
+              if(preModScenario==PreModScenario.ModParent){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
+              if(preModScenario==PreModScenario.ModRoot){
+                verifyItr.verifyIllegalAdd();
+              }
+              break;
+            case ModParent:
+            case ModSeq:
+            case NoMod:
+              verifyItr.verifyAscending(1,numToAdd);
+              if(preModScenario==PreModScenario.ModSeq){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyParentPostAlloc();
+              for(int i=0;i<numToAdd;++i){
+                verifyItr.verifyIllegalAdd();
+              }
+              if(preModScenario==PreModScenario.ModParent){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
+              if(preModScenario==PreModScenario.ModRoot){
+                verifyItr.verifyIllegalAdd();
+              }
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ModRoot:
+          numExpectedIteratedValues=numToAdd;
+          switch(preModScenario){
+            case ModSeq:
+            case ModParent:
+            case ModRoot:
+            case NoMod:
+              verifyItr.verifyAscending(1,numToAdd);
+              verifyItr.verifyPostAlloc(preModScenario);
+              for(int i=0;i<numToAdd;++i){
+                verifyItr.verifyIllegalAdd();
+              } 
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ThrowModSeq:
+          numExpectedIteratedValues=1;
+          verifyItr.verifyAscending(numToAdd);
+          switch(preModScenario){
+            case ModParent:
+            case ModRoot:
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            case NoMod:
+            case ModSeq:
+              verifyItr.verifyIllegalAdd();
+              verifyItr.verifyPostAlloc(preModScenario);
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ThrowModParent:
+          numExpectedIteratedValues=1;
+          verifyItr.verifyAscending(numToAdd);
+          switch(preModScenario){
+            case ModParent:
+              verifyItr.verifyParentPostAlloc();
+              verifyItr.verifyIllegalAdd();
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              for(int i=0;i<numExpectedIteratedValues;++i)
+              {
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
+              break;
+            case ModRoot:
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              if(preModScenario==PreModScenario.ModSeq){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyParentPostAlloc();
+              if(preModScenario==PreModScenario.ModParent){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
+              if(preModScenario==PreModScenario.ModRoot){
+                verifyItr.verifyIllegalAdd();
+              }
+              break;
+            case NoMod:
+            case ModSeq:
+              if(preModScenario==PreModScenario.ModSeq){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyParentPostAlloc();
+              verifyItr.verifyIllegalAdd();
+              if(preModScenario==PreModScenario.ModParent){
+                verifyItr.verifyIllegalAdd();
+              }
+              verifyItr.verifyRootPostAlloc();
+              if(preModScenario==PreModScenario.ModRoot){
+                verifyItr.verifyIllegalAdd();
+              }
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        case ThrowModRoot:
+          numExpectedIteratedValues=1;
+          verifyItr.verifyAscending(numToAdd);
+          switch(preModScenario){
+            case ModParent:
+            case ModRoot:
+              verifyItr.verifyPostAlloc(preModScenario);
+              numExpectedIteratedValues=Math.min(numToAdd,1);
+              break;
+            case NoMod:
+            case ModSeq:
+              verifyItr.verifyPostAlloc(preModScenario);
+              verifyItr.verifyIllegalAdd();
+              break;
+            default:
+              throw new Error("Unknown preModScenario "+preModScenario);
+          }
+          break;
+        default:
+          throw new Error("Unknown monitoredFunctionGen "+monitoredFunctionGen);
+      }
+    }
+    Assertions.assertEquals(numExpectedIteratedValues,monitoredUnaryOperator.encounteredValues.size());
+    RefDblLnkNode currNode=seqMonitor.seq.head;
+    boolean encounteredValuesFlag=false;
+    outer: switch(monitoredFunctionGen)
+    {
+      case ModSeq:
+        switch(preModScenario){
+          case ModParent:
+          case ModRoot:  
+            break outer;
+          case ModSeq:
+          case NoMod:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      case ModParent:
+        switch(preModScenario){
+          case ModRoot:
+            break outer;
+          case ModParent:
+          case ModSeq:
+          case NoMod:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      case ModRoot:
+      case NoThrow:
+        encounteredValuesFlag=true;
+        break;
+      case Throw:
+      case ThrowModSeq:
+      case ThrowModParent:
+      case ThrowModRoot:
+        break;
+      default:
+        throw new Error("Unknown monitoredFunctionGen "+monitoredFunctionGen);
+    }
+    if(encounteredValuesFlag)
+    {
+      for(var encounteredValue:monitoredUnaryOperator.encounteredValues)
+      {
+        var expectedVal=(Object)(Integer.valueOf((int)encounteredValue)+1);
+        Assertions.assertEquals(expectedVal,currNode.val);
+        currNode=currNode.next;
+      }
+    }
+    else
+    {
+      for(var encounteredValue:monitoredUnaryOperator.encounteredValues){
+        Assertions.assertSame(encounteredValue,currNode.val);
+        currNode=currNode.next;
+      }
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testclone_void(){
+    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
+        testclone_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]);
+    });
+  }
+  private static void testclone_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      var clone=(OmniCollection.OfRef)seqMonitor.seq.clone();
+      Assertions.assertNotSame(clone,seqMonitor.seq);
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertTrue(clone instanceof RefDblLnkSeq.CheckedList);
+        Assertions.assertEquals(0,((RefDblLnkSeq.CheckedList)clone).modCount);
+      }else{
+        Assertions.assertTrue(clone instanceof RefDblLnkSeq.UncheckedList);
+      }
+      var dblLnkSeqClone=(RefDblLnkSeq)clone;
+      var cloneHead=dblLnkSeqClone.head;
+      var cloneTail=dblLnkSeqClone.tail;
+      Assertions.assertEquals(numToAdd,dblLnkSeqClone.size);
+      if(numToAdd==0){
+        Assertions.assertNull(cloneHead);
+        Assertions.assertNull(cloneTail);
+      }else{
+        Assertions.assertNotNull(cloneHead);
+        Assertions.assertNotNull(cloneTail);
+        var originalHead=seqMonitor.seq.head;
+        var originalTail=seqMonitor.seq.tail;
+        Assertions.assertNotSame(cloneHead,originalHead);
+        Assertions.assertNotSame(cloneTail,originalTail);
+        Assertions.assertNull(cloneHead.prev);
+        for(int i=0;;){
+          Assertions.assertSame(originalHead.val,cloneHead.val);
+          if(++i==numToAdd){
+            Assertions.assertSame(cloneHead,cloneTail);
+            Assertions.assertNull(cloneHead.next);
+            break;
+          }
+          Assertions.assertSame(cloneHead,(cloneHead=cloneHead.next).prev);
+          originalHead=originalHead.next;
+        }
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.clone());
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getListsubList_int_intArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
+              for(int seqSize=0;seqSize<=5;++seqSize){
+                for(int fromIndex=-2;fromIndex<=seqSize+1;++fromIndex){
+                  if(checkedType.checked || fromIndex>=0){
+                    for(int toIndex=-1;toIndex<=seqSize+2;++toIndex){
+                      if(checkedType.checked || (toIndex>=fromIndex && toIndex<=seqSize)){
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,fromIndex,toIndex));
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListsubList_int_int(){
+    getListsubList_int_intArgs().parallel().map(Arguments::get).forEach(args->{
+        testListsubList_int_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(int)args[3],(int)args[4]);
+    });
+  }
+  private static void testListsubList_int_intHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int seqSize,int fromIndex,int toIndex){
+    for(int i=0;i<seqSize;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      if(fromIndex>=0 && fromIndex<=toIndex && toIndex<=seqSize){
+        var subList=(RefDblLnkSeq)seqMonitor.seq.subList(fromIndex,toIndex);
+        if(seqMonitor.checkedType.checked){
+          Assertions.assertEquals(seqMonitor.expectedSeqModCount,FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.modCount(subList));
+          if(seqMonitor.nestedType.rootType){
+            Assertions.assertNull(FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.parent(subList));
+            Assertions.assertSame(seqMonitor.seq,FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.root(subList));
+          }else{
+            Assertions.assertSame(seqMonitor.seq,FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.parent(subList));
+            Assertions.assertSame(seqMonitor.parents[seqMonitor.parents.length-1],FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.root(subList));
+          }
+          Assertions.assertEquals(fromIndex,FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.parentOffset(subList));
+        }else{
+          if(seqMonitor.nestedType.rootType){
+            Assertions.assertNull(FieldAndMethodAccessor.RefDblLnkSeq.UncheckedSubList.parent(subList));
+            Assertions.assertSame(seqMonitor.seq,FieldAndMethodAccessor.RefDblLnkSeq.UncheckedSubList.root(subList));
+          }else{
+            Assertions.assertSame(seqMonitor.seq,FieldAndMethodAccessor.RefDblLnkSeq.UncheckedSubList.parent(subList));
+            Assertions.assertSame(seqMonitor.parents[seqMonitor.parents.length-1],FieldAndMethodAccessor.RefDblLnkSeq.UncheckedSubList.root(subList));
+          }
+          Assertions.assertEquals(fromIndex,FieldAndMethodAccessor.RefDblLnkSeq.UncheckedSubList.parentOffset(subList));
+        }
+        Assertions.assertSame(toIndex-fromIndex,subList.size);
+        var subListHead=subList.head;
+        var subListTail=subList.tail;
+        if(toIndex-fromIndex==0){
+          Assertions.assertNull(subListHead);
+          Assertions.assertNull(subListTail);
+        }else{
+          Assertions.assertSame(RefDblLnkNode.iterateAscending(seqMonitor.seq.head,fromIndex),subListHead);
+          Assertions.assertSame(RefDblLnkNode.iterateDescending(seqMonitor.seq.tail,seqMonitor.seq.size-toIndex),subListTail);
+        }
+      }else{
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->seqMonitor.seq.subList(fromIndex,toIndex));
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.subList(fromIndex,toIndex));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(seqSize).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getListlistIterator_intArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
+              for(var seqLocation:SequenceLocation.values()){
+                if(seqLocation.expectedException!=null && checkedType.checked){
+                  builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListlistIterator_int(){
+    getListlistIterator_intArgs().parallel().map(Arguments::get).forEach(args->{
+        testListlistIterator_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(SequenceLocation)args[2]);
+    });
+  }
+  private static void testListlistIterator_intHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    final int itrIndex;
+    switch(seqLocation){
+      case IOBLO:
+        itrIndex=-1;
+        break;
+      case IOBHI:
+        itrIndex=101;
+        break;
+      case BEGINNING:
+        itrIndex=0;
+        break;
+      case MIDDLE:
+        itrIndex=50;
+        break;
+      case END:
+        itrIndex=100;
+        break;
+      default:
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+    Class<? extends Throwable> expectedException=(preModScenario.expectedException==null)?(seqLocation.expectedException):(preModScenario.expectedException);
+    if(expectedException==null){
+      var itrMonitor=seqMonitor.getListItrMonitor(itrIndex);
+      itrMonitor.verifyIteratorState();
+      Assertions.assertEquals(itrIndex,itrMonitor.nextIndex());
+    }else{
+      Assertions.assertThrows(expectedException,()->seqMonitor.getListItrMonitor(itrIndex));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getListlistIterator_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
+              builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario));
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListlistIterator_void(){
+    getListlistIterator_intArgs().parallel().map(Arguments::get).forEach(args->{
+        testListlistIterator_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1]);
+    });
+  }
+  private static void testListlistIterator_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      var itrMonitor=seqMonitor.getListItrMonitor();
+      itrMonitor.verifyIteratorState();
+      Assertions.assertEquals(0,itrMonitor.nextIndex());
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.getListItrMonitor());
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getiterator_voidArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario));
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testiterator_void(){
+    getiterator_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testiterator_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1]);
+    });
+  }
+  private static void testiterator_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      var itrMonitor=seqMonitor.getItrMonitor();
+      itrMonitor.verifyIteratorState();
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.getItrMonitor());
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getdescendingIterator_voidArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario));
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testdescendingIterator_void(){
+    getdescendingIterator_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testiterator_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1]);
+    });
+  }
+  private static void testdescendingIterator_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      var itrMonitor=seqMonitor.getDescendingItrMonitor();
+      itrMonitor.verifyIteratorState();
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.getItrMonitor());
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc(preModScenario);
+  }
+  @org.junit.jupiter.api.Test
+  public void testhashCode_void(){
+    gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
+      testhashCode_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]
+      ,(MonitoredObjectGen)args[3]
+      );
+    });
+  }
+  private static void testhashCode_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd
+  ,MonitoredObjectGen monitoredObjectGen
+  ){
+    MonitoredObject monitoredObject=null;
+    if(numToAdd!=0 && monitoredObjectGen.expectedException!=null){
+      monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.addVal(monitoredObject);
+      }
+    }else
+    {
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      if(monitoredObject!=null){
+        Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.hashCode());
+        Assertions.assertEquals(seqMonitor.verifyThrowCondition(numToAdd,monitoredObject,monitoredObjectGen),monitoredObject.numHashCodeCalls);
+      }else
+      {
+        int resultHash=seqMonitor.seq.hashCode();
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+        var itr=seqMonitor.seq.iterator();
+        int expectedHash=1;
+        for(int i=0;i<numToAdd;++i){
+          expectedHash=(expectedHash*31)+itr.next().hashCode();
+        }
+        Assertions.assertEquals(expectedHash,resultHash);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.hashCode());
+      seqMonitor.verifyThrowCondition(numToAdd,preModScenario
+        ,monitoredObject,monitoredObjectGen
+      );
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoString_void(){
+    gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
+      testtoString_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2]
+      ,(MonitoredObjectGen)args[3]
+      );
+    });
+  }
+  private static void testtoString_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd
+  ,MonitoredObjectGen monitoredObjectGen
+  ){
+    MonitoredObject monitoredObject=null;
+    if(numToAdd!=0 && monitoredObjectGen.expectedException!=null){
+      monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.addVal(monitoredObject);
+      }
+    }else
+    {
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      if(monitoredObject!=null){
+        Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.toString());
+        Assertions.assertEquals(seqMonitor.verifyThrowCondition(numToAdd,monitoredObject,monitoredObjectGen),monitoredObject.numToStringCalls);
+      }
+      else
+      {
+        var resultStr=seqMonitor.seq.toString();
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+        var itr=seqMonitor.seq.iterator();
+        var arrList=new ArrayList<Object>();
+        for(int i=0;i<numToAdd;++i){
+          arrList.add(itr.next());
+        }
+        Assertions.assertEquals(arrList.toString(),resultStr);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toString());
+      seqMonitor.verifyThrowCondition(numToAdd,preModScenario
+        ,monitoredObject,monitoredObjectGen
+      );
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testclear_void(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (!nestedType.rootType && checkedType.checked))){
+            for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+              switch(nestedType){
+                case SUBLIST:
+                  if(preModScenario.expectedException==null){
+                    for(int parentsLength=1;parentsLength<=3;++parentsLength){
+                      if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent)){
+                        runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testclear_voidHelper(seqMonitor,preModScenario,seqSize));
+                      }
+                    }
+                    break;
+                  }
+                case LISTDEQUE:
+                  testclear_voidHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize);
+                  break;
+                default:
+                  throw new Error("Unknown nested type "+nestedType);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  private static void testclear_voidHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      seqMonitor.clear();
+      Assertions.assertTrue(seqMonitor.seq.isEmpty());
+      numToAdd=0;
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.isEmpty());
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+  }
+  @org.junit.jupiter.api.Test
+  public void testListunstableAscendingSort_void(){
+    getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
+        testListunstableAscendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
+    });
+  }
+  private static void testListunstableAscendingSort_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
+    if(preModScenario.expectedException==null){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
+        seqMonitor.unstableAscendingSort();
+        monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+      }else{
+        Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.unstableAscendingSort());
+        monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.unstableAscendingSort());
+      monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testListunstableDescendingSort_void(){
+    getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
+        testListunstableDescendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
+    });
+  }
+  private static void testListunstableDescendingSort_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.initReverse(seqMonitor,numToAdd,preModScenario);
+    if(preModScenario.expectedException==null){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
+        seqMonitor.unstableDescendingSort();
+        monitoredComparatorGen.assertReverseSorted(seqMonitor,numToAdd,preModScenario);
+      }else{
+        Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.unstableDescendingSort());
+        monitoredComparatorGen.assertReverseUnmodified(seqMonitor,numToAdd,preModScenario);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.unstableDescendingSort());
+      monitoredComparatorGen.assertReverseUnmodified(seqMonitor,numToAdd,preModScenario);
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testListstableDescendingSort_void(){
+    getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
+        testListstableDescendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
+    });
+  }
+  private static void testListstableDescendingSort_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.initReverse(seqMonitor,numToAdd,preModScenario);
+    if(preModScenario.expectedException==null){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
+        seqMonitor.stableDescendingSort();
+        monitoredComparatorGen.assertReverseSorted(seqMonitor,numToAdd,preModScenario);
+      }else{
+        Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.stableDescendingSort());
+        monitoredComparatorGen.assertReverseUnmodified(seqMonitor,numToAdd,preModScenario);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.stableDescendingSort());
+      monitoredComparatorGen.assertReverseUnmodified(seqMonitor,numToAdd,preModScenario);
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testListstableAscendingSort_void(){
+    getNonComparatorSortArgs().parallel().map(Arguments::get).forEach(args->{
+        testListstableAscendingSort_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
+    });
+  }
+  private static void testListstableAscendingSort_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
+    if(preModScenario.expectedException==null){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
+        seqMonitor.stableAscendingSort();
+        monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+      }else{
+        Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.stableAscendingSort());
+        monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.stableAscendingSort());
+      monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+    }
+  }
+  static Stream<Arguments> getListunstableSort_ComparatorArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if((checkedType.checked || preModScenario.expectedException==null) && ((nestedType.rootType && preModScenario.expectedException==null)||(!nestedType.rootType && preModScenario.appliesToSubList))){
+              for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
+                if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
+                  for(int seqSize:new int[]{0,2}){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListunstableSort_Comparator(){
+    getListunstableSort_ComparatorArgs().parallel().map(Arguments::get).forEach(args->{
+        testListunstableSort_ComparatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3]);
+    });
+  }
+  private static void testListunstableSort_ComparatorHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd){
+    monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
+    var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
+    if(preModScenario.expectedException==null){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
+        seqMonitor.unstableSort(sorter);
+        monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+      }else{
+        Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.unstableSort(sorter));
+        monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.unstableSort(sorter));
+      monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+    }
+  }
+  static Stream<Arguments> getListsort_ComparatorArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if((checkedType.checked || preModScenario.expectedException==null) && ((nestedType.rootType && preModScenario.expectedException==null)||(!nestedType.rootType && preModScenario.appliesToSubList))){
+              for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
+                if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
+                  for(int seqSize:new int[]{0,2}){
+                    for(var functionCallType:FunctionCallType.values()){
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize,functionCallType));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListsort_Comparator(){
+    getListsort_ComparatorArgs().parallel().map(Arguments::get).forEach(args->{
+        testListsort_ComparatorHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredComparatorGen)args[2],(int)args[3],(FunctionCallType)args[4]);
+    });
+  }
+  private static void testListsort_ComparatorHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int numToAdd,FunctionCallType functionCallType){
+    monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
+    var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
+    if(preModScenario.expectedException==null){
+      if(monitoredComparatorGen.expectedException==null || numToAdd<2){
+        seqMonitor.sort(sorter,functionCallType);
+        monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+      }else{
+        Assertions.assertThrows(monitoredComparatorGen.expectedException,()->seqMonitor.sort(sorter,functionCallType));
+        monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.sort(sorter,functionCallType));
+      monitoredComparatorGen.assertUnmodified(seqMonitor,numToAdd,preModScenario);
+    }
+  }
+  static Stream<Arguments> gettoArray_IntFunctionArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+          for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize));
+          }
+        }
+      }   
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_IntFunction(){
+    gettoArray_IntFunctionArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoArray_IntFunctionHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3]);
+    });
+  }
+  private static void testtoArray_IntFunctionHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    var arrConstructor=monitoredFunctionGen.getMonitoredArrayConstructor(seqMonitor);
+    if(preModScenario.expectedException==null){
+      if(monitoredFunctionGen.expectedException==null){
+        var resultArr=seqMonitor.seq.toArray(arrConstructor);
+        Assertions.assertEquals(numToAdd,resultArr.length);
+        var itr=seqMonitor.seq.iterator();
+        for(int i=0;i<numToAdd;++i){
+          Assertions.assertSame(resultArr[i],itr.next());
+        }
+      }else{
+         Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.seq.toArray(arrConstructor));
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toArray(arrConstructor));
+    }
+    var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+    switch(monitoredFunctionGen){
+      case NoThrow:
+      case Throw:
+        verifyItr.verifyPostAlloc(preModScenario);
+        break;
+      case ModSeq:
+      case ThrowModSeq:
+        if(preModScenario==PreModScenario.NoMod){
+           verifyItr.verifyIllegalAdd().verifyPostAlloc();
+        }else{
+          verifyItr.verifyPostAlloc(preModScenario);
+        }
+        break;
+      case ModParent:
+      case ThrowModParent:
+        if(preModScenario==PreModScenario.ModSeq){
+          verifyItr.verifyIllegalAdd();
+        }
+        verifyItr.verifyParentPostAlloc();
+        if(preModScenario!=PreModScenario.ModRoot){
+          verifyItr.verifyIllegalAdd();
+          if(preModScenario!=PreModScenario.NoMod){
+            verifyItr.verifyIllegalAdd();
+          }
+        }
+        verifyItr.verifyRootPostAlloc();
+        if(preModScenario==PreModScenario.ModRoot){
+          verifyItr.verifyIllegalAdd();
+        }
+        break;
+      case ModRoot:
+      case ThrowModRoot:
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+        break;
+      default:
+        throw new Error("Unknown monitoredFunctionGen "+monitoredFunctionGen);
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  static Stream<Arguments> gettoArray_ObjectArrayArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      for(int seqSize=0;seqSize<=15;seqSize+=5){
+        for(int arrSize=0;arrSize<=20;arrSize+=5){
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,arrSize));
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_ObjectArray(){
+    gettoArray_ObjectArrayArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoArray_ObjectArrayHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(int)args[3]);
+    });
+  }
+  private static void testtoArray_ObjectArrayHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int seqSize,int arrSize){
+    for(int i=0;i<seqSize;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    Integer[] paramArr=new Integer[arrSize];
+    for(int i=seqSize,bound=seqSize+arrSize;i<bound;++i){
+      paramArr[i-seqSize]=TypeConversionUtil.convertToInteger(i);
+    }
+    if(preModScenario.expectedException==null){
+      var resultArr=seqMonitor.seq.toArray(paramArr);
+      if(arrSize<seqSize){
+        Assertions.assertNotSame(paramArr,resultArr);
+        Assertions.assertEquals(seqSize,resultArr.length);
+      }else if(arrSize>seqSize){
+        Assertions.assertSame(paramArr,resultArr);
+        Assertions.assertNull(resultArr[seqSize]);
+        for(int i=seqSize+1;i<arrSize;++i){
+          Assertions.assertEquals(TypeConversionUtil.convertToInteger(i+seqSize),resultArr[i]);
+        }
+      }else{
+        Assertions.assertSame(paramArr,resultArr);
+      }
+      var itr=seqMonitor.seq.iterator();
+      for(int i=0;i<seqSize;++i){
+        Assertions.assertSame(itr.next(),resultArr[i]);
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.toArray(paramArr));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(seqSize).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> gettoArray_voidArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+        for(var outputArgType:RefOutputTestArgType.values()){
+          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,outputArgType));
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_void(){
+    gettoArray_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testtoArray_voidHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(RefOutputTestArgType)args[3]);
+    });
+  }
+  private static void testtoArray_voidHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,RefOutputTestArgType outputArgType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      outputArgType.verifyToArray(seqMonitor.seq,numToAdd);
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->outputArgType.verifyToArray(seqMonitor.seq,numToAdd));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getListget_intArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
+              for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+                for(var seqLocation:SequenceLocation.values()){
+                  if((seqLocation==SequenceLocation.BEGINNING && seqSize!=0) || (checkedType.checked && seqLocation.expectedException!=null)){
+                    for(var outputArgType:RefOutputTestArgType.values()){
+                      builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,outputArgType));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListget_int(){
+    getListget_intArgs().parallel().map(Arguments::get).forEach(args->{
+        testListget_intHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(SequenceLocation)args[3],(RefOutputTestArgType)args[4]);
+    });
+  }
+  private static void testListget_intHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,RefOutputTestArgType outputArgType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      switch(seqLocation){
+        case IOBLO:
+          Assertions.assertThrows(seqLocation.expectedException,()->outputArgType.verifyListGet(seqMonitor.seq,-1,0));
+          break;
+        case IOBHI:
+          Assertions.assertThrows(seqLocation.expectedException,()->outputArgType.verifyListGet(seqMonitor.seq,numToAdd,0));
+          break;
+        case BEGINNING:
+          for(int i=0;i<numToAdd;++i){
+            outputArgType.verifyListGet(seqMonitor.seq,i,i);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+    }else{
+      final int getIndex;
+      switch(seqLocation){
+        case IOBLO:
+          getIndex=-1;
+          break;
+        case IOBHI:
+          getIndex=numToAdd;
+          break;
+        case BEGINNING:
+          getIndex=0;
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+      Assertions.assertThrows(preModScenario.expectedException,()->outputArgType.verifyListGet(seqMonitor.seq,getIndex,0));
+    }
+    seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  static Stream<Arguments> getListset_int_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
+              for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+                for(var seqLocation:SequenceLocation.values()){
+                  if((seqLocation==SequenceLocation.BEGINNING && seqSize!=0) || (checkedType.checked && seqLocation.expectedException!=null)){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Unboxed));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListset_int_val(){
+    getListset_int_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testListset_int_valHelper((SeqMonitor)args[0],(PreModScenario)args[1],(int)args[2],(SequenceLocation)args[3],(FunctionCallType)args[4]);
+    });
+  }
+  private static void testListset_int_valHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,FunctionCallType functionCallType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      switch(seqLocation){
+        case IOBLO:
+          Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.verifySet(-1,-1,0,functionCallType));
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+          break;
+        case IOBHI:
+          Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.verifySet(numToAdd,numToAdd+1,numToAdd,functionCallType));
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc();
+          break;
+        case BEGINNING:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.verifySet(i,i+numToAdd,i,functionCallType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          seqMonitor.verifyPreAlloc().verifyAscending(numToAdd,numToAdd).verifyPostAlloc();
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+    }else{
+      final int setIndex;
+      switch(seqLocation){
+        case IOBLO:
+          setIndex=-1;
+          break;
+        case IOBHI:
+          setIndex=numToAdd;
+          break;
+        case BEGINNING:
+          setIndex=0;
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.verifySet(setIndex,numToAdd+1,setIndex,functionCallType));
+      seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  static Stream<Arguments> getListput_int_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var seqLocation:SequenceLocation.values()){
+            if((checkedType.checked || seqLocation.expectedException==null) && seqLocation.validForEmpty){
+              for(var preModScenario:PreModScenario.values()){
+                if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || checkedType.checked) && (!nestedType.rootType || preModScenario==PreModScenario.NoMod)){
+                  for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+                    if(seqSize!=0 || seqLocation.expectedException!=null){
+                      for(var inputArgType:RefInputTestArgType.values()){
+                        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,seqSize));
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testListput_int_val(){
+    getListput_int_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testListput_int_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1],(SequenceLocation)args[2],(PreModScenario)args[3],(int)args[4]);
+    });
+  }
+  private static void testListput_int_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,int numToAdd){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    SequenceVerificationItr verifyItr;
+    if(preModScenario.expectedException==null){
+      switch(seqLocation){
+        case IOBLO:
+          Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.put(-1,0,inputArgType));
+          seqMonitor.verifyStructuralIntegrity();
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          break;
+        case IOBHI:
+          Assertions.assertThrows(seqLocation.expectedException,()->seqMonitor.put(numToAdd,0,inputArgType));
+          seqMonitor.verifyStructuralIntegrity();
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+          break;
+        case BEGINNING:
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.put(i,numToAdd-i-1,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,numToAdd).verifyPostAlloc();
+          for(int i=0;i<numToAdd;++i){
+            seqMonitor.put(i,i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(inputArgType,numToAdd);
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+    }else{
+      final int insertionIndex;
+      switch(seqLocation){
+        case IOBLO:
+          insertionIndex=-1;
+          break;
+        case IOBHI:
+           insertionIndex=numToAdd;
+          break;
+        case BEGINNING:
+          insertionIndex=0;
+          break;
+        default:
+          throw new Error("Unknown seqLocation "+seqLocation);
+      }
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.put(insertionIndex,0,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+      verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+    }
+    verifyItr.verifyPostAlloc(preModScenario);
+  }
+  static Stream<Arguments> getreadAndwriteObjectArgs(){
+    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
+          for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+            for(int initVal=0;initVal<=1;++initVal){
+              streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,initVal));
+            }
+          }
+        }
+      }
+    });
+  }
+  @org.junit.jupiter.api.Test
+  public void testreadAndwriteObject(){
+    getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
+        testreadAndwriteObjectHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3],(int)args[4]);
+    });
+  }
+  private static void testreadAndwriteObjectHelper
+  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,int initVal)
+  {
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i+initVal);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    final File file;
+    try{
+      file=Files.createTempFile(null,null).toFile();
+    }catch(Exception e){
+      Assertions.fail(e);
+      return;
+    }
+    if(preModScenario.expectedException==null){
+      if(monitoredFunctionGen.expectedException==null){
+        try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
+          oos.writeObject(seqMonitor.seq);
+        }catch(Exception e){
+          Assertions.fail(e);
+        }
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+        OmniCollection.OfRef readCol=null;
+        try(var ois=new ObjectInputStream(new FileInputStream(file));){
+          readCol=(OmniCollection.OfRef)ois.readObject();
+        }catch(Exception e){
+          Assertions.fail(e);
+          return;
+        }
+        var itr=readCol.iterator();
+        if(seqMonitor.nestedType.forwardIteration){
+          for(int i=0;i<numToAdd;++i){
+            Assertions.assertEquals(TypeConversionUtil.convertToObject(i),itr.next());
+          }
+        }else{
+          for(int i=0;i<numToAdd;++i){
+            Assertions.assertEquals(TypeConversionUtil.convertToObject(numToAdd-i-1),itr.next());
+          }
+        }
+        Assertions.assertFalse(itr.hasNext());
+      }else{
+        Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
+          try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(file,seqMonitor);){
+            seqMonitor.writeObject(moos);
+          }
+        });
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->{
+        try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(file,seqMonitor);){
+          seqMonitor.writeObject(moos);
+        }
+      });
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  static Stream<Arguments> getQueueelement_voidArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var outputType:RefOutputTestArgType.values()){
+        builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType),outputType));
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueelement_void(){
+    getQueueelement_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testQueueelement_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testQueueelement_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      outputArgType.verifyQueueElement(seqMonitor.seq,i);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.pop(i,outputArgType);
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  static Stream<Arguments> getStackpush_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var inputArgType:RefInputTestArgType.values()){
+        builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType),inputArgType));
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testStackpush_val(){
+    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testStackpush_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1]);
+    });
+  }
+  private static void testStackpush_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.push(i,inputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,100).verifyPostAlloc();
+  }
+  static Stream<Arguments> getQueueoffer_valArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var inputArgType:RefInputTestArgType.values()){
+        builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType),inputArgType));
+      }
+    }
+    return builder.build();
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueoffer_val(){
+    getQueueoffer_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testQueueoffer_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1]);
+    });
+  }
+  private static void testQueueoffer_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpeek_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpeek_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpeek_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    if(seqMonitor.nestedType.forwardIteration){
+      for(int i=0;i<100;++i){
+        seqMonitor.add(i);
+      }
+      for(int i=0;i<100;++i){
+        outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.pop(i,outputArgType);
+      }
+      outputArgType.verifyPeek(seqMonitor.seq,0,0);
+      seqMonitor.verifyStructuralIntegrity();
+    }else{
+      for(int i=0;i<100;){
+        outputArgType.verifyPeek(seqMonitor.seq,i,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.add(++i);
+      }
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testpoll_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpoll_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpoll_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    if(seqMonitor.nestedType.forwardIteration){
+      for(int i=0;i<100;++i){
+        seqMonitor.poll(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }else{
+      for(int i=100;--i>=0;){
+        seqMonitor.poll(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    seqMonitor.poll(0,outputArgType);
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpop_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpop_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpop_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    if(seqMonitor.nestedType.forwardIteration){
+      for(int i=0;i<100;++i){
+        seqMonitor.pop(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }else{
+      for(int i=100;--i>=0;){
+        seqMonitor.pop(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueremove_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testQueueremove_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testQueueremove_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      seqMonitor.queueRemove(i,outputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  //TODO test removeLastOccurrence
+  //TODO test pollLast/peekLast
+  //TODO test pollFirst/peekFirst
+  //TODO test offerFirst/offerLast
+  //TODO test addFirst/addLast
+  //TODO test getFirst/getLast
+  //TODO test removeFirst/removeLast
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);
@@ -2794,6 +4324,50 @@ public class RefDblLnkSeqTest{
         this.seq=(RefDblLnkSeq)parents[0].subList(fromIndex,toIndex);
         this.expectedSeqSize=toIndex-fromIndex;
         Assertions.assertEquals(0,this.expectedSeqSize);
+      }
+    }
+    void stableAscendingSort(){
+      int seqSize=expectedSeqSize;
+      ((OmniList.OfRef)seq).stableAscendingSort();
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+    }
+    void stableDescendingSort(){
+      int seqSize=expectedSeqSize;
+      ((OmniList.OfRef)seq).stableDescendingSort();
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+    }
+    void unstableAscendingSort(){
+      int seqSize=expectedSeqSize;
+      ((OmniList.OfRef)seq).unstableAscendingSort();
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+    }
+    void unstableDescendingSort(){
+      int seqSize=expectedSeqSize;
+      ((OmniList.OfRef)seq).unstableDescendingSort();
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+    }
+    void unstableSort(MonitoredComparator sorter){
+      int seqSize=expectedSeqSize;
+      ((OmniList.OfRef)seq).unstableSort((Comparator)sorter);
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+    }
+    void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
+      int seqSize=expectedSeqSize;
+      {
+        ((OmniList.OfRef)seq).sort((Comparator)sorter);
+      }
+      if(seqSize>1){
+       verifyFunctionalModification();
       }
     }
     AbstractItrMonitor getItrMonitor(){
@@ -3737,12 +5311,53 @@ public class RefDblLnkSeqTest{
       ,MonitoredObjectGen monitoredObjectGen
     );
   }
+  static Stream<Arguments> getNonComparatorSortArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType.forwardIteration){
+        for(var checkedType:CheckedType.values()){
+          for(var preModScenario:PreModScenario.values()){
+            if((checkedType.checked || preModScenario.expectedException==null) && ((nestedType.rootType && preModScenario.expectedException==null)||(!nestedType.rootType && preModScenario.appliesToSubList))){
+              for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
+                if(monitoredComparatorGen.nullComparator && ((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null))){
+                  for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+                    builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  static Stream<Arguments> getPeekPollAndPopArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var outputType:RefOutputTestArgType.values()){
+        builder.accept(Arguments.of(new SeqMonitor(NestedType.LISTDEQUE,checkedType),outputType));
+      }
+    }
+    return builder.build();
+  }
   static Stream<Arguments> getBasicCollectionTestArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
       for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
         streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
       }
     });
+  }
+  static Stream<Arguments> gettoStringAndhashCode_voidArgs(){
+   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
+     for(int seqSize:AbstractRefSeqMonitor.FIB_SEQ){
+       for(var monitoredObjectGen:MonitoredObjectGen.values()){
+         if(monitoredObjectGen.expectedException==null || (checkedType.checked && (!nestedType.rootType || monitoredObjectGen.appliesToRoot))){
+           streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,monitoredObjectGen));
+         }
+       }
+     }
+   });
   }
   private static void runSubListTests(boolean quickTest,CheckedType checkedType,boolean parallel,int parentLength,Consumer<? super SeqMonitor> testMethod){
     if(quickTest){

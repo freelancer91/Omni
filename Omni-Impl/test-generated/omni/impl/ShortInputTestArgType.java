@@ -4,10 +4,15 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 public enum ShortInputTestArgType{
   ARRAY_TYPE{
+    public void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addLast(TypeConversionUtil.convertToshort(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addFirst(TypeConversionUtil.convertToshort(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerLast(TypeConversionUtil.convertToshort(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerFirst(TypeConversionUtil.convertToshort(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert){return ((OmniQueue.OfShort)seq).offer(TypeConversionUtil.convertToshort(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert){itr.add(TypeConversionUtil.convertToshort(valToConvert));}
     public void callListItrSet(OmniListIterator.OfShort itr,int valToConvert){itr.set(TypeConversionUtil.convertToshort(valToConvert));}
@@ -19,6 +24,10 @@ public enum ShortInputTestArgType{
   }
   ,
   BOXED_TYPE{
+    public void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addLast(TypeConversionUtil.convertToShort(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addFirst(TypeConversionUtil.convertToShort(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerLast(TypeConversionUtil.convertToShort(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerFirst(TypeConversionUtil.convertToShort(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert){return ((OmniQueue.OfShort)seq).offer(TypeConversionUtil.convertToShort(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert){itr.add(TypeConversionUtil.convertToShort(valToConvert));}
     public void callListItrSet(OmniListIterator.OfShort itr,int valToConvert){itr.set(TypeConversionUtil.convertToShort(valToConvert));}
@@ -30,6 +39,10 @@ public enum ShortInputTestArgType{
   }
   ,
   PRIMITIVE_BOOLEAN{
+    public void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addLast(TypeConversionUtil.convertToboolean(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addFirst(TypeConversionUtil.convertToboolean(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerLast(TypeConversionUtil.convertToboolean(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerFirst(TypeConversionUtil.convertToboolean(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert){return ((OmniQueue.OfShort)seq).offer(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert){itr.add(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfShort itr,int valToConvert){itr.set(TypeConversionUtil.convertToboolean(valToConvert));}
@@ -41,6 +54,10 @@ public enum ShortInputTestArgType{
   }
   ,
   BOXED_BOOLEAN{
+    public void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addLast(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addFirst(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerLast(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerFirst(TypeConversionUtil.convertToBoolean(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert){return ((OmniQueue.OfShort)seq).offer(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert){itr.add(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfShort itr,int valToConvert){itr.set(TypeConversionUtil.convertToBoolean(valToConvert));}
@@ -52,6 +69,10 @@ public enum ShortInputTestArgType{
   }
   ,
   PRIMITIVE_BYTE{
+    public void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addLast(TypeConversionUtil.convertTobyte(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addFirst(TypeConversionUtil.convertTobyte(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerLast(TypeConversionUtil.convertTobyte(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerFirst(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert){return ((OmniQueue.OfShort)seq).offer(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert){itr.add(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListItrSet(OmniListIterator.OfShort itr,int valToConvert){itr.set(TypeConversionUtil.convertTobyte(valToConvert));}
@@ -63,6 +84,10 @@ public enum ShortInputTestArgType{
   }
   ,
   BOXED_BYTE{
+    public void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addLast(TypeConversionUtil.convertToByte(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert){((OmniDeque.OfShort)seq).addFirst(TypeConversionUtil.convertToByte(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerLast(TypeConversionUtil.convertToByte(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert){return ((OmniDeque.OfShort)seq).offerFirst(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert){return ((OmniQueue.OfShort)seq).offer(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert){itr.add(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListItrSet(OmniListIterator.OfShort itr,int valToConvert){itr.set(TypeConversionUtil.convertToByte(valToConvert));}
@@ -73,6 +98,10 @@ public enum ShortInputTestArgType{
     public void verifyVal(int expectedValToConvert,short actualVal){Assertions.assertEquals(TypeConversionUtil.convertToshortbyte(expectedValToConvert),actualVal);}
   }
   ;
+    public abstract void callDequeAddLast(OmniCollection.OfShort seq,int valToConvert);
+    public abstract void callDequeAddFirst(OmniCollection.OfShort seq,int valToConvert);
+    public abstract boolean callDequeOfferLast(OmniCollection.OfShort seq,int valToConvert);
+    public abstract boolean callDequeOfferFirst(OmniCollection.OfShort seq,int valToConvert);
     public abstract boolean callQueueOffer(OmniCollection.OfShort seq,int valToConvert);
     public abstract void callListItrAdd(OmniListIterator.OfShort itr,int valToConvert);
     public abstract void callListItrSet(OmniListIterator.OfShort itr,int valToConvert);

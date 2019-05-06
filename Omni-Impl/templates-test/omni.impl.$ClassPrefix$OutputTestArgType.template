@@ -13,6 +13,7 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.OmniArray;
@@ -188,6 +189,130 @@ VALUE_NAME{
 #ENDIF
     }
   }
+  @Override public void verifyDequePollLast(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal){
+    if(expectedSize==0){
+      #IF OfRef
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$<?>)col).pollLast());
+      #ELSE
+        #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertNull(((OmniDeque.Of$ClassPrefix$)col).pollLast());
+        #ELSE
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$)col).pollLastTYPENAMEMODIFIER());
+        #ENDIF
+      #ENDIF
+    }else{
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollLastTYPENAMEMODIFIER());
+  #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollLast());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollLastTYPENAMEMODIFIER());
+  #ENDIF
+#ELSEIF OfRef
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$<?>)col).pollLast());
+#ELSE
+  #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollLast());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollLastTYPENAMEMODIFIER());
+  #ENDIF
+#ENDIF
+    }
+  }
+  @Override public void verifyDequePollFirst(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal){
+    if(expectedSize==0){
+      #IF OfRef
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$<?>)col).pollFirst());
+      #ELSE
+        #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertNull(((OmniDeque.Of$ClassPrefix$)col).pollFirst());
+        #ELSE
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$)col).pollFirstTYPENAMEMODIFIER());
+        #ENDIF
+      #ENDIF
+    }else{
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollFirstTYPENAMEMODIFIER());
+  #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollFirst());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollFirstTYPENAMEMODIFIER());
+  #ENDIF
+#ELSEIF OfRef
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$<?>)col).pollFirst());
+#ELSE
+  #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollFirst());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).pollFirstTYPENAMEMODIFIER());
+  #ENDIF
+#ENDIF
+    }
+  }
+  @Override public void verifyDequePeekLast(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal){
+    if(expectedSize==0){
+      #IF OfRef
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$<?>)col).peekLast());
+      #ELSE
+        #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertNull(((OmniDeque.Of$ClassPrefix$)col).peekLast());
+        #ELSE
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$)col).peekLastTYPENAMEMODIFIER());
+        #ENDIF
+      #ENDIF
+    }else{
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekLastTYPENAMEMODIFIER());
+  #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekLast());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekLastTYPENAMEMODIFIER());
+  #ENDIF
+#ELSEIF OfRef
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$<?>)col).peekLast());
+#ELSE
+  #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekLast());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekLastTYPENAMEMODIFIER());
+  #ENDIF
+#ENDIF
+    }
+  }
+  @Override public void verifyDequePeekFirst(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal){
+    if(expectedSize==0){
+      #IF OfRef
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$<?>)col).peekFirst());
+      #ELSE
+        #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertNull(((OmniDeque.Of$ClassPrefix$)col).peekFirst());
+        #ELSE
+      Assertions.assertEquals(DEFAULT_VAL,((OmniDeque.Of$ClassPrefix$)col).peekFirstTYPENAMEMODIFIER());
+        #ENDIF
+      #ENDIF
+    }else{
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekFirstTYPENAMEMODIFIER());
+  #ELSEIFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekFirst());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekFirstTYPENAMEMODIFIER());
+  #ENDIF
+#ELSEIF OfRef
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$<?>)col).peekFirst());
+#ELSE
+  #IFSWITCH VALUE_NAME==BOXED_TYPE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekFirst());
+  #ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).peekFirstTYPENAMEMODIFIER());
+  #ENDIF
+#ENDIF
+    }
+  }
   @Override public void verifyStackPop(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
 #IF OfBoolean,OfByte,OfChar,OfShort
   #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
@@ -198,7 +323,6 @@ VALUE_NAME{
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniStack.Of$ClassPrefix$)col).popTYPENAMEMODIFIER());
 #ENDIF
-
   }
   @Override public void verifyQueueElement(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
 #IF OfBoolean,OfByte,OfChar,OfShort
@@ -210,7 +334,6 @@ VALUE_NAME{
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniQueue.Of$ClassPrefix$)col).ELEMENTMETHOD());
 #ENDIF
-
   }
   @Override public void verifyQueueRemove(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
 #IF OfBoolean,OfByte,OfChar,OfShort
@@ -222,10 +345,62 @@ VALUE_NAME{
 #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniQueue.Of$ClassPrefix$)col).removeTYPENAMEMODIFIER());
 #ENDIF
-
+  }
+  @Override public void verifyDequeRemoveFirst(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).removeFirstTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).removeFirstTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).removeFirstTYPENAMEMODIFIER());
+#ENDIF
+  }
+  @Override public void verifyDequeRemoveLast(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).removeLastTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).removeLastTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).removeLastTYPENAMEMODIFIER());
+#ENDIF
+  }
+  @Override public void verifyDequeGetFirst(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).getFirstTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).getFirstTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).getFirstTYPENAMEMODIFIER());
+#ENDIF
+  }
+  @Override public void verifyDequeGetLast(OmniCollection.Of$ClassPrefix$ col,int expectedVal){
+#IF OfBoolean,OfByte,OfChar,OfShort
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).getLastTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE$exposedType$(expectedVal),((OmniDeque.Of$ClassPrefix$)col).getLastTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedVal),((OmniDeque.Of$ClassPrefix$)col).getLastTYPENAMEMODIFIER());
+#ENDIF
   }
 }
 #ENDDEF
+
+  public abstract void verifyDequePeekLast(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePollLast(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePeekFirst(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePollFirst(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
+  public abstract void verifyDequeRemoveLast(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
+  public abstract void verifyDequeRemoveFirst(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
+  public abstract void verifyDequeGetLast(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
+  public abstract void verifyDequeGetFirst(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
   public abstract void verifyItrPrevious(OmniIterator.Of$ClassPrefix$ itr,int valToConvert);
   public abstract void verifyItrNext(OmniIterator.Of$ClassPrefix$ itr,int valToConvert);
   public abstract void verifyListRemoveAt(OmniCollection.Of$ClassPrefix$ col,int index,int valToConvert);
@@ -236,5 +411,4 @@ VALUE_NAME{
   public abstract void verifyQueueRemove(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
   public abstract void verifyQueueElement(OmniCollection.Of$ClassPrefix$ col,int expectedVal);
   public abstract void verifyPeek(OmniCollection.Of$ClassPrefix$ col,int expectedSize,int expectedVal);
-  //TODO other method tests
 }

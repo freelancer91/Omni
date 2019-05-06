@@ -4,10 +4,15 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 public enum CharInputTestArgType{
   ARRAY_TYPE{
+    public void callDequeAddLast(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addLast(TypeConversionUtil.convertTochar(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addFirst(TypeConversionUtil.convertTochar(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerLast(TypeConversionUtil.convertTochar(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerFirst(TypeConversionUtil.convertTochar(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfChar seq,int valToConvert){return ((OmniQueue.OfChar)seq).offer(TypeConversionUtil.convertTochar(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfChar itr,int valToConvert){itr.add(TypeConversionUtil.convertTochar(valToConvert));}
     public void callListItrSet(OmniListIterator.OfChar itr,int valToConvert){itr.set(TypeConversionUtil.convertTochar(valToConvert));}
@@ -19,6 +24,10 @@ public enum CharInputTestArgType{
   }
   ,
   BOXED_TYPE{
+    public void callDequeAddLast(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addLast(TypeConversionUtil.convertToCharacter(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addFirst(TypeConversionUtil.convertToCharacter(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerLast(TypeConversionUtil.convertToCharacter(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerFirst(TypeConversionUtil.convertToCharacter(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfChar seq,int valToConvert){return ((OmniQueue.OfChar)seq).offer(TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfChar itr,int valToConvert){itr.add(TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callListItrSet(OmniListIterator.OfChar itr,int valToConvert){itr.set(TypeConversionUtil.convertToCharacter(valToConvert));}
@@ -30,6 +39,10 @@ public enum CharInputTestArgType{
   }
   ,
   PRIMITIVE_BOOLEAN{
+    public void callDequeAddLast(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addLast(TypeConversionUtil.convertToboolean(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addFirst(TypeConversionUtil.convertToboolean(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerLast(TypeConversionUtil.convertToboolean(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerFirst(TypeConversionUtil.convertToboolean(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfChar seq,int valToConvert){return ((OmniQueue.OfChar)seq).offer(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfChar itr,int valToConvert){itr.add(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfChar itr,int valToConvert){itr.set(TypeConversionUtil.convertToboolean(valToConvert));}
@@ -41,6 +54,10 @@ public enum CharInputTestArgType{
   }
   ,
   BOXED_BOOLEAN{
+    public void callDequeAddLast(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addLast(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfChar seq,int valToConvert){((OmniDeque.OfChar)seq).addFirst(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerLast(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfChar seq,int valToConvert){return ((OmniDeque.OfChar)seq).offerFirst(TypeConversionUtil.convertToBoolean(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfChar seq,int valToConvert){return ((OmniQueue.OfChar)seq).offer(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfChar itr,int valToConvert){itr.add(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfChar itr,int valToConvert){itr.set(TypeConversionUtil.convertToBoolean(valToConvert));}
@@ -51,6 +68,10 @@ public enum CharInputTestArgType{
     public void verifyVal(int expectedValToConvert,char actualVal){Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedValToConvert),actualVal);}
   }
   ;
+    public abstract void callDequeAddLast(OmniCollection.OfChar seq,int valToConvert);
+    public abstract void callDequeAddFirst(OmniCollection.OfChar seq,int valToConvert);
+    public abstract boolean callDequeOfferLast(OmniCollection.OfChar seq,int valToConvert);
+    public abstract boolean callDequeOfferFirst(OmniCollection.OfChar seq,int valToConvert);
     public abstract boolean callQueueOffer(OmniCollection.OfChar seq,int valToConvert);
     public abstract void callListItrAdd(OmniListIterator.OfChar itr,int valToConvert);
     public abstract void callListItrSet(OmniListIterator.OfChar itr,int valToConvert);

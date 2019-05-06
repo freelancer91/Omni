@@ -4,6 +4,7 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.OmniArray;
@@ -49,6 +50,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((PeekAndPollIfc.BooleanOutput<?>)col).peekBoolean());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(false,((OmniDeque.OfBoolean)col).pollLastBoolean());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastBoolean());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(false,((OmniDeque.OfBoolean)col).pollFirstBoolean());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstBoolean());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(false,((OmniDeque.OfBoolean)col).peekLastBoolean());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastBoolean());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(false,((OmniDeque.OfBoolean)col).peekFirstBoolean());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstBoolean());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniStack.OfBoolean)col).popBoolean());
     }
@@ -57,6 +86,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniQueue.OfBoolean)col).removeBoolean());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstBoolean());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastBoolean());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstBoolean());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastBoolean());
     }
   }
   ,
@@ -99,6 +140,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((PeekAndPollIfc<?>)col).peek());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfBoolean)col).pollLast());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).pollLast());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfBoolean)col).pollFirst());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirst());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfBoolean)col).peekLast());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).peekLast());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertNull(((OmniDeque.OfBoolean)col).peekFirst());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirst());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniStack.OfBoolean)col).pop());
     }
@@ -107,6 +176,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniQueue.OfBoolean)col).remove());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirst());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).removeLast());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).getFirst());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToBoolean(expectedVal),((OmniDeque.OfBoolean)col).getLast());
     }
   }
   ,
@@ -149,6 +230,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((PeekAndPollIfc.DoubleOutput<?>)col).peekDouble());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfBoolean)col).pollLastDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastDouble());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfBoolean)col).pollFirstDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstDouble());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfBoolean)col).peekLastDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastDouble());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Double.NaN,((OmniDeque.OfBoolean)col).peekFirstDouble());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstDouble());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniStack.OfBoolean)col).popDouble());
     }
@@ -157,6 +266,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniQueue.OfBoolean)col).removeDouble());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstDouble());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastDouble());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstDouble());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastDouble());
     }
   }
   ,
@@ -199,6 +320,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((PeekAndPollIfc.FloatOutput<?>)col).peekFloat());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfBoolean)col).pollLastFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastFloat());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfBoolean)col).pollFirstFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstFloat());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfBoolean)col).peekLastFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastFloat());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Float.NaN,((OmniDeque.OfBoolean)col).peekFirstFloat());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstFloat());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniStack.OfBoolean)col).popFloat());
     }
@@ -207,6 +356,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniQueue.OfBoolean)col).removeFloat());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstFloat());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastFloat());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstFloat());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTofloatboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastFloat());
     }
   }
   ,
@@ -249,6 +410,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((PeekAndPollIfc.LongOutput<?>)col).peekLong());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfBoolean)col).pollLastLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastLong());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfBoolean)col).pollFirstLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstLong());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfBoolean)col).peekLastLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastLong());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Long.MIN_VALUE,((OmniDeque.OfBoolean)col).peekFirstLong());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstLong());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniStack.OfBoolean)col).popLong());
     }
@@ -257,6 +446,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniQueue.OfBoolean)col).removeLong());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstLong());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastLong());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstLong());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastLong());
     }
   }
   ,
@@ -299,6 +500,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((PeekAndPollIfc.IntOutput<?>)col).peekInt());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfBoolean)col).pollLastInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastInt());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfBoolean)col).pollFirstInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstInt());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfBoolean)col).peekLastInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastInt());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Integer.MIN_VALUE,((OmniDeque.OfBoolean)col).peekFirstInt());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstInt());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniStack.OfBoolean)col).popInt());
     }
@@ -307,6 +536,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniQueue.OfBoolean)col).removeInt());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstInt());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastInt());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstInt());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTointboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastInt());
     }
   }
   ,
@@ -349,6 +590,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((PeekAndPollIfc.ShortOutput<?>)col).peekShort());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfBoolean)col).pollLastShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastShort());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfBoolean)col).pollFirstShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstShort());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfBoolean)col).peekLastShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastShort());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Short.MIN_VALUE,((OmniDeque.OfBoolean)col).peekFirstShort());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstShort());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniStack.OfBoolean)col).popShort());
     }
@@ -357,6 +626,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniQueue.OfBoolean)col).removeShort());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstShort());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastShort());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstShort());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertToshortboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastShort());
     }
   }
   ,
@@ -399,6 +680,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((PeekAndPollIfc.ByteOutput<?>)col).peekByte());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfBoolean)col).pollLastByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastByte());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfBoolean)col).pollFirstByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstByte());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfBoolean)col).peekLastByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastByte());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Byte.MIN_VALUE,((OmniDeque.OfBoolean)col).peekFirstByte());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstByte());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniStack.OfBoolean)col).popByte());
     }
@@ -407,6 +716,18 @@ public enum BooleanOutputTestArgType{
     }
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniQueue.OfBoolean)col).removeByte());
+    }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstByte());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastByte());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstByte());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTobyteboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastByte());
     }
   }
   ,
@@ -449,6 +770,34 @@ public enum BooleanOutputTestArgType{
         Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((PeekAndPollIfc.CharOutput<?>)col).peekChar());
       }
     }
+    @Override public void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Character.MIN_VALUE,((OmniDeque.OfBoolean)col).pollLastChar());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).pollLastChar());
+      }
+    }
+    @Override public void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Character.MIN_VALUE,((OmniDeque.OfBoolean)col).pollFirstChar());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).pollFirstChar());
+      }
+    }
+    @Override public void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Character.MIN_VALUE,((OmniDeque.OfBoolean)col).peekLastChar());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).peekLastChar());
+      }
+    }
+    @Override public void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal){
+      if(expectedSize==0){
+        Assertions.assertEquals(Character.MIN_VALUE,((OmniDeque.OfBoolean)col).peekFirstChar());
+      }else{
+        Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).peekFirstChar());
+      }
+    }
     @Override public void verifyStackPop(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniStack.OfBoolean)col).popChar());
     }
@@ -458,8 +807,28 @@ public enum BooleanOutputTestArgType{
     @Override public void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal){
       Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniQueue.OfBoolean)col).removeChar());
     }
+    @Override public void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).removeFirstChar());
+    }
+    @Override public void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).removeLastChar());
+    }
+    @Override public void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).getFirstChar());
+    }
+    @Override public void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal){
+      Assertions.assertEquals(TypeConversionUtil.convertTocharboolean(expectedVal),((OmniDeque.OfBoolean)col).getLastChar());
+    }
   }
   ;
+  public abstract void verifyDequePeekLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePollLast(OmniCollection.OfBoolean col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePeekFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal);
+  public abstract void verifyDequePollFirst(OmniCollection.OfBoolean col,int expectedSize,int expectedVal);
+  public abstract void verifyDequeRemoveLast(OmniCollection.OfBoolean col,int expectedVal);
+  public abstract void verifyDequeRemoveFirst(OmniCollection.OfBoolean col,int expectedVal);
+  public abstract void verifyDequeGetLast(OmniCollection.OfBoolean col,int expectedVal);
+  public abstract void verifyDequeGetFirst(OmniCollection.OfBoolean col,int expectedVal);
   public abstract void verifyItrPrevious(OmniIterator.OfBoolean itr,int valToConvert);
   public abstract void verifyItrNext(OmniIterator.OfBoolean itr,int valToConvert);
   public abstract void verifyListRemoveAt(OmniCollection.OfBoolean col,int index,int valToConvert);
@@ -470,5 +839,4 @@ public enum BooleanOutputTestArgType{
   public abstract void verifyQueueRemove(OmniCollection.OfBoolean col,int expectedVal);
   public abstract void verifyQueueElement(OmniCollection.OfBoolean col,int expectedVal);
   public abstract void verifyPeek(OmniCollection.OfBoolean col,int expectedSize,int expectedVal);
-  //TODO other method tests
 }

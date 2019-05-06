@@ -13,6 +13,7 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 #IF OfRef
@@ -67,6 +68,10 @@ public enum $ClassPrefix$InputTestArgType{
   ;
 #MACRODEF InputTestArgTypeImpl<VALUE_NAME,INPUTTYPE,OUTPUTTYPE,PRIMITIVE_TYPE>()
 VALUE_NAME{
+  public void callDequeAddLast(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){((OmniDeque.Of$ClassPrefix$)seq).addLast(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public void callDequeAddFirst(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){((OmniDeque.Of$ClassPrefix$)seq).addFirst(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public boolean callDequeOfferLast(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){return ((OmniDeque.Of$ClassPrefix$)seq).offerLast(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public boolean callDequeOfferFirst(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){return ((OmniDeque.Of$ClassPrefix$)seq).offerFirst(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public boolean callQueueOffer(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){return ((OmniQueue.Of$ClassPrefix$)seq).offer(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public void callListItrAdd(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert){itr.add(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
   public void callListItrSet(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert){itr.set(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
@@ -97,6 +102,10 @@ VALUE_NAME{
 #ENDIF
 }
 #ENDDEF
+    public abstract void callDequeAddLast(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
+    public abstract void callDequeAddFirst(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
+    public abstract boolean callDequeOfferLast(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
+    public abstract boolean callDequeOfferFirst(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
     public abstract boolean callQueueOffer(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
     public abstract void callListItrAdd(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert);
     public abstract void callListItrSet(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert);

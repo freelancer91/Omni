@@ -187,95 +187,79 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     }
   }
   @Override public void sort(Comparator<? super E> sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final Object[] tmp;
       final RefDblLnkNode<E> tail;
       RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
-        }else{
-          {
-            RefSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
+      }else{
+        RefSortUtil.uncheckedStableSort(tmp,0,size,sorter);
       }
       RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableAscendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final Object[] tmp;
       final RefDblLnkNode<E> tail;
       RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-      {
-          RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
-      }
+      RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
       RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableDescendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final Object[] tmp;
       final RefDblLnkNode<E> tail;
       RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-      {
-          RefSortUtil.uncheckedStableDescendingSort(tmp,0,size);
-      }
+      RefSortUtil.uncheckedStableDescendingSort(tmp,0,size);
       RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableAscendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final Object[] tmp;
       final RefDblLnkNode<E> tail;
       RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-      {
-          RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
-      }
+      RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
       RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableDescendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final Object[] tmp;
       final RefDblLnkNode<E> tail;
       RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-      {
-          RefSortUtil.uncheckedUnstableDescendingSort(tmp,0,size);
-      }
+      RefSortUtil.uncheckedUnstableDescendingSort(tmp,0,size);
       RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableSort(Comparator<? super E> sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final Object[] tmp;
       final RefDblLnkNode<E> tail;
       RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
-        }else{
-          {
-            RefSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
+      }else{
+        RefSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
       }
       RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
@@ -3675,9 +3659,12 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
           oos.writeInt(size=this.size);
           if(size!=0){
             var curr=this.head;
-            do{
+            for(;;curr=curr.next){
               oos.writeObject(curr.val);
-            }while((curr=curr.next)!=null);
+              if(--size==0){
+                break;
+              }
+            }
           }
         }finally{
           modCountChecker.checkModCount();
@@ -4594,22 +4581,23 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       return this.size==0;
     }
     @Override public void replaceAll(UnaryOperator<E> operator){
-      int modCount=this.modCount;
+      final RefDblLnkNode<E> head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList<E> root;
+      int modCount=this.modCount;
       try{
-        final RefDblLnkNode<E> head;
-        if((head=this.head)==null){
-          return;
-        }
         RefDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(Consumer<? super E> action){
       final int modCount=this.modCount;
@@ -4623,168 +4611,158 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super E> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList<E> root;
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
+        try{
           if(sorter==null){
             RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
           }else{
-            {
-              RefSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
+            RefSortUtil.uncheckedStableSort(tmp,0,size,sorter);
           }
-        }
-        finally{
-          final CheckedList<E> root;
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
+        final CheckedList<E> root;
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList<E> root;
+        try{
+          RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
+        final CheckedList<E> root;
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedStableDescendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList<E> root;
+        try{
+          RefSortUtil.uncheckedStableDescendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void unstableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
+        final CheckedList<E> root;
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList<E> root;
+        try{
+          RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void unstableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
+        final CheckedList<E> root;
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedUnstableDescendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList<E> root;
+        try{
+          RefSortUtil.uncheckedUnstableDescendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void unstableSort(Comparator<? super E> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList<E> root;
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
+        try{
           if(sorter==null){
             RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
           }else{
-            {
-              RefSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
+            RefSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
           }
-        }
-        finally{
-          final CheckedList<E> root;
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
@@ -4808,17 +4786,27 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       return super.toArray();
     }
     @Override public String toString(){
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        return super.toString();
+        final RefDblLnkNode<E> head;
+        if((head=this.head)!=null){
+           final StringBuilder builder;
+           RefDblLnkNode.uncheckedToString(head,size,builder=new StringBuilder("["));
+           return builder.append(']').toString();
+        }
+        return "[]";
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public int hashCode(){
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        return super.hashCode();
+        final RefDblLnkNode<E> head;
+        if((head=this.head)!=null){
+           return RefDblLnkNode.uncheckedHashCode(head,size);
+        }
+        return 1;
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -5046,67 +5034,65 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super E> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
         int modCount=this.modCount;
-        try
-        {
+        try{
           if(sorter==null){
             RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
           }else{
-            {
-              RefSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
+            RefSortUtil.uncheckedStableSort(tmp,0,size,sorter);
           }
-        }
-        finally{
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
+        this.modCount=modCount+1;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
-        }
-        finally{
+        try{
+          RefSortUtil.uncheckedStableAscendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
+        this.modCount=modCount+1;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedStableDescendingSort(tmp,0,size);
-        }
-        finally{
+        try{
+          RefSortUtil.uncheckedStableDescendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
+        this.modCount=modCount+1;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
@@ -5116,7 +5102,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          RefDblLnkNode.uncheckedToString(head,tail,builder);
+          RefDblLnkNode.uncheckedToString(head,size,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -5129,7 +5115,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          return RefDblLnkNode.uncheckedHashCode(head,tail);
+          return RefDblLnkNode.uncheckedHashCode(head,size);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -5138,66 +5124,64 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     }
     @Override public void unstableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
-        }
-        finally{
+        try{
+          RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
+        this.modCount=modCount+1;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void unstableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
         int modCount=this.modCount;
-        try
-        {
-            RefSortUtil.uncheckedUnstableDescendingSort(tmp,0,size);
-        }
-        finally{
+        try{
+          RefSortUtil.uncheckedUnstableDescendingSort(tmp,0,size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
+        this.modCount=modCount+1;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void unstableSort(Comparator<? super E> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final Object[] tmp;
         final RefDblLnkNode<E> tail;
         RefDblLnkNode.uncheckedCopyInto(tmp=new Object[size],tail=this.tail,size);
         int modCount=this.modCount;
-        try
-        {
+        try{
           if(sorter==null){
             RefSortUtil.uncheckedUnstableAscendingSort(tmp,0,size);
           }else{
-            {
-              RefSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
+            RefSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
           }
-        }
-        finally{
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
+        this.modCount=modCount+1;
         RefDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
@@ -5325,7 +5309,17 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        out.writeInt(size=this.size);
+        if(size!=0){
+          var curr=this.head;
+          for(;;curr=curr.next){
+            out.writeObject(curr.val);
+            if(--size==0){
+              break;
+            }
+          }
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -6019,7 +6013,7 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     @Override public void push(E val){
       RefDblLnkNode<E> head;
       if((head=this.head)==null){
-        this.head=tail=new RefDblLnkNode<E>(val);
+        tail=head=new RefDblLnkNode<E>(val);
       }else{
         head.prev=head=new RefDblLnkNode<E>(val,head);
       }

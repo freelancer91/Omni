@@ -4,10 +4,15 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniQueue;
+import omni.api.OmniDeque;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 public enum DoubleInputTestArgType{
   ARRAY_TYPE{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertTodouble(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertTodouble(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertTodouble(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertTodouble(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertTodouble(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertTodouble(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertTodouble(valToConvert));}
@@ -19,6 +24,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_TYPE{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToDouble(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToDouble(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToDouble(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToDouble(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToDouble(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToDouble(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToDouble(valToConvert));}
@@ -30,6 +39,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMITIVE_BOOLEAN{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToboolean(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToboolean(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToboolean(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToboolean(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToboolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToboolean(valToConvert));}
@@ -41,6 +54,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_BOOLEAN{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToBoolean(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToBoolean(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToBoolean(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToBoolean(valToConvert));}
@@ -52,6 +69,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMITIVE_BYTE{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertTobyte(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertTobyte(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertTobyte(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertTobyte(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertTobyte(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertTobyte(valToConvert));}
@@ -63,6 +84,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_BYTE{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToByte(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToByte(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToByte(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToByte(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToByte(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToByte(valToConvert));}
@@ -74,6 +99,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMTIVE_SHORT{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToshort(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToshort(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToshort(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToshort(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToshort(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToshort(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToshort(valToConvert));}
@@ -85,6 +114,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_SHORT{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToShort(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToShort(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToShort(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToShort(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToShort(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToShort(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToShort(valToConvert));}
@@ -96,6 +129,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMITIVE_CHAR{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertTochar(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertTochar(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertTochar(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertTochar(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertTochar(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertTochar(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertTochar(valToConvert));}
@@ -107,6 +144,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_CHAR{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToCharacter(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToCharacter(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToCharacter(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToCharacter(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToCharacter(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToCharacter(valToConvert));}
@@ -118,6 +159,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMITIVE_INT{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToint(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToint(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToint(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToint(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToint(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToint(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToint(valToConvert));}
@@ -129,6 +174,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_INT{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToInteger(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToInteger(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToInteger(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToInteger(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToInteger(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToInteger(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToInteger(valToConvert));}
@@ -140,6 +189,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMITIVE_LONG{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertTolong(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertTolong(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertTolong(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertTolong(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertTolong(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertTolong(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertTolong(valToConvert));}
@@ -151,6 +204,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_LONG{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToLong(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToLong(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToLong(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToLong(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToLong(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToLong(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToLong(valToConvert));}
@@ -162,6 +219,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   PRIMITIVE_FLOAT{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertTofloat(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertTofloat(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertTofloat(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertTofloat(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertTofloat(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertTofloat(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertTofloat(valToConvert));}
@@ -173,6 +234,10 @@ public enum DoubleInputTestArgType{
   }
   ,
   BOXED_FLOAT{
+    public void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addLast(TypeConversionUtil.convertToFloat(valToConvert));}
+    public void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert){((OmniDeque.OfDouble)seq).addFirst(TypeConversionUtil.convertToFloat(valToConvert));}
+    public boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerLast(TypeConversionUtil.convertToFloat(valToConvert));}
+    public boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert){return ((OmniDeque.OfDouble)seq).offerFirst(TypeConversionUtil.convertToFloat(valToConvert));}
     public boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert){return ((OmniQueue.OfDouble)seq).offer(TypeConversionUtil.convertToFloat(valToConvert));}
     public void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert){itr.add(TypeConversionUtil.convertToFloat(valToConvert));}
     public void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert){itr.set(TypeConversionUtil.convertToFloat(valToConvert));}
@@ -183,6 +248,10 @@ public enum DoubleInputTestArgType{
     public void verifyVal(int expectedValToConvert,double actualVal){Assertions.assertEquals(TypeConversionUtil.convertTodouble(expectedValToConvert),actualVal);}
   }
   ;
+    public abstract void callDequeAddLast(OmniCollection.OfDouble seq,int valToConvert);
+    public abstract void callDequeAddFirst(OmniCollection.OfDouble seq,int valToConvert);
+    public abstract boolean callDequeOfferLast(OmniCollection.OfDouble seq,int valToConvert);
+    public abstract boolean callDequeOfferFirst(OmniCollection.OfDouble seq,int valToConvert);
     public abstract boolean callQueueOffer(OmniCollection.OfDouble seq,int valToConvert);
     public abstract void callListItrAdd(OmniListIterator.OfDouble itr,int valToConvert);
     public abstract void callListItrSet(OmniListIterator.OfDouble itr,int valToConvert);

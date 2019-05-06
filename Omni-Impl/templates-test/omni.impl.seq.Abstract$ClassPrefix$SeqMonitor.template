@@ -54,12 +54,9 @@ import omni.util.TypeUtil;
 import omni.impl.QueryCastType;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniStack;
-import omni.api.OmniQueue;
 import omni.api.OmniList;
-import omni.api.OmniDeque;
 @SuppressWarnings({"rawtypes","unchecked"})
-abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$ClassPrefix$>
-{
+abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$ClassPrefix$>{
   static final int[] FIB_SEQ=new int[12];
   static{
     FIB_SEQ[0]=0;
@@ -69,14 +66,10 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
       FIB_SEQ[i]=FIB_SEQ[i-1]+FIB_SEQ[i-2];
     }
   }
-
   final CheckedType checkedType;
   SEQ seq;
   int expectedSeqSize;
   int expectedSeqModCount;
-  
-  
-  
   Abstract$ClassPrefix$SeqMonitor(CheckedType checkedType)
   {
     this.checkedType=checkedType;
@@ -90,12 +83,10 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
   AbstractItrMonitor getListItrMonitor(int index){
     throw new UnsupportedOperationException();
   }
-  
   abstract SequenceVerificationItr verifyPreAlloc(int expectedVal);
   abstract SequenceVerificationItr verifyPreAlloc();
   abstract void illegalAdd(PreModScenario preModScenario);
   abstract void verifyAddition();
-  
   abstract void writeObject(ObjectOutputStream oos) throws IOException;
   abstract void verifyRemoval();
   abstract void verifyStructuralIntegrity();
@@ -472,30 +463,62 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
       Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(expectedRet),((OmniList.Of$ClassPrefix$)seq).set(index,TypeConversionUtil.convertTo$ArrayType$(val)));
     }
   }
-  void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
-    if(seq instanceof OmniDeque)
-    {
-      throw new Error("Not implemented yet");
-    }
-    else if(seq instanceof OmniQueue)
-    {
-      outputType.verifyQueueRemove(seq,expectedVal);
-    }
-    else if(seq instanceof OmniStack)
-    {
-      outputType.verifyStackPop(seq,expectedVal);
-    }
-    else
-    {
-      throw new Error("Unknown nested type for "+seq);
-    }
+  
+  void queueRemove(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyQueueRemove(seq,expectedVal);
     verifyRemoval();
+  }
+  void removeFirst(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyDequeRemoveFirst(seq,expectedVal);
+    verifyRemoval();
+  }
+  void removeLast(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyDequeRemoveLast(seq,expectedVal);
+    verifyRemoval();
+  }
+  void pop(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyStackPop(seq,expectedVal);
+    verifyRemoval();
+  }
+  void pollFirst(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyPollFirst(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      verifyRemoveVal();
+    }
+  }
+  void pollLast(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
+    outputType.verifyPollLast(seq,expectedSeqSize,expectedVal);
+    if(expectedSeqSize!=0){
+      verifyRemoveVal();
+    }
   }
   void poll(int expectedVal,$ClassPrefix$OutputTestArgType outputType){
     outputType.verifyPoll(seq,expectedSeqSize,expectedVal);
     if(expectedSeqSize!=0){
       verifyRemoval();
     }
+  }
+  void addLast(int val,$ClassPrefix$InputTestArgType inputArgType){
+    inputArgType.callDequeAddLast(seq,val);
+    verifyAddition();
+  }
+  void addFirst(int val,$ClassPrefix$InputTestArgType inputArgType){
+    inputArgType.callDequeAddFirst(seq,val);
+    verifyAddition();
+  }
+  boolean offerLast(int val,$ClassPrefix$InputTestArgType inputArgType){
+    boolean ret=inputArgType.callDequeOfferLast(seq,val);
+    if(ret){
+      verifyAddition();
+    }
+    return ret;
+  }
+  boolean offerFirst(int val,$ClassPrefix$InputTestArgType inputArgType){
+    boolean ret=inputArgType.callDequeOfferFirst(seq,val);
+    if(ret){
+      verifyAddition();
+    }
+    return ret;
   }
   boolean offer(int val,$ClassPrefix$InputTestArgType inputArgType){
     boolean ret=inputArgType.callQueueOffer(seq,val);
@@ -551,21 +574,49 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
 #IFNOT OfBoolean
   void unstableSort(MonitoredComparator sorter){
     int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).unstableSort(($Comparator$)sorter);
+    try
+    {
+      ((OmniList.Of$ClassPrefix$)seq).unstableSort(($Comparator$)sorter);
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
-      verifyFunctionalModification();
+     verifyFunctionalModification();
     }
   }
 #ENDIF
   void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
     int seqSize=expectedSeqSize;
-  #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed){
-      ((OmniList.Of$ClassPrefix$)seq).replaceAll((UnaryOperator)operator);
-    }else
-  #ENDIF
+    try
     {
-      ((OmniList.Of$ClassPrefix$)seq).replaceAll(($UnaryOperator$)operator);
+  #IFNOT OfRef
+      if(functionCallType==FunctionCallType.Boxed){
+      ((OmniList.Of$ClassPrefix$)seq).replaceAll((UnaryOperator)operator);
+      }else
+  #ENDIF
+      {
+        ((OmniList.Of$ClassPrefix$)seq).replaceAll(($UnaryOperator$)operator);
+      }
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize!=0){
+       verifyFunctionalModification();
+      }
+      throw e;
     }
     if(seqSize!=0){
      verifyFunctionalModification();
@@ -573,28 +624,70 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
   }
   void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
     int seqSize=expectedSeqSize;
-  #IFNOT OfRef
-    if(functionCallType==FunctionCallType.Boxed){
-      ((OmniList.Of$ClassPrefix$)seq).sort((Comparator)sorter);
-    }else
-  #ENDIF
+    try
     {
-      ((OmniList.Of$ClassPrefix$)seq).sort(($Comparator$)sorter);
+  #IFNOT OfRef
+      if(functionCallType==FunctionCallType.Boxed){
+        ((OmniList.Of$ClassPrefix$)seq).sort((Comparator)sorter);
+      }else
+  #ENDIF
+      {
+        ((OmniList.Of$ClassPrefix$)seq).sort(($Comparator$)sorter);
+      }
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
     }
     if(seqSize>1){
-      verifyFunctionalModification();
+     verifyFunctionalModification();
     }
   }
   void stableAscendingSort(){
     int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).stableAscendingSort();
+    try
+    {
+      ((OmniList.Of$ClassPrefix$)seq).stableAscendingSort();
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
-      verifyFunctionalModification();
+     verifyFunctionalModification();
     }
   }
   void stableDescendingSort(){
     int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).stableDescendingSort();
+    try
+    {
+      ((OmniList.Of$ClassPrefix$)seq).stableDescendingSort();
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
      verifyFunctionalModification();
     }
@@ -604,16 +697,44 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
   #IF OfRef
   void unstableAscendingSort(){
     int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).unstableAscendingSort();
+    try
+    {
+      ((OmniList.Of$ClassPrefix$)seq).unstableAscendingSort();
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
      verifyFunctionalModification();
     }
   }
   void unstableDescendingSort(){
     int seqSize=expectedSeqSize;
-    ((OmniList.Of$ClassPrefix$)seq).unstableDescendingSort();
+    try
+    {
+      ((OmniList.Of$ClassPrefix$)seq).unstableDescendingSort();
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
-      verifyFunctionalModification();
+     verifyFunctionalModification();
     }
   }
   #ENDIF
@@ -664,7 +785,7 @@ boolean METHODNAME(INPUTTYPE obj)
   #ENDIF
     return strOffset;
   }
-  private static void verifyLargeStr(String str,int offset,int bound,SequenceVerificationItr verifyItr){
+  static void verifyLargeStr(String str,int offset,int bound,SequenceVerificationItr verifyItr){
     if(offset>=bound){
       return;
     }
@@ -2323,13 +2444,23 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new AIOBThrowingMonitoredObject(3));
         seqMonitor.addVal(new AIOBThrowingMonitoredObject(2));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new AIOBThrowingMonitoredObject(2));
         seqMonitor.addVal(new AIOBThrowingMonitoredObject(3));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
         verifyItr.verifyPostAlloc(preModScenario);
       }
       @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
@@ -2346,13 +2477,23 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new IOBThrowingMonitoredObject(3));
         seqMonitor.addVal(new IOBThrowingMonitoredObject(2));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new IOBThrowingMonitoredObject(2));
         seqMonitor.addVal(new IOBThrowingMonitoredObject(3));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
         verifyItr.verifyPostAlloc(preModScenario);
       }
       @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
@@ -2369,10 +2510,6 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModSeqMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModSeqMonitoredObject(seqMonitor,2));
       }
-      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.addVal(new ModSeqMonitoredObject(seqMonitor,2));
-        seqMonitor.addVal(new ModSeqMonitoredObject(seqMonitor,3));
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
          switch(preModScenario){
           case NoMod:
@@ -2385,6 +2522,46 @@ boolean METHODNAME(INPUTTYPE obj)
           case ModRoot:
             verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
             verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.addVal(new ModSeqMonitoredObject(seqMonitor,2));
+        seqMonitor.addVal(new ModSeqMonitoredObject(seqMonitor,3));
+      }
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+         switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
             break;
           default:
             throw new Error("Unknown preModScenario "+preModScenario);
@@ -2418,10 +2595,6 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModParentMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModParentMonitoredObject(seqMonitor,2));
       }
-      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.addVal(new ModParentMonitoredObject(seqMonitor,2));
-        seqMonitor.addVal(new ModParentMonitoredObject(seqMonitor,3));
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         switch(preModScenario){
           case NoMod:
@@ -2442,6 +2615,63 @@ boolean METHODNAME(INPUTTYPE obj)
           case ModRoot:
             verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
             verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.addVal(new ModParentMonitoredObject(seqMonitor,2));
+        seqMonitor.addVal(new ModParentMonitoredObject(seqMonitor,3));
+      }
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+            verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
             verifyItr.verifyPostAlloc(preModScenario);
             break;
           default:
@@ -2483,11 +2713,22 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModRootMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModRootMonitoredObject(seqMonitor,2));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new ModRootMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModRootMonitoredObject(seqMonitor,3));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
@@ -2506,13 +2747,43 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModSeqAIOBThrowingMonitoredObject(seqMonitor,2));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         switch(preModScenario){
           case NoMod:
           case ModSeq:
@@ -2549,13 +2820,43 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new ModSeqIOBThrowingMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModSeqIOBThrowingMonitoredObject(seqMonitor,2));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         switch(preModScenario){
           case NoMod:
           case ModSeq:
@@ -2592,13 +2893,51 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new ModParentAIOBThrowingMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModParentAIOBThrowingMonitoredObject(seqMonitor,2));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         switch(preModScenario){
           case ModSeq:
             verifyItr.verifyIllegalAdd();
@@ -2643,13 +2982,51 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new ModParentIOBThrowingMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModParentIOBThrowingMonitoredObject(seqMonitor,2));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         switch(preModScenario){
           case ModSeq:
             verifyItr.verifyIllegalAdd();
@@ -2694,13 +3071,23 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
       }
+      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new ModRootAIOBThrowingMonitoredObject(seqMonitor,3));
         seqMonitor.addVal(new ModRootAIOBThrowingMonitoredObject(seqMonitor,2));
       }
-      @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
       @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
@@ -2708,6 +3095,7 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
+
     },
     NullComparatorModRootThrowIOB(ConcurrentModificationException.class,false,false,false,true){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2717,16 +3105,26 @@ boolean METHODNAME(INPUTTYPE obj)
         seqMonitor.addVal(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
         seqMonitor.addVal(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
       }
-      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.addVal(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
-        seqMonitor.addVal(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.addVal(new ModRootIOBThrowingMonitoredObject(seqMonitor,3));
+        seqMonitor.addVal(new ModRootIOBThrowingMonitoredObject(seqMonitor,2));
+      }
       @Override void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
+        verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(new MonitoredObject(3));
         verifyItr.verifyIndexAndIterate(new MonitoredObject(2));
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
@@ -2754,6 +3152,19 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+     
+      */
     },
     NoThrowDescending(null,true,false,true,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2767,13 +3178,14 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario);
       }
     },
@@ -2790,6 +3202,11 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
       @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.add(2);
         seqMonitor.add(3);
@@ -2799,6 +3216,20 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      
+      @Override void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      
+      
+      */
     },
     ThrowAIOB(IllegalArgumentException.class,true,false,false,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2817,6 +3248,19 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      
+      */
     },
     ThrowIOB(IndexOutOfBoundsException.class,true,false,false,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2835,6 +3279,18 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      */
     },
     ModSeqAscending(ConcurrentModificationException.class,true,true,false,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2871,6 +3327,45 @@ boolean METHODNAME(INPUTTYPE obj)
         }
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      
+      */
     },
     ModSeqDescending(ConcurrentModificationException.class,true,false,true,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2884,10 +3379,6 @@ boolean METHODNAME(INPUTTYPE obj)
             #ENDIF
           }
         };
-      }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         switch(preModScenario){
@@ -2907,6 +3398,45 @@ boolean METHODNAME(INPUTTYPE obj)
         }
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      
+      */
     },
     ModParentAscending(ConcurrentModificationException.class,false,true,false,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2951,6 +3481,61 @@ boolean METHODNAME(INPUTTYPE obj)
             throw new Error("Unknown preModScenario "+preModScenario);
         }
       }
+      
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      */
     },
     ModParentDescending(ConcurrentModificationException.class,false,false,true,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -2964,10 +3549,6 @@ boolean METHODNAME(INPUTTYPE obj)
             #ENDIF
           }
         };
-      }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         switch(preModScenario){
@@ -2984,6 +3565,33 @@ boolean METHODNAME(INPUTTYPE obj)
           case ModParent:
             verifyItr.verifyIndexAndIterate(3);
             verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
             verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
             break;
           case ModRoot:
@@ -3018,6 +3626,17 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      //@Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      //  verifyItr.verifyIndexAndIterate(2);
+      //  verifyItr.verifyIndexAndIterate(3);
+      //  verifyItr.verifyPostAlloc(preModScenario);
+      //}
+      
     },
     ModRootDescending(ConcurrentModificationException.class,false,false,true,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -3032,13 +3651,14 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
     },
@@ -3051,11 +3671,22 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyIndexAndIterate(3);
         switch(preModScenario){
@@ -3080,24 +3711,35 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-          verifyItr.verifyIndexAndIterate(2);
-          verifyItr.verifyIndexAndIterate(3);
-          switch(preModScenario){
-            case NoMod:
-            case ModSeq:
-              verifyItr.verifyIllegalAdd();
-            case ModParent:
-            case ModRoot:
-              break;
-            default:
-              throw new Error("Unknown preModScenario "+preModScenario);
-          }
-          verifyItr.verifyPostAlloc(preModScenario);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
       }
     },
     ModParentThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
@@ -3109,9 +3751,24 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
@@ -3142,9 +3799,24 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
@@ -3165,6 +3837,7 @@ boolean METHODNAME(INPUTTYPE obj)
             throw new Error("Unknown preModScenario "+preModScenario);
         }
       }
+      
     },
     ModRootThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -3175,15 +3848,18 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+     
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
+      
     },
     ModRootThrowIOB(ConcurrentModificationException.class,false,false,false,false){
       MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor){
@@ -3194,15 +3870,17 @@ boolean METHODNAME(INPUTTYPE obj)
           }
         };
       }
-      @Override void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
+      
     };
     final Class<? extends Throwable> expectedException;
     final boolean appliesToRoot;
@@ -3216,9 +3894,23 @@ boolean METHODNAME(INPUTTYPE obj)
       this.descending=descending;
       this.nullComparator=nullComparator;
     }
-    abstract void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+    abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
+    abstract MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor);
     void initReverseHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
+    }
+    void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    void initHelper(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+      seqMonitor.add(2);
+      seqMonitor.add(3);
     }
     void init(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       if(seqSize>1){
@@ -3236,10 +3928,26 @@ boolean METHODNAME(INPUTTYPE obj)
       }
       seqMonitor.illegalAdd(preModScenario);
     }
-    void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-      throw new UnsupportedOperationException();
+    void assertUnmodified(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqSize>1){
+        assertUnmodifiedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
     }
-    abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
+    void assertReverseUnmodified(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqSize>1){
+        assertReverseUnmodifiedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    }
     void assertSorted(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
@@ -3260,7 +3968,7 @@ boolean METHODNAME(INPUTTYPE obj)
         verifyItr.verifyPostAlloc(preModScenario);
       }
     }
-    abstract MonitoredComparator getMonitoredComparator(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+    
   }
 
 

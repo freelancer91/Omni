@@ -259,86 +259,70 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
     }
   }
   @Override public void sort(ByteComparator sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final byte[] tmp;
       final ByteDblLnkNode tail;
       ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
       }
       ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void sort(Comparator<? super Byte> sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final byte[] tmp;
       final ByteDblLnkNode tail;
       ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-          }
-        }
+      if(sorter==null){
+        ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
       }
       ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableAscendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final byte[] tmp;
       final ByteDblLnkNode tail;
       ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-      {
-          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-      }
+      ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
       ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableDescendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final byte[] tmp;
       final ByteDblLnkNode tail;
       ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-      {
-          ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
-      }
+      ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
       ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableSort(ByteComparator sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final byte[] tmp;
       final ByteDblLnkNode tail;
       ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
       }
       ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
@@ -2891,9 +2875,12 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
           oos.writeInt(size=this.size);
           if(size!=0){
             var curr=this.head;
-            do{
+            for(;;curr=curr.next){
               oos.writeByte(curr.val);
-            }while((curr=curr.next)!=null);
+              if(--size==0){
+                break;
+              }
+            }
           }
         }finally{
           modCountChecker.checkModCount();
@@ -3819,22 +3806,23 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
       return this.size==0;
     }
     @Override public void replaceAll(ByteUnaryOperator operator){
-      int modCount=this.modCount;
+      final ByteDblLnkNode head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList root;
+      int modCount=this.modCount;
       try{
-        final ByteDblLnkNode head;
-        if((head=this.head)==null){
-          return;
-        }
         ByteDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(ByteConsumer action){
       final int modCount=this.modCount;
@@ -3848,111 +3836,89 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(ByteComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final byte[] tmp;
         final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          try{
+            ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
+        ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
+        ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void replaceAll(UnaryOperator<Byte> operator){
-      int modCount=this.modCount;
+      final ByteDblLnkNode head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList root;
+      int modCount=this.modCount;
       try{
-        final ByteDblLnkNode head;
-        if((head=this.head)==null){
-          return;
-        }
         ByteDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(Consumer<? super Byte> action){
       final int modCount=this.modCount;
@@ -3966,76 +3932,62 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super Byte> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final byte[] tmp;
         final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          try{
+            ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void unstableSort(ByteComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final byte[] tmp;
         final ByteDblLnkNode tail;
-        ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
+          try{
+            ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
@@ -4313,58 +4265,52 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(ByteComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        ++this.modCount;
+        ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+        this.modCount=modCount+1;
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-            ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        ++this.modCount;
+        ByteSortUtil.uncheckedDescendingSort(tmp,0,size);
+        this.modCount=modCount+1;
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
@@ -4392,53 +4338,49 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super Byte> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            ByteSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void unstableSort(ByteComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final byte[] tmp;
         final ByteDblLnkNode tail;
         ByteDblLnkNode.uncheckedCopyInto(tmp=new byte[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          ByteSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            ByteSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         ByteDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
@@ -4567,7 +4509,17 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        out.writeInt(size=this.size);
+        if(size!=0){
+          var curr=this.head;
+          for(;;curr=curr.next){
+            out.writeByte(curr.val);
+            if(--size==0){
+              break;
+            }
+          }
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -5262,7 +5214,7 @@ public abstract class ByteDblLnkSeq extends AbstractSeq implements
     @Override public void push(byte val){
       ByteDblLnkNode head;
       if((head=this.head)==null){
-        this.head=tail=new ByteDblLnkNode(val);
+        tail=head=new ByteDblLnkNode(val);
       }else{
         head.prev=head=new ByteDblLnkNode(val,head);
       }

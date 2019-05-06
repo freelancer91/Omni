@@ -861,22 +861,46 @@ public class LongSnglLnkSeqTest{
   }
   private static void testpeek_voidHelper
   (SeqMonitor seqMonitor,LongOutputTestArgType outputArgType){
-    if(seqMonitor.nestedType.forwardIteration){
-      for(int i=0;i<100;++i){
-        seqMonitor.add(i);
-      }
-      for(int i=0;i<100;++i){
-        outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+    if(seqMonitor.nestedType==NestedType.STACK)
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.add(i);
+        }
+        for(int i=0;i<100;++i){
+          outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.pop(i,outputArgType);
+        }
+        outputArgType.verifyPeek(seqMonitor.seq,0,0);
         seqMonitor.verifyStructuralIntegrity();
-        seqMonitor.pop(i,outputArgType);
+      }else{
+        for(int i=0;i<100;){
+          outputArgType.verifyPeek(seqMonitor.seq,i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.add(++i);
+        }
       }
-      outputArgType.verifyPeek(seqMonitor.seq,0,0);
-      seqMonitor.verifyStructuralIntegrity();
-    }else{
-      for(int i=0;i<100;){
-        outputArgType.verifyPeek(seqMonitor.seq,i,i);
+    }
+    else
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.add(i);
+        }
+        for(int i=0;i<100;++i){
+          outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.queueRemove(i,outputArgType);
+        }
+        outputArgType.verifyPeek(seqMonitor.seq,0,0);
         seqMonitor.verifyStructuralIntegrity();
-        seqMonitor.add(++i);
+      }else{
+        for(int i=0;i<100;){
+          outputArgType.verifyPeek(seqMonitor.seq,i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.add(++i);
+        }
       }
     }
   }
@@ -916,20 +940,41 @@ public class LongSnglLnkSeqTest{
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
-    if(seqMonitor.nestedType.forwardIteration){
-      for(int i=0;i<100;++i){
-        seqMonitor.pop(i,outputArgType);
-        seqMonitor.verifyStructuralIntegrity();
+    if(seqMonitor.nestedType==NestedType.STACK)
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.pop(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }else{
+        for(int i=100;--i>=0;){
+          seqMonitor.pop(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
       }
-    }else{
-      for(int i=100;--i>=0;){
-        seqMonitor.pop(i,outputArgType);
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
         seqMonitor.verifyStructuralIntegrity();
       }
     }
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
-      seqMonitor.verifyStructuralIntegrity();
+    else
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.queueRemove(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }else{
+        for(int i=100;--i>=0;){
+          seqMonitor.queueRemove(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
     }
   }
   static Stream<Arguments> getreadAndwriteObjectArgs(){
@@ -1062,7 +1107,7 @@ public class LongSnglLnkSeqTest{
     for(int i=0;i<100;++i){
       outputArgType.verifyQueueElement(seqMonitor.seq,i);
       seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.pop(i,outputArgType);
+      seqMonitor.queueRemove(i,outputArgType);
     }
     if(seqMonitor.checkedType.checked){
       Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
@@ -1168,27 +1213,58 @@ public class LongSnglLnkSeqTest{
     seqMonitor.verifyPreAlloc().verifyNaturalAscending(seqSize).verifyPostAlloc();
   }
     private static final int MAX_TOSTRING_LENGTH=20;
-  static Stream<Arguments> getMASSIVEtoString_voidArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
+  @Tag("MASSIVEtoString")
+  @org.junit.jupiter.api.Test
+  public void testMASSIVEtoString_void(){
     final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-    LongSnglLnkNode head=new LongSnglLnkNode(TypeConversionUtil.convertTolong(1));
-    LongSnglLnkNode tail=head;
-    for(int i=1;i<seqLength;++i){
+    var head=new LongSnglLnkNode(TypeConversionUtil.convertTolong(1));
+    var tail=head;
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int threadSpan=seqLength/numThreads;
+    var wayPointNodes=new LongSnglLnkNode[numThreads];
+    wayPointNodes[0]=head;
+    int nextWayPointIndex=threadSpan;
+    int threadIndex=0;
+    int threadBound=numThreads-1;
+    for(int i=1;i<seqLength;++i)
+    {
       tail=tail.next=new LongSnglLnkNode(TypeConversionUtil.convertTolong(1));
+      if(i==nextWayPointIndex){
+        wayPointNodes[++threadIndex]=tail;
+        if(threadIndex==threadBound){
+          nextWayPointIndex=Integer.MIN_VALUE;
+        }else{
+          nextWayPointIndex+=threadSpan;
+        }
+      }
     }
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){
-        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,head,seqLength,tail)));
+        var seqMonitor=new SeqMonitor(nestedType,checkedType,head,seqLength,tail);
+        String string=seqMonitor.seq.toString();
+        Assertions.assertEquals('[',string.charAt(0));
+        Assertions.assertEquals(']',string.charAt(string.length()-1));
+        seqMonitor.verifyStructuralIntegrity();
+        var threads=new Thread[threadBound];
+        for(threadIndex=0,nextWayPointIndex=0;threadIndex<threadBound;){
+          var verifyItr=new SeqMonitor.SnglLnkSeqSequenceVerificationItr(seqMonitor,wayPointNodes[threadIndex]);
+          final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          final int finalWayPointIndex=nextWayPointIndex;
+          threads[threadIndex++]=new Thread(()->AbstractLongSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr));
+          nextWayPointIndex=finalWayPointBound;
+        }
+        var verifyItr=new SeqMonitor.SnglLnkSeqSequenceVerificationItr(seqMonitor,wayPointNodes[threadIndex]);
+        AbstractLongSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+        try{
+          for(threadIndex=0;threadIndex<threadBound;++threadIndex){
+            threads[threadIndex].join();
+          }
+        }catch(InterruptedException e){
+          Assertions.fail(e);
+        }
+        verifyItr.verifyPostAlloc(1);
       }
     }
-    return builder.build();
-  }
-  @Tag("MASSIVEtoString")
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getMASSIVEtoString_voidArgs")
-  public void testMASSIVEtoString_void
-  (SeqMonitor seqMonitor){
-    seqMonitor.verifyMASSIVEString();
   }
   @org.junit.jupiter.api.Test
   public void testtoString_void(){
@@ -1302,6 +1378,17 @@ public class LongSnglLnkSeqTest{
           throw new Error("unknown nested type "+nestedType);
       }
     }
+    /*
+    @Override void verifyMASSIVEString(){
+      String string=seq.toString();
+      verifyStructuralIntegrity();
+      var verifyItr=verifyPreAlloc(1);
+      Assertions.assertEquals('[',string.charAt(0));
+      Assertions.assertEquals(']',string.charAt(string.length()-1));
+      verifyLargeStr(string,0,expectedSeqSize,verifyItr);
+      verifyItr.verifyPostAlloc(1);
+    }
+    */
     void illegalAdd(PreModScenario preModScenario){
       switch(preModScenario){
         case ModSeq:

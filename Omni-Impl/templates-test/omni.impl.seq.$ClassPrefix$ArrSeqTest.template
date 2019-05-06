@@ -105,7 +105,7 @@ public class $ClassPrefix$ArrSeqTest{
 #MACRO testforEach_Consumer<PARALLEL>()
 #MACRO testItrforEachRemaining_Consumer<PARALLEL>()
 #MACRO testListItrpreviousIndex_void_And_ListItrnextIndex_void<PARALLEL>()
-#MACRO testItrremove_void<false>()
+#MACRO testItrremove_void<PARALLEL>()
 #MACRO testListItrprevious_void<PARALLEL>()
 #MACRO testItrnext_void<PARALLEL>()
 #MACRO testListItrset_val<PARALLEL>()
@@ -3627,7 +3627,16 @@ public void testListsort_Comparator
   }else{
     Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.sort(sorter,functionCallType));
   }
-  monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+#IFNOT OfRef
+  if(monitoredComparatorGen==MonitoredComparatorGen.NullComparator && seqMonitor.checkedType.checked && preModScenario.expectedException!=null)
+  {
+    monitoredComparatorGen.assertReverseSorted(seqMonitor,numToAdd,preModScenario);
+  }
+  else
+#ENDIF
+  {
+    monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+  }
 }
 #ENDDEF
 #MACRODEF testListunstableSort_Comparator<PARALLEL>()
@@ -3677,7 +3686,16 @@ public void testListunstableSort_Comparator
   }else{
     Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.unstableSort(sorter));
   }
-  monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+#IFNOT OfRef
+  if(monitoredComparatorGen==MonitoredComparatorGen.NullComparator && seqMonitor.checkedType.checked && preModScenario.expectedException!=null)
+  {
+    monitoredComparatorGen.assertReverseSorted(seqMonitor,numToAdd,preModScenario);
+  }
+  else
+#ENDIF
+  {
+    monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+  }
 }
 #ENDDEF
 #MACRODEF testListstableAscendingSort_void<PARALLEL>()
@@ -4099,7 +4117,7 @@ public void testclear_void
     Assertions.assertTrue(seqMonitor.seq.isEmpty());
     numToAdd=0;
   }else{
-    Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.isEmpty());
+    Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.clear());
   }
   seqMonitor.verifyStructuralIntegrity();
   seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
@@ -4274,8 +4292,9 @@ static Stream<Arguments> getListlistIterator_intArgs(){
         for(var preModScenario:PreModScenario.values()){
           if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
             for(var seqLocation:SequenceLocation.values()){
-              if(seqLocation.expectedException!=null && checkedType.checked)
+              if(seqLocation.expectedException!=null && checkedType.checked){
                 builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation));
+              }
             }
           }
         }

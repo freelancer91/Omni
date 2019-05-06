@@ -963,7 +963,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
             var curr=this.head;
 #IF OfBoolean
             for(int word=TypeUtil.castToByte(curr.val),marker=1;;){
-              if((curr=curr.next)==null){
+              if(--size==0){
                 oos.writeByte(word);
                 return;
               }else if((marker<<=1)==(1<<8)){
@@ -971,18 +971,21 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
                 word=0;
                 marker=1;
               }
-              if(curr.val){
+              if((curr=curr.next).val){
                 word|=marker;
               }
             }
 #ELSE
-            do{
+            for(;;curr=curr.next){
   #IF OfRef
               oos.writeObject(curr.val);
   #ELSE
               oos.write$TypeNameModifier$(curr.val);
   #ENDIF
-            }while((curr=curr.next)!=null);
+              if(--size==0){
+                break;
+              }
+            }
 #ENDIF
           }
         }finally{
@@ -1028,22 +1031,23 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       return this.size==0;
     }
     @Override public void replaceAll($UnaryOperator$$<E>$ operator){
-      int modCount=this.modCount;
+      final $DNode$$<E>$ head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList$<E>$ root;
+      int modCount=this.modCount;
       try{
-        final $DNode$$<E>$ head;
-        if((head=this.head)==null){
-          return;
-        }
         $DNode$.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
       final int modCount=this.modCount;
@@ -1064,22 +1068,23 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     #MACRO NonComparatorSortImpl<Unstable,SubList,true,Descending>()
 #ELSE
     @Override public void replaceAll(UnaryOperator<$BoxedType$> operator){
-      int modCount=this.modCount;
+      final $DNode$$<E>$ head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList$<E>$ root;
+      int modCount=this.modCount;
       try{
-        final $DNode$$<E>$ head;
-        if((head=this.head)==null){
-          return;
-        }
         $DNode$.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(Consumer<? super $BoxedType$> action){
       final int modCount=this.modCount;
@@ -1137,9 +1142,15 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
   #ENDIF
     @Override public String toString(){
 #IF OfRef
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        return super.toString();
+        final $DNode$$<E>$ head;
+        if((head=this.head)!=null){
+           final StringBuilder builder;
+           RefDblLnkNode.uncheckedToString(head,size,builder=new StringBuilder("["));
+           return builder.append(']').toString();
+        }
+        return "[]";
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -1150,9 +1161,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     }
     @Override public int hashCode(){
 #IF OfRef
-      int modCount=this.modCount;
+      final int modCount=this.modCount;
       try{
-        return super.hashCode();
+        final $DNode$$<E>$ head;
+        if((head=this.head)!=null){
+           return RefDblLnkNode.uncheckedHashCode(head,size);
+        }
+        return 1;
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
@@ -1270,7 +1285,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         final StringBuilder builder=new StringBuilder("[");
         final int modCount=this.modCount;
         try{
-          RefDblLnkNode.uncheckedToString(head,tail,builder);
+          RefDblLnkNode.uncheckedToString(head,size,builder);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1283,7 +1298,7 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       if((head=this.head)!=null){
         final int modCount=this.modCount;
         try{
-          return RefDblLnkNode.uncheckedHashCode(head,tail);
+          return RefDblLnkNode.uncheckedHashCode(head,size);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
         }
@@ -1524,7 +1539,38 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        out.writeInt(size=this.size);
+        if(size!=0){
+          var curr=this.head;
+  #IF OfBoolean
+          for(int word=TypeUtil.castToByte(curr.val),marker=1;;){
+            if(--size==0){
+              out.writeByte(word);
+              return;
+            }else if((marker<<=1)==(1<<8)){
+              out.writeByte(word);
+              word=0;
+              marker=1;
+            }
+            if((curr=curr.next).val){
+              word|=marker;
+            }
+          }
+  #ELSE
+          for(;;curr=curr.next){
+    #IF OfRef
+            out.writeObject(curr.val);
+    #ELSE
+            out.write$TypeNameModifier$(curr.val);
+    #ENDIF
+            if(--size==0){
+              break;
+            }
+          }
+        
+  #ENDIF
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -3692,58 +3738,82 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 @Override public void unstableDIRECTIONSort()
 #ENDIF
 {
+  //todo: see about making an in-place sort implementation rather than copying to an array
+#IFSWITCH CHECKED==true
+  #IFSWITCH STRUCTNAME==SubList
+    #IF OfRef
   final int size;
   if((size=this.size)>1){
-    //todo: see about making an in-place sort implementation rather than copying to an array
     final $ArrayType$[] tmp;
     final $DNode$$<E>$ tail;
     $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
-#IFSWITCH CHECKED==true
-  #IFSWITCH STRUCTNAME==SubList
+    final CheckedList$<E>$ root;
     int modCount=this.modCount;
-    try
-  #ELSE
-    #IF OfRef
-    int modCount=this.modCount;
-    try
-    #ENDIF
-  #ENDIF
-#ENDIF
-    {
-#IF OfRef
-        $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(tmp,0,size);
-#ELSE
-        $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
-#ENDIF
-    }
-#IFSWITCH CHECKED==true
-  #IFSWITCH STRUCTNAME==SubList
-    finally{
-      final CheckedList$<E>$ root;
+    try{
+      $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(tmp,0,size);
+    }catch(ArrayIndexOutOfBoundsException e){
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-      this.modCount=modCount;
     }
-  #ELSE
-    #IF OfRef
-    finally{
-      CheckedCollection.checkModCount(modCount,this.modCount);
-      this.modCount=modCount+1;
-    }
-    #ELSE
-    ++this.modCount;
-    #ENDIF
-  #ENDIF
-#ENDIF
+    root.modCount=++modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    this.modCount=modCount;
     $DNode$.uncheckedCopyFrom(tmp,size,tail);
-  }
-#IFSWITCH CHECKED==true
-  #IFSWITCH STRUCTNAME==SubList
-  else{
+  }else{
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
+    #ELSE
+  int modCount;
+  final CheckedList$<E>$ root;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+  final int size;
+  if((size=this.size)>1){
+    final $ArrayType$[] tmp;
+    final $DNode$$<E>$ tail;
+    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    root.modCount=++modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    this.modCount=modCount;
+    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
+    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+  }
+    #ENDIF
+  #ELSE
+  final int size;
+  if((size=this.size)>1){
+    final $ArrayType$[] tmp;
+    final $DNode$$<E>$ tail;
+    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    #IF OfRef
+    int modCount=this.modCount;
+    try{
+      $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(tmp,0,size);
+    }catch(ArrayIndexOutOfBoundsException e){
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
+      CheckedCollection.checkModCount(modCount,this.modCount);
+    }
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
+    #ENDIF
+    this.modCount=modCount+1;
+    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+  }
   #ENDIF
+#ELSE
+  final int size;
+  if((size=this.size)>1){
+    final $ArrayType$[] tmp;
+    final $DNode$$<E>$ tail;
+    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+  #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(tmp,0,size);
+  #ELSE
+    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(tmp,0,size);
+  #ENDIF
+    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+  }
 #ENDIF
 }
 #ENDDEF
@@ -3753,95 +3823,119 @@ boolean uncheckedremoveLastOccurrenceSUFFIX($DNode$$<E>$ tail
 #ELSE
 @Override public void unstableSort(COMPARATOR sorter){
 #ENDIF
+  //todo: see about making an in-place sort implementation rather than copying to an array
+#IFSWITCH CHECKED==true
+  #IFSWITCH STRUCTNAME==SubList
   final int size;
   if((size=this.size)>1){
-    //todo: see about making an in-place sort implementation rather than copying to an array
+    int modCount=this.modCount;
+    final CheckedList$<E>$ root;
+    final $ArrayType$[] tmp;
+    final $DNode$$<E>$ tail;
+    #IF OfRef
+    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    try{
+      if(sorter==null){
+        $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(tmp,0,size);
+      }else{
+        $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
+      }
+    }catch(ArrayIndexOutOfBoundsException e){
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+    }
+    #ELSE
+    if(sorter==null){
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+      $ClassPrefix$SortUtil.uncheckedAscendingSort(tmp,0,size);
+    }else{
+      $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+      try{
+      #IF OfBoolean
+        $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
+      #ELSE
+        $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
+      #ENDIF
+      }catch(ArrayIndexOutOfBoundsException e){
+        throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+      }finally{
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      }
+    }
+    #ENDIF
+    root.modCount=++modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    this.modCount=modCount;
+    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+  }else{
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #ELSE
+  final int size;
+  if((size=this.size)>1){
     final $ArrayType$[] tmp;
     final $DNode$$<E>$ tail;
     $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
-#IFSWITCH CHECKED==true
-  #IF OfRef
+    #IF OfRef
     int modCount=this.modCount;
-    try
-  #ENDIF
-#ENDIF
-    {
+    try{
       if(sorter==null){
-#IFSWITCH CHECKED==true
-  #IFNOT OfRef
-    #IFSWITCH STRUCTNAME==SubList
-        final CheckedList$<E>$ root;
-        int modCount;
-        CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-        this.modCount=modCount;
-    #ELSE
-        ++this.modCount;
-    #ENDIF
-  #ENDIF
-#ENDIF
-#IF OfRef
         $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(tmp,0,size);
-#ELSE
-        $ClassPrefix$SortUtil.uncheckedAscendingSort(tmp,0,size);
-#ENDIF
       }else{
-#IFSWITCH CHECKED==true
-  #IFNOT OfRef
-        int modCount=this.modCount;
-        try
-  #ENDIF
-#ENDIF
-        {
-#IF OfBoolean
-          $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
-#ELSE
-          $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
-#ENDIF
-        }
-#IFSWITCH CHECKED==true
-  #IFNOT OfRef
-        finally{
-    #IFSWITCH STRUCTNAME==Root
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
-    #ELSE
-          final CheckedList$<E>$ root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-    #ENDIF
-        }
-  #ENDIF
-#ENDIF
+        $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
       }
-    }
-#IFSWITCH CHECKED==true
-  #IF OfRef
-    finally{
-    #IFSWITCH STRUCTNAME==Root
+    }catch(ArrayIndexOutOfBoundsException e){
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
       CheckedCollection.checkModCount(modCount,this.modCount);
-      this.modCount=modCount+1;
-    #ELSE
-      final CheckedList$<E>$ root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-      this.modCount=modCount;
-    #ENDIF
     }
-  #ENDIF
-#ENDIF
+    this.modCount=modCount+1;
+    #ELSE   
+    if(sorter==null){
+      $ClassPrefix$SortUtil.uncheckedAscendingSort(tmp,0,size);
+      ++this.modCount;
+    }else{
+      int modCount=this.modCount;
+      try{
+      #IF OfBoolean
+        $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
+      #ELSE
+        $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
+      #ENDIF
+      }catch(ArrayIndexOutOfBoundsException e){
+        throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+      this.modCount=modCount+1;
+    }
+    #ENDIF
     $DNode$.uncheckedCopyFrom(tmp,size,tail);
   }
-#IFSWITCH CHECKED==true
-  #IFSWITCH STRUCTNAME==SubList
-  else{
-    CheckedCollection.checkModCount(modCount,root.modCount);
-  }
   #ENDIF
+#ELSE
+  final int size;
+  if((size=this.size)>1){
+    final $ArrayType$[] tmp;
+    final $DNode$$<E>$ tail;
+    $DNode$.uncheckedCopyInto(tmp=new $ArrayType$[size],tail=this.tail,size);
+    if(sorter==null){
+  #IF OfRef
+      $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(tmp,0,size);
+  #ELSE
+      $ClassPrefix$SortUtil.uncheckedAscendingSort(tmp,0,size);
+  #ENDIF
+    }else{
+  #IF OfBoolean
+      $ClassPrefix$SortUtil.uncheckedSort(tmp,0,size,COMPARE);
+  #ELSE
+      $ClassPrefix$SortUtil.uncheckedSTABLESort(tmp,0,size,COMPARE);
+  #ENDIF
+    }
+    $DNode$.uncheckedCopyFrom(tmp,size,tail);
+  }
 #ENDIF
 }
 #ENDDEF
@@ -4192,7 +4286,7 @@ private void bubbleUpInit($DNode$$<E>$ newNode){
 @Override public void push($exposedType$ val){
   $DNode$$<E>$ head;
   if((head=this.head)==null){
-    this.head=tail=new $DNode$$<E>$(val);
+    tail=head=new $DNode$$<E>$(val);
   }else{
     head.prev=head=new $DNode$$<E>$(val,head);
   }

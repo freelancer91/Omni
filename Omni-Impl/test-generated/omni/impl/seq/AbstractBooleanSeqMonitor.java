@@ -28,12 +28,9 @@ import omni.util.TypeUtil;
 import omni.impl.QueryCastType;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniStack;
-import omni.api.OmniQueue;
 import omni.api.OmniList;
-import omni.api.OmniDeque;
 @SuppressWarnings({"rawtypes","unchecked"})
-abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
-{
+abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
   static final int[] FIB_SEQ=new int[12];
   static{
     FIB_SEQ[0]=0;
@@ -419,23 +416,12 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedRet),((OmniList.OfBoolean)seq).set(index,TypeConversionUtil.convertToboolean(val)));
     }
   }
+  void queueRemove(int expectedVal,BooleanOutputTestArgType outputType){
+    outputType.verifyQueueRemove(seq,expectedVal);
+    verifyRemoval();
+  }
   void pop(int expectedVal,BooleanOutputTestArgType outputType){
-    if(seq instanceof OmniDeque)
-    {
-      throw new Error("Not implemented yet");
-    }
-    else if(seq instanceof OmniQueue)
-    {
-      outputType.verifyQueueRemove(seq,expectedVal);
-    }
-    else if(seq instanceof OmniStack)
-    {
-      outputType.verifyStackPop(seq,expectedVal);
-    }
-    else
-    {
-      throw new Error("Unknown nested type for "+seq);
-    }
+    outputType.verifyStackPop(seq,expectedVal);
     verifyRemoval();
   }
   void poll(int expectedVal,BooleanOutputTestArgType outputType){
@@ -485,11 +471,25 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
   }
   void replaceAll(MonitoredUnaryOperator operator,FunctionCallType functionCallType){
     int seqSize=expectedSeqSize;
-    if(functionCallType==FunctionCallType.Boxed){
-      ((OmniList.OfBoolean)seq).replaceAll((UnaryOperator)operator);
-    }else
+    try
     {
-      ((OmniList.OfBoolean)seq).replaceAll((BooleanPredicate)operator);
+      if(functionCallType==FunctionCallType.Boxed){
+      ((OmniList.OfBoolean)seq).replaceAll((UnaryOperator)operator);
+      }else
+      {
+        ((OmniList.OfBoolean)seq).replaceAll((BooleanPredicate)operator);
+      }
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize!=0){
+       verifyFunctionalModification();
+      }
+      throw e;
     }
     if(seqSize!=0){
      verifyFunctionalModification();
@@ -497,26 +497,68 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
   }
   void sort(MonitoredComparator sorter,FunctionCallType functionCallType){
     int seqSize=expectedSeqSize;
-    if(functionCallType==FunctionCallType.Boxed){
-      ((OmniList.OfBoolean)seq).sort((Comparator)sorter);
-    }else
+    try
     {
-      ((OmniList.OfBoolean)seq).sort((BooleanComparator)sorter);
+      if(functionCallType==FunctionCallType.Boxed){
+        ((OmniList.OfBoolean)seq).sort((Comparator)sorter);
+      }else
+      {
+        ((OmniList.OfBoolean)seq).sort((BooleanComparator)sorter);
+      }
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
     }
     if(seqSize>1){
-      verifyFunctionalModification();
+     verifyFunctionalModification();
     }
   }
   void stableAscendingSort(){
     int seqSize=expectedSeqSize;
-    ((OmniList.OfBoolean)seq).stableAscendingSort();
+    try
+    {
+      ((OmniList.OfBoolean)seq).stableAscendingSort();
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
-      verifyFunctionalModification();
+     verifyFunctionalModification();
     }
   }
   void stableDescendingSort(){
     int seqSize=expectedSeqSize;
-    ((OmniList.OfBoolean)seq).stableDescendingSort();
+    try
+    {
+      ((OmniList.OfBoolean)seq).stableDescendingSort();
+    }
+    catch(ConcurrentModificationException e)
+    {
+      throw e;
+    }
+    catch(RuntimeException e)
+    {
+      if(seqSize>1){
+       verifyFunctionalModification();
+      }
+      throw e;
+    }
     if(seqSize>1){
      verifyFunctionalModification();
     }
@@ -685,7 +727,7 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
     Assertions.assertTrue(str.charAt(strOffset)=='t' && str.charAt(++strOffset)=='r' && str.charAt(++strOffset)=='u' && str.charAt(++strOffset)=='e',"String fails at index "+strOffset);
     return strOffset;
   }
-  private static void verifyLargeStr(String str,int offset,int bound,SequenceVerificationItr verifyItr){
+  static void verifyLargeStr(String str,int offset,int bound,SequenceVerificationItr verifyItr){
     if(offset>=bound){
       return;
     }
@@ -1833,6 +1875,18 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      */
     },
     NoThrowDescending(null,true,false,true,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -1842,13 +1896,14 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario);
       }
     },
@@ -1865,6 +1920,11 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
       @Override void initReverseHelper(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.add(2);
         seqMonitor.add(3);
@@ -1874,6 +1934,17 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void initReverseHelper(AbstractBooleanSeqMonitor seqMonitor){
+        seqMonitor.add(2);
+        seqMonitor.add(3);
+      }
+      */
     },
     ThrowAIOB(IllegalArgumentException.class,true,false,false,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -1892,6 +1963,18 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      */
     },
     ThrowIOB(IndexOutOfBoundsException.class,true,false,false,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -1910,6 +1993,18 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      */
     },
     ModSeqAscending(ConcurrentModificationException.class,true,true,false,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -1942,6 +2037,44 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         }
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      */
     },
     ModSeqDescending(ConcurrentModificationException.class,true,false,true,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -1951,10 +2084,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
             return -Boolean.compare(val1,val2);
           }
         };
-      }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         switch(preModScenario){
@@ -1974,6 +2103,44 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         }
         verifyItr.verifyPostAlloc(preModScenario);
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd();
+            break;
+          case ModParent:
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      */
     },
     ModParentAscending(ConcurrentModificationException.class,false,true,false,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -2014,6 +2181,60 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
             throw new Error("Unknown preModScenario "+preModScenario);
         }
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      /*
+      @Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      */
     },
     ModParentDescending(ConcurrentModificationException.class,false,false,true,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -2023,10 +2244,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
             return -Boolean.compare(val1,val2);
           }
         };
-      }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         switch(preModScenario){
@@ -2043,6 +2260,32 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           case ModParent:
             verifyItr.verifyIndexAndIterate(3);
             verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        switch(preModScenario){
+          case NoMod:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModSeq:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
+            verifyItr.verifyIllegalAdd().verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyIndexAndIterate(2);
+            verifyItr.verifyIndexAndIterate(3);
             verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
             break;
           case ModRoot:
@@ -2073,6 +2316,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      //@Override void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      //  verifyItr.verifyIndexAndIterate(2);
+      //  verifyItr.verifyIndexAndIterate(3);
+      //  verifyItr.verifyPostAlloc(preModScenario);
+      //}
     },
     ModRootDescending(ConcurrentModificationException.class,false,false,true,false){
       MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor){
@@ -2083,13 +2336,14 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
         verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
     },
@@ -2102,11 +2356,22 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
         verifyItr.verifyIndexAndIterate(3);
         switch(preModScenario){
@@ -2131,24 +2396,35 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
-      }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-          verifyItr.verifyIndexAndIterate(2);
-          verifyItr.verifyIndexAndIterate(3);
-          switch(preModScenario){
-            case NoMod:
-            case ModSeq:
-              verifyItr.verifyIllegalAdd();
-            case ModParent:
-            case ModRoot:
-              break;
-            default:
-              throw new Error("Unknown preModScenario "+preModScenario);
-          }
-          verifyItr.verifyPostAlloc(preModScenario);
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case NoMod:
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case ModParent:
+          case ModRoot:
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
+        verifyItr.verifyPostAlloc(preModScenario);
       }
     },
     ModParentThrowAIOB(ConcurrentModificationException.class,false,false,false,false){
@@ -2160,9 +2436,24 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
@@ -2193,9 +2484,24 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        switch(preModScenario){
+          case ModSeq:
+            verifyItr.verifyIllegalAdd();
+          case NoMod:
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ModParent:
+            verifyItr.verifyParentPostAlloc().verifyIllegalAdd().verifyIllegalAdd().verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          default:
+            throw new Error("Unknown preModScenario "+preModScenario);
+        }
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
@@ -2226,9 +2532,10 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
@@ -2245,9 +2552,10 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
           }
         };
       }
-      @Override void initHelper(AbstractBooleanSeqMonitor seqMonitor){
-        seqMonitor.add(2);
-        seqMonitor.add(3);
+      @Override void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+        verifyItr.verifyIndexAndIterate(2);
+        verifyItr.verifyIndexAndIterate(3);
+        verifyItr.verifyPostAlloc(preModScenario).verifyIllegalAdd();
       }
       @Override void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
         verifyItr.verifyIndexAndIterate(2);
@@ -2267,9 +2575,23 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       this.descending=descending;
       this.nullComparator=nullComparator;
     }
-    abstract void initHelper(AbstractBooleanSeqMonitor seqMonitor);
+    abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
+    abstract MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor);
     void initReverseHelper(AbstractBooleanSeqMonitor seqMonitor){
       throw new UnsupportedOperationException();
+    }
+    void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    void assertUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    void assertReverseUnmodifiedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
+      throw new UnsupportedOperationException();
+    }
+    void initHelper(AbstractBooleanSeqMonitor seqMonitor){
+      seqMonitor.add(2);
+      seqMonitor.add(3);
     }
     void init(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       if(seqSize>1){
@@ -2287,10 +2609,26 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
       }
       seqMonitor.illegalAdd(preModScenario);
     }
-    void assertReverseSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario){
-      throw new UnsupportedOperationException();
+    void assertUnmodified(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqSize>1){
+        assertUnmodifiedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
     }
-    abstract void assertSortedHelper(SequenceVerificationItr verifyItr,PreModScenario preModScenario);
+    void assertReverseUnmodified(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      if(seqSize>1){
+        assertReverseUnmodifiedHelper(verifyItr,preModScenario);
+      }else{
+        verifyItr.verifyIndexAndIterate(1);
+        verifyItr.verifyPostAlloc(preModScenario);
+      }
+    }
     void assertSorted(AbstractBooleanSeqMonitor seqMonitor,int seqSize,PreModScenario preModScenario){
       seqMonitor.verifyStructuralIntegrity();
       var verifyItr=seqMonitor.verifyPreAlloc();
@@ -2311,7 +2649,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>
         verifyItr.verifyPostAlloc(preModScenario);
       }
     }
-    abstract MonitoredComparator getMonitoredComparator(AbstractBooleanSeqMonitor seqMonitor);
   }
   static enum QueryTester
   {

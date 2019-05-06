@@ -3315,8 +3315,8 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
           OmniArray.OfChar.uncheckedReplaceAll(this.arr,0,size,operator);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
         }
-        this.modCount=modCount+1;
       }
     }
     @Override
@@ -3332,12 +3332,11 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
           try{
             CharSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }catch(ArrayIndexOutOfBoundsException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-          }catch(RuntimeException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
           }
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
       }
     }
@@ -3367,8 +3366,8 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
           OmniArray.OfChar.uncheckedReplaceAll(this.arr,0,size,operator::apply);
         }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
         }
-        this.modCount=modCount+1;
       }
     }
     @Override
@@ -3384,12 +3383,11 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
           try{
             CharSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
           }catch(ArrayIndexOutOfBoundsException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-          }catch(RuntimeException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
           }
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
       }
     }
@@ -3406,12 +3404,11 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
           try{
             CharSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }catch(ArrayIndexOutOfBoundsException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-          }catch(RuntimeException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
           }
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
         }
       }
     }
@@ -4754,169 +4751,173 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
       return false;
     }
     @Override public void replaceAll(CharUnaryOperator operator){
+      final int size;
+      if((size=this.size)==0){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       int modCount=this.modCount;
       final var root=this.root;
       try{
-        final int size;
-        if((size=this.size)==0){
-          return;
-        }
         final int rootOffset;
         OmniArray.OfChar.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
     }
     @Override
     public void sort(CharComparator sorter)
     {
-      int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)<2){
-          return;
-        }
-        {
-          final int rootOffset;
-          if(sorter==null){
-            CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-          }else{
-            try
-            {
-              CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
-            }
-            catch(ArrayIndexOutOfBoundsException e){
-              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
-            }
-          }
-        }
-      }finally{
+      final int size;
+      if((size=this.size)<2){
         CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      final var root=this.root;
+      int modCount=this.modCount;
+      if(sorter==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        final int rootOffset;
+        CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      }else{
+        try{
+          final int rootOffset;
+          CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        }
+      }
     }
     @Override
     public void stableAscendingSort()
     {
+      final int size;
+      if((size=this.size)<2){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       int modCount=this.modCount;
       final var root=this.root;
       try{
-        final int size;
-        if((size=this.size)<2){
-          return;
-        }
         final int rootOffset;
         CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void stableDescendingSort()
     {
+      final int size;
+      if((size=this.size)<2){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       int modCount=this.modCount;
       final var root=this.root;
       try{
-        final int size;
-        if((size=this.size)<2){
-          return;
-        }
         final int rootOffset;
         CharSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override public void replaceAll(UnaryOperator<Character> operator){
+      final int size;
+      if((size=this.size)==0){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       int modCount=this.modCount;
       final var root=this.root;
       try{
-        final int size;
-        if((size=this.size)==0){
-          return;
-        }
         final int rootOffset;
         OmniArray.OfChar.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
       }finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
     }
     @Override
     public void sort(Comparator<? super Character> sorter)
     {
-      int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)<2){
-          return;
-        }
-        {
-          final int rootOffset;
-          if(sorter==null){
-            CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-          }else{
-            try
-            {
-              CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
-            }
-            catch(ArrayIndexOutOfBoundsException e){
-              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
-            }
-          }
-        }
-      }finally{
+      final int size;
+      if((size=this.size)<2){
         CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      final var root=this.root;
+      int modCount=this.modCount;
+      if(sorter==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        final int rootOffset;
+        CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      }else{
+        try{
+          final int rootOffset;
+          CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        }
+      }
     }
     @Override
     public void unstableSort(CharComparator sorter)
     {
-      int modCount=this.modCount;
-      final var root=this.root;
-      try{
-        final int size;
-        if((size=this.size)<2){
-          return;
-        }
-        {
-          final int rootOffset;
-          if(sorter==null){
-            CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-          }else{
-            try
-            {
-              CharSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
-            }
-            catch(ArrayIndexOutOfBoundsException e){
-              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
-            }
-          }
-        }
-      }finally{
+      final int size;
+      if((size=this.size)<2){
         CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
       }
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      final var root=this.root;
+      int modCount=this.modCount;
+      if(sorter==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        final int rootOffset;
+        CharSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      }else{
+        try{
+          final int rootOffset;
+          CharSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        }
+      }
     }
     @Override public OmniList.OfChar subList(int fromIndex,int toIndex){
       CheckedCollection.checkModCount(modCount,root.modCount);

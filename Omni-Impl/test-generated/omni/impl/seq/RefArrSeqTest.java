@@ -830,8 +830,9 @@ public class RefArrSeqTest{
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
               for(var seqLocation:SequenceLocation.values()){
-                if(seqLocation.expectedException!=null && checkedType.checked)
+                if(seqLocation.expectedException!=null && checkedType.checked){
                   builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation));
+                }
               }
             }
           }
@@ -1239,7 +1240,7 @@ public class RefArrSeqTest{
       Assertions.assertTrue(seqMonitor.seq.isEmpty());
       numToAdd=0;
     }else{
-      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.seq.isEmpty());
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.clear());
     }
     seqMonitor.verifyStructuralIntegrity();
     seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
@@ -1356,7 +1357,9 @@ public class RefArrSeqTest{
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.unstableSort(sorter));
     }
-    monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+    {
+      monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+    }
   }
   static Stream<Arguments> getListsort_ComparatorArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
@@ -1400,7 +1403,9 @@ public class RefArrSeqTest{
     }else{
       Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.sort(sorter,functionCallType));
     }
-    monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+    {
+      monitoredComparatorGen.assertSorted(seqMonitor,numToAdd,preModScenario);
+    }
   }
   @org.junit.jupiter.api.Test
   public void testremoveVal_val(){
@@ -2908,9 +2913,13 @@ public class RefArrSeqTest{
     }
     return builder.build();
   }
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getItrremove_voidArgs")
-  public void testItrremove_void
+  @org.junit.jupiter.api.Test
+  public void testItrremove_void(){
+    getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(int)args[3],(ItrType)args[4],(SequenceLocation)args[5]);
+    });
+  }
+  private static void testItrremove_voidHelper
   (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,int numToAdd,ItrType itrType,SequenceLocation seqLocation){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);

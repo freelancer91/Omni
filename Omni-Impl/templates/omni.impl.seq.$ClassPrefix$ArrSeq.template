@@ -1909,30 +1909,28 @@ public void unstableDIRECTIONSort()
   #ENDIF
 {
   #IFSWITCH STRUCTNAME==CheckedSubList
+  final int size;
+  if((size=this.size)<2){
+    CheckedCollection.checkModCount(modCount,root.modCount);
+    return;
+  }
   int modCount=this.modCount;
   final var root=this.root;
   try{
-    final int size;
-    if((size=this.size)<2){
-      return;
-    }
-    #IF OfRef
-    try{
-      final int rootOffset;
-      $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-    }catch(ArrayIndexOutOfBoundsException e){
-      throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-    }
-    #ELSE
     final int rootOffset;
+    #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+  }catch(ArrayIndexOutOfBoundsException e){
+    throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    #ELSE
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
     #ENDIF
   }finally{
     CheckedCollection.checkModCount(modCount,root.modCount);
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
   }
-  root.modCount=++modCount;
-  this.modCount=modCount;
-  for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
   #ELSE
   final int size;
   if((size=this.size)>1){
@@ -1942,29 +1940,27 @@ public void unstableDIRECTIONSort()
     try{
       $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(this.arr,0,size);
     }catch(ArrayIndexOutOfBoundsException e){
-      throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-    }catch(RuntimeException e){
-      throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
     }
-    CheckedCollection.checkModCount(modCount,this.modCount);
       #ELSE
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
-      #ENDIF
     this.modCount=modCount+1;
-    #ELSE
-      #IFSWITCH STRUCTNAME==UncheckedSubList
+      #ENDIF
+    #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
     final int rootOffset;
-        #IF OfRef
+      #IF OfRef
     $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        #ELSE
-    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        #ENDIF
       #ELSE
-        #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      #ENDIF
+    #ELSE
+      #IF OfRef
     $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(this.arr,0,size);
-        #ELSE
+      #ELSE
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
-        #ENDIF
       #ENDIF
     #ENDIF
   }
@@ -1982,53 +1978,57 @@ public void unstableSort(COMPARATOR sorter)
 #ENDIF
 {
   #IFSWITCH STRUCTNAME==CheckedSubList
+  final int size;
+  if((size=this.size)<2){
+    CheckedCollection.checkModCount(modCount,root.modCount);
+    return;
+  }
+    #IF OfRef
   int modCount=this.modCount;
   final var root=this.root;
   try{
-    final int size;
-    if((size=this.size)<2){
-      return;
+    final int rootOffset=this.rootOffset;
+    if(sorter==null){
+      $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(root.arr,rootOffset,rootOffset+size);
+    }else{
+      $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset,rootOffset+size,COMPARE);
     }
-    #IF OfRef
-    try
-    #ENDIF
-    {
-      final int rootOffset;
-      if(sorter==null){
-    #IF OfRef
-        $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-    #ELSE
-        $ClassPrefix$SortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-    #ENDIF
-      }else{
-      #IFNOT OfRef
-        try
-      #ENDIF
-        {
-    #IF OfBoolean
-          $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
-    #ELSE
-          $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
-    #ENDIF
-        }
-      #IFNOT OfRef
-        catch(ArrayIndexOutOfBoundsException e){
-          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
-        }
-      #ENDIF
-      }
-    }
-    #IF OfRef
-    catch(ArrayIndexOutOfBoundsException e){
-      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
-    }
-    #ENDIF
+  }catch(ArrayIndexOutOfBoundsException e){
+    throw new IllegalArgumentException("Comparison method violates its general contract!",e);
   }finally{
     CheckedCollection.checkModCount(modCount,root.modCount);
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
   }
-  root.modCount=++modCount;
-  this.modCount=modCount;
-  for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    #ELSE
+  final var root=this.root;
+  int modCount=this.modCount;
+  if(sorter==null){
+    CheckedCollection.checkModCount(modCount,root.modCount);
+    final int rootOffset;
+    $ClassPrefix$SortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+  }else{
+    try{
+      final int rootOffset;
+      #IF OfBoolean
+      $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+      #ELSE
+      $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+      #ENDIF
+    }catch(ArrayIndexOutOfBoundsException e){
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+  }
+    #ENDIF
   #ELSE
   final int size;
   if((size=this.size)>1){
@@ -2042,12 +2042,11 @@ public void unstableSort(COMPARATOR sorter)
         $ClassPrefix$SortUtil.uncheckedSTABLESort(this.arr,0,size,COMPARE);
       }
     }catch(ArrayIndexOutOfBoundsException e){
-      throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-    }catch(RuntimeException e){
-      throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }finally{
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
     }
-    CheckedCollection.checkModCount(modCount,this.modCount);
-    this.modCount=modCount+1;
       #ELSE
     if(sorter==null){
       $ClassPrefix$SortUtil.uncheckedAscendingSort(this.arr,0,size);
@@ -2061,12 +2060,11 @@ public void unstableSort(COMPARATOR sorter)
         $ClassPrefix$SortUtil.uncheckedSTABLESort(this.arr,0,size,COMPARE);
         #ENDIF
       }catch(ArrayIndexOutOfBoundsException e){
-        throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
-      }catch(RuntimeException e){
-        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+        throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.modCount=modCount+1;
       }
-      CheckedCollection.checkModCount(modCount,this.modCount);
-      this.modCount=modCount+1;
     }
       #ENDIF
     #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
@@ -2108,21 +2106,23 @@ public void unstableSort(COMPARATOR sorter)
 #IFSWITCH STRUCTNAME==UncheckedList,CheckedList,UncheckedSubList,CheckedSubList
 @Override public void replaceAll(OPERATOR operator){
   #IFSWITCH STRUCTNAME==CheckedSubList
+  final int size;
+  if((size=this.size)==0){
+    CheckedCollection.checkModCount(modCount,root.modCount);
+    return;
+  }
   int modCount=this.modCount;
   final var root=this.root;
   try{
-    final int size;
-    if((size=this.size)==0){
-      return;
-    }
     final int rootOffset;
     OmniArray.Of$ClassPrefix$.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,APPLY);  
   }finally{
     CheckedCollection.checkModCount(modCount,root.modCount);
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
   }
-  root.modCount=++modCount;
-  this.modCount=modCount;
-  for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+  
   #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
   final int size;
   if((size=this.size)!=0){
@@ -2137,8 +2137,8 @@ public void unstableSort(COMPARATOR sorter)
       OmniArray.Of$ClassPrefix$.uncheckedReplaceAll(this.arr,0,size,APPLY);
     }finally{
       CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
     }
-    this.modCount=modCount+1;
   }
   #ELSE
   final int size;

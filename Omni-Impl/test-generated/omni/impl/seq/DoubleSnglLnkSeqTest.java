@@ -860,22 +860,46 @@ public class DoubleSnglLnkSeqTest{
   }
   private static void testpeek_voidHelper
   (SeqMonitor seqMonitor,DoubleOutputTestArgType outputArgType){
-    if(seqMonitor.nestedType.forwardIteration){
-      for(int i=0;i<100;++i){
-        seqMonitor.add(i);
-      }
-      for(int i=0;i<100;++i){
-        outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+    if(seqMonitor.nestedType==NestedType.STACK)
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.add(i);
+        }
+        for(int i=0;i<100;++i){
+          outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.pop(i,outputArgType);
+        }
+        outputArgType.verifyPeek(seqMonitor.seq,0,0);
         seqMonitor.verifyStructuralIntegrity();
-        seqMonitor.pop(i,outputArgType);
+      }else{
+        for(int i=0;i<100;){
+          outputArgType.verifyPeek(seqMonitor.seq,i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.add(++i);
+        }
       }
-      outputArgType.verifyPeek(seqMonitor.seq,0,0);
-      seqMonitor.verifyStructuralIntegrity();
-    }else{
-      for(int i=0;i<100;){
-        outputArgType.verifyPeek(seqMonitor.seq,i,i);
+    }
+    else
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.add(i);
+        }
+        for(int i=0;i<100;++i){
+          outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.queueRemove(i,outputArgType);
+        }
+        outputArgType.verifyPeek(seqMonitor.seq,0,0);
         seqMonitor.verifyStructuralIntegrity();
-        seqMonitor.add(++i);
+      }else{
+        for(int i=0;i<100;){
+          outputArgType.verifyPeek(seqMonitor.seq,i,i);
+          seqMonitor.verifyStructuralIntegrity();
+          seqMonitor.add(++i);
+        }
       }
     }
   }
@@ -915,20 +939,41 @@ public class DoubleSnglLnkSeqTest{
     for(int i=0;i<100;++i){
       seqMonitor.add(i);
     }
-    if(seqMonitor.nestedType.forwardIteration){
-      for(int i=0;i<100;++i){
-        seqMonitor.pop(i,outputArgType);
-        seqMonitor.verifyStructuralIntegrity();
+    if(seqMonitor.nestedType==NestedType.STACK)
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.pop(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }else{
+        for(int i=100;--i>=0;){
+          seqMonitor.pop(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
       }
-    }else{
-      for(int i=100;--i>=0;){
-        seqMonitor.pop(i,outputArgType);
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
         seqMonitor.verifyStructuralIntegrity();
       }
     }
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
-      seqMonitor.verifyStructuralIntegrity();
+    else
+    {
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.queueRemove(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }else{
+        for(int i=100;--i>=0;){
+          seqMonitor.queueRemove(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
     }
   }
   static Stream<Arguments> getreadAndwriteObjectArgs(){
@@ -1061,7 +1106,7 @@ public class DoubleSnglLnkSeqTest{
     for(int i=0;i<100;++i){
       outputArgType.verifyQueueElement(seqMonitor.seq,i);
       seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.pop(i,outputArgType);
+      seqMonitor.queueRemove(i,outputArgType);
     }
     if(seqMonitor.checkedType.checked){
       Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
@@ -1263,6 +1308,17 @@ public class DoubleSnglLnkSeqTest{
           throw new Error("unknown nested type "+nestedType);
       }
     }
+    /*
+    @Override void verifyMASSIVEString(){
+      String string=seq.toString();
+      verifyStructuralIntegrity();
+      var verifyItr=verifyPreAlloc(1);
+      Assertions.assertEquals('[',string.charAt(0));
+      Assertions.assertEquals(']',string.charAt(string.length()-1));
+      verifyLargeStr(string,0,expectedSeqSize,verifyItr);
+      verifyItr.verifyPostAlloc(1);
+    }
+    */
     void illegalAdd(PreModScenario preModScenario){
       switch(preModScenario){
         case ModSeq:

@@ -247,68 +247,56 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     }
   }
   @Override public void sort(BooleanComparator sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final boolean[] tmp;
       final BooleanDblLnkNode tail;
       BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
       }
       BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void sort(Comparator<? super Boolean> sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final boolean[] tmp;
       final BooleanDblLnkNode tail;
       BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
-          }
-        }
+      if(sorter==null){
+        BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
       }
       BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableAscendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final boolean[] tmp;
       final BooleanDblLnkNode tail;
       BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-      {
-          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-      }
+      BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
       BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableDescendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final boolean[] tmp;
       final BooleanDblLnkNode tail;
       BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-      {
-          BooleanSortUtil.uncheckedDescendingSort(tmp,0,size);
-      }
+      BooleanSortUtil.uncheckedDescendingSort(tmp,0,size);
       BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
@@ -3125,7 +3113,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
           if(size!=0){
             var curr=this.head;
             for(int word=TypeUtil.castToByte(curr.val),marker=1;;){
-              if((curr=curr.next)==null){
+              if(--size==0){
                 oos.writeByte(word);
                 return;
               }else if((marker<<=1)==(1<<8)){
@@ -3133,7 +3121,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
                 word=0;
                 marker=1;
               }
-              if(curr.val){
+              if((curr=curr.next).val){
                 word|=marker;
               }
             }
@@ -4013,22 +4001,23 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       return this.size==0;
     }
     @Override public void replaceAll(BooleanPredicate operator){
-      int modCount=this.modCount;
+      final BooleanDblLnkNode head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList root;
+      int modCount=this.modCount;
       try{
-        final BooleanDblLnkNode head;
-        if((head=this.head)==null){
-          return;
-        }
         BooleanDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(BooleanConsumer action){
       final int modCount=this.modCount;
@@ -4042,111 +4031,89 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(BooleanComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
-        BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
+          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
+          try{
+            BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
         BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
+        BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
         BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            BooleanSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
+        BooleanSortUtil.uncheckedDescendingSort(tmp,0,size);
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void replaceAll(UnaryOperator<Boolean> operator){
-      int modCount=this.modCount;
+      final BooleanDblLnkNode head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList root;
+      int modCount=this.modCount;
       try{
-        final BooleanDblLnkNode head;
-        if((head=this.head)==null){
-          return;
-        }
         BooleanDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(Consumer<? super Boolean> action){
       final int modCount=this.modCount;
@@ -4160,39 +4127,32 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super Boolean> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
-        BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
+          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
+          try{
+            BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
@@ -4478,58 +4438,52 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(BooleanComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
         BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            BooleanSortUtil.uncheckedSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
         BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        {
-            BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        ++this.modCount;
+        BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+        this.modCount=modCount+1;
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
         BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        {
-            BooleanSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        ++this.modCount;
+        BooleanSortUtil.uncheckedDescendingSort(tmp,0,size);
+        this.modCount=modCount+1;
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
@@ -4557,27 +4511,25 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super Boolean> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final boolean[] tmp;
         final BooleanDblLnkNode tail;
         BooleanDblLnkNode.uncheckedCopyInto(tmp=new boolean[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          BooleanSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            BooleanSortUtil.uncheckedSort(tmp,0,size,sorter::compare);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         BooleanDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
@@ -4671,7 +4623,24 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        out.writeInt(size=this.size);
+        if(size!=0){
+          var curr=this.head;
+          for(int word=TypeUtil.castToByte(curr.val),marker=1;;){
+            if(--size==0){
+              out.writeByte(word);
+              return;
+            }else if((marker<<=1)==(1<<8)){
+              out.writeByte(word);
+              word=0;
+              marker=1;
+            }
+            if((curr=curr.next).val){
+              word|=marker;
+            }
+          }
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -5430,7 +5399,7 @@ public abstract class BooleanDblLnkSeq extends AbstractSeq implements
     @Override public void push(boolean val){
       BooleanDblLnkNode head;
       if((head=this.head)==null){
-        this.head=tail=new BooleanDblLnkNode(val);
+        tail=head=new BooleanDblLnkNode(val);
       }else{
         head.prev=head=new BooleanDblLnkNode(val,head);
       }

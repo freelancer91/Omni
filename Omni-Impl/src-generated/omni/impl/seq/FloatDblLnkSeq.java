@@ -223,86 +223,70 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
     }
   }
   @Override public void sort(FloatComparator sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final float[] tmp;
       final FloatDblLnkNode tail;
       FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
       }
       FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void sort(Comparator<? super Float> sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final float[] tmp;
       final FloatDblLnkNode tail;
       FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-          }
-        }
+      if(sorter==null){
+        FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
       }
       FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableAscendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final float[] tmp;
       final FloatDblLnkNode tail;
       FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-      {
-          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-      }
+      FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
       FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void stableDescendingSort()
   {
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final float[] tmp;
       final FloatDblLnkNode tail;
       FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-      {
-          FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
-      }
+      FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
       FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
   }
   @Override public void unstableSort(FloatComparator sorter){
+    //todo: see about making an in-place sort implementation rather than copying to an array
     final int size;
     if((size=this.size)>1){
-      //todo: see about making an in-place sort implementation rather than copying to an array
       final float[] tmp;
       final FloatDblLnkNode tail;
       FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-      {
-        if(sorter==null){
-          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }else{
-          {
-            FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-          }
-        }
+      if(sorter==null){
+        FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+      }else{
+        FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
       }
       FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
     }
@@ -3361,9 +3345,12 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
           oos.writeInt(size=this.size);
           if(size!=0){
             var curr=this.head;
-            do{
+            for(;;curr=curr.next){
               oos.writeFloat(curr.val);
-            }while((curr=curr.next)!=null);
+              if(--size==0){
+                break;
+              }
+            }
           }
         }finally{
           modCountChecker.checkModCount();
@@ -4289,22 +4276,23 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       return this.size==0;
     }
     @Override public void replaceAll(FloatUnaryOperator operator){
-      int modCount=this.modCount;
+      final FloatDblLnkNode head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList root;
+      int modCount=this.modCount;
       try{
-        final FloatDblLnkNode head;
-        if((head=this.head)==null){
-          return;
-        }
         FloatDblLnkNode.uncheckedReplaceAll(head,this.size,operator);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(FloatConsumer action){
       final int modCount=this.modCount;
@@ -4318,111 +4306,89 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(FloatComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final float[] tmp;
         final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          try{
+            FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
+        FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        int modCount=this.modCount;
-        try
-        {
-            FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        finally{
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          root.modCount=++modCount;
-          for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-          this.modCount=modCount;
-        }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
+        FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
-        CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void replaceAll(UnaryOperator<Float> operator){
-      int modCount=this.modCount;
+      final FloatDblLnkNode head;
+      if((head=this.head)==null){
+        CheckedCollection.checkModCount(modCount,root.modCount);
+        return;
+      }
       final CheckedList root;
+      int modCount=this.modCount;
       try{
-        final FloatDblLnkNode head;
-        if((head=this.head)==null){
-          return;
-        }
         FloatDblLnkNode.uncheckedReplaceAll(head,this.size,operator::apply);
       }finally{
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        var curr=this;
+        do{
+          curr.modCount=modCount;
+        }while((curr=curr.parent)!=null);
       }
-      root.modCount=++modCount;
-      var curr=this;
-      do{
-        curr.modCount=modCount;
-      }while((curr=curr.parent)!=null);
     }
     @Override public void forEach(Consumer<? super Float> action){
       final int modCount=this.modCount;
@@ -4436,76 +4402,62 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super Float> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final float[] tmp;
         final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          try{
+            FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
     @Override public void unstableSort(FloatComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
+        int modCount=this.modCount;
+        final CheckedList root;
         final float[] tmp;
         final FloatDblLnkNode tail;
-        FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            final CheckedList root;
-            int modCount;
-            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-            root.modCount=++modCount;
-            for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-            this.modCount=modCount;
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
-            finally{
-              final CheckedList root;
-              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-              root.modCount=++modCount;
-              for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
-              this.modCount=modCount;
-            }
+        if(sorter==null){
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+        }else{
+          FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
+          try{
+            FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           }
         }
+        root.modCount=++modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+        this.modCount=modCount;
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
-      }
-      else{
+      }else{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
     }
@@ -4767,58 +4719,52 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(FloatComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableAscendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-        }
-        ++this.modCount;
+        FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+        this.modCount=modCount+1;
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void stableDescendingSort()
     {
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-            FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
-        }
-        ++this.modCount;
+        FloatSortUtil.uncheckedDescendingSort(tmp,0,size);
+        this.modCount=modCount+1;
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
@@ -4846,53 +4792,49 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }
     }
     @Override public void sort(Comparator<? super Float> sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            FloatSortUtil.uncheckedStableSort(tmp,0,size,sorter::compare);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
     }
     @Override public void unstableSort(FloatComparator sorter){
+      //todo: see about making an in-place sort implementation rather than copying to an array
       final int size;
       if((size=this.size)>1){
-        //todo: see about making an in-place sort implementation rather than copying to an array
         final float[] tmp;
         final FloatDblLnkNode tail;
         FloatDblLnkNode.uncheckedCopyInto(tmp=new float[size],tail=this.tail,size);
-        {
-          if(sorter==null){
-            ++this.modCount;
-            FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
-          }else{
-            int modCount=this.modCount;
-            try
-            {
-              FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
-            }
-            finally{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-            }
+        if(sorter==null){
+          FloatSortUtil.uncheckedAscendingSort(tmp,0,size);
+          ++this.modCount;
+        }else{
+          int modCount=this.modCount;
+          try{
+            FloatSortUtil.uncheckedUnstableSort(tmp,0,size,sorter);
+          }catch(ArrayIndexOutOfBoundsException e){
+            throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+          }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
           }
+          this.modCount=modCount+1;
         }
         FloatDblLnkNode.uncheckedCopyFrom(tmp,size,tail);
       }
@@ -5021,7 +4963,17 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       final int modCount=this.modCount;
       try{
-        super.writeExternal(out);
+        int size;
+        out.writeInt(size=this.size);
+        if(size!=0){
+          var curr=this.head;
+          for(;;curr=curr.next){
+            out.writeFloat(curr.val);
+            if(--size==0){
+              break;
+            }
+          }
+        }
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
@@ -5714,7 +5666,7 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
     @Override public void push(float val){
       FloatDblLnkNode head;
       if((head=this.head)==null){
-        this.head=tail=new FloatDblLnkNode(val);
+        tail=head=new FloatDblLnkNode(val);
       }else{
         head.prev=head=new FloatDblLnkNode(val,head);
       }
