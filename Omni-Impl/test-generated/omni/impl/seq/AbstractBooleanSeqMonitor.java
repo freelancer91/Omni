@@ -1098,37 +1098,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
     }
     Assertions.fail("string fails at index "+strOffset);
   }
-  String callToString(){
-    return seq.toString();
-  }
-  void verifyMASSIVEString(){
-    String string=callToString();
-    verifyStructuralIntegrity();
-    var verifyItr=verifyPreAlloc(1);
-    Assertions.assertEquals('[',string.charAt(0));
-    Assertions.assertEquals(']',string.charAt(string.length()-1));
-    int numThreads=Runtime.getRuntime().availableProcessors();
-    int seqSize=getExpectedSeqSize();
-    int threadOffset=0;
-    int threadSpan=seqSize/numThreads;
-    Thread[] threads=new Thread[numThreads-1];
-    for(int i=0;i<numThreads-1;++i){
-      final int thisThreadOffset=threadOffset;
-      final int thisThreadBound=thisThreadOffset+threadSpan;
-      final var thisThreadVerifyItr=verifyItr.getOffset(thisThreadOffset);
-      threadOffset=thisThreadBound;
-      (threads[i]=new Thread(()->verifyLargeStr(string,thisThreadOffset,thisThreadBound,thisThreadVerifyItr))).start();
-    }
-    verifyLargeStr(string,threadOffset,threadOffset+threadSpan,verifyItr.getOffset(threadOffset));
-    try{
-      for(int i=0;i<numThreads-1;++i){
-        threads[i].join();
-      }
-    }catch(InterruptedException e){
-      Assertions.fail(e);
-    }
-    verifyItr.skip(seqSize).verifyPostAlloc(1);
-  }
   void verifyThrowCondition(int numToAdd,PreModScenario preModScenario
   ){
      var verifyItr=verifyPreAlloc();

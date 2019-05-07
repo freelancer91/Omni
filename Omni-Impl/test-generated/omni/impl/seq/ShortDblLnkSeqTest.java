@@ -3804,7 +3804,7 @@ public class ShortDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testremoveLastOccurrence_val(){
-      runQueryTests(false,NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
+      runQueryTests(true,NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,seqSize,preModScenario
       )->{
             testremoveLastOccurrence_valHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),argType,queryCastType,seqLocation,seqSize
             );
@@ -3848,7 +3848,24 @@ public class ShortDblLnkSeqTest{
     seqMonitor.verifyStructuralIntegrity();
     seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
   }
-  //TODO test removeFirstOccurrence/removeLastOccurrence
+  @org.junit.jupiter.api.Test
+  public void testpollLast_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpollLast_voidHelper((SeqMonitor)args[0],(ShortOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpollLast_voidHelper
+  (SeqMonitor seqMonitor,ShortOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=100;--i>=0;){
+      seqMonitor.pollLast(i,outputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.pollLast(0,outputArgType);
+    seqMonitor.verifyStructuralIntegrity();
+  }
   //TODO test pollLast/peekLast
   //TODO test pollFirst/peekFirst
   //TODO test offerFirst/offerLast

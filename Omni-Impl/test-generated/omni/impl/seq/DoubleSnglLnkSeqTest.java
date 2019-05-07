@@ -1308,17 +1308,6 @@ public class DoubleSnglLnkSeqTest{
           throw new Error("unknown nested type "+nestedType);
       }
     }
-    /*
-    @Override void verifyMASSIVEString(){
-      String string=seq.toString();
-      verifyStructuralIntegrity();
-      var verifyItr=verifyPreAlloc(1);
-      Assertions.assertEquals('[',string.charAt(0));
-      Assertions.assertEquals(']',string.charAt(string.length()-1));
-      verifyLargeStr(string,0,expectedSeqSize,verifyItr);
-      verifyItr.verifyPostAlloc(1);
-    }
-    */
     void illegalAdd(PreModScenario preModScenario){
       switch(preModScenario){
         case ModSeq:

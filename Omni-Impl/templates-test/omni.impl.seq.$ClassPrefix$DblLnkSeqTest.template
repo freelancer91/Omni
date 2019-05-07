@@ -139,8 +139,8 @@ public class $ClassPrefix$DblLnkSeqTest{
 
 #MACRO testQueueremove_void<PARALLEL>()
 #MACRO testremoveFirstOccurrence_val<PARALLEL>()
-#MACRO testremoveLastOccurrence_val<false>()
-//TODO test removeFirstOccurrence/removeLastOccurrence
+#MACRO testremoveLastOccurrence_val<PARALLEL>()
+#MACRO testpollLast_void<PARALLEL>()
 //TODO test pollLast/peekLast
 //TODO test pollFirst/peekFirst
 //TODO test offerFirst/offerLast
@@ -150,6 +150,32 @@ public class $ClassPrefix$DblLnkSeqTest{
 
 
 
+#ENDDEF
+#MACRODEF testpollLast_void<PARALLEL>()
+#IFSWITCH PARALLEL==true
+@org.junit.jupiter.api.Test
+public void testpollLast_void(){
+  getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+      testpollLast_voidHelper((SeqMonitor)args[0],($ClassPrefix$OutputTestArgType)args[1]);
+  });
+}
+private static void testpollLast_voidHelper
+#ELSE
+@org.junit.jupiter.params.ParameterizedTest
+@org.junit.jupiter.params.provider.MethodSource("getPeekPollAndPopArgs")
+public void testpollLast_void
+#ENDIF
+(SeqMonitor seqMonitor,$ClassPrefix$OutputTestArgType outputArgType){
+  for(int i=0;i<100;++i){
+    seqMonitor.add(i);
+  }
+  for(int i=100;--i>=0;){
+    seqMonitor.pollLast(i,outputArgType);
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  seqMonitor.pollLast(0,outputArgType);
+  seqMonitor.verifyStructuralIntegrity();
+}
 #ENDDEF
 #MACRODEF testremoveFirstOccurrence_val<PARALLEL>()
 @org.junit.jupiter.api.Test

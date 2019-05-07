@@ -3159,6 +3159,7 @@ public class IntArrSeqTest{
     seqMonitor.verifyStructuralIntegrity();
   }
     private static final int MAX_TOSTRING_LENGTH=11;
+  /*
   static Stream<Arguments> getMASSIVEtoString_voidArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
     final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
@@ -3174,12 +3175,46 @@ public class IntArrSeqTest{
     }
     return builder.build();
   }
+  */
   @Tag("MASSIVEtoString")
-  @org.junit.jupiter.params.ParameterizedTest
-  @org.junit.jupiter.params.provider.MethodSource("getMASSIVEtoString_voidArgs")
-  public void testMASSIVEtoString_void
-  (SeqMonitor seqMonitor){
-    seqMonitor.verifyMASSIVEString();
+  @org.junit.jupiter.api.Test
+  public void testMASSIVEtoString_void(){
+    int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
+    int[] arr=new int[seqLength];
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int threadSpan=seqLength/numThreads;
+    int threadBound=numThreads-1;
+    for(int i=0;i<seqLength;++i){
+      arr[i]=TypeConversionUtil.convertToint(1);
+    }
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        var seqMonitor=new SeqMonitor(nestedType,checkedType,seqLength,arr);
+        String string=seqMonitor.seq.toString();
+        Assertions.assertEquals('[',string.charAt(0));
+        Assertions.assertEquals(']',string.charAt(string.length()-1));
+        seqMonitor.verifyStructuralIntegrity();
+        var threads=new Thread[threadBound];
+        int nextWayPointIndex=0;
+        for(int threadIndex=0;threadIndex<threadBound;){
+          var verifyItr=new SeqMonitor.ArrSeqSequenceVerificationItr(seqMonitor,nextWayPointIndex,arr);
+          final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          final int finalWayPointIndex=nextWayPointIndex;
+          threads[threadIndex++]=new Thread(()->AbstractIntSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr));
+          nextWayPointIndex=finalWayPointBound;
+        }
+        var verifyItr=new SeqMonitor.ArrSeqSequenceVerificationItr(seqMonitor,nextWayPointIndex,arr);
+        AbstractIntSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+        try{
+          for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
+            threads[threadIndex].join();
+          }
+        }catch(InterruptedException e){
+          Assertions.fail(e);
+        }
+        verifyItr.verifyPostAlloc(1);
+      }
+    }
   }
   static Stream<Arguments> getreadAndwriteObjectArgs(){
     return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType,preModScenario)->{
@@ -3308,7 +3343,6 @@ public class IntArrSeqTest{
       this.initialCapacity=(arr==null)?0:(arr==OmniArray.OfInt.DEFAULT_ARR?OmniArray.DEFAULT_ARR_SEQ_CAP:arr.length);
       switch(nestedType){
         case SUBLIST:
-          seqLength+=(4*DEFAULT_PRE_AND_POST_ALLOC);
         case LIST:
           this.root=checkedType.checked?new IntArrSeq.CheckedList(seqLength,arr):new IntArrSeq.UncheckedList(seqLength,arr);
           break;
@@ -3318,19 +3352,15 @@ public class IntArrSeqTest{
         default:
           throw new Error("Unknown nestedType "+nestedType);
       }
+      this.rootPreAlloc=0;
+      this.parentPreAlloc=0;
+      this.parentPostAlloc=0;
+      this.rootPostAlloc=0;
       if(nestedType.rootType){
-        this.rootPreAlloc=0;
-        this.parentPreAlloc=0;
-        this.parentPostAlloc=0;
-        this.rootPostAlloc=0;
         this.parent=root;
         this.seq=root;
       }else{
         Assertions.assertTrue(arr!=null && seqLength<=arr.length);
-        this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-        this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-        this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-        this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
         this.parent=((OmniList.OfInt)root).subList(rootPreAlloc,seqLength-rootPostAlloc);
         this.seq=((OmniList.OfInt)parent).subList(parentPreAlloc,seqLength-rootPreAlloc-parentPostAlloc-rootPostAlloc);
       }
