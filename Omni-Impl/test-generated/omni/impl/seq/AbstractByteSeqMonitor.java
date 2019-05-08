@@ -1532,6 +1532,68 @@ abstract class AbstractByteSeqMonitor<SEQ extends OmniCollection.OfByte>{
   }
   static enum MonitoredRemoveIfPredicateGen
   {
+    RemoveFirst(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final byte matchVal=TypeConversionUtil.convertTobyte(0);
+          @Override boolean testImpl(byte val){
+            return matchVal==val;
+          }
+        };
+      }
+    },
+    RemoveLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final byte matchVal=TypeConversionUtil.convertTobyte(numExpectedCalls-1);
+          @Override boolean testImpl(byte val){
+            return matchVal==val;
+          }
+        };
+      }
+    },
+    RemoveFirstAndLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final byte matchVal1=TypeConversionUtil.convertTobyte(0);
+          private final byte matchVal2=TypeConversionUtil.convertTobyte(numExpectedCalls-1);
+          @Override boolean testImpl(byte val){
+            return matchVal1==val || matchVal2==val;
+          }
+        };
+      }
+    },
+    RemoveAllButFirst(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final byte matchVal=TypeConversionUtil.convertTobyte(0);
+          @Override boolean testImpl(byte val){
+            return matchVal!=val;
+          }
+        };
+      }
+    },
+    RemoveAllButLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final byte matchVal=TypeConversionUtil.convertTobyte(numExpectedCalls-1);
+          @Override boolean testImpl(byte val){
+            return matchVal!=val;
+          }
+        };
+      }
+    },
+    RemoveAllButFirstAndLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final byte matchVal1=TypeConversionUtil.convertTobyte(0);
+          private final byte matchVal2=TypeConversionUtil.convertTobyte(numExpectedCalls-1);
+          @Override boolean testImpl(byte val){
+            return matchVal1!=val && matchVal2!=val;
+          }
+        };
+      }
+    },
     RemoveAll(null,true,false){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractByteSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
         return new MonitoredRemoveIfPredicate(){

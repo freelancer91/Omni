@@ -218,12 +218,6 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
     }
     return node;
   }
-  public static $<E>$ $DNode$$<E>$ uncheckedIterateAscending($DNode$$<E>$ node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static $<E>$ $DNode$$<E>$ uncheckedIterateDescending($DNode$$<E>$ node,int length){
     do{
       node=node.prev;

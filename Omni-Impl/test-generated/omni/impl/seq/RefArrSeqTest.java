@@ -89,6 +89,20 @@ public class RefArrSeqTest{
     final int numExpectedCalls=seqSize;
     final int numExpectedRemoved;
     switch(monitoredRemoveIfPredicateGen){
+      case RemoveFirst:
+      case RemoveLast:
+        numExpectedRemoved=Math.min(1,seqSize);
+        break;
+      case RemoveFirstAndLast:
+        numExpectedRemoved=Math.min(2,seqSize);
+        break;
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+        numExpectedRemoved=seqSize-Math.min(1,seqSize);
+        break;
+      case RemoveAllButFirstAndLast:
+        numExpectedRemoved=seqSize-Math.min(2,seqSize);
+        break;
       case RemoveAll:
         numExpectedRemoved=seqSize;
         break;
@@ -143,6 +157,12 @@ public class RefArrSeqTest{
       case Random:
       case RemoveAll:
       case RemoveNone:
+      case RemoveFirst:
+      case RemoveLast:
+      case RemoveFirstAndLast:
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+      case RemoveAllButFirstAndLast:
       case Throw:
         verifyItr.verifyPostAlloc(preModScenario);
         break;

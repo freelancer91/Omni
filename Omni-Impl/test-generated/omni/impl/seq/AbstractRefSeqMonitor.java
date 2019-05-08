@@ -1644,6 +1644,68 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
   }
   static enum MonitoredRemoveIfPredicateGen
   {
+    RemoveFirst(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final Object matchVal=TypeConversionUtil.convertToObject(0);
+          @Override boolean testImpl(Object val){
+            return matchVal.equals(val);
+          }
+        };
+      }
+    },
+    RemoveLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final Object matchVal=TypeConversionUtil.convertToObject(numExpectedCalls-1);
+          @Override boolean testImpl(Object val){
+            return matchVal.equals(val);
+          }
+        };
+      }
+    },
+    RemoveFirstAndLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final Object matchVal1=TypeConversionUtil.convertToObject(0);
+          private final Object matchVal2=TypeConversionUtil.convertToObject(numExpectedCalls-1);
+          @Override boolean testImpl(Object val){
+            return matchVal1.equals(val) || matchVal2.equals(val);
+          }
+        };
+      }
+    },
+    RemoveAllButFirst(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final Object matchVal=TypeConversionUtil.convertToObject(0);
+          @Override boolean testImpl(Object val){
+            return !matchVal.equals(val);
+          }
+        };
+      }
+    },
+    RemoveAllButLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final Object matchVal=TypeConversionUtil.convertToObject(numExpectedCalls-1);
+          @Override boolean testImpl(Object val){
+            return !matchVal.equals(val);
+          }
+        };
+      }
+    },
+    RemoveAllButFirstAndLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final Object matchVal1=TypeConversionUtil.convertToObject(0);
+          private final Object matchVal2=TypeConversionUtil.convertToObject(numExpectedCalls-1);
+          @Override boolean testImpl(Object val){
+            return !matchVal1.equals(val) && !matchVal2.equals(val);
+          }
+        };
+      }
+    },
     RemoveAll(null,true,false){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(AbstractRefSeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
         return new MonitoredRemoveIfPredicate(){

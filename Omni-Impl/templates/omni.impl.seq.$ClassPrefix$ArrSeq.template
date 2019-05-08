@@ -60,7 +60,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable{
+import java.util.RandomAccess;
+public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient $ArrayType$[] arr; 
@@ -590,17 +591,17 @@ public
 #ENDIF
 #IFSWITCH STRUCTNAME==UncheckedList,CheckedSubList,UncheckedSubList
   #IF OfRef
-    implements OmniList.Of$ClassPrefix$$<E>$,Cloneable
+    implements OmniList.Of$ClassPrefix$$<E>$,Cloneable,RandomAccess
   #ELSE
     #IFSWITCH STRUCTNAME==UncheckedList
-    implements $ClassPrefix$ListDefault$<E>$,Cloneable
+    implements $ClassPrefix$ListDefault$<E>$,Cloneable,RandomAccess
     #ELSE
-    implements $ClassPrefix$SubListDefault$<E>$,Cloneable
+    implements $ClassPrefix$SubListDefault$<E>$,Cloneable,RandomAccess
     #ENDIF
   #ENDIF
 #ENDIF
 #IFSWITCH STRUCTNAME==UncheckedStack
-    implements OmniStack.Of$ClassPrefix$$<E>$,Cloneable
+    implements OmniStack.Of$ClassPrefix$$<E>$,Cloneable,RandomAccess
 #ENDIF
 {
   private static final long serialVersionUID=1L;

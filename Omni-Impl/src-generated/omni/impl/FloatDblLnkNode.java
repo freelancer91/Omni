@@ -140,12 +140,6 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     }
     return node;
   }
-  public static  FloatDblLnkNode uncheckedIterateAscending(FloatDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  FloatDblLnkNode uncheckedIterateDescending(FloatDblLnkNode node,int length){
     do{
       node=node.prev;

@@ -140,12 +140,6 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
     }
     return node;
   }
-  public static  BooleanDblLnkNode uncheckedIterateAscending(BooleanDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  BooleanDblLnkNode uncheckedIterateDescending(BooleanDblLnkNode node,int length){
     do{
       node=node.prev;

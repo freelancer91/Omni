@@ -139,12 +139,6 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
     }
     return node;
   }
-  public static  ShortDblLnkNode uncheckedIterateAscending(ShortDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  ShortDblLnkNode uncheckedIterateDescending(ShortDblLnkNode node,int length){
     do{
       node=node.prev;

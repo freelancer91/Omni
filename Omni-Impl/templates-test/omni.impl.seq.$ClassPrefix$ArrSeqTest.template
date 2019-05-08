@@ -5148,6 +5148,21 @@ for(int i=0;i<seqSize;){
     case RemoveFalse:
       numExpectedRemoved=seqSize-trueCount;
       break;
+#ELSE
+    case RemoveFirst:
+    case RemoveLast:
+      numExpectedRemoved=Math.min(1,seqSize);
+      break;
+    case RemoveFirstAndLast:
+      numExpectedRemoved=Math.min(2,seqSize);
+      break;
+    case RemoveAllButFirst:
+    case RemoveAllButLast:
+      numExpectedRemoved=seqSize-Math.min(1,seqSize);
+      break;
+    case RemoveAllButFirstAndLast:
+      numExpectedRemoved=seqSize-Math.min(2,seqSize);
+      break;
 #ENDIF
     case RemoveAll:
       numExpectedRemoved=seqSize;
@@ -5206,6 +5221,13 @@ for(int i=0;i<seqSize;){
 #IF OfBoolean
     case RemoveTrue:
     case RemoveFalse:
+#ELSE
+    case RemoveFirst:
+    case RemoveLast:
+    case RemoveFirstAndLast:
+    case RemoveAllButFirst:
+    case RemoveAllButLast:
+    case RemoveAllButFirstAndLast:
 #ENDIF
     case Throw:
       verifyItr.verifyPostAlloc(preModScenario);

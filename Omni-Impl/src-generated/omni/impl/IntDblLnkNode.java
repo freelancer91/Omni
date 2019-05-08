@@ -139,12 +139,6 @@ public class IntDblLnkNode implements Comparable<IntDblLnkNode>
     }
     return node;
   }
-  public static  IntDblLnkNode uncheckedIterateAscending(IntDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  IntDblLnkNode uncheckedIterateDescending(IntDblLnkNode node,int length){
     do{
       node=node.prev;

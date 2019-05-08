@@ -516,6 +516,20 @@ public class FloatSnglLnkSeqTest{
     final int numExpectedCalls=seqSize;
     final int numExpectedRemoved;
     switch(monitoredRemoveIfPredicateGen){
+      case RemoveFirst:
+      case RemoveLast:
+        numExpectedRemoved=Math.min(1,seqSize);
+        break;
+      case RemoveFirstAndLast:
+        numExpectedRemoved=Math.min(2,seqSize);
+        break;
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+        numExpectedRemoved=seqSize-Math.min(1,seqSize);
+        break;
+      case RemoveAllButFirstAndLast:
+        numExpectedRemoved=seqSize-Math.min(2,seqSize);
+        break;
       case RemoveAll:
         numExpectedRemoved=seqSize;
         break;

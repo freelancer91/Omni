@@ -130,12 +130,6 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
     }
     return node;
   }
-  public static  CharDblLnkNode uncheckedIterateAscending(CharDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  CharDblLnkNode uncheckedIterateDescending(CharDblLnkNode node,int length){
     do{
       node=node.prev;

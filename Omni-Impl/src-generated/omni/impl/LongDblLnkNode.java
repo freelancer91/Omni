@@ -139,12 +139,6 @@ public class LongDblLnkNode implements Comparable<LongDblLnkNode>
     }
     return node;
   }
-  public static  LongDblLnkNode uncheckedIterateAscending(LongDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  LongDblLnkNode uncheckedIterateDescending(LongDblLnkNode node,int length){
     do{
       node=node.prev;

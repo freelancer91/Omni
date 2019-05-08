@@ -142,12 +142,6 @@ public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
     }
     return node;
   }
-  public static <E> RefDblLnkNode<E> uncheckedIterateAscending(RefDblLnkNode<E> node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static <E> RefDblLnkNode<E> uncheckedIterateDescending(RefDblLnkNode<E> node,int length){
     do{
       node=node.prev;

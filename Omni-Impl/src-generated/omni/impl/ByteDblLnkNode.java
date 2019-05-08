@@ -139,12 +139,6 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
     }
     return node;
   }
-  public static  ByteDblLnkNode uncheckedIterateAscending(ByteDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  ByteDblLnkNode uncheckedIterateDescending(ByteDblLnkNode node,int length){
     do{
       node=node.prev;

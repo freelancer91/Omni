@@ -821,13 +821,9 @@ public class RefDblLnkSeqTest{
               && (monitoredObjectGen==null || monitoredObjectGen.expectedException==null)
             ){
               for(int parentsLength=1;parentsLength<=3;++parentsLength){
-                if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent
-                && (monitoredObjectGen==null|| (monitoredObjectGen!=MonitoredObjectGen.ModParent && monitoredObjectGen!=MonitoredObjectGen.ThrowModParent))
-                 )){
-                  runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testremoveVal_valHelper(seqMonitor,argType,queryCastType,seqLocation,seqSize,preModScenario
-                    ,monitoredObjectGen
-                  ));
-                }
+                runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testremoveVal_valHelper(seqMonitor,argType,queryCastType,seqLocation,seqSize,preModScenario
+                  ,monitoredObjectGen
+                ));
               }
               break;
             }
@@ -1275,7 +1271,6 @@ public class RefDblLnkSeqTest{
                 continue;
               }
               for(int seqSize:seqSizes){
-                System.out.println("RefDblLnkSeq.testremoveIf_Predicate<"+nestedType+","+checkedType+","+functionCallType+","+preModScenario+","+monitoredRemoveIfPredicateGen+","+seqSize+">");
                 double[] thresholdArr;
                 long randSeedBound;
                 if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
@@ -1293,11 +1288,9 @@ public class RefDblLnkSeqTest{
                   for(var threshold:thresholdArr){
                     switch(nestedType){
                       case SUBLIST:
-                        if(functionCallType==FunctionCallType.Unboxed && monitoredRemoveIfPredicateGen.expectedException==null && preModScenario.expectedException==null){
+                        if(functionCallType==FunctionCallType.Unboxed && monitoredRemoveIfPredicateGen.expectedException==null && preModScenario.expectedException==null && !monitoredRemoveIfPredicateGen.isRandomized){
                           for(int parentsLength=1;parentsLength<=3;++parentsLength){
-                            if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ModParent && monitoredRemoveIfPredicateGen!=MonitoredRemoveIfPredicateGen.ThrowModParent)){
-                              runSubListTests(true,checkedType,randSeedBound==0?true:false,parentsLength,seqMonitor->testremoveIf_PredicateHelper(seqMonitor,preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
-                            }
+                            runSubListTests(true,checkedType,randSeedBound==0?true:false,parentsLength,seqMonitor->testremoveIf_PredicateHelper(seqMonitor,preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
                           }
                           break;
                         }
@@ -1323,6 +1316,20 @@ public class RefDblLnkSeqTest{
     final int numExpectedCalls=seqSize;
     final int numExpectedRemoved;
     switch(monitoredRemoveIfPredicateGen){
+      case RemoveFirst:
+      case RemoveLast:
+        numExpectedRemoved=Math.min(1,seqSize);
+        break;
+      case RemoveFirstAndLast:
+        numExpectedRemoved=Math.min(2,seqSize);
+        break;
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+        numExpectedRemoved=seqSize-Math.min(1,seqSize);
+        break;
+      case RemoveAllButFirstAndLast:
+        numExpectedRemoved=seqSize-Math.min(2,seqSize);
+        break;
       case RemoveAll:
         numExpectedRemoved=seqSize;
         break;
@@ -1370,6 +1377,12 @@ public class RefDblLnkSeqTest{
       case Random:
       case RemoveAll:
       case RemoveNone:
+      case RemoveFirst:
+      case RemoveLast:
+      case RemoveFirstAndLast:
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+      case RemoveAllButFirstAndLast:
       case Throw:
         verifyItr.verifyPostAlloc(preModScenario);
         break;
@@ -1402,11 +1415,9 @@ public class RefDblLnkSeqTest{
                     for(var outputArgType:RefOutputTestArgType.values()){
                       switch(nestedType){
                         case SUBLIST:
-                          if(preModScenario.expectedException==null && seqLocation==SequenceLocation.BEGINNING || seqLocation==SequenceLocation.END){
+                          if(preModScenario.expectedException==null){
                             for(int parentsLength=1;parentsLength<=3;++parentsLength){
-                              if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent)){
-                                runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testListremoveAt_intHelper(seqMonitor,preModScenario,seqLocation,seqSize,outputArgType));
-                              }
+                              runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testListremoveAt_intHelper(seqMonitor,preModScenario,seqLocation,seqSize,outputArgType));
                             }
                             break;
                           }
@@ -3331,9 +3342,7 @@ public class RefDblLnkSeqTest{
                 case SUBLIST:
                   if(preModScenario.expectedException==null){
                     for(int parentsLength=1;parentsLength<=3;++parentsLength){
-                      if(parentsLength!=1 || (preModScenario!=PreModScenario.ModParent)){
-                        runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testclear_voidHelper(seqMonitor,preModScenario,seqSize));
-                      }
+                      runSubListTests(true,checkedType,true,parentsLength,seqMonitor->testclear_voidHelper(seqMonitor,preModScenario,seqSize));
                     }
                     break;
                   }
@@ -4443,12 +4452,196 @@ public class RefDblLnkSeqTest{
     seqMonitor.pollLast(0,outputArgType);
     seqMonitor.verifyStructuralIntegrity();
   }
-  //TODO test pollLast/peekLast
-  //TODO test pollFirst/peekFirst
-  //TODO test offerFirst/offerLast
-  //TODO test addFirst/addLast
-  //TODO test getFirst/getLast
-  //TODO test removeFirst/removeLast
+  @org.junit.jupiter.api.Test
+  public void testpeekLast_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpeekLast_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpeekLast_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;){
+      outputArgType.verifyDequePeekLast(seqMonitor.seq,i,i);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.add(++i);
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testpollFirst_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpollFirst_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpollFirst_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      seqMonitor.pollFirst(i,outputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.pollFirst(0,outputArgType);
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpeekFirst_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testpeekFirst_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testpeekFirst_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      outputArgType.verifyDequePeekFirst(seqMonitor.seq,100-i,i);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.pop(i,outputArgType);
+    }
+    outputArgType.verifyDequePeekFirst(seqMonitor.seq,0,0);
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testaddFirst_val(){
+    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testaddFirst_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1]);
+    });
+  }
+  private static void testaddFirst_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.addFirst(i,inputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,100).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testaddLast_val(){
+    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testaddLast_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1]);
+    });
+  }
+  private static void testaddLast_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.addLast(i,inputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyAscending(inputArgType,100).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testofferFirst_val(){
+    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testofferFirst_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1]);
+    });
+  }
+  private static void testofferFirst_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seqMonitor.offerFirst(i,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyDescending(inputArgType,100).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testofferLast_val(){
+    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
+        testofferLast_valHelper((SeqMonitor)args[0],(RefInputTestArgType)args[1]);
+    });
+  }
+  private static void testofferLast_valHelper
+  (SeqMonitor seqMonitor,RefInputTestArgType inputArgType){
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seqMonitor.offerLast(i,inputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    seqMonitor.verifyPreAlloc().verifyAscending(inputArgType,100).verifyPostAlloc();
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveFirst_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testremoveFirst_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testremoveFirst_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      seqMonitor.removeFirst(i,outputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.removeFirst(0,outputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveLast_void(){
+    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
+        testremoveLast_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testremoveLast_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      seqMonitor.removeLast(100-i-1,outputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.removeLast(0,outputArgType));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testgetFirst_void(){
+    getQueueelement_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testgetFirst_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testgetFirst_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    for(int i=0;i<100;++i){
+      outputArgType.verifyDequeGetFirst(seqMonitor.seq,i);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.pop(i,outputArgType);
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyDequeGetFirst(seqMonitor.seq,0));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testgetLast_void(){
+    getQueueelement_voidArgs().parallel().map(Arguments::get).forEach(args->{
+        testgetLast_voidHelper((SeqMonitor)args[0],(RefOutputTestArgType)args[1]);
+    });
+  }
+  private static void testgetLast_voidHelper
+  (SeqMonitor seqMonitor,RefOutputTestArgType outputArgType){
+    for(int i=0;i<100;++i){
+      seqMonitor.add(i);
+    }
+    int seqSize=seqMonitor.expectedSeqSize;
+    for(int i=0;i<seqSize;++i){
+      outputArgType.verifyDequeGetLast(seqMonitor.seq,seqSize-i-1);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.removeLast(seqSize-i-1,outputArgType);
+    }
+    if(seqMonitor.checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyDequeGetLast(seqMonitor.seq,0));
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }
   static enum NestedType{
     LISTDEQUE(true),
     SUBLIST(false);

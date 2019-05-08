@@ -130,12 +130,6 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     }
     return node;
   }
-  public static  DoubleDblLnkNode uncheckedIterateAscending(DoubleDblLnkNode node,int length){
-    do{
-      node=node.next;
-    }while(--length!=0);
-    return node;
-  }
   public static  DoubleDblLnkNode uncheckedIterateDescending(DoubleDblLnkNode node,int length){
     do{
       node=node.prev;

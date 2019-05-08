@@ -1384,6 +1384,93 @@ boolean METHODNAME(INPUTTYPE obj)
         };
       }
     },
+#ELSE
+    RemoveFirst(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final $ArrayType$ matchVal=TypeConversionUtil.convertTo$ArrayType$(0);
+          @Override boolean testImpl($ArrayType$ val){
+#IF OfRef
+            return matchVal.equals(val);
+#ELSE
+            return matchVal==val;
+#ENDIF
+          }
+        };
+      }
+    },
+    RemoveLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final $ArrayType$ matchVal=TypeConversionUtil.convertTo$ArrayType$(numExpectedCalls-1);
+          @Override boolean testImpl($ArrayType$ val){
+#IF OfRef
+            return matchVal.equals(val);
+#ELSE
+            return matchVal==val;
+#ENDIF
+          }
+        };
+      }
+    },
+    RemoveFirstAndLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final $ArrayType$ matchVal1=TypeConversionUtil.convertTo$ArrayType$(0);
+          private final $ArrayType$ matchVal2=TypeConversionUtil.convertTo$ArrayType$(numExpectedCalls-1);
+          @Override boolean testImpl($ArrayType$ val){
+#IF OfRef
+            return matchVal1.equals(val) || matchVal2.equals(val);
+#ELSE
+            return matchVal1==val || matchVal2==val;
+#ENDIF
+          }
+        };
+      }
+    },
+    RemoveAllButFirst(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final $ArrayType$ matchVal=TypeConversionUtil.convertTo$ArrayType$(0);
+          @Override boolean testImpl($ArrayType$ val){
+#IF OfRef
+            return !matchVal.equals(val);
+#ELSE
+            return matchVal!=val;
+#ENDIF
+          }
+        };
+      }
+    },
+    RemoveAllButLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final $ArrayType$ matchVal=TypeConversionUtil.convertTo$ArrayType$(numExpectedCalls-1);
+          @Override boolean testImpl($ArrayType$ val){
+#IF OfRef
+            return !matchVal.equals(val);
+#ELSE
+            return matchVal!=val;
+#ENDIF
+          }
+        };
+      }
+    },
+    RemoveAllButFirstAndLast(null,true,false){
+      @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
+        return new MonitoredRemoveIfPredicate(){
+          private final $ArrayType$ matchVal1=TypeConversionUtil.convertTo$ArrayType$(0);
+          private final $ArrayType$ matchVal2=TypeConversionUtil.convertTo$ArrayType$(numExpectedCalls-1);
+          @Override boolean testImpl($ArrayType$ val){
+#IF OfRef
+            return !matchVal1.equals(val) && !matchVal2.equals(val);
+#ELSE
+            return matchVal1!=val && matchVal2!=val;
+#ENDIF
+          }
+        };
+      }
+    },
 #ENDIF
     RemoveAll(null,true,false){
       @Override MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(Abstract$ClassPrefix$SeqMonitor seqMonitor,long randSeed,int numExpectedCalls,double threshold){
