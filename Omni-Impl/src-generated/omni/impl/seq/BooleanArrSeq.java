@@ -28,7 +28,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollection.OfBoolean,Externalizable{
+import java.util.RandomAccess;
+public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollection.OfBoolean,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient boolean[] arr; 
@@ -691,7 +692,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
   public
     static class UncheckedStack
       extends BooleanArrSeq
-      implements OmniStack.OfBoolean,Cloneable
+      implements OmniStack.OfBoolean,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -1148,7 +1149,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
   public
     static class UncheckedList
       extends BooleanArrSeq
-      implements BooleanListDefault,Cloneable
+      implements BooleanListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1807,7 +1808,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
   public
     static class UncheckedSubList
       extends AbstractSeq
-      implements BooleanSubListDefault,Cloneable
+      implements BooleanSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -3706,7 +3707,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
   private
     static class CheckedSubList
       extends AbstractSeq
-      implements BooleanSubListDefault,Cloneable
+      implements BooleanSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;

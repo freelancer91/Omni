@@ -18,7 +18,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
-public class LongArrDeq implements OmniDeque.OfLong{
+import java.util.RandomAccess;
+public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,RandomAccess{
+  private static final long serialVersionUID=1L;
   transient long[] arr;
   transient int head;
   transient int tail;
@@ -86,55 +88,9 @@ public class LongArrDeq implements OmniDeque.OfLong{
     }
     OmniArray.OfLong.ascendingForEach(arr,head,tail,action);
   }
-  boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
-    //TODO
-    return false;
-  }
-  boolean nonfragmentedRemoveIf(int head,int tail,LongPredicate filter){
-    //TODO
-    return false;
-  }
-  @Override public OmniIterator.OfLong iterator(){
-    //TODO
-    return null;
-  }
-  @Override public OmniIterator.OfLong descendingIterator(){
-    //TODO
-    return null;
-  }
-  @Override public Object clone(){
-    //TODO
-    return null;
-  }
-  @Override public String toString(){
-    //TODO
-    return null;
-  }
-  @Override public int hashCode(){
-    //TODO
-    return 0;
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    return false;
-  }
-  @Override public void push(long val){
-    //TODO
-  }
-  @Override public long popLong(){
-    //TODO
-    return Long.MIN_VALUE;
-  }
-  @Override public long removeLastLong(){
-    //TODO
-    return Long.MIN_VALUE;
-  }
   @Override public boolean add(long val){
     addLast(val);
     return true;
-  }
-  @Override public void addLast(long val){
-    //TODO
   }
   @Override public void addFirst(long val){
     push(val);
@@ -1088,7 +1044,120 @@ public class LongArrDeq implements OmniDeque.OfLong{
     }
     return false;
   }
+  @Override public String toString(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return uncheckedToString(tail);
+    }
+    return "[]";
+  }
+  @Override public int hashCode(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return uncheckedHashCode(tail);
+    }
+    return 1;
+  }
+  @Override public long popLong(){
+    final long[] arr;
+    int head;
+    var ret=(long)((arr=this.arr)[head=this.head]);
+    if(head==this.tail){
+      this.tail=-1;
+      return ret;
+    }else if(++head==arr.length){
+      head=0;
+    }
+    this.head=head;
+    return ret;
+  }
+  @Override public long removeLastLong(){
+    final long[] arr;
+    int tail;
+    var ret=(long)((arr=this.arr)[tail=this.tail]);
+    if(this.head==tail){
+      tail=-1;
+    }else if(--tail==-1){
+      tail=arr.length-1;
+    }
+    this.tail=tail;
+    return ret;
+  }
+  @Override public Object clone(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final var arr=this.arr;
+      final long[] dst;
+      int size,head;
+      LongArrDeq clone;
+      if((size=(++tail)-(head=this.head))<=0){
+        clone=new LongArrDeq(0,dst=new long[size+=arr.length],size-1);
+        ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
+      }else{
+        clone=new LongArrDeq(0,dst=new long[size],size-1);
+      }
+      ArrCopy.uncheckedCopy(arr,head,dst,0,size);
+      return clone;
+    }
+    return new LongArrDeq();
+  }
+  @Override public boolean equals(Object obj){
+    //TODO
+    return false;
+  }
+  boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
+    //TODO
+    return false;
+  }
+  boolean nonfragmentedRemoveIf(int head,int tail,LongPredicate filter){
+    //TODO
+    return false;
+  }
+  @Override public OmniIterator.OfLong iterator(){
+    //TODO
+    return null;
+  }
+  @Override public OmniIterator.OfLong descendingIterator(){
+    //TODO
+    return null;
+  }
+  private String uncheckedToString(int tail){
+    //TODO
+    return null;
+  }
+  private int uncheckedHashCode(int tail){
+    //TODO
+    return -1;
+  }
+  @Override public void push(long val){
+    long[] arr;
+    if((arr=this.arr)!=null){
+      if(arr==OmniArray.OfLong.DEFAULT_ARR){
+        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
+      }else{
+        //TODO
+      }
+    }else{
+      this.head=0;
+      this.tail=0;
+      this.arr=new long[]{val};
+    }
+  }
+  @Override public void addLast(long val){
+    //TODO
+  }
+  @Override public void readExternal(ObjectInput input) throws IOException
+  {
+    //TODO
+  }
+  @Override public void writeExternal(ObjectOutput output) throws IOException{
+    //TODO
+  }
   public static class Checked extends LongArrDeq{
+    private static final long serialVersionUID=1L;
     transient int modCount;
     public Checked(){
       super();
@@ -1098,36 +1167,6 @@ public class LongArrDeq implements OmniDeque.OfLong{
     }
     Checked(int head,long[] arr,int tail){
       super(head,arr,tail);
-    }
-    @Override public void clear(){
-      if(this.tail!=-1){
-        ++this.modCount;
-        this.tail=-1;
-      }
-    }
-    @Override public void push(long val){
-      ++this.modCount;
-      super.push(val);
-    }
-    @Override public void addLast(long val){
-      ++this.modCount;
-      super.addLast(val);
-    }
-    @Override public long popLong(){
-      //TODO
-      return Long.MIN_VALUE;
-    }
-    @Override public long removeLastLong(){
-      //TODO
-      return Long.MIN_VALUE;
-    }
-    @Override void uncheckedForEach(final int tail,LongConsumer action){
-      final int modCount=this.modCount;
-      try{
-        super.uncheckedForEach(tail,action);
-      }finally{
-        CheckedCollection.checkModCount(modCount,this.modCount);
-      }
     }
     @Override boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
       //TODO
@@ -1145,13 +1184,91 @@ public class LongArrDeq implements OmniDeque.OfLong{
       //TODO
       return null;
     }
-    @Override public Object clone(){
-      //TODO
-      return null;
-    }
     @Override public boolean equals(Object obj){
       //TODO
       return false;
+    }
+    @Override public Object clone(){
+      int tail;
+      if((tail=this.tail)!=-1){
+        final var arr=this.arr;
+        final long[] dst;
+        int size,head;
+        Checked clone;
+        if((size=(++tail)-(head=this.head))<=0){
+          clone=new Checked(0,dst=new long[size+=arr.length],size-1);
+          ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
+        }else{
+          clone=new Checked(0,dst=new long[size],size-1);
+        }
+        ArrCopy.uncheckedCopy(arr,head,dst,0,size);
+        return clone;
+      }
+      return new Checked();
+    }
+    @Override public long removeLastLong(){
+      int tail;
+      if((tail=this.tail)!=-1){
+        ++this.modCount;
+        final long[] arr;
+        var ret=(long)((arr=this.arr)[tail]);
+        if(this.head==tail){
+          tail=-1;
+        }else if(--tail==-1){
+          tail=arr.length-1;
+        }
+        this.tail=tail;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public long popLong(){
+      int tail;
+      if((tail=this.tail)!=-1){
+        ++this.modCount;
+        final long[] arr;
+        int head;
+        var ret=(long)((arr=this.arr)[head=this.head]);
+        if(head==tail){
+          this.tail=-1;
+          return ret;
+        }else if(++head==arr.length){
+          head=0;
+        }
+        this.head=head;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public void writeExternal(ObjectOutput output) throws IOException{
+      int modCount=this.modCount;
+      try{
+        super.writeExternal(output);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    @Override public void clear(){
+      if(this.tail!=-1){
+        ++this.modCount;
+        this.tail=-1;
+      }
+    }
+    @Override public void push(long val){
+      ++this.modCount;
+      super.push(val);
+    }
+    @Override public void addLast(long val){
+      ++this.modCount;
+      super.addLast(val);
+    }
+    @Override void uncheckedForEach(final int tail,LongConsumer action){
+      final int modCount=this.modCount;
+      try{
+        super.uncheckedForEach(tail,action);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
     }
     @Override public long longElement(){
       if(tail!=-1){

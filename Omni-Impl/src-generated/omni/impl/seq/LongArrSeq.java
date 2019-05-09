@@ -29,7 +29,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.OfLong,Externalizable{
+import java.util.RandomAccess;
+public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.OfLong,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient long[] arr; 
@@ -632,7 +633,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
   public
     static class UncheckedStack
       extends LongArrSeq
-      implements OmniStack.OfLong,Cloneable
+      implements OmniStack.OfLong,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -921,7 +922,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
   public
     static class UncheckedList
       extends LongArrSeq
-      implements LongListDefault,Cloneable
+      implements LongListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1431,7 +1432,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
   public
     static class UncheckedSubList
       extends AbstractSeq
-      implements LongSubListDefault,Cloneable
+      implements LongSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -3027,7 +3028,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
   private
     static class CheckedSubList
       extends AbstractSeq
-      implements LongSubListDefault,Cloneable
+      implements LongSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;

@@ -29,7 +29,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.OfInt,Externalizable{
+import java.util.RandomAccess;
+public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.OfInt,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient int[] arr; 
@@ -654,7 +655,7 @@ public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.Of
   public
     static class UncheckedStack
       extends IntArrSeq
-      implements OmniStack.OfInt,Cloneable
+      implements OmniStack.OfInt,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -970,7 +971,7 @@ public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.Of
   public
     static class UncheckedList
       extends IntArrSeq
-      implements IntListDefault,Cloneable
+      implements IntListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1499,7 +1500,7 @@ public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.Of
   public
     static class UncheckedSubList
       extends AbstractSeq
-      implements IntSubListDefault,Cloneable
+      implements IntSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -3146,7 +3147,7 @@ public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.Of
   private
     static class CheckedSubList
       extends AbstractSeq
-      implements IntSubListDefault,Cloneable
+      implements IntSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;

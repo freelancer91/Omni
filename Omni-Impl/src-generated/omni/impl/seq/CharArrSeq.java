@@ -28,7 +28,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.OfChar,Externalizable{
+import java.util.RandomAccess;
+public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.OfChar,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient char[] arr; 
@@ -696,7 +697,7 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
   public
     static class UncheckedStack
       extends CharArrSeq
-      implements OmniStack.OfChar,Cloneable
+      implements OmniStack.OfChar,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -1060,7 +1061,7 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
   public
     static class UncheckedList
       extends CharArrSeq
-      implements CharListDefault,Cloneable
+      implements CharListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1653,7 +1654,7 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
   public
     static class UncheckedSubList
       extends AbstractSeq
-      implements CharSubListDefault,Cloneable
+      implements CharSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -3419,7 +3420,7 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
   private
     static class CheckedSubList
       extends AbstractSeq
-      implements CharSubListDefault,Cloneable
+      implements CharSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;

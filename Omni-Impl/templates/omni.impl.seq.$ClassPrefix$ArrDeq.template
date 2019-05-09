@@ -343,7 +343,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   @Override public $exposedType$ pop$TypeNameModifier$(){
     final $ArrayType$[] arr;
     int head;
-    var ret=CAST((arr=this.arr)[head=this.head]);
+    var ret=($exposedType$)((arr=this.arr)[head=this.head]);
 #IF OfRef
     arr[head]=null;
 #ENDIF
@@ -359,7 +359,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   @Override public $exposedType$ removeLast$TypeNameModifier$(){
     final $ArrayType$[] arr;
     int tail;
-    var ret=CAST((arr=this.arr)[tail=this.tail]);
+    var ret=($exposedType$)((arr=this.arr)[tail=this.tail]);
 #IF OfRef
     arr[tail]=null;
 #ENDIF
@@ -375,14 +375,14 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     int tail;
     if((tail=this.tail)!=-1){
       final var arr=this.arr;
-      final ARRTYPE[] dst;
+      final $ArrayType$[] dst;
       int size,head;
       $ClassPrefix$ArrDeq$<E>$ clone;
       if((size=(++tail)-(head=this.head))<=0){
-        clone=new $ClassPrefix$ArrDeq$<E>$(0,dst=new ARRTYPE[size+=arr.length],size-1);
+        clone=new $ClassPrefix$ArrDeq$<E>$(0,dst=new $ArrayType$[size+=arr.length],size-1);
         ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
       }else{
-        clone=new $ClassPrefix$ArrDeq$<E>$(0,dst=new ARRTYPE[size],size-1);
+        clone=new $ClassPrefix$ArrDeq$<E>$(0,dst=new $ArrayType$[size],size-1);
       }
       ArrCopy.uncheckedCopy(arr,head,dst,0,size);
       return clone;
@@ -420,19 +420,13 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   @Override public void push($exposedType$ val){
     $ArrayType$[] arr;
     if((arr=this.arr)!=null){
-      if(arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
-        this.head=DEFAULT_ARR_SEQ_CAP-1;
-        this.tail=DEFAULT_ARR_SEQ_CAP-1;
+      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
         this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
-        arr[DEFAULT_ARR_SEQ_CAP-1]=val;
+        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
       }else{
-        int head;
-        if((head=this.head)==0){
-          if(tail==arr.length-1){
-          }else{
-          }
-        }else{
-        }
+        //TODO
       }
     }else{
       this.head=0;
@@ -489,14 +483,14 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       int tail;
       if((tail=this.tail)!=-1){
         final var arr=this.arr;
-        final ARRTYPE[] dst;
+        final $ArrayType$[] dst;
         int size,head;
         Checked$<E>$ clone;
         if((size=(++tail)-(head=this.head))<=0){
-          clone=new Checked$<E>$(0,dst=new ARRTYPE[size+=arr.length],size-1);
+          clone=new Checked$<E>$(0,dst=new $ArrayType$[size+=arr.length],size-1);
           ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
         }else{
-          clone=new Checked$<E>$(0,dst=new ARRTYPE[size],size-1);
+          clone=new Checked$<E>$(0,dst=new $ArrayType$[size],size-1);
         }
         ArrCopy.uncheckedCopy(arr,head,dst,0,size);
         return clone;
@@ -508,7 +502,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       if((tail=this.tail)!=-1){
         ++this.modCount;
         final $ArrayType$[] arr;
-        var ret=CAST((arr=this.arr)[tail]);
+        var ret=($exposedType$)((arr=this.arr)[tail]);
     #IF OfRef
         arr[tail]=null;
     #ENDIF
@@ -520,7 +514,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.tail=tail;
         return ret;
       }
-      throw new NoSuchElemementException();
+      throw new NoSuchElementException();
     }
     @Override public $exposedType$ pop$TypeNameModifier$(){
       int tail;
@@ -528,7 +522,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         ++this.modCount;
         final $ArrayType$[] arr;
         int head;
-        var ret=CAST((arr=this.arr)[head=this.head]);
+        var ret=($exposedType$)((arr=this.arr)[head=this.head]);
     #IF OfRef
         arr[head]=null;
     #ENDIF
@@ -541,7 +535,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.head=head;
         return ret;
       }
-      throw new NoSuchElemementException();
+      throw new NoSuchElementException();
     }
     @Override public void writeExternal(ObjectOutput output) throws IOException{
       int modCount=this.modCount;

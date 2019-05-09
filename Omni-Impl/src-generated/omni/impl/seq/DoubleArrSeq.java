@@ -28,7 +28,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection.OfDouble,Externalizable{
+import java.util.RandomAccess;
+public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection.OfDouble,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient double[] arr; 
@@ -726,7 +727,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
   public
     static class UncheckedStack
       extends DoubleArrSeq
-      implements OmniStack.OfDouble,Cloneable
+      implements OmniStack.OfDouble,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -1039,7 +1040,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
   public
     static class UncheckedList
       extends DoubleArrSeq
-      implements DoubleListDefault,Cloneable
+      implements DoubleListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1638,7 +1639,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
   public
     static class UncheckedSubList
       extends AbstractSeq
-      implements DoubleSubListDefault,Cloneable
+      implements DoubleSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -3485,7 +3486,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
   private
     static class CheckedSubList
       extends AbstractSeq
-      implements DoubleSubListDefault,Cloneable
+      implements DoubleSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;

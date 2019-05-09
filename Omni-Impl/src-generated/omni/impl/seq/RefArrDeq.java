@@ -14,7 +14,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectInput;
-public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
+import java.util.RandomAccess;
+public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable,RandomAccess{
+  private static final long serialVersionUID=1L;
   transient Object[] arr;
   transient int head;
   transient int tail;
@@ -92,55 +94,9 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
     }
     OmniArray.OfRef.ascendingForEach(arr,head,tail,action);
   }
-  boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-    //TODO
-    return false;
-  }
-  boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-    //TODO
-    return false;
-  }
-  @Override public OmniIterator.OfRef<E> iterator(){
-    //TODO
-    return null;
-  }
-  @Override public OmniIterator.OfRef<E> descendingIterator(){
-    //TODO
-    return null;
-  }
-  @Override public Object clone(){
-    //TODO
-    return null;
-  }
-  @Override public String toString(){
-    //TODO
-    return null;
-  }
-  @Override public int hashCode(){
-    //TODO
-    return 0;
-  }
-  @Override public boolean equals(Object obj){
-    //TODO
-    return false;
-  }
-  @Override public void push(E val){
-    //TODO
-  }
-  @Override public E pop(){
-    //TODO
-    return null;
-  }
-  @Override public E removeLast(){
-    //TODO
-    return null;
-  }
   @Override public boolean add(E val){
     addLast(val);
     return true;
-  }
-  @Override public void addLast(E val){
-    //TODO
   }
   @Override public void addFirst(E val){
     push(val);
@@ -1611,7 +1567,123 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
       }
     }
   }
+  @Override public String toString(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return uncheckedToString(tail);
+    }
+    return "[]";
+  }
+  @Override public int hashCode(){
+    final int tail;
+    if((tail=this.tail)!=-1){
+      return uncheckedHashCode(tail);
+    }
+    return 1;
+  }
+  @Override public E pop(){
+    final Object[] arr;
+    int head;
+    var ret=(E)((arr=this.arr)[head=this.head]);
+    arr[head]=null;
+    if(head==this.tail){
+      this.tail=-1;
+      return ret;
+    }else if(++head==arr.length){
+      head=0;
+    }
+    this.head=head;
+    return ret;
+  }
+  @Override public E removeLast(){
+    final Object[] arr;
+    int tail;
+    var ret=(E)((arr=this.arr)[tail=this.tail]);
+    arr[tail]=null;
+    if(this.head==tail){
+      tail=-1;
+    }else if(--tail==-1){
+      tail=arr.length-1;
+    }
+    this.tail=tail;
+    return ret;
+  }
+  @Override public Object clone(){
+    int tail;
+    if((tail=this.tail)!=-1){
+      final var arr=this.arr;
+      final Object[] dst;
+      int size,head;
+      RefArrDeq<E> clone;
+      if((size=(++tail)-(head=this.head))<=0){
+        clone=new RefArrDeq<E>(0,dst=new Object[size+=arr.length],size-1);
+        ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
+      }else{
+        clone=new RefArrDeq<E>(0,dst=new Object[size],size-1);
+      }
+      ArrCopy.uncheckedCopy(arr,head,dst,0,size);
+      return clone;
+    }
+    return new RefArrDeq<E>();
+  }
+  @Override public boolean equals(Object obj){
+    //TODO
+    return false;
+  }
+  boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
+    //TODO
+    return false;
+  }
+  boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
+    //TODO
+    return false;
+  }
+  @Override public OmniIterator.OfRef<E> iterator(){
+    //TODO
+    return null;
+  }
+  @Override public OmniIterator.OfRef<E> descendingIterator(){
+    //TODO
+    return null;
+  }
+  private String uncheckedToString(int tail){
+    //TODO
+    return null;
+  }
+  private int uncheckedHashCode(int tail){
+    //TODO
+    return -1;
+  }
+  @Override public void push(E val){
+    Object[] arr;
+    if((arr=this.arr)!=null){
+      if(arr==OmniArray.OfRef.DEFAULT_ARR){
+        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.arr=arr=new Object[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
+      }else{
+        //TODO
+      }
+    }else{
+      this.head=0;
+      this.tail=0;
+      this.arr=new Object[]{val};
+    }
+  }
+  @Override public void addLast(E val){
+    //TODO
+  }
+  @Override public void readExternal(ObjectInput input) throws IOException
+    ,ClassNotFoundException
+  {
+    //TODO
+  }
+  @Override public void writeExternal(ObjectOutput output) throws IOException{
+    //TODO
+  }
   public static class Checked<E> extends RefArrDeq<E>{
+    private static final long serialVersionUID=1L;
     transient int modCount;
     public Checked(){
       super();
@@ -1621,6 +1693,88 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
     }
     Checked(int head,Object[] arr,int tail){
       super(head,arr,tail);
+    }
+    @Override boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
+      //TODO
+      return false;
+    }
+    @Override boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
+      //TODO
+      return false;
+    }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      //TODO
+      return null;
+    }
+    @Override public OmniIterator.OfRef<E> descendingIterator(){
+      //TODO
+      return null;
+    }
+    @Override public boolean equals(Object obj){
+      //TODO
+      return false;
+    }
+    @Override public Object clone(){
+      int tail;
+      if((tail=this.tail)!=-1){
+        final var arr=this.arr;
+        final Object[] dst;
+        int size,head;
+        Checked<E> clone;
+        if((size=(++tail)-(head=this.head))<=0){
+          clone=new Checked<E>(0,dst=new Object[size+=arr.length],size-1);
+          ArrCopy.uncheckedCopy(arr,0,dst,size-=tail,tail);
+        }else{
+          clone=new Checked<E>(0,dst=new Object[size],size-1);
+        }
+        ArrCopy.uncheckedCopy(arr,head,dst,0,size);
+        return clone;
+      }
+      return new Checked<E>();
+    }
+    @Override public E removeLast(){
+      int tail;
+      if((tail=this.tail)!=-1){
+        ++this.modCount;
+        final Object[] arr;
+        var ret=(E)((arr=this.arr)[tail]);
+        arr[tail]=null;
+        if(this.head==tail){
+          tail=-1;
+        }else if(--tail==-1){
+          tail=arr.length-1;
+        }
+        this.tail=tail;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public E pop(){
+      int tail;
+      if((tail=this.tail)!=-1){
+        ++this.modCount;
+        final Object[] arr;
+        int head;
+        var ret=(E)((arr=this.arr)[head=this.head]);
+        arr[head]=null;
+        if(head==tail){
+          this.tail=-1;
+          return ret;
+        }else if(++head==arr.length){
+          head=0;
+        }
+        this.head=head;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override public void writeExternal(ObjectOutput output) throws IOException{
+      int modCount=this.modCount;
+      try{
+        super.writeExternal(output);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
     }
     @Override public void clear(){
       int tail;
@@ -1644,14 +1798,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
       ++this.modCount;
       super.addLast(val);
     }
-    @Override public E pop(){
-      //TODO
-      return null;
-    }
-    @Override public E removeLast(){
-      //TODO
-      return null;
-    }
     @Override void uncheckedForEach(final int tail,Consumer<? super E> action){
       final int modCount=this.modCount;
       try{
@@ -1659,30 +1805,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
-    }
-    @Override boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-      //TODO
-      return false;
-    }
-    @Override boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-      //TODO
-      return false;
-    }
-    @Override public OmniIterator.OfRef<E> iterator(){
-      //TODO
-      return null;
-    }
-    @Override public OmniIterator.OfRef<E> descendingIterator(){
-      //TODO
-      return null;
-    }
-    @Override public Object clone(){
-      //TODO
-      return null;
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     @Override public E element(){
       if(tail!=-1){
@@ -1744,12 +1866,28 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>{
       return null;
     }
     @Override public String toString(){
-      //TODO
-      return null;
+      final int tail;
+      if((tail=this.tail)!=-1){
+        int modCount=this.modCount;
+        try{
+          return super.uncheckedToString(tail);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      return "[]";
     }
     @Override public int hashCode(){
-      //TODO
-      return 0;
+      final int tail;
+      if((tail=this.tail)!=-1){
+        int modCount=this.modCount;
+        try{
+          return super.uncheckedHashCode(tail);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      return 1;
     }
     @Override public boolean contains(Object val){
       final int tail;

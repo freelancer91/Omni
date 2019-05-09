@@ -29,7 +29,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.OfShort,Externalizable{
+import java.util.RandomAccess;
+public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.OfShort,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient short[] arr; 
@@ -704,7 +705,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
   public
     static class UncheckedStack
       extends ShortArrSeq
-      implements OmniStack.OfShort,Cloneable
+      implements OmniStack.OfShort,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -1071,7 +1072,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
   public
     static class UncheckedList
       extends ShortArrSeq
-      implements ShortListDefault,Cloneable
+      implements ShortListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1667,7 +1668,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
   public
     static class UncheckedSubList
       extends AbstractSeq
-      implements ShortSubListDefault,Cloneable
+      implements ShortSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -3438,7 +3439,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
   private
     static class CheckedSubList
       extends AbstractSeq
-      implements ShortSubListDefault,Cloneable
+      implements ShortSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;

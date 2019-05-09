@@ -23,7 +23,8 @@ import java.io.ObjectOutput;
 import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection.OfRef<E>,Externalizable{
+import java.util.RandomAccess;
+public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection.OfRef<E>,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient Object[] arr; 
@@ -785,7 +786,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
   public
     static class UncheckedStack<E>
       extends RefArrSeq<E>
-      implements OmniStack.OfRef<E>,Cloneable
+      implements OmniStack.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedStack(){
@@ -1165,7 +1166,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
   public
     static class UncheckedList<E>
       extends RefArrSeq<E>
-      implements OmniList.OfRef<E>,Cloneable
+      implements OmniList.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     public UncheckedList(){
@@ -1935,7 +1936,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
   public
     static class UncheckedSubList<E>
       extends AbstractSeq
-      implements OmniList.OfRef<E>,Cloneable
+      implements OmniList.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient final int rootOffset;
@@ -4167,7 +4168,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
   private
     static class CheckedSubList<E>
       extends AbstractSeq
-      implements OmniList.OfRef<E>,Cloneable
+      implements OmniList.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
     transient int modCount;
