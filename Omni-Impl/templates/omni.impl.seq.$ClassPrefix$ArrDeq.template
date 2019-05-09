@@ -389,6 +389,245 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return new $ClassPrefix$ArrDeq$<E>$();
   }
+  private String uncheckedToString(int tail){
+    final var arr=this.arr;
+#IF OfDouble,OfRef
+    final var builder=new StringBuilder("[");
+    int head;
+    if(tail<(head=this.head)){
+      for(int bound=arr.length;;){
+        builder.append(arr[head]).append(',').append(' ');
+        if(++head==bound){
+          head=0;
+          break;
+        }
+      }
+    }
+    for(;;builder.append(',').append(' '),++head){
+      builder.append(arr[head]);
+      if(head==tail){
+        return builder.append(']').toString();
+      }
+    }
+#ELSEIF OfChar
+    final char[] buffer;
+    int size,head,bufferOffset=1;
+    if((size=(++tail)-(head=this.head))<=0){
+      for(buffer=new char[size+(size=arr.length)];;++bufferOffset){
+        buffer[bufferOffset]=arr[head];
+        buffer[++bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+        if(++head==size){
+          ++bufferOffset;
+          head=0;
+          break
+        }
+      }
+    }else{
+      buffer=new char[size];
+    }
+    for(;;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
+      buffer[bufferOffset]=arr[head];
+      if(++head==tail){
+        buffer[0]='[';
+        buffer[++bufferOffset]=']';
+        return new String(buffer,0,bufferOffset+1);
+      }
+    }
+#ELSE
+    final byte[] buffer;
+    int size,head,bufferOffset=1
+    if((size=(++tail)-(head=this.head))<=0){
+      int bound;
+  #IF OfBoolean
+      if((size+=(bound=arr.length))<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
+  #ELSEIF OfByte
+      if((size+=(bound=arr.length))<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+  #ELSEIF OfShort
+      if((size+=(bound=arr.length))<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
+  #ELSEIF OfInt
+      if((size+=(bound=arr.length))<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
+  #ELSEIF OfLong
+      if((size+=(bound=arr.length))<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
+  #ELSEIF OfFloat
+      if((size+=(bound=arr.length))<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
+  #ENDIF
+        [0]=(byte)'[';
+        for(;;++bufferOffset){
+  #IF OfByte
+          buffer[bufferOffset=ToStringUtil.getStringShort(arr[head],buffer,bufferOffset)]=(byte)',';
+  #ELSE
+          buffer[bufferOffset=ToStringUtil.getString$ClassPrefix$(arr[head],buffer,bufferOffset)]=(byte)',';
+  #ENDIF
+          buffer[++bufferOffset]=(byte)' ';
+          if(++head==bound){
+            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
+  #IF OfByte
+              bufferOffset=ToStringUtil.getStringShort(arr[head],buffer,++bufferOffset);;
+  #ELSE
+              bufferOffset=ToStringUtil.getString$ClassPrefix$(arr[head],buffer,++bufferOffset);;
+  #ENDIF
+              if(++head==tail){
+                buffer[bufferOffset]=(byte)']';
+                return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
+              }
+            }
+          }
+        }
+      }else{
+        final ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]);
+        for(;;){
+  #IF OfByte
+          builder.uncheckedAppendShort(arr[head]);
+  #ELSE
+          builder.uncheckedAppendCLASSPREFIX(arr[head]);
+  #ENDIF
+          builder.uncheckedAppendCommaAndSpace();
+          if(++head==bound){
+            for(head=0;;builder.uncheckedAppendCommaAndSpace()){
+  #IF OfByte
+              builder.uncheckedAppendShort(arr[head]);
+  #ELSE
+              builder.uncheckedAppendCLASSPREFIX(arr[head]);
+  #ENDIF
+              if(++head==tail){
+                builder.uncheckedAppendChar((byte)']');
+                (buffer=builder.buffer)[0]=(byte)'[';
+                return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
+              }
+            }
+          }
+        }
+      }
+    }else{
+  #IF OfBoolean
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
+  #ELSEIF OfByte
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+  #ELSEIF OfShort
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
+  #ELSEIF OfInt
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
+  #ELSEIF OfLong
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
+  #ELSEIF OfFloat
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
+  #ENDIF
+        [size=OmniArray.Of$ClassPrefix$.ascendingToString(arr,head,tail-1,buffer,1)]=(byte)']';
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
+      }else{
+        final ToStringUtil.OmniStringBuilderByte builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(arr,head,tail-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        builder.uncheckedAppendChar((byte)']');
+        (buffer=builder.buffer)[0]=(byte)'[';
+        return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
+      }
+    }
+#ENDIF
+  }
+  private int uncheckedHashCode(int tail){
+    final $ArrayType$[] arr;
+    int head;
+    int hash=31+$hashCodeMethod$((arr=this.arr)[head=this.head]);
+    if(tail<head){
+      for(final int bound=arr.length;;){  
+        if(++head==bound){
+          hash=hash*31+$hashCodeMethod$(arr[head=0]);
+          break;
+        }
+        hash=(hash*31)+$hashCodeMethod$(arr[head]);
+      }
+    }
+    for(;head!=tail;hash=(hash*31)+$hashCodeMethod$(arr[head]),++head){}
+    return hash;
+  }
+  @Override public void push($exposedType$ val){
+    $ArrayType$[] arr;
+    if((arr=this.arr)!=null){
+      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
+        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
+      }else{
+        int tail;
+        if((tail=this.tail)==-1){
+          arr[tail=arr.length-1]=val;
+          this.tail=tail;
+          this.head=tail;
+        }else{
+          int head;
+          if((head=this.head-1)==tail){
+            final $ArrayType$[] newArr;
+            int newCap,size;
+            this.tail=(newCap=OmniArray.growBy50Pct(head+(size=arr.length)))-1;
+            ArrCopy.uncheckedCopy(arr,0,newArr=new $ArrayType$[newCap],newCap-=(++tail),tail);
+            ArrCopy.uncheckedCopy(arr,head,newArr,head=newCap-(size-=tail),size);
+            this.arr=newArr;
+            --head;
+          }else if(head==-1 && tail==(head=arr.length-1)){
+            int newCap;
+            this.tail=(newCap=OmniArray.growBy50Pct(++tail))-1;
+            ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[newCap],head=newCap-tail,tail);
+            this.arr=arr;
+            --head;
+          }
+          arr[head]=val;
+          this.head=head;
+        }
+      }
+    }else{
+      initFromNullArr(val);
+    }
+  }
+  private void initFromNullArr($exposedType$ val){
+    this.head=0;
+    this.tail=0;
+    this.arr=new $ArrayType$[]{val};
+  }
+  @Override public void addLast($exposedType$ val){
+    $ArrayType$[] arr;
+    if((arr=this.arr)!=null){
+      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+        this.head=0;
+        this.tail=0;
+        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[0]=val;
+      }else{
+        int tail;
+        if((tail=this.tail)==-1){
+          arr[0]=val;
+          this.tail=0;
+          this.head=0;
+        }else{
+          int head;
+          if(++tail==(head=this.head){
+            this.head=0;
+            final $ArrayType$[] newArr;
+            (newArr=new $ArrayType$[OmniArray.growBy50Pct(tail=arr.length)])[tail]=val;
+            this.tail=tail;
+            ArrCopy.uncheckedCopy(arr,head,newArr,0,tail-=head);
+            ArrCopy.uncheckedCopy(arr,0,newArr,tail,head);
+            this.arr=newArr;
+          }else{
+            if(tail==arr.length){
+              if(head==0){
+                ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+            arr[tail]=val;
+            this.tail=tail;
+          }
+        }
+      }
+    }else{
+      initFromNullArr(val);
+    }
+  }
   @Override public boolean equals(Object obj){
     //TODO
     return false;
@@ -401,41 +640,313 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     //TODO
     return false;
   }
-  @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
-    //TODO
-    return null;
+  private void eraseHead(){
+    int head;
+    switch(Integer.signum(this.tail-(head=this.head)){
+      case -1:
+#IF OfRef
+        $ArrayType$[] arr;
+        (arr=this.arr)[head]=null;
+#ENDIF
+        this.head=head==arr.length-1?0:head+1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.head=head+1;
+    }
+#IF OfRef
+    arr[head]=null;
+#ENDIF
   }
-  @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
-    //TODO
-    return null;
+  private void eraseTail(){
+    int tail;
+    switch(Integer.signum((tail=this.tail)-this.head)){
+      case -1:
+#IF OfRef
+        $ArrayType$[] arr;
+        (arr=this.arr)[tail]=null;
+#ENDIF
+        this.tail=tail==0?arr.length-1:tail-1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.tail=tail-1;
+    }
+#IF OfRef
+    arr[tail]=null;
+#ENDIF
   }
-  private String uncheckedToString(int tail){
-    //TODO
-    return null;
+  private static int fragmentedPullUp($ArrayType$[] arr,int head,int headDist){
+#IF OfRef
+    final int tmp;
+    ArrCopy.semicheckedCopy(arr,tmp=head,arr,++head,headDist);
+    arr[tmp]=null;
+#ELSE
+    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+#ENDIF
+    return head;
   }
-  private int uncheckedHashCode(int tail){
-    //TODO
-    return -1;
-  }
-  @Override public void push($exposedType$ val){
-    $ArrayType$[] arr;
-    if((arr=this.arr)!=null){
-      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
-        this.head=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
-        this.tail=OmniArray.DEFAULT_ARR_SEQ_CAP-1;
-        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
-        arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
-      }else{
-        //TODO
+  private static abstract class AbstractDeqItr$<E>$
+#IF OfRef
+    implements OmniIterator.Of$ClassPrefix$$<E>$
+#ELSE
+    extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+  {
+    transient int cursor;
+    AbstractDeqItr(int cursor){
+      this.cursor=cursor;
+    }
+    @Override public boolean hasNext(){
+      return this.cursor!=-1;
+    }
+    abstract void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action);
+    @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
+      int cursor;
+      if((cursor=this.cursor)!=-1){
+        uncheckedForEachRemaining(cursor,action);
       }
-    }else{
-      this.head=0;
-      this.tail=0;
-      this.arr=new $ArrayType$[]{val};
+    }
+#IFNOT OfRef
+    @Override public void forEachRemaining(Consumer<? super $BoxedType$> action){
+      int cursor;
+      if((cursor=this.cursor)!=-1){
+        uncheckedForEachRemaining(cursor,action::accept);
+      }
+    }
+#ENDIF
+  }
+  
+  private static class AscendingItr$<E>$ extends AbsractDequeItr$<E>$
+  {
+    transient final $ClassPrefix$ArrDeq$<E>$ root;
+    private AscendingItr($ClassPrefix$ArrDeq$<E>$ root){
+      super(root.tail!=-1?root.head:-1);
+      this.root=root;
+    }
+    private AscendingItr($ClassPrefix$ArrDeq$<E>$ root,int cursor){
+      super(cursor);
+      this.root=root;
+    }
+    @Override public $exposedType$ next$TypeNameModifier$(){
+      final $ArrayType$[] arr;
+      int cursor;
+      final $ClassPrefix$ArrDeq$<E>$ root;
+      final var ret=($exposedType$)(arr=(root=this.root).arr)[cursor=this.cursor];
+      if(cursor==root.tail){
+        cursor=-1;
+      }else if(++cursor==arr.length){
+        cursor=0;
+      }
+      this.cursor=cursor;
+      return ret;
+    }
+    private void removeZeroIndex(){
+      int head,tail,headDist,cursor;
+      $ClassPrefix$ArrDeq$<E>$ root;
+      $ArrayType$[] arr;
+      if((tail=(root=this.root).tail)<(headDist=(cursor=(arr=root.arr).length-1)-(head=root.head))){
+        arr[cursor]=arr[0];
+        if(tail==0){
+          root.tail=cursor;
+        }else{
+          ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+          root.tail=tail-1;
+        }
+#IF OfRef
+        arr[tail]=null;
+#ENDIF
+        this.cursor=cursor;
+      }else{
+        if(headDist==0){
+          root.head=0; 
+          arr[head]=null;
+        }else{
+#IF OfRef
+          ArrCopy.uncheckedSelfCopy(arr,tail=head,arr,++head,headDist);
+          arr[tail]=null;
+#ELSE
+          ArrCopy.uncheckedSelfCopy(arr,head,arr,++head,headDist);
+#ENDIF
+          root.head=head;
+        }
+      }
+    }
+    private void fragmentedRemoveFromTailRun(int lastRet,int head,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      $ArrayType$[] arr;
+      int tailDist,headDist,arrBound;
+      if((tailDist=tail-lastRet)<=(headDist=(arrBound=(arr=root.arr).length-1)-head)+lastRet){
+        ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+#IF OfRef
+        arr[tail]=null;
+#ENDIF
+        root.tail=tail-1;
+        this.cursor=lastRet;
+      }else{
+        ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+        arr[0]=arr[arrBound];
+        if(headDist==0){
+          root.head=0;
+#IF OfRef
+          arr[head]=null;
+#ENDIF
+        }else{
+#IF OfRef
+          ArrCopy.uncheckedCopy(arr,tail=head,arr,++head,headDist);
+          arr[tail]=null;
+#ELSE
+          ArrCopy.uncheckedCopy(arr,head,arr,++head,headDist);
+#ENDIF
+          root.head=head;
+        }
+      }
+    }
+    private void nonfragmentedRemove(int head,int cursor,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      int headDist,tailDist
+      if((headDist=(--cursor)-head)<=(tailDist=tail-cursor)){
+        $ArrayType$[] arr;
+#IF OfRef
+        ArrCopy.semicheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
+        arr[tail]=null;
+#ELSE
+        ArrCopy.semicheckedCopy(arr=root.arr,head,arr,++head,headDist);
+#ENDIF
+        root.head=head;
+      }else{
+#IF OfRef
+        $ArrayType$[] arr;
+        ArrCopy.uncheckedSelfCopy(arr=root.arr,cursor,cursor+1,tailDist);
+        arr[tail]=null;
+#ELSE
+        ArrCopy.uncheckedSelfCopy(root.arr,cursor,cursor+1,tailDist);
+#ENDIF
+        root.tail=tail-1;
+        this.cursor=cursor;
+      }
+    }
+    private void mainRemoveImpl(int cursor){
+      $ClassPrefix$ArrDeq$<E>$ root;
+      int head,tail;
+      if((tail=(root=this.root).tail)<(head=root.head)){
+        int headDist;
+        if((headDist=(--cursor)-head)>=0){
+          $ArrayType$[] arr;
+          int tailDist,arrBound;
+          if(headDist<=(tailDist=(arrBound=(arr=root.arr).length-1)-cursor)+tail){
+            root.head=fragmentedPullUp(arr,head,headDist);
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist)
+            arr[arrBound]=arr[0];
+            if(tail==0){
+              root.tail=arrBound;
+            }else{
+              ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+              root.tail=tail-1;
+            }
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+            this.cursor=cursor;
+          }
+        }else{
+          fragmentedRemoveFromTailRun(cursor,head,tail,root);
+        }
+      }else{
+        nonfragmentedRemove(head,cursor,tail,root);
+      }
+    }
+    @Override public void remove(){
+      int cursor;
+      switch(cursor=this.cursor){
+        case -1:
+          root.eraseTail();
+          break;
+        case 0:
+          removeZeroIndex();
+          break;
+        default:
+          mainRemoveImpl(cursor);
+      }
+    }
+    @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
+      final $ClassPrefix$ArrDeq$<E>$ root;
+      int tail;
+      final var arr=(root=this.root).arr;
+      if(cursor>(tail=root.tail)){
+        OmniArray.Of$ClassPrefix$.ascendingForEach(arr,cursor,arr.length-1,action);
+        cursor=0;
+      }
+      OmniArray.Of$ClassPrefix$.ascendingForEach(arr,cursor,tail,action);
+      this.cursor=-1;
     }
   }
-  @Override public void addLast($exposedType$ val){
-    //TODO
+  private static class DescendingItr$<E>$ extends AscendingItr$<E>$
+  {
+    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root){
+      super(root,root.tail);
+    }
+    @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
+      final $ClassPrefix$ArrDeq$<E>$ root;
+      final int head;
+      final var arr=(root=this.root).arr;
+      if(cursor<(head=root.head)){
+        OmniArray.Of$ClassPrefix$.descendingForEach(arr,0,cursor,action);
+        cursor=arr.length-1
+      }
+      OmniArray.Of$ClassPrefix$.descendingForEach(arr,head,cursor,action);
+      this.cursor=-1;
+    }
+    @Override public $exposedType$ next$TypeNameModifier$(){
+      final $ArrayType$[] arr;
+      int cursor;
+      final $ClassPrefix$ArrDeq$<E>$ root;
+      final var ret=($exposedType$)(arr=(root=this.root).arr)[cursor=this.cursor];
+      if(cursor==root.head){
+        cursor=-1;
+      }else if(--cursor==-1){
+        cursor=arr.length-1;
+      }
+      this.cursor=cursor;
+      return ret;
+    }
+    @Override public void remove(){
+      int cursor;
+      if((cursor=this.cursor)==-1){
+         root.eraseHead();
+      }else{
+        $ClassPrefix$ArrDeq$<E>$ root;
+        $ArrayType$[] arr;
+        int arrBound;
+        if(cursor==(arrBound=(arr=(root=this.root).arr).length-1))
+        {
+          //TODO remove from split
+          int tail;
+          if((tail=root.tail)<=(arrBound+1)-head)
+          {
+            //TODO pull down tail
+          }
+          else
+          {
+            //TODO pull up head
+          }
+        }
+        else
+        {
+          //TODO mainRemoveImpl
+        }
+      }
+    }
+  }
+  
+  @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+    return new AscendingItr$<E>$(this);
+  }
+  @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
+    return new DescendingItr$<E>$(this);
   }
   @Override public void readExternal(ObjectInput input) throws IOException
 #IF OfRef
@@ -468,12 +979,109 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       return false;
     }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
-      //TODO
-      return null;
+      return new AscendingItr$<E>$(this);
     }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
-      //TODO
-      return null;
+      return new DescendingItr$<E>$(this);
+    }
+    private static class AscendingItr$<E>$ extends AbstractDeqItr$<E>$
+    {
+      transient int modCount;
+      transient int lastRet;
+      transient final Checked$<E>$ root;
+      private AscendingItr(Checked$<E>$ root){
+        super(root.tail==-1?-1:root.head);
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+      }
+      private AscendingItr(Checked$<E>$ root,int cursor){
+        super(cursor);
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final Checked$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int cursor;
+        if((cursor=this.cursor)!=-1){
+          final $ArrayType$[] arr;
+          final var ret=($exposedType$)(arr=root.arr)[cursor];
+          this.lastRet=cursor;
+          if(cursor==root.tail){
+            cursor=-1;
+          }else if(++cursor==arr.length){
+            cursor=0;
+          }
+          this.cursor=cursor;
+          return ret;
+        }
+        throw new NoSuchElementException();
+        
+      }
+      @Override public void remove(){
+        //TODO
+      }
+      @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
+        int modCount=this.modCount;
+        final Checked$<E>$ root;
+        int tail=(root=this.root).tail;
+        try{
+          final var arr=root.arr;
+          if(cursor>tail){
+            OmniArray.Of$ClassPrefix$.ascendingForEach(arr,cursor,arr.length-1,action);
+            cursor=0;
+          }
+          OmniArray.Of$ClassPrefix$.ascendingForEach(arr,cursor,tail,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+        this.lastRet=tail;
+        this.cursor=-1;
+      }
+    }
+    private static DescendingItr$<E>$ extends AscendingItr$<E>${
+      private DescendingItr(Checked$<E>$ root){
+        super(root,root.tail);
+      }
+      @Override public $exposedType$ next$TypeNameModifier$(){
+        final Checked$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int cursor;
+        if((cursor=this.cursor)!=-1){
+          final $ArrayType$[] arr;
+          final var ret=($exposedType$)(arr=root.arr)[cursor];
+          this.lastRet=cursor;
+          if(cursor==root.head){
+            cursor=-1;
+          }else if(--cursor==-1){
+            cursor=arr.length-1;
+          }
+          this.cursor=cursor;
+          return ret;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override public void remove(){
+        //TODO
+      }
+      @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
+        int modCount=this.modCount;
+        final Checked$<E>$ root;
+        int head=(root=this.root).head;
+        try{
+          if(cursor<head){
+            OmniArray.Of$ClassPrefix$.descendingForEach(arr,0,cursor,action);
+            cursor=arr.length-1
+          }
+          OmniArray.Of$ClassPrefix$.descendingForEach(arr,head,cursor,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+        this.lastRet=head;
+        this.cursor=-1;
+      }
     }
     @Override public boolean equals(Object obj){
       //TODO
