@@ -61,7 +61,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     int size;
     this.size=size=in.readInt();
     if(size!=0){
-      OmniArray.OfRef.readArray(this.arr=new Object[size],0,size-1,in);
+      Object[] arr;
+      OmniArray.OfRef.readArray(arr=new Object[size],0,size-1,in);
+      this.arr=arr;
     }
   }
   @SuppressWarnings("unchecked")
@@ -1974,7 +1976,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfRef.readArray(this.arr=new Object[size],0,size-1,ois);
+          Object[] arr;
+          OmniArray.OfRef.readArray(arr=new Object[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -4212,7 +4216,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfRef.readArray(this.arr=new Object[size],0,size-1,ois);
+          Object[] arr;
+          OmniArray.OfRef.readArray(arr=new Object[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

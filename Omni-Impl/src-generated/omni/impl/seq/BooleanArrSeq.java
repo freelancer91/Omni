@@ -65,7 +65,9 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
     int size;
     this.size=size=in.readInt();
     if(size!=0){
-      OmniArray.OfBoolean.readArray(this.arr=new boolean[size],0,size-1,in);
+      boolean[] arr;
+      OmniArray.OfBoolean.readArray(arr=new boolean[size],0,size-1,in);
+      this.arr=arr;
     }
   }
   @Override public void clear(){
@@ -1845,7 +1847,9 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfBoolean.readArray(this.arr=new boolean[size],0,size-1,ois);
+          boolean[] arr;
+          OmniArray.OfBoolean.readArray(arr=new boolean[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -1890,7 +1894,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
             OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";
@@ -3750,7 +3754,9 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfBoolean.readArray(this.arr=new boolean[size],0,size-1,ois);
+          boolean[] arr;
+          OmniArray.OfBoolean.readArray(arr=new boolean[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3804,7 +3810,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
             OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";

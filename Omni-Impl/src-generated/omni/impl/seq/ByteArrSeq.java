@@ -66,7 +66,9 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
     int size;
     this.size=size=in.readInt();
     if(size!=0){
-      in.readFully(this.arr=new byte[size],0,size);
+      byte[] arr;
+      in.readFully(arr=new byte[size],0,size);
+      this.arr=arr;
     }
   }
   private static  long markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter){
@@ -1713,7 +1715,9 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          ois.readFully(this.arr=new byte[size]);
+          byte[] arr;
+          ois.readFully(arr=new byte[size]);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -1757,7 +1761,7 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
             OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";
@@ -3483,7 +3487,9 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          ois.readFully(this.arr=new byte[size]);
+          byte[] arr;
+          ois.readFully(arr=new byte[size]);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3536,7 +3542,7 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
             OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";

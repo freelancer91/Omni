@@ -66,7 +66,9 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
     int size;
     this.size=size=in.readInt();
     if(size!=0){
-      OmniArray.OfShort.readArray(this.arr=new short[size],0,size-1,in);
+      short[] arr;
+      OmniArray.OfShort.readArray(arr=new short[size],0,size-1,in);
+      this.arr=arr;
     }
   }
   private static  long markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter){
@@ -1705,7 +1707,9 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfShort.readArray(this.arr=new short[size],0,size-1,ois);
+          short[] arr;
+          OmniArray.OfShort.readArray(arr=new short[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -1750,7 +1754,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
             OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";
@@ -3482,7 +3486,9 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfShort.readArray(this.arr=new short[size],0,size-1,ois);
+          short[] arr;
+          OmniArray.OfShort.readArray(arr=new short[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3536,7 +3542,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
             OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";

@@ -8,6 +8,9 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
 import omni.util.OmniArray;
 import omni.api.OmniDeque;
 import omni.util.ArrCopy;
@@ -20,7 +23,7 @@ import java.util.function.IntFunction;
 #IFNOT OfRef
 import omni.util.TypeUtil;
 #ENDIF
-import java.util.ConcurrentModificationException;
+
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 import java.util.function.$TypeNameModifier$Consumer;
@@ -35,7 +38,9 @@ import omni.util.ToStringUtil;
 import omni.impl.Abstract$TypeNameModifier$Itr;
 #ENDIF
 #IF OfRef
+import java.util.ConcurrentModificationException;
 import omni.util.OmniPred;
+import java.util.Objects;
 #ENDIF
 import java.io.Externalizable;
 import java.io.IOException;
@@ -140,9 +145,11 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     addLast(val);
     return true;
   }
+  #MACRO SuppressUnchecked()
   @Override public $exposedType$ $elementMethod$(){
     return ($exposedType$)arr[head];
   }
+  #MACRO SuppressUnchecked()
   @Override public $exposedType$ getLast$TypeNameModifier$(){
     return ($exposedType$)arr[tail];
   }
@@ -340,6 +347,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
     return 1;
   }
+  #MACRO SuppressUnchecked()
   @Override public $exposedType$ pop$TypeNameModifier$(){
     final $ArrayType$[] arr;
     int head;
@@ -356,6 +364,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     this.head=head;
     return ret;
   }
+  #MACRO SuppressUnchecked()
   @Override public $exposedType$ removeLast$TypeNameModifier$(){
     final $ArrayType$[] arr;
     int tail;
@@ -420,7 +429,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         if(++head==size){
           ++bufferOffset;
           head=0;
-          break
+          break;
         }
       }
     }else{
@@ -436,7 +445,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
 #ELSE
     final byte[] buffer;
-    int size,head,bufferOffset=1
+    int size,head,bufferOffset=1;
     if((size=(++tail)-(head=this.head))<=0){
       int bound;
   #IF OfBoolean
@@ -480,7 +489,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   #IF OfByte
           builder.uncheckedAppendShort(arr[head]);
   #ELSE
-          builder.uncheckedAppendCLASSPREFIX(arr[head]);
+          builder.uncheckedAppend$ClassPrefix$(arr[head]);
   #ENDIF
           builder.uncheckedAppendCommaAndSpace();
           if(++head==bound){
@@ -488,7 +497,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   #IF OfByte
               builder.uncheckedAppendShort(arr[head]);
   #ELSE
-              builder.uncheckedAppendCLASSPREFIX(arr[head]);
+              builder.uncheckedAppend$ClassPrefix$(arr[head]);
   #ENDIF
               if(++head==tail){
                 builder.uncheckedAppendChar((byte)']');
@@ -602,7 +611,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           this.head=0;
         }else{
           int head;
-          if(++tail==(head=this.head){
+          if(++tail==(head=this.head)){
             this.head=0;
             final $ArrayType$[] newArr;
             (newArr=new $ArrayType$[OmniArray.growBy50Pct(tail=arr.length)])[tail]=val;
@@ -628,21 +637,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       initFromNullArr(val);
     }
   }
-  @Override public boolean equals(Object obj){
-    //TODO
-    return false;
-  }
-  boolean fragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
-    //TODO
-    return false;
-  }
-  boolean nonfragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
-    //TODO
-    return false;
-  }
   private void eraseHead(){
     int head;
-    switch(Integer.signum(this.tail-(head=this.head)){
+    switch(Integer.signum(this.tail-(head=this.head))){
       case -1:
 #IF OfRef
         $ArrayType$[] arr;
@@ -680,16 +677,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     arr[tail]=null;
 #ENDIF
   }
-  private static int fragmentedPullUp($ArrayType$[] arr,int head,int headDist){
-#IF OfRef
-    final int tmp;
-    ArrCopy.semicheckedCopy(arr,tmp=head,arr,++head,headDist);
-    arr[tmp]=null;
-#ELSE
-    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
-#ENDIF
-    return head;
-  }
   private static abstract class AbstractDeqItr$<E>$
 #IF OfRef
     implements OmniIterator.Of$ClassPrefix$$<E>$
@@ -720,8 +707,47 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
 #ENDIF
   }
-  
-  private static class AscendingItr$<E>$ extends AbsractDequeItr$<E>$
+  private static int pullUp($ArrayType$[] arr,int head,int headDist){
+#IF OfRef
+    final int tmp;
+    ArrCopy.semicheckedCopy(arr,tmp=head,arr,++head,headDist);
+    arr[tmp]=null;
+#ELSE
+    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+#ENDIF
+    return head;
+  }
+  private static int fragmentedPullUp($ArrayType$[] arr,int head,int headDist){
+    if(headDist==0){
+#IF OfRef
+      arr[head]=null;
+#ENDIF
+      return 0;
+    }else{
+#IF OfRef
+      int tmp;
+      ArrCopy.uncheckedCopy(arr,tmp=head,arr,++head,headDist);
+      arr[tmp]=null;
+#ELSE
+      ArrCopy.uncheckedCopy(arr,head,arr,++head,headDist);
+#ENDIF
+      return head;
+    }
+  }
+  private static int fragmentedPullDown($ArrayType$[] arr,int arrBound,int tail){
+    if(tail==0){
+#IF OfRef
+      arr[0]=null;
+#ENDIF
+      return arrBound;
+    }
+    ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+#IF OfRef
+    arr[tail]=null;
+#ENDIF
+    return tail-1;
+  }
+  private static class AscendingItr$<E>$ extends AbstractDeqItr$<E>$
   {
     transient final $ClassPrefix$ArrDeq$<E>$ root;
     private AscendingItr($ClassPrefix$ArrDeq$<E>$ root){
@@ -732,6 +758,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       super(cursor);
       this.root=root;
     }
+    #MACRO SuppressUnchecked()
     @Override public $exposedType$ next$TypeNameModifier$(){
       final $ArrayType$[] arr;
       int cursor;
@@ -745,77 +772,10 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       this.cursor=cursor;
       return ret;
     }
-    private void removeZeroIndex(){
-      int head,tail,headDist,cursor;
-      $ClassPrefix$ArrDeq$<E>$ root;
-      $ArrayType$[] arr;
-      if((tail=(root=this.root).tail)<(headDist=(cursor=(arr=root.arr).length-1)-(head=root.head))){
-        arr[cursor]=arr[0];
-        if(tail==0){
-          root.tail=cursor;
-        }else{
-          ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
-          root.tail=tail-1;
-        }
-#IF OfRef
-        arr[tail]=null;
-#ENDIF
-        this.cursor=cursor;
-      }else{
-        if(headDist==0){
-          root.head=0; 
-          arr[head]=null;
-        }else{
-#IF OfRef
-          ArrCopy.uncheckedSelfCopy(arr,tail=head,arr,++head,headDist);
-          arr[tail]=null;
-#ELSE
-          ArrCopy.uncheckedSelfCopy(arr,head,arr,++head,headDist);
-#ENDIF
-          root.head=head;
-        }
-      }
-    }
-    private void fragmentedRemoveFromTailRun(int lastRet,int head,int tail,$ClassPrefix$ArrDeq$<E>$ root){
-      $ArrayType$[] arr;
-      int tailDist,headDist,arrBound;
-      if((tailDist=tail-lastRet)<=(headDist=(arrBound=(arr=root.arr).length-1)-head)+lastRet){
-        ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-#IF OfRef
-        arr[tail]=null;
-#ENDIF
-        root.tail=tail-1;
-        this.cursor=lastRet;
-      }else{
-        ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
-        arr[0]=arr[arrBound];
-        if(headDist==0){
-          root.head=0;
-#IF OfRef
-          arr[head]=null;
-#ENDIF
-        }else{
-#IF OfRef
-          ArrCopy.uncheckedCopy(arr,tail=head,arr,++head,headDist);
-          arr[tail]=null;
-#ELSE
-          ArrCopy.uncheckedCopy(arr,head,arr,++head,headDist);
-#ENDIF
-          root.head=head;
-        }
-      }
-    }
     private void nonfragmentedRemove(int head,int cursor,int tail,$ClassPrefix$ArrDeq$<E>$ root){
-      int headDist,tailDist
+      int headDist,tailDist;
       if((headDist=(--cursor)-head)<=(tailDist=tail-cursor)){
-        $ArrayType$[] arr;
-#IF OfRef
-        ArrCopy.semicheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
-        arr[tail]=null;
-#ELSE
-        ArrCopy.semicheckedCopy(arr=root.arr,head,arr,++head,headDist);
-#ENDIF
-        root.head=head;
+        root.head=pullUp(root.arr,head,headDist);
       }else{
 #IF OfRef
         $ArrayType$[] arr;
@@ -828,48 +788,62 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.cursor=cursor;
       }
     }
-    private void mainRemoveImpl(int cursor){
-      $ClassPrefix$ArrDeq$<E>$ root;
-      int head,tail;
-      if((tail=(root=this.root).tail)<(head=root.head)){
-        int headDist;
-        if((headDist=(--cursor)-head)>=0){
-          $ArrayType$[] arr;
-          int tailDist,arrBound;
-          if(headDist<=(tailDist=(arrBound=(arr=root.arr).length-1)-cursor)+tail){
-            root.head=fragmentedPullUp(arr,head,headDist);
-          }else{
-            ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist)
-            arr[arrBound]=arr[0];
-            if(tail==0){
-              root.tail=arrBound;
-            }else{
-              ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
-              root.tail=tail-1;
-            }
-#IF OfRef
-            arr[tail]=null;
-#ENDIF
-            this.cursor=cursor;
-          }
+    private void fragmentedRemove(int head,int cursor,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      $ArrayType$[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=(--cursor)-head)>=0){
+        if(headDist<=(tailDist=arrBound-cursor)+tail){
+          root.head=pullUp(arr,head,headDist);
         }else{
-          fragmentedRemoveFromTailRun(cursor,head,tail,root);
+          ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+          this.cursor=cursor;
         }
       }else{
-        nonfragmentedRemove(head,cursor,tail,root);
+        if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
+          ArrCopy.uncheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+#IF OfRef
+          arr[tail]=null;
+#ENDIF
+          root.tail=tail-1;
+          this.cursor=cursor;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,cursor);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+        }
+      }
+    }
+    private void eraseAtSplit(){
+      final int head,tail,headDist,arrBound;
+      final $ClassPrefix$ArrDeq$<E>$ root;
+      final $ArrayType$[] arr;
+      if((tail=(root=this.root).tail)<(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
+        arr[arrBound]=arr[0];
+        root.tail=fragmentedPullDown(arr,arrBound,tail);
+        this.cursor=arrBound;
+      }else{
+        root.head=fragmentedPullUp(arr,head,headDist);
       }
     }
     @Override public void remove(){
-      int cursor;
+      final int cursor;
       switch(cursor=this.cursor){
         case -1:
           root.eraseTail();
           break;
         case 0:
-          removeZeroIndex();
+          eraseAtSplit();
           break;
         default:
-          mainRemoveImpl(cursor);
+          final int head,tail;
+          final $ClassPrefix$ArrDeq$<E>$ root;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedRemove(head,cursor,tail,root);
+          }
       }
     }
     @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
@@ -886,58 +860,104 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   }
   private static class DescendingItr$<E>$ extends AscendingItr$<E>$
   {
-    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root){
-      super(root,root.tail);
+    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root,int cursor){
+      super(root,cursor);
     }
     @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
       final $ClassPrefix$ArrDeq$<E>$ root;
       final int head;
       final var arr=(root=this.root).arr;
-      if(cursor<(head=root.head)){
-        OmniArray.Of$ClassPrefix$.descendingForEach(arr,0,cursor,action);
-        cursor=arr.length-1
+      if(--cursor<(head=root.head)){
+         if(cursor>=0){
+           OmniArray.Of$ClassPrefix$.descendingForEach(arr,cursor,0,action);
+         }
+         cursor=arr.length-1;
       }
       OmniArray.Of$ClassPrefix$.descendingForEach(arr,head,cursor,action);
       this.cursor=-1;
     }
+    #MACRO SuppressUnchecked()
     @Override public $exposedType$ next$TypeNameModifier$(){
-      final $ArrayType$[] arr;
       int cursor;
       final $ClassPrefix$ArrDeq$<E>$ root;
-      final var ret=($exposedType$)(arr=(root=this.root).arr)[cursor=this.cursor];
-      if(cursor==root.head){
-        cursor=-1;
-      }else if(--cursor==-1){
+      final var arr=(root=this.root).arr;
+      if((cursor=this.cursor-1)==-1){
         cursor=arr.length-1;
       }
-      this.cursor=cursor;
-      return ret;
+      this.cursor=(cursor==root.head)?-1:cursor;
+      return ($exposedType$)arr[cursor];
+    }
+    private void eraseAtSplit(){
+      final $ClassPrefix$ArrDeq$<E>$ root;
+      final int head,tail,headDist,arrBound;
+      final $ArrayType$[] arr;
+      if((tail=(root=this.root).tail)<=(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
+        root.tail=fragmentedPullDown(arr,arrBound,tail);
+      }else{
+        root.head=fragmentedPullUp(arr,head,headDist);
+        this.cursor=0;
+      }
+    }
+    private void fragmentedRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      $ArrayType$[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=lastRet-head)>=0){
+        if(headDist<=(tailDist=arrBound-lastRet)+tail){
+          root.head=pullUp(arr,head,headDist);
+          this.cursor=lastRet;
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+        }
+      }else{
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+#IF OfRef
+          arr[tail]=null;
+#ENDIF
+          root.tail=tail-1;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+          this.cursor=lastRet;
+        }
+      }
+    }
+    private void nonfragmentedRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      int headDist,tailDist;
+      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+        root.head=pullUp(root.arr,head,headDist);
+        this.cursor=lastRet;
+      }else{
+#IF OfRef
+        $ArrayType$[] arr;
+        ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+#ELSE
+        ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+#ENDIF
+        root.tail=tail-1;
+      }
     }
     @Override public void remove(){
-      int cursor;
-      if((cursor=this.cursor)==-1){
-         root.eraseHead();
-      }else{
-        $ClassPrefix$ArrDeq$<E>$ root;
-        $ArrayType$[] arr;
-        int arrBound;
-        if(cursor==(arrBound=(arr=(root=this.root).arr).length-1))
-        {
-          //TODO remove from split
-          int tail;
-          if((tail=root.tail)<=(arrBound+1)-head)
-          {
-            //TODO pull down tail
+      final int cursor;
+      switch(cursor=this.cursor){
+        case -1:
+          root.eraseHead();
+          break;
+        case 0:
+          eraseAtSplit();
+          break;
+        default:
+          final int head,tail;
+          final $ClassPrefix$ArrDeq$<E>$ root;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedRemove(head,cursor,tail,root);
           }
-          else
-          {
-            //TODO pull up head
-          }
-        }
-        else
-        {
-          //TODO mainRemoveImpl
-        }
       }
     }
   }
@@ -946,17 +966,444 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     return new AscendingItr$<E>$(this);
   }
   @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
-    return new DescendingItr$<E>$(this);
+    int tail;
+    return new DescendingItr$<E>$(this,(tail=this.tail)==-1?-1:tail==arr.length-1?0:tail+1);
+  }
+  #MACRO SuppressUnchecked()
+  boolean fragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+#IF OfBoolean
+    final var arr=this.arr;
+    int trueCount=0;
+    int size;
+    for(int i=tail;;--i){
+      if(arr[i])
+      {
+        ++trueCount;
+      }
+      if(i==0)
+      {
+        for(i=(size=arr.length)-1;;--i)
+        {
+          if(arr[i])
+          {
+            ++trueCount;
+          }
+          if(i==head)
+          {
+            break;
+          }
+        }
+        size+=(tail+1-head);
+        break;
+      }
+    }
+    if(trueCount==size)
+    {
+      if(filter.test(true))
+      {
+        this.tail=-1;
+        return true;
+      }
+    }else if(trueCount==0)
+    {
+      if(filter.test(false))
+      {
+        this.tail=-1;
+        return true;
+      }
+    }else{
+      if(filter.test(true)){
+        if(filter.test(false)){
+          this.tail=-1;
+        }else{
+          setRange(arr,size-=(trueCount+1),false);
+          this.head=0;
+          this.tail=size;         
+        }
+        return true;
+      }else if(filter.test(false)){
+        setRange(arr,--trueCount,true);
+        this.head=0;
+        this.tail=trueCount;
+        return true;
+      }
+    }
+    return false;
+#ELSE
+    $ArrayType$[] arr;
+    if(filter.test(($exposedType$)(arr=this.arr)[head]))
+    {
+      if(filter.test(($exposedType$)arr[tail]))
+      {
+        fragmentedCollapseHeadAndTail(arr,head,tail,filter);
+      }
+      else
+      {
+        fragmentedCollapsehead(arr,head,tail,filter);
+      }
+      return true;
+    }
+    else if(filter.test(($exposedType$)arr[tail]))
+    {
+      fragmentedCollapsetail(arr,head,tail,filter);
+      return true;
+    }
+    return fragmentedCollapseBody(arr,head,tail,filter);
+#ENDIF
+  }
+#IF OfBoolean
+  private static void setRange($ArrayType$[] arr,int tail,$ArrayType$ val){
+    for(;;--tail){
+      arr[tail]=val;
+      if(tail==0){
+        return;
+      }
+    }
+  }
+#ELSE
+  #MACRO SuppressUnchecked()
+  private static $<E>$ int pullDown($ArrayType$[] arr,int dstOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter){
+    for(int srcOffset=dstOffset+1;srcOffset!=srcBound;++srcOffset)
+    {
+      final $ArrayType$ v;
+      if(!filter.test(($exposedType$)(v=arr[srcOffset])))
+      {
+        arr[dstOffset++]=v;
+      }
+    }
+    arr[dstOffset]=arr[srcBound];
+#IF OfRef
+    OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcBound,dstOffset+1);
+#ENDIF
+    return dstOffset;
+  }
+  #MACRO SuppressUnchecked()
+  private static $<E>$ int pullUp($ArrayType$[] arr,int dstOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter){
+    for(int srcOffset=dstOffset-1;srcOffset!=srcBound;--srcOffset)
+    {
+      final $ArrayType$ v;
+      if(!filter.test(($exposedType$)(v=arr[srcOffset])))
+      {
+        arr[dstOffset--]=v;
+      }
+    }
+    arr[dstOffset]=arr[srcBound];
+#IF OfRef
+    OmniArray.Of$ClassPrefix$.nullifyRange(arr,dstOffset-1,srcBound);
+#ENDIF
+    return dstOffset;
+  }
+  #MACRO SuppressUnchecked()
+  private void fragmentedCollapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        tail=pullDown(arr,srcOffset,tail,filter);
+        break;
+      }
+    }
+    this.tail=tail;
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset)
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        head=pullUp(arr,srcOffset,head,filter);
+        break;
+      }
+    }
+    this.head=head;
+  }
+  #MACRO SuppressUnchecked()
+  private void collapseBodyHelper($ArrayType$[] ar,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    int midPoint;
+    for(int srcOffset=midPoint=(head+tail)>>1;srcOffset!=head;--srcOffset){
+      if(filter.test(($exposedType$)arr[srcOffset])){
+        this.head=pullUp(arr,srcOffset,head,filter);
+        while(++midPoint!=tail){
+          if(filter.test(($exposedType$)arr[midPoint])){
+            tail=pullDown(arr,midPoint,tail,filter);
+            break;
+          }
+        }
+        this.tail=tail;
+        return;
+      }
+    }
+    while(++midPoint!=tail){
+      if(filter.test(($exposedType$)arr[midPoint])){
+        tail=pullDown(arr,midPoint,tail,filter);
+        break;
+      }
+    }
+    this.head=head;
+    this.tail=tail;
+  }
+  #MACRO SuppressUnchecked()
+  private void fragmentedCollapseHeadAndTail($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+#IF OfRef
+    arr[head]=null;
+#ENDIF
+    outer:for(;;){
+      do{
+#IF OfRef
+        arr[tail]=null;
+#ENDIF
+        if(tail==0){
+          for(tail=arr.length-1;tail!=head;--tail){
+            if(!filter.test(($exposedType$)arr[tail])){
+              break outer;
+            }
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+          }  
+          this.tail=-1;
+          return;
+        }
+      }while(filter.test(($exposedType$)arr[--tail]));
+      for(int bound=arr.length;++head!=bound;){
+        if(!filter.test(($exposedType$)arr[head])){
+          fragmentedCollapseBodyHelper(arr,head,tail,filter);
+          return;
+        }
+#IF OfRef
+        arr[head]=null;
+#ENDIF
+      }
+      head=-1;
+      break;
+    }
+    while(++head!=tail){
+      if(!filter.test(($exposedType$)arr[head])){
+        collapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+#IF OfRef
+      arr[head]=null;
+#ENDIF
+    }
+    this.head=head;
+    this.tail=tail;
+  }
+  #MACRO SuppressUnchecked()
+  private boolean fragmentedCollapseBody($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset){
+      if(filter.test(($exposedType$)arr[srcOffset])){
+        this.tail=pullDown(arr,srcOffset,tail,filter);
+        for(srcOffset=arr.length-1;srcOffset!=head;--srcOffset){
+          if(filter.test(($exposedType$)arr[srcOffset])){
+            this.head=pullUp(arr,srcOffset,head,filter);
+            break;
+          }
+        }
+        return true;
+      }
+    }
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset){
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        this.head=pullUp(arr,srcOffset,head,filter);
+        return true;
+      }
+    }
+    return false;
+  }
+  #MACRO CollapseEnd<false,head,tail>(++)
+  #MACRO CollapseEnd<false,tail,head>(--)
+  #MACRO SuppressUnchecked()
+  private void collapseHeadAndTail($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+#IF OfRef
+    arr[tail]=null;
+#ENDIF
+    do{
+#IF OfRef
+      arr[head]=null;
+#ENDIF
+      if(++head==tail){
+        this.tail=-1;
+        return;
+      }
+    }while(filter.test(($exposedType$)arr[head]));
+    while(--tail!=head){
+      if(!filter.test(($exposedType$)arr[tail])){
+        collapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+#IF OfRef
+      arr[tail]=null;
+#ENDIF
+    }
+    this.head=head;
+    this.tail=head;
+  }
+  #MACRO SuppressUnchecked()
+  private boolean collapseBody($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+    int midPoint;
+    for(int srcOffset=midPoint=(head+tail)>>1;srcOffset!=head;--srcOffset){
+      if(filter.test(($exposedType$)arr[srcOffset])){
+        this.head=pullUp(arr,srcOffset,head,filter);
+        while(++midPoint!=tail){
+          if(filter.test(($exposedType$)arr[midPoint])){
+            this.tail=pullDown(arr,midPoint,tail,filter);
+            break;
+          }
+        }
+        return true;
+      }
+    }
+    while(++midPoint!=tail){
+      if(filter.test(($exposedType$)arr[midPoint])){
+        this.tail=pullDown(arr,midPoint,tail,filter);
+        return true;
+      }
+    }
+    return false;
+  }
+#ENDIF
+  #MACRO SuppressUnchecked()
+  boolean nonfragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+#IF OfBoolean
+    final var arr=this.arr;
+    int trueCount=0;
+    for(int i=head;;++i){
+      if(arr[i]){
+        ++trueCount;
+      }
+      if(i==tail){
+        break;
+      }
+    }
+    int size;
+    if(trueCount==(size=tail-head+1)){
+      if(filter.test(true)){
+        this.tail=-1;
+        return true;
+      }
+    }else if(trueCount==0){
+      if(filter.test(false)){
+        this.tail=-1;
+        return true;
+      }
+    }else{
+      if(filter.test(true)){
+        if(filter.test(false)){
+          this.tail=-1;
+        }else{
+          setRange(arr,size-=-(trueCount+1),false);
+          this.head=0;
+          this.tail=size;
+        }
+        return true;
+      }else if(filter.test(false)){
+        setRange(arr,--trueCount,true);
+        this.head=0;
+        this.tail=trueCount;
+        return true;
+      }
+    }
+#ELSE
+    final $ArrayType$[] arr;
+    if(filter.test(($exposedType$)(arr=this.arr)[head])){
+      if(head==tail){
+#IF OfRef
+        arr[tail]=null;
+#ENDIF
+        this.tail=-1;
+      }else{
+        if(filter.test(($exposedType$)arr[tail])){
+          collapseHeadAndTail(arr,head,tail,filter);
+        }else{
+          collapsehead(arr,head,tail,filter);
+        }
+      }
+      return true;
+    }else if(head!=tail){
+      if(filter.test(($exposedType$)arr[tail])){
+        collapsetail(arr,head,tail,filter);
+        return true;
+      }
+      return collapseBody(arr,head,tail,filter);
+    }
+#ENDIF
+    return false;
   }
   @Override public void readExternal(ObjectInput input) throws IOException
 #IF OfRef
     ,ClassNotFoundException
 #ENDIF
   {
-    //TODO
+    int size;
+    if((size=input.readInt())!=0){
+      $ArrayType$[] arr;
+#IF OfByte
+      input.readFully(arr=new $ArrayType$[size]);
+      this.tail=size-1;
+#ELSE
+      OmniArray.Of$ClassPrefix$.readArray(arr=new $ArrayType$[size],0,--size,input);
+      this.tail=size;
+#ENDIF
+      this.head=0;
+      this.arr=arr;
+    }else{
+      this.tail=-1;
+    }
   }
   @Override public void writeExternal(ObjectOutput output) throws IOException{
-    //TODO
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head,size;
+      if((size=(++tail)-(head=this.head))<=0){
+        $ArrayType$[] arr;
+        output.writeInt(size+(size=(arr=this.arr).length));
+#IF OfBoolean
+        for(int word=TypeUtil.castToByte(arr[head]),marker=1;;){
+          if(++head==size){
+             head=0;
+             do{
+               if((marker<<=1)==(1<<8)){
+                 output.writeByte(word);
+                 word=0;
+                 marker=1;
+               }
+               if(arr[head]){
+                 word|=marker;
+               }
+             }while(++head!=tail);
+             output.writeByte(word);
+             return;
+          }
+          if((marker<<=1)==(1<<8)){
+            output.writeByte(word);
+            word=0;
+            marker=1;
+          }
+          if(arr[head]){
+            word|=marker;
+          }
+        }
+#ELSEIF OfByte
+        output.write(arr,head,size-head);
+        output.write(arr,0,tail);
+#ELSE
+        OmniArray.Of$ClassPrefix$.writeArray(arr,head,size-1,output);
+        OmniArray.Of$ClassPrefix$.writeArray(arr,0,tail-1,output);
+#ENDIF
+      }else{
+        output.writeInt(size);
+#IF OfByte
+        output.write(arr,head,size);
+#ELSE
+        OmniArray.Of$ClassPrefix$.writeArray(arr,head,tail-1,output);
+#ENDIF
+      }
+    }else{
+      output.writeInt(0);
+    }
+  }
+  @Override public boolean equals(Object obj){
+      //TODO
+      return false;
   }
   public static class Checked$<E>$ extends $ClassPrefix$ArrDeq$<E>${
     private static final long serialVersionUID=1L;
@@ -970,12 +1417,151 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     Checked(int head,$ArrayType$[] arr,int tail){
       super(head,arr,tail);
     }
+    @Override public boolean equals(Object obj){
+      //TODO
+      return false;
+    }
+   
+#IFNOT OfBoolean
+    #MACRO CollapseEnd<true,head,tail>(++)
+    #MACRO CollapseEnd<true,tail,head>(--)
+    #MACRO SuppressUnchecked()
+    private void collapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      //TODO
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseHeadAndTail($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      for(int headOffset=head+1;headOffset!=tail;++headOffset)
+      {
+        if(!filter.test(($exposedType$)arr[headOffset]))
+        {
+          for(int tailOffset=tail-1;tailOffset!=headOffset;--tailOffset)
+          {
+            if(!filter.test(($exposedType$)arr[tailOffset]))
+            {
+              collapseBodyHelper(arr,headOffset,tailOffset,filter,modCount);
+              this.modCount=modCount+;
+#IF OfRef
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,tailOffset+1);
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
+#ENDIF
+              return;
+            }
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.head=headOffset;
+          this.tail=headOffset;
+#IF OfRef
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,headOffset+1);
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
+#ENDIF
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+      this.tail=-1;
+#IF OfRef
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+#ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private boolean collapseBody($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      //TODO
+      return false;
+    }
+#ENDIF
+    #MACRO SuppressUnchecked()
     @Override boolean fragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
       //TODO
       return false;
     }
+    #MACRO SuppressUnchecked()
     @Override boolean nonfragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
-      //TODO
+#IF OfBoolean
+      final var arr=this.arr;
+      int trueCount=0;
+      for(int i=head;;++i){
+        if(arr[i]){
+          ++trueCount;
+        }
+        if(i==tail){
+          break;
+        }
+      }
+#ENDIF
+      final int modCount=this.modCount;
+      try{
+#IF OfBoolean
+        int size;
+        if(trueCount==(size=tail-head+1)){
+          if(filter.test(true)){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            this.tail=-1;
+            return true;
+          }
+        }else if(trueCount==0){
+          if(filter.test(false)){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            this.tail=-1;
+            return true;
+          }
+        }else{
+          if(filter.test(true)){
+            if(filter.test(false)){
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.modCount=modCount+1;
+              this.tail=-1;
+            }else{
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.modCount=modCount+1;
+              setRange(arr,size-=-(trueCount+1),false);
+              this.head=0;
+              this.tail=size;
+            }
+            return true;
+          }else if(filter.test(false)){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            setRange(arr,--trueCount,true);
+            this.head=0;
+            this.tail=trueCount;
+            return true;
+          }
+        }
+#ELSE
+        final $ArrayType$[] arr;
+        if(filter.test(($exposedType$)(arr=this.arr)[head])){
+          if(head==tail){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+  #IF OfRef
+            arr[tail]=null;
+  #ENDIF
+            this.tail=-1;
+          }else if(filter.test(($exposedType$)arr[tail])){
+            collapseHeadAndTail(arr,head,tail,filter,modCount);
+          }else{
+            collapsehead(arr,head,tail,filter,modCount);
+          }
+          return true;
+        }else if(head!=tail){
+          if(filter.test(($exposedType$)arr[tail]){
+            collapsetail(arr,head,tail,filter,modCount);
+            return true;
+          }
+          return collapseBody(arr,head,tail,filter,modCount);
+        }
+#ENDIF
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
@@ -984,8 +1570,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
       return new DescendingItr$<E>$(this);
     }
-    private static class AscendingItr$<E>$ extends AbstractDeqItr$<E>$
-    {
+    private static class AscendingItr$<E>$ extends AbstractDeqItr$<E>${
       transient int modCount;
       transient int lastRet;
       transient final Checked$<E>$ root;
@@ -1001,6 +1586,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.modCount=root.modCount;
         this.lastRet=-1;
       }
+      #MACRO SuppressUnchecked()
       @Override public $exposedType$ next$TypeNameModifier$(){
         final Checked$<E>$ root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
@@ -1018,10 +1604,76 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           return ret;
         }
         throw new NoSuchElementException();
-        
+      }
+      void fragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
+        $ArrayType$[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        if((headDist=lastRet-head)>=0){
+          if(headDist<=(tailDist=arrBound-lastRet)+tail){
+            root.head=pullUp(arr,head,headDist);
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+            this.cursor=lastRet;
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+            root.tail=tail-1;
+            this.cursor=lastRet;
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+          }
+        }
+      }
+      void nonfragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
+        final int headDist,tailDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+#IF OfRef
+          final $ArrayType$[] arr;
+          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+#ELSE
+          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+#ENDIF
+          root.tail=tail-1;
+          this.cursor=lastRet;
+        }else{
+          root.head=pullUp(root.arr,head,headDist);
+        }
       }
       @Override public void remove(){
-        //TODO
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked$<E>$ root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
+#IF OfRef
+              root.arr[tail]=null;
+#ENDIF
+              break;
+            default:
+              nonfragmentedRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
+        }
+        throw new IllegalStateException();
       }
       @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
         int modCount=this.modCount;
@@ -1041,10 +1693,11 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.cursor=-1;
       }
     }
-    private static DescendingItr$<E>$ extends AscendingItr$<E>${
+    private static class DescendingItr$<E>$ extends AscendingItr$<E>${
       private DescendingItr(Checked$<E>$ root){
         super(root,root.tail);
       }
+      #MACRO SuppressUnchecked()
       @Override public $exposedType$ next$TypeNameModifier$(){
         final Checked$<E>$ root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
@@ -1063,17 +1716,58 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         }
         throw new NoSuchElementException();
       }
-      @Override public void remove(){
-        //TODO
+      @Override void fragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
+        $ArrayType$[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        if((headDist=lastRet-head)>=0){
+          if(headDist<=(tailDist=arrBound-lastRet)+tail){
+            root.head=pullUp(arr,head,headDist);
+            this.cursor=lastRet;
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+            root.tail=tail-1;
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=lastRet;
+          }
+        }
+      }
+      @Override void nonfragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
+        final int headDist,tailDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+#IF OfRef
+          final $ArrayType$[] arr;
+          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+#ELSE
+          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+#ENDIF
+          root.tail=tail-1;
+        }else{
+          root.head=pullUp(root.arr,head,headDist);
+          this.cursor=lastRet;
+        }
       }
       @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
         int modCount=this.modCount;
         final Checked$<E>$ root;
         int head=(root=this.root).head;
         try{
+          final var arr=root.arr;
           if(cursor<head){
             OmniArray.Of$ClassPrefix$.descendingForEach(arr,0,cursor,action);
-            cursor=arr.length-1
+            cursor=arr.length-1;
           }
           OmniArray.Of$ClassPrefix$.descendingForEach(arr,head,cursor,action);
         }finally{
@@ -1082,10 +1776,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.lastRet=head;
         this.cursor=-1;
       }
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
-      return false;
     }
     @Override public Object clone(){
       int tail;
@@ -1105,6 +1795,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
       return new Checked$<E>$();
     }
+    #MACRO SuppressUnchecked()
     @Override public $exposedType$ removeLast$TypeNameModifier$(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -1124,6 +1815,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
       throw new NoSuchElementException();
     }
+    #MACRO SuppressUnchecked()
     @Override public $exposedType$ pop$TypeNameModifier$(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -1188,12 +1880,14 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
+    #MACRO SuppressUnchecked()
     @Override public $exposedType$ $elementMethod$(){
       if(tail!=-1){
         return ($exposedType$)arr[head];
       }
       throw new NoSuchElementException();
     }
+    #MACRO SuppressUnchecked()
     @Override public $exposedType$ getLast$TypeNameModifier$(){
       final int tail;
       if((tail=this.tail)!=-1){
@@ -1312,6 +2006,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
 #ENDIF
 #ENDDEF
 #MACRODEF PollImpl(ARRTYPE,CLASSPREFIX,DEFAULTARR,RETTYPE,DEFAULTVAL,CAST)
+#MACRO SuppressUnchecked()
 @Override public RETTYPE pollCLASSPREFIX(){
   int tail;
   if((tail=this.tail)!=-1){
@@ -1335,6 +2030,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   }
   return DEFAULTVAL;
 }
+#MACRO SuppressUnchecked()
 @Override public RETTYPE pollLastCLASSPREFIX(){
   int tail;
   if((tail=this.tail)!=-1){
@@ -1358,12 +2054,14 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
 }
 #ENDDEF
 #MACRODEF PeekImpl(ARRTYPE,CLASSPREFIX,DEFAULTARR,RETTYPE,DEFAULTVAL,CAST)
+#MACRO SuppressUnchecked()
 @Override public RETTYPE peekCLASSPREFIX(){
   if(tail!=-1){
     return CAST(arr[head]);
   }
   return DEFAULTVAL;
 }
+#MACRO SuppressUnchecked()
 @Override public RETTYPE peekLastCLASSPREFIX(){
   final int tail;
   if((tail=this.tail)!=-1){
@@ -2311,4 +3009,105 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
   return false;
 #ENDIF
 }
+#ENDDEF
+#MACRODEF SuppressUnchecked()
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+#ENDDEF
+#MACRODEF CollapseEnd<CHECKED,HEAD,TAIL>(INCREMENT)
+#IFSWITCH CHECKED==true
+//TODO CollapseEnd<CHECKED>(HEAD,TAIL,INCREMENT)
+private void fragmentedCollapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+  //TODO
+}
+#MACRO SuppressUnchecked()
+private void collapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+  for(int srcOffset=HEAD;INCREMENTsrcOffset!=TAIL;)
+  {
+    if(!filter.test(($exposedType$)arr[srcOffset]))
+    {
+#IFSWITCH HEAD==head
+      collapseBodyHelper(arr,srcOffset,tail,filter,modCount);
+      
+  #IF OfRef
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcOffset-1,head);
+  #ENDIF
+#ELSE
+      collapseBodyHelper(arr,head,srcOffset,filter,modCount);
+  #IF OfRef
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,srcOffset+1);
+  #ENDIF
+#ENDIF
+      this.modCount=modCount+1;
+      return;
+    }
+  }
+  CheckedCollection.checkModCount(modCount,this.modCount);
+  this.modCount=modCount+1;
+#IF OfRef
+  #IFSWITCH HEAD==head
+  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail-1,head);
+  #ELSE
+  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head+1);
+  #ENDIF
+#ENDIF
+  this.HEAD=head;
+}
+#ELSE
+#MACRO SuppressUnchecked()
+private void fragmentedCollapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+  #IFSWITCH HEAD==head
+  for(int bound=arr.length;;)
+  #ELSE
+  for(;;)
+  #ENDIF
+  {
+  #IF OfRef
+    arr[HEAD]=null;
+  #ENDIF
+  #IFSWITCH HEAD==head
+    if(INCREMENTHEAD==bound){
+      for(HEAD=0;HEAD!=TAIL;INCREMENTHEAD)
+  #ELSE
+    if(HEAD==0){
+      for(HEAD=arr.length-1;HEAD!=TAIL;INCREMENTHEAD)
+  #ENDIF
+      {
+        if(!filter.test(($exposedType$)arr[HEAD]))
+        {
+          collapseBodyHelper(arr,head,tail,filter);
+          break;
+        }
+  #IF OfRef
+        arr[HEAD]=null;
+  #ENDIF
+      }
+      return;
+    }
+  #IFSWITCH HEAD==head
+    if(!filter.test(($exposedType$)arr[HEAD]))
+  #ELSE
+    if(!filter.test(($exposedType$)arr[INCREMENTHEAD]))
+  #ENDIF
+    {
+      fragmentedCollapseBodyHelper(arr,head,tail,filter);
+      return;
+    }
+  }
+}
+#MACRO SuppressUnchecked()
+private void collapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
+  do{
+  #IF OfRef
+    arr[HEAD]=null;
+  #ENDIF
+    if(INCREMENTHEAD==TAIL){
+      this.HEAD=HEAD;
+      return;
+    }
+  }while(filter.test(($exposedType$)arr[HEAD]));
+  collapseBodyHelper(arr,head,tail,filter);
+}
+#ENDIF
 #ENDDEF

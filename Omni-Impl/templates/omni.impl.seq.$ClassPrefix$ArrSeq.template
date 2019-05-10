@@ -104,16 +104,18 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
     int size;
     this.size=size=in.readInt();
     if(size!=0){
+      $ArrayType$[] arr;
 #IF OfByte
-      in.readFully(this.arr=new $ArrayType$[size],0,size);
+      in.readFully(arr=new $ArrayType$[size],0,size);
 #ELSE
-      OmniArray.Of$ClassPrefix$.readArray(this.arr=new $ArrayType$[size],0,size-1,in);
+      OmniArray.Of$ClassPrefix$.readArray(arr=new $ArrayType$[size],0,size-1,in);
 #ENDIF
+      this.arr=arr;
     }
   }
 #IFNOT OfBoolean
   #MACRO SuppressUnchecked()
-  private static $<E>$ long markSurvivors($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter){
+  static $<E>$ long markSurvivors($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test(($exposedType$)arr[srcOffset])){
         word|=marker;
@@ -124,7 +126,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
     }
   }
   #MACRO SuppressUnchecked()
-  private static $<E>$ int markSurvivors($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
+  static $<E>$ int markSurvivors($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{
@@ -713,11 +715,13 @@ public
       int size;
       this.size=size=ois.readInt();
       if(size!=0){
+        $ArrayType$[] arr;
 #IF OfByte
-        ois.readFully(this.arr=new $ArrayType$[size]);
+        ois.readFully(arr=new $ArrayType$[size]);
 #ELSE
-        OmniArray.Of$ClassPrefix$.readArray(this.arr=new $ArrayType$[size],0,size-1,ois);
+        OmniArray.Of$ClassPrefix$.readArray(arr=new $ArrayType$[size],0,size-1,ois);
 #ENDIF
+        this.arr=arr;
       }
     }
     private void writeObject(ObjectOutputStream oos) throws IOException{

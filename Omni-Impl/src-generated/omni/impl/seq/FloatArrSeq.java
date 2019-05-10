@@ -66,7 +66,9 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
     int size;
     this.size=size=in.readInt();
     if(size!=0){
-      OmniArray.OfFloat.readArray(this.arr=new float[size],0,size-1,in);
+      float[] arr;
+      OmniArray.OfFloat.readArray(arr=new float[size],0,size-1,in);
+      this.arr=arr;
     }
   }
   private static  long markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter){
@@ -1892,7 +1894,9 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfFloat.readArray(this.arr=new float[size],0,size-1,ois);
+          float[] arr;
+          OmniArray.OfFloat.readArray(arr=new float[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -1937,7 +1941,7 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
             OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";
@@ -3899,7 +3903,9 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfFloat.readArray(this.arr=new float[size],0,size-1,ois);
+          float[] arr;
+          OmniArray.OfFloat.readArray(arr=new float[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3953,7 +3959,7 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
             OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
             builder.uncheckedAppendChar((byte)']');
             (buffer=builder.buffer)[0]=(byte)'[';
-            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
+            return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
           }
       }
       return "[]";

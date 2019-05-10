@@ -10,6 +10,7 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.ConcurrentModificationException;
 import omni.util.OmniPred;
+import java.util.Objects;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
@@ -109,9 +110,11 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     addLast(val);
     return true;
   }
+  @SuppressWarnings("unchecked")
   @Override public E element(){
     return (E)arr[head];
   }
+  @SuppressWarnings("unchecked")
   @Override public E getLast(){
     return (E)arr[tail];
   }
@@ -923,12 +926,14 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return OmniArray.OfRef.DEFAULT_ARR;
   }
+  @SuppressWarnings("unchecked")
   @Override public E peek(){
     if(tail!=-1){
       return (E)(arr[head]);
     }
     return null;
   }
+  @SuppressWarnings("unchecked")
   @Override public E peekLast(){
     final int tail;
     if((tail=this.tail)!=-1){
@@ -936,6 +941,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return null;
   }
+  @SuppressWarnings("unchecked")
   @Override public E poll(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -954,6 +960,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return null;
   }
+  @SuppressWarnings("unchecked")
   @Override public E pollLast(){
     int tail;
     if((tail=this.tail)!=-1){
@@ -1581,6 +1588,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return 1;
   }
+  @SuppressWarnings("unchecked")
   @Override public E pop(){
     final Object[] arr;
     int head;
@@ -1595,6 +1603,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     this.head=head;
     return ret;
   }
+  @SuppressWarnings("unchecked")
   @Override public E removeLast(){
     final Object[] arr;
     int tail;
@@ -1626,33 +1635,41 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
     return new RefArrDeq<E>();
   }
-  @Override public boolean equals(Object obj){
-    //TODO
-    return false;
-  }
-  boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-    //TODO
-    return false;
-  }
-  boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-    //TODO
-    return false;
-  }
-  @Override public OmniIterator.OfRef<E> iterator(){
-    //TODO
-    return null;
-  }
-  @Override public OmniIterator.OfRef<E> descendingIterator(){
-    //TODO
-    return null;
-  }
   private String uncheckedToString(int tail){
-    //TODO
-    return null;
+    final var arr=this.arr;
+    final var builder=new StringBuilder("[");
+    int head;
+    if(tail<(head=this.head)){
+      for(int bound=arr.length;;){
+        builder.append(arr[head]).append(',').append(' ');
+        if(++head==bound){
+          head=0;
+          break;
+        }
+      }
+    }
+    for(;;builder.append(',').append(' '),++head){
+      builder.append(arr[head]);
+      if(head==tail){
+        return builder.append(']').toString();
+      }
+    }
   }
   private int uncheckedHashCode(int tail){
-    //TODO
-    return -1;
+    final Object[] arr;
+    int head;
+    int hash=31+Objects.hashCode((arr=this.arr)[head=this.head]);
+    if(tail<head){
+      for(final int bound=arr.length;;){  
+        if(++head==bound){
+          hash=hash*31+Objects.hashCode(arr[head=0]);
+          break;
+        }
+        hash=(hash*31)+Objects.hashCode(arr[head]);
+      }
+    }
+    for(;head!=tail;hash=(hash*31)+Objects.hashCode(arr[head]),++head){}
+    return hash;
   }
   @Override public void push(E val){
     Object[] arr;
@@ -1663,24 +1680,695 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         this.arr=arr=new Object[OmniArray.DEFAULT_ARR_SEQ_CAP];
         arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
       }else{
-        //TODO
+        int tail;
+        if((tail=this.tail)==-1){
+          arr[tail=arr.length-1]=val;
+          this.tail=tail;
+          this.head=tail;
+        }else{
+          int head;
+          if((head=this.head-1)==tail){
+            final Object[] newArr;
+            int newCap,size;
+            this.tail=(newCap=OmniArray.growBy50Pct(head+(size=arr.length)))-1;
+            ArrCopy.uncheckedCopy(arr,0,newArr=new Object[newCap],newCap-=(++tail),tail);
+            ArrCopy.uncheckedCopy(arr,head,newArr,head=newCap-(size-=tail),size);
+            this.arr=newArr;
+            --head;
+          }else if(head==-1 && tail==(head=arr.length-1)){
+            int newCap;
+            this.tail=(newCap=OmniArray.growBy50Pct(++tail))-1;
+            ArrCopy.uncheckedCopy(arr,0,arr=new Object[newCap],head=newCap-tail,tail);
+            this.arr=arr;
+            --head;
+          }
+          arr[head]=val;
+          this.head=head;
+        }
       }
     }else{
-      this.head=0;
-      this.tail=0;
-      this.arr=new Object[]{val};
+      initFromNullArr(val);
     }
   }
+  private void initFromNullArr(E val){
+    this.head=0;
+    this.tail=0;
+    this.arr=new Object[]{val};
+  }
   @Override public void addLast(E val){
-    //TODO
+    Object[] arr;
+    if((arr=this.arr)!=null){
+      if(arr==OmniArray.OfRef.DEFAULT_ARR){
+        this.head=0;
+        this.tail=0;
+        this.arr=arr=new Object[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[0]=val;
+      }else{
+        int tail;
+        if((tail=this.tail)==-1){
+          arr[0]=val;
+          this.tail=0;
+          this.head=0;
+        }else{
+          int head;
+          if(++tail==(head=this.head)){
+            this.head=0;
+            final Object[] newArr;
+            (newArr=new Object[OmniArray.growBy50Pct(tail=arr.length)])[tail]=val;
+            this.tail=tail;
+            ArrCopy.uncheckedCopy(arr,head,newArr,0,tail-=head);
+            ArrCopy.uncheckedCopy(arr,0,newArr,tail,head);
+            this.arr=newArr;
+          }else{
+            if(tail==arr.length){
+              if(head==0){
+                ArrCopy.uncheckedCopy(arr,0,arr=new Object[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+            arr[tail]=val;
+            this.tail=tail;
+          }
+        }
+      }
+    }else{
+      initFromNullArr(val);
+    }
+  }
+  private void eraseHead(){
+    int head;
+    switch(Integer.signum(this.tail-(head=this.head))){
+      case -1:
+        Object[] arr;
+        (arr=this.arr)[head]=null;
+        this.head=head==arr.length-1?0:head+1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.head=head+1;
+    }
+    arr[head]=null;
+  }
+  private void eraseTail(){
+    int tail;
+    switch(Integer.signum((tail=this.tail)-this.head)){
+      case -1:
+        Object[] arr;
+        (arr=this.arr)[tail]=null;
+        this.tail=tail==0?arr.length-1:tail-1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.tail=tail-1;
+    }
+    arr[tail]=null;
+  }
+  private static abstract class AbstractDeqItr<E>
+    implements OmniIterator.OfRef<E>
+  {
+    transient int cursor;
+    AbstractDeqItr(int cursor){
+      this.cursor=cursor;
+    }
+    @Override public boolean hasNext(){
+      return this.cursor!=-1;
+    }
+    abstract void uncheckedForEachRemaining(int cursor,Consumer<? super E> action);
+    @Override public void forEachRemaining(Consumer<? super E> action){
+      int cursor;
+      if((cursor=this.cursor)!=-1){
+        uncheckedForEachRemaining(cursor,action);
+      }
+    }
+  }
+  private static int pullUp(Object[] arr,int head,int headDist){
+    final int tmp;
+    ArrCopy.semicheckedCopy(arr,tmp=head,arr,++head,headDist);
+    arr[tmp]=null;
+    return head;
+  }
+  private static int fragmentedPullUp(Object[] arr,int head,int headDist){
+    if(headDist==0){
+      arr[head]=null;
+      return 0;
+    }else{
+      int tmp;
+      ArrCopy.uncheckedCopy(arr,tmp=head,arr,++head,headDist);
+      arr[tmp]=null;
+      return head;
+    }
+  }
+  private static int fragmentedPullDown(Object[] arr,int arrBound,int tail){
+    if(tail==0){
+      arr[0]=null;
+      return arrBound;
+    }
+    ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+    arr[tail]=null;
+    return tail-1;
+  }
+  private static class AscendingItr<E> extends AbstractDeqItr<E>
+  {
+    transient final RefArrDeq<E> root;
+    private AscendingItr(RefArrDeq<E> root){
+      super(root.tail!=-1?root.head:-1);
+      this.root=root;
+    }
+    private AscendingItr(RefArrDeq<E> root,int cursor){
+      super(cursor);
+      this.root=root;
+    }
+    @SuppressWarnings("unchecked")
+    @Override public E next(){
+      final Object[] arr;
+      int cursor;
+      final RefArrDeq<E> root;
+      final var ret=(E)(arr=(root=this.root).arr)[cursor=this.cursor];
+      if(cursor==root.tail){
+        cursor=-1;
+      }else if(++cursor==arr.length){
+        cursor=0;
+      }
+      this.cursor=cursor;
+      return ret;
+    }
+    private void nonfragmentedRemove(int head,int cursor,int tail,RefArrDeq<E> root){
+      int headDist,tailDist;
+      if((headDist=(--cursor)-head)<=(tailDist=tail-cursor)){
+        root.head=pullUp(root.arr,head,headDist);
+      }else{
+        Object[] arr;
+        ArrCopy.uncheckedSelfCopy(arr=root.arr,cursor,cursor+1,tailDist);
+        arr[tail]=null;
+        root.tail=tail-1;
+        this.cursor=cursor;
+      }
+    }
+    private void fragmentedRemove(int head,int cursor,int tail,RefArrDeq<E> root){
+      Object[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=(--cursor)-head)>=0){
+        if(headDist<=(tailDist=arrBound-cursor)+tail){
+          root.head=pullUp(arr,head,headDist);
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+          this.cursor=cursor;
+        }
+      }else{
+        if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
+          ArrCopy.uncheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+          arr[tail]=null;
+          root.tail=tail-1;
+          this.cursor=cursor;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,cursor);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+        }
+      }
+    }
+    private void eraseAtSplit(){
+      final int head,tail,headDist,arrBound;
+      final RefArrDeq<E> root;
+      final Object[] arr;
+      if((tail=(root=this.root).tail)<(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
+        arr[arrBound]=arr[0];
+        root.tail=fragmentedPullDown(arr,arrBound,tail);
+        this.cursor=arrBound;
+      }else{
+        root.head=fragmentedPullUp(arr,head,headDist);
+      }
+    }
+    @Override public void remove(){
+      final int cursor;
+      switch(cursor=this.cursor){
+        case -1:
+          root.eraseTail();
+          break;
+        case 0:
+          eraseAtSplit();
+          break;
+        default:
+          final int head,tail;
+          final RefArrDeq<E> root;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedRemove(head,cursor,tail,root);
+          }
+      }
+    }
+    @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
+      final RefArrDeq<E> root;
+      int tail;
+      final var arr=(root=this.root).arr;
+      if(cursor>(tail=root.tail)){
+        OmniArray.OfRef.ascendingForEach(arr,cursor,arr.length-1,action);
+        cursor=0;
+      }
+      OmniArray.OfRef.ascendingForEach(arr,cursor,tail,action);
+      this.cursor=-1;
+    }
+  }
+  private static class DescendingItr<E> extends AscendingItr<E>
+  {
+    private DescendingItr(RefArrDeq<E> root,int cursor){
+      super(root,cursor);
+    }
+    @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
+      final RefArrDeq<E> root;
+      final int head;
+      final var arr=(root=this.root).arr;
+      if(--cursor<(head=root.head)){
+         if(cursor>=0){
+           OmniArray.OfRef.descendingForEach(arr,cursor,0,action);
+         }
+         cursor=arr.length-1;
+      }
+      OmniArray.OfRef.descendingForEach(arr,head,cursor,action);
+      this.cursor=-1;
+    }
+    @SuppressWarnings("unchecked")
+    @Override public E next(){
+      int cursor;
+      final RefArrDeq<E> root;
+      final var arr=(root=this.root).arr;
+      if((cursor=this.cursor-1)==-1){
+        cursor=arr.length-1;
+      }
+      this.cursor=(cursor==root.head)?-1:cursor;
+      return (E)arr[cursor];
+    }
+    private void eraseAtSplit(){
+      final RefArrDeq<E> root;
+      final int head,tail,headDist,arrBound;
+      final Object[] arr;
+      if((tail=(root=this.root).tail)<=(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
+        root.tail=fragmentedPullDown(arr,arrBound,tail);
+      }else{
+        root.head=fragmentedPullUp(arr,head,headDist);
+        this.cursor=0;
+      }
+    }
+    private void fragmentedRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+      Object[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=lastRet-head)>=0){
+        if(headDist<=(tailDist=arrBound-lastRet)+tail){
+          root.head=pullUp(arr,head,headDist);
+          this.cursor=lastRet;
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+        }
+      }else{
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+          root.tail=tail-1;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+          this.cursor=lastRet;
+        }
+      }
+    }
+    private void nonfragmentedRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+      int headDist,tailDist;
+      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+        root.head=pullUp(root.arr,head,headDist);
+        this.cursor=lastRet;
+      }else{
+        Object[] arr;
+        ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+        root.tail=tail-1;
+      }
+    }
+    @Override public void remove(){
+      final int cursor;
+      switch(cursor=this.cursor){
+        case -1:
+          root.eraseHead();
+          break;
+        case 0:
+          eraseAtSplit();
+          break;
+        default:
+          final int head,tail;
+          final RefArrDeq<E> root;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedRemove(head,cursor,tail,root);
+          }
+      }
+    }
+  }
+  @Override public OmniIterator.OfRef<E> iterator(){
+    return new AscendingItr<E>(this);
+  }
+  @Override public OmniIterator.OfRef<E> descendingIterator(){
+    int tail;
+    return new DescendingItr<E>(this,(tail=this.tail)==-1?-1:tail==arr.length-1?0:tail+1);
+  }
+  @SuppressWarnings("unchecked")
+  boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
+    Object[] arr;
+    if(filter.test((E)(arr=this.arr)[head]))
+    {
+      if(filter.test((E)arr[tail]))
+      {
+        fragmentedCollapseHeadAndTail(arr,head,tail,filter);
+      }
+      else
+      {
+        fragmentedCollapsehead(arr,head,tail,filter);
+      }
+      return true;
+    }
+    else if(filter.test((E)arr[tail]))
+    {
+      fragmentedCollapsetail(arr,head,tail,filter);
+      return true;
+    }
+    return fragmentedCollapseBody(arr,head,tail,filter);
+  }
+  @Override public boolean equals(Object obj){
+      //TODO
+      return false;
+  }
+  @SuppressWarnings("unchecked")
+  private static <E> int pullDown(Object[] arr,int dstOffset,int srcBound,Predicate<? super E> filter){
+    for(int srcOffset=dstOffset+1;srcOffset!=srcBound;++srcOffset)
+    {
+      final Object v;
+      if(!filter.test((E)(v=arr[srcOffset])))
+      {
+        arr[dstOffset++]=v;
+      }
+    }
+    arr[dstOffset]=arr[srcBound];
+    OmniArray.OfRef.nullifyRange(arr,srcBound,dstOffset+1);
+    return dstOffset;
+  }
+  @SuppressWarnings("unchecked")
+  private static <E> int pullUp(Object[] arr,int dstOffset,int srcBound,Predicate<? super E> filter){
+    for(int srcOffset=dstOffset-1;srcOffset!=srcBound;--srcOffset)
+    {
+      final Object v;
+      if(!filter.test((E)(v=arr[srcOffset])))
+      {
+        arr[dstOffset--]=v;
+      }
+    }
+    arr[dstOffset]=arr[srcBound];
+    OmniArray.OfRef.nullifyRange(arr,dstOffset-1,srcBound);
+    return dstOffset;
+  }
+  @SuppressWarnings("unchecked")
+  private void fragmentedCollapseBodyHelper(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+    {
+      if(filter.test((E)arr[srcOffset]))
+      {
+        tail=pullDown(arr,srcOffset,tail,filter);
+        break;
+      }
+    }
+    this.tail=tail;
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset)
+    {
+      if(filter.test((E)arr[srcOffset]))
+      {
+        head=pullUp(arr,srcOffset,head,filter);
+        break;
+      }
+    }
+    this.head=head;
+  }
+  @SuppressWarnings("unchecked")
+  private void collapseBodyHelper(Object[] ar,int head,int tail,Predicate<? super E> filter){
+    int midPoint;
+    for(int srcOffset=midPoint=(head+tail)>>1;srcOffset!=head;--srcOffset){
+      if(filter.test((E)arr[srcOffset])){
+        this.head=pullUp(arr,srcOffset,head,filter);
+        while(++midPoint!=tail){
+          if(filter.test((E)arr[midPoint])){
+            tail=pullDown(arr,midPoint,tail,filter);
+            break;
+          }
+        }
+        this.tail=tail;
+        return;
+      }
+    }
+    while(++midPoint!=tail){
+      if(filter.test((E)arr[midPoint])){
+        tail=pullDown(arr,midPoint,tail,filter);
+        break;
+      }
+    }
+    this.head=head;
+    this.tail=tail;
+  }
+  @SuppressWarnings("unchecked")
+  private void fragmentedCollapseHeadAndTail(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    arr[head]=null;
+    outer:for(;;){
+      do{
+        arr[tail]=null;
+        if(tail==0){
+          for(tail=arr.length-1;tail!=head;--tail){
+            if(!filter.test((E)arr[tail])){
+              break outer;
+            }
+            arr[tail]=null;
+          }  
+          this.tail=-1;
+          return;
+        }
+      }while(filter.test((E)arr[--tail]));
+      for(int bound=arr.length;++head!=bound;){
+        if(!filter.test((E)arr[head])){
+          fragmentedCollapseBodyHelper(arr,head,tail,filter);
+          return;
+        }
+        arr[head]=null;
+      }
+      head=-1;
+      break;
+    }
+    while(++head!=tail){
+      if(!filter.test((E)arr[head])){
+        collapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+      arr[head]=null;
+    }
+    this.head=head;
+    this.tail=tail;
+  }
+  @SuppressWarnings("unchecked")
+  private boolean fragmentedCollapseBody(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset){
+      if(filter.test((E)arr[srcOffset])){
+        this.tail=pullDown(arr,srcOffset,tail,filter);
+        for(srcOffset=arr.length-1;srcOffset!=head;--srcOffset){
+          if(filter.test((E)arr[srcOffset])){
+            this.head=pullUp(arr,srcOffset,head,filter);
+            break;
+          }
+        }
+        return true;
+      }
+    }
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset){
+      if(filter.test((E)arr[srcOffset]))
+      {
+        this.head=pullUp(arr,srcOffset,head,filter);
+        return true;
+      }
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  private void fragmentedCollapsehead(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    for(int bound=arr.length;;)
+    {
+      arr[head]=null;
+      if(++head==bound){
+        for(head=0;head!=tail;++head)
+        {
+          if(!filter.test((E)arr[head]))
+          {
+            collapseBodyHelper(arr,head,tail,filter);
+            break;
+          }
+          arr[head]=null;
+        }
+        return;
+      }
+      if(!filter.test((E)arr[head]))
+      {
+        fragmentedCollapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+    }
+  }
+  @SuppressWarnings("unchecked")
+  private void collapsehead(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    do{
+      arr[head]=null;
+      if(++head==tail){
+        this.head=head;
+        return;
+      }
+    }while(filter.test((E)arr[head]));
+    collapseBodyHelper(arr,head,tail,filter);
+  }
+  @SuppressWarnings("unchecked")
+  private void fragmentedCollapsetail(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    for(;;)
+    {
+      arr[tail]=null;
+      if(tail==0){
+        for(tail=arr.length-1;tail!=head;--tail)
+        {
+          if(!filter.test((E)arr[tail]))
+          {
+            collapseBodyHelper(arr,head,tail,filter);
+            break;
+          }
+          arr[tail]=null;
+        }
+        return;
+      }
+      if(!filter.test((E)arr[--tail]))
+      {
+        fragmentedCollapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+    }
+  }
+  @SuppressWarnings("unchecked")
+  private void collapsetail(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    do{
+      arr[tail]=null;
+      if(--tail==head){
+        this.tail=tail;
+        return;
+      }
+    }while(filter.test((E)arr[tail]));
+    collapseBodyHelper(arr,head,tail,filter);
+  }
+  @SuppressWarnings("unchecked")
+  private void collapseHeadAndTail(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    arr[tail]=null;
+    do{
+      arr[head]=null;
+      if(++head==tail){
+        this.tail=-1;
+        return;
+      }
+    }while(filter.test((E)arr[head]));
+    while(--tail!=head){
+      if(!filter.test((E)arr[tail])){
+        collapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+      arr[tail]=null;
+    }
+    this.head=head;
+    this.tail=head;
+  }
+  @SuppressWarnings("unchecked")
+  private boolean collapseBody(Object[] arr,int head,int tail,Predicate<? super E> filter){
+    int midPoint;
+    for(int srcOffset=midPoint=(head+tail)>>1;srcOffset!=head;--srcOffset){
+      if(filter.test((E)arr[srcOffset])){
+        this.head=pullUp(arr,srcOffset,head,filter);
+        while(++midPoint!=tail){
+          if(filter.test((E)arr[midPoint])){
+            this.tail=pullDown(arr,midPoint,tail,filter);
+            break;
+          }
+        }
+        return true;
+      }
+    }
+    while(++midPoint!=tail){
+      if(filter.test((E)arr[midPoint])){
+        this.tail=pullDown(arr,midPoint,tail,filter);
+        return true;
+      }
+    }
+    return false;
+  }
+  @SuppressWarnings("unchecked")
+  boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
+    Object[] arr;
+    if(filter.test((E)(arr=this.arr)[head])){
+      if(head==tail){
+        arr[tail]=null;
+        this.tail=-1;
+      }else{
+        if(filter.test((E)arr[tail])){
+          collapseHeadAndTail(arr,head,tail,filter);
+        }else{
+          collapsehead(arr,head,tail,filter);
+        }
+      }
+      return true;
+    }else if(head!=tail){
+      if(filter.test((E)arr[tail])){
+        collapsetail(arr,head,tail,filter);
+        return true;
+      }
+      return collapseBody(arr,head,tail,filter);
+    }
+    return false;
   }
   @Override public void readExternal(ObjectInput input) throws IOException
     ,ClassNotFoundException
   {
-    //TODO
+    int size;
+    if((size=input.readInt())!=0){
+      Object[] arr;
+      OmniArray.OfRef.readArray(arr=new Object[size],0,--size,input);
+      this.tail=size;
+      this.head=0;
+      this.arr=arr;
+    }else{
+      this.tail=-1;
+    }
   }
   @Override public void writeExternal(ObjectOutput output) throws IOException{
-    //TODO
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head,size;
+      if((size=(++tail)-(head=this.head))<=0){
+        Object[] arr;
+        output.writeInt(size+(size=(arr=this.arr).length));
+        OmniArray.OfRef.writeArray(arr,head,size-1,output);
+        OmniArray.OfRef.writeArray(arr,0,tail-1,output);
+      }else{
+        output.writeInt(size);
+        OmniArray.OfRef.writeArray(arr,head,tail-1,output);
+      }
+    }else{
+      output.writeInt(0);
+    }
   }
   public static class Checked<E> extends RefArrDeq<E>{
     private static final long serialVersionUID=1L;
@@ -1702,17 +2390,208 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       //TODO
       return false;
     }
-    @Override public OmniIterator.OfRef<E> iterator(){
-      //TODO
-      return null;
-    }
-    @Override public OmniIterator.OfRef<E> descendingIterator(){
-      //TODO
-      return null;
-    }
     @Override public boolean equals(Object obj){
       //TODO
       return false;
+    }
+    @Override public OmniIterator.OfRef<E> iterator(){
+      return new AscendingItr<E>(this);
+    }
+    @Override public OmniIterator.OfRef<E> descendingIterator(){
+      return new DescendingItr<E>(this);
+    }
+    private static class AscendingItr<E> extends AbstractDeqItr<E>{
+      transient int modCount;
+      transient int lastRet;
+      transient final Checked<E> root;
+      private AscendingItr(Checked<E> root){
+        super(root.tail==-1?-1:root.head);
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+      }
+      private AscendingItr(Checked<E> root,int cursor){
+        super(cursor);
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+      }
+      @SuppressWarnings("unchecked")
+      @Override public E next(){
+        final Checked<E> root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int cursor;
+        if((cursor=this.cursor)!=-1){
+          final Object[] arr;
+          final var ret=(E)(arr=root.arr)[cursor];
+          this.lastRet=cursor;
+          if(cursor==root.tail){
+            cursor=-1;
+          }else if(++cursor==arr.length){
+            cursor=0;
+          }
+          this.cursor=cursor;
+          return ret;
+        }
+        throw new NoSuchElementException();
+      }
+      void fragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
+        Object[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        if((headDist=lastRet-head)>=0){
+          if(headDist<=(tailDist=arrBound-lastRet)+tail){
+            root.head=pullUp(arr,head,headDist);
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+            this.cursor=lastRet;
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[tail]=null;
+            root.tail=tail-1;
+            this.cursor=lastRet;
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+          }
+        }
+      }
+      void nonfragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
+        final int headDist,tailDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+          final Object[] arr;
+          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+          root.tail=tail-1;
+          this.cursor=lastRet;
+        }else{
+          root.head=pullUp(root.arr,head,headDist);
+        }
+      }
+      @Override public void remove(){
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked<E> root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
+              root.arr[tail]=null;
+              break;
+            default:
+              nonfragmentedRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
+        int modCount=this.modCount;
+        final Checked<E> root;
+        int tail=(root=this.root).tail;
+        try{
+          final var arr=root.arr;
+          if(cursor>tail){
+            OmniArray.OfRef.ascendingForEach(arr,cursor,arr.length-1,action);
+            cursor=0;
+          }
+          OmniArray.OfRef.ascendingForEach(arr,cursor,tail,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+        this.lastRet=tail;
+        this.cursor=-1;
+      }
+    }
+    private static class DescendingItr<E> extends AscendingItr<E>{
+      private DescendingItr(Checked<E> root){
+        super(root,root.tail);
+      }
+      @SuppressWarnings("unchecked")
+      @Override public E next(){
+        final Checked<E> root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int cursor;
+        if((cursor=this.cursor)!=-1){
+          final Object[] arr;
+          final var ret=(E)(arr=root.arr)[cursor];
+          this.lastRet=cursor;
+          if(cursor==root.head){
+            cursor=-1;
+          }else if(--cursor==-1){
+            cursor=arr.length-1;
+          }
+          this.cursor=cursor;
+          return ret;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override void fragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
+        Object[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        if((headDist=lastRet-head)>=0){
+          if(headDist<=(tailDist=arrBound-lastRet)+tail){
+            root.head=pullUp(arr,head,headDist);
+            this.cursor=lastRet;
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[tail]=null;
+            root.tail=tail-1;
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=lastRet;
+          }
+        }
+      }
+      @Override void nonfragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
+        final int headDist,tailDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+          final Object[] arr;
+          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+          root.tail=tail-1;
+        }else{
+          root.head=pullUp(root.arr,head,headDist);
+          this.cursor=lastRet;
+        }
+      }
+      @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
+        int modCount=this.modCount;
+        final Checked<E> root;
+        int head=(root=this.root).head;
+        try{
+          final var arr=root.arr;
+          if(cursor<head){
+            OmniArray.OfRef.descendingForEach(arr,0,cursor,action);
+            cursor=arr.length-1;
+          }
+          OmniArray.OfRef.descendingForEach(arr,head,cursor,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+        this.lastRet=head;
+        this.cursor=-1;
+      }
     }
     @Override public Object clone(){
       int tail;
@@ -1732,6 +2611,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
       return new Checked<E>();
     }
+    @SuppressWarnings("unchecked")
     @Override public E removeLast(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -1749,6 +2629,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
       throw new NoSuchElementException();
     }
+    @SuppressWarnings("unchecked")
     @Override public E pop(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -1806,12 +2687,14 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
+    @SuppressWarnings("unchecked")
     @Override public E element(){
       if(tail!=-1){
         return (E)arr[head];
       }
       throw new NoSuchElementException();
     }
+    @SuppressWarnings("unchecked")
     @Override public E getLast(){
       final int tail;
       if((tail=this.tail)!=-1){
@@ -1829,6 +2712,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         }
       });
     }
+    @SuppressWarnings("unchecked")
     @Override public E poll(){
       int tail;
       if((tail=this.tail)!=-1){
@@ -1848,6 +2732,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
       return null;
     }
+    @SuppressWarnings("unchecked")
     @Override public E pollLast(){
       int tail;
       if((tail=this.tail)!=-1){

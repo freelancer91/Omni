@@ -1,5 +1,4 @@
 package omni.impl.seq;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Externalizable;
 import java.lang.reflect.Field;

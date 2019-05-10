@@ -65,7 +65,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     int size;
     this.size=size=in.readInt();
     if(size!=0){
-      OmniArray.OfDouble.readArray(this.arr=new double[size],0,size-1,in);
+      double[] arr;
+      OmniArray.OfDouble.readArray(arr=new double[size],0,size-1,in);
+      this.arr=arr;
     }
   }
   private static  long markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter){
@@ -1676,7 +1678,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfDouble.readArray(this.arr=new double[size],0,size-1,ois);
+          double[] arr;
+          OmniArray.OfDouble.readArray(arr=new double[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3529,7 +3533,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
         int size;
         this.size=size=ois.readInt();
         if(size!=0){
-          OmniArray.OfDouble.readArray(this.arr=new double[size],0,size-1,ois);
+          double[] arr;
+          OmniArray.OfDouble.readArray(arr=new double[size],0,size-1,ois);
+          this.arr=arr;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

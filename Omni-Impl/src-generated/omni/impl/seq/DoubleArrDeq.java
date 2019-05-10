@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import omni.util.HashUtil;
 import omni.util.OmniArray;
 import omni.api.OmniDeque;
 import omni.util.ArrCopy;
@@ -9,7 +10,6 @@ import java.util.NoSuchElementException;
 import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import omni.util.TypeUtil;
-import java.util.ConcurrentModificationException;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleConsumer;
 import omni.impl.AbstractDoubleItr;
@@ -1500,33 +1500,41 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return new DoubleArrDeq();
   }
-  @Override public boolean equals(Object obj){
-    //TODO
-    return false;
-  }
-  boolean fragmentedRemoveIf(int head,int tail,DoublePredicate filter){
-    //TODO
-    return false;
-  }
-  boolean nonfragmentedRemoveIf(int head,int tail,DoublePredicate filter){
-    //TODO
-    return false;
-  }
-  @Override public OmniIterator.OfDouble iterator(){
-    //TODO
-    return null;
-  }
-  @Override public OmniIterator.OfDouble descendingIterator(){
-    //TODO
-    return null;
-  }
   private String uncheckedToString(int tail){
-    //TODO
-    return null;
+    final var arr=this.arr;
+    final var builder=new StringBuilder("[");
+    int head;
+    if(tail<(head=this.head)){
+      for(int bound=arr.length;;){
+        builder.append(arr[head]).append(',').append(' ');
+        if(++head==bound){
+          head=0;
+          break;
+        }
+      }
+    }
+    for(;;builder.append(',').append(' '),++head){
+      builder.append(arr[head]);
+      if(head==tail){
+        return builder.append(']').toString();
+      }
+    }
   }
   private int uncheckedHashCode(int tail){
-    //TODO
-    return -1;
+    final double[] arr;
+    int head;
+    int hash=31+HashUtil.hashDouble((arr=this.arr)[head=this.head]);
+    if(tail<head){
+      for(final int bound=arr.length;;){  
+        if(++head==bound){
+          hash=hash*31+HashUtil.hashDouble(arr[head=0]);
+          break;
+        }
+        hash=(hash*31)+HashUtil.hashDouble(arr[head]);
+      }
+    }
+    for(;head!=tail;hash=(hash*31)+HashUtil.hashDouble(arr[head]),++head){}
+    return hash;
   }
   @Override public void push(double val){
     double[] arr;
@@ -1537,23 +1545,648 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         this.arr=arr=new double[OmniArray.DEFAULT_ARR_SEQ_CAP];
         arr[OmniArray.DEFAULT_ARR_SEQ_CAP-1]=val;
       }else{
-        //TODO
+        int tail;
+        if((tail=this.tail)==-1){
+          arr[tail=arr.length-1]=val;
+          this.tail=tail;
+          this.head=tail;
+        }else{
+          int head;
+          if((head=this.head-1)==tail){
+            final double[] newArr;
+            int newCap,size;
+            this.tail=(newCap=OmniArray.growBy50Pct(head+(size=arr.length)))-1;
+            ArrCopy.uncheckedCopy(arr,0,newArr=new double[newCap],newCap-=(++tail),tail);
+            ArrCopy.uncheckedCopy(arr,head,newArr,head=newCap-(size-=tail),size);
+            this.arr=newArr;
+            --head;
+          }else if(head==-1 && tail==(head=arr.length-1)){
+            int newCap;
+            this.tail=(newCap=OmniArray.growBy50Pct(++tail))-1;
+            ArrCopy.uncheckedCopy(arr,0,arr=new double[newCap],head=newCap-tail,tail);
+            this.arr=arr;
+            --head;
+          }
+          arr[head]=val;
+          this.head=head;
+        }
       }
     }else{
-      this.head=0;
-      this.tail=0;
-      this.arr=new double[]{val};
+      initFromNullArr(val);
     }
   }
+  private void initFromNullArr(double val){
+    this.head=0;
+    this.tail=0;
+    this.arr=new double[]{val};
+  }
   @Override public void addLast(double val){
-    //TODO
+    double[] arr;
+    if((arr=this.arr)!=null){
+      if(arr==OmniArray.OfDouble.DEFAULT_ARR){
+        this.head=0;
+        this.tail=0;
+        this.arr=arr=new double[OmniArray.DEFAULT_ARR_SEQ_CAP];
+        arr[0]=val;
+      }else{
+        int tail;
+        if((tail=this.tail)==-1){
+          arr[0]=val;
+          this.tail=0;
+          this.head=0;
+        }else{
+          int head;
+          if(++tail==(head=this.head)){
+            this.head=0;
+            final double[] newArr;
+            (newArr=new double[OmniArray.growBy50Pct(tail=arr.length)])[tail]=val;
+            this.tail=tail;
+            ArrCopy.uncheckedCopy(arr,head,newArr,0,tail-=head);
+            ArrCopy.uncheckedCopy(arr,0,newArr,tail,head);
+            this.arr=newArr;
+          }else{
+            if(tail==arr.length){
+              if(head==0){
+                ArrCopy.uncheckedCopy(arr,0,arr=new double[OmniArray.growBy50Pct(tail)],0,tail);
+                this.arr=arr;
+              }else{
+                tail=0;
+              }
+            }
+            arr[tail]=val;
+            this.tail=tail;
+          }
+        }
+      }
+    }else{
+      initFromNullArr(val);
+    }
+  }
+  private void eraseHead(){
+    int head;
+    switch(Integer.signum(this.tail-(head=this.head))){
+      case -1:
+        this.head=head==arr.length-1?0:head+1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.head=head+1;
+    }
+  }
+  private void eraseTail(){
+    int tail;
+    switch(Integer.signum((tail=this.tail)-this.head)){
+      case -1:
+        this.tail=tail==0?arr.length-1:tail-1;
+        return;
+      case 0:
+        this.tail=-1;
+        break;
+      default:
+        this.tail=tail-1;
+    }
+  }
+  private static abstract class AbstractDeqItr
+    extends AbstractDoubleItr
+  {
+    transient int cursor;
+    AbstractDeqItr(int cursor){
+      this.cursor=cursor;
+    }
+    @Override public boolean hasNext(){
+      return this.cursor!=-1;
+    }
+    abstract void uncheckedForEachRemaining(int cursor,DoubleConsumer action);
+    @Override public void forEachRemaining(DoubleConsumer action){
+      int cursor;
+      if((cursor=this.cursor)!=-1){
+        uncheckedForEachRemaining(cursor,action);
+      }
+    }
+    @Override public void forEachRemaining(Consumer<? super Double> action){
+      int cursor;
+      if((cursor=this.cursor)!=-1){
+        uncheckedForEachRemaining(cursor,action::accept);
+      }
+    }
+  }
+  private static int pullUp(double[] arr,int head,int headDist){
+    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+    return head;
+  }
+  private static int fragmentedPullUp(double[] arr,int head,int headDist){
+    if(headDist==0){
+      return 0;
+    }else{
+      ArrCopy.uncheckedCopy(arr,head,arr,++head,headDist);
+      return head;
+    }
+  }
+  private static int fragmentedPullDown(double[] arr,int arrBound,int tail){
+    if(tail==0){
+      return arrBound;
+    }
+    ArrCopy.uncheckedSelfCopy(arr,0,1,tail);
+    return tail-1;
+  }
+  private static class AscendingItr extends AbstractDeqItr
+  {
+    transient final DoubleArrDeq root;
+    private AscendingItr(DoubleArrDeq root){
+      super(root.tail!=-1?root.head:-1);
+      this.root=root;
+    }
+    private AscendingItr(DoubleArrDeq root,int cursor){
+      super(cursor);
+      this.root=root;
+    }
+    @Override public double nextDouble(){
+      final double[] arr;
+      int cursor;
+      final DoubleArrDeq root;
+      final var ret=(double)(arr=(root=this.root).arr)[cursor=this.cursor];
+      if(cursor==root.tail){
+        cursor=-1;
+      }else if(++cursor==arr.length){
+        cursor=0;
+      }
+      this.cursor=cursor;
+      return ret;
+    }
+    private void nonfragmentedRemove(int head,int cursor,int tail,DoubleArrDeq root){
+      int headDist,tailDist;
+      if((headDist=(--cursor)-head)<=(tailDist=tail-cursor)){
+        root.head=pullUp(root.arr,head,headDist);
+      }else{
+        ArrCopy.uncheckedSelfCopy(root.arr,cursor,cursor+1,tailDist);
+        root.tail=tail-1;
+        this.cursor=cursor;
+      }
+    }
+    private void fragmentedRemove(int head,int cursor,int tail,DoubleArrDeq root){
+      double[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=(--cursor)-head)>=0){
+        if(headDist<=(tailDist=arrBound-cursor)+tail){
+          root.head=pullUp(arr,head,headDist);
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+          this.cursor=cursor;
+        }
+      }else{
+        if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
+          ArrCopy.uncheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+          root.tail=tail-1;
+          this.cursor=cursor;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,cursor);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+        }
+      }
+    }
+    private void eraseAtSplit(){
+      final int head,tail,headDist,arrBound;
+      final DoubleArrDeq root;
+      final double[] arr;
+      if((tail=(root=this.root).tail)<(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
+        arr[arrBound]=arr[0];
+        root.tail=fragmentedPullDown(arr,arrBound,tail);
+        this.cursor=arrBound;
+      }else{
+        root.head=fragmentedPullUp(arr,head,headDist);
+      }
+    }
+    @Override public void remove(){
+      final int cursor;
+      switch(cursor=this.cursor){
+        case -1:
+          root.eraseTail();
+          break;
+        case 0:
+          eraseAtSplit();
+          break;
+        default:
+          final int head,tail;
+          final DoubleArrDeq root;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedRemove(head,cursor,tail,root);
+          }
+      }
+    }
+    @Override void uncheckedForEachRemaining(int cursor,DoubleConsumer action){
+      final DoubleArrDeq root;
+      int tail;
+      final var arr=(root=this.root).arr;
+      if(cursor>(tail=root.tail)){
+        OmniArray.OfDouble.ascendingForEach(arr,cursor,arr.length-1,action);
+        cursor=0;
+      }
+      OmniArray.OfDouble.ascendingForEach(arr,cursor,tail,action);
+      this.cursor=-1;
+    }
+  }
+  private static class DescendingItr extends AscendingItr
+  {
+    private DescendingItr(DoubleArrDeq root,int cursor){
+      super(root,cursor);
+    }
+    @Override void uncheckedForEachRemaining(int cursor,DoubleConsumer action){
+      final DoubleArrDeq root;
+      final int head;
+      final var arr=(root=this.root).arr;
+      if(--cursor<(head=root.head)){
+         if(cursor>=0){
+           OmniArray.OfDouble.descendingForEach(arr,cursor,0,action);
+         }
+         cursor=arr.length-1;
+      }
+      OmniArray.OfDouble.descendingForEach(arr,head,cursor,action);
+      this.cursor=-1;
+    }
+    @Override public double nextDouble(){
+      int cursor;
+      final DoubleArrDeq root;
+      final var arr=(root=this.root).arr;
+      if((cursor=this.cursor-1)==-1){
+        cursor=arr.length-1;
+      }
+      this.cursor=(cursor==root.head)?-1:cursor;
+      return (double)arr[cursor];
+    }
+    private void eraseAtSplit(){
+      final DoubleArrDeq root;
+      final int head,tail,headDist,arrBound;
+      final double[] arr;
+      if((tail=(root=this.root).tail)<=(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
+        root.tail=fragmentedPullDown(arr,arrBound,tail);
+      }else{
+        root.head=fragmentedPullUp(arr,head,headDist);
+        this.cursor=0;
+      }
+    }
+    private void fragmentedRemove(int head,int lastRet,int tail,DoubleArrDeq root){
+      double[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=lastRet-head)>=0){
+        if(headDist<=(tailDist=arrBound-lastRet)+tail){
+          root.head=pullUp(arr,head,headDist);
+          this.cursor=lastRet;
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+        }
+      }else{
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          root.tail=tail-1;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+          this.cursor=lastRet;
+        }
+      }
+    }
+    private void nonfragmentedRemove(int head,int lastRet,int tail,DoubleArrDeq root){
+      int headDist,tailDist;
+      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+        root.head=pullUp(root.arr,head,headDist);
+        this.cursor=lastRet;
+      }else{
+        ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+        root.tail=tail-1;
+      }
+    }
+    @Override public void remove(){
+      final int cursor;
+      switch(cursor=this.cursor){
+        case -1:
+          root.eraseHead();
+          break;
+        case 0:
+          eraseAtSplit();
+          break;
+        default:
+          final int head,tail;
+          final DoubleArrDeq root;
+          if((tail=(root=this.root).tail)<(head=root.head)){
+            fragmentedRemove(head,cursor,tail,root);
+          }else{
+            nonfragmentedRemove(head,cursor,tail,root);
+          }
+      }
+    }
+  }
+  @Override public OmniIterator.OfDouble iterator(){
+    return new AscendingItr(this);
+  }
+  @Override public OmniIterator.OfDouble descendingIterator(){
+    int tail;
+    return new DescendingItr(this,(tail=this.tail)==-1?-1:tail==arr.length-1?0:tail+1);
+  }
+  boolean fragmentedRemoveIf(int head,int tail,DoublePredicate filter){
+    double[] arr;
+    if(filter.test((double)(arr=this.arr)[head]))
+    {
+      if(filter.test((double)arr[tail]))
+      {
+        fragmentedCollapseHeadAndTail(arr,head,tail,filter);
+      }
+      else
+      {
+        fragmentedCollapsehead(arr,head,tail,filter);
+      }
+      return true;
+    }
+    else if(filter.test((double)arr[tail]))
+    {
+      fragmentedCollapsetail(arr,head,tail,filter);
+      return true;
+    }
+    return fragmentedCollapseBody(arr,head,tail,filter);
+  }
+  @Override public boolean equals(Object obj){
+      //TODO
+      return false;
+  }
+  private static  int pullDown(double[] arr,int dstOffset,int srcBound,DoublePredicate filter){
+    for(int srcOffset=dstOffset+1;srcOffset!=srcBound;++srcOffset)
+    {
+      final double v;
+      if(!filter.test((double)(v=arr[srcOffset])))
+      {
+        arr[dstOffset++]=v;
+      }
+    }
+    arr[dstOffset]=arr[srcBound];
+    return dstOffset;
+  }
+  private static  int pullUp(double[] arr,int dstOffset,int srcBound,DoublePredicate filter){
+    for(int srcOffset=dstOffset-1;srcOffset!=srcBound;--srcOffset)
+    {
+      final double v;
+      if(!filter.test((double)(v=arr[srcOffset])))
+      {
+        arr[dstOffset--]=v;
+      }
+    }
+    arr[dstOffset]=arr[srcBound];
+    return dstOffset;
+  }
+  private void fragmentedCollapseBodyHelper(double[] arr,int head,int tail,DoublePredicate filter){
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+    {
+      if(filter.test((double)arr[srcOffset]))
+      {
+        tail=pullDown(arr,srcOffset,tail,filter);
+        break;
+      }
+    }
+    this.tail=tail;
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset)
+    {
+      if(filter.test((double)arr[srcOffset]))
+      {
+        head=pullUp(arr,srcOffset,head,filter);
+        break;
+      }
+    }
+    this.head=head;
+  }
+  private void collapseBodyHelper(double[] ar,int head,int tail,DoublePredicate filter){
+    int midPoint;
+    for(int srcOffset=midPoint=(head+tail)>>1;srcOffset!=head;--srcOffset){
+      if(filter.test((double)arr[srcOffset])){
+        this.head=pullUp(arr,srcOffset,head,filter);
+        while(++midPoint!=tail){
+          if(filter.test((double)arr[midPoint])){
+            tail=pullDown(arr,midPoint,tail,filter);
+            break;
+          }
+        }
+        this.tail=tail;
+        return;
+      }
+    }
+    while(++midPoint!=tail){
+      if(filter.test((double)arr[midPoint])){
+        tail=pullDown(arr,midPoint,tail,filter);
+        break;
+      }
+    }
+    this.head=head;
+    this.tail=tail;
+  }
+  private void fragmentedCollapseHeadAndTail(double[] arr,int head,int tail,DoublePredicate filter){
+    outer:for(;;){
+      do{
+        if(tail==0){
+          for(tail=arr.length-1;tail!=head;--tail){
+            if(!filter.test((double)arr[tail])){
+              break outer;
+            }
+          }  
+          this.tail=-1;
+          return;
+        }
+      }while(filter.test((double)arr[--tail]));
+      for(int bound=arr.length;++head!=bound;){
+        if(!filter.test((double)arr[head])){
+          fragmentedCollapseBodyHelper(arr,head,tail,filter);
+          return;
+        }
+      }
+      head=-1;
+      break;
+    }
+    while(++head!=tail){
+      if(!filter.test((double)arr[head])){
+        collapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+    }
+    this.head=head;
+    this.tail=tail;
+  }
+  private boolean fragmentedCollapseBody(double[] arr,int head,int tail,DoublePredicate filter){
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset){
+      if(filter.test((double)arr[srcOffset])){
+        this.tail=pullDown(arr,srcOffset,tail,filter);
+        for(srcOffset=arr.length-1;srcOffset!=head;--srcOffset){
+          if(filter.test((double)arr[srcOffset])){
+            this.head=pullUp(arr,srcOffset,head,filter);
+            break;
+          }
+        }
+        return true;
+      }
+    }
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset){
+      if(filter.test((double)arr[srcOffset]))
+      {
+        this.head=pullUp(arr,srcOffset,head,filter);
+        return true;
+      }
+    }
+    return false;
+  }
+  private void fragmentedCollapsehead(double[] arr,int head,int tail,DoublePredicate filter){
+    for(int bound=arr.length;;)
+    {
+      if(++head==bound){
+        for(head=0;head!=tail;++head)
+        {
+          if(!filter.test((double)arr[head]))
+          {
+            collapseBodyHelper(arr,head,tail,filter);
+            break;
+          }
+        }
+        return;
+      }
+      if(!filter.test((double)arr[head]))
+      {
+        fragmentedCollapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+    }
+  }
+  private void collapsehead(double[] arr,int head,int tail,DoublePredicate filter){
+    do{
+      if(++head==tail){
+        this.head=head;
+        return;
+      }
+    }while(filter.test((double)arr[head]));
+    collapseBodyHelper(arr,head,tail,filter);
+  }
+  private void fragmentedCollapsetail(double[] arr,int head,int tail,DoublePredicate filter){
+    for(;;)
+    {
+      if(tail==0){
+        for(tail=arr.length-1;tail!=head;--tail)
+        {
+          if(!filter.test((double)arr[tail]))
+          {
+            collapseBodyHelper(arr,head,tail,filter);
+            break;
+          }
+        }
+        return;
+      }
+      if(!filter.test((double)arr[--tail]))
+      {
+        fragmentedCollapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+    }
+  }
+  private void collapsetail(double[] arr,int head,int tail,DoublePredicate filter){
+    do{
+      if(--tail==head){
+        this.tail=tail;
+        return;
+      }
+    }while(filter.test((double)arr[tail]));
+    collapseBodyHelper(arr,head,tail,filter);
+  }
+  private void collapseHeadAndTail(double[] arr,int head,int tail,DoublePredicate filter){
+    do{
+      if(++head==tail){
+        this.tail=-1;
+        return;
+      }
+    }while(filter.test((double)arr[head]));
+    while(--tail!=head){
+      if(!filter.test((double)arr[tail])){
+        collapseBodyHelper(arr,head,tail,filter);
+        return;
+      }
+    }
+    this.head=head;
+    this.tail=head;
+  }
+  private boolean collapseBody(double[] arr,int head,int tail,DoublePredicate filter){
+    int midPoint;
+    for(int srcOffset=midPoint=(head+tail)>>1;srcOffset!=head;--srcOffset){
+      if(filter.test((double)arr[srcOffset])){
+        this.head=pullUp(arr,srcOffset,head,filter);
+        while(++midPoint!=tail){
+          if(filter.test((double)arr[midPoint])){
+            this.tail=pullDown(arr,midPoint,tail,filter);
+            break;
+          }
+        }
+        return true;
+      }
+    }
+    while(++midPoint!=tail){
+      if(filter.test((double)arr[midPoint])){
+        this.tail=pullDown(arr,midPoint,tail,filter);
+        return true;
+      }
+    }
+    return false;
+  }
+  boolean nonfragmentedRemoveIf(int head,int tail,DoublePredicate filter){
+    double[] arr;
+    if(filter.test((double)(arr=this.arr)[head])){
+      if(head==tail){
+        this.tail=-1;
+      }else{
+        if(filter.test((double)arr[tail])){
+          collapseHeadAndTail(arr,head,tail,filter);
+        }else{
+          collapsehead(arr,head,tail,filter);
+        }
+      }
+      return true;
+    }else if(head!=tail){
+      if(filter.test((double)arr[tail])){
+        collapsetail(arr,head,tail,filter);
+        return true;
+      }
+      return collapseBody(arr,head,tail,filter);
+    }
+    return false;
   }
   @Override public void readExternal(ObjectInput input) throws IOException
   {
-    //TODO
+    int size;
+    if((size=input.readInt())!=0){
+      double[] arr;
+      OmniArray.OfDouble.readArray(arr=new double[size],0,--size,input);
+      this.tail=size;
+      this.head=0;
+      this.arr=arr;
+    }else{
+      this.tail=-1;
+    }
   }
   @Override public void writeExternal(ObjectOutput output) throws IOException{
-    //TODO
+    int tail;
+    if((tail=this.tail)!=-1){
+      int head,size;
+      if((size=(++tail)-(head=this.head))<=0){
+        double[] arr;
+        output.writeInt(size+(size=(arr=this.arr).length));
+        OmniArray.OfDouble.writeArray(arr,head,size-1,output);
+        OmniArray.OfDouble.writeArray(arr,0,tail-1,output);
+      }else{
+        output.writeInt(size);
+        OmniArray.OfDouble.writeArray(arr,head,tail-1,output);
+      }
+    }else{
+      output.writeInt(0);
+    }
   }
   public static class Checked extends DoubleArrDeq{
     private static final long serialVersionUID=1L;
@@ -1575,17 +2208,199 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       //TODO
       return false;
     }
-    @Override public OmniIterator.OfDouble iterator(){
-      //TODO
-      return null;
-    }
-    @Override public OmniIterator.OfDouble descendingIterator(){
-      //TODO
-      return null;
-    }
     @Override public boolean equals(Object obj){
       //TODO
       return false;
+    }
+    @Override public OmniIterator.OfDouble iterator(){
+      return new AscendingItr(this);
+    }
+    @Override public OmniIterator.OfDouble descendingIterator(){
+      return new DescendingItr(this);
+    }
+    private static class AscendingItr extends AbstractDeqItr{
+      transient int modCount;
+      transient int lastRet;
+      transient final Checked root;
+      private AscendingItr(Checked root){
+        super(root.tail==-1?-1:root.head);
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+      }
+      private AscendingItr(Checked root,int cursor){
+        super(cursor);
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+      }
+      @Override public double nextDouble(){
+        final Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int cursor;
+        if((cursor=this.cursor)!=-1){
+          final double[] arr;
+          final var ret=(double)(arr=root.arr)[cursor];
+          this.lastRet=cursor;
+          if(cursor==root.tail){
+            cursor=-1;
+          }else if(++cursor==arr.length){
+            cursor=0;
+          }
+          this.cursor=cursor;
+          return ret;
+        }
+        throw new NoSuchElementException();
+      }
+      void fragmentedRemove(int head,int lastRet,int tail,Checked root){
+        double[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        if((headDist=lastRet-head)>=0){
+          if(headDist<=(tailDist=arrBound-lastRet)+tail){
+            root.head=pullUp(arr,head,headDist);
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+            this.cursor=lastRet;
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            root.tail=tail-1;
+            this.cursor=lastRet;
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+          }
+        }
+      }
+      void nonfragmentedRemove(int head,int lastRet,int tail,Checked root){
+        final int headDist,tailDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+          root.tail=tail-1;
+          this.cursor=lastRet;
+        }else{
+          root.head=pullUp(root.arr,head,headDist);
+        }
+      }
+      @Override public void remove(){
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
+              break;
+            default:
+              nonfragmentedRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
+        }
+        throw new IllegalStateException();
+      }
+      @Override void uncheckedForEachRemaining(int cursor,DoubleConsumer action){
+        int modCount=this.modCount;
+        final Checked root;
+        int tail=(root=this.root).tail;
+        try{
+          final var arr=root.arr;
+          if(cursor>tail){
+            OmniArray.OfDouble.ascendingForEach(arr,cursor,arr.length-1,action);
+            cursor=0;
+          }
+          OmniArray.OfDouble.ascendingForEach(arr,cursor,tail,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+        this.lastRet=tail;
+        this.cursor=-1;
+      }
+    }
+    private static class DescendingItr extends AscendingItr{
+      private DescendingItr(Checked root){
+        super(root,root.tail);
+      }
+      @Override public double nextDouble(){
+        final Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int cursor;
+        if((cursor=this.cursor)!=-1){
+          final double[] arr;
+          final var ret=(double)(arr=root.arr)[cursor];
+          this.lastRet=cursor;
+          if(cursor==root.head){
+            cursor=-1;
+          }else if(--cursor==-1){
+            cursor=arr.length-1;
+          }
+          this.cursor=cursor;
+          return ret;
+        }
+        throw new NoSuchElementException();
+      }
+      @Override void fragmentedRemove(int head,int lastRet,int tail,Checked root){
+        double[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        if((headDist=lastRet-head)>=0){
+          if(headDist<=(tailDist=arrBound-lastRet)+tail){
+            root.head=pullUp(arr,head,headDist);
+            this.cursor=lastRet;
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            root.tail=tail-1;
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=lastRet;
+          }
+        }
+      }
+      @Override void nonfragmentedRemove(int head,int lastRet,int tail,Checked root){
+        final int headDist,tailDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+          root.tail=tail-1;
+        }else{
+          root.head=pullUp(root.arr,head,headDist);
+          this.cursor=lastRet;
+        }
+      }
+      @Override void uncheckedForEachRemaining(int cursor,DoubleConsumer action){
+        int modCount=this.modCount;
+        final Checked root;
+        int head=(root=this.root).head;
+        try{
+          final var arr=root.arr;
+          if(cursor<head){
+            OmniArray.OfDouble.descendingForEach(arr,0,cursor,action);
+            cursor=arr.length-1;
+          }
+          OmniArray.OfDouble.descendingForEach(arr,head,cursor,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+        this.lastRet=head;
+        this.cursor=-1;
+      }
     }
     @Override public Object clone(){
       int tail;
