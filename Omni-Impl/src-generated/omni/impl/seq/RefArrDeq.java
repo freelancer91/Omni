@@ -1501,6 +1501,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1532,6 +1533,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1564,6 +1566,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1674,7 +1677,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         hash=(hash*31)+Objects.hashCode(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+Objects.hashCode(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+Objects.hashCode(arr[++head])){}
     return hash;
   }
   @Override public void push(E val){

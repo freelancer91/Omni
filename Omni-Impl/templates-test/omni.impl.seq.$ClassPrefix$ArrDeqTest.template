@@ -51,7 +51,11 @@ import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.QueryTester;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.ItrType;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredComparatorGen;
 import java.nio.file.Files;
+#IF OfDouble,OfFloat
+import omni.util.HashUtil;
+#ENDIF
 #IF OfRef
+import java.util.Objects;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredObjectGen;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredObject;
 #ENDIF
@@ -72,8 +76,14 @@ import omni.function.$Comparator$;
 @Execution(ExecutionMode.CONCURRENT)
 public class $ClassPrefix$ArrDeqTest{
 
-  #MACRO TestMethods(true)
+  #MACRO TestMethods(false)
 #MACRODEF TestMethods(PARALLEL)
+#MACRO testtoArray_ObjectArray<PARALLEL>()
+#MACRO testcontains_val<PARALLEL>()
+#MACRO testsearch_val<PARALLEL>()
+#MACRO testMASSIVEtoString_void<PARALLEL>()
+#MACRO testhashCode_void<PARALLEL>()
+#MACRO testtoString_void<PARALLEL>()
 #MACRO testelement_void<PARALLEL>()
 #MACRO testgetFirst_void<PARALLEL>()
 #MACRO testgetLast_void<PARALLEL>()
@@ -97,6 +107,268 @@ public class $ClassPrefix$ArrDeqTest{
 #MACRO testConstructor_void<PARALLEL>()
 #MACRO testConstructor_int<PARALLEL>()
 #ENDDEF
+#MACRODEF testtoArray_ObjectArray<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testtoArray_ObjectArray(){
+  for(var checkedType:CheckedType.values()){
+    IntStream.iterate(0,seqSize->seqSize+=5).limit(3)
+    .forEach(seqSize->{
+      IntStream.iterate(0,paramArrSize->paramArrSize+=5).limit((seqSize/5)+1)
+      .forEach(paramArrSize->{
+        if(seqSize==0)
+        {
+          testtoArray_ObjectArrayHelper(checkedType,seqSize,0,paramArrSize);
+        }
+        else
+        {
+          IntStream.range(0,seqSize)
+#IFSWITCH PARALLEL==true
+          .parallel()
+#ENDDEF
+          .forEach(head->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize););
+        }
+      });
+    });
+  }
+}
+private static void testtoArray_ObjectArrayHelper(CheckedType checkedType,int seqSize,int head,int paramArrSize){
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+  initializeAscending(seqMonitor.seq.arr,head,seqSize);
+  var paramArr=new Object[paramArrSize];
+  for(int i=0;i<paramArrSize;++i)
+  {
+    paramArr[i]=Integer.valueOf(paramArrSize);
+  }
+  var resultArr=seqMonitor.seq.toArray(paramArr);
+  Assertions.assertNotSame(resultArr,seqMonitor.seq.arr);
+  if(paramArrSize<seqSize){
+    Assertions.assertNotSame(resultArrm
+  }else if(paramArrSize>seqSize)
+  {
+  }
+}
+#ENDDEF
+#MACRODEF testMASSIVEtoString_void<PARALLEL>()
+#IF OfBoolean
+  private static final int MAX_TOSTRING_LENGTH=5;
+#ELSEIF OfByte
+  private static final int MAX_TOSTRING_LENGTH=4;
+#ELSEIF OfShort
+  private static final int MAX_TOSTRING_LENGTH=6;
+#ELSEIF OfInt
+  private static final int MAX_TOSTRING_LENGTH=11;
+#ELSEIF OfLong
+  private static final int MAX_TOSTRING_LENGTH=20;
+#ELSEIF OfFloat
+  private static final int MAX_TOSTRING_LENGTH=15;
+#ENDIF
+#IF OfBoolean,OfByte,OfShort,OfInt,OfLong,OfFloat
+@Tag("MASSIVEtoString")
+@org.junit.jupiter.api.Test
+public void testMASSIVEtoString_void(){
+  int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
+  $ArrayType$[] arr=new $ArrayType$[seqLength];
+#IFSWITCH PARALLEL==true
+  int numThreads=Runtime.getRuntime().availableProcessors();
+  int threadSpan=seqLength/numThreads;
+  int threadBound=numThreads-1;
+#ENDIF
+  for(int i=0;i<seqLength;++i){
+    arr[i]=TypeConversionUtil.convertTo$ArrayType$(1);
+  }
+  for(int tail=seqLength-1;tail>=(seqLength>>2);tail-=(seqLength>>1)){
+    for(var checkedType:CheckedType.values()){
+      int head=tail-(seqLength-1);
+      if(head<0)
+      {
+        head+=seqLength;
+      }
+      var seqMonitor=new SeqMonitor(checkedType,head,arr,tail);
+      String string=seqMonitor.seq.toString();
+      Assertions.assertEquals('[',string.charAt(0));
+      Assertions.assertEquals(']',string.charAt(string.length()-1));
+      seqMonitor.verifyStructuralIntegrity();
+#IFSWITCH PARALLEL==true
+      var threads=new Thread[threadBound];
+      int nextWayPointIndex=0;
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      for(int threadIndex=0;threadIndex<threadBound;){
+        
+        final int finalWayPointBound=nextWayPointIndex+threadSpan;
+        final int finalWayPointIndex=nextWayPointIndex;
+        threads[threadIndex++]=new Thread(()->Abstract$ClassPrefix$SeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
+        verifyItr.skip(threadSpan);
+        nextWayPointIndex=finalWayPointBound;
+      }
+      Abstract$ClassPrefix$SeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+      try{
+        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
+          threads[threadIndex].join();
+        }
+      }catch(InterruptedException e){
+        Assertions.fail(e);
+      }
+#ELSE
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      Abstract$ClassPrefix$SeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
+#ENDIF
+    }
+  }
+}
+#ENDIF
+#ENDDEF
+#MACRODEF testtoString_void<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testtoString_void(){
+  runToStringOrHashCodeTests(PARALLEL,$ClassPrefix$ArrDeqTest::testtoString_voidHelper);
+}
+private static void testtoString_voidHelper(CheckedType checkedType,int size,int head
+#IF OfRef
+,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+)
+{
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,size,head,size);
+#IF OfRef
+  MonitoredObject monitoredObject=null;
+  if(size!=0 && monitoredObjectGen!=null && monitoredObjectGen.expectedException!=null)
+  {
+    monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+    for(int i=0;i<size;++i)
+    {
+      seqMonitor.seq.arr[i]=monitoredObject;
+    }
+  }
+  else
+#ENDIF
+  {
+    initializeAscending(seqMonitor.seq.arr,head,size);
+  }
+#IF OfRef
+  if(monitoredObject!=null)
+  {
+    Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.toString());
+    Assertions.assertEquals(seqMonitor.verifyThrowCondition(size,monitoredObject,monitoredObjectGen),monitoredObject.numToStringCalls);
+  }
+  else
+#ENDIF
+  {
+    var resultStr=seqMonitor.seq.toString();
+    seqMonitor.verifyPreAlloc().verifyAscending(size);
+    var arrList=new ArrayList<Object>();
+    if(size!=0){
+      for(int i=0,j=seqMonitor.seq.head,bound=seqMonitor.seq.arr.length;i<size;++i)
+      {
+        arrList.add(seqMonitor.seq.arr[j]);
+        if(++j==bound)
+        {
+          j=0;
+        }
+      }
+    }
+    Assertions.assertEquals(arrList.toString(),resultStr);
+  }
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
+#MACRODEF testhashCode_void<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testhashCode_void(){
+  runToStringOrHashCodeTests(PARALLEL,$ClassPrefix$ArrDeqTest::testhashCode_voidHelper);
+}
+private static void testhashCode_voidHelper(CheckedType checkedType,int size,int head
+#IF OfRef
+,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+)
+{
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,size,head,size);
+#IF OfRef
+  MonitoredObject monitoredObject=null;
+  if(size!=0 && monitoredObjectGen!=null && monitoredObjectGen.expectedException!=null)
+  {
+    monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+    for(int i=0;i<size;++i)
+    {
+      seqMonitor.seq.arr[i]=monitoredObject;
+    }
+  }
+  else
+#ENDIF
+  {
+    initializeAscending(seqMonitor.seq.arr,head,size);
+  }
+#IF OfRef
+  if(monitoredObject!=null)
+  {
+    Assertions.assertThrows(monitoredObjectGen.expectedException,()->seqMonitor.seq.hashCode());
+    Assertions.assertEquals(seqMonitor.verifyThrowCondition(size,monitoredObject,monitoredObjectGen),monitoredObject.numHashCodeCalls);
+  }
+  else
+#ENDIF
+  {
+    int resultHash=seqMonitor.seq.hashCode();
+    seqMonitor.verifyPreAlloc().verifyAscending(size);
+    int expectedHash=1;
+    if(size!=0)
+    {
+      $ArrayType$[] arr;
+      for(int i=0,j=seqMonitor.seq.head,bound=(arr=seqMonitor.seq.arr).length;i<size;++i){
+        expectedHash=(expectedHash*31)+$hashCodeMethod$(arr[j]);
+        if(++j==bound){
+          j=0;
+        }
+      }
+    }
+    Assertions.assertEquals(expectedHash,resultHash);
+  }
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
+
+  interface ToStringAndHashCodeTest{
+    void runTest(CheckedType checkedType,int size,int head
+#IF OfRef
+    ,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+    );
+  }
+  static void runToStringOrHashCodeTests(boolean parallel,ToStringAndHashCodeTest tester){
+    for(var checkedType:CheckedType.values()){
+      var seqSizeStream=IntStream.rangeClosed(0,10);
+      if(parallel){
+        seqSizeStream=seqSizeStream.parallel();
+      }
+      seqSizeStream.forEach(seqSize->{
+        if(seqSize==0)
+        {
+#IF OfRef
+          tester.runTest(checkedType,seqSize,0,null);
+#ELSE
+          tester.runTest(checkedType,seqSize,0);
+#ENDIF
+        }
+        else
+        {
+          var headStream=IntStream.range(0,seqSize);
+          if(parallel){
+            headStream=headStream.parallel();
+          }
+          headStream.forEach(head->{
+#IF OfRef
+            var monitoredObjectGenStream=Stream.of(MonitoredObjectGen.values()).filter(monitoredObjectGen->monitoredObjectGen.expectedException==null||(checkedType.checked && monitoredObjectGen.appliesToRoot));
+            if(parallel){
+              monitoredObjectGenStream=monitoredObjectGenStream.parallel();
+            }
+            monitoredObjectGenStream.forEach(monitoredObjectGen->tester.runTest(checkedType,seqSize,head,monitoredObjectGen));
+#ELSE
+            tester.runTest(checkedType,seqSize,head);
+#ENDIF
+          });
+        }
+      });
+    }
+  }
 #MACRODEF testelement_void<PARALLEL>()
 @org.junit.jupiter.api.Test
 public void testelement_void(){
@@ -168,7 +440,6 @@ public void testclone_void(){
     .forEach(seqSize->{
       if(seqSize==0)
       {
-        var seqMonitor=new SeqMonitor(checkedType,0,0,0);
         testclone_voidHelper(new SeqMonitor(checkedType,0,0,0));
       }
       else
@@ -464,10 +735,10 @@ private static void testoffer_valHelper(CheckedType checkedType,int initialCapac
 #ENDDEF
 #MACRODEF testofferLast_val<PARALLEL>()
 @org.junit.jupiter.api.Test
-public void tesetofferLast_val(){
-  runInputTests(PARALLEL,$ClassPrefix$ArrDeqTest::tesetofferLast_valHelper);
+public void testofferLast_val(){
+  runInputTests(PARALLEL,$ClassPrefix$ArrDeqTest::testofferLast_valHelper);
 }
-private static void tesetofferLast_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,$ClassPrefix$InputTestArgType inputArgType)
+private static void testofferLast_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,$ClassPrefix$InputTestArgType inputArgType)
 {
   SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
   initializeAscending(seqMonitor.seq.arr,head,initialSize);
@@ -789,6 +1060,179 @@ private static void testremoveVal_valHelper(CheckedType checkedType,int capacity
   seqMonitor.verifyStructuralIntegrity();
 }
 #ENDDEF
+
+#MACRODEF testsearch_val<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testsearch_val(){
+  runQueryTests(PARALLEL,(checkedType,argType,queryCastType,seqLocation,seqSize
+#IF OfRef
+  ,monitoredObjectGen
+#ENDIF
+  )->{
+    if(seqSize==0)
+    {
+      testsearch_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
+#IF OfRef
+      ,monitoredObjectGen
+#ENDIF
+      );
+    }
+    else
+    {
+      IntStream.range(0,seqSize)
+#IFSWITCH PARALLEL==true
+      .parallel()
+#ENDIF
+      .forEach(head->{
+        testsearch_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
+#IF OfRef
+        ,monitoredObjectGen
+#ENDIF
+        );
+      });
+    }
+
+  });
+}
+private static void testsearch_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
+#IF OfRef
+  ,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+){
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
+  int expectedIndex;
+  if(numToAdd!=0){
+#IF OfRef
+    if(monitoredObjectGen!=null){
+      final var monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+      int numExpectedCalls=initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation,monitoredObject);
+      Assertions.assertThrows(monitoredObjectGen.expectedException,()->argType.invokesearchMonitored(seqMonitor,monitoredObject));
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc().skip(numToAdd);
+      switch(monitoredObjectGen){
+        case ModSeq:
+        case ModParent:
+        case ModRoot:
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case ThrowModSeq:
+        case ThrowModParent:
+        case ThrowModRoot:
+          verifyItr.verifyIllegalAdd();
+        case Throw:
+          numExpectedCalls=1;
+          break;
+        default:
+          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
+      }
+      Assertions.assertEquals(numExpectedCalls,monitoredObject.numEqualsCalls);
+      return;
+    }else{
+      expectedIndex=initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation,null);
+    }
+#ELSE
+    expectedIndex=initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
+#ENDIF
+  }else{
+    expectedIndex=-1;
+  }
+  if(seqLocation==SequenceLocation.IOBHI){
+    expectedIndex=-1;
+  }
+  Assertions.assertEquals(expectedIndex,argType.invokesearch(seqMonitor,queryCastType));
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
+
+#MACRODEF testcontains_val<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testcontains_val(){
+  runQueryTests(PARALLEL,(checkedType,argType,queryCastType,seqLocation,seqSize
+#IF OfRef
+  ,monitoredObjectGen
+#ENDIF
+  )->{
+    if(seqSize==0)
+    {
+      testcontains_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
+#IF OfRef
+      ,monitoredObjectGen
+#ENDIF
+      );
+    }
+    else
+    {
+      IntStream.range(0,seqSize)
+#IFSWITCH PARALLEL==true
+      .parallel()
+#ENDIF
+      .forEach(head->{
+        testcontains_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
+#IF OfRef
+        ,monitoredObjectGen
+#ENDIF
+        );
+      });
+    }
+
+  });
+}
+private static void testcontains_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
+#IF OfRef
+  ,MonitoredObjectGen monitoredObjectGen
+#ENDIF
+){
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
+  if(numToAdd!=0){
+#IF OfRef
+    if(monitoredObjectGen!=null){
+      final var monitoredObject=monitoredObjectGen.getMonitoredObject(seqMonitor);
+      int numExpectedCalls=initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation,monitoredObject);
+      if(seqLocation!=SequenceLocation.IOBHI && seqMonitor.seq.tail<seqMonitor.seq.head){
+        if(seqMonitor.seq.head+numExpectedCalls>seqMonitor.seq.arr.length){
+          numExpectedCalls-=(seqMonitor.seq.arr.length-seqMonitor.seq.head);
+        }else{
+          numExpectedCalls+=(seqMonitor.seq.tail+1);
+        }
+      }
+      Assertions.assertThrows(monitoredObjectGen.expectedException,()->argType.invokecontainsMonitored(seqMonitor,monitoredObject));
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc().skip(numToAdd);
+      switch(monitoredObjectGen){
+        case ModSeq:
+        case ModParent:
+        case ModRoot:
+          for(int i=0;i<numExpectedCalls;++i){
+            verifyItr.verifyIllegalAdd();
+          }
+          break;
+        case ThrowModSeq:
+        case ThrowModParent:
+        case ThrowModRoot:
+          verifyItr.verifyIllegalAdd();
+        case Throw:
+          numExpectedCalls=1;
+          break;
+        default:
+          throw new Error("Unknown monitoredObjectGen "+monitoredObjectGen);
+      }
+      Assertions.assertEquals(numExpectedCalls,monitoredObject.numEqualsCalls);
+      return;
+    }else{
+      initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation,null);
+    }
+#ELSE
+    initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
+#ENDIF
+  }
+  Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokecontains(seqMonitor,queryCastType));
+  seqMonitor.verifyStructuralIntegrity();
+}
+#ENDDEF
+
+
   interface QueryTest
   {
     void runTest(CheckedType checkedType,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
@@ -1305,13 +1749,8 @@ private static void testremoveVal_valHelper(CheckedType checkedType,int capacity
   
   
   
-  static enum NestedType{
-    DEQUE;
-    final boolean rootType=true;
-    final boolean forwardIteration=true;
-  }
+
   private static class SeqMonitor extends Abstract$ClassPrefix$SeqMonitor<$ClassPrefix$ArrDeq>{
-    private final NestedType nestedType=NestedType.DEQUE;
     //private int expectedTail;
     //private int expectedHead;
 #IFNOT OfDouble,OfRef,OfChar
@@ -1588,7 +2027,7 @@ private static void testremoveVal_valHelper(CheckedType checkedType,int capacity
           this.expectedCursor=-1;
         }
       }
-      int newCursor(){
+      int getNewCursor(){
         return expectedCursor==seq.head?-1:expectedCursor==0?seq.arr.length-1:expectedCursor-1;
       }
       int getRemoveCursor(){
@@ -1687,31 +2126,24 @@ private static void testremoveVal_valHelper(CheckedType checkedType,int capacity
         }
       }
       @Override SequenceVerificationItr getOffset(int i){
-        int index=currIndex+i;
-        if(i>0){
-          if(index<0){
-            index+=seqMonitor.seq.arr.length;
-          }
-        }else{
-          int arrLength;
-          if(index>=(arrLength=seqMonitor.seq.arr.length)){
-            index-=arrLength;
-          }
+        int index=currIndex+1;
+        int arrLength;
+        if(index>=(arrLength=seqMonitor.seq.arr.length)){
+          index-=arrLength;
+        }else if(index<0){
+          index+=arrLength;
         }
         return new ArrDeqVerificationItr(index,seqMonitor);
       }
       @Override SequenceVerificationItr skip(int i){
         currIndex+=i;
-        if(i>0){
-          if(currIndex<0){
-            currIndex+=seqMonitor.seq.arr.length;
-          }
-        }else{
-          int arrLength;
-          if(currIndex>=(arrLength=seqMonitor.seq.arr.length)){
-            currIndex-=arrLength;
-          }
+        int arrLength;
+        if(currIndex>=(arrLength=seqMonitor.seq.arr.length)){
+          currIndex-=arrLength;
+        }else if(currIndex<0){
+          currIndex+=arrLength;
         }
+        
         return this;
       }
       @Override public boolean equals(Object val){

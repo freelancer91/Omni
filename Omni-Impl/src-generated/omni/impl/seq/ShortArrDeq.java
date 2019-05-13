@@ -1255,6 +1255,7 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1357,8 +1358,8 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
           buffer[bufferOffset=ToStringUtil.getStringShort(arr[head],buffer,bufferOffset)]=(byte)',';
           buffer[++bufferOffset]=(byte)' ';
           if(++head==bound){
-            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
-              bufferOffset=ToStringUtil.getStringShort(arr[head],buffer,++bufferOffset);;
+            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' '){
+              bufferOffset=ToStringUtil.getStringShort(arr[head],buffer,++bufferOffset);
               if(++head==tail){
                 buffer[bufferOffset]=(byte)']';
                 return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
@@ -1410,7 +1411,7 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
         hash=(hash*31)+(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+(arr[++head])){}
     return hash;
   }
   @Override public void push(short val){

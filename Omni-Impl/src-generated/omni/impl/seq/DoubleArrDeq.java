@@ -1355,6 +1355,7 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1386,6 +1387,7 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1417,6 +1419,7 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1540,7 +1543,7 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         hash=(hash*31)+HashUtil.hashDouble(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+HashUtil.hashDouble(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+HashUtil.hashDouble(arr[++head])){}
     return hash;
   }
   @Override public void push(double val){

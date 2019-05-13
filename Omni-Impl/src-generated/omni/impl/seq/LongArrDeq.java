@@ -1013,6 +1013,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1115,8 +1116,8 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
           buffer[bufferOffset=ToStringUtil.getStringLong(arr[head],buffer,bufferOffset)]=(byte)',';
           buffer[++bufferOffset]=(byte)' ';
           if(++head==bound){
-            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
-              bufferOffset=ToStringUtil.getStringLong(arr[head],buffer,++bufferOffset);;
+            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' '){
+              bufferOffset=ToStringUtil.getStringLong(arr[head],buffer,++bufferOffset);
               if(++head==tail){
                 buffer[bufferOffset]=(byte)']';
                 return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
@@ -1168,7 +1169,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         hash=(hash*31)+Long.hashCode(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+Long.hashCode(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+Long.hashCode(arr[++head])){}
     return hash;
   }
   @Override public void push(long val){

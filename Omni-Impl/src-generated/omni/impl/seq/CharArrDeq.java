@@ -1256,6 +1256,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1351,7 +1352,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     final char[] buffer;
     int size,head,bufferOffset=1;
     if((size=(++tail)-(head=this.head))<=0){
-      for(buffer=new char[size+(size=arr.length)];;++bufferOffset){
+      for(buffer=new char[size+(size=arr.length)*3];;++bufferOffset){
         buffer[bufferOffset]=arr[head];
         buffer[++bufferOffset]=',';
         buffer[++bufferOffset]=' ';
@@ -1362,7 +1363,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
         }
       }
     }else{
-      buffer=new char[size];
+      buffer=new char[size*3];
     }
     for(;;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',++bufferOffset){
       buffer[bufferOffset]=arr[head];
@@ -1386,7 +1387,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
         hash=(hash*31)+(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+(arr[++head])){}
     return hash;
   }
   @Override public void push(char val){

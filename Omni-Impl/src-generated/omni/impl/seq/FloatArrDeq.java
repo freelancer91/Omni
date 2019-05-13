@@ -1529,6 +1529,7 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1560,6 +1561,7 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1591,6 +1593,7 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1693,8 +1696,8 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
           buffer[bufferOffset=ToStringUtil.getStringFloat(arr[head],buffer,bufferOffset)]=(byte)',';
           buffer[++bufferOffset]=(byte)' ';
           if(++head==bound){
-            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
-              bufferOffset=ToStringUtil.getStringFloat(arr[head],buffer,++bufferOffset);;
+            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' '){
+              bufferOffset=ToStringUtil.getStringFloat(arr[head],buffer,++bufferOffset);
               if(++head==tail){
                 buffer[bufferOffset]=(byte)']';
                 return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
@@ -1746,7 +1749,7 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
         hash=(hash*31)+HashUtil.hashFloat(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+HashUtil.hashFloat(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+HashUtil.hashFloat(arr[++head])){}
     return hash;
   }
   @Override public void push(float val){

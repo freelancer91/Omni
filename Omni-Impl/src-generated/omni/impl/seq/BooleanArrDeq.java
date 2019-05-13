@@ -1562,6 +1562,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         if(++prefix==bound){
           prefix=bound-head;
           head=0;
+          break;
         }
       }
     }else{
@@ -1664,8 +1665,8 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           buffer[bufferOffset=ToStringUtil.getStringBoolean(arr[head],buffer,bufferOffset)]=(byte)',';
           buffer[++bufferOffset]=(byte)' ';
           if(++head==bound){
-            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' ',++bufferOffset){
-              bufferOffset=ToStringUtil.getStringBoolean(arr[head],buffer,++bufferOffset);;
+            for(head=0;;buffer[bufferOffset]=(byte)',',buffer[++bufferOffset]=(byte)' '){
+              bufferOffset=ToStringUtil.getStringBoolean(arr[head],buffer,++bufferOffset);
               if(++head==tail){
                 buffer[bufferOffset]=(byte)']';
                 return new String(buffer,0,bufferOffset+1,ToStringUtil.IOS8859CharSet);
@@ -1717,7 +1718,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         hash=(hash*31)+Boolean.hashCode(arr[head]);
       }
     }
-    for(;head!=tail;hash=(hash*31)+Boolean.hashCode(arr[head]),++head){}
+    for(;head!=tail;hash=(hash*31)+Boolean.hashCode(arr[++head])){}
     return hash;
   }
   @Override public void push(boolean val){

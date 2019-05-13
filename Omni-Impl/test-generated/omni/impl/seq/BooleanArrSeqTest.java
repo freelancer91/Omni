@@ -3129,23 +3129,6 @@ public class BooleanArrSeqTest{
     seqMonitor.verifyStructuralIntegrity();
   }
     private static final int MAX_TOSTRING_LENGTH=5;
-  /*
-  static Stream<Arguments> getMASSIVEtoString_voidArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-    final int arrLength=seqLength+20;
-    boolean[] arr=new boolean[arrLength];
-    for(int i=0;i<arrLength;++i){
-      arr[i]=TypeConversionUtil.convertToboolean(1);
-    }
-    for(var nestedType:NestedType.values()){
-      for(var checkedType:CheckedType.values()){
-        builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType,seqLength,arr)));
-      }
-    }
-    return builder.build();
-  }
-  */
   @Tag("MASSIVEtoString")
   @org.junit.jupiter.api.Test
   public void testMASSIVEtoString_void(){
