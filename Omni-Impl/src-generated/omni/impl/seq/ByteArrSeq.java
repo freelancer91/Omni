@@ -71,7 +71,7 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
       this.arr=arr;
     }
   }
-  private static  long markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter){
+  static  long markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((byte)arr[srcOffset])){
         word|=marker;
@@ -81,7 +81,7 @@ public abstract class ByteArrSeq extends AbstractSeq implements OmniCollection.O
       }
     }
   }
-  private static  int markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter,long[] survivorSet){
+  static  int markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

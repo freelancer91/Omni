@@ -71,7 +71,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
       this.arr=arr;
     }
   }
-  private static  long markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter){
+  static  long markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((short)arr[srcOffset])){
         word|=marker;
@@ -81,7 +81,7 @@ public abstract class ShortArrSeq extends AbstractSeq implements OmniCollection.
       }
     }
   }
-  private static  int markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter,long[] survivorSet){
+  static  int markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

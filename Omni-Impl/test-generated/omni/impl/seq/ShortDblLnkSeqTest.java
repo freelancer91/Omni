@@ -4265,7 +4265,7 @@ public class ShortDblLnkSeqTest{
     AbstractShortSeqMonitor.AbstractItrMonitor getDescendingItrMonitor(){
       return checkedType.checked?new CheckedDescendingItrMonitor():new UncheckedDescendingItrMonitor();
     }
-    AbstractShortSeqMonitor.AbstractItrMonitor getListItrMonitor(){
+    AbstractItrMonitor getListItrMonitor(){
       switch(nestedType){
         case LISTDEQUE:
           return checkedType.checked?new CheckedBidirectionalItrMonitor():new UncheckedBidirectionalItrMonitor();
@@ -4275,7 +4275,7 @@ public class ShortDblLnkSeqTest{
           throw new Error("Unknown nested type "+nestedType);
       }
     }
-    AbstractShortSeqMonitor.AbstractItrMonitor getListItrMonitor(int index){
+    AbstractItrMonitor getListItrMonitor(int index){
       switch(nestedType){
         case LISTDEQUE:
           return checkedType.checked?new CheckedBidirectionalItrMonitor(index):new UncheckedBidirectionalItrMonitor(index);

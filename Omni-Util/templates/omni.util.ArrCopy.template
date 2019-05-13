@@ -167,7 +167,7 @@ static void semicheckedSelfCopy(ARR[] src,int dstOffset,int srcOffset,int length
   #MACRO Assert(dstOffset>=0)
   #MACRO Assert(length>=0)
   #MACRO Assert(srcOffset+length<=src.length)
-  #MACRO Assert(dstOffset+length<=dst.length)
+  #MACRO Assert(dstOffset+length<=src.length)
   if(length!=0)
   {
     uncheckedSelfCopy(src,dstOffset,srcOffset,length);
@@ -179,7 +179,7 @@ static void uncheckedSelfCopy(ARR[] src,int dstOffset,int srcOffset,int length)
   #MACRO Assert(dstOffset>=0)
   #MACRO Assert(length>0)
   #MACRO Assert(srcOffset+length<=src.length)
-  #MACRO Assert(dstOffset+length<=dst.length)
+  #MACRO Assert(dstOffset+length<=src.length)
   #MACRO Assert(length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset)
   switch(length)
   {
@@ -269,5 +269,5 @@ static GENERICPARAM void semicheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst
 }
 #ENDDEF
 #MACRODEF Assert(expr)
-//assert expr;
+assert expr;
 #ENDDEF

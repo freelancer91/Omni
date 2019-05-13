@@ -4155,7 +4155,7 @@ public class DoubleDblLnkSeqTest{
     AbstractDoubleSeqMonitor.AbstractItrMonitor getDescendingItrMonitor(){
       return checkedType.checked?new CheckedDescendingItrMonitor():new UncheckedDescendingItrMonitor();
     }
-    AbstractDoubleSeqMonitor.AbstractItrMonitor getListItrMonitor(){
+    AbstractItrMonitor getListItrMonitor(){
       switch(nestedType){
         case LISTDEQUE:
           return checkedType.checked?new CheckedBidirectionalItrMonitor():new UncheckedBidirectionalItrMonitor();
@@ -4165,7 +4165,7 @@ public class DoubleDblLnkSeqTest{
           throw new Error("Unknown nested type "+nestedType);
       }
     }
-    AbstractDoubleSeqMonitor.AbstractItrMonitor getListItrMonitor(int index){
+    AbstractItrMonitor getListItrMonitor(int index){
       switch(nestedType){
         case LISTDEQUE:
           return checkedType.checked?new CheckedBidirectionalItrMonitor(index):new UncheckedBidirectionalItrMonitor(index);

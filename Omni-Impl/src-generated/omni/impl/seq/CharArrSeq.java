@@ -70,7 +70,7 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
       this.arr=arr;
     }
   }
-  private static  long markSurvivors(char[] arr,int srcOffset,int srcBound,CharPredicate filter){
+  static  long markSurvivors(char[] arr,int srcOffset,int srcBound,CharPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((char)arr[srcOffset])){
         word|=marker;
@@ -80,7 +80,7 @@ public abstract class CharArrSeq extends AbstractSeq implements OmniCollection.O
       }
     }
   }
-  private static  int markSurvivors(char[] arr,int srcOffset,int srcBound,CharPredicate filter,long[] survivorSet){
+  static  int markSurvivors(char[] arr,int srcOffset,int srcBound,CharPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

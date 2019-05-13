@@ -2996,10 +2996,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Boolean)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Boolean)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Boolean)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3029,10 +3035,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Byte)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Byte)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Byte)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3062,10 +3074,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Character)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Character)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Character)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3095,10 +3113,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Short)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Short)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Short)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3128,10 +3152,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Integer)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Integer)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Integer)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3161,10 +3191,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Long)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Long)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Long)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3194,10 +3230,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Float)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Float)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Float)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3227,10 +3269,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Double)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Double)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Double)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3260,10 +3308,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((Object)(null));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((Object)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((Object)(null));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3293,10 +3347,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((boolean)(false));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((boolean)(false));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((boolean)(false));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(false);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(false));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3326,10 +3386,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((boolean)(true));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((boolean)(true));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((boolean)(true));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3359,10 +3425,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((byte)(0));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((byte)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((byte)(0));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3392,10 +3464,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((byte)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((byte)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((byte)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3425,10 +3503,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((byte)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((byte)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((byte)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3458,10 +3542,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((byte)(-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((byte)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((byte)(-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3491,10 +3581,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((char)(0));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((char)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((char)(0));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3524,10 +3620,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((char)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((char)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((char)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3557,10 +3659,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((char)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((char)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((char)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3590,10 +3698,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((char)(((char)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((char)Byte.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((char)Byte.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3623,10 +3737,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((char)(((char)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((char)Short.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((char)Short.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3656,10 +3776,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((short)(0));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((short)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((short)(0));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3689,10 +3815,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((short)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((short)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((short)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3722,10 +3854,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((short)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((short)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((short)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3755,10 +3893,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((short)(-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((short)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((short)(-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3788,10 +3932,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((short)Byte.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((short)Byte.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3821,10 +3971,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((short)Byte.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((short)Byte.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3854,10 +4010,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(0));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(0));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3887,10 +4049,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3920,10 +4088,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3953,10 +4127,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3986,10 +4166,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((int)Byte.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((int)Byte.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4019,10 +4205,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((int)Byte.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((int)Byte.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4052,10 +4244,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(((int)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((int)Short.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((int)Short.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4085,10 +4283,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(((int)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((int)Short.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((int)Short.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4118,10 +4322,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(((int)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((int)Character.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((int)Character.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4151,10 +4361,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((TypeUtil.MAX_SAFE_INT+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((TypeUtil.MAX_SAFE_INT+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4184,10 +4400,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((TypeUtil.MIN_SAFE_INT-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((TypeUtil.MIN_SAFE_INT-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4217,10 +4439,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(0));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(0));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -4250,10 +4478,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4283,10 +4517,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4316,10 +4556,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4349,10 +4595,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Byte.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Byte.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4382,10 +4634,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Byte.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Byte.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4415,10 +4673,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Short.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Short.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4448,10 +4712,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Short.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Short.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4481,10 +4751,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Character.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Character.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4514,10 +4790,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)TypeUtil.MAX_SAFE_INT)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)TypeUtil.MAX_SAFE_INT)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4547,10 +4829,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)TypeUtil.MIN_SAFE_INT)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)TypeUtil.MIN_SAFE_INT)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4580,10 +4868,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Integer.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Integer.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4613,10 +4907,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)Integer.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)Integer.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4646,10 +4946,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)TypeUtil.MAX_SAFE_LONG)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)TypeUtil.MAX_SAFE_LONG)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4679,10 +4985,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((long)TypeUtil.MIN_SAFE_LONG)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((long)TypeUtil.MIN_SAFE_LONG)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4712,10 +5024,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(0.0F));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(0.0F));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(0.0F));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0.0F)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0.0F)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -4745,10 +5063,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(-0.0F));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(-0.0F));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(-0.0F));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-0.0F)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-0.0F)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -4778,10 +5102,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4811,10 +5141,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4844,10 +5180,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4877,10 +5219,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Byte.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Byte.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4910,10 +5258,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Byte.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Byte.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4943,10 +5297,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Short.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Short.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4976,10 +5336,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Short.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Short.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5009,10 +5375,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Character.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Character.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5042,10 +5414,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Integer.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Integer.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5075,10 +5453,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Integer.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Integer.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5108,10 +5492,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Long.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Long.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Long.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5141,10 +5531,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(((float)Long.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((float)Long.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((float)Long.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5174,10 +5570,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(Float.MIN_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(Float.MIN_VALUE));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Float.MIN_VALUE)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Float.MIN_VALUE)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5207,10 +5609,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(Float.MAX_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(Float.MAX_VALUE));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Float.MAX_VALUE)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Float.MAX_VALUE)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5240,10 +5648,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((float)(Float.NaN));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((float)(Float.NaN));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((float)(Float.NaN));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Float.NaN)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Float.NaN)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5273,10 +5687,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(0.0D));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(0.0D));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(0.0D));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((0.0D)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((0.0D)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -5306,10 +5726,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(-0.0D));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(-0.0D));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(-0.0D));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-0.0D)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-0.0D)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -5339,10 +5765,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)(true);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)(true));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5372,10 +5804,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(2));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(2));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((2)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((2)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5405,10 +5843,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5438,10 +5882,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Byte.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Byte.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5471,10 +5921,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Byte.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Byte.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5504,10 +5960,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Short.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Short.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5537,10 +5999,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Short.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Short.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5570,10 +6038,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Character.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Character.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5603,10 +6077,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)TypeUtil.MAX_SAFE_INT)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)TypeUtil.MAX_SAFE_INT)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5636,10 +6116,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)TypeUtil.MIN_SAFE_INT)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)TypeUtil.MIN_SAFE_INT)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5669,10 +6155,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Integer.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Integer.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5702,10 +6194,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Integer.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Integer.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5735,10 +6233,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Long.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Long.MAX_VALUE)+1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Long.MAX_VALUE)+1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5768,10 +6272,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(((double)Long.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((((double)Long.MIN_VALUE)-1)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((((double)Long.MIN_VALUE)-1)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5801,10 +6311,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(Float.MIN_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(Float.MIN_VALUE));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Float.MIN_VALUE)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Float.MIN_VALUE)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5834,10 +6350,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(Float.MAX_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(Float.MAX_VALUE));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Float.MAX_VALUE)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Float.MAX_VALUE)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5867,10 +6389,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(Double.MIN_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(Double.MIN_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(Double.MIN_VALUE));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Double.MIN_VALUE)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Double.MIN_VALUE)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5900,10 +6428,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(Double.MAX_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(Double.MAX_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(Double.MAX_VALUE));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Double.MAX_VALUE)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Double.MAX_VALUE)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5933,10 +6467,16 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       @Override int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniStack.OfBoolean)seqMonitor.seq).search((double)(Double.NaN));}
       @Override int invokeindexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).indexOf((double)(Double.NaN));}
       @Override int invokelastIndexOfUnboxed(AbstractBooleanSeqMonitor seqMonitor){return ((OmniList.OfBoolean)seqMonitor.seq).lastIndexOf((double)(Double.NaN));}
-      void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void setEqualsVal(boolean[] arr,int index){
+        arr[index]=(boolean)((Double.NaN)==1);
+      }
+      @Override void setNotEqualsVal(boolean[] arr,int index){
+        arr[index]=((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)((Double.NaN)==1));
       }
-      void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -6052,6 +6592,8 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       abstract int invokesearchUnboxed(AbstractBooleanSeqMonitor seqMonitor);
       abstract void addEqualsVal(AbstractBooleanSeqMonitor seqMonitor);
       abstract void addNotEqualsVal(AbstractBooleanSeqMonitor seqMonitor);
+      abstract void setEqualsVal(boolean[] arr,int index);
+      abstract void setNotEqualsVal(boolean[] arr,int index);
       void initDoesNotContain(AbstractBooleanSeqMonitor seqMonitor,int seqSize){
         for(int i=0;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
@@ -6074,20 +6616,20 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
       }
       int initContainsMiddle(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/2;i<bound;++i){
+        for(int i=0,bound=seqSize>>1;i<bound;++i){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=(seqSize/2)+1;i<seqSize;++i){
+        for(int i=(seqSize>>1)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return seqSize/2+1;
+          return (seqSize>>1)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-(seqSize/2);
+          return seqMonitor.expectedSeqSize-(seqSize>>1);
         }
       }
       int initContainsNearBeginning(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
@@ -6096,34 +6638,34 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=(seqSize/4)+1;i<seqSize;++i){
+        for(int i=(seqSize>>2)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return (seqSize/4)+1;
+          return (seqSize>>2)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-((seqSize/4));
+          return seqMonitor.expectedSeqSize-((seqSize>>2));
         }
       }
       int initContainsNearEnd(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
+        for(int i=0,bound=(seqSize>>2)*3;i<bound;++i){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
+        for(int i=((seqSize>>2)*3)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return ((seqSize/4)*3)+1;
+          return ((seqSize>>2)*3)+1;
         }
         else
         {
-          return (seqMonitor.expectedSeqSize)-(seqSize/4)*3;
+          return (seqMonitor.expectedSeqSize)-(seqSize>>2)*3;
         }
       }
       int initContainsBeginning(AbstractBooleanSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){

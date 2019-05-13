@@ -71,7 +71,7 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
       this.arr=arr;
     }
   }
-  private static  long markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter){
+  static  long markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((float)arr[srcOffset])){
         word|=marker;
@@ -81,7 +81,7 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
       }
     }
   }
-  private static  int markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter,long[] survivorSet){
+  static  int markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

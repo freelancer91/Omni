@@ -70,7 +70,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       this.arr=arr;
     }
   }
-  private static  long markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter){
+  static  long markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((double)arr[srcOffset])){
         word|=marker;
@@ -80,7 +80,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       }
     }
   }
-  private static  int markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter,long[] survivorSet){
+  static  int markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

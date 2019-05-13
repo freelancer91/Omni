@@ -71,7 +71,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
       this.arr=arr;
     }
   }
-  private static  long markSurvivors(long[] arr,int srcOffset,int srcBound,LongPredicate filter){
+  static  long markSurvivors(long[] arr,int srcOffset,int srcBound,LongPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((long)arr[srcOffset])){
         word|=marker;
@@ -81,7 +81,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
       }
     }
   }
-  private static  int markSurvivors(long[] arr,int srcOffset,int srcBound,LongPredicate filter,long[] survivorSet){
+  static  int markSurvivors(long[] arr,int srcOffset,int srcBound,LongPredicate filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

@@ -23,7 +23,6 @@ import java.util.function.IntFunction;
 #IFNOT OfRef
 import omni.util.TypeUtil;
 #ENDIF
-
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 import java.util.function.$TypeNameModifier$Consumer;
@@ -37,8 +36,8 @@ import omni.util.ToStringUtil;
 #IFNOT OfRef
 import omni.impl.Abstract$TypeNameModifier$Itr;
 #ENDIF
-#IF OfRef
 import java.util.ConcurrentModificationException;
+#IF OfRef
 import omni.util.OmniPred;
 import java.util.Objects;
 #ENDIF
@@ -231,10 +230,10 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     return $elementMethod$();
   }
   @Override public $BoxedType$ peekFirst(){
-    return peek$TypeNameModifier$();
+    return peek();
   }
   @Override public $BoxedType$ pollFirst(){
-    return poll$TypeNameModifier$();
+    return poll();
   }
   @Override public $BoxedType$ removeFirst(){
     return pop$TypeNameModifier$();
@@ -572,8 +571,8 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
             int newCap,size;
             this.tail=(newCap=OmniArray.growBy50Pct(head+(size=arr.length)))-1;
             ArrCopy.uncheckedCopy(arr,0,newArr=new $ArrayType$[newCap],newCap-=(++tail),tail);
-            ArrCopy.uncheckedCopy(arr,head,newArr,head=newCap-(size-=tail),size);
-            this.arr=newArr;
+            ArrCopy.uncheckedCopy(arr,head+1,newArr,head=newCap-(size-=tail),size);
+            this.arr=arr=newArr;
             --head;
           }else if(head==-1 && tail==(head=arr.length-1)){
             int newCap;
@@ -706,6 +705,72 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
     }
 #ENDIF
+    private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      int tailDist,headDist;
+      if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+#IF OfRef
+        $ArrayType$[] arr;
+        ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+#ELSE
+        ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+#ENDIF
+        root.tail=tail-1;
+      }else{
+        $ArrayType$[] arr;
+#IF OfRef
+        ArrCopy.uncheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
+        arr[tail]=null;
+#ELSE
+        ArrCopy.uncheckedCopy(arr=root.arr,head,arr,++head,headDist);
+#ENDIF
+        root.head=head;
+        this.cursor=lastRet;
+      }
+    }
+    private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      int headDist,tailDist;
+      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+        root.head=pullUp(root.arr,head,headDist);
+      }else{
+#IF OfRef
+        $ArrayType$[] arr;
+        ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+#ELSE
+        ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+#ENDIF
+        root.tail=tail-1;
+        this.cursor=lastRet;
+      }
+    }
+    private void fragmentedAscendingRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+      $ArrayType$[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=lastRet-head)>=0){
+        if(headDist<=(tailDist=arrBound-lastRet)+tail){
+          root.head=pullUp(arr,head,headDist);
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+          this.cursor=lastRet;
+        }
+      }else{
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+#IF OfRef
+          arr[tail]=null;
+#ENDIF
+          root.tail=tail-1;
+          this.cursor=lastRet;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+        }
+      }
+    }
   }
   private static int pullUp($ArrayType$[] arr,int head,int headDist){
 #IF OfRef
@@ -772,49 +837,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       this.cursor=cursor;
       return ret;
     }
-    private void nonfragmentedRemove(int head,int cursor,int tail,$ClassPrefix$ArrDeq$<E>$ root){
-      int headDist,tailDist;
-      if((headDist=(--cursor)-head)<=(tailDist=tail-cursor)){
-        root.head=pullUp(root.arr,head,headDist);
-      }else{
-#IF OfRef
-        $ArrayType$[] arr;
-        ArrCopy.uncheckedSelfCopy(arr=root.arr,cursor,cursor+1,tailDist);
-        arr[tail]=null;
-#ELSE
-        ArrCopy.uncheckedSelfCopy(root.arr,cursor,cursor+1,tailDist);
-#ENDIF
-        root.tail=tail-1;
-        this.cursor=cursor;
-      }
-    }
-    private void fragmentedRemove(int head,int cursor,int tail,$ClassPrefix$ArrDeq$<E>$ root){
-      $ArrayType$[] arr;
-      int headDist,tailDist,arrBound=(arr=root.arr).length;
-      if((headDist=(--cursor)-head)>=0){
-        if(headDist<=(tailDist=arrBound-cursor)+tail){
-          root.head=pullUp(arr,head,headDist);
-        }else{
-          ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
-          arr[arrBound]=arr[0];
-          root.tail=fragmentedPullDown(arr,arrBound,tail);
-          this.cursor=cursor;
-        }
-      }else{
-        if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
-          ArrCopy.uncheckedSelfCopy(arr,cursor,cursor+1,tailDist);
-#IF OfRef
-          arr[tail]=null;
-#ENDIF
-          root.tail=tail-1;
-          this.cursor=cursor;
-        }else{
-          ArrCopy.semicheckedCopy(arr,0,arr,1,cursor);
-          arr[0]=arr[arrBound];
-          root.head=fragmentedPullUp(arr,head,headDist);
-        }
-      }
-    }
     private void eraseAtSplit(){
       final int head,tail,headDist,arrBound;
       final $ClassPrefix$ArrDeq$<E>$ root;
@@ -840,9 +862,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           final int head,tail;
           final $ClassPrefix$ArrDeq$<E>$ root;
           if((tail=(root=this.root).tail)<(head=root.head)){
-            fragmentedRemove(head,cursor,tail,root);
+            super.fragmentedAscendingRemove(head,cursor-1,tail,root);
           }else{
-            nonfragmentedRemove(head,cursor,tail,root);
+            super.nonfragmentedAscendingRemove(head,cursor-1,tail,root);
           }
       }
     }
@@ -858,20 +880,17 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       this.cursor=-1;
     }
   }
-  private static class DescendingItr$<E>$ extends AscendingItr$<E>$
-  {
-    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root,int cursor){
-      super(root,cursor);
+  private static class DescendingItr$<E>$ extends AscendingItr$<E>${
+    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root){
+      super(root,root.tail);
     }
     @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
       final $ClassPrefix$ArrDeq$<E>$ root;
       final int head;
       final var arr=(root=this.root).arr;
-      if(--cursor<(head=root.head)){
-         if(cursor>=0){
-           OmniArray.Of$ClassPrefix$.descendingForEach(arr,cursor,0,action);
-         }
-         cursor=arr.length-1;
+      if(cursor<(head=root.head)){
+        OmniArray.Of$ClassPrefix$.descendingForEach(arr,0,cursor,action);
+        cursor=arr.length-1;
       }
       OmniArray.Of$ClassPrefix$.descendingForEach(arr,head,cursor,action);
       this.cursor=-1;
@@ -881,93 +900,72 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       int cursor;
       final $ClassPrefix$ArrDeq$<E>$ root;
       final var arr=(root=this.root).arr;
-      if((cursor=this.cursor-1)==-1){
-        cursor=arr.length-1;
-      }
-      this.cursor=(cursor==root.head)?-1:cursor;
+      this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?arr.length-1:cursor-1;
       return ($exposedType$)arr[cursor];
     }
-    private void eraseAtSplit(){
-      final $ClassPrefix$ArrDeq$<E>$ root;
-      final int head,tail,headDist,arrBound;
-      final $ArrayType$[] arr;
-      if((tail=(root=this.root).tail)<=(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
-        root.tail=fragmentedPullDown(arr,arrBound,tail);
-      }else{
-        root.head=fragmentedPullUp(arr,head,headDist);
-        this.cursor=0;
-      }
-    }
-    private void fragmentedRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
+    private void fragmentedDescendingRemove(int head,int cursor,int tail,$ClassPrefix$ArrDeq$<E>$ root){
       $ArrayType$[] arr;
-      int headDist,tailDist,arrBound=(arr=root.arr).length;
-      if((headDist=lastRet-head)>=0){
-        if(headDist<=(tailDist=arrBound-lastRet)+tail){
-          root.head=pullUp(arr,head,headDist);
-          this.cursor=lastRet;
-        }else{
-          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-          arr[arrBound]=arr[0];
-          root.tail=fragmentedPullDown(arr,arrBound,tail);
-        }
-      }else{
-        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
-          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+      int arrBound;
+      if((arrBound=(arr=root.arr).length-1)==cursor){
+        if(tail<=(cursor=arrBound-head)){
+          ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
 #IF OfRef
           arr[tail]=null;
 #ENDIF
           root.tail=tail-1;
         }else{
-          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
           arr[0]=arr[arrBound];
-          root.head=fragmentedPullUp(arr,head,headDist);
-          this.cursor=lastRet;
+          root.head=pullUp(arr,head,cursor);
+          this.cursor=0;
+        }
+      }else{
+        int headDist,tailDist;
+        if((headDist=(++cursor)-head)>=0){
+          if(headDist<=(tailDist=arrBound-cursor)+tail){
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=cursor;
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+          }
+        }else{
+          if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
+            ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+            root.tail=tail-1;
+          }else{
+            ArrCopy.uncheckedCopy(arr,0,arr,1,cursor);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=cursor;
+          }
         }
       }
     }
-    private void nonfragmentedRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
-      int headDist,tailDist;
-      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
-        root.head=pullUp(root.arr,head,headDist);
-        this.cursor=lastRet;
-      }else{
-#IF OfRef
-        $ArrayType$[] arr;
-        ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-        arr[tail]=null;
-#ELSE
-        ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
-#ENDIF
-        root.tail=tail-1;
-      }
-    }
+    
     @Override public void remove(){
-      final int cursor;
-      switch(cursor=this.cursor){
-        case -1:
-          root.eraseHead();
-          break;
-        case 0:
-          eraseAtSplit();
-          break;
-        default:
-          final int head,tail;
-          final $ClassPrefix$ArrDeq$<E>$ root;
-          if((tail=(root=this.root).tail)<(head=root.head)){
-            fragmentedRemove(head,cursor,tail,root);
-          }else{
-            nonfragmentedRemove(head,cursor,tail,root);
-          }
+      int cursor;
+      if((cursor=this.cursor)==-1){
+        root.eraseHead();
+      }else{
+        $ClassPrefix$ArrDeq$<E>$ root;
+        int head,tail;
+        if((tail=(root=this.root).tail)<(head=root.head)){
+          fragmentedDescendingRemove(head,cursor,tail,root);
+        }else{
+          ((AbstractDeqItr$<E>$)this).nonfragmentedDescendingRemove(head,cursor+1,tail,root);
+        }
       }
     }
-  }
-  
+  } 
   @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
     return new AscendingItr$<E>$(this);
   }
   @Override public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator(){
-    int tail;
-    return new DescendingItr$<E>$(this,(tail=this.tail)==-1?-1:tail==arr.length-1?0:tail+1);
+    return new DescendingItr$<E>$(this);
   }
   #MACRO SuppressUnchecked()
   boolean fragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
@@ -1440,7 +1438,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
             if(!filter.test(($exposedType$)arr[tailOffset]))
             {
               collapseBodyHelper(arr,headOffset,tailOffset,filter,modCount);
-              this.modCount=modCount+;
+              this.modCount=modCount+1;
 #IF OfRef
               OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,tailOffset+1);
               OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
@@ -1549,7 +1547,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           }
           return true;
         }else if(head!=tail){
-          if(filter.test(($exposedType$)arr[tail]){
+          if(filter.test(($exposedType$)arr[tail])){
             collapsetail(arr,head,tail,filter,modCount);
             return true;
           }
@@ -1605,49 +1603,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         }
         throw new NoSuchElementException();
       }
-      void fragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
-        $ArrayType$[] arr;
-        int headDist,tailDist,arrBound=(arr=root.arr).length;
-        if((headDist=lastRet-head)>=0){
-          if(headDist<=(tailDist=arrBound-lastRet)+tail){
-            root.head=pullUp(arr,head,headDist);
-          }else{
-            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-            arr[arrBound]=arr[0];
-            root.tail=fragmentedPullDown(arr,arrBound,tail);
-            this.cursor=lastRet;
-          }
-        }else{
-          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
-            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-#IF OfRef
-            arr[tail]=null;
-#ENDIF
-            root.tail=tail-1;
-            this.cursor=lastRet;
-          }else{
-            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
-            arr[0]=arr[arrBound];
-            root.head=fragmentedPullUp(arr,head,headDist);
-          }
-        }
-      }
-      void nonfragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
-        final int headDist,tailDist;
-        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
-#IF OfRef
-          final $ArrayType$[] arr;
-          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-          arr[tail]=null;
-#ELSE
-          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
-#ENDIF
-          root.tail=tail-1;
-          this.cursor=lastRet;
-        }else{
-          root.head=pullUp(root.arr,head,headDist);
-        }
-      }
       @Override public void remove(){
         int lastRet;
         if((lastRet=this.lastRet)!=-1){
@@ -1659,7 +1614,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           final int head,tail;
           switch(Integer.signum((tail=root.tail)-(head=root.head))){
             case -1:
-              fragmentedRemove(head,lastRet,tail,root);
+              super.fragmentedAscendingRemove(head,lastRet,tail,root);
               break;
             case 0:
               root.tail=-1;
@@ -1668,7 +1623,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
 #ENDIF
               break;
             default:
-              nonfragmentedRemove(head,lastRet,tail,root);
+              super.nonfragmentedAscendingRemove(head,lastRet,tail,root);
           }
           this.lastRet=-1;
           return;
@@ -1716,7 +1671,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         }
         throw new NoSuchElementException();
       }
-      @Override void fragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
+      private void fragmentedDescendingRemove(int head,int lastRet,int tail,$ClassPrefix$ArrDeq$<E>$ root){
         $ArrayType$[] arr;
         int headDist,tailDist,arrBound=(arr=root.arr).length;
         if((headDist=lastRet-head)>=0){
@@ -1731,9 +1686,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         }else{
           if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
             ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-#IF OfRef
+  #IF OfRef
             arr[tail]=null;
-#ENDIF
+  #ENDIF
             root.tail=tail-1;
           }else{
             ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
@@ -1743,21 +1698,32 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           }
         }
       }
-      @Override void nonfragmentedRemove(int head,int lastRet,int tail,Checked$<E>$ root){
-        final int headDist,tailDist;
-        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+      @Override public void remove(){
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked$<E>$ root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedDescendingRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
 #IF OfRef
-          final $ArrayType$[] arr;
-          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-          arr[tail]=null;
-#ELSE
-          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+              root.arr[tail]=null;
 #ENDIF
-          root.tail=tail-1;
-        }else{
-          root.head=pullUp(root.arr,head,headDist);
-          this.cursor=lastRet;
+              break;
+            default:
+              ((AbstractDeqItr$<E>$)this).nonfragmentedDescendingRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
         }
+        throw new IllegalStateException();
       }
       @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
         int modCount=this.modCount;
@@ -2131,7 +2097,7 @@ boolean uncheckedremoveValSUFFIX(int tail
           this.modCount=modCount+1;
 #ENDIF
           int headDist,tailDist;
-          if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+          if((headDist=index-head)<((tailDist=bound-index)+tail)){
   #IF OfRef
             ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
             arr[head]=null;
@@ -2183,6 +2149,7 @@ boolean uncheckedremoveValSUFFIX(int tail
               break;
             }
           }
+          break;
         }
       }
     }else{
@@ -2293,7 +2260,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
               this.modCount=modCount+1;
 #ENDIF
               int headDist,tailDist;
-              if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+              if((headDist=index-head)<((tailDist=bound-index)+tail)){
   #IF OfRef
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
@@ -2316,6 +2283,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
               break;
             }
           }
+          break;
         }
       }
     }else{

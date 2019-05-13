@@ -3055,10 +3055,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Boolean)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Boolean)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Boolean)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3088,10 +3094,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Byte)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Byte)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Byte)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3121,10 +3133,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Character)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Character)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Character)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3154,10 +3172,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Short)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Short)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Short)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3187,10 +3211,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Integer)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Integer)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Integer)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3220,10 +3250,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Long)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Long)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Long)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3253,10 +3289,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Float)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Float)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Float)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3286,10 +3328,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Double)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Double)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Double)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3319,10 +3367,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((Object)(null));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((Object)(null));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((Object)(null));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
         throw new UnsupportedOperationException();
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+        throw new UnsupportedOperationException();
+      }
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3352,10 +3406,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((boolean)(false));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((boolean)(false));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((boolean)(false));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)TypeUtil.castToFloat(false));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)TypeUtil.castToFloat(false));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3385,10 +3445,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((boolean)(true));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((boolean)(true));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((boolean)(true));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)TypeUtil.castToFloat(true));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)TypeUtil.castToFloat(true));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3418,10 +3484,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(0));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(0));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3451,10 +3523,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3484,10 +3562,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3517,10 +3601,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((byte)(-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((byte)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((byte)(-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3550,10 +3640,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(0));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(0));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3583,10 +3679,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3616,10 +3718,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3649,10 +3757,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(((char)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(((char)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((char)Byte.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((char)Byte.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3682,10 +3796,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((char)(((char)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((char)(((char)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((char)Short.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((char)Short.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3715,10 +3835,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(0));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(0));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3748,10 +3874,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3781,10 +3913,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3814,10 +3952,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3847,10 +3991,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(((short)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((short)Byte.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((short)Byte.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3880,10 +4030,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((short)(((short)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((short)(((short)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((short)Byte.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((short)Byte.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3913,10 +4069,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(0));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(0));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -3946,10 +4108,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -3979,10 +4147,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4012,10 +4186,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4045,10 +4225,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((int)Byte.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((int)Byte.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4078,10 +4264,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((int)Byte.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((int)Byte.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4111,10 +4303,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((int)Short.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((int)Short.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4144,10 +4342,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((int)Short.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((int)Short.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4177,10 +4381,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(((int)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(((int)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((int)Character.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((int)Character.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4210,10 +4420,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(TypeUtil.MAX_SAFE_INT+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(TypeUtil.MAX_SAFE_INT+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4243,10 +4459,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(TypeUtil.MIN_SAFE_INT-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(TypeUtil.MIN_SAFE_INT-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4276,10 +4498,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(0));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(0));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(0));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -4309,10 +4537,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4342,10 +4576,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4375,10 +4615,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4408,10 +4654,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Byte.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Byte.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4441,10 +4693,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Byte.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Byte.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4474,10 +4732,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Short.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Short.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4507,10 +4771,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Short.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Short.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4540,10 +4810,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Character.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Character.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4573,10 +4849,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)TypeUtil.MAX_SAFE_INT)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)TypeUtil.MAX_SAFE_INT)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4606,10 +4888,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)TypeUtil.MIN_SAFE_INT)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)TypeUtil.MIN_SAFE_INT)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4639,10 +4927,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Integer.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Integer.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4672,10 +4966,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)Integer.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)Integer.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)Integer.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4705,10 +5005,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)TypeUtil.MAX_SAFE_LONG)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)TypeUtil.MAX_SAFE_LONG)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4738,10 +5044,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((long)TypeUtil.MIN_SAFE_LONG)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((long)TypeUtil.MIN_SAFE_LONG)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4771,10 +5083,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(0.0F));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(0.0F));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(0.0F));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0.0F));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0.0F));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -4804,10 +5122,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(-0.0F));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(-0.0F));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(-0.0F));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-0.0F));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-0.0F));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -4837,10 +5161,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4870,10 +5200,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4903,10 +5239,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4936,10 +5278,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Byte.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Byte.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -4969,10 +5317,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Byte.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Byte.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5002,10 +5356,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Short.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Short.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5035,10 +5395,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Short.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Short.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5068,10 +5434,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Character.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Character.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5101,10 +5473,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Integer.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Integer.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5134,10 +5512,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Integer.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Integer.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Integer.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5167,10 +5551,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Long.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Long.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Long.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5200,10 +5590,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(((float)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(((float)Long.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((float)Long.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((float)Long.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5233,10 +5629,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(Float.MIN_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(Float.MIN_VALUE));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Float.MIN_VALUE));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Float.MIN_VALUE));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5266,10 +5668,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(Float.MAX_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(Float.MAX_VALUE));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Float.MAX_VALUE));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Float.MAX_VALUE));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5299,10 +5707,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((float)(Float.NaN));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((float)(Float.NaN));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((float)(Float.NaN));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Float.NaN));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Float.NaN));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5332,10 +5746,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(0.0D));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(0.0D));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(0.0D));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(0.0D));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(0.0D));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -5365,10 +5785,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(-0.0D));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(-0.0D));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(-0.0D));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-0.0D));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)true);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-0.0D));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)true);
       }
     },
@@ -5398,10 +5824,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5431,10 +5863,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(2));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(2));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(2));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(2));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(2));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5464,10 +5902,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5497,10 +5941,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Byte.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Byte.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Byte.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5530,10 +5980,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Byte.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Byte.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Byte.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Byte.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5563,10 +6019,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Short.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Short.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Short.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Short.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5596,10 +6058,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Short.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Short.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Short.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Short.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5629,10 +6097,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Character.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Character.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Character.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Character.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5662,10 +6136,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)TypeUtil.MAX_SAFE_INT)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)TypeUtil.MAX_SAFE_INT)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5695,10 +6175,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)TypeUtil.MIN_SAFE_INT)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)TypeUtil.MIN_SAFE_INT)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5728,10 +6214,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Integer.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Integer.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Integer.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5761,10 +6253,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Integer.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Integer.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Integer.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Integer.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5794,10 +6292,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Long.MAX_VALUE)+1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Long.MAX_VALUE)+1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Long.MAX_VALUE)+1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Long.MAX_VALUE)+1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5827,10 +6331,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(((double)Long.MIN_VALUE)-1));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(((double)Long.MIN_VALUE)-1));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(((double)Long.MIN_VALUE)-1));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(((double)Long.MIN_VALUE)-1));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5860,10 +6370,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Float.MIN_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Float.MIN_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Float.MIN_VALUE));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Float.MIN_VALUE));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Float.MIN_VALUE));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5893,10 +6409,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Float.MAX_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Float.MAX_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Float.MAX_VALUE));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Float.MAX_VALUE));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Float.MAX_VALUE));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5926,10 +6448,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Double.MIN_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Double.MIN_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Double.MIN_VALUE));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Double.MIN_VALUE));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Double.MIN_VALUE));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5959,10 +6487,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Double.MAX_VALUE));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Double.MAX_VALUE));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Double.MAX_VALUE));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Double.MAX_VALUE));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Double.MAX_VALUE));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -5992,10 +6526,16 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       @Override int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniStack.OfFloat)seqMonitor.seq).search((double)(Double.NaN));}
       @Override int invokeindexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).indexOf((double)(Double.NaN));}
       @Override int invokelastIndexOfUnboxed(AbstractFloatSeqMonitor seqMonitor){return ((OmniList.OfFloat)seqMonitor.seq).lastIndexOf((double)(Double.NaN));}
-      void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void setEqualsVal(float[] arr,int index){
+        arr[index]=((float)(Double.NaN));
+      }
+      @Override void setNotEqualsVal(float[] arr,int index){
+        arr[index]=TypeUtil.castToFloat((boolean)false);
+      }
+      @Override void addEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((float)(Double.NaN));
       }
-      void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
+      @Override void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor){
         seqMonitor.addVal((boolean)false);
       }
     },
@@ -6111,6 +6651,8 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       abstract int invokesearchUnboxed(AbstractFloatSeqMonitor seqMonitor);
       abstract void addEqualsVal(AbstractFloatSeqMonitor seqMonitor);
       abstract void addNotEqualsVal(AbstractFloatSeqMonitor seqMonitor);
+      abstract void setEqualsVal(float[] arr,int index);
+      abstract void setNotEqualsVal(float[] arr,int index);
       void initDoesNotContain(AbstractFloatSeqMonitor seqMonitor,int seqSize){
         for(int i=0;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
@@ -6133,20 +6675,20 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
       }
       int initContainsMiddle(AbstractFloatSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/2;i<bound;++i){
+        for(int i=0,bound=seqSize>>1;i<bound;++i){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=(seqSize/2)+1;i<seqSize;++i){
+        for(int i=(seqSize>>1)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return seqSize/2+1;
+          return (seqSize>>1)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-(seqSize/2);
+          return seqMonitor.expectedSeqSize-(seqSize>>1);
         }
       }
       int initContainsNearBeginning(AbstractFloatSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
@@ -6155,34 +6697,34 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=(seqSize/4)+1;i<seqSize;++i){
+        for(int i=(seqSize>>2)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return (seqSize/4)+1;
+          return (seqSize>>2)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-((seqSize/4));
+          return seqMonitor.expectedSeqSize-((seqSize>>2));
         }
       }
       int initContainsNearEnd(AbstractFloatSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
+        for(int i=0,bound=(seqSize>>2)*3;i<bound;++i){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
+        for(int i=((seqSize>>2)*3)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return ((seqSize/4)*3)+1;
+          return ((seqSize>>2)*3)+1;
         }
         else
         {
-          return (seqMonitor.expectedSeqSize)-(seqSize/4)*3;
+          return (seqMonitor.expectedSeqSize)-(seqSize>>2)*3;
         }
       }
       int initContainsBeginning(AbstractFloatSeqMonitor seqMonitor,int seqSize,boolean forwardIteration){

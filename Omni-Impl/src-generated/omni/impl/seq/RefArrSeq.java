@@ -67,7 +67,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> long markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter){
+  static <E> long markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((E)arr[srcOffset])){
         word|=marker;
@@ -78,7 +78,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     }
   }
   @SuppressWarnings("unchecked")
-  private static <E> int markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter,long[] survivorSet){
+  static <E> int markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter,long[] survivorSet){
     for(int numSurvivors=0,wordOffset=0;;){
       long word=0L,marker=1L;
       do{

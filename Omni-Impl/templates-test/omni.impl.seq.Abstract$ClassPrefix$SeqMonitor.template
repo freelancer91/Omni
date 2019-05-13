@@ -4074,6 +4074,10 @@ boolean METHODNAME(INPUTTYPE obj)
       @Override int invokesearchBoxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override int invokesearchUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
       @Override void addEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor){throw new UnsupportedOperationException();}
+      @Override void setEqualsVal($ArrayType$[] arr,int index){throw new UnsupportedOperationException();}
+      @Override void setNotEqualsVal($ArrayType$[] arr,int index){
+        arr[index]=(new Object());
+      }
       @Override void addNotEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor){
         seqMonitor.addVal(new Object());
       }
@@ -4115,20 +4119,20 @@ boolean METHODNAME(INPUTTYPE obj)
       }
       @Override int initContainsMiddle(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/2;i<bound;++i){
+        for(int i=0,bound=seqSize>>1;i<bound;++i){
           seqMonitor.addVal(new Object());
         }
         seqMonitor.addVal(monitoredObject);
-        for(int i=(seqSize/2)+1;i<seqSize;++i){
+        for(int i=(seqSize>>1)+1;i<seqSize;++i){
           seqMonitor.addVal(new Object());
         }
          if(forwardIteration)
         {
-          return (seqSize/2)+1;
+          return (seqSize>>1)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-(seqSize/2);
+          return seqMonitor.expectedSeqSize-(seqSize>>1);
         }
       }
       @Override int initContainsBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
@@ -4148,38 +4152,38 @@ boolean METHODNAME(INPUTTYPE obj)
       }
       @Override int initContainsNearBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/4;i<bound;++i){
+        for(int i=0,bound=seqSize>>2;i<bound;++i){
           seqMonitor.addVal(new Object());
         }
         seqMonitor.addVal(monitoredObject);
-        for(int i=(seqSize/4)+1;i<seqSize;++i){
+        for(int i=(seqSize>>2)+1;i<seqSize;++i){
           seqMonitor.addVal(new Object());
         }
         if(forwardIteration)
         {
-          return (seqSize/4)+1;
+          return (seqSize>>2)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-(seqSize/4);
+          return seqMonitor.expectedSeqSize-(seqSize>>2);
         }
       }
       @Override int initContainsNearEnd(Abstract$ClassPrefix$SeqMonitor seqMonitor,MonitoredObject monitoredObject,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
+        for(int i=0,bound=(seqSize>>2)*3;i<bound;++i){
           seqMonitor.addVal(new Object());
         }
         seqMonitor.addVal(monitoredObject);
-        for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
+        for(int i=((seqSize>>2)*3)+1;i<seqSize;++i){
           seqMonitor.addVal(new Object());
         }
         if(forwardIteration)
         {
-          return ((seqSize/4)*3)+1;
+          return ((seqSize>>2)*3)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-((seqSize/4)*3);
+          return seqMonitor.expectedSeqSize-((seqSize>>2)*3);
         }
       }
     },
@@ -4310,7 +4314,42 @@ BOXED_TYPEVALUE_NAME(false){
   @Override int invokesearchUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniStack.Of$ClassPrefix$)seqMonitor.seq).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokeindexOfUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).indexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
   @Override int invokelastIndexOfUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor){return ((OmniList.Of$ClassPrefix$)seqMonitor.seq).lastIndexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
-  void addEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+  
+  @Override void setEqualsVal($ArrayType$[] arr,int index){
+#IF OfRef
+    arr[index]=(Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL);
+#ELSE
+   #IFSWITCH VALUE_NAME==null
+    throw new UnsupportedOperationException();
+  #ELSE
+    #IF OfBoolean
+      #IFSWITCH PRIMITIVE_TYPE==boolean
+    arr[index]=(boolean)(PRIMITIVE_VAL);
+      #ELSE
+        #IFSWITCH VALUE_NAME==pos1
+    arr[index]=(boolean)(true);
+        #ELSE
+    arr[index]=(boolean)((PRIMITIVE_VAL)==1);
+        #ENDIF
+      #ENDIF
+    #ELSE
+      #IFSWITCH PRIMITIVE_TYPE==boolean
+    arr[index]=(($exposedType$)$queryCastBoolean$(PRIMITIVE_VAL));
+      #ELSE
+    arr[index]=(($exposedType$)(PRIMITIVE_VAL));
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  }
+  @Override void setNotEqualsVal($ArrayType$[] arr,int index){
+    #IF OfRef
+    arr[index]=((Object)(boolean)NOT_EQUALS_VAL);
+    #ELSE
+    arr[index]=$queryCastBoolean$((boolean)NOT_EQUALS_VAL);
+    #ENDIF
+  }
+  @Override void addEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor){
 #IF OfRef
     seqMonitor.addVal((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));
 #ELSE
@@ -4337,7 +4376,7 @@ BOXED_TYPEVALUE_NAME(false){
   #ENDIF
 #ENDIF
   }
-  void addNotEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor){
+  @Override void addNotEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor){
     #IF OfRef
     seqMonitor.addVal((Object)(boolean)NOT_EQUALS_VAL);
     #ELSE
@@ -4461,6 +4500,8 @@ BOXED_TYPEVALUE_NAME(false){
       abstract int invokesearchUnboxed(Abstract$ClassPrefix$SeqMonitor seqMonitor);
       abstract void addEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor);
       abstract void addNotEqualsVal(Abstract$ClassPrefix$SeqMonitor seqMonitor);
+      abstract void setEqualsVal($ArrayType$[] arr,int index);
+      abstract void setNotEqualsVal($ArrayType$[] arr,int index);
       void initDoesNotContain(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize){
         for(int i=0;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
@@ -4484,20 +4525,20 @@ BOXED_TYPEVALUE_NAME(false){
       }
       int initContainsMiddle(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=seqSize/2;i<bound;++i){
+        for(int i=0,bound=seqSize>>1;i<bound;++i){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=(seqSize/2)+1;i<seqSize;++i){
+        for(int i=(seqSize>>1)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return seqSize/2+1;
+          return (seqSize>>1)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-(seqSize/2);
+          return seqMonitor.expectedSeqSize-(seqSize>>1);
         }
       }
       int initContainsNearBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
@@ -4506,34 +4547,34 @@ BOXED_TYPEVALUE_NAME(false){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=(seqSize/4)+1;i<seqSize;++i){
+        for(int i=(seqSize>>2)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return (seqSize/4)+1;
+          return (seqSize>>2)+1;
         }
         else
         {
-          return seqMonitor.expectedSeqSize-((seqSize/4));
+          return seqMonitor.expectedSeqSize-((seqSize>>2));
         }
       }
       int initContainsNearEnd(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,boolean forwardIteration){
         Assertions.assertEquals(0,seqMonitor.expectedSeqSize);
-        for(int i=0,bound=(seqSize/4)*3;i<bound;++i){
+        for(int i=0,bound=(seqSize>>2)*3;i<bound;++i){
           addNotEqualsVal(seqMonitor);
         }
         addEqualsVal(seqMonitor);
-        for(int i=((seqSize/4)*3)+1;i<seqSize;++i){
+        for(int i=((seqSize>>2)*3)+1;i<seqSize;++i){
           addNotEqualsVal(seqMonitor);
         }
         if(forwardIteration)
         {
-          return ((seqSize/4)*3)+1;
+          return ((seqSize>>2)*3)+1;
         }
         else
         {
-          return (seqMonitor.expectedSeqSize)-(seqSize/4)*3;
+          return (seqMonitor.expectedSeqSize)-(seqSize>>2)*3;
         }
       }
       int initContainsBeginning(Abstract$ClassPrefix$SeqMonitor seqMonitor,int seqSize,boolean forwardIteration){

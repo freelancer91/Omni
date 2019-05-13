@@ -2,6 +2,7 @@
 
 package omni.impl.seq;
 import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
 import java.io.Externalizable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -175,6 +176,91 @@ final class FieldAndMethodAccessor{
   #MACRO TypeImpl<Double>(,double)
 }
 #MACRODEF TypeImpl<CLASSPREFIX>(TYPEPARAMETER,ARRTYPE)
+static interface CLASSPREFIXArrDeq{
+  public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+    ((Externalizable)obj).writeExternal(oos);
+  }
+  public static int head(Object obj){
+    return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).head;
+  }
+  public static int tail(Object obj){
+    return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).tail;
+  }
+  public static ARRTYPE[] arr(Object obj){
+    return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).arr;
+  }
+  static interface AbstractDeqItr{
+    static final Field cursorField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+    public static int cursor(Object obj){
+      return getIntValue(cursorField,obj);
+    }
+  }
+  static interface AscendingItr extends AbstractDeqItr{
+    static final Field rootField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrDeq"+DOLLARSIGN+"AscendingItr","root");
+    public static int cursor(Object obj){
+      return getIntValue(cursorField,obj);
+    }
+    public static omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER root(Object obj){
+      return (omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)getValue(rootField,obj);
+    }
+  }
+  static interface DescendingItr extends AscendingItr{
+    public static int cursor(Object obj){
+      return getIntValue(cursorField,obj);
+    }
+    public static omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER root(Object obj){
+      return (omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)getValue(rootField,obj);
+    }
+  }
+  static interface Checked extends CLASSPREFIXArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).tail;
+    }
+    public static ARRTYPE[] arr(Object obj){
+      return ((omni.impl.seq.CLASSPREFIXArrDeqTYPEPARAMETER)obj).arr;
+    }
+    public static int modCount(Object obj){
+      return ((omni.impl.seq.CLASSPREFIXArrDeq.CheckedTYPEPARAMETER)obj).modCount;
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+      static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+      static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static int modCount(Object obj){
+        return getIntValue(modCountField,obj);
+      }
+      public static int lastRet(Object obj){
+        return getIntValue(lastRetField,obj);
+      }
+      public static omni.impl.seq.CLASSPREFIXArrDeq.CheckedTYPEPARAMETER root(Object obj){
+        return (omni.impl.seq.CLASSPREFIXArrDeq.CheckedTYPEPARAMETER)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static int modCount(Object obj){
+        return getIntValue(modCountField,obj);
+      }
+      public static int lastRet(Object obj){
+        return getIntValue(lastRetField,obj);
+      }
+      public static omni.impl.seq.CLASSPREFIXArrDeq.CheckedTYPEPARAMETER root(Object obj){
+        return (omni.impl.seq.CLASSPREFIXArrDeq.CheckedTYPEPARAMETER)getValue(rootField,obj);
+      }
+    }
+  }
+}
 static interface CLASSPREFIXDblLnkSeq{
   public static int size(Object obj){
     return ((omni.impl.seq.CLASSPREFIXDblLnkSeqTYPEPARAMETER)obj).size;

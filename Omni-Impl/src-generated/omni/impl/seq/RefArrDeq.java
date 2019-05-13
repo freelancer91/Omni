@@ -1037,7 +1037,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         for(index=head,bound=arr.length-1;;++index){
           if(nonNull.equals(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+            if((headDist=index-head)<((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
               arr[head]=null;
               this.head=(tail>bound)?0:tail;
@@ -1069,6 +1069,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 break;
               }
             }
+            break;
           }
         }
       }else{
@@ -1107,7 +1108,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         for(index=head,bound=arr.length-1;;++index){
           if(null==(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+            if((headDist=index-head)<((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
               arr[head]=null;
               this.head=(tail>bound)?0:tail;
@@ -1139,6 +1140,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 break;
               }
             }
+            break;
           }
         }
       }else{
@@ -1178,7 +1180,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         for(index=head,bound=arr.length-1;;++index){
           if(pred.test(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+            if((headDist=index-head)<((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
               arr[head]=null;
               this.head=(tail>bound)?0:tail;
@@ -1210,6 +1212,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 break;
               }
             }
+            break;
           }
         }
       }else{
@@ -1265,7 +1268,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             for(index=bound;;--index){
               if(nonNull.equals(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+                if((headDist=index-head)<((tailDist=bound-index)+tail)){
                   ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                   arr[head]=null;
                   this.head=(tail>bound)?0:tail;
@@ -1281,6 +1284,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 break;
               }
             }
+            break;
           }
         }
       }else{
@@ -1335,7 +1339,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             for(index=bound;;--index){
               if(null==(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+                if((headDist=index-head)<((tailDist=bound-index)+tail)){
                   ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                   arr[head]=null;
                   this.head=(tail>bound)?0:tail;
@@ -1351,6 +1355,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 break;
               }
             }
+            break;
           }
         }
       }else{
@@ -1406,7 +1411,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             for(index=bound;;--index){
               if(pred.test(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+                if((headDist=index-head)<((tailDist=bound-index)+tail)){
                   ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                   arr[head]=null;
                   this.head=(tail>bound)?0:tail;
@@ -1422,6 +1427,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 break;
               }
             }
+            break;
           }
         }
       }else{
@@ -1692,8 +1698,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             int newCap,size;
             this.tail=(newCap=OmniArray.growBy50Pct(head+(size=arr.length)))-1;
             ArrCopy.uncheckedCopy(arr,0,newArr=new Object[newCap],newCap-=(++tail),tail);
-            ArrCopy.uncheckedCopy(arr,head,newArr,head=newCap-(size-=tail),size);
-            this.arr=newArr;
+            ArrCopy.uncheckedCopy(arr,head+1,newArr,head=newCap-(size-=tail),size);
+            this.arr=arr=newArr;
             --head;
           }else if(head==-1 && tail==(head=arr.length-1)){
             int newCap;
@@ -1806,6 +1812,58 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         uncheckedForEachRemaining(cursor,action);
       }
     }
+    private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+      int tailDist,headDist;
+      if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+        Object[] arr;
+        ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+        root.tail=tail-1;
+      }else{
+        Object[] arr;
+        ArrCopy.uncheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
+        arr[tail]=null;
+        root.head=head;
+        this.cursor=lastRet;
+      }
+    }
+    private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+      int headDist,tailDist;
+      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+        root.head=pullUp(root.arr,head,headDist);
+      }else{
+        Object[] arr;
+        ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+        root.tail=tail-1;
+        this.cursor=lastRet;
+      }
+    }
+    private void fragmentedAscendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+      Object[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length;
+      if((headDist=lastRet-head)>=0){
+        if(headDist<=(tailDist=arrBound-lastRet)+tail){
+          root.head=pullUp(arr,head,headDist);
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+          this.cursor=lastRet;
+        }
+      }else{
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+          root.tail=tail-1;
+          this.cursor=lastRet;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+        }
+      }
+    }
   }
   private static int pullUp(Object[] arr,int head,int headDist){
     final int tmp;
@@ -1858,43 +1916,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       this.cursor=cursor;
       return ret;
     }
-    private void nonfragmentedRemove(int head,int cursor,int tail,RefArrDeq<E> root){
-      int headDist,tailDist;
-      if((headDist=(--cursor)-head)<=(tailDist=tail-cursor)){
-        root.head=pullUp(root.arr,head,headDist);
-      }else{
-        Object[] arr;
-        ArrCopy.uncheckedSelfCopy(arr=root.arr,cursor,cursor+1,tailDist);
-        arr[tail]=null;
-        root.tail=tail-1;
-        this.cursor=cursor;
-      }
-    }
-    private void fragmentedRemove(int head,int cursor,int tail,RefArrDeq<E> root){
-      Object[] arr;
-      int headDist,tailDist,arrBound=(arr=root.arr).length;
-      if((headDist=(--cursor)-head)>=0){
-        if(headDist<=(tailDist=arrBound-cursor)+tail){
-          root.head=pullUp(arr,head,headDist);
-        }else{
-          ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
-          arr[arrBound]=arr[0];
-          root.tail=fragmentedPullDown(arr,arrBound,tail);
-          this.cursor=cursor;
-        }
-      }else{
-        if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
-          ArrCopy.uncheckedSelfCopy(arr,cursor,cursor+1,tailDist);
-          arr[tail]=null;
-          root.tail=tail-1;
-          this.cursor=cursor;
-        }else{
-          ArrCopy.semicheckedCopy(arr,0,arr,1,cursor);
-          arr[0]=arr[arrBound];
-          root.head=fragmentedPullUp(arr,head,headDist);
-        }
-      }
-    }
     private void eraseAtSplit(){
       final int head,tail,headDist,arrBound;
       final RefArrDeq<E> root;
@@ -1920,9 +1941,9 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           final int head,tail;
           final RefArrDeq<E> root;
           if((tail=(root=this.root).tail)<(head=root.head)){
-            fragmentedRemove(head,cursor,tail,root);
+            super.fragmentedAscendingRemove(head,cursor-1,tail,root);
           }else{
-            nonfragmentedRemove(head,cursor,tail,root);
+            super.nonfragmentedAscendingRemove(head,cursor-1,tail,root);
           }
       }
     }
@@ -1938,20 +1959,17 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       this.cursor=-1;
     }
   }
-  private static class DescendingItr<E> extends AscendingItr<E>
-  {
-    private DescendingItr(RefArrDeq<E> root,int cursor){
-      super(root,cursor);
+  private static class DescendingItr<E> extends AscendingItr<E>{
+    private DescendingItr(RefArrDeq<E> root){
+      super(root,root.tail);
     }
     @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
       final RefArrDeq<E> root;
       final int head;
       final var arr=(root=this.root).arr;
-      if(--cursor<(head=root.head)){
-         if(cursor>=0){
-           OmniArray.OfRef.descendingForEach(arr,cursor,0,action);
-         }
-         cursor=arr.length-1;
+      if(cursor<(head=root.head)){
+        OmniArray.OfRef.descendingForEach(arr,0,cursor,action);
+        cursor=arr.length-1;
       }
       OmniArray.OfRef.descendingForEach(arr,head,cursor,action);
       this.cursor=-1;
@@ -1961,86 +1979,67 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       int cursor;
       final RefArrDeq<E> root;
       final var arr=(root=this.root).arr;
-      if((cursor=this.cursor-1)==-1){
-        cursor=arr.length-1;
-      }
-      this.cursor=(cursor==root.head)?-1:cursor;
+      this.cursor=(cursor=this.cursor)==root.head?-1:cursor==0?arr.length-1:cursor-1;
       return (E)arr[cursor];
     }
-    private void eraseAtSplit(){
-      final RefArrDeq<E> root;
-      final int head,tail,headDist,arrBound;
-      final Object[] arr;
-      if((tail=(root=this.root).tail)<=(headDist=(arrBound=(arr=root.arr).length-1)-(head=root.head))){
-        root.tail=fragmentedPullDown(arr,arrBound,tail);
-      }else{
-        root.head=fragmentedPullUp(arr,head,headDist);
-        this.cursor=0;
-      }
-    }
-    private void fragmentedRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+    private void fragmentedDescendingRemove(int head,int cursor,int tail,RefArrDeq<E> root){
       Object[] arr;
-      int headDist,tailDist,arrBound=(arr=root.arr).length;
-      if((headDist=lastRet-head)>=0){
-        if(headDist<=(tailDist=arrBound-lastRet)+tail){
-          root.head=pullUp(arr,head,headDist);
-          this.cursor=lastRet;
-        }else{
-          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-          arr[arrBound]=arr[0];
-          root.tail=fragmentedPullDown(arr,arrBound,tail);
-        }
-      }else{
-        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
-          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+      int arrBound;
+      if((arrBound=(arr=root.arr).length-1)==cursor){
+        if(tail<=(cursor=arrBound-head)){
+          ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
           arr[tail]=null;
           root.tail=tail-1;
         }else{
-          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
           arr[0]=arr[arrBound];
-          root.head=fragmentedPullUp(arr,head,headDist);
-          this.cursor=lastRet;
+          root.head=pullUp(arr,head,cursor);
+          this.cursor=0;
+        }
+      }else{
+        int headDist,tailDist;
+        if((headDist=(++cursor)-head)>=0){
+          if(headDist<=(tailDist=arrBound-cursor)+tail){
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=cursor;
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+          }
+        }else{
+          if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
+            ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
+            arr[tail]=null;
+            root.tail=tail-1;
+          }else{
+            ArrCopy.uncheckedCopy(arr,0,arr,1,cursor);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+            this.cursor=cursor;
+          }
         }
       }
     }
-    private void nonfragmentedRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
-      int headDist,tailDist;
-      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
-        root.head=pullUp(root.arr,head,headDist);
-        this.cursor=lastRet;
-      }else{
-        Object[] arr;
-        ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-        arr[tail]=null;
-        root.tail=tail-1;
-      }
-    }
     @Override public void remove(){
-      final int cursor;
-      switch(cursor=this.cursor){
-        case -1:
-          root.eraseHead();
-          break;
-        case 0:
-          eraseAtSplit();
-          break;
-        default:
-          final int head,tail;
-          final RefArrDeq<E> root;
-          if((tail=(root=this.root).tail)<(head=root.head)){
-            fragmentedRemove(head,cursor,tail,root);
-          }else{
-            nonfragmentedRemove(head,cursor,tail,root);
-          }
+      int cursor;
+      if((cursor=this.cursor)==-1){
+        root.eraseHead();
+      }else{
+        RefArrDeq<E> root;
+        int head,tail;
+        if((tail=(root=this.root).tail)<(head=root.head)){
+          fragmentedDescendingRemove(head,cursor,tail,root);
+        }else{
+          ((AbstractDeqItr<E>)this).nonfragmentedDescendingRemove(head,cursor+1,tail,root);
+        }
       }
     }
-  }
+  } 
   @Override public OmniIterator.OfRef<E> iterator(){
     return new AscendingItr<E>(this);
   }
   @Override public OmniIterator.OfRef<E> descendingIterator(){
-    int tail;
-    return new DescendingItr<E>(this,(tail=this.tail)==-1?-1:tail==arr.length-1?0:tail+1);
+    return new DescendingItr<E>(this);
   }
   @SuppressWarnings("unchecked")
   boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
@@ -2063,10 +2062,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       return true;
     }
     return fragmentedCollapseBody(arr,head,tail,filter);
-  }
-  @Override public boolean equals(Object obj){
-      //TODO
-      return false;
   }
   @SuppressWarnings("unchecked")
   private static <E> int pullDown(Object[] arr,int dstOffset,int srcBound,Predicate<? super E> filter){
@@ -2317,7 +2312,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
   }
   @SuppressWarnings("unchecked")
   boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-    Object[] arr;
+    final Object[] arr;
     if(filter.test((E)(arr=this.arr)[head])){
       if(head==tail){
         arr[tail]=null;
@@ -2370,6 +2365,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       output.writeInt(0);
     }
   }
+  @Override public boolean equals(Object obj){
+      //TODO
+      return false;
+  }
   public static class Checked<E> extends RefArrDeq<E>{
     private static final long serialVersionUID=1L;
     transient int modCount;
@@ -2382,16 +2381,127 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     Checked(int head,Object[] arr,int tail){
       super(head,arr,tail);
     }
+    @Override public boolean equals(Object obj){
+      //TODO
+      return false;
+    }
+    //TODO CollapseEnd<true>(head,tail,++)
+    private void fragmentedCollapsehead(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      //TODO
+    }
+    @SuppressWarnings("unchecked")
+    private void collapsehead(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      for(int srcOffset=head;++srcOffset!=tail;)
+      {
+        if(!filter.test((E)arr[srcOffset]))
+        {
+          collapseBodyHelper(arr,srcOffset,tail,filter,modCount);
+          OmniArray.OfRef.nullifyRange(arr,srcOffset-1,head);
+          this.modCount=modCount+1;
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+      OmniArray.OfRef.nullifyRange(arr,tail-1,head);
+      this.head=head;
+    }
+    //TODO CollapseEnd<true>(tail,head,--)
+    private void fragmentedCollapsetail(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      //TODO
+    }
+    @SuppressWarnings("unchecked")
+    private void collapsetail(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      for(int srcOffset=tail;--srcOffset!=head;)
+      {
+        if(!filter.test((E)arr[srcOffset]))
+        {
+          collapseBodyHelper(arr,head,srcOffset,filter,modCount);
+          OmniArray.OfRef.nullifyRange(arr,tail,srcOffset+1);
+          this.modCount=modCount+1;
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+      OmniArray.OfRef.nullifyRange(arr,tail,head+1);
+      this.tail=head;
+    }
+    @SuppressWarnings("unchecked")
+    private void collapseBodyHelper(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      //TODO
+    }
+    @SuppressWarnings("unchecked")
+    private void collapseHeadAndTail(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      for(int headOffset=head+1;headOffset!=tail;++headOffset)
+      {
+        if(!filter.test((E)arr[headOffset]))
+        {
+          for(int tailOffset=tail-1;tailOffset!=headOffset;--tailOffset)
+          {
+            if(!filter.test((E)arr[tailOffset]))
+            {
+              collapseBodyHelper(arr,headOffset,tailOffset,filter,modCount);
+              this.modCount=modCount+1;
+              OmniArray.OfRef.nullifyRange(arr,tail,tailOffset+1);
+              OmniArray.OfRef.nullifyRange(arr,headOffset-1,head);
+              return;
+            }
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.head=headOffset;
+          this.tail=headOffset;
+          OmniArray.OfRef.nullifyRange(arr,tail,headOffset+1);
+          OmniArray.OfRef.nullifyRange(arr,headOffset-1,head);
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+      this.tail=-1;
+      OmniArray.OfRef.nullifyRange(arr,tail,head);
+    }
+    @SuppressWarnings("unchecked")
+    private boolean collapseBody(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
+      //TODO
+      return false;
+    }
+    @SuppressWarnings("unchecked")
     @Override boolean fragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
       //TODO
       return false;
     }
+    @SuppressWarnings("unchecked")
     @Override boolean nonfragmentedRemoveIf(int head,int tail,Predicate<? super E> filter){
-      //TODO
-      return false;
-    }
-    @Override public boolean equals(Object obj){
-      //TODO
+      final int modCount=this.modCount;
+      try{
+        final Object[] arr;
+        if(filter.test((E)(arr=this.arr)[head])){
+          if(head==tail){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            arr[tail]=null;
+            this.tail=-1;
+          }else if(filter.test((E)arr[tail])){
+            collapseHeadAndTail(arr,head,tail,filter,modCount);
+          }else{
+            collapsehead(arr,head,tail,filter,modCount);
+          }
+          return true;
+        }else if(head!=tail){
+          if(filter.test((E)arr[tail])){
+            collapsetail(arr,head,tail,filter,modCount);
+            return true;
+          }
+          return collapseBody(arr,head,tail,filter,modCount);
+        }
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
     @Override public OmniIterator.OfRef<E> iterator(){
@@ -2435,43 +2545,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         }
         throw new NoSuchElementException();
       }
-      void fragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
-        Object[] arr;
-        int headDist,tailDist,arrBound=(arr=root.arr).length;
-        if((headDist=lastRet-head)>=0){
-          if(headDist<=(tailDist=arrBound-lastRet)+tail){
-            root.head=pullUp(arr,head,headDist);
-          }else{
-            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-            arr[arrBound]=arr[0];
-            root.tail=fragmentedPullDown(arr,arrBound,tail);
-            this.cursor=lastRet;
-          }
-        }else{
-          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
-            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-            arr[tail]=null;
-            root.tail=tail-1;
-            this.cursor=lastRet;
-          }else{
-            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
-            arr[0]=arr[arrBound];
-            root.head=fragmentedPullUp(arr,head,headDist);
-          }
-        }
-      }
-      void nonfragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
-        final int headDist,tailDist;
-        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
-          final Object[] arr;
-          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-          arr[tail]=null;
-          root.tail=tail-1;
-          this.cursor=lastRet;
-        }else{
-          root.head=pullUp(root.arr,head,headDist);
-        }
-      }
       @Override public void remove(){
         int lastRet;
         if((lastRet=this.lastRet)!=-1){
@@ -2483,14 +2556,14 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           final int head,tail;
           switch(Integer.signum((tail=root.tail)-(head=root.head))){
             case -1:
-              fragmentedRemove(head,lastRet,tail,root);
+              super.fragmentedAscendingRemove(head,lastRet,tail,root);
               break;
             case 0:
               root.tail=-1;
               root.arr[tail]=null;
               break;
             default:
-              nonfragmentedRemove(head,lastRet,tail,root);
+              super.nonfragmentedAscendingRemove(head,lastRet,tail,root);
           }
           this.lastRet=-1;
           return;
@@ -2538,7 +2611,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         }
         throw new NoSuchElementException();
       }
-      @Override void fragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
+      private void fragmentedDescendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
         Object[] arr;
         int headDist,tailDist,arrBound=(arr=root.arr).length;
         if((headDist=lastRet-head)>=0){
@@ -2563,17 +2636,30 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           }
         }
       }
-      @Override void nonfragmentedRemove(int head,int lastRet,int tail,Checked<E> root){
-        final int headDist,tailDist;
-        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
-          final Object[] arr;
-          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-          arr[tail]=null;
-          root.tail=tail-1;
-        }else{
-          root.head=pullUp(root.arr,head,headDist);
-          this.cursor=lastRet;
+      @Override public void remove(){
+        int lastRet;
+        if((lastRet=this.lastRet)!=-1){
+          int modCount;
+          final Checked<E> root;
+          CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+          root.modCount=++modCount;
+          this.modCount=modCount;
+          final int head,tail;
+          switch(Integer.signum((tail=root.tail)-(head=root.head))){
+            case -1:
+              fragmentedDescendingRemove(head,lastRet,tail,root);
+              break;
+            case 0:
+              root.tail=-1;
+              root.arr[tail]=null;
+              break;
+            default:
+              ((AbstractDeqItr<E>)this).nonfragmentedDescendingRemove(head,lastRet,tail,root);
+          }
+          this.lastRet=-1;
+          return;
         }
+        throw new IllegalStateException();
       }
       @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
         int modCount=this.modCount;
@@ -2820,7 +2906,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
               CheckedCollection.checkModCount(modCount,this.modCount);
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+              if((headDist=index-head)<((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
                 this.head=(tail>bound)?0:tail;
@@ -2854,6 +2940,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   break;
                 }
               }
+              break;
             }
           }
         }else{
@@ -2902,7 +2989,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             if(null==(arr[index])){
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+              if((headDist=index-head)<((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
                 this.head=(tail>bound)?0:tail;
@@ -2935,6 +3022,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   break;
                 }
               }
+              break;
             }
           }
         }else{
@@ -2977,7 +3065,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             if(pred.test(arr[index])){
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+              if((headDist=index-head)<((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
                 this.head=(tail>bound)?0:tail;
@@ -3010,6 +3098,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   break;
                 }
               }
+              break;
             }
           }
         }else{
@@ -3073,7 +3162,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   CheckedCollection.checkModCount(modCount,this.modCount);
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
                     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                     arr[head]=null;
                     this.head=(tail>bound)?0:tail;
@@ -3089,6 +3178,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   break;
                 }
               }
+              break;
             }
           }
         }else{
@@ -3154,7 +3244,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 if(null==(arr[index])){
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
                     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                     arr[head]=null;
                     this.head=(tail>bound)?0:tail;
@@ -3170,6 +3260,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   break;
                 }
               }
+              break;
             }
           }
         }else{
@@ -3229,7 +3320,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 if(pred.test(arr[index])){
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<(tailDist=(bound-index)+tail)){
+                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
                     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                     arr[head]=null;
                     this.head=(tail>bound)?0:tail;
@@ -3245,6 +3336,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   break;
                 }
               }
+              break;
             }
           }
         }else{

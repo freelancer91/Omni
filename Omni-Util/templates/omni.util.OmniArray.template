@@ -363,11 +363,7 @@ public interface OfCLASSPREFIX
     }
 #ENDIF
   }
-  
-  
-  
 #ENDIF
-
 #IFSWITCH CLASSPREFIX==Ref
   @SuppressWarnings("unchecked")
 #ENDIF
@@ -382,8 +378,6 @@ public interface OfCLASSPREFIX
       }
     }
   }
-
-
 #IFSWITCH CLASSPREFIX==Ref
   @SuppressWarnings("unchecked")
 #ENDIF
@@ -412,7 +406,6 @@ public interface OfCLASSPREFIX
       }
     }
   }
-
   public static int ascendingSeqHashCode(PRIMITIVETYPE[] arr,int begin,int end)
   {
     for(int hash=31+
@@ -443,7 +436,6 @@ public interface OfCLASSPREFIX
         );
     }
   }
-
 #IFSWITCH CLASSPREFIX==Double,Ref
   public static void ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,StringBuilder builder)
   {

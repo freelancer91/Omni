@@ -1,5 +1,6 @@
 package omni.impl.seq;
 import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
 import java.io.Externalizable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -161,6 +162,91 @@ final class FieldAndMethodAccessor{
     }
   }
   private static final char DOLLARSIGN=(char)36;
+  static interface RefArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.RefArrDeq<?>)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.RefArrDeq<?>)obj).tail;
+    }
+    public static Object[] arr(Object obj){
+      return ((omni.impl.seq.RefArrDeq<?>)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.RefArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.RefArrDeq<?> root(Object obj){
+        return (omni.impl.seq.RefArrDeq<?>)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.RefArrDeq<?> root(Object obj){
+        return (omni.impl.seq.RefArrDeq<?>)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends RefArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.RefArrDeq<?>)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.RefArrDeq<?>)obj).tail;
+      }
+      public static Object[] arr(Object obj){
+        return ((omni.impl.seq.RefArrDeq<?>)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.RefArrDeq.Checked<?>)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.RefArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.RefArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.RefArrDeq.Checked<?> root(Object obj){
+          return (omni.impl.seq.RefArrDeq.Checked<?>)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.RefArrDeq.Checked<?> root(Object obj){
+          return (omni.impl.seq.RefArrDeq.Checked<?>)getValue(rootField,obj);
+        }
+      }
+    }
+  }
   static interface RefDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.RefDblLnkSeq<?>)obj).size;
@@ -829,6 +915,91 @@ final class FieldAndMethodAccessor{
         }
         static OmniList.OfRef<?> parent(Object obj){
           return (OmniList.OfRef<?>)getValue(parentField,obj);
+        }
+      }
+    }
+  }
+  static interface BooleanArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.BooleanArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.BooleanArrDeq)obj).tail;
+    }
+    public static boolean[] arr(Object obj){
+      return ((omni.impl.seq.BooleanArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.BooleanArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.BooleanArrDeq root(Object obj){
+        return (omni.impl.seq.BooleanArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.BooleanArrDeq root(Object obj){
+        return (omni.impl.seq.BooleanArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends BooleanArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.BooleanArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.BooleanArrDeq)obj).tail;
+      }
+      public static boolean[] arr(Object obj){
+        return ((omni.impl.seq.BooleanArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.BooleanArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.BooleanArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.BooleanArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.BooleanArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.BooleanArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.BooleanArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.BooleanArrDeq.Checked)getValue(rootField,obj);
         }
       }
     }
@@ -1505,6 +1676,91 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  static interface ByteArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.ByteArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.ByteArrDeq)obj).tail;
+    }
+    public static byte[] arr(Object obj){
+      return ((omni.impl.seq.ByteArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.ByteArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.ByteArrDeq root(Object obj){
+        return (omni.impl.seq.ByteArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.ByteArrDeq root(Object obj){
+        return (omni.impl.seq.ByteArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends ByteArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.ByteArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.ByteArrDeq)obj).tail;
+      }
+      public static byte[] arr(Object obj){
+        return ((omni.impl.seq.ByteArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.ByteArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.ByteArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ByteArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.ByteArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.ByteArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.ByteArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.ByteArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+    }
+  }
   static interface ByteDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.ByteDblLnkSeq)obj).size;
@@ -2173,6 +2429,91 @@ final class FieldAndMethodAccessor{
         }
         static OmniList.OfByte parent(Object obj){
           return (OmniList.OfByte)getValue(parentField,obj);
+        }
+      }
+    }
+  }
+  static interface CharArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.CharArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.CharArrDeq)obj).tail;
+    }
+    public static char[] arr(Object obj){
+      return ((omni.impl.seq.CharArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.CharArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.CharArrDeq root(Object obj){
+        return (omni.impl.seq.CharArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.CharArrDeq root(Object obj){
+        return (omni.impl.seq.CharArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends CharArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.CharArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.CharArrDeq)obj).tail;
+      }
+      public static char[] arr(Object obj){
+        return ((omni.impl.seq.CharArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.CharArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.CharArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CharArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.CharArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.CharArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.CharArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.CharArrDeq.Checked)getValue(rootField,obj);
         }
       }
     }
@@ -2849,6 +3190,91 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  static interface ShortArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.ShortArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.ShortArrDeq)obj).tail;
+    }
+    public static short[] arr(Object obj){
+      return ((omni.impl.seq.ShortArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.ShortArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.ShortArrDeq root(Object obj){
+        return (omni.impl.seq.ShortArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.ShortArrDeq root(Object obj){
+        return (omni.impl.seq.ShortArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends ShortArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.ShortArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.ShortArrDeq)obj).tail;
+      }
+      public static short[] arr(Object obj){
+        return ((omni.impl.seq.ShortArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.ShortArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.ShortArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.ShortArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.ShortArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.ShortArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.ShortArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.ShortArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+    }
+  }
   static interface ShortDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.ShortDblLnkSeq)obj).size;
@@ -3517,6 +3943,91 @@ final class FieldAndMethodAccessor{
         }
         static OmniList.OfShort parent(Object obj){
           return (OmniList.OfShort)getValue(parentField,obj);
+        }
+      }
+    }
+  }
+  static interface IntArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.IntArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.IntArrDeq)obj).tail;
+    }
+    public static int[] arr(Object obj){
+      return ((omni.impl.seq.IntArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.IntArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.IntArrDeq root(Object obj){
+        return (omni.impl.seq.IntArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.IntArrDeq root(Object obj){
+        return (omni.impl.seq.IntArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends IntArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.IntArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.IntArrDeq)obj).tail;
+      }
+      public static int[] arr(Object obj){
+        return ((omni.impl.seq.IntArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.IntArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.IntArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.IntArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.IntArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.IntArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.IntArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.IntArrDeq.Checked)getValue(rootField,obj);
         }
       }
     }
@@ -4193,6 +4704,91 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  static interface LongArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.LongArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.LongArrDeq)obj).tail;
+    }
+    public static long[] arr(Object obj){
+      return ((omni.impl.seq.LongArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.LongArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.LongArrDeq root(Object obj){
+        return (omni.impl.seq.LongArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.LongArrDeq root(Object obj){
+        return (omni.impl.seq.LongArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends LongArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.LongArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.LongArrDeq)obj).tail;
+      }
+      public static long[] arr(Object obj){
+        return ((omni.impl.seq.LongArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.LongArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.LongArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.LongArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.LongArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.LongArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.LongArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.LongArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+    }
+  }
   static interface LongDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.LongDblLnkSeq)obj).size;
@@ -4865,6 +5461,91 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  static interface FloatArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.FloatArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.FloatArrDeq)obj).tail;
+    }
+    public static float[] arr(Object obj){
+      return ((omni.impl.seq.FloatArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.FloatArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.FloatArrDeq root(Object obj){
+        return (omni.impl.seq.FloatArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.FloatArrDeq root(Object obj){
+        return (omni.impl.seq.FloatArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends FloatArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.FloatArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.FloatArrDeq)obj).tail;
+      }
+      public static float[] arr(Object obj){
+        return ((omni.impl.seq.FloatArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.FloatArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.FloatArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.FloatArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.FloatArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.FloatArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.FloatArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.FloatArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+    }
+  }
   static interface FloatDblLnkSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.FloatDblLnkSeq)obj).size;
@@ -5533,6 +6214,91 @@ final class FieldAndMethodAccessor{
         }
         static OmniList.OfFloat parent(Object obj){
           return (OmniList.OfFloat)getValue(parentField,obj);
+        }
+      }
+    }
+  }
+  static interface DoubleArrDeq{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int head(Object obj){
+      return ((omni.impl.seq.DoubleArrDeq)obj).head;
+    }
+    public static int tail(Object obj){
+      return ((omni.impl.seq.DoubleArrDeq)obj).tail;
+    }
+    public static double[] arr(Object obj){
+      return ((omni.impl.seq.DoubleArrDeq)obj).arr;
+    }
+    static interface AbstractDeqItr{
+      static final Field cursorField=prepareFieldForClassName("omni.impl.seq.DoubleArrDeq"+DOLLARSIGN+"AbstractDeqItr","cursor");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+    }
+    static interface AscendingItr extends AbstractDeqItr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleArrDeq"+DOLLARSIGN+"AscendingItr","root");
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.DoubleArrDeq root(Object obj){
+        return (omni.impl.seq.DoubleArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface DescendingItr extends AscendingItr{
+      public static int cursor(Object obj){
+        return getIntValue(cursorField,obj);
+      }
+      public static omni.impl.seq.DoubleArrDeq root(Object obj){
+        return (omni.impl.seq.DoubleArrDeq)getValue(rootField,obj);
+      }
+    }
+    static interface Checked extends DoubleArrDeq{
+      public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int head(Object obj){
+        return ((omni.impl.seq.DoubleArrDeq)obj).head;
+      }
+      public static int tail(Object obj){
+        return ((omni.impl.seq.DoubleArrDeq)obj).tail;
+      }
+      public static double[] arr(Object obj){
+        return ((omni.impl.seq.DoubleArrDeq)obj).arr;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.DoubleArrDeq.Checked)obj).modCount;
+      }
+      static interface AscendingItr extends AbstractDeqItr{
+        static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","root");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.DoubleArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.DoubleArrDeq"+DOLLARSIGN+"Checked"+DOLLARSIGN+"AscendingItr","modCount");
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.DoubleArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.DoubleArrDeq.Checked)getValue(rootField,obj);
+        }
+      }
+      static interface DescendingItr extends AscendingItr{
+        public static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        public static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+        public static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        public static omni.impl.seq.DoubleArrDeq.Checked root(Object obj){
+          return (omni.impl.seq.DoubleArrDeq.Checked)getValue(rootField,obj);
         }
       }
     }
