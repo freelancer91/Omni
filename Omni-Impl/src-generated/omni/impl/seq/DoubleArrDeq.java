@@ -57,7 +57,7 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach(DoubleConsumer action){
     final int tail;

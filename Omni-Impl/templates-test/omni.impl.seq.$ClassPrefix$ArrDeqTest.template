@@ -78,6 +78,10 @@ public class $ClassPrefix$ArrDeqTest{
 
   #MACRO TestMethods(false)
 #MACRODEF TestMethods(PARALLEL)
+#MACRO testItrforEachRemaining_Consumer<PARALLEL>()
+#MACRO testItrnext_void<PARALLEL>()
+#MACRO testtoArray_void<PARALLEL>()
+#MACRO testclear_void<PARALLEL>()
 #MACRO testtoArray_ObjectArray<PARALLEL>()
 #MACRO testcontains_val<PARALLEL>()
 #MACRO testsearch_val<PARALLEL>()
@@ -107,6 +111,194 @@ public class $ClassPrefix$ArrDeqTest{
 #MACRO testConstructor_void<PARALLEL>()
 #MACRO testConstructor_int<PARALLEL>()
 #ENDDEF
+#MACRODEF testItrforEachRemaining_Consumer<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testItrforEachRemaining_Consumer(){
+  for(var checkedType:CheckedType.values()){
+    for(var preModScenario:PreModScenario.values()){
+      if(preModScenario.expectedException==null || (preModScenario==PreModScenario.ModSeq && checkedType.checked)){
+        Stream.of(MonitoredFunctionGen.values()).filter(monitoredFunctionGen->(monitoredFunctionGen.expectedException==null || checkedType.checked) && monitoredFunctionGen.appliesToRootItr)
+#IFSWITCH PARALLEL==true
+        .parallel()
+#ENDIF
+        .forEach(monitoredFunctionGen->{
+          for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
+            Stream.of($ClassPrefix$OutputTestArgType.values())
+#IFSWITCH PARALLEL==true
+            .parallel()
+#ENDIF
+            .forEach(outputArgType->{
+              IntStream.rangeClosed(0,10)
+#IFSWITCH PARALLEL==true
+              .parallel()
+#ENDIF
+              .forEach(seqSize->{
+                if(seqSize==0){
+                  testItrforEachRemaining_ConsumerHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,0,monitoredFunctionGen);
+                }else{
+                  IntStream.range(0,seqSize)
+#IFSWITCH PARALLEL==true
+                  .parallel()
+#ENDIF
+                  .forEach(head->testItrforEachRemaining_ConsumerHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,head,monitoredFunctionGen));
+                }
+              });
+            });
+          }
+        });
+      }
+    }
+  }
+}
+private static void testItrforEachRemaining_ConsumerHelper(CheckedType checkedType,PreModScenario preModScenario,$ClassPrefix$OutputTestArgType outputArgType,ItrType itrType,int seqSize,int head,MonitoredFunctionGen monitoredFunctionGen){
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+  initializeAscending(seqMonitor.seq.arr,head,seqSize);
+  var itrMonitor=seqMonitor.getItrMonitor(itrType);
+  seqMonitor.illegalAdd(preModScenario);
+  //TODO
+  /*
+  if(preModScenario.expectedException==null){
+    if(itrType==ItrType.Itr){
+      for(int i=0;itrMonitor.itr.hasNext();++i){
+        itrMonitor.verifyNext(i,outputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }else{
+      for(int i=seqSize;itrMonitor.itr.hasNext();){
+        itrMonitor.verifyNext(--i,outputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    if(checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->itrMonitor.verifyNext(0,outputArgType));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }else{
+    Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.verifyNext(0,outputArgType));
+    itrMonitor.verifyIteratorState();
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(seqSize);
+  if(preModScenario==PreModScenario.ModSeq){
+    verifyItr.verifyIllegalAdd();
+  }
+  */
+}
+#ENDDEF
+#MACRODEF testItrnext_void<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testItrnext_void(){
+  for(var checkedType:CheckedType.values()){
+    for(var preModScenario:PreModScenario.values()){
+      if(preModScenario.expectedException==null || (preModScenario==PreModScenario.ModSeq && checkedType.checked)){
+        for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
+          Stream.of($ClassPrefix$OutputTestArgType.values())
+#IFSWITCH PARALLEL==true
+          .parallel()
+#ENDIF
+          .forEach(outputArgType->{
+            IntStream.rangeClosed(0,10)
+#IFSWITCH PARALLEL==true
+            .parallel()
+#ENDIF
+            .forEach(seqSize->{
+              if(seqSize==0){
+                testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,0);
+              }else{
+                IntStream.range(0,seqSize)
+#IFSWITCH PARALLEL==true
+                .parallel()
+#ENDIF
+                .forEach(head->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,head));
+              }
+            });
+          });
+        }
+      }
+    }
+  }
+}
+private static void testItrnext_voidHelper(CheckedType checkedType,PreModScenario preModScenario,$ClassPrefix$OutputTestArgType outputArgType,ItrType itrType,int seqSize,int head){
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+  initializeAscending(seqMonitor.seq.arr,head,seqSize);
+  var itrMonitor=seqMonitor.getItrMonitor(itrType);
+  seqMonitor.illegalAdd(preModScenario);
+  if(preModScenario.expectedException==null){
+    if(itrType==ItrType.Itr){
+      for(int i=0;itrMonitor.itr.hasNext();++i){
+        itrMonitor.verifyNext(i,outputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }else{
+      for(int i=seqSize;itrMonitor.itr.hasNext();){
+        itrMonitor.verifyNext(--i,outputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    }
+    if(checkedType.checked){
+      Assertions.assertThrows(NoSuchElementException.class,()->itrMonitor.verifyNext(0,outputArgType));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+    }
+  }else{
+    Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.verifyNext(0,outputArgType));
+    itrMonitor.verifyIteratorState();
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(seqSize);
+  if(preModScenario==PreModScenario.ModSeq){
+    verifyItr.verifyIllegalAdd();
+  }
+}
+#ENDDEF
+#MACRODEF testtoArray_void<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testtoArray_void(){
+  runOutputTests(PARALLEL,true,$ClassPrefix$ArrDeqTest::testtoArray_voidHelper);
+}
+private static void testtoArray_voidHelper(CheckedType checkedType,int head,int initialSize,$ClassPrefix$OutputTestArgType outputArgType)
+{
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+  initializeAscending(seqMonitor.seq.arr,head,initialSize);
+  outputArgType.verifyToArray(seqMonitor.seq,initialSize);
+  seqMonitor.verifyStructuralIntegrity();
+  seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
+}
+#ENDDEF
+#MACRODEF testclear_void<PARALLEL>()
+@org.junit.jupiter.api.Test
+public void testclear_void(){
+  for(var checkedType:CheckedType.values()){
+    testclear_voidHelper(checkedType,0,0);
+    for(int seqSize=1;seqSize<=10;++seqSize){
+      for(int head=0;head<seqSize;++head){
+        testclear_voidHelper(checkedType,seqSize,head);
+      }
+    }
+  }
+}
+private static void testclear_voidHelper(CheckedType checkedType,int seqSize,int head){
+  SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+  initializeAscending(seqMonitor.seq.arr,head,seqSize);
+  seqMonitor.clear();
+  seqMonitor.verifyStructuralIntegrity();
+  Assertions.assertEquals(-1,seqMonitor.seq.tail);
+#IF OfRef
+  if(seqSize!=0)
+  {
+    for(int i=0;i<seqSize;++i)
+    {
+      Assertions.assertNull(seqMonitor.seq.arr[i]);
+    }
+  }
+#ENDIF
+}
+#ENDDEF
 #MACRODEF testtoArray_ObjectArray<PARALLEL>()
 @org.junit.jupiter.api.Test
 public void testtoArray_ObjectArray(){
@@ -124,8 +316,8 @@ public void testtoArray_ObjectArray(){
           IntStream.range(0,seqSize)
 #IFSWITCH PARALLEL==true
           .parallel()
-#ENDDEF
-          .forEach(head->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize););
+#ENDIF
+          .forEach(head->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize));
         }
       });
     });
@@ -140,11 +332,32 @@ private static void testtoArray_ObjectArrayHelper(CheckedType checkedType,int se
     paramArr[i]=Integer.valueOf(paramArrSize);
   }
   var resultArr=seqMonitor.seq.toArray(paramArr);
+  seqMonitor.verifyStructuralIntegrity();
+  seqMonitor.verifyPreAlloc().verifyAscending(seqSize);
   Assertions.assertNotSame(resultArr,seqMonitor.seq.arr);
   if(paramArrSize<seqSize){
-    Assertions.assertNotSame(resultArrm
-  }else if(paramArrSize>seqSize)
-  {
+    Assertions.assertNotSame(resultArr,paramArr);
+  }else{
+    Assertions.assertSame(resultArr,paramArr);
+    if(paramArrSize>seqSize){
+      Assertions.assertNull(resultArr[seqSize]);
+      for(int i=seqSize+1;i<paramArrSize;++i){
+        Assertions.assertEquals(Integer.valueOf(paramArrSize),resultArr[i]);
+      }
+    }
+  }
+  if(seqSize!=0){
+    $ArrayType$[] arr;
+    for(int i=0,j=seqMonitor.seq.head,bound=(arr=seqMonitor.seq.arr).length;i<seqSize;++i){
+  #IF OfRef
+      Assertions.assertSame(resultArr[i],arr[j]);
+  #ELSE
+      Assertions.assertEquals((Object)resultArr[i],(Object)arr[j]);
+  #ENDIF
+      if(++j==bound){
+        j=0;
+      }
+    }
   }
 }
 #ENDDEF
@@ -2004,8 +2217,6 @@ private static void testcontains_valHelper(CheckedType checkedType,int capacity,
       }
     }
     class CheckedDescendingItrMonitor extends CheckedAscendingItrMonitor{
-      int expectedLastRet;
-      int expectedCursor;
       CheckedDescendingItrMonitor(){
         super(ItrType.DescendingItr,seq.descendingIterator(),expectedSeqModCount);
         this.expectedCursor=seq.tail;

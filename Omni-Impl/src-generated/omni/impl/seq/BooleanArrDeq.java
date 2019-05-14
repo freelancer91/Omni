@@ -57,7 +57,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach(BooleanConsumer action){
     final int tail;

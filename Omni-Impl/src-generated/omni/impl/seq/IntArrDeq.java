@@ -57,7 +57,7 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach(IntConsumer action){
     final int tail;

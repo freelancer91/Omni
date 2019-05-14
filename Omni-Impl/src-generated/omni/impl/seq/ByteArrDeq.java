@@ -57,7 +57,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach(ByteConsumer action){
     final int tail;

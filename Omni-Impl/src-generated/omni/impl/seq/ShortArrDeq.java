@@ -57,7 +57,7 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach(ShortConsumer action){
     final int tail;

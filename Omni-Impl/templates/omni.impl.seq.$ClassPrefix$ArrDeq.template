@@ -84,7 +84,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
     final int tail;
@@ -113,7 +113,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,0);
         tail=arr.length-1;
       }
-      OmniArray.Of$ClassPrefix$.nullifyRange(arr,head,tail);
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
       this.tail=-1;
     }
 #ELSE
@@ -1822,7 +1822,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,0);
           tail=arr.length-1;
         }
-        OmniArray.Of$ClassPrefix$.nullifyRange(arr,head,tail);
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
 #ELSE
       if(this.tail!=-1){
         ++this.modCount;

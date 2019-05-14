@@ -56,7 +56,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     return tail;
   }
   @Override public boolean isEmpty(){
-    return this.tail!=-1;
+    return this.tail==-1;
   }
   @Override public void forEach(CharConsumer action){
     final int tail;
