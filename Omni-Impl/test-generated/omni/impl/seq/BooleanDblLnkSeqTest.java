@@ -1508,7 +1508,7 @@ public class BooleanDblLnkSeqTest{
         break;
       case PostInit:
         if(itrType!=ItrType.ListItr && seqLocation!=SequenceLocation.BEGINNING){
-          throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} hasPrevious returned false");
+          throw new Error("Invalid test{removeScenario="+removeScenario+", numToAdd="+numToAdd+", itrType="+itrType+"} must be ListItr");
         }
         break;
       default:

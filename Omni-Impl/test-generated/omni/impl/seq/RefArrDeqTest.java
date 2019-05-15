@@ -52,6 +52,173 @@ import java.util.Comparator;
 @Execution(ExecutionMode.CONCURRENT)
 public class RefArrDeqTest{
   @org.junit.jupiter.api.Test
+  public void testItrremove_void(){
+    for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
+      for(var checkedType:CheckedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(preModScenario.expectedException==null || (checkedType.checked && preModScenario.appliesToRootItr)){
+            for(var removeScenario:ItrRemoveScenario.values()){
+              if((checkedType.checked || removeScenario.expectedException==null)&&removeScenario!=ItrRemoveScenario.PostAdd && removeScenario!=ItrRemoveScenario.PostPrevious){
+                for(var seqLocation:SequenceLocation.values()){
+                  if(seqLocation.expectedException==null && (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING)){
+                    if(removeScenario.validWithEmptySeq){
+                      testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,0,0);
+                    }
+                    for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
+                      int seqSize=tmpSeqSize;
+                      for(int tmpHead=0;tmpHead<tmpSeqSize;++tmpHead){
+                        int head=tmpHead;
+                        testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,seqSize,head);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  private static void testItrremove_voidHelper(ItrType itrType,CheckedType checkedType,PreModScenario preModScenario,ItrRemoveScenario removeScenario,SequenceLocation seqLocation,int seqSize,int head){
+    SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+    initializeAscending(seqMonitor.seq.arr,head,seqSize);
+    var itrMonitor=seqMonitor.getItrMonitor(seqLocation,itrType);
+    int numBefore;
+    switch(seqLocation){
+      case BEGINNING:
+        numBefore=0;
+        break;
+      case NEARBEGINNING:
+        numBefore=seqSize>>2;
+        break;
+      case MIDDLE:
+        numBefore=seqSize>>1;
+        break;
+      case NEAREND:
+        numBefore=(seqSize>>2)*3;
+        break;
+      case END:
+        numBefore=seqSize;
+        break;
+      default:
+        throw new Error("Unknown seqLocation "+seqLocation);
+    }
+    boolean hasLastRet;
+    switch(itrType){
+      case Itr:
+        hasLastRet=numBefore>0;
+        break;
+      case DescendingItr:
+        numBefore=seqSize-numBefore;
+        hasLastRet=numBefore<seqSize;
+        break;
+      default:
+        throw new Error("Unknown itrType "+itrType);
+    }
+    int numAfter=seqSize-numBefore;
+    switch(removeScenario){
+      case PostNext:
+        if(!hasLastRet){
+          if(itrMonitor.hasNext()){
+            itrMonitor.iterateForward();
+            if(itrType==ItrType.DescendingItr){
+              --numBefore;
+              --numAfter;
+            }
+            hasLastRet=true;
+          }
+        }else{
+          if(itrType==ItrType.Itr){
+            --numBefore;
+          }else{
+            --numAfter;
+          }
+        }
+        break;
+      case PostRemove:
+        if(!hasLastRet){
+          if(itrMonitor.hasNext()){
+            itrMonitor.iterateForward();
+            if(itrType==ItrType.DescendingItr){
+              --numBefore;
+            }else{
+              --numAfter;
+            }
+          }else{
+            throw new Error("Invalid test{removeScenario="+removeScenario+", seqSize="+seqSize+", itrType="+itrType+"} must be ListItr");
+          }
+        }else if(itrType==ItrType.Itr){
+          --numBefore;
+        }else{
+          --numAfter;
+        }
+        itrMonitor.remove();
+        hasLastRet=false;
+        break;
+      case PostInit:
+        if(seqLocation!=SequenceLocation.BEGINNING){
+          throw new Error("Invalid test{removeScenario="+removeScenario+", seqSize="+seqSize+", itrType="+itrType+"} must be ListItr");
+        }
+        break;
+      default:
+        throw new Error("Unknown removeScenario "+removeScenario);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    SequenceVerificationItr verifyItr;
+    if(removeScenario.expectedException==null){
+      if(preModScenario.expectedException==null){
+        itrMonitor.remove();
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        while(itrMonitor.hasNext()){
+          itrMonitor.iterateForward();
+          itrMonitor.remove();
+          itrMonitor.verifyIteratorState();
+          seqMonitor.verifyStructuralIntegrity();
+        }
+        if(itrType==ItrType.Itr){
+          Assertions.assertTrue(numBefore!=0 || seqMonitor.isEmpty());
+        }else{
+          Assertions.assertTrue(numAfter!=0 || seqMonitor.isEmpty());
+        }
+        verifyItr=seqMonitor.verifyPreAlloc();
+        switch(itrType){
+          case Itr:
+            verifyItr.verifyAscending(numBefore);
+            break;
+          case DescendingItr:
+            verifyItr.verifyAscending(numBefore+1,numAfter);
+            break;
+          default:
+            throw new Error("Unknown itrType "+itrType);
+        }
+      }else{
+        Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.remove());
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(seqSize);
+      }
+    }else{
+      Assertions.assertThrows(removeScenario.expectedException,()->itrMonitor.remove());
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      verifyItr=seqMonitor.verifyPreAlloc();
+      switch(removeScenario){
+        case PostInit:
+          verifyItr.verifyAscending(seqSize);
+          break;
+        case PostRemove:
+          verifyItr.verifyAscending(numBefore);
+          verifyItr.verifyAscending(numBefore+1,numAfter);
+          break;
+        default:
+          throw new Error("Unknown removeScenario "+removeScenario);
+      }
+    }
+    verifyItr.verifyPostAlloc(preModScenario);
+  }
+  @org.junit.jupiter.api.Test
   public void testItrnext_void(){
     for(var checkedType:CheckedType.values()){
       for(var preModScenario:PreModScenario.values()){
@@ -75,21 +242,20 @@ public class RefArrDeqTest{
     }
   }
   private static void testItrnext_voidHelper(CheckedType checkedType,PreModScenario preModScenario,RefOutputTestArgType outputArgType,ItrType itrType,int seqSize,int head){
-    //TODO
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
     initializeAscending(seqMonitor.seq.arr,head,seqSize);
     var itrMonitor=seqMonitor.getItrMonitor(itrType);
     seqMonitor.illegalAdd(preModScenario);
     if(preModScenario.expectedException==null){
       if(itrType==ItrType.Itr){
-        for(int i=0;i<seqSize;++i){
+        for(int i=0;itrMonitor.itr.hasNext();++i){
           itrMonitor.verifyNext(i,outputArgType);
           itrMonitor.verifyIteratorState();
           seqMonitor.verifyStructuralIntegrity();
         }
       }else{
-        for(int i=seqSize;--i>=0;){
-          itrMonitor.verifyNext(i,outputArgType);
+        for(int i=seqSize;itrMonitor.itr.hasNext();){
+          itrMonitor.verifyNext(--i,outputArgType);
           itrMonitor.verifyIteratorState();
           seqMonitor.verifyStructuralIntegrity();
         }
@@ -1675,6 +1841,9 @@ public class RefArrDeqTest{
       }
       int getRemoveCursor(){
         int newCursor=expectedCursor;
+        if(newCursor==-1){
+          return -1;
+        }
         int head,tail;
         switch(Integer.signum((tail=seq.tail)-(head=seq.head)))
         {
@@ -1737,6 +1906,9 @@ public class RefArrDeqTest{
       }
       int getRemoveCursor(){
         int newCursor=expectedCursor;
+        if(newCursor==-1){
+          return -1;
+        }
         int head,tail;
         switch(Integer.signum((tail=seq.tail)-(head=seq.head)))
         {

@@ -1868,40 +1868,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         this.cursor=lastRet;
       }
     }
-    private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,BooleanArrDeq root){
-      int headDist,tailDist;
-      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
-        root.head=pullUp(root.arr,head,headDist);
-      }else{
-        ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
-        root.tail=tail-1;
-        this.cursor=lastRet;
-      }
-    }
-    private void fragmentedAscendingRemove(int head,int lastRet,int tail,BooleanArrDeq root){
-      boolean[] arr;
-      int headDist,tailDist,arrBound=(arr=root.arr).length;
-      if((headDist=lastRet-head)>=0){
-        if(headDist<=(tailDist=arrBound-lastRet)+tail){
-          root.head=pullUp(arr,head,headDist);
-        }else{
-          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-          arr[arrBound]=arr[0];
-          root.tail=fragmentedPullDown(arr,arrBound,tail);
-          this.cursor=lastRet;
-        }
-      }else{
-        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
-          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
-          root.tail=tail-1;
-          this.cursor=lastRet;
-        }else{
-          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
-          arr[0]=arr[arrBound];
-          root.head=fragmentedPullUp(arr,head,headDist);
-        }
-      }
-    }
   }
   private static int pullUp(boolean[] arr,int head,int headDist){
     ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
@@ -1958,6 +1924,42 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         root.head=fragmentedPullUp(arr,head,headDist);
       }
     }
+    private void fragmentedAscendingRemove(int head,int lastRet,int tail,BooleanArrDeq root){
+      boolean[] arr;
+      int headDist,tailDist,arrBound=(arr=root.arr).length-1;
+      if((headDist=lastRet-head)>=0){
+        //index to remove is in head run
+        if(headDist<=(tailDist=arrBound-lastRet)+tail){
+          ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+          root.head=head;
+        }else{
+          ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          arr[arrBound]=arr[0];
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
+          this.cursor=lastRet;
+        }
+      }else{
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+          ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          root.tail=tail-1;
+          this.cursor=lastRet;
+        }else{
+          ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+          arr[0]=arr[arrBound];
+          root.head=fragmentedPullUp(arr,head,headDist);
+        }
+      }
+    }
+    private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,BooleanArrDeq root){
+      int headDist,tailDist;
+      if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+        root.head=pullUp(root.arr,head,headDist);
+      }else{
+        ArrCopy.uncheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+        root.tail=tail-1;
+        this.cursor=lastRet;
+      }
+    }
     @Override public void remove(){
       final int cursor;
       switch(cursor=this.cursor){
@@ -1971,9 +1973,9 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           final int head,tail;
           final BooleanArrDeq root;
           if((tail=(root=this.root).tail)<(head=root.head)){
-            super.fragmentedAscendingRemove(head,cursor-1,tail,root);
+            fragmentedAscendingRemove(head,cursor-1,tail,root);
           }else{
-            super.nonfragmentedAscendingRemove(head,cursor-1,tail,root);
+            nonfragmentedAscendingRemove(head,cursor-1,tail,root);
           }
       }
     }
@@ -2352,6 +2354,61 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         }
         throw new NoSuchElementException();
       }
+      private void fragmentedAscendingRemove(int head,int lastRet,int tail,BooleanArrDeq root){
+        boolean[] arr;
+        int headDist,tailDist,arrBound=(arr=root.arr).length-1;
+        if((headDist=lastRet-head)>=0){
+          //index to remove is in head run
+          if(headDist<=(tailDist=arrBound-lastRet)+tail+1){
+            if(headDist==0){
+              if(tailDist==0){
+                root.head=0;
+              }
+              else{
+                root.head=head+1;
+              }
+            }else{
+              ArrCopy.uncheckedCopy(arr,head,arr,++head,headDist);
+              root.head=head;
+            }
+          }else{
+            ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+            arr[arrBound]=arr[0];
+            root.tail=fragmentedPullDown(arr,arrBound,tail);
+            this.cursor=lastRet;
+          }
+        }else{
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet+1){
+            if(tailDist==0){
+              if(lastRet==0){
+                root.tail=arrBound;
+              }else{
+                root.tail=tail-1;
+              }
+            }else{
+              ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+              root.tail=tail-1;
+              this.cursor=lastRet;
+            }
+          }else{
+            ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
+            arr[0]=arr[arrBound];
+            root.head=fragmentedPullUp(arr,head,headDist);
+          }
+        }
+      }
+      private void nonfragmentedAscendingRemove(int head,int lastRet,int tail,BooleanArrDeq root){
+        int headDist,tailDist;
+        if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
+          root.head=pullUp(root.arr,head,headDist);
+        }else{
+          ArrCopy.semicheckedSelfCopy(root.arr,lastRet,lastRet+1,tailDist);
+          root.tail=tail-1;
+          if(this.cursor!=-1){
+            this.cursor=lastRet;
+          }
+        }
+      }
       @Override public void remove(){
         int lastRet;
         if((lastRet=this.lastRet)!=-1){
@@ -2363,13 +2420,13 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
           final int head,tail;
           switch(Integer.signum((tail=root.tail)-(head=root.head))){
             case -1:
-              super.fragmentedAscendingRemove(head,lastRet,tail,root);
+              fragmentedAscendingRemove(head,lastRet,tail,root);
               break;
             case 0:
               root.tail=-1;
               break;
             default:
-              super.nonfragmentedAscendingRemove(head,lastRet,tail,root);
+              nonfragmentedAscendingRemove(head,lastRet,tail,root);
           }
           this.lastRet=-1;
           return;
