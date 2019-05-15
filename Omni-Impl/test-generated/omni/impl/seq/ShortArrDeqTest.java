@@ -51,124 +51,110 @@ import omni.function.ShortComparator;
 @Execution(ExecutionMode.CONCURRENT)
 public class ShortArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newSingleThreadExecutor();
+  java.util.concurrent.Executors.newCachedThreadPool();
   private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
   }
   private static void completeAllTests(){
-    TESTQUEUE.forEach(test->{
-      try{
-        test.get();
-      }catch(InterruptedException|java.util.concurrent.ExecutionException e){
-        var cause=e.getCause();
-        if(cause instanceof RuntimeException){
-          throw (RuntimeException)cause;
+    try{
+      TESTQUEUE.forEach(test->{
+        try{
+          test.get();
+        }catch(InterruptedException|java.util.concurrent.ExecutionException e){
+          var cause=e.getCause();
+          if(cause instanceof RuntimeException){
+            throw (RuntimeException)cause;
+          }
+          if(cause instanceof Error){
+            throw (Error)cause;
+          }
+          throw new Error(cause);
         }
-        if(cause instanceof Error){
-          throw (Error)cause;
-        }
-        throw new Error(cause);
-      }
-    });
-    TESTQUEUE.clear();
+      });
+    }finally{
+      TESTQUEUE.clear();
+    }
   }
     //TODO removeIf
   @org.junit.jupiter.api.Test
   public void testpeek_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpeek_voidHelper);
-  }
-  private static void testpeek_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      outputArgType.verifyPeek(seqMonitor.seq,initialSize-i,i);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        outputArgType.verifyPeek(seqMonitor.seq,initialSize-i,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.removeFirst(i,outputArgType);
+      }
+      outputArgType.verifyPeek(seqMonitor.seq,0,0);
       seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.removeFirst(i,outputArgType);
-    }
-    outputArgType.verifyPeek(seqMonitor.seq,0,0);
-    seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests(true);
   }
   @org.junit.jupiter.api.Test
   public void testpeekFirst_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpeekFirst_voidHelper);
-  }
-  private static void testpeekFirst_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      outputArgType.verifyDequePeekFirst(seqMonitor.seq,initialSize-i,i);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        outputArgType.verifyDequePeekFirst(seqMonitor.seq,initialSize-i,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.removeFirst(i,outputArgType);
+      }
+      outputArgType.verifyDequePeekFirst(seqMonitor.seq,0,0);
       seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.removeFirst(i,outputArgType);
-    }
-    outputArgType.verifyDequePeekFirst(seqMonitor.seq,0,0);
-    seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests(true);
   }
   @org.junit.jupiter.api.Test
   public void testpeekLast_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpeekLast_voidHelper);
-  }
-  private static void testpeekLast_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      outputArgType.verifyDequePeekLast(seqMonitor.seq,initialSize-i,initialSize-i-1);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        outputArgType.verifyDequePeekLast(seqMonitor.seq,initialSize-i,initialSize-i-1);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.removeLast(initialSize-i-1,outputArgType);
+      }
+      outputArgType.verifyDequePeekLast(seqMonitor.seq,0,0);
       seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.removeLast(initialSize-i-1,outputArgType);
-    }
-    outputArgType.verifyDequePeekLast(seqMonitor.seq,0,0);
-    seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests(true);
   }
   @org.junit.jupiter.api.Test
   public void testremoveFirstOccurrence_val(){
-    runQueryTests(false,(checkedType,argType,queryCastType,seqLocation,seqSize
+    QueryTest test=(checkedType,argType,queryCastType,seqLocation,seqSize,head
     )->{
-      if(seqSize==0)
-      {
-        testremoveFirstOccurrence_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
-        );
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+      if(seqSize!=0){
+        initializeArrayForQuery(true,seqMonitor.seq.arr,head,seqSize,argType,seqLocation);
       }
-      else
-      {
-        IntStream.range(0,seqSize)
-        .forEach(head->{
-          testremoveFirstOccurrence_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
-          );
-        });
-      }
-    });
-  }
-  private static void testremoveFirstOccurrence_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
-  ){
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
-    if(numToAdd!=0){
-      initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
-    }
-    Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveFirstOccurrence(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveFirstOccurrence(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testreadandwriteObject(){
     for(var checkedType:CheckedType.values()){
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRoot)){
-          testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,0,0);
+          submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,0,0));
           for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
             int seqSize=tmpSeqSize;
             for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
               int head=tmpHead;
-              testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,seqSize,head);
+              submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,seqSize,head));
             }
           }
         }
       }
     }
+    completeAllTests();
   }
   private static void testreadandwriteObjectHelper(CheckedType checkedType,MonitoredFunctionGen monitoredFunctionGen,int seqSize,int head
   ){
@@ -223,17 +209,18 @@ public class ShortArrDeqTest{
     for(var checkedType:CheckedType.values()){
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRoot)){
-          testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,0,0);
+          submitTest(()->testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,0,0));
           for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
             int seqSize=tmpSeqSize;
             for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
               int head=tmpHead;
-              testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,seqSize,head);
+              submitTest(()->testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,seqSize,head));
             }
           }
         }
       }
     }
+    completeAllTests();
   }
   private static void testtoArray_IntFunctionHelper(CheckedType checkedType,MonitoredFunctionGen monitoredFunctionGen,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -276,18 +263,19 @@ public class ShortArrDeqTest{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){ 
-            testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,0,0);
+            submitTest(()->testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
               int seqSize=tmpSeqSize;
               for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
                 int head=tmpHead;
-                testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,seqSize,head);
+                submitTest(()->testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,seqSize,head));
               }
             }
           }
         }
       }
     }
+    completeAllTests();
   }
   private static void testforEach_ConsumerHelper(CheckedType checkedType,MonitoredFunctionGen monitoredFunctionGen,FunctionCallType functionCallType,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -322,12 +310,12 @@ public class ShortArrDeqTest{
             for(var functionCallType:FunctionCallType.values()){
               for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
                 if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRootItr)){
-                  testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,0,0);
+                  submitTest(()->testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,0,0));
                   for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
                     int seqSize=tmpSeqSize;
                     for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
                       int head=tmpHead;
-                      testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,seqSize,head);
+                      submitTest(()->testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,seqSize,head));
                     }
                   }
                 }
@@ -337,6 +325,7 @@ public class ShortArrDeqTest{
         }
       }
     }
+    completeAllTests();
   }
   private static void testItrforEachRemaining_ConsumerHelper(ItrType itrType,CheckedType checkedType,PreModScenario preModScenario,FunctionCallType functionCallType,MonitoredFunctionGen monitoredFunctionGen,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -386,15 +375,16 @@ public class ShortArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testsize_void(){
     for(var checkedType:CheckedType.values()){
-      testsize_voidHelper(checkedType,0,0);
+      submitTest(()->testsize_voidHelper(checkedType,0,0));
       for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
         int seqSize=tmpSeqSize;
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           int head=tmpHead;
-          testsize_voidHelper(checkedType,seqSize,head);
+          submitTest(()->testsize_voidHelper(checkedType,seqSize,head));
         }
       }
     }
+    completeAllTests();
   }
   private static void testsize_voidHelper(CheckedType checkedType,int seqSize,int head){
     var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -406,15 +396,16 @@ public class ShortArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testisEmpty_void(){
     for(var checkedType:CheckedType.values()){
-      testisEmpty_voidHelper(checkedType,0,0);
+      submitTest(()->testisEmpty_voidHelper(checkedType,0,0));
       for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
         int seqSize=tmpSeqSize;
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           int head=tmpHead;
-          testisEmpty_voidHelper(checkedType,seqSize,head);
+          submitTest(()->testisEmpty_voidHelper(checkedType,seqSize,head));
         }
       }
     }
+    completeAllTests();
   }
   private static void testisEmpty_voidHelper(CheckedType checkedType,int seqSize,int head){
     var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -434,13 +425,13 @@ public class ShortArrDeqTest{
                 for(var seqLocation:SequenceLocation.values()){
                   if(seqLocation.expectedException==null && (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING)){
                     if(removeScenario.validWithEmptySeq){
-                      testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,0,0);
+                      submitTest(()->testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,0,0));
                     }
                     for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
                       int seqSize=tmpSeqSize;
                       for(int tmpHead=0;tmpHead<tmpSeqSize;++tmpHead){
                         int head=tmpHead;
-                        testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,seqSize,head);
+                        submitTest(()->testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,seqSize,head));
                       }
                     }
                   }
@@ -451,6 +442,7 @@ public class ShortArrDeqTest{
         }
       }
     }
+    completeAllTests();
   }
   private static void testItrremove_voidHelper(ItrType itrType,CheckedType checkedType,PreModScenario preModScenario,ItrRemoveScenario removeScenario,SequenceLocation seqLocation,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -596,22 +588,21 @@ public class ShortArrDeqTest{
       for(var preModScenario:PreModScenario.values()){
         if(preModScenario.expectedException==null || (preModScenario==PreModScenario.ModSeq && checkedType.checked)){
           for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
-            Stream.of(ShortOutputTestArgType.values())
-            .forEach(outputArgType->{
-              IntStream.rangeClosed(0,10)
-              .forEach(seqSize->{
-                if(seqSize==0){
-                  testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,0);
-                }else{
-                  IntStream.range(0,seqSize)
-                  .forEach(head->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,head));
+            for(var outputArgType:ShortOutputTestArgType.values()){
+              submitTest(()->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,0,0));
+              for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
+                final int seqSize=tmpSeqSize;
+                for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+                  final int head=tmpHead;
+                  submitTest(()->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,head));
                 }
-              });
-            });
+              }
+            }
           }
         }
       }
     }
+    completeAllTests();
   }
   private static void testItrnext_voidHelper(CheckedType checkedType,PreModScenario preModScenario,ShortOutputTestArgType outputArgType,ItrType itrType,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -649,7 +640,14 @@ public class ShortArrDeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testtoArray_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testtoArray_voidHelper);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      outputArgType.verifyToArray(seqMonitor.seq,initialSize);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
+    };
+    test.runTests(true);
   }
   private static void testtoArray_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
   {
@@ -662,13 +660,16 @@ public class ShortArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testclear_void(){
     for(var checkedType:CheckedType.values()){
-      testclear_voidHelper(checkedType,0,0);
-      for(int seqSize=1;seqSize<=10;++seqSize){
-        for(int head=0;head<seqSize;++head){
-          testclear_voidHelper(checkedType,seqSize,head);
+      submitTest(()->testclear_voidHelper(checkedType,0,0));
+      for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
+        final int seqSize=tmpSeqSize;
+        for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+          final int head=tmpHead;
+          submitTest(()->testclear_voidHelper(checkedType,seqSize,head));
         }
       }
     }
+    completeAllTests();
   }
   private static void testclear_voidHelper(CheckedType checkedType,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -680,22 +681,22 @@ public class ShortArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testtoArray_ObjectArray(){
     for(var checkedType:CheckedType.values()){
-      IntStream.iterate(0,seqSize->seqSize+=5).limit(3)
-      .forEach(seqSize->{
-        IntStream.iterate(0,paramArrSize->paramArrSize+=5).limit((seqSize/5)+2)
-        .forEach(paramArrSize->{
-          if(seqSize==0)
-          {
-            testtoArray_ObjectArrayHelper(checkedType,seqSize,0,paramArrSize);
+      for(int tmpSeqSize=0;tmpSeqSize<=15;tmpSeqSize+=5){
+        final int seqSize=tmpSeqSize;
+        for(int tmpParamArrSize=0;tmpParamArrSize<=seqSize+5;tmpParamArrSize+=5){
+          final int paramArrSize=tmpParamArrSize;
+          if(seqSize==0){
+            submitTest(()->testtoArray_ObjectArrayHelper(checkedType,seqSize,0,paramArrSize));
+          }else{
+            for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+              final int head=tmpHead;
+              submitTest(()->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize));
+            }
           }
-          else
-          {
-            IntStream.range(0,seqSize)
-            .forEach(head->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize));
-          }
-        });
-      });
+        }
+      }
     }
+    completeAllTests();
   }
   private static void testtoArray_ObjectArrayHelper(CheckedType checkedType,int seqSize,int head,int paramArrSize){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -732,65 +733,35 @@ public class ShortArrDeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testcontains_val(){
-    runQueryTests(false,(checkedType,argType,queryCastType,seqLocation,seqSize
+    QueryTest test=(checkedType,argType,queryCastType,seqLocation,seqSize,head
     )->{
-      if(seqSize==0)
-      {
-        testcontains_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
-        );
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+      if(seqSize!=0){
+        initializeArrayForQuery(true,seqMonitor.seq.arr,head,seqSize,argType,seqLocation);
       }
-      else
-      {
-        IntStream.range(0,seqSize)
-        .forEach(head->{
-          testcontains_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
-          );
-        });
-      }
-    });
-  }
-  private static void testcontains_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
-  ){
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
-    if(numToAdd!=0){
-      initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
-    }
-    Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokecontains(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokecontains(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testsearch_val(){
-    runQueryTests(false,(checkedType,argType,queryCastType,seqLocation,seqSize
+    QueryTest test=(checkedType,argType,queryCastType,seqLocation,seqSize,head
     )->{
-      if(seqSize==0)
-      {
-        testsearch_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
-        );
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+      int expectedIndex;
+      if(seqSize!=0){
+        expectedIndex=initializeArrayForQuery(true,seqMonitor.seq.arr,head,seqSize,argType,seqLocation);
+      }else{
+        expectedIndex=-1;
       }
-      else
-      {
-        IntStream.range(0,seqSize)
-        .forEach(head->{
-          testsearch_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
-          );
-        });
+      if(seqLocation==SequenceLocation.IOBHI){
+        expectedIndex=-1;
       }
-    });
-  }
-  private static void testsearch_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
-  ){
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
-    int expectedIndex;
-    if(numToAdd!=0){
-      expectedIndex=initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
-    }else{
-      expectedIndex=-1;
-    }
-    if(seqLocation==SequenceLocation.IOBHI){
-      expectedIndex=-1;
-    }
-    Assertions.assertEquals(expectedIndex,argType.invokesearch(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(expectedIndex,argType.invokesearch(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
     private static final int MAX_TOSTRING_LENGTH=6;
   @Tag("MASSIVEtoString")
@@ -798,6 +769,9 @@ public class ShortArrDeqTest{
   public void testMASSIVEtoString_void(){
     int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
     short[] arr=new short[seqLength];
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int threadSpan=seqLength/numThreads;
+    int threadBound=numThreads-1;
     for(int i=0;i<seqLength;++i){
       arr[i]=TypeConversionUtil.convertToshort(1);
     }
@@ -813,226 +787,220 @@ public class ShortArrDeqTest{
         Assertions.assertEquals('[',string.charAt(0));
         Assertions.assertEquals(']',string.charAt(string.length()-1));
         seqMonitor.verifyStructuralIntegrity();
+        int nextWayPointIndex=0;
         var verifyItr=seqMonitor.verifyPreAlloc();
-        AbstractShortSeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
+        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
+          final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          final int finalWayPointIndex=nextWayPointIndex;
+          submitTest(()->AbstractShortSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
+          verifyItr.skip(threadSpan);
+          nextWayPointIndex=finalWayPointBound;
+        }
+        AbstractShortSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+        completeAllTests();
       }
     }
   }
   @org.junit.jupiter.api.Test
   public void testhashCode_void(){
-    runToStringOrHashCodeTests(false,ShortArrDeqTest::testhashCode_voidHelper);
-  }
-  private static void testhashCode_voidHelper(CheckedType checkedType,int size,int head
-  )
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,size,head,size);
-    {
-      initializeAscending(seqMonitor.seq.arr,head,size);
-    }
-    {
-      int resultHash=seqMonitor.seq.hashCode();
-      seqMonitor.verifyPreAlloc().verifyAscending(size);
-      int expectedHash=1;
-      if(size!=0)
+    ToStringAndHashCodeTest test=(checkedType,size,head
+    )->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,size,head,size);
       {
-        short[] arr;
-        for(int i=0,j=seqMonitor.seq.head,bound=(arr=seqMonitor.seq.arr).length;i<size;++i){
-          expectedHash=(expectedHash*31)+(arr[j]);
-          if(++j==bound){
-            j=0;
+        initializeAscending(seqMonitor.seq.arr,head,size);
+      }
+      {
+        int resultHash=seqMonitor.seq.hashCode();
+        seqMonitor.verifyPreAlloc().verifyAscending(size);
+        int expectedHash=1;
+        if(size!=0)
+        {
+          short[] arr;
+          for(int i=0,j=seqMonitor.seq.head,bound=(arr=seqMonitor.seq.arr).length;i<size;++i){
+            expectedHash=(expectedHash*31)+(arr[j]);
+            if(++j==bound){
+              j=0;
+            }
           }
         }
+        Assertions.assertEquals(expectedHash,resultHash);
       }
-      Assertions.assertEquals(expectedHash,resultHash);
-    }
-    seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testtoString_void(){
-    runToStringOrHashCodeTests(false,ShortArrDeqTest::testtoString_voidHelper);
-  }
-  private static void testtoString_voidHelper(CheckedType checkedType,int size,int head
-  )
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,size,head,size);
-    {
-      initializeAscending(seqMonitor.seq.arr,head,size);
-    }
-    {
-      var resultStr=seqMonitor.seq.toString();
-      seqMonitor.verifyPreAlloc().verifyAscending(size);
-      var arrList=new ArrayList<Object>();
-      if(size!=0){
-        for(int i=0,j=seqMonitor.seq.head,bound=seqMonitor.seq.arr.length;i<size;++i)
-        {
-          arrList.add(seqMonitor.seq.arr[j]);
-          if(++j==bound)
+    ToStringAndHashCodeTest test=(checkedType,size,head
+    )->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,size,head,size);
+      {
+        initializeAscending(seqMonitor.seq.arr,head,size);
+      }
+      {
+        var resultStr=seqMonitor.seq.toString();
+        seqMonitor.verifyPreAlloc().verifyAscending(size);
+        var arrList=new ArrayList<Object>();
+        if(size!=0){
+          for(int i=0,j=seqMonitor.seq.head,bound=seqMonitor.seq.arr.length;i<size;++i)
           {
-            j=0;
+            arrList.add(seqMonitor.seq.arr[j]);
+            if(++j==bound)
+            {
+              j=0;
+            }
           }
         }
+        Assertions.assertEquals(arrList.toString(),resultStr);
       }
-      Assertions.assertEquals(arrList.toString(),resultStr);
-    }
-    seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testelement_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testelement_voidHelper);
-  }
-  private static void testelement_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i){
-      outputArgType.verifyQueueElement(seqMonitor.seq,i);
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.removeFirst(i,outputArgType);
-    }
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i){
+        outputArgType.verifyQueueElement(seqMonitor.seq,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.removeFirst(i,outputArgType);
+      }
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testgetFirst_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testgetFirst_voidHelper);
-  }
-  private static void testgetFirst_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i){
-      outputArgType.verifyDequeGetFirst(seqMonitor.seq,i);
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.removeFirst(i,outputArgType);
-    }
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyDequeGetFirst(seqMonitor.seq,0));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i){
+        outputArgType.verifyDequeGetFirst(seqMonitor.seq,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.removeFirst(i,outputArgType);
+      }
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyDequeGetFirst(seqMonitor.seq,0));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testgetLast_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testgetLast_voidHelper);
-  }
-  private static void testgetLast_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=initialSize;--i>=0;){
-      outputArgType.verifyDequeGetLast(seqMonitor.seq,i);
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.removeLast(i,outputArgType);
-    }
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyDequeGetLast(seqMonitor.seq,0));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=initialSize;--i>=0;){
+        outputArgType.verifyDequeGetLast(seqMonitor.seq,i);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.removeLast(i,outputArgType);
+      }
+      if(seqMonitor.checkedType.checked){
+        Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyDequeGetLast(seqMonitor.seq,0));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testremoveLast_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testremoveLast_voidHelper);
-  }
-  private static void testremoveLast_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=initialSize;--i>=0;)
-    {
-      seqMonitor.removeLast(i,outputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    if(checkedType.checked)
-    {
-      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.removeLast(0,outputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=initialSize;--i>=0;)
+      {
+        seqMonitor.removeLast(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      if(checkedType.checked)
+      {
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.removeLast(0,outputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testremoveFirst_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testremoveFirst_voidHelper);
-  }
-  private static void testremoveFirst_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      seqMonitor.removeFirst(i,outputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    if(checkedType.checked)
-    {
-      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.removeFirst(0,outputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        seqMonitor.removeFirst(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      if(checkedType.checked)
+      {
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.removeFirst(0,outputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testremove_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testremove_voidHelper);
-  }
-  private static void testremove_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      seqMonitor.queueRemove(i,outputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    if(checkedType.checked)
-    {
-      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        seqMonitor.queueRemove(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      if(checkedType.checked)
+      {
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testpop_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpop_voidHelper);
-  }
-  private static void testpop_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      seqMonitor.pop(i,outputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    if(checkedType.checked)
-    {
-      Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        seqMonitor.pop(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      if(checkedType.checked)
+      {
+        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+    };
+    test.runTests(false);
   }
   @org.junit.jupiter.api.Test
   public void testclone_void(){
     for(var checkedType:CheckedType.values()){
-      IntStream.range(0,10)
-      .forEach(seqSize->{
-        if(seqSize==0)
-        {
-          testclone_voidHelper(new SeqMonitor(checkedType,0,0,0));
+      submitTest(()->testclone_voidHelper(checkedType,0,0));
+      for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
+        final int seqSize=tmpSeqSize;
+        for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+          final int head=tmpHead;
+          submitTest(()->testclone_voidHelper(checkedType,seqSize,head));
         }
-        else
-        {
-          IntStream.range(0,seqSize)
-          .forEach(head->{
-            var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
-            initializeAscending(seqMonitor.seq.arr,head,seqSize);
-            testclone_voidHelper(seqMonitor);
-          });
-        }
-      });
+      }
     }
+    completeAllTests();
   }
-  private static void testclone_voidHelper(SeqMonitor seqMonitor){
+  private static void testclone_voidHelper(CheckedType checkedType,int seqSize,int head){
+    var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+    initializeAscending(seqMonitor.seq.arr,head,seqSize);
     var clone=(ShortArrDeq)seqMonitor.seq.clone();
     if(seqMonitor.checkedType.checked){
       Assertions.assertEquals(0,((ShortArrDeq.Checked)clone).modCount);
     }
-    int seqSize;
     if((seqSize=seqMonitor.expectedSeqSize)==0)
     {
       Assertions.assertEquals(-1,clone.tail);
@@ -1056,476 +1024,408 @@ public class ShortArrDeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testpoll_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpoll_voidHelper);
-  }
-  private static void testpoll_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      seqMonitor.poll(i,outputArgType);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        seqMonitor.poll(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      seqMonitor.poll(0,outputArgType);
       seqMonitor.verifyStructuralIntegrity();
-    }
-    seqMonitor.poll(0,outputArgType);
-    seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests(true);
   }
   @org.junit.jupiter.api.Test
   public void testpollFirst_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpollFirst_voidHelper);
-  }
-  private static void testpollFirst_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<initialSize;++i)
-    {
-      seqMonitor.pollFirst(i,outputArgType);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<initialSize;++i)
+      {
+        seqMonitor.pollFirst(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      seqMonitor.pollFirst(0,outputArgType);
       seqMonitor.verifyStructuralIntegrity();
-    }
-    seqMonitor.pollFirst(0,outputArgType);
-    seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests(true);
   }
   @org.junit.jupiter.api.Test
   public void testpollLast_void(){
-    runOutputTests(false,true,ShortArrDeqTest::testpollLast_voidHelper);
-  }
-  private static void testpollLast_voidHelper(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=initialSize;--i>=0;)
-    {
-      seqMonitor.pollLast(i,outputArgType);
+    OutputTest test=(checkedType,head,initialSize,outputArgType)->{
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialSize,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=initialSize;--i>=0;)
+      {
+        seqMonitor.pollLast(i,outputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      seqMonitor.pollLast(0,outputArgType);
       seqMonitor.verifyStructuralIntegrity();
-    }
-    seqMonitor.pollLast(0,outputArgType);
-    seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests(true);
   }
   @org.junit.jupiter.api.Test
   public void testremoveVal_val(){
-    runQueryTests(false,(checkedType,argType,queryCastType,seqLocation,seqSize
+    QueryTest test=(checkedType,argType,queryCastType,seqLocation,seqSize,head
     )->{
-      if(seqSize==0)
-      {
-        testremoveVal_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
-        );
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+      if(seqSize!=0){
+        initializeArrayForQuery(true,seqMonitor.seq.arr,head,seqSize,argType,seqLocation);
       }
-      else
-      {
-        IntStream.range(0,seqSize)
-        .forEach(head->{
-          testremoveVal_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
-          );
-        });
-      }
-    });
-  }
-  private static void testremoveVal_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
-  ){
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
-    if(numToAdd!=0){
-      initializeArrayForQuery(true,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
-    }
-    Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveVal(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveVal(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testremoveLastOccurrence_val(){
-    runQueryTests(false,(checkedType,argType,queryCastType,seqLocation,seqSize
+    QueryTest test=(checkedType,argType,queryCastType,seqLocation,seqSize,head
     )->{
-      if(seqSize==0)
-      {
-        testremoveLastOccurrence_valHelper(checkedType,seqSize,0,seqSize,seqLocation,argType,queryCastType
-        );
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+      if(seqSize!=0){
+        initializeArrayForQuery(false,seqMonitor.seq.arr,head,seqSize,argType,seqLocation);
       }
-      else
-      {
-        IntStream.range(0,seqSize)
-        .forEach(head->{
-          testremoveLastOccurrence_valHelper(checkedType,seqSize,head,seqSize,seqLocation,argType,queryCastType
-          );
-        });
-      }
-    });
-  }
-  private static void testremoveLastOccurrence_valHelper(CheckedType checkedType,int capacity,int head,int numToAdd,SequenceLocation seqLocation,QueryTester argType,QueryCastType queryCastType
-  ){
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,capacity,head,numToAdd);
-    if(numToAdd!=0){
-      initializeArrayForQuery(false,seqMonitor.seq.arr,head,numToAdd,argType,seqLocation);
-    }
-    Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveLastOccurrence(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveLastOccurrence(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testadd_val(){
-    runInputTests(false,ShortArrDeqTest::testadd_valHelper);
-  }
-  private static void testadd_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      Assertions.assertTrue(seqMonitor.add(i,inputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
-    verifyItr.verifyAscending(inputArgType,100);
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertTrue(seqMonitor.add(i,inputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
+      verifyItr.verifyAscending(inputArgType,100);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testaddLast_val(){
-    runInputTests(false,ShortArrDeqTest::testaddLast_valHelper);
-  }
-  private static void testaddLast_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      seqMonitor.addLast(i,inputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
-    verifyItr.verifyAscending(inputArgType,100);
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        seqMonitor.addLast(i,inputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
+      verifyItr.verifyAscending(inputArgType,100);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testpush_val(){
-    runInputTests(false,ShortArrDeqTest::testpush_valHelper);
-  }
-  private static void testpush_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      seqMonitor.push(i,inputArgType);
-      seqMonitor.verifyStructuralIntegrity();
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        seqMonitor.push(i,inputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+        var verifyItr=seqMonitor.verifyPreAlloc();
+        verifyItr.verifyDescending(inputArgType,i+1);
+        verifyItr.verifyAscending(initialSize);
+      }
       var verifyItr=seqMonitor.verifyPreAlloc();
-      verifyItr.verifyDescending(inputArgType,i+1);
+      verifyItr.verifyDescending(inputArgType,100);
       verifyItr.verifyAscending(initialSize);
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc();
-    verifyItr.verifyDescending(inputArgType,100);
-    verifyItr.verifyAscending(initialSize);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testaddFirst_val(){
-    runInputTests(false,ShortArrDeqTest::testaddFirst_valHelper);
-  }
-  private static void testaddFirst_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      seqMonitor.addFirst(i,inputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc();
-    verifyItr.verifyDescending(inputArgType,100);
-    verifyItr.verifyAscending(initialSize);
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        seqMonitor.addFirst(i,inputArgType);
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      verifyItr.verifyDescending(inputArgType,100);
+      verifyItr.verifyAscending(initialSize);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testofferFirst_val(){
-    runInputTests(false,ShortArrDeqTest::testofferFirst_valHelper);
-  }
-  private static void testofferFirst_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      Assertions.assertTrue(seqMonitor.offerFirst(i,inputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc();
-    verifyItr.verifyDescending(inputArgType,100);
-    verifyItr.verifyAscending(initialSize);
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertTrue(seqMonitor.offerFirst(i,inputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      verifyItr.verifyDescending(inputArgType,100);
+      verifyItr.verifyAscending(initialSize);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testoffer_val(){
-    runInputTests(false,ShortArrDeqTest::testoffer_valHelper);
-  }
-  private static void testoffer_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
-    verifyItr.verifyAscending(inputArgType,100);
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
+      verifyItr.verifyAscending(inputArgType,100);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testofferLast_val(){
-    runInputTests(false,ShortArrDeqTest::testofferLast_valHelper);
-  }
-  private static void testofferLast_valHelper(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputArgType)
-  {
-    SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
-    initializeAscending(seqMonitor.seq.arr,head,initialSize);
-    for(int i=0;i<100;++i)
+    InputTest test=(checkedType,initialCapacity,head,initialSize,inputArgType)->
     {
-      Assertions.assertTrue(seqMonitor.offerLast(i,inputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
-    verifyItr.verifyAscending(inputArgType,100);
+      SeqMonitor seqMonitor=new SeqMonitor(checkedType,initialCapacity,head,initialSize);
+      initializeAscending(seqMonitor.seq.arr,head,initialSize);
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertTrue(seqMonitor.offerLast(i,inputArgType));
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(initialSize);
+      verifyItr.verifyAscending(inputArgType,100);
+    };
+    test.runTests();
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_void(){
-    {
-      var deq=new ShortArrDeq.Checked();
-      Assertions.assertEquals(0,deq.modCount);
-      Assertions.assertEquals(-1,deq.tail);
-      Assertions.assertEquals(0,deq.head);
-      Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,deq.arr);
-    }
-    {
-      var deq=new ShortArrDeq();
-      Assertions.assertEquals(-1,deq.tail);
-      Assertions.assertEquals(0,deq.head);
-      Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,deq.arr);
+    for(var checkedType:CheckedType.values()){
+      submitTest(()->{
+        ShortArrDeq deq;
+        if(checkedType.checked){
+          Assertions.assertEquals(0,((ShortArrDeq.Checked)(deq=new ShortArrDeq.Checked())).modCount);
+        }else{
+          deq=new ShortArrDeq();
+        }
+        Assertions.assertEquals(-1,deq.tail);
+        Assertions.assertEquals(0,deq.head);
+        Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,deq.arr);
+      });
     }
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_int(){
-    for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-    {
-      {
-        var deq=new ShortArrDeq.Checked(initialCapacity);
-        Assertions.assertEquals(0,deq.modCount);
-        Assertions.assertEquals(-1,deq.tail);
-        Assertions.assertEquals(0,deq.head);
-        switch(initialCapacity){
-          case 0:
-            Assertions.assertNull(deq.arr);
-            break;
-          case OmniArray.DEFAULT_ARR_SEQ_CAP:
-            Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,deq.arr);
-            break;
-          default:
-            Assertions.assertEquals(initialCapacity,deq.arr.length);
-        }
-      }
-      {
-        var deq=new ShortArrDeq.Checked(initialCapacity);
-        Assertions.assertEquals(-1,deq.tail);
-        Assertions.assertEquals(0,deq.head);
-        switch(initialCapacity){
-          case 0:
-            Assertions.assertNull(deq.arr);
-            break;
-          case OmniArray.DEFAULT_ARR_SEQ_CAP:
-            Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,deq.arr);
-            break;
-          default:
-            Assertions.assertEquals(initialCapacity,deq.arr.length);
-        }
+    for(var checkedType:CheckedType.values()){
+      for(int tmpInitialCapacity=0;tmpInitialCapacity<=15;tmpInitialCapacity+=5){
+        final int initialCapacity=tmpInitialCapacity;
+        submitTest(()->{
+          ShortArrDeq deq;
+          if(checkedType.checked){
+            Assertions.assertEquals(0,((ShortArrDeq.Checked)(deq=new ShortArrDeq.Checked(initialCapacity))).modCount);
+          }else{
+            deq=new ShortArrDeq(initialCapacity);
+          }
+          Assertions.assertEquals(-1,deq.tail);
+          Assertions.assertEquals(0,deq.head);
+          switch(initialCapacity){
+            case 0:
+              Assertions.assertNull(deq.arr);
+              break;
+            case OmniArray.DEFAULT_ARR_SEQ_CAP:
+              Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,deq.arr);
+              break;
+            default:
+              Assertions.assertEquals(initialCapacity,deq.arr.length);
+          }
+        });
       }
     }
+    completeAllTests();
   }
   interface ToStringAndHashCodeTest{
     void runTest(CheckedType checkedType,int size,int head
     );
-  }
-  static void runToStringOrHashCodeTests(boolean parallel,ToStringAndHashCodeTest tester){
-    for(var checkedType:CheckedType.values()){
-      var seqSizeStream=IntStream.rangeClosed(0,10);
-      if(parallel){
-        seqSizeStream=seqSizeStream.parallel();
-      }
-      seqSizeStream.forEach(seqSize->{
-        if(seqSize==0)
-        {
-          tester.runTest(checkedType,seqSize,0);
-        }
-        else
-        {
-          var headStream=IntStream.range(0,seqSize);
-          if(parallel){
-            headStream=headStream.parallel();
+    private void runTests(){
+      for(var checkedType:CheckedType.values()){
+        submitTest(()->runTest(checkedType,0,0));
+        for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
+          final int seqSize=tmpSeqSize;
+          for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+            final int head=tmpHead;
+            submitTest(()->runTest(checkedType,seqSize,head));
           }
-          headStream.forEach(head->{
-            tester.runTest(checkedType,seqSize,head);
-          });
         }
-      });
+      }
+      completeAllTests();
     }
   }
-  interface OutputTester{
-    void runTest(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType inputType);
-  }
-  static void runOutputTests(boolean parallel,boolean allowEmpty,OutputTester outputTest){
-    for(final var checkedType:CheckedType.values()){
-      var seqSizeStream=IntStream.rangeClosed(0,10).filter(seqSize->allowEmpty||seqSize!=0||checkedType.checked);
-      if(parallel){
-        seqSizeStream=seqSizeStream.parallel();
-      }
-      seqSizeStream.forEach(seqSize->{
-        var outputArgTypeStream=Stream.of(ShortOutputTestArgType.values());
-        if(parallel){
-          outputArgTypeStream=outputArgTypeStream.parallel();
-        }
-        outputArgTypeStream.forEach(outputType->{
-          if(seqSize==0){
-            outputTest.runTest(checkedType,0,seqSize,outputType);
-          }else{
-            var headStream=IntStream.range(0,seqSize);
-            if(parallel){
-              headStream=headStream.parallel();
+  interface OutputTest{
+    void runTest(CheckedType checkedType,int head,int initialSize,ShortOutputTestArgType outputArgType);
+    private void runTests(boolean allowEmpty){
+      for(var checkedType:CheckedType.values()){
+        for(var outputArgType:ShortOutputTestArgType.values()){
+          if(allowEmpty || checkedType.checked){
+            submitTest(()->runTest(checkedType,0,0,outputArgType));
+          }
+          for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
+            final int seqSize=tmpSeqSize;
+            for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+              final int head=tmpHead;
+              submitTest(()->runTest(checkedType,head,seqSize,outputArgType));
             }
-            headStream.forEach(head->outputTest.runTest(checkedType,head,seqSize,outputType));
           }
-        });
-      });
+        }
+      }
+      completeAllTests();
     }
   }
-  interface InputTester{
+  interface InputTest{
     void runTest(CheckedType checkedType,int initialCapacity,int head,int initialSize,ShortInputTestArgType inputType);
-  }
-  static void runInputTests(boolean parallel,InputTester inputTester)
-  {
-    for(var checkedType:CheckedType.values()){
-      var capacityStream=IntStream.rangeClosed(0,15);
-      if(parallel){
-        capacityStream=capacityStream.parallel();
-      }
-      capacityStream.forEach(capacity->{
-        var seqSizeStream=IntStream.rangeClosed(0,capacity);
-        if(parallel)
-        {
-          seqSizeStream=seqSizeStream.parallel();
-        }
-        seqSizeStream.forEach(seqSize->{
-          var inputArgTypeStream=Stream.of(ShortInputTestArgType.values());
-          if(parallel)
-          {
-            inputArgTypeStream=inputArgTypeStream.parallel();
+    private void runTests(){
+      for(var checkedType:CheckedType.values()){
+        for(var inputArgType:ShortInputTestArgType.values()){
+          submitTest(()->runTest(checkedType,0,0,0,inputArgType));
+          for(int tmpCapacity=1;tmpCapacity<=15;++tmpCapacity){
+            final int capacity=tmpCapacity;
+            submitTest(()->runTest(checkedType,capacity,0,0,inputArgType));
+            for(int tmpSeqSize=1;tmpSeqSize<=capacity;++tmpSeqSize){
+              final int seqSize=tmpSeqSize;
+              for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+                final int head=tmpHead;
+                submitTest(()->runTest(checkedType,capacity,head,seqSize,inputArgType));
+              }
+            }
           }
-          inputArgTypeStream.forEach(inputType->{
-             if(seqSize==0)
-             {
-               inputTester.runTest(checkedType,capacity,0,seqSize,inputType);
-             }
-             else
-             {
-               var headStream=IntStream.range(0,capacity);
-               if(parallel){
-                 headStream=headStream.parallel();
-               }
-               headStream.forEach(head->{
-                 inputTester.runTest(checkedType,capacity,head,seqSize,inputType);
-               });
-             }
-          });
-        });
-      });
+        }
+      }
+      completeAllTests();
     }
   }
   interface QueryTest
   {
-    void runTest(CheckedType checkedType,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+    void runTest(CheckedType checkedType,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize,int head
     );
-  }
-  static void runQueryTests(boolean parallel,QueryTest queryTest){
-    for(var checkedType:CheckedType.values()){
-      var seqLocationStream=Stream.of(SequenceLocation.values()).filter(seqLocation->seqLocation!=SequenceLocation.IOBLO);
-      if(parallel){
-        seqLocationStream=seqLocationStream.parallel();
+    private void runTests(CheckedType checkedType,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+    ){
+      if(seqSize==0)
+      {
+        submitTest(()->runTest(checkedType,argType,queryCastType,seqLocation,seqSize,0
+        ));
       }
-      seqLocationStream.forEach(seqLocation->{
-        for(int tmpSeqSize=0;tmpSeqSize<=10;++tmpSeqSize){
-          final int seqSize=tmpSeqSize;
-          if(seqLocation==SequenceLocation.IOBHI || seqSize!=0){
-            for(var queryCastType:QueryCastType.values()){
-              var argTypeStream=Stream.of(QueryTester.values());
-              if(parallel){
-                argTypeStream=argTypeStream.parallel();
-              }
-              argTypeStream.forEach(argType->{
-                switch(argType){
-                  case Booleannull:
-                  case Bytenull:
-                  case Characternull:
-                  case Shortnull:
-                  case Integernull:
-                  case Longnull:
-                  case Floatnull:
-                  case Doublenull:
-                    if(queryCastType!=QueryCastType.ToBoxed || (seqSize!=0 && seqLocation.expectedException==null)){
-                      return;
-                    }
+      else
+      {
+        for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+          final int head=tmpHead;
+          submitTest(()->runTest(checkedType,argType,queryCastType,seqLocation,seqSize,head
+          ));
+        }
+      }
+    }
+    private void runTests(){
+      for(var checkedType:CheckedType.values()){
+        for(var seqLocation:SequenceLocation.values()){
+          if(seqLocation==SequenceLocation.IOBLO){
+            continue;
+          }
+          for(int tmpSeqSize=0;tmpSeqSize<=10;++tmpSeqSize){
+            final int seqSize=tmpSeqSize;
+            if(seqLocation==SequenceLocation.IOBHI || seqSize!=0){
+              for(var queryCastType:QueryCastType.values()){
+                for(var argType:QueryTester.values()){
+                  switch(argType){
+                    case Booleannull:
+                    case Bytenull:
+                    case Characternull:
+                    case Shortnull:
+                    case Integernull:
+                    case Longnull:
+                    case Floatnull:
+                    case Doublenull:
+                      if(queryCastType!=QueryCastType.ToBoxed || (seqSize!=0 && seqLocation.expectedException==null)){
+                        continue;
+                      }
+                      break;
+                    case Objectnull:
+                      if(queryCastType!=QueryCastType.ToObject || (seqSize!=0 && seqLocation.expectedException==null)){
+                        continue;
+                      }
+                      break;
+                    case Booleanfalse:
+                    case Byte0:
+                    case Character0:
+                    case Short0:
+                    case Integer0:
+                    case Long0:
+                    case Floatpos0:
+                    case Floatneg0:
+                    case Doublepos0:
+                    case Doubleneg0:
+                    case Booleantrue:
+                    case Bytepos1:
+                    case Characterpos1:
+                    case Shortpos1:
+                    case Integerpos1:
+                    case Longpos1:
+                    case Floatpos1:
+                    case Doublepos1:
+                    //values beyond the range of boolean
+                    case Bytepos2:
+                    case Characterpos2:
+                    case Shortpos2:
+                    case Integerpos2:
+                    case Longpos2:
+                    case Floatpos2:
+                    case Doublepos2:
+                    //negative values beyond the range of char
+                    case Byteneg1:
+                    case Shortneg1:
+                    case Integerneg1:
+                    case Longneg1:
+                    case Floatneg1:
+                    case Doubleneg1:
+                    //negative values beyond the range of byte
+                    case ShortMIN_BYTE_MINUS1:
+                    case IntegerMIN_BYTE_MINUS1:
+                    case LongMIN_BYTE_MINUS1:
+                    case FloatMIN_BYTE_MINUS1:
+                    case DoubleMIN_BYTE_MINUS1:
+                    //positive values out of the range of byte
+                    case CharacterMAX_BYTE_PLUS1:
+                    case ShortMAX_BYTE_PLUS1:
+                    case IntegerMAX_BYTE_PLUS1:
+                    case LongMAX_BYTE_PLUS1:
+                    case FloatMAX_BYTE_PLUS1:
+                    case DoubleMAX_BYTE_PLUS1:
+                    //these input values cannot potentially return true
                     break;
-                  case Objectnull:
-                    if(queryCastType!=QueryCastType.ToObject || (seqSize!=0 && seqLocation.expectedException==null)){
-                      return;
+                    default:
+                    if(seqSize!=0 && seqLocation.expectedException==null){
+                      continue;
                     }
-                    break;
-                  case Booleanfalse:
-                  case Byte0:
-                  case Character0:
-                  case Short0:
-                  case Integer0:
-                  case Long0:
-                  case Floatpos0:
-                  case Floatneg0:
-                  case Doublepos0:
-                  case Doubleneg0:
-                  case Booleantrue:
-                  case Bytepos1:
-                  case Characterpos1:
-                  case Shortpos1:
-                  case Integerpos1:
-                  case Longpos1:
-                  case Floatpos1:
-                  case Doublepos1:
-                  //values beyond the range of boolean
-                  case Bytepos2:
-                  case Characterpos2:
-                  case Shortpos2:
-                  case Integerpos2:
-                  case Longpos2:
-                  case Floatpos2:
-                  case Doublepos2:
-                  //negative values beyond the range of char
-                  case Byteneg1:
-                  case Shortneg1:
-                  case Integerneg1:
-                  case Longneg1:
-                  case Floatneg1:
-                  case Doubleneg1:
-                  //negative values beyond the range of byte
-                  case ShortMIN_BYTE_MINUS1:
-                  case IntegerMIN_BYTE_MINUS1:
-                  case LongMIN_BYTE_MINUS1:
-                  case FloatMIN_BYTE_MINUS1:
-                  case DoubleMIN_BYTE_MINUS1:
-                  //positive values out of the range of byte
-                  case CharacterMAX_BYTE_PLUS1:
-                  case ShortMAX_BYTE_PLUS1:
-                  case IntegerMAX_BYTE_PLUS1:
-                  case LongMAX_BYTE_PLUS1:
-                  case FloatMAX_BYTE_PLUS1:
-                  case DoubleMAX_BYTE_PLUS1:
-                  //these input values cannot potentially return true
-                  break;
-                  default:
-                  if(seqSize!=0 && seqLocation.expectedException==null){
-                    return;
+                    //these values must necessarily return false
                   }
-                  //these values must necessarily return false
+                  runTests(checkedType,argType,queryCastType,seqLocation,seqSize);
                 }
-                queryTest.runTest(checkedType,argType,queryCastType,seqLocation,seqSize);
-              });
+              }
             }
           }
         }
-      });
+      }
+      completeAllTests();
     }
   }
   private static void initializeAscending(short[] arr,int head,int size)
