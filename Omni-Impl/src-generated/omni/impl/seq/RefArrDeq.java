@@ -1815,21 +1815,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         uncheckedForEachRemaining(cursor,action);
       }
     }
-    private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
-      int tailDist,headDist;
-      if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
-        Object[] arr;
-        ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-        arr[tail]=null;
-        root.tail=tail-1;
-      }else{
-        Object[] arr;
-        ArrCopy.uncheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
-        arr[tail]=null;
-        root.head=head;
-        this.cursor=lastRet;
-      }
-    }
   }
   private static int pullUp(Object[] arr,int head,int headDist){
     final int tmp;
@@ -1899,10 +1884,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       int headDist,tailDist,arrBound=(arr=root.arr).length-1;
       if((headDist=lastRet-head)>=0){
         //index to remove is in head run
-        if(headDist<=(tailDist=arrBound-lastRet)+tail){
-          ArrCopy.semicheckedCopy(arr,tail=head,arr,++head,headDist);
-          arr[tail]=null;
-          root.head=head;
+        if(headDist<=(tailDist=arrBound-lastRet)+tail+1){
+          root.head=pullUp(arr,head,headDist);
         }else{
           ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
           arr[arrBound]=arr[0];
@@ -1910,7 +1893,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           this.cursor=lastRet;
         }
       }else{
-        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
+        if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet+1){
           ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
           arr[tail]=null;
           root.tail=tail-1;
@@ -1992,20 +1975,22 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       Object[] arr;
       int arrBound;
       if((arrBound=(arr=root.arr).length-1)==cursor){
+        //remove index 0
         if(tail<=(cursor=arrBound-head)){
-          ArrCopy.semicheckedSelfCopy(arr,0,1,tail);
-          arr[tail]=null;
-          root.tail=tail-1;
+          root.tail=fragmentedPullDown(arr,arrBound,tail);
         }else{
           arr[0]=arr[arrBound];
-          root.head=pullUp(arr,head,cursor);
+          root.head=fragmentedPullUp(arr,head,cursor);
           this.cursor=0;
         }
       }else{
         int headDist,tailDist;
-        if((headDist=(++cursor)-head)>=0){
-          if(headDist<=(tailDist=arrBound-cursor)+tail){
-            root.head=fragmentedPullUp(arr,head,headDist);
+        if((headDist=(++cursor)-head)>0){
+          //removing from head run
+          if(headDist<=(tailDist=arrBound-cursor)+tail+1){
+            ArrCopy.uncheckedCopy(arr,tail=head,arr,++head,headDist);
+            arr[tail]=null;
+            root.head=head;
             this.cursor=cursor;
           }else{
             ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
@@ -2013,7 +1998,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             root.tail=fragmentedPullDown(arr,arrBound,tail);
           }
         }else{
-          if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor){
+          //removing from tail run
+          if((tailDist=tail-cursor)<=(headDist=arrBound-head)+cursor+1){
             ArrCopy.semicheckedSelfCopy(arr,cursor,cursor+1,tailDist);
             arr[tail]=null;
             root.tail=tail-1;
@@ -2026,6 +2012,21 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         }
       }
     }
+    private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+      int tailDist,headDist;
+      if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+        Object[] arr;
+        ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+        arr[tail]=null;
+        root.tail=tail-1;
+      }else{
+        Object[] arr;
+        ArrCopy.uncheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
+        arr[tail]=null;
+        root.head=head;
+        this.cursor=lastRet;
+      }
+    }
     @Override public void remove(){
       int cursor;
       if((cursor=this.cursor)==-1){
@@ -2036,7 +2037,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         if((tail=(root=this.root).tail)<(head=root.head)){
           fragmentedDescendingRemove(head,cursor,tail,root);
         }else{
-          ((AbstractDeqItr<E>)this).nonfragmentedDescendingRemove(head,cursor+1,tail,root);
+          nonfragmentedDescendingRemove(head,cursor+1,tail,root);
         }
       }
     }
@@ -2602,13 +2603,16 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         if((headDist=lastRet-head)<=(tailDist=tail-lastRet)){
           root.head=pullUp(root.arr,head,headDist);
         }else{
-          Object[] arr;
-          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
-          arr[tail]=null;
-          root.tail=tail-1;
-          if(this.cursor!=-1){
+          if(tailDist==0){
+            root.arr[tail]=null;
+          }else
+          {
+            Object[] arr;
+            ArrCopy.uncheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+            arr[tail]=null;
             this.cursor=lastRet;
           }
+          root.tail=tail-1;
         }
       }
       @Override public void remove(){
@@ -2679,26 +2683,65 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
       private void fragmentedDescendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
         Object[] arr;
-        int headDist,tailDist,arrBound=(arr=root.arr).length;
+        int headDist,tailDist,arrBound=(arr=root.arr).length-1;
         if((headDist=lastRet-head)>=0){
-          if(headDist<=(tailDist=arrBound-lastRet)+tail){
-            root.head=pullUp(arr,head,headDist);
-            this.cursor=lastRet;
+          if(headDist<=(tailDist=arrBound-lastRet)+tail+1){
+            if(headDist==0){
+              if(lastRet==arrBound){
+                root.head=0;
+              }else{
+                root.head=head+1;
+              }
+              arr[head]=null;
+            }else{
+              ArrCopy.uncheckedCopy(arr,tail=head,arr,++head,headDist);
+              arr[tail]=null;
+              root.head=head;
+              this.cursor=lastRet;
+            }
           }else{
             ArrCopy.semicheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
             arr[arrBound]=arr[0];
             root.tail=fragmentedPullDown(arr,arrBound,tail);
           }
         }else{
-          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet){
-            ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+          if((tailDist=tail-lastRet)<=(headDist=arrBound-head)+lastRet+1){
+            if(tailDist==0){
+              if(lastRet==0){
+                root.tail=arrBound;
+              }else{
+                root.tail=tail-1;
+              }
+            }else{
+              ArrCopy.uncheckedSelfCopy(arr,lastRet,lastRet+1,tailDist);
+              root.tail=tail-1;
+            }
             arr[tail]=null;
-            root.tail=tail-1;
           }else{
             ArrCopy.semicheckedCopy(arr,0,arr,1,lastRet);
             arr[0]=arr[arrBound];
             root.head=fragmentedPullUp(arr,head,headDist);
             this.cursor=lastRet;
+          }
+        }
+      }
+      private void nonfragmentedDescendingRemove(int head,int lastRet,int tail,RefArrDeq<E> root){
+        int tailDist,headDist;
+        if((tailDist=tail-lastRet)<=(headDist=lastRet-head)){
+          Object[] arr;
+          ArrCopy.semicheckedSelfCopy(arr=root.arr,lastRet,lastRet+1,tailDist);
+          arr[tail]=null;
+          root.tail=tail-1;
+        }else{
+          if(headDist==0){
+            root.head=head+1;
+            root.arr[head]=null;
+          }else{
+            Object[] arr;
+            ArrCopy.uncheckedCopy(arr=root.arr,tail=head,arr,++head,headDist);
+            arr[tail]=null;
+            this.cursor=lastRet;
+            root.head=head;
           }
         }
       }
@@ -2720,7 +2763,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
               root.arr[tail]=null;
               break;
             default:
-              ((AbstractDeqItr<E>)this).nonfragmentedDescendingRemove(head,lastRet,tail,root);
+              nonfragmentedDescendingRemove(head,lastRet,tail,root);
           }
           this.lastRet=-1;
           return;
