@@ -2870,7 +2870,5 @@ private static void completeAllTests(){
   }finally{
     TESTQUEUE.clear();
   }
-  
 }
-
 #ENDDEF

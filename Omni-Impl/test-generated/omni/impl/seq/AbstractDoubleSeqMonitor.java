@@ -434,6 +434,27 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
       verifyRemoval();
     }
   }
+  void queueRemove(int expectedVal){
+    queueRemove(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
+  void removeFirst(int expectedVal){
+    removeFirst(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
+  void removeLast(int expectedVal){
+    removeLast(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
+  void pop(int expectedVal){
+    pop(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
+  void pollFirst(int expectedVal){
+    pollFirst(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
+  void pollLast(int expectedVal){
+    pollLast(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
+  void poll(int expectedVal){
+    poll(expectedVal,DoubleOutputTestArgType.ARRAY_TYPE);
+  }
   void addLast(int val,DoubleInputTestArgType inputArgType){
     inputArgType.callDequeAddLast(seq,val);
     verifyAddition();
@@ -441,6 +462,21 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
   void addFirst(int val,DoubleInputTestArgType inputArgType){
     inputArgType.callDequeAddFirst(seq,val);
     verifyAddition();
+  }
+  void addLast(int val){
+    addLast(val,DoubleInputTestArgType.ARRAY_TYPE);
+  }
+  void addFirst(int val){
+    addFirst(val,DoubleInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerLast(int val){
+    return offerLast(val,DoubleInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerFirst(int val){
+    return offerFirst(val,DoubleInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offer(int val){
+    return offer(val,DoubleInputTestArgType.ARRAY_TYPE);
   }
   boolean offerLast(int val,DoubleInputTestArgType inputArgType){
     boolean ret=inputArgType.callDequeOfferLast(seq,val);

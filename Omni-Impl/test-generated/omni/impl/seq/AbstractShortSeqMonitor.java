@@ -434,6 +434,27 @@ abstract class AbstractShortSeqMonitor<SEQ extends OmniCollection.OfShort>{
       verifyRemoval();
     }
   }
+  void queueRemove(int expectedVal){
+    queueRemove(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
+  void removeFirst(int expectedVal){
+    removeFirst(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
+  void removeLast(int expectedVal){
+    removeLast(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
+  void pop(int expectedVal){
+    pop(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
+  void pollFirst(int expectedVal){
+    pollFirst(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
+  void pollLast(int expectedVal){
+    pollLast(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
+  void poll(int expectedVal){
+    poll(expectedVal,ShortOutputTestArgType.ARRAY_TYPE);
+  }
   void addLast(int val,ShortInputTestArgType inputArgType){
     inputArgType.callDequeAddLast(seq,val);
     verifyAddition();
@@ -441,6 +462,21 @@ abstract class AbstractShortSeqMonitor<SEQ extends OmniCollection.OfShort>{
   void addFirst(int val,ShortInputTestArgType inputArgType){
     inputArgType.callDequeAddFirst(seq,val);
     verifyAddition();
+  }
+  void addLast(int val){
+    addLast(val,ShortInputTestArgType.ARRAY_TYPE);
+  }
+  void addFirst(int val){
+    addFirst(val,ShortInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerLast(int val){
+    return offerLast(val,ShortInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerFirst(int val){
+    return offerFirst(val,ShortInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offer(int val){
+    return offer(val,ShortInputTestArgType.ARRAY_TYPE);
   }
   boolean offerLast(int val,ShortInputTestArgType inputArgType){
     boolean ret=inputArgType.callDequeOfferLast(seq,val);

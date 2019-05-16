@@ -499,6 +499,30 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
       verifyRemoval();
     }
   }
+  
+  void queueRemove(int expectedVal){
+    queueRemove(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  void removeFirst(int expectedVal){
+    removeFirst(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  void removeLast(int expectedVal){
+    removeLast(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  void pop(int expectedVal){
+    pop(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  void pollFirst(int expectedVal){
+    pollFirst(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  void pollLast(int expectedVal){
+    pollLast(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  void poll(int expectedVal){
+    poll(expectedVal,$ClassPrefix$OutputTestArgType.ARRAY_TYPE);
+  }
+  
+  
   void addLast(int val,$ClassPrefix$InputTestArgType inputArgType){
     inputArgType.callDequeAddLast(seq,val);
     verifyAddition();
@@ -506,6 +530,21 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
   void addFirst(int val,$ClassPrefix$InputTestArgType inputArgType){
     inputArgType.callDequeAddFirst(seq,val);
     verifyAddition();
+  }
+  void addLast(int val){
+    addLast(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  void addFirst(int val){
+    addFirst(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerLast(int val){
+    return offerLast(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerFirst(int val){
+    return offerFirst(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  boolean offer(int val){
+    return offer(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
   }
   boolean offerLast(int val,$ClassPrefix$InputTestArgType inputArgType){
     boolean ret=inputArgType.callDequeOfferLast(seq,val);

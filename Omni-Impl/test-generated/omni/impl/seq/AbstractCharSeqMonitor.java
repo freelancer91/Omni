@@ -434,6 +434,27 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
       verifyRemoval();
     }
   }
+  void queueRemove(int expectedVal){
+    queueRemove(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
+  void removeFirst(int expectedVal){
+    removeFirst(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
+  void removeLast(int expectedVal){
+    removeLast(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
+  void pop(int expectedVal){
+    pop(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
+  void pollFirst(int expectedVal){
+    pollFirst(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
+  void pollLast(int expectedVal){
+    pollLast(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
+  void poll(int expectedVal){
+    poll(expectedVal,CharOutputTestArgType.ARRAY_TYPE);
+  }
   void addLast(int val,CharInputTestArgType inputArgType){
     inputArgType.callDequeAddLast(seq,val);
     verifyAddition();
@@ -441,6 +462,21 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
   void addFirst(int val,CharInputTestArgType inputArgType){
     inputArgType.callDequeAddFirst(seq,val);
     verifyAddition();
+  }
+  void addLast(int val){
+    addLast(val,CharInputTestArgType.ARRAY_TYPE);
+  }
+  void addFirst(int val){
+    addFirst(val,CharInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerLast(int val){
+    return offerLast(val,CharInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offerFirst(int val){
+    return offerFirst(val,CharInputTestArgType.ARRAY_TYPE);
+  }
+  boolean offer(int val){
+    return offer(val,CharInputTestArgType.ARRAY_TYPE);
   }
   boolean offerLast(int val,CharInputTestArgType inputArgType){
     boolean ret=inputArgType.callDequeOfferLast(seq,val);
