@@ -6,9 +6,7 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.FloatInputTestArgType;
 import omni.impl.FloatOutputTestArgType;
-import org.junit.jupiter.params.provider.Arguments;
 import java.util.NoSuchElementException;
-import java.util.stream.Stream;
 import omni.util.OmniArray;
 import omni.impl.FloatSnglLnkNode;
 import omni.impl.FunctionCallType;
@@ -19,8 +17,6 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import omni.impl.seq.AbstractFloatSeqMonitor.CheckedType;
 import omni.impl.seq.AbstractFloatSeqMonitor.PreModScenario;
 import omni.impl.seq.AbstractFloatSeqMonitor.SequenceLocation;
@@ -35,98 +31,308 @@ import omni.api.OmniCollection;
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("SnglLnkSeqTest")
-@Execution(ExecutionMode.CONCURRENT)
 public class FloatSnglLnkSeqTest{
-  static Stream<Arguments> getConstructor_voidArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType)));
-    });
+  private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
+  java.util.concurrent.Executors.newWorkStealingPool();
+  private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
+  private static void submitTest(Runnable test){
+    TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
   }
-  @org.junit.jupiter.api.Test
-  public void testConstructor_void(){
-    getConstructor_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testConstructor_voidHelper((SeqMonitor)args[0]);
-    });
-  }
-  private static void testConstructor_voidHelper
-  (SeqMonitor seqMonitor){
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertEquals(0,seqMonitor.nestedType==NestedType.QUEUE?FieldAndMethodAccessor.FloatSnglLnkSeq.CheckedQueue.modCount(seqMonitor.seq):FieldAndMethodAccessor.FloatSnglLnkSeq.CheckedStack.modCount(seqMonitor.seq));
+  private static void completeAllTests(){
+    try{
+      TESTQUEUE.forEach(test->{
+        try{
+          test.get();
+        }catch(InterruptedException|java.util.concurrent.ExecutionException e){
+          var cause=e.getCause();
+          if(cause instanceof RuntimeException){
+            throw (RuntimeException)cause;
+          }
+          if(cause instanceof Error){
+            throw (Error)cause;
+          }
+          throw new Error(cause);
+        }
+      });
+    }finally{
+      TESTQUEUE.clear();
     }
-    Assertions.assertEquals(0,seqMonitor.seq.size);
-    Assertions.assertNull(seqMonitor.seq.head);
   }
-  static Stream<Arguments> getItrnext_voidArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var itrScenario:IterationScenario.values()){
-        if(checkedType.checked || itrScenario==IterationScenario.NoMod){
+  @org.junit.jupiter.api.AfterEach
+  public void verifyAllExecuted(){
+    if(!TESTQUEUE.isEmpty()){
+      System.err.println("Warning: there were "+TESTQUEUE.size()+" tests that were not completed");
+    }
+  }
+  @org.junit.jupiter.api.AfterAll
+  public static void cleanUp(){
+    java.util.List<Runnable> stillRunning=EXECUTORSERVICE.shutdownNow();
+    if(!TESTQUEUE.isEmpty() || !stillRunning.isEmpty()){
+      throw new Error("There were unfinished tests in the queue");
+    }
+  }
+    private static final int MAX_TOSTRING_LENGTH=15;
+  @Tag("MASSIVEtoString")
+  @org.junit.jupiter.api.Test
+  public void testMASSIVEtoString_void(){
+    final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
+    var head=new FloatSnglLnkNode(TypeConversionUtil.convertTofloat(1));
+    var tail=head;
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int threadSpan=seqLength/numThreads;
+    var wayPointNodes=new FloatSnglLnkNode[numThreads];
+    wayPointNodes[0]=head;
+    int nextWayPointIndex=threadSpan;
+    int threadIndex=0;
+    int threadBound=numThreads-1;
+    for(int i=1;i<seqLength;++i)
+    {
+      tail=tail.next=new FloatSnglLnkNode(TypeConversionUtil.convertTofloat(1));
+      if(i==nextWayPointIndex){
+        wayPointNodes[++threadIndex]=tail;
+        if(threadIndex==threadBound){
+          nextWayPointIndex=Integer.MIN_VALUE;
+        }else{
+          nextWayPointIndex+=threadSpan;
+        }
+      }
+    }
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        var seqMonitor=new SeqMonitor(nestedType,checkedType,head,seqLength,tail);
+        String string=seqMonitor.seq.toString();
+        Assertions.assertEquals('[',string.charAt(0));
+        Assertions.assertEquals(']',string.charAt(string.length()-1));
+        seqMonitor.verifyStructuralIntegrity();
+        for(threadIndex=0,nextWayPointIndex=0;threadIndex<threadBound;++threadIndex){
+          var verifyItr=new SeqMonitor.SnglLnkSeqSequenceVerificationItr(seqMonitor,wayPointNodes[threadIndex]);
+          final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          final int finalWayPointIndex=nextWayPointIndex;
+          submitTest(()->AbstractFloatSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr));
+          nextWayPointIndex=finalWayPointBound;
+        }
+        var verifyItr=new SeqMonitor.SnglLnkSeqSequenceVerificationItr(seqMonitor,wayPointNodes[threadIndex]);
+        AbstractFloatSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+        completeAllTests();
+        verifyItr.verifyPostAlloc(1);
+      }
+    }
+  }
+  interface BasicCollectionTest{
+    void runTest(SeqMonitor seqMonitor,int seqSize);
+    private void runTests(){
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
           for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-            if(seqSize!=0 || itrScenario.validWithEmptySeq){
-              if(itrScenario.preModScenario.appliesToRootItr){
-                for(var outputType:FloatOutputTestArgType.values()){
-                  streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),itrScenario,seqSize,outputType));
-                }
-              }
-            }
+            submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),seqSize));
           }
         }
       }
-    });
+      completeAllTests();
+    }
   }
   @org.junit.jupiter.api.Test
-  public void testItrnext_void(){
-    getItrnext_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrnext_voidHelper((SeqMonitor)args[0],(IterationScenario)args[1],(int)args[2],(FloatOutputTestArgType)args[3]);
-    });
+  public void testclear_void(){
+    BasicCollectionTest test=(seqMonitor,numToAdd)->{
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
+      seqMonitor.clear();
+      seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertTrue(seqMonitor.seq.isEmpty());
+      seqMonitor.verifyPreAlloc().verifyPostAlloc();
+    };
+    test.runTests();
   }
-  private static void testItrnext_voidHelper
-  (SeqMonitor seqMonitor,IterationScenario itrScenario,int numToAdd,FloatOutputTestArgType outputType){
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    var itrMonitor=seqMonitor.getItrMonitor();
-    switch(itrScenario){
-      case NoMod:
-      case ModSeqSupercedesThrowNSEE:
-        for(int i=0;;++i){
-          if(i==numToAdd){
-            Assertions.assertFalse(itrMonitor.hasNext());
+  @org.junit.jupiter.api.Test
+  public void testisEmpty_void(){
+    BasicCollectionTest test=(seqMonitor,numToAdd)->{
+      for(int i=0;i<numToAdd;++i){
+        Assertions.assertEquals(i==0,seqMonitor.seq.isEmpty());
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.add(i);
+      }
+      var itrMonitor=seqMonitor.getItrMonitor();
+      while(numToAdd>0){
+        Assertions.assertEquals((numToAdd--)==0,seqMonitor.seq.isEmpty());
+        seqMonitor.verifyStructuralIntegrity();
+        itrMonitor.iterateForward();
+        itrMonitor.remove();
+      }
+      Assertions.assertTrue(seqMonitor.seq.isEmpty());
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testsize_void(){
+    BasicCollectionTest test=(seqMonitor,numToAdd)->{
+      for(int i=0;i<numToAdd;++i){
+        Assertions.assertEquals(i,seqMonitor.seq.size());
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.add(i);
+      }
+      var itrMonitor=seqMonitor.getItrMonitor();
+      while(numToAdd>0){
+        Assertions.assertEquals(numToAdd--,seqMonitor.seq.size());
+        seqMonitor.verifyStructuralIntegrity();
+        itrMonitor.iterateForward();
+        itrMonitor.remove();
+      }
+      Assertions.assertEquals(numToAdd,seqMonitor.seq.size());
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testclone_void(){
+    BasicCollectionTest test=(seqMonitor,numToAdd)->{
+      for(int i=0;i<numToAdd;++i){
+        seqMonitor.add(i);
+      }
+      var clone=(OmniCollection.OfFloat)seqMonitor.seq.clone();
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+      Assertions.assertNotSame(clone,seqMonitor.seq);
+      switch(seqMonitor.nestedType){
+        case STACK:
+          if(seqMonitor.checkedType.checked){
+            Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.CheckedStack);
+            Assertions.assertEquals(0,((FloatSnglLnkSeq.CheckedStack)clone).modCount);
+          }else{
+            Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.UncheckedStack);
+          }
+          break;
+        case QUEUE:
+          if(seqMonitor.checkedType.checked){
+            Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.CheckedQueue);
+            Assertions.assertEquals(0,((FloatSnglLnkSeq.CheckedQueue)clone).modCount);
+          }else{
+            Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.UncheckedQueue);
+          }
+          break;
+        default:
+          throw new Error("Unknown nested type "+seqMonitor.nestedType);
+      }
+      var snglLnkSeqClone=(FloatSnglLnkSeq)clone;
+      var originalHead=((FloatSnglLnkSeq)seqMonitor.seq).head;
+      var cloneHead=snglLnkSeqClone.head;
+      Assertions.assertEquals(numToAdd,snglLnkSeqClone.size);
+      if(snglLnkSeqClone.size==0){
+        Assertions.assertNull(cloneHead);
+        if(seqMonitor.nestedType==NestedType.QUEUE){
+          if(seqMonitor.checkedType.checked){
+            Assertions.assertNull(((FloatSnglLnkSeq.CheckedQueue)snglLnkSeqClone).tail);
+          }else{
+            Assertions.assertNull(((FloatSnglLnkSeq.UncheckedQueue)snglLnkSeqClone).tail);
+          }
+        }
+      }else{
+        for(int i=snglLnkSeqClone.size;;cloneHead=cloneHead.next,originalHead=originalHead.next){
+          Assertions.assertNotNull(cloneHead);
+          Assertions.assertNotSame(cloneHead,originalHead);
+          Assertions.assertEquals(cloneHead.val,originalHead.val);
+          if(--i==0){
+            if(seqMonitor.nestedType==NestedType.QUEUE){
+              if(seqMonitor.checkedType.checked){
+                Assertions.assertSame(cloneHead,((FloatSnglLnkSeq.CheckedQueue)snglLnkSeqClone).tail);
+              }else{
+                Assertions.assertSame(cloneHead,((FloatSnglLnkSeq.UncheckedQueue)snglLnkSeqClone).tail);
+              }
+            }
+            Assertions.assertNull(cloneHead.next);
+            Assertions.assertNull(originalHead.next);
             break;
           }
-          Assertions.assertTrue(itrMonitor.hasNext());
-          itrMonitor.verifyNext(seqMonitor.nestedType==NestedType.STACK?numToAdd-i-1:i,outputType);
-          itrMonitor.verifyIteratorState();
-          seqMonitor.verifyStructuralIntegrity();
         }
-      case ModSeq:
-        break;
-      default:
-        throw new Error("unknown itr scenario "+itrScenario);
-    }
-    if(seqMonitor.checkedType.checked){
-      seqMonitor.illegalAdd(itrScenario.preModScenario);
-      Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
-    }
-    itrMonitor.verifyIteratorState();
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc(itrScenario.preModScenario).verifyNaturalAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
+      }
+    };
+    test.runTests();
   }
-  static Stream<Arguments> getItrremove_voidArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var removeScenario:ItrRemoveScenario.values()){
-        if(removeScenario.validWithForwardItr && (checkedType.checked || removeScenario.expectedException==null)){
+  interface ToStringAndHashCodeTest{
+    void runTest(SeqMonitor seqMonitor,int seqSize
+    );
+    private void runTests(){
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
           for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-            if(seqSize!=0 || removeScenario.validWithEmptySeq){
-              for(var preModScenario:PreModScenario.values()){
-                if(preModScenario.appliesToRootItr && (checkedType.checked || preModScenario.expectedException==null)){
-                  for(var seqLocation:SequenceLocation.values()){
-                    if(seqLocation.expectedException==null &&
-                      (seqSize!=0 || seqLocation==SequenceLocation.BEGINNING) &&
-                      (seqLocation!=SequenceLocation.END || removeScenario!=ItrRemoveScenario.PostInit)&&
-                      (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING)
-                    ){
-                      streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),removeScenario,preModScenario,seqSize,seqLocation));
-                    }
+            submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),seqSize));
+          }
+        }
+      }
+      completeAllTests();
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testhashCode_void(){
+    ToStringAndHashCodeTest test=(seqMonitor,numToAdd
+    )->{
+      {
+        for(int i=0;i<numToAdd;++i){
+          seqMonitor.add(i);
+        }
+      }
+      {
+        int resultHash=seqMonitor.seq.hashCode();
+        seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+        var itr=seqMonitor.seq.iterator();
+        int expectedHash=1;
+        for(int i=0;i<numToAdd;++i){
+          expectedHash=(expectedHash*31)+itr.next().hashCode();
+        }
+        Assertions.assertEquals(expectedHash,resultHash);
+      }
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoString_void(){
+    ToStringAndHashCodeTest test=(seqMonitor,numToAdd
+    )->{
+      {
+        for(int i=0;i<numToAdd;++i){
+          seqMonitor.add(i);
+        }
+      }
+      {
+        var resultStr=seqMonitor.seq.toString();
+        seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+        var itr=seqMonitor.seq.iterator();
+        var arrList=new ArrayList<Object>();
+        for(int i=0;i<numToAdd;++i){
+          arrList.add(itr.next());
+        }
+        Assertions.assertEquals(arrList.toString(),resultStr);
+      }
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveIf_Predicate(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
+          if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
+            for(var functionCallType:FunctionCallType.values()){
+              for(int tmpSeqSize=0;tmpSeqSize<=100;tmpSeqSize+=10){
+                final int seqSize=tmpSeqSize;
+                double[] thresholdArr;
+                long randSeedBound;
+                if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+                  thresholdArr=new double[]{0.5};
+                  randSeedBound=0;
+                }else{
+                  thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
+                  randSeedBound=100;
+                }
+                for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
+                  final long randSeed=tmpRandSeed;
+                  for(double threshold:thresholdArr){
+                    submitTest(()->testremoveIf_PredicateHelper(new SeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
                   }
                 }
               }
@@ -134,148 +340,775 @@ public class FloatSnglLnkSeqTest{
           }
         }
       }
-    });
+    }
+    completeAllTests();
   }
-  @org.junit.jupiter.api.Test
-  public void testItrremove_void(){
-    getItrremove_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrremove_voidHelper((SeqMonitor)args[0],(ItrRemoveScenario)args[1],(PreModScenario)args[2],(int)args[3],(SequenceLocation)args[4]);
-    });
-  }
-  private static void testItrremove_voidHelper
-  (SeqMonitor seqMonitor,ItrRemoveScenario removeScenario,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation){
-    for(int i=0;i<numToAdd;++i){
+  private static void testremoveIf_PredicateHelper(SeqMonitor seqMonitor,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
+  ){
+    for(int i=0;i<seqSize;++i){
       seqMonitor.add(i);
     }
-    var itrMonitor=seqMonitor.getItrMonitor();
-    int numIterated=0;
-    switch(seqLocation){
-      case BEGINNING:
+    final var clone=(OmniCollection.OfFloat)seqMonitor.seq.clone();
+    final int numExpectedCalls=seqSize;
+    final int numExpectedRemoved;
+    switch(monitoredRemoveIfPredicateGen){
+      case RemoveFirst:
+      case RemoveLast:
+        numExpectedRemoved=Math.min(1,seqSize);
         break;
-      case NEARBEGINNING:
-        for(int i=0,bound=numToAdd/4;i<bound;++i){
-          ++numIterated;
-          itrMonitor.iterateForward();
-        }
+      case RemoveFirstAndLast:
+        numExpectedRemoved=Math.min(2,seqSize);
         break;
-      case MIDDLE:
-        for(int i=0,bound=numToAdd/2;i<bound;++i){
-          ++numIterated;
-          itrMonitor.iterateForward();
-        }
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+        numExpectedRemoved=seqSize-Math.min(1,seqSize);
         break;
-      case NEAREND:
-        for(int i=0,bound=(numToAdd/4)*3;i<bound;++i){
-          ++numIterated;
-          itrMonitor.iterateForward();
-        }
+      case RemoveAllButFirstAndLast:
+        numExpectedRemoved=seqSize-Math.min(2,seqSize);
         break;
-      case END:
-        for(int i=0;i<numToAdd;++i){
-          ++numIterated;
-          itrMonitor.iterateForward();
-        }
+      case RemoveAll:
+        numExpectedRemoved=seqSize;
         break;
-      default:
-        throw new Error("Unknown seqLocation "+seqLocation);
-    }
-    switch(removeScenario){
-      case PostNext:
-        if(numIterated==0){
-          ++numIterated;
-          itrMonitor.iterateForward();
-        }
+      case Random:
+        numExpectedRemoved=-1;
         break;
-      case PostRemove:
-        if(numIterated==0){
-          ++numIterated;
-          itrMonitor.iterateForward();
-        }
-        itrMonitor.remove();
-      case PostInit:
+      case RemoveNone:
+      case Throw:
+      case ModSeq:
+      case ThrowModSeq:
+        numExpectedRemoved=0;
         break;
       default:
-         throw new Error("unknown remove scenario "+removeScenario);
+        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
-    seqMonitor.illegalAdd(preModScenario);
-    SequenceVerificationItr verifyItr;
-    if(removeScenario.expectedException==null){
-      if(preModScenario.expectedException==null){
-        itrMonitor.remove();
-        itrMonitor.verifyIteratorState();
-        seqMonitor.verifyStructuralIntegrity();
-        while(itrMonitor.hasNext()){
-          itrMonitor.iterateForward();
-          itrMonitor.remove();
-          itrMonitor.verifyIteratorState();
-          seqMonitor.verifyStructuralIntegrity();
-        }
-        Assertions.assertFalse(itrMonitor.hasNext());
-        switch(seqLocation){
-          case BEGINNING:
-            Assertions.assertTrue(seqMonitor.isEmpty());
-          case NEARBEGINNING:
-          case MIDDLE:
-          case NEAREND:
-          case END:
-            Assertions.assertEquals(numIterated-1,seqMonitor.seq.size());
-            break;
-          default:
-            throw new Error("Unknown seqLocation "+seqLocation);
-        }
-        return;
-      }else{
-        Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.remove());
-        itrMonitor.verifyIteratorState();
-        seqMonitor.verifyStructuralIntegrity();
-        verifyItr=seqMonitor.verifyPreAlloc(preModScenario).verifyNaturalAscending(numToAdd);
-      }
+    final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
+    if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
+      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
+      seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
+      return;
     }else{
-      Assertions.assertThrows(removeScenario.expectedException,()->itrMonitor.remove());
-      itrMonitor.verifyIteratorState();
-      seqMonitor.verifyStructuralIntegrity();
-      verifyItr=seqMonitor.verifyPreAlloc(preModScenario);
-      switch(removeScenario){
-        case PostInit:
-          verifyItr.verifyNaturalAscending(numToAdd);
-          break;
-        case PostRemove:
-          if(seqMonitor.nestedType.forwardIteration){
-            verifyItr.verifyAscending(numIterated-1).verifyAscending(numIterated,numToAdd-numIterated);
-          }else{
-            verifyItr.verifyDescending(numToAdd,numIterated-1).verifyDescending(numToAdd-numIterated);
-          }
-          break;
-        default:
-          throw new Error("unknown remove scenario "+removeScenario);
-      }
+      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+      //TODO verify contents of sequence in throw cases 
     }
-    verifyItr.verifyPostAlloc(preModScenario);
+    seqMonitor.verifyStructuralIntegrity();
   }
-  static Stream<Arguments> getItrforEachRemaining_ConsumerArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var preModScenario:PreModScenario.values()){
-        if(checkedType.checked || preModScenario.expectedException==null){
-          for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
-            if((monitoredFunctionGen.expectedException==null || checkedType.checked) && (preModScenario.appliesToRootItr&&monitoredFunctionGen.appliesToRootItr)){
-              for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
-                streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
+  interface QueryTest{
+    void runTest(SeqMonitor seqMonitor,QueryTester tester,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
+    );
+    private void runStackTests(){
+      runTests(NestedType.STACK);
+      completeAllTests();
+    }
+    private void runCollectionTests(){
+      runTests(NestedType.STACK);
+      runTests(NestedType.QUEUE);
+      completeAllTests();
+    }
+    private void runTests(NestedType nestedType){
+      for(var checkedType:CheckedType.values()){
+        for(var seqLocation:SequenceLocation.values()){
+          if(seqLocation!=SequenceLocation.IOBLO){
+            for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
+              if(seqLocation==SequenceLocation.IOBHI || (seqSize>1 || (seqLocation==SequenceLocation.BEGINNING && seqSize>0))){
+                for(var argType:QueryTester.values()){
+                  for(var queryCastType:QueryCastType.values()){
+                    switch(argType){
+                      case Booleannull:
+                      case Bytenull:
+                      case Characternull:
+                      case Shortnull:
+                      case Integernull:
+                      case Longnull:
+                      case Floatnull:
+                      case Doublenull:
+                        if(queryCastType!=QueryCastType.ToBoxed || (seqSize>0 && seqLocation.expectedException==null)){
+                          continue;
+                        }
+                        break;
+                      case Objectnull:
+                        if(queryCastType!=QueryCastType.ToObject || (seqSize>0 && seqLocation.expectedException==null)){
+                          continue;
+                        }
+                        break;
+                      case Booleanfalse:
+                      case Byte0:
+                      case Character0:
+                      case Short0:
+                      case Integer0:
+                      case Long0:
+                      case Floatpos0:
+                      case Floatneg0:
+                      case Doublepos0:
+                      case Doubleneg0:
+                      case Booleantrue:
+                      case Bytepos1:
+                      case Characterpos1:
+                      case Shortpos1:
+                      case Integerpos1:
+                      case Longpos1:
+                      case Floatpos1:
+                      case Doublepos1:
+                      //values beyond the range of boolean
+                      case Bytepos2:
+                      case Characterpos2:
+                      case Shortpos2:
+                      case Integerpos2:
+                      case Longpos2:
+                      case Floatpos2:
+                      case Doublepos2:
+                      //negative values beyond the range of char
+                      case Byteneg1:
+                      case Shortneg1:
+                      case Integerneg1:
+                      case Longneg1:
+                      case Floatneg1:
+                      case Doubleneg1:
+                      //negative values beyond the range of byte
+                      case ShortMIN_BYTE_MINUS1:
+                      case IntegerMIN_BYTE_MINUS1:
+                      case LongMIN_BYTE_MINUS1:
+                      case FloatMIN_BYTE_MINUS1:
+                      case DoubleMIN_BYTE_MINUS1:
+                      //negative values beyond the range of short
+                      case IntegerMIN_SHORT_MINUS1:
+                      case LongMIN_SHORT_MINUS1:
+                      case FloatMIN_SHORT_MINUS1:
+                      case DoubleMIN_SHORT_MINUS1:
+                      //negative values beyond the range of int
+                      case FloatMIN_INT_MINUS1:
+                      //positive values out of the range of byte
+                      case CharacterMAX_BYTE_PLUS1:
+                      case ShortMAX_BYTE_PLUS1:
+                      case IntegerMAX_BYTE_PLUS1:
+                      case LongMAX_BYTE_PLUS1:
+                      case FloatMAX_BYTE_PLUS1:
+                      case DoubleMAX_BYTE_PLUS1:
+                      //positive values out of the range of short
+                      case CharacterMAX_SHORT_PLUS1:
+                      case IntegerMAX_SHORT_PLUS1:
+                      case LongMAX_SHORT_PLUS1:
+                      case FloatMAX_SHORT_PLUS1:
+                      case DoubleMAX_SHORT_PLUS1:
+                      //positive values out of the range of char
+                      case IntegerMAX_CHAR_PLUS1:
+                      case LongMAX_CHAR_PLUS1:
+                      case FloatMAX_CHAR_PLUS1:
+                      case DoubleMAX_CHAR_PLUS1:
+                      //positive values out of the range of int
+                      case LongMAX_INT_PLUS1:
+                      case FloatMAX_INT_PLUS1:
+                      case DoubleMAX_INT_PLUS1:
+                        //floating-point values beyond the range any integral type
+                      case FloatMAX_LONG_PLUS1:
+                      case FloatMIN_LONG_MINUS1:
+                      case FloatMAX_FLOAT_VALUE:
+                      case DoubleMAX_FLOAT_VALUE:
+                      //fractional floating point values that cannot be matched with any integral type
+                      case FloatMIN_FLOAT_VALUE:
+                      case DoubleMIN_FLOAT_VALUE:
+                      //NaN values that can only be matches with NaN
+                      case FloatNaN:
+                      case DoubleNaN:
+                      //these input values cannot potentially return true
+                      break;
+                      default:
+                      if(seqSize>0 && seqLocation.expectedException==null){
+                        continue;
+                      }
+                      //these values must necessarily return false
+                    }
+                    submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize));
+                  }
+                }
               }
             }
           }
         }
       }
-    });
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testremoveVal_val(){
+    QueryTest test=(seqMonitor,argType,queryCastType,seqLocation,seqSize
+    )->{
+      if(seqSize>0){
+        {
+          switch(seqLocation){
+            case BEGINNING:
+              argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case NEARBEGINNING:
+              argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case MIDDLE:
+              argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case NEAREND:
+              argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case END:
+              argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case IOBHI:
+              argType.initDoesNotContain(seqMonitor,seqSize);
+              break;
+            default:
+              throw new Error("Unknown seqLocation "+seqLocation);
+          }
+        }
+      }
+      boolean expectedResult;
+      Assertions.assertEquals(expectedResult=seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveVal(seqMonitor,queryCastType));
+      if(expectedResult){
+        --seqSize;
+      }
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+    };
+    test.runCollectionTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testsearch_val(){
+    QueryTest test=(seqMonitor,argType,queryCastType,seqLocation,seqSize
+    )->{
+      int expectedIndex;
+      if(seqSize>0){
+        {
+          switch(seqLocation){
+            case BEGINNING:
+              expectedIndex=argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case NEARBEGINNING:
+              expectedIndex=argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case MIDDLE:
+              expectedIndex=argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case NEAREND:
+              expectedIndex=argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case END:
+              expectedIndex=argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case IOBHI:
+              argType.initDoesNotContain(seqMonitor,seqSize);
+              expectedIndex=-1;
+              break;
+            default:
+              throw new Error("Unknown seqLocation "+seqLocation);
+          }
+        }
+      }else{
+        expectedIndex=-1;
+      }
+      Assertions.assertEquals(expectedIndex,argType.invokesearch(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+    };
+    test.runStackTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testcontains_val(){
+    QueryTest test=(seqMonitor,argType,queryCastType,seqLocation,seqSize
+    )->{
+      if(seqSize>0){
+        {
+          switch(seqLocation){
+            case BEGINNING:
+              argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case NEARBEGINNING:
+              argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case MIDDLE:
+              argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case NEAREND:
+              argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case END:
+              argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
+              break;
+            case IOBHI:
+              argType.initDoesNotContain(seqMonitor,seqSize);
+              break;
+            default:
+              throw new Error("Unknown seqLocation "+seqLocation);
+          }
+        }
+      }
+      Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokecontains(seqMonitor,queryCastType));
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
+    };
+    test.runCollectionTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_IntFunction(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+          if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&monitoredFunctionGen.appliesToRoot){
+            for(int numToAdd:AbstractFloatSeqMonitor.FIB_SEQ){
+              submitTest(()->{
+                var seqMonitor=new SeqMonitor(nestedType,checkedType);
+                for(int i=0;i<numToAdd;++i){
+                  seqMonitor.add(i);
+                }
+                var arrConstructor=monitoredFunctionGen.getMonitoredArrayConstructor(seqMonitor);
+                if(monitoredFunctionGen.expectedException==null){
+                  var resultArr=seqMonitor.seq.toArray(arrConstructor);
+                  Assertions.assertEquals(numToAdd,resultArr.length);
+                  var itr=seqMonitor.seq.iterator();
+                  for(int i=0;i<numToAdd;++i){
+                    Assertions.assertEquals(resultArr[i],(Object)itr.nextFloat());
+                  }
+                }else{
+                   Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.seq.toArray(arrConstructor));
+                }
+                seqMonitor.verifyStructuralIntegrity();
+                var verifyItr=seqMonitor.verifyPreAlloc();
+                switch(monitoredFunctionGen){
+                  case NoThrow:
+                  case Throw:
+                    verifyItr.verifyNaturalAscending(numToAdd);
+                    break;
+                  case ModSeq:
+                  case ThrowModSeq:
+                    if(seqMonitor.nestedType.forwardIteration){
+                      verifyItr.verifyAscending(numToAdd).verifyIllegalAdd();
+                    }else{
+                      verifyItr.verifyIllegalAdd().verifyDescending(numToAdd);
+                    }
+                    break;
+                  default:
+                    throw new Error("Unknown monitoredFunctionGen "+monitoredFunctionGen);
+                }
+                verifyItr.verifyPostAlloc();
+              });
+            }
+          }
+        }   
+      }
+    }
+    completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_ObjectArray(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(int tmpSeqSize=0;tmpSeqSize<=15;tmpSeqSize+=5){
+          final int seqSize=tmpSeqSize;
+          for(int tmpArrSize=0;tmpArrSize<=seqSize+5;tmpArrSize+=5){
+            final int arrSize=tmpArrSize;
+            submitTest(()->{
+              var seqMonitor=new SeqMonitor(nestedType,checkedType);
+              for(int i=0;i<seqSize;++i){
+                seqMonitor.add(i);
+              }
+              Float[] paramArr=new Float[arrSize];
+              for(int i=seqSize,bound=seqSize+arrSize;i<bound;++i){
+                paramArr[i-seqSize]=TypeConversionUtil.convertToFloat(i);
+              }
+              var resultArr=seqMonitor.seq.toArray(paramArr);
+              seqMonitor.verifyStructuralIntegrity();
+              if(arrSize<seqSize){
+                Assertions.assertNotSame(paramArr,resultArr);
+                Assertions.assertEquals(seqSize,resultArr.length);
+              }
+              else if(arrSize>seqSize){
+                Assertions.assertSame(paramArr,resultArr);
+                Assertions.assertNull(resultArr[seqSize]);
+                for(int i=seqSize+1;i<arrSize;++i){
+                  Assertions.assertEquals(TypeConversionUtil.convertToFloat(i+seqSize),resultArr[i]);
+                }
+              }else{
+                Assertions.assertSame(paramArr,resultArr);
+              }
+              var itr=seqMonitor.seq.iterator();
+              for(int i=0;i<seqSize;++i){
+                Assertions.assertEquals((Object)itr.nextFloat(),resultArr[i]);
+              }
+              seqMonitor.verifyPreAlloc().verifyNaturalAscending(seqSize).verifyPostAlloc();
+            });
+          }
+        }
+      }
+    }
+    completeAllTests();
+  }
+  interface OutputTest{
+    void runTest(SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType);
+    private void runTests(){
+      for(var nestedType:NestedType.values()){
+        for(var checkedType:CheckedType.values()){
+          for(var outputArgType:FloatOutputTestArgType.values()){
+            submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),outputArgType));
+          }
+        }
+      }
+      completeAllTests();
+    }
+  }
+  @org.junit.jupiter.api.Test
+  public void testpop_void(){
+    OutputTest test=(seqMonitor,outputArgType)->{
+      for(int i=0;i<100;++i){
+        seqMonitor.add(i);
+      }
+      if(seqMonitor.nestedType==NestedType.STACK)
+      {
+        if(seqMonitor.nestedType.forwardIteration){
+          for(int i=0;i<100;++i){
+            seqMonitor.pop(i,outputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+        }else{
+          for(int i=100;--i>=0;){
+            seqMonitor.pop(i,outputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+        }
+        if(seqMonitor.checkedType.checked){
+          Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }
+      else
+      {
+        if(seqMonitor.nestedType.forwardIteration){
+          for(int i=0;i<100;++i){
+            seqMonitor.queueRemove(i,outputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+        }else{
+          for(int i=100;--i>=0;){
+            seqMonitor.queueRemove(i,outputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+        }
+        if(seqMonitor.checkedType.checked){
+          Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpeek_void(){
+    OutputTest test=(seqMonitor,outputArgType)->{
+      if(seqMonitor.nestedType==NestedType.STACK)
+      {
+        if(seqMonitor.nestedType.forwardIteration){
+          for(int i=0;i<100;++i){
+            seqMonitor.add(i);
+          }
+          for(int i=0;i<100;++i){
+            outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+            seqMonitor.verifyStructuralIntegrity();
+            seqMonitor.pop(i,outputArgType);
+          }
+          outputArgType.verifyPeek(seqMonitor.seq,0,0);
+          seqMonitor.verifyStructuralIntegrity();
+        }else{
+          for(int i=0;i<100;){
+            outputArgType.verifyPeek(seqMonitor.seq,i,i);
+            seqMonitor.verifyStructuralIntegrity();
+            seqMonitor.add(++i);
+          }
+        }
+      }
+      else
+      {
+        if(seqMonitor.nestedType.forwardIteration){
+          for(int i=0;i<100;++i){
+            seqMonitor.add(i);
+          }
+          for(int i=0;i<100;++i){
+            outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
+            seqMonitor.verifyStructuralIntegrity();
+            seqMonitor.queueRemove(i,outputArgType);
+          }
+          outputArgType.verifyPeek(seqMonitor.seq,0,0);
+          seqMonitor.verifyStructuralIntegrity();
+        }else{
+          for(int i=0;i<100;){
+            outputArgType.verifyPeek(seqMonitor.seq,i,i);
+            seqMonitor.verifyStructuralIntegrity();
+            seqMonitor.add(++i);
+          }
+        }
+      }
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testpoll_void(){
+    OutputTest test=(seqMonitor,outputArgType)->{
+      for(int i=0;i<100;++i){
+        seqMonitor.add(i);
+      }
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<100;++i){
+          seqMonitor.poll(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }else{
+        for(int i=100;--i>=0;){
+          seqMonitor.poll(i,outputArgType);
+          seqMonitor.verifyStructuralIntegrity();
+        }
+      }
+      seqMonitor.poll(0,outputArgType);
+      seqMonitor.verifyStructuralIntegrity();
+    };
+    test.runTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueelement_void(){
+    for(var checkedType:CheckedType.values()){
+      for(var outputArgType:FloatOutputTestArgType.values()){
+        submitTest(()->{
+          var seqMonitor=new SeqMonitor(NestedType.QUEUE,checkedType);
+          for(int i=0;i<100;++i){
+            seqMonitor.add(i);
+          }
+          for(int i=0;i<100;++i){
+            outputArgType.verifyQueueElement(seqMonitor.seq,i);
+            seqMonitor.verifyStructuralIntegrity();
+            seqMonitor.queueRemove(i,outputArgType);
+          }
+          if(seqMonitor.checkedType.checked){
+            Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
+            seqMonitor.verifyStructuralIntegrity();
+          }
+        });
+      }
+    }
+    completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testtoArray_void(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(int numToAdd:AbstractFloatSeqMonitor.FIB_SEQ){
+          for(var outputArgType:FloatOutputTestArgType.values()){
+            submitTest(()->{
+              var seqMonitor=new SeqMonitor(nestedType,checkedType);
+              for(int i=0;i<numToAdd;++i){
+                seqMonitor.add(i);
+              }
+              outputArgType.verifyToArray(seqMonitor.seq,numToAdd);
+              seqMonitor.verifyStructuralIntegrity();
+              seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+            });
+          }
+        }
+      }
+    }
+    completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testreadAndwriteObject(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+          if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(monitoredFunctionGen.appliesToRoot)){
+            for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
+              submitTest(()->testreadAndwriteObjectHelper(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize
+              ));
+            }
+          }
+        }
+      }
+    }
+    completeAllTests();
+  }
+  private static void testreadAndwriteObjectHelper(SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd
+  )
+  {
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    final File file;
+    try{
+      file=Files.createTempFile(null,null).toFile();
+    }catch(Exception e){
+      Assertions.fail(e);
+      return;
+    }
+    if(monitoredFunctionGen.expectedException==null){
+      try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
+        oos.writeObject(seqMonitor.seq);
+      }catch(Exception e){
+        Assertions.fail(e);
+      }
+      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+      OmniCollection.OfFloat readCol=null;
+      try(var ois=new ObjectInputStream(new FileInputStream(file));){
+        readCol=(OmniCollection.OfFloat)ois.readObject();
+      }catch(Exception e){
+        Assertions.fail(e);
+        return;
+      }
+      var itr=readCol.iterator();
+      if(seqMonitor.nestedType.forwardIteration){
+        for(int i=0;i<numToAdd;++i){
+          Assertions.assertEquals(TypeConversionUtil.convertTofloat(i),itr.nextFloat());
+        }
+      }else{
+        for(int i=0;i<numToAdd;++i){
+          Assertions.assertEquals(TypeConversionUtil.convertTofloat(numToAdd-i-1),itr.nextFloat());
+        }
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }else{
+      Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
+        try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(file,seqMonitor);){
+          seqMonitor.writeObject(moos);
+        }
+      });
+    }
+    seqMonitor.verifyStructuralIntegrity();
+  }
+  @org.junit.jupiter.api.Test
+  public void testStackpush_val(){
+    for(var checkedType:CheckedType.values()){
+      for(var inputArgType:FloatInputTestArgType.values()){
+        submitTest(()->{
+          var seqMonitor=new SeqMonitor(NestedType.STACK,checkedType);
+          for(int i=0;i<100;++i){
+            seqMonitor.push(i,inputArgType);
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+        });
+      }
+    }
+    completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testQueueoffer_val(){
+    for(var checkedType:CheckedType.values()){
+      for(var inputArgType:FloatInputTestArgType.values()){
+        submitTest(()->{
+          var seqMonitor=new SeqMonitor(NestedType.QUEUE,checkedType);
+          for(int i=0;i<100;++i){
+            Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+        });
+      }
+    }
+    completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testadd_val(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var inputArgType:FloatInputTestArgType.values()){
+          submitTest(()->{
+            var seqMonitor=new SeqMonitor(nestedType,checkedType);
+            for(int i=0;i<100;++i){
+              Assertions.assertTrue(seqMonitor.add(i,inputArgType));
+              seqMonitor.verifyStructuralIntegrity();
+            }
+            seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
+          });
+        }
+      }
+    }
+    completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
+  public void testforEach_Consumer(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+          if(monitoredFunctionGen.appliesToRoot&&(checkedType.checked || monitoredFunctionGen.expectedException==null)){
+            for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
+              submitTest(()->testforEach_ConsumerHelper(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+              submitTest(()->testforEach_ConsumerHelper(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
+            }
+          }
+        }
+      }
+    }
+    completeAllTests();
+  }
+  private static void testforEach_ConsumerHelper(SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(seqMonitor);
+    int numExpectedIteratedValues;
+    if(monitoredFunctionGen.expectedException==null || numToAdd==0){
+      seqMonitor.forEach(monitoredConsumer,functionCallType);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
+      numExpectedIteratedValues=numToAdd;
+    }else{
+      Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.forEach(monitoredConsumer,functionCallType));
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc();
+      switch(monitoredFunctionGen){
+        case Throw:
+          numExpectedIteratedValues=1;
+          verifyItr.verifyNaturalAscending(numToAdd);
+          break;
+        case ModSeq:
+          numExpectedIteratedValues=numToAdd;
+          if(seqMonitor.nestedType.forwardIteration){
+            verifyItr.verifyAscending(numToAdd);
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+          }else{
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyDescending(numToAdd);
+          }
+          break;
+        case ThrowModSeq:
+          numExpectedIteratedValues=1;
+          if(seqMonitor.nestedType.forwardIteration){
+            verifyItr.verifyAscending(numToAdd).verifyIllegalAdd();
+          }else{
+            verifyItr.verifyIllegalAdd().verifyDescending(numToAdd);
+          }
+          break;
+        default:
+          throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
+      }
+      verifyItr.verifyPostAlloc();
+    }
+    Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
+    //TODO verify iterated values
   }
   @org.junit.jupiter.api.Test
   public void testItrforEachRemaining_Consumer(){
-    getItrforEachRemaining_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-        testItrforEachRemaining_ConsumerHelper((SeqMonitor)args[0],(PreModScenario)args[1],(MonitoredFunctionGen)args[2],(int)args[3],(FunctionCallType)args[4]);
-    });
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(checkedType.checked || preModScenario.expectedException==null){
+            for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
+              if((monitoredFunctionGen.expectedException==null || checkedType.checked) && (preModScenario.appliesToRootItr&&monitoredFunctionGen.appliesToRootItr)){
+                for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
+                  submitTest(()->testItrforEachRemaining_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+                  submitTest(()->testItrforEachRemaining_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    completeAllTests();
   }
-  private static void testItrforEachRemaining_ConsumerHelper
-  (SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
+  private static void testItrforEachRemaining_ConsumerHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
       seqMonitor.add(i);
     }
@@ -403,963 +1236,211 @@ public class FloatSnglLnkSeqTest{
     Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
     //TODO verify the iterated values
   }
-  static Stream<Arguments> getforEach_ConsumerArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
-        if(monitoredFunctionGen.appliesToRoot&&(checkedType.checked || monitoredFunctionGen.expectedException==null)){
-          for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
-          }
-        }
-      }
-    });
-  }
   @org.junit.jupiter.api.Test
-  public void testforEach_Consumer(){
-    getforEach_ConsumerArgs().parallel().map(Arguments::get).forEach(args->{
-        testforEach_ConsumerHelper((SeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2],(FunctionCallType)args[3]);
-    });
-  }
-  private static void testforEach_ConsumerHelper
-  (SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(seqMonitor);
-    int numExpectedIteratedValues;
-    if(monitoredFunctionGen.expectedException==null || numToAdd==0){
-      seqMonitor.forEach(monitoredConsumer,functionCallType);
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-      numExpectedIteratedValues=numToAdd;
-    }else{
-      Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.forEach(monitoredConsumer,functionCallType));
-      seqMonitor.verifyStructuralIntegrity();
-      var verifyItr=seqMonitor.verifyPreAlloc();
-      switch(monitoredFunctionGen){
-        case Throw:
-          numExpectedIteratedValues=1;
-          verifyItr.verifyNaturalAscending(numToAdd);
-          break;
-        case ModSeq:
-          numExpectedIteratedValues=numToAdd;
-          if(seqMonitor.nestedType.forwardIteration){
-            verifyItr.verifyAscending(numToAdd);
-            for(int i=0;i<numToAdd;++i){
-              verifyItr.verifyIllegalAdd();
-            }
-          }else{
-            for(int i=0;i<numToAdd;++i){
-              verifyItr.verifyIllegalAdd();
-            }
-            verifyItr.verifyDescending(numToAdd);
-          }
-          break;
-        case ThrowModSeq:
-          numExpectedIteratedValues=1;
-          if(seqMonitor.nestedType.forwardIteration){
-            verifyItr.verifyAscending(numToAdd).verifyIllegalAdd();
-          }else{
-            verifyItr.verifyIllegalAdd().verifyDescending(numToAdd);
-          }
-          break;
-        default:
-          throw new Error("Unknown monitored function gen "+monitoredFunctionGen);
-      }
-      verifyItr.verifyPostAlloc();
-    }
-    Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
-    //TODO verify iterated values
-  }
-  static Stream<Arguments> getremoveIf_PredicateArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
-        if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
-          for(var functionCallType:FunctionCallType.values()){
-            for(int seqSize=0;seqSize<=100;seqSize+=10){
-              double[] thresholdArr;
-              long randSeedBound;
-              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
-                thresholdArr=new double[]{0.5};
-                randSeedBound=0;
-              }else{
-                thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
-                randSeedBound=100;
-              }
-              for(long randSeed=0;randSeed<=randSeedBound;++randSeed){
-                for(double threshold:thresholdArr)
-                {
-                  streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+  public void testItrremove_void(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(var removeScenario:ItrRemoveScenario.values()){
+          if(removeScenario.validWithForwardItr && (checkedType.checked || removeScenario.expectedException==null)){
+            for(int numToAdd:AbstractFloatSeqMonitor.FIB_SEQ){
+              if(numToAdd!=0 || removeScenario.validWithEmptySeq){
+                for(var preModScenario:PreModScenario.values()){
+                  if(preModScenario.appliesToRootItr && (checkedType.checked || preModScenario.expectedException==null)){
+                    for(var seqLocation:SequenceLocation.values()){
+                      if(seqLocation.expectedException==null &&
+                        (numToAdd!=0 || seqLocation==SequenceLocation.BEGINNING) &&
+                        (seqLocation!=SequenceLocation.END || removeScenario!=ItrRemoveScenario.PostInit)&&
+                        (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING)
+                      ){
+                        submitTest(()->{
+                          var seqMonitor=new SeqMonitor(nestedType,checkedType);
+                          for(int i=0;i<numToAdd;++i){
+                            seqMonitor.add(i);
+                          }
+                          var itrMonitor=seqMonitor.getItrMonitor();
+                          int numIterated=0;
+                          switch(seqLocation){
+                            case BEGINNING:
+                              break;
+                            case NEARBEGINNING:
+                              for(int i=0,bound=numToAdd/4;i<bound;++i){
+                                ++numIterated;
+                                itrMonitor.iterateForward();
+                              }
+                              break;
+                            case MIDDLE:
+                              for(int i=0,bound=numToAdd/2;i<bound;++i){
+                                ++numIterated;
+                                itrMonitor.iterateForward();
+                              }
+                              break;
+                            case NEAREND:
+                              for(int i=0,bound=(numToAdd/4)*3;i<bound;++i){
+                                ++numIterated;
+                                itrMonitor.iterateForward();
+                              }
+                              break;
+                            case END:
+                              for(int i=0;i<numToAdd;++i){
+                                ++numIterated;
+                                itrMonitor.iterateForward();
+                              }
+                              break;
+                            default:
+                              throw new Error("Unknown seqLocation "+seqLocation);
+                          }
+                          switch(removeScenario){
+                            case PostNext:
+                              if(numIterated==0){
+                                ++numIterated;
+                                itrMonitor.iterateForward();
+                              }
+                              break;
+                            case PostRemove:
+                              if(numIterated==0){
+                                ++numIterated;
+                                itrMonitor.iterateForward();
+                              }
+                              itrMonitor.remove();
+                            case PostInit:
+                              break;
+                            default:
+                               throw new Error("unknown remove scenario "+removeScenario);
+                          }
+                          seqMonitor.illegalAdd(preModScenario);
+                          SequenceVerificationItr verifyItr;
+                          if(removeScenario.expectedException==null){
+                            if(preModScenario.expectedException==null){
+                              itrMonitor.remove();
+                              itrMonitor.verifyIteratorState();
+                              seqMonitor.verifyStructuralIntegrity();
+                              while(itrMonitor.hasNext()){
+                                itrMonitor.iterateForward();
+                                itrMonitor.remove();
+                                itrMonitor.verifyIteratorState();
+                                seqMonitor.verifyStructuralIntegrity();
+                              }
+                              Assertions.assertFalse(itrMonitor.hasNext());
+                              switch(seqLocation){
+                                case BEGINNING:
+                                  Assertions.assertTrue(seqMonitor.isEmpty());
+                                case NEARBEGINNING:
+                                case MIDDLE:
+                                case NEAREND:
+                                case END:
+                                  Assertions.assertEquals(numIterated-1,seqMonitor.seq.size());
+                                  break;
+                                default:
+                                  throw new Error("Unknown seqLocation "+seqLocation);
+                              }
+                              return;
+                            }else{
+                              Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.remove());
+                              itrMonitor.verifyIteratorState();
+                              seqMonitor.verifyStructuralIntegrity();
+                              verifyItr=seqMonitor.verifyPreAlloc(preModScenario).verifyNaturalAscending(numToAdd);
+                            }
+                          }else{
+                            Assertions.assertThrows(removeScenario.expectedException,()->itrMonitor.remove());
+                            itrMonitor.verifyIteratorState();
+                            seqMonitor.verifyStructuralIntegrity();
+                            verifyItr=seqMonitor.verifyPreAlloc(preModScenario);
+                            switch(removeScenario){
+                              case PostInit:
+                                verifyItr.verifyNaturalAscending(numToAdd);
+                                break;
+                              case PostRemove:
+                                if(seqMonitor.nestedType.forwardIteration){
+                                  verifyItr.verifyAscending(numIterated-1).verifyAscending(numIterated,numToAdd-numIterated);
+                                }else{
+                                  verifyItr.verifyDescending(numToAdd,numIterated-1).verifyDescending(numToAdd-numIterated);
+                                }
+                                break;
+                              default:
+                                throw new Error("unknown remove scenario "+removeScenario);
+                            }
+                          }
+                          verifyItr.verifyPostAlloc(preModScenario);
+                        });
+                      }
+                    }
+                  }
                 }
               }
             }
           }
         }
       }
-   });
+    }
+    completeAllTests();
   }
   @org.junit.jupiter.api.Test
-  public void testremoveIf_Predicate(){
-    getremoveIf_PredicateArgs().parallel().map(Arguments::get).forEach(args->{
-      testremoveIf_PredicateHelper((SeqMonitor)args[0],(MonitoredRemoveIfPredicateGen)args[1],(double)args[2],(long)args[3],(FunctionCallType)args[4],(int)args[5]
-      );
-    });
-  }
-  private static void testremoveIf_PredicateHelper
-  (SeqMonitor seqMonitor,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
-  ){
-    for(int i=0;i<seqSize;++i){
-      seqMonitor.add(i);
-    }
-    final var clone=(OmniCollection.OfFloat)seqMonitor.seq.clone();
-    final int numExpectedCalls=seqSize;
-    final int numExpectedRemoved;
-    switch(monitoredRemoveIfPredicateGen){
-      case RemoveFirst:
-      case RemoveLast:
-        numExpectedRemoved=Math.min(1,seqSize);
-        break;
-      case RemoveFirstAndLast:
-        numExpectedRemoved=Math.min(2,seqSize);
-        break;
-      case RemoveAllButFirst:
-      case RemoveAllButLast:
-        numExpectedRemoved=seqSize-Math.min(1,seqSize);
-        break;
-      case RemoveAllButFirstAndLast:
-        numExpectedRemoved=seqSize-Math.min(2,seqSize);
-        break;
-      case RemoveAll:
-        numExpectedRemoved=seqSize;
-        break;
-      case Random:
-        numExpectedRemoved=-1;
-        break;
-      case RemoveNone:
-      case Throw:
-      case ModSeq:
-      case ThrowModSeq:
-        numExpectedRemoved=0;
-        break;
-      default:
-        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
-    }
-    final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
-    if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
-      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
-      seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
-      return;
-    }else{
-      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
-      //TODO verify contents of sequence in throw cases 
-    }
-    seqMonitor.verifyStructuralIntegrity();
-  }
-  @org.junit.jupiter.api.Test
-  public void testclone_void(){
-    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testclone_voidHelper((SeqMonitor)args[0],(int)args[1]);
-    });
-  }
-  private static void testclone_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd){
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    var clone=(OmniCollection.OfFloat)seqMonitor.seq.clone();
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-    Assertions.assertNotSame(clone,seqMonitor.seq);
-    switch(seqMonitor.nestedType){
-      case STACK:
-        if(seqMonitor.checkedType.checked){
-          Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.CheckedStack);
-          Assertions.assertEquals(0,((FloatSnglLnkSeq.CheckedStack)clone).modCount);
-        }else{
-          Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.UncheckedStack);
-        }
-        break;
-      case QUEUE:
-        if(seqMonitor.checkedType.checked){
-          Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.CheckedQueue);
-          Assertions.assertEquals(0,((FloatSnglLnkSeq.CheckedQueue)clone).modCount);
-        }else{
-          Assertions.assertTrue(clone instanceof FloatSnglLnkSeq.UncheckedQueue);
-        }
-        break;
-      default:
-        throw new Error("Unknown nested type "+seqMonitor.nestedType);
-    }
-    var snglLnkSeqClone=(FloatSnglLnkSeq)clone;
-    var originalHead=((FloatSnglLnkSeq)seqMonitor.seq).head;
-    var cloneHead=snglLnkSeqClone.head;
-    Assertions.assertEquals(numToAdd,snglLnkSeqClone.size);
-    if(snglLnkSeqClone.size==0){
-      Assertions.assertNull(cloneHead);
-      if(seqMonitor.nestedType==NestedType.QUEUE){
-        if(seqMonitor.checkedType.checked){
-          Assertions.assertNull(((FloatSnglLnkSeq.CheckedQueue)snglLnkSeqClone).tail);
-        }else{
-          Assertions.assertNull(((FloatSnglLnkSeq.UncheckedQueue)snglLnkSeqClone).tail);
-        }
-      }
-    }else{
-      for(int i=snglLnkSeqClone.size;;cloneHead=cloneHead.next,originalHead=originalHead.next){
-        Assertions.assertNotNull(cloneHead);
-        Assertions.assertNotSame(cloneHead,originalHead);
-        Assertions.assertEquals(cloneHead.val,originalHead.val);
-        if(--i==0){
-          if(seqMonitor.nestedType==NestedType.QUEUE){
-            if(seqMonitor.checkedType.checked){
-              Assertions.assertSame(cloneHead,((FloatSnglLnkSeq.CheckedQueue)snglLnkSeqClone).tail);
-            }else{
-              Assertions.assertSame(cloneHead,((FloatSnglLnkSeq.UncheckedQueue)snglLnkSeqClone).tail);
-            }
-          }
-          Assertions.assertNull(cloneHead.next);
-          Assertions.assertNull(originalHead.next);
-          break;
-        }
-      }
-    }
-  }
-  @org.junit.jupiter.api.Test
-  public void testsize_void(){
-    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testsize_voidHelper((SeqMonitor)args[0],(int)args[1]);
-    });
-  }
-  private static void testsize_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd){
-    for(int i=0;i<numToAdd;++i){
-      Assertions.assertEquals(i,seqMonitor.seq.size());
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.add(i);
-    }
-    var itrMonitor=seqMonitor.getItrMonitor();
-    while(numToAdd>0){
-      Assertions.assertEquals(numToAdd--,seqMonitor.seq.size());
-      seqMonitor.verifyStructuralIntegrity();
-      itrMonitor.iterateForward();
-      itrMonitor.remove();
-    }
-    Assertions.assertEquals(numToAdd,seqMonitor.seq.size());
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-  }
-  @org.junit.jupiter.api.Test
-  public void testisEmpty_void(){
-    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testisEmpty_voidHelper((SeqMonitor)args[0],(int)args[1]);
-    });
-  }
-  private static void testisEmpty_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd){
-    for(int i=0;i<numToAdd;++i){
-      Assertions.assertEquals(i==0,seqMonitor.seq.isEmpty());
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.add(i);
-    }
-    var itrMonitor=seqMonitor.getItrMonitor();
-    while(numToAdd>0){
-      Assertions.assertEquals((numToAdd--)==0,seqMonitor.seq.isEmpty());
-      seqMonitor.verifyStructuralIntegrity();
-      itrMonitor.iterateForward();
-      itrMonitor.remove();
-    }
-    Assertions.assertTrue(seqMonitor.seq.isEmpty());
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-  }
-  static Stream<Arguments> getadd_valArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var inputArgType:FloatInputTestArgType.values()){
-        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),inputArgType));
-      }
-    });
-  }
-  @org.junit.jupiter.api.Test
-  public void testadd_val(){
-    getadd_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testadd_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1]);
-    });
-  }
-  private static void testadd_valHelper
-  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType){
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seqMonitor.add(i,inputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
-  }
-  static Stream<Arguments> getStackpush_valArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(var checkedType:CheckedType.values()){
-      for(var inputArgType:FloatInputTestArgType.values()){
-        builder.accept(Arguments.of(new SeqMonitor(NestedType.STACK,checkedType),inputArgType));
-      }
-    }
-    return builder.build();
-  }
-  @org.junit.jupiter.api.Test
-  public void testStackpush_val(){
-    getStackpush_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testStackpush_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1]);
-    });
-  }
-  private static void testStackpush_valHelper
-  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType){
-    for(int i=0;i<100;++i){
-      seqMonitor.push(i,inputArgType);
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
-  }
-  static Stream<Arguments> getQueueoffer_valArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(var checkedType:CheckedType.values()){
-      for(var inputArgType:FloatInputTestArgType.values()){
-        builder.accept(Arguments.of(new SeqMonitor(NestedType.QUEUE,checkedType),inputArgType));
-      }
-    }
-    return builder.build();
-  }
-  @org.junit.jupiter.api.Test
-  public void testQueueoffer_val(){
-    getQueueoffer_valArgs().parallel().map(Arguments::get).forEach(args->{
-        testQueueoffer_valHelper((SeqMonitor)args[0],(FloatInputTestArgType)args[1]);
-    });
-  }
-  private static void testQueueoffer_valHelper
-  (SeqMonitor seqMonitor,FloatInputTestArgType inputArgType){
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seqMonitor.offer(i,inputArgType));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(inputArgType,100).verifyPostAlloc();
-  }
-  @org.junit.jupiter.api.Test
-  public void testcontains_val(){
-    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testcontains_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
-        );
-    });
-  }
-  private static void testcontains_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
-  ){
-    if(seqSize>0){
-      {
-        switch(seqLocation){
-          case BEGINNING:
-            argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case NEARBEGINNING:
-            argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case MIDDLE:
-            argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case NEAREND:
-            argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case END:
-            argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case IOBHI:
-            argType.initDoesNotContain(seqMonitor,seqSize);
-            break;
-          default:
-            throw new Error("Unknown seqLocation "+seqLocation);
-        }
-      }
-    }
-    Assertions.assertEquals(seqLocation!=SequenceLocation.IOBHI,argType.invokecontains(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
-  }
-  @org.junit.jupiter.api.Test
-  public void testsearch_val(){
-    getQueryStackArguments().parallel().map(Arguments::get).forEach(args->{
-        testsearch_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
-        );
-    });
-  }
-  private static void testsearch_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
-  ){
-    int expectedIndex;
-    if(seqSize>0){
-      {
-        switch(seqLocation){
-          case BEGINNING:
-            expectedIndex=argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case NEARBEGINNING:
-            expectedIndex=argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case MIDDLE:
-            expectedIndex=argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case NEAREND:
-            expectedIndex=argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case END:
-            expectedIndex=argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case IOBHI:
-            argType.initDoesNotContain(seqMonitor,seqSize);
-            expectedIndex=-1;
-            break;
-          default:
-            throw new Error("Unknown seqLocation "+seqLocation);
-        }
-      }
-    }else{
-      expectedIndex=-1;
-    }
-    Assertions.assertEquals(expectedIndex,argType.invokesearch(seqMonitor,queryCastType));
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
-  }
-  @org.junit.jupiter.api.Test
-  public void testremoveVal_val(){
-    getQueryCollectionArguments().parallel().map(Arguments::get).forEach(args->{
-        testremoveVal_valHelper((SeqMonitor)args[0],(QueryTester)args[1],(QueryCastType)args[2],(SequenceLocation)args[3],(int)args[4]
-        );
-    });
-  }
-  private static void testremoveVal_valHelper
-  (SeqMonitor seqMonitor,QueryTester argType,QueryCastType queryCastType,SequenceLocation seqLocation,int seqSize
-  ){
-    if(seqSize>0){
-      {
-        switch(seqLocation){
-          case BEGINNING:
-            argType.initContainsBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case NEARBEGINNING:
-            argType.initContainsNearBeginning(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case MIDDLE:
-            argType.initContainsMiddle(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case NEAREND:
-            argType.initContainsNearEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case END:
-            argType.initContainsEnd(seqMonitor,seqSize,seqMonitor.nestedType.forwardIteration);
-            break;
-          case IOBHI:
-            argType.initDoesNotContain(seqMonitor,seqSize);
-            break;
-          default:
-            throw new Error("Unknown seqLocation "+seqLocation);
-        }
-      }
-    }
-    boolean expectedResult;
-    Assertions.assertEquals(expectedResult=seqLocation!=SequenceLocation.IOBHI,argType.invokeremoveVal(seqMonitor,queryCastType));
-    if(expectedResult){
-      --seqSize;
-    }
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().skip(seqSize).verifyPostAlloc();
-  }
-  @org.junit.jupiter.api.Test
-  public void testpeek_void(){
-    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
-        testpeek_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
-    });
-  }
-  private static void testpeek_voidHelper
-  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
-    if(seqMonitor.nestedType==NestedType.STACK)
-    {
-      if(seqMonitor.nestedType.forwardIteration){
-        for(int i=0;i<100;++i){
-          seqMonitor.add(i);
-        }
-        for(int i=0;i<100;++i){
-          outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
-          seqMonitor.verifyStructuralIntegrity();
-          seqMonitor.pop(i,outputArgType);
-        }
-        outputArgType.verifyPeek(seqMonitor.seq,0,0);
-        seqMonitor.verifyStructuralIntegrity();
-      }else{
-        for(int i=0;i<100;){
-          outputArgType.verifyPeek(seqMonitor.seq,i,i);
-          seqMonitor.verifyStructuralIntegrity();
-          seqMonitor.add(++i);
-        }
-      }
-    }
-    else
-    {
-      if(seqMonitor.nestedType.forwardIteration){
-        for(int i=0;i<100;++i){
-          seqMonitor.add(i);
-        }
-        for(int i=0;i<100;++i){
-          outputArgType.verifyPeek(seqMonitor.seq,100-i,i);
-          seqMonitor.verifyStructuralIntegrity();
-          seqMonitor.queueRemove(i,outputArgType);
-        }
-        outputArgType.verifyPeek(seqMonitor.seq,0,0);
-        seqMonitor.verifyStructuralIntegrity();
-      }else{
-        for(int i=0;i<100;){
-          outputArgType.verifyPeek(seqMonitor.seq,i,i);
-          seqMonitor.verifyStructuralIntegrity();
-          seqMonitor.add(++i);
-        }
-      }
-    }
-  }
-  @org.junit.jupiter.api.Test
-  public void testpoll_void(){
-    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
-        testpoll_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
-    });
-  }
-  private static void testpoll_voidHelper
-  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
-    for(int i=0;i<100;++i){
-      seqMonitor.add(i);
-    }
-    if(seqMonitor.nestedType.forwardIteration){
-      for(int i=0;i<100;++i){
-        seqMonitor.poll(i,outputArgType);
-        seqMonitor.verifyStructuralIntegrity();
-      }
-    }else{
-      for(int i=100;--i>=0;){
-        seqMonitor.poll(i,outputArgType);
-        seqMonitor.verifyStructuralIntegrity();
-      }
-    }
-    seqMonitor.poll(0,outputArgType);
-    seqMonitor.verifyStructuralIntegrity();
-  }
-  @org.junit.jupiter.api.Test
-  public void testpop_void(){
-    getPeekPollAndPopArgs().parallel().map(Arguments::get).forEach(args->{
-        testpop_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
-    });
-  }
-  private static void testpop_voidHelper
-  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
-    for(int i=0;i<100;++i){
-      seqMonitor.add(i);
-    }
-    if(seqMonitor.nestedType==NestedType.STACK)
-    {
-      if(seqMonitor.nestedType.forwardIteration){
-        for(int i=0;i<100;++i){
-          seqMonitor.pop(i,outputArgType);
-          seqMonitor.verifyStructuralIntegrity();
-        }
-      }else{
-        for(int i=100;--i>=0;){
-          seqMonitor.pop(i,outputArgType);
-          seqMonitor.verifyStructuralIntegrity();
-        }
-      }
-      if(seqMonitor.checkedType.checked){
-        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.pop(0,outputArgType));
-        seqMonitor.verifyStructuralIntegrity();
-      }
-    }
-    else
-    {
-      if(seqMonitor.nestedType.forwardIteration){
-        for(int i=0;i<100;++i){
-          seqMonitor.queueRemove(i,outputArgType);
-          seqMonitor.verifyStructuralIntegrity();
-        }
-      }else{
-        for(int i=100;--i>=0;){
-          seqMonitor.queueRemove(i,outputArgType);
-          seqMonitor.verifyStructuralIntegrity();
-        }
-      }
-      if(seqMonitor.checkedType.checked){
-        Assertions.assertThrows(NoSuchElementException.class,()->seqMonitor.queueRemove(0,outputArgType));
-        seqMonitor.verifyStructuralIntegrity();
-      }
-    }
-  }
-  static Stream<Arguments> getreadAndwriteObjectArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
-        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(monitoredFunctionGen.appliesToRoot)){
-          for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize
-            ));
-          }
-        }
-      }
-    });
-  }
-  @org.junit.jupiter.api.Test
-  public void testreadAndwriteObject(){
-    getreadAndwriteObjectArgs().parallel().map(Arguments::get).forEach(args->{
-        testreadAndwriteObjectHelper((SeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]
-        );
-    });
-  }
-  private static void testreadAndwriteObjectHelper
-  (SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd
-  )
-  {
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    final File file;
-    try{
-      file=Files.createTempFile(null,null).toFile();
-    }catch(Exception e){
-      Assertions.fail(e);
-      return;
-    }
-    if(monitoredFunctionGen.expectedException==null){
-      try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
-        oos.writeObject(seqMonitor.seq);
-      }catch(Exception e){
-        Assertions.fail(e);
-      }
-      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-      OmniCollection.OfFloat readCol=null;
-      try(var ois=new ObjectInputStream(new FileInputStream(file));){
-        readCol=(OmniCollection.OfFloat)ois.readObject();
-      }catch(Exception e){
-        Assertions.fail(e);
-        return;
-      }
-      var itr=readCol.iterator();
-      if(seqMonitor.nestedType.forwardIteration){
-        for(int i=0;i<numToAdd;++i){
-          Assertions.assertEquals(TypeConversionUtil.convertTofloat(i),itr.nextFloat());
-        }
-      }else{
-        for(int i=0;i<numToAdd;++i){
-          Assertions.assertEquals(TypeConversionUtil.convertTofloat(numToAdd-i-1),itr.nextFloat());
-        }
-      }
-      Assertions.assertFalse(itr.hasNext());
-    }else{
-      Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
-        try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(file,seqMonitor);){
-          seqMonitor.writeObject(moos);
-        }
-      });
-    }
-    seqMonitor.verifyStructuralIntegrity();
-  }
-  static Stream<Arguments> gettoArray_voidArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-        for(var outputArgType:FloatOutputTestArgType.values()){
-          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize,outputArgType));
-        }
-      }
-    });
-  }
-  @org.junit.jupiter.api.Test
-  public void testtoArray_void(){
-    gettoArray_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_voidHelper((SeqMonitor)args[0],(int)args[1],(FloatOutputTestArgType)args[2]);
-    });
-  }
-  private static void testtoArray_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd,FloatOutputTestArgType outputArgType){
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    outputArgType.verifyToArray(seqMonitor.seq,numToAdd);
-    seqMonitor.verifyStructuralIntegrity();
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-  }
-  @org.junit.jupiter.api.Test
-  public void testclear_void(){
-    getBasicCollectionTestArgs().parallel().map(Arguments::get).forEach(args->{
-        testclear_voidHelper((SeqMonitor)args[0],(int)args[1]);
-    });
-  }
-  private static void testclear_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd){
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    seqMonitor.clear();
-    seqMonitor.verifyStructuralIntegrity();
-    Assertions.assertTrue(seqMonitor.seq.isEmpty());
-    seqMonitor.verifyPreAlloc().verifyPostAlloc();
-  }
-  static Stream<Arguments> getQueueelement_voidArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(var checkedType:CheckedType.values()){
-      for(var outputType:FloatOutputTestArgType.values()){
-        builder.accept(Arguments.of(new SeqMonitor(NestedType.QUEUE,checkedType),outputType));
-      }
-    }
-    return builder.build();
-  }
-  @org.junit.jupiter.api.Test
-  public void testQueueelement_void(){
-    getQueueelement_voidArgs().parallel().map(Arguments::get).forEach(args->{
-        testQueueelement_voidHelper((SeqMonitor)args[0],(FloatOutputTestArgType)args[1]);
-    });
-  }
-  private static void testQueueelement_voidHelper
-  (SeqMonitor seqMonitor,FloatOutputTestArgType outputArgType){
-    for(int i=0;i<100;++i){
-      seqMonitor.add(i);
-    }
-    for(int i=0;i<100;++i){
-      outputArgType.verifyQueueElement(seqMonitor.seq,i);
-      seqMonitor.verifyStructuralIntegrity();
-      seqMonitor.queueRemove(i,outputArgType);
-    }
-    if(seqMonitor.checkedType.checked){
-      Assertions.assertThrows(NoSuchElementException.class,()->outputArgType.verifyQueueElement(seqMonitor.seq,0));
-      seqMonitor.verifyStructuralIntegrity();
-    }
-  }
-  static Stream<Arguments> gettoArray_IntFunctionArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
-        if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&monitoredFunctionGen.appliesToRoot){
-          for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-            streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),monitoredFunctionGen,seqSize));
-          }
-        }
-      }   
-    });
-  }
-  @org.junit.jupiter.api.Test
-  public void testtoArray_IntFunction(){
-    gettoArray_IntFunctionArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_IntFunctionHelper((SeqMonitor)args[0],(MonitoredFunctionGen)args[1],(int)args[2]);
-    });
-  }
-  private static void testtoArray_IntFunctionHelper
-  (SeqMonitor seqMonitor,MonitoredFunctionGen monitoredFunctionGen,int numToAdd){
-    for(int i=0;i<numToAdd;++i){
-      seqMonitor.add(i);
-    }
-    var arrConstructor=monitoredFunctionGen.getMonitoredArrayConstructor(seqMonitor);
-    if(monitoredFunctionGen.expectedException==null){
-      var resultArr=seqMonitor.seq.toArray(arrConstructor);
-      Assertions.assertEquals(numToAdd,resultArr.length);
-      var itr=seqMonitor.seq.iterator();
-      for(int i=0;i<numToAdd;++i){
-        Assertions.assertEquals(resultArr[i],(Object)itr.nextFloat());
-      }
-    }else{
-       Assertions.assertThrows(monitoredFunctionGen.expectedException,()->seqMonitor.seq.toArray(arrConstructor));
-    }
-    seqMonitor.verifyStructuralIntegrity();
-    var verifyItr=seqMonitor.verifyPreAlloc();
-    switch(monitoredFunctionGen){
-      case NoThrow:
-      case Throw:
-        verifyItr.verifyNaturalAscending(numToAdd);
-        break;
-      case ModSeq:
-      case ThrowModSeq:
-        if(seqMonitor.nestedType.forwardIteration){
-          verifyItr.verifyAscending(numToAdd).verifyIllegalAdd();
-        }else{
-          verifyItr.verifyIllegalAdd().verifyDescending(numToAdd);
-        }
-        break;
-      default:
-        throw new Error("Unknown monitoredFunctionGen "+monitoredFunctionGen);
-    }
-    verifyItr.verifyPostAlloc();
-  }
-  static Stream<Arguments> gettoArray_ObjectArrayArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(int seqSize=0;seqSize<=15;seqSize+=5){
-        for(int arrSize=0;arrSize<=20;arrSize+=5){
-          streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize,arrSize));
-        }
-      }
-    });
-  }
-  @org.junit.jupiter.api.Test
-  public void testtoArray_ObjectArray(){
-    gettoArray_ObjectArrayArgs().parallel().map(Arguments::get).forEach(args->{
-        testtoArray_ObjectArrayHelper((SeqMonitor)args[0],(int)args[1],(int)args[2]);
-    });
-  }
-  private static void testtoArray_ObjectArrayHelper
-  (SeqMonitor seqMonitor,int seqSize,int arrSize){
-    for(int i=0;i<seqSize;++i){
-      seqMonitor.add(i);
-    }
-    Float[] paramArr=new Float[arrSize];
-    for(int i=seqSize,bound=seqSize+arrSize;i<bound;++i){
-      paramArr[i-seqSize]=TypeConversionUtil.convertToFloat(i);
-    }
-    var resultArr=seqMonitor.seq.toArray(paramArr);
-    seqMonitor.verifyStructuralIntegrity();
-    if(arrSize<seqSize){
-      Assertions.assertNotSame(paramArr,resultArr);
-      Assertions.assertEquals(seqSize,resultArr.length);
-    }
-    else if(arrSize>seqSize){
-      Assertions.assertSame(paramArr,resultArr);
-      Assertions.assertNull(resultArr[seqSize]);
-      for(int i=seqSize+1;i<arrSize;++i){
-        Assertions.assertEquals(TypeConversionUtil.convertToFloat(i+seqSize),resultArr[i]);
-      }
-    }else{
-      Assertions.assertSame(paramArr,resultArr);
-    }
-    var itr=seqMonitor.seq.iterator();
-    for(int i=0;i<seqSize;++i){
-      Assertions.assertEquals((Object)itr.nextFloat(),resultArr[i]);
-    }
-    seqMonitor.verifyPreAlloc().verifyNaturalAscending(seqSize).verifyPostAlloc();
-  }
-    private static final int MAX_TOSTRING_LENGTH=15;
-  @Tag("MASSIVEtoString")
-  @org.junit.jupiter.api.Test
-  public void testMASSIVEtoString_void(){
-    final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-    var head=new FloatSnglLnkNode(TypeConversionUtil.convertTofloat(1));
-    var tail=head;
-    int numThreads=Runtime.getRuntime().availableProcessors();
-    int threadSpan=seqLength/numThreads;
-    var wayPointNodes=new FloatSnglLnkNode[numThreads];
-    wayPointNodes[0]=head;
-    int nextWayPointIndex=threadSpan;
-    int threadIndex=0;
-    int threadBound=numThreads-1;
-    for(int i=1;i<seqLength;++i)
-    {
-      tail=tail.next=new FloatSnglLnkNode(TypeConversionUtil.convertTofloat(1));
-      if(i==nextWayPointIndex){
-        wayPointNodes[++threadIndex]=tail;
-        if(threadIndex==threadBound){
-          nextWayPointIndex=Integer.MIN_VALUE;
-        }else{
-          nextWayPointIndex+=threadSpan;
-        }
-      }
-    }
+  public void testItrnext_void(){
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){
-        var seqMonitor=new SeqMonitor(nestedType,checkedType,head,seqLength,tail);
-        String string=seqMonitor.seq.toString();
-        Assertions.assertEquals('[',string.charAt(0));
-        Assertions.assertEquals(']',string.charAt(string.length()-1));
-        seqMonitor.verifyStructuralIntegrity();
-        var threads=new Thread[threadBound];
-        for(threadIndex=0,nextWayPointIndex=0;threadIndex<threadBound;){
-          var verifyItr=new SeqMonitor.SnglLnkSeqSequenceVerificationItr(seqMonitor,wayPointNodes[threadIndex]);
-          final int finalWayPointBound=nextWayPointIndex+threadSpan;
-          final int finalWayPointIndex=nextWayPointIndex;
-          threads[threadIndex++]=new Thread(()->AbstractFloatSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr));
-          nextWayPointIndex=finalWayPointBound;
-        }
-        var verifyItr=new SeqMonitor.SnglLnkSeqSequenceVerificationItr(seqMonitor,wayPointNodes[threadIndex]);
-        AbstractFloatSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
-        try{
-          for(threadIndex=0;threadIndex<threadBound;++threadIndex){
-            threads[threadIndex].join();
+        for(var itrScenario:IterationScenario.values()){
+          if(checkedType.checked || itrScenario==IterationScenario.NoMod){
+            for(int numToAdd:AbstractFloatSeqMonitor.FIB_SEQ){
+              if(numToAdd!=0 || itrScenario.validWithEmptySeq){
+                if(itrScenario.preModScenario.appliesToRootItr){
+                  for(var outputType:FloatOutputTestArgType.values()){
+                    submitTest(()->{
+                      var seqMonitor=new SeqMonitor(nestedType,checkedType);
+                      for(int i=0;i<numToAdd;++i){
+                        seqMonitor.add(i);
+                      }
+                      var itrMonitor=seqMonitor.getItrMonitor();
+                      switch(itrScenario){
+                        case NoMod:
+                        case ModSeqSupercedesThrowNSEE:
+                          for(int i=0;;++i){
+                            if(i==numToAdd){
+                              Assertions.assertFalse(itrMonitor.hasNext());
+                              break;
+                            }
+                            Assertions.assertTrue(itrMonitor.hasNext());
+                            itrMonitor.verifyNext(seqMonitor.nestedType==NestedType.STACK?numToAdd-i-1:i,outputType);
+                            itrMonitor.verifyIteratorState();
+                            seqMonitor.verifyStructuralIntegrity();
+                          }
+                        case ModSeq:
+                          break;
+                        default:
+                          throw new Error("unknown itr scenario "+itrScenario);
+                      }
+                      if(seqMonitor.checkedType.checked){
+                        seqMonitor.illegalAdd(itrScenario.preModScenario);
+                        Assertions.assertThrows(itrScenario.expectedException,()->itrMonitor.iterateForward());
+                      }
+                      itrMonitor.verifyIteratorState();
+                      seqMonitor.verifyStructuralIntegrity();
+                      seqMonitor.verifyPreAlloc(itrScenario.preModScenario).verifyNaturalAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
+                    });
+                  }
+                }
+              }
+            }
           }
-        }catch(InterruptedException e){
-          Assertions.fail(e);
-        }
-        verifyItr.verifyPostAlloc(1);
-      }
-    }
-  }
-  @org.junit.jupiter.api.Test
-  public void testtoString_void(){
-    gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testtoString_voidHelper((SeqMonitor)args[0],(int)args[1]
-      );
-    });
-  }
-  private static void testtoString_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd
-  ){
-    {
-      for(int i=0;i<numToAdd;++i){
-        seqMonitor.add(i);
-      }
-    }
-    {
-      var resultStr=seqMonitor.seq.toString();
-      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-      var itr=seqMonitor.seq.iterator();
-      var arrList=new ArrayList<Object>();
-      for(int i=0;i<numToAdd;++i){
-        arrList.add(itr.next());
-      }
-      Assertions.assertEquals(arrList.toString(),resultStr);
-    }
-    seqMonitor.verifyStructuralIntegrity();
-  }
-  @org.junit.jupiter.api.Test
-  public void testhashCode_void(){
-    gettoStringAndhashCode_voidArgs().parallel().map(Arguments::get).forEach(args->{
-      testhashCode_voidHelper((SeqMonitor)args[0],(int)args[1]
-      );
-    });
-  }
-  private static void testhashCode_voidHelper
-  (SeqMonitor seqMonitor,int numToAdd
-  ){
-    {
-      for(int i=0;i<numToAdd;++i){
-        seqMonitor.add(i);
-      }
-    }
-    {
-      int resultHash=seqMonitor.seq.hashCode();
-      seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc();
-      var itr=seqMonitor.seq.iterator();
-      int expectedHash=1;
-      for(int i=0;i<numToAdd;++i){
-        expectedHash=(expectedHash*31)+itr.next().hashCode();
-      }
-      Assertions.assertEquals(expectedHash,resultHash);
-    }
-    seqMonitor.verifyStructuralIntegrity();
-  }
-  @FunctionalInterface
-  interface ArgBuilder{
-    void buildArgs(Stream.Builder<Arguments> streamBuilder,NestedType nestedType,CheckedType checkedType);
-    static Stream<Arguments> buildSeqArgs(ArgBuilder argBuilder){
-      Stream.Builder<Arguments> streamBuilder=Stream.builder();
-      for(var nestedType:NestedType.values()){
-        for(var checkedType:CheckedType.values()){
-          argBuilder.buildArgs(streamBuilder,nestedType,checkedType);
         }
       }
-      return streamBuilder.build();
     }
+    completeAllTests();
   }
-  static Stream<Arguments> getPeekPollAndPopArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(var outputType:FloatOutputTestArgType.values()){
-        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),outputType));
+  @org.junit.jupiter.api.Test
+  public void testConstructor_void(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        submitTest(()->{
+          var seqMonitor=new SeqMonitor(nestedType,checkedType);
+          if(seqMonitor.checkedType.checked){
+            Assertions.assertEquals(0,seqMonitor.nestedType==NestedType.QUEUE?FieldAndMethodAccessor.FloatSnglLnkSeq.CheckedQueue.modCount(seqMonitor.seq):FieldAndMethodAccessor.FloatSnglLnkSeq.CheckedStack.modCount(seqMonitor.seq));
+          }
+          Assertions.assertEquals(0,seqMonitor.seq.size);
+          Assertions.assertNull(seqMonitor.seq.head);
+        });
       }
-    });
-  }
-  static Stream<Arguments> gettoStringAndhashCode_voidArgs(){
-   return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-     for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-       streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize));
-     }
-   });
+    }
+    completeAllTests();
   }
   private static class SeqMonitor extends AbstractFloatSeqMonitor<FloatSnglLnkSeq>{
     NestedType nestedType;
@@ -1705,146 +1786,5 @@ public class FloatSnglLnkSeqTest{
     NestedType(boolean forwardIteration){
       this.forwardIteration=forwardIteration;
     }
-  }
-  static void buildQueryArguments(Stream.Builder<Arguments> builder,NestedType nestedType){
-    for(var checkedType:CheckedType.values()){
-      for(var seqLocation:SequenceLocation.values()){
-        if(seqLocation!=SequenceLocation.IOBLO){
-          for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-            if(seqLocation==SequenceLocation.IOBHI || (seqSize>1 || (seqLocation==SequenceLocation.BEGINNING && seqSize>0))){
-              for(var argType:QueryTester.values()){
-                for(var queryCastType:QueryCastType.values()){
-                  switch(argType){
-                    case Booleannull:
-                    case Bytenull:
-                    case Characternull:
-                    case Shortnull:
-                    case Integernull:
-                    case Longnull:
-                    case Floatnull:
-                    case Doublenull:
-                      if(queryCastType!=QueryCastType.ToBoxed || (seqSize>0 && seqLocation.expectedException==null)){
-                        continue;
-                      }
-                      break;
-                    case Objectnull:
-                      if(queryCastType!=QueryCastType.ToObject || (seqSize>0 && seqLocation.expectedException==null)){
-                        continue;
-                      }
-                      break;
-                    case Booleanfalse:
-                    case Byte0:
-                    case Character0:
-                    case Short0:
-                    case Integer0:
-                    case Long0:
-                    case Floatpos0:
-                    case Floatneg0:
-                    case Doublepos0:
-                    case Doubleneg0:
-                    case Booleantrue:
-                    case Bytepos1:
-                    case Characterpos1:
-                    case Shortpos1:
-                    case Integerpos1:
-                    case Longpos1:
-                    case Floatpos1:
-                    case Doublepos1:
-                    //values beyond the range of boolean
-                    case Bytepos2:
-                    case Characterpos2:
-                    case Shortpos2:
-                    case Integerpos2:
-                    case Longpos2:
-                    case Floatpos2:
-                    case Doublepos2:
-                    //negative values beyond the range of char
-                    case Byteneg1:
-                    case Shortneg1:
-                    case Integerneg1:
-                    case Longneg1:
-                    case Floatneg1:
-                    case Doubleneg1:
-                    //negative values beyond the range of byte
-                    case ShortMIN_BYTE_MINUS1:
-                    case IntegerMIN_BYTE_MINUS1:
-                    case LongMIN_BYTE_MINUS1:
-                    case FloatMIN_BYTE_MINUS1:
-                    case DoubleMIN_BYTE_MINUS1:
-                    //negative values beyond the range of short
-                    case IntegerMIN_SHORT_MINUS1:
-                    case LongMIN_SHORT_MINUS1:
-                    case FloatMIN_SHORT_MINUS1:
-                    case DoubleMIN_SHORT_MINUS1:
-                    //negative values beyond the range of int
-                    case FloatMIN_INT_MINUS1:
-                    //positive values out of the range of byte
-                    case CharacterMAX_BYTE_PLUS1:
-                    case ShortMAX_BYTE_PLUS1:
-                    case IntegerMAX_BYTE_PLUS1:
-                    case LongMAX_BYTE_PLUS1:
-                    case FloatMAX_BYTE_PLUS1:
-                    case DoubleMAX_BYTE_PLUS1:
-                    //positive values out of the range of short
-                    case CharacterMAX_SHORT_PLUS1:
-                    case IntegerMAX_SHORT_PLUS1:
-                    case LongMAX_SHORT_PLUS1:
-                    case FloatMAX_SHORT_PLUS1:
-                    case DoubleMAX_SHORT_PLUS1:
-                    //positive values out of the range of char
-                    case IntegerMAX_CHAR_PLUS1:
-                    case LongMAX_CHAR_PLUS1:
-                    case FloatMAX_CHAR_PLUS1:
-                    case DoubleMAX_CHAR_PLUS1:
-                    //positive values out of the range of int
-                    case LongMAX_INT_PLUS1:
-                    case FloatMAX_INT_PLUS1:
-                    case DoubleMAX_INT_PLUS1:
-                      //floating-point values beyond the range any integral type
-                    case FloatMAX_LONG_PLUS1:
-                    case FloatMIN_LONG_MINUS1:
-                    case FloatMAX_FLOAT_VALUE:
-                    case DoubleMAX_FLOAT_VALUE:
-                    //fractional floating point values that cannot be matched with any integral type
-                    case FloatMIN_FLOAT_VALUE:
-                    case DoubleMIN_FLOAT_VALUE:
-                    //NaN values that can only be matches with NaN
-                    case FloatNaN:
-                    case DoubleNaN:
-                    //these input values cannot potentially return true
-                    break;
-                    default:
-                    if(seqSize>0 && seqLocation.expectedException==null){
-                      continue;
-                    }
-                    //these values must necessarily return false
-                  }
-                  builder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize));
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  static Stream<Arguments> getQueryStackArguments(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    buildQueryArguments(builder,NestedType.STACK);
-    return builder.build();
-  }
-  static Stream<Arguments> getQueryCollectionArguments(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(var nestedType:NestedType.values()){
-      buildQueryArguments(builder,nestedType);
-    }
-    return builder.build();
-  }
-  static Stream<Arguments> getBasicCollectionTestArgs(){
-    return ArgBuilder.buildSeqArgs((streamBuilder,nestedType,checkedType)->{
-      for(int seqSize:AbstractFloatSeqMonitor.FIB_SEQ){
-        streamBuilder.accept(Arguments.of(new SeqMonitor(nestedType,checkedType),seqSize));
-      }
-    });
   }
 }
