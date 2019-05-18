@@ -2256,53 +2256,6 @@ public class $ClassPrefix$SnglLnkSeqTest{
   }
 #ENDIF
 }
-#MACRODEF ParallelizationCode<PARALLEL>()
-private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-#IFSWITCH PARALLEL==true
-java.util.concurrent.Executors.newWorkStealingPool();
-#ELSE
-java.util.concurrent.Executors.newSingleThreadExecutor();
-#ENDIF
-private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
-
-private static void submitTest(Runnable test){
-  TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
-}
-private static void completeAllTests(){
-  try{
-    TESTQUEUE.forEach(test->{
-      try{
-        test.get();
-      }catch(InterruptedException|java.util.concurrent.ExecutionException e){
-        
-        var cause=e.getCause();
-        if(cause instanceof RuntimeException){
-          throw (RuntimeException)cause;
-        }
-        if(cause instanceof Error){
-          throw (Error)cause;
-        }
-        throw new Error(cause);
-      }
-    });
-  }finally{
-    TESTQUEUE.clear();
-  }
-}
-@org.junit.jupiter.api.AfterEach
-public void verifyAllExecuted(){
-  if(!TESTQUEUE.isEmpty()){
-    System.err.println("Warning: there were "+TESTQUEUE.size()+" tests that were not completed");
-  }
-}
-@org.junit.jupiter.api.AfterAll
-public static void cleanUp(){
-  java.util.List<Runnable> stillRunning=EXECUTORSERVICE.shutdownNow();
-  if(!TESTQUEUE.isEmpty() || !stillRunning.isEmpty()){
-    throw new Error("There were unfinished tests in the queue");
-  }
-}
-#ENDDEF
 #MACRODEF testMASSIVEtoString_void<PARALLEL>()
 #IF OfBoolean
   private static final int MAX_TOSTRING_LENGTH=5;
@@ -2374,4 +2327,51 @@ public void testMASSIVEtoString_void(){
   }
 }
 #ENDIF
+#ENDDEF
+#MACRODEF ParallelizationCode<PARALLEL>()
+private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
+#IFSWITCH PARALLEL==true
+java.util.concurrent.Executors.newWorkStealingPool();
+#ELSE
+java.util.concurrent.Executors.newSingleThreadExecutor();
+#ENDIF
+private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
+
+private static void submitTest(Runnable test){
+  TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
+}
+private static void completeAllTests(){
+  try{
+    TESTQUEUE.forEach(test->{
+      try{
+        test.get();
+      }catch(InterruptedException|java.util.concurrent.ExecutionException e){
+        
+        var cause=e.getCause();
+        if(cause instanceof RuntimeException){
+          throw (RuntimeException)cause;
+        }
+        if(cause instanceof Error){
+          throw (Error)cause;
+        }
+        throw new Error(cause);
+      }
+    });
+  }finally{
+    TESTQUEUE.clear();
+  }
+}
+@org.junit.jupiter.api.AfterEach
+public void verifyAllExecuted(){
+  if(!TESTQUEUE.isEmpty()){
+    System.err.println("Warning: there were "+TESTQUEUE.size()+" tests that were not completed");
+  }
+}
+@org.junit.jupiter.api.AfterAll
+public static void cleanUp(){
+  java.util.List<Runnable> stillRunning=EXECUTORSERVICE.shutdownNow();
+  if(!TESTQUEUE.isEmpty() || !stillRunning.isEmpty()){
+    throw new Error("There were unfinished tests in the queue");
+  }
+}
 #ENDDEF

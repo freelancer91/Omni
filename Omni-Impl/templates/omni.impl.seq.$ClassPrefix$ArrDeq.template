@@ -1293,7 +1293,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         if(filter.test(false)){
           this.tail=-1;
         }else{
-          setRange(arr,size-=-(trueCount+1),false);
+          setRange(arr,size-=(trueCount+1),false);
           this.head=0;
           this.tail=size;
         }
@@ -1424,61 +1424,403 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       //TODO
       return false;
     }
-   
 #IFNOT OfBoolean
     #MACRO CollapseEnd<true,head,tail>(++)
     #MACRO CollapseEnd<true,tail,head>(--)
-    #MACRO SuppressUnchecked()
-    private void collapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
-      //TODO
+
+    private class CollapseBodyData
+    {
+      int biggestRunLength;
+      int biggestRunBegin;
+      final int numLeft;
+      final int srcOffset;
+      final int dstOffset;
+      fianl int srcBound;
+      CollapseBodyData(int numLeft,int srcOffset,int dstOffset,int srcBound){
+        this.numLeft=numLeft;
+        this.srcOffset=srcOffset;
+        this.dstOffset=dstOffset;
+        this.srcBound=srcBound;
+      }
+      #MACRO SuppressUnchecked()
+      private long markSurvivors($TypeNameModifier$Predicate$<? super E>$ filter){
+        var arr=Checked.this.arr;
+        int currentRunLength=0,srcOffset=this.srcOffset,srcBound=this.srcBound;
+        for(long word=0L,marker=1L;;marker<<=1){
+          if(!filter.test(($exposedType$)arr[srcOffset])){
+            word|=marker;
+            if(++currentRunLength>biggestRunLength){
+              biggestRunLength=currentRunLength;
+              biggestRunBegin=srcOffset-currentRunLength-1;
+            }
+          }else{
+            currentRunLength=0;
+          }
+          if(++srcOffset==srcBound){
+            return word;
+          }
+        }
+      }
+      #MACRO SuppressUnchecked()
+      private int markSurvivors($TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
+        var arr=Checked.this.arr;
+        for(int numSurvivors=0,currentRunLength=0,wordOffset=0,srcOffset=this.srcOffset,srcBound=this.srcBound;;){
+          long word=0L,marker=1L;
+          do{
+            if(!filter.test(($exposedType$)arr[srcOffset])){
+              word|=marker;
+              ++numSurvivors;
+              if(++currentRunLength>biggestRunLength){
+                biggestRunLength=currentRunLength;
+                biggestRunBegin=srcOffset-currentRunLength-1;
+              }
+            }else{
+              currentRunLength=0;
+            }
+            if(++srcOffset==tail){
+              survivorSet[wordOffset]=word;
+              return numSurvivors;
+            }
+          }
+          while((marker<<=1)!=0L);
+          survivorSet[wordOffset++]=word;
+        }
+      }
+      private $<E>$ void collapseSurvivors(int numSurvivors,int head,long[] survivorSet){
+        final Checked$<E>$ deq
+        final var arr=(deq=Checked.this).arr;
+        if(numSurvivors!=0){
+          int numLeft;
+          if(numSurvivors==(numLeft=this.numLeft)){
+            int dstOffset;
+            if((numSurvivors=(dstOffset=this.dstOffset)-head)<=(numLeft+=2)){
+              ArrCopy.uncheckedCopy(arr,head,arr,dstOffset=this.srcOffset-1-numSurvivors,numSurvivors);
+              deq.head=dstOffset;
+#IF OfRef
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,dstOffset-1,head);
+#ENDIF
+              deq.tail=srcBound;
+            }else{
+              System.arraycopy(arr,this.srcOffset-1,arr,dstOffset,numLeft);
+              
+#IF OfRef
+              deq.tail=dstOffset+=numLeft;
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcBound,dstOffset+1);
+#ELSE
+              deq.tail=dstOffset+numLeft;
+#ENDIF
+              deq.head=head;
+            }
+          }else{
+            int beforeBiggestRun=this.biggestRunBegin-1;
+            int afterBiggestRun=beforeBiggestRun+biggestRunLength+1
+            //TODO
+          }
+        }else{
+          int dstOffset;
+          arr[dstOffset=this.dstOffset]=arr[srcOffset-1];
+#IF OfRef
+          arr[++dstOffset]=arr[numSurvivors=srcBound];
+          OmniArray.nullifyRange(arr,numSurvivors,dstOffset+1);
+#ELSE
+          arr[++dstOffset]=arr[srcBound];
+#ENDIF
+          deq.tail=dstOffset;
+          deq.head=head;
+        }
+      }
+      private $<E>$ void collapseSurvivors(int head,long survivorWord){
+        final Checked deq;
+        final var arr=(deq=Checked.this).arr;
+        int numSurvivors;
+        if((numSurvivors=Long.bitCount(survivorWord))!=0){
+          int numLeft;
+          if(numSurvivors==(numLeft=this.numLeft)){
+            int dstOffset;
+            if((numSurvivors=(dstOffset=this.dstOffset)-head)<=(numLeft+=2)){
+              ArrCopy.uncheckedCopy(arr,head,arr,dstOffset=this.srcOffset-1-numSurvivors,numSurvivors);
+              deq.head=dstOffset;
+#IF OfRef
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,dstOffset-1,head);
+#ENDIF
+              deq.tail=srcBound;
+            }else{
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numLeft);
+#IF OfRef
+              deq.tail=dstOffset+=numLeft;
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcBound,dstOffset+1);
+#ELSE
+              deq.tail=dstOffset+numLeft;
+#ENDIF
+              deq.head=head;
+            }
+          }else{
+            int beforeBiggestRun=this.biggestRunBegin-1;
+            int afterBiggestRun=beforeBiggestRun+biggestRunLength+1
+            //TODO
+          }
+        }else{
+          int dstOffset;
+          arr[dstOffset=this.dstOffset]=arr[srcOffset-1];
+#IF OfRef
+          arr[++dstOffset]=arr[numSurvivors=srcBound];
+          OmniArray.nullifyRange(arr,numSurvivors,dstOffset+1);
+#ELSE
+          arr[++dstOffset]=arr[srcBound];
+#ENDIF
+          deq.tail=dstOffset;
+          deq.head=head;
+        }
+      }
     }
     #MACRO SuppressUnchecked()
-    private void collapseHeadAndTail($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
-      for(int headOffset=head+1;headOffset!=tail;++headOffset)
+    private void collapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      for(int srcOffset=head+1;;)
       {
-        if(!filter.test(($exposedType$)arr[headOffset]))
+        if(srcOffset==tail)
         {
-          for(int tailOffset=tail-1;tailOffset!=headOffset;--tailOffset)
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.head=head;
+          this.tail=tail;
+          break;
+        }
+        if(filter.test(($exposedType$)arr[srcOffset]))
+        {
+          int dstOffset=srcOffset;
+          outer:for(;;)
           {
-            if(!filter.test(($exposedType$)arr[tailOffset]))
+            if(++srcOffset==tail)
             {
-              collapseBodyHelper(arr,headOffset,tailOffset,filter,modCount);
-              this.modCount=modCount+1;
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.head=head;
+              arr[dstOffset]=arr[tail];
 #IF OfRef
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,tailOffset+1);
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,dstOffset+1);
 #ENDIF
+              this.tail=dstOffset;
+              return;
+            }
+            if(!filter.test(($exposedType$)arr[srcOffset]))
+            {
+              int numLeft;
+              if((numLeft=tail-(++srcOffset))!=0)
+              {
+                var collapseBodyData=new CollapseBodyData(numLeft,srcOffset,dstOffset);
+                if(numLeft>64)
+                {
+                  long[] survivorSet;
+                  int numSurvivors=collapseBodyData.markSurvivors(filter,survivorSet=new long[((numLeft-1)>>6)+1]);
+                  CheckedCollection.checkModCount(modCount,this.modCount);
+                  collapseBodyData.collapseSurvivors(numSurvivors,head,survivorSet);
+                }
+                else
+                {
+                  long survivorWord=collapseBodyData.markSurvivors(filter);
+                  CheckedCollection.checkModCount(modCount,this.modCount);
+                  collapseBodyData.collapseSurvivors(head,survivorWord);
+                }
+              }
+              else
+              {
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                if(dstOffset-head<2)
+                {
+                  arr[--srcOffset]=arr[head];
+#IF OfRef
+                  OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcOffset-1,head);
+#ENDIF
+                  this.head=srcOffset;
+                  this.tail=tail;
+                }
+                else
+                {
+                  arr[dstOffset]=arr[srcOffset-1];
+                  arr[++dstOffset]=arr[tail];
+#IF OfRef
+                  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,dstOffset+1);
+#ENDIF
+                  this.tail=dstOffset;
+                  this.head=head;
+                }
+              }
               return;
             }
           }
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
-          this.head=headOffset;
-          this.tail=headOffset;
-#IF OfRef
-          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,headOffset+1);
-          OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
-#ENDIF
-          return;
         }
       }
-      CheckedCollection.checkModCount(modCount,this.modCount);
-      this.modCount=modCount+1;
-      this.tail=-1;
-#IF OfRef
-      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
-#ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private void fragmentedCollapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      //TODO
     }
     #MACRO SuppressUnchecked()
     private boolean collapseBody($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
       //TODO
       return false;
     }
+    #MACRO SuppressUnchecked()
+    private boolean fragmentedCollapseBody($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      //TODO
+      return false;
+    }
+    #MACRO SuppressUnchecked()
+    private void fragmentedCollapseHeadAndTail($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      int newTail=tail-1,newHead=head+1,bound=arr.length-1;
+      for(;;--newTail){
+        if(newTail==-1){
+          for(;;++newHead){
+            if(newHead>bound){
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.tail=-1;
+              break;
+            }else if(!filter.test(($exposedType$)arr[newHead])){
+              collapsetailHelper(arr,newHead,filter,modCount);
+              break;
+            }
+          }
+          break;
+        }else if(!filter.test(($exposedType$)arr[newTail])){
+          for(;;++newHead){
+            if(newHead>bound){
+              collapseheadHelper(arr,newTail,filter,modCount);
+              break;
+            }else if(!filter.test(($exposedType$)arr[newHead])){
+              fragmentedCollapseBodyHelper(arr,newHead,newTail,filter,modCount);
+              break;
+            }
+          }
+          break;
+        }
+      }
+  #IF OfRef
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,newHead-1,head);
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,newTail+1);
+  #ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseHeadAndTail($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+      for(int headOffset=head+1;headOffset!=tail;++headOffset){
+        if(!filter.test(($exposedType$)arr[headOffset])){
+          for(int tailOffset=tail-1;tailOffset!=headOffset;--tailOffset){
+            if(!filter.test(($exposedType$)arr[tailOffset])){
+              collapseBodyHelper(arr,headOffset,tailOffset,filter,modCount);
+  #IF OfRef
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,tailOffset+1);
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
+  #ENDIF
+              return;
+            }
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.head=headOffset;
+          this.tail=headOffset;
+  #IF OfRef
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,headOffset+1);
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,headOffset-1,head);
+  #ENDIF
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.tail=-1;
+  #IF OfRef
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head);
+  #ENDIF
+    }
 #ENDIF
     #MACRO SuppressUnchecked()
     @Override boolean fragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
-      //TODO
-      return false;
+#IF OfBoolean
+      final $ArrayType$[] arr;
+      int trueCount=0,bound=(arr=this.arr).length;
+      for(int i=head;;){
+        if(arr[i]){
+          ++trueCount;
+        }
+        if(++i==bound){
+          for(i=0;;++i){
+            if(arr[i]){
+              ++trueCount;
+            }
+            if(i==tail){
+              break;
+            }
+          }
+          break;
+        }
+      }
+      int modCount=this.modCount;
+      try{
+        if(trueCount!=0){
+          if(trueCount!=(bound+=(tail-head+1))){
+            head=(filter.test(true)?0b01:0b00)|(filter.test(false)?0b10:0b00);
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            switch(head){
+              case 0b00:
+                return false;
+              case 0b01:
+                setRange(arr,bound-=(trueCount+1),false);
+                this.tail=bound;
+                this.head=0;
+                break;
+              case 0b10:
+                setRange(arr,--trueCount,true);
+                this.tail=trueCount;
+                this.head=0;
+                break;
+              default:
+                this.tail=-1;
+            }
+          }else{
+            boolean removeTrue=filter.test(true);
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            if(!removeTrue){
+              return false;
+            }
+            this.tail=-1;
+          }
+        }else{
+          boolean removeFalse=filter.test(false);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if(!removeFalse){
+             return false; 
+          }
+          this.tail=-1;
+        }
+        this.modCount=modCount+1;
+        return true;
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+      
+#ELSE
+      int modCount=this.modCount;
+      try{
+        final $ArrayType$[] arr;
+        if(filter.test(($exposedType$)(arr=this.arr)[head])){
+          if(filter.test(($exposedType$)arr[tail])){
+            fragmentedCollapseHeadAndTail(arr,head,tail,filter,modCount);
+          }else{
+            fragmentedCollapsehead(arr,head,tail,filter,modCount);
+          }
+          this.modCount=modCount+1;
+          return true;
+        }else{
+          if(filter.test(($exposedType$)arr[tail])){
+            fragmentedCollapsetail(arr,head,tail,filter,modCount);
+            this.modCount=modCount+1;
+            return true;
+          }
+          return fragmentedCollapseBody(arr,head,tail,filter,modCount);
+        }
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+#ENDIF
     }
     #MACRO SuppressUnchecked()
     @Override boolean nonfragmentedRemoveIf(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter){
@@ -1497,50 +1839,49 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       final int modCount=this.modCount;
       try{
 #IF OfBoolean
-        int size;
-        if(trueCount==(size=tail-head+1)){
-          if(filter.test(true)){
+        if(trueCount!=0){
+          if(trueCount!=(tail-=(head-1))){
+            head=(filter.test(true)?0b01:0b00)|(filter.test(false)?0b10:0b00);
             CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-            this.tail=-1;
-            return true;
-          }
-        }else if(trueCount==0){
-          if(filter.test(false)){
+            switch(head){
+              case 0b00:
+                return false;
+              case 0b01:
+                setRange(arr,tail-=(trueCount+1),false);
+                this.tail=tail;
+                this.head=0;
+                break;
+              case 0b10:
+                setRange(arr,--trueCount,true);
+                this.tail=trueCount;
+                this.head=0;
+                break;
+              default:
+                this.tail=-1;
+            }
+          }else{
+            boolean removeTrue=filter.test(true);
             CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
+            if(!removeTrue){
+               return false; 
+            }
             this.tail=-1;
-            return true;
           }
         }else{
-          if(filter.test(true)){
-            if(filter.test(false)){
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-              this.tail=-1;
-            }else{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-              setRange(arr,size-=-(trueCount+1),false);
-              this.head=0;
-              this.tail=size;
-            }
-            return true;
-          }else if(filter.test(false)){
-            CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-            setRange(arr,--trueCount,true);
-            this.head=0;
-            this.tail=trueCount;
-            return true;
+          boolean removeFalse=filter.test(false);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if(!removeFalse){
+             return false; 
           }
+          this.tail=-1;
         }
+        this.modCount=modCount+1;
+        return true;
 #ELSE
         final $ArrayType$[] arr;
         if(filter.test(($exposedType$)(arr=this.arr)[head])){
           if(head==tail){
             CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
   #IF OfRef
             arr[tail]=null;
   #ENDIF
@@ -1550,10 +1891,12 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           }else{
             collapsehead(arr,head,tail,filter,modCount);
           }
+          this.modCount=modCount+1;
           return true;
         }else if(head!=tail){
           if(filter.test(($exposedType$)arr[tail])){
             collapsetail(arr,head,tail,filter,modCount);
+            this.modCount=modCount+1;
             return true;
           }
           return collapseBody(arr,head,tail,filter,modCount);
@@ -1564,8 +1907,10 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }catch(RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
+#IFNOT OfBoolean
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
+#ENDIF
     }
     @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
       return new AscendingItr$<E>$(this);
@@ -3126,26 +3471,144 @@ ERROR unknown method name METHODNAME in QueryMethod<INPUTTYPE>(CAST)
 #ENDDEF
 #MACRODEF CollapseEnd<CHECKED,HEAD,TAIL>(INCREMENT)
 #IFSWITCH CHECKED==true
-//TODO CollapseEnd<CHECKED>(HEAD,TAIL,INCREMENT)
+#MACRO SuppressUnchecked()
+private void collapseHEADHelper($ArrayType$[] arr,int TAIL,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+  #IFSWITCH HEAD==head
+  if(tail==0){
+    CheckedCollection.checkModCount(modCount,this.modCount);
+    this.head=0;
+    this.tail=0;
+  }else{
+    for(int head=0;;)
+  #ELSE
+    #IF OfRef
+  int bound;  
+  if((bound=arr.length-1)==head){
+    CheckedCollection.checkModCount(modCount,this.modCount);
+    this.tail=bound;
+    this.head=head;
+  }else{
+    for(int tail=bound;;)
+    #ELSE
+  int tail;
+  if((tail=arr.length-1)==head){
+    CheckedCollection.checkModCount(modCount,this.modCount);
+    this.tail=tail;
+    this.head=head;
+  }else{
+    for(;;)
+    #ENDIF
+  #ENDIF
+    {
+      if(!filter.test(($exposedType$)arr[HEAD])){
+        collapseBodyHelper(arr,head,tail,filter,modCount);
+        break;
+      }else if(INCREMENTHEAD==TAIL){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.tail=tail;
+        this.head=head;
+        break;
+      }
+    }
+  #IF OfRef
+    #IFSWITCH HEAD==head
+    OmniArray.Of$ClassPrefix$.nullifyRange(arr,head-1,0);
+    #ELSE
+    OmniArray.Of$ClassPrefix$.nullifyRange(arr,bound,tail+1);
+    #ENDIF
+  #ENDIF
+  }
+}
+#MACRO SuppressUnchecked()
+private void fragmentedCollapseHEADHelper($ArrayType$[] arr,int TAIL,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
+  #IFSWITCH HEAD==head
+  if(TAIL==0){
+    CheckedCollection.checkModCount(modCount,this.modCount);
+    this.HEAD=0;
+  }else{
+    int HEAD;
+    for(HEAD=0;;INCREMENTHEAD)
+  #ELSE
+    #IF OfRef
+  int bound;
+  if((bound=arr.length-1)==TAIL){
+    CheckedCollection.checkModCount(modCount,this.modCount);
+    this.HEAD=TAIL;
+  }else{
+    int HEAD;
+    for(HEAD=bound;;INCREMENTHEAD)
+    #ELSE
+  int HEAD;
+  if((HEAD=arr.length-1)==TAIL){
+    CheckedCollection.checkModCount(modCount,this.modCount);
+    this.HEAD=TAIL;
+  }else{
+    for(;;INCREMENTHEAD)
+    #ENDIF
+  #ENDIF
+    {
+      if(HEAD==TAIL){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.HEAD=HEAD;
+        break;
+      }else if(!filter.test(($exposedType$)arr[HEAD])){
+        collapseBodyHelper(arr,head,tail,filter,modCount);
+        break;
+      }
+    }
+  #IF OfRef
+    #IFSWITCH HEAD==head
+    OmniArray.Of$ClassPrefix$.nullifyRange(arr,HEAD-1,0);
+    #ELSE
+    OmniArray.Of$ClassPrefix$.nullifyRange(arr,bound,HEAD+1);
+    #ENDIF
+  #ENDIF
+  }
+}
+#MACRO SuppressUnchecked()
 private void fragmentedCollapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
-  //TODO
+  int newHEAD;
+  #IFSWITCH HEAD==head
+  int bound;
+  for(newHEAD=HEAD+1,bound=arr.length-1;;INCREMENTnewHEAD){
+    if(newHEAD>bound){
+  #ELSE
+  for(newHEAD=HEAD-1;;INCREMENTnewHEAD){
+    if(newHEAD==-1){
+  #ENDIF
+      fragmentedCollapseHEADHelper(arr,TAIL,filter,modCount);
+      break;
+    }
+    if(!filter.test(($exposedType$)arr[newHEAD])){
+  #IFSWITCH HEAD==head
+      fragmentedCollapseBodyHelper(arr,newHEAD,TAIL,filter,modCount);
+  #ELSE
+      fragmentedCollapseBodyHelper(arr,TAIL,newHEAD,filter,modCount);
+  #ENDIF
+      break;
+    }
+  }
+  #IF OfRef
+    #IFSWITCH HEAD==head
+  OmniArray.Of$ClassPrefix$.nullifyRange(arr,newHEAD-1,HEAD);
+    #ELSE
+  OmniArray.Of$ClassPrefix$.nullifyRange(arr,HEAD,newHEAD+1);  
+    #ENDIF
+  #ENDIF
 }
 #MACRO SuppressUnchecked()
 private void collapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
-  for(int srcOffset=HEAD;INCREMENTsrcOffset!=TAIL;)
-  {
-    if(!filter.test(($exposedType$)arr[srcOffset]))
-    {
+  for(int srcOffset=HEAD;INCREMENTsrcOffset!=TAIL;){
+    if(!filter.test(($exposedType$)arr[srcOffset])){
 #IFSWITCH HEAD==head
-      collapseBodyHelper(arr,srcOffset,tail,filter,modCount);
-      
+      collapseBodyHelper(arr,srcOffset,TAIL,filter,modCount);
   #IF OfRef
-      OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcOffset-1,head);
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcOffset-1,HEAD);
   #ENDIF
 #ELSE
-      collapseBodyHelper(arr,head,srcOffset,filter,modCount);
+      collapseBodyHelper(arr,TAIL,srcOffset,filter,modCount);
   #IF OfRef
-      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,srcOffset+1);
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,HEAD,srcOffset+1);
   #ENDIF
 #ENDIF
       this.modCount=modCount+1;
@@ -3156,9 +3619,9 @@ private void collapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$
   this.modCount=modCount+1;
 #IF OfRef
   #IFSWITCH HEAD==head
-  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail-1,head);
+  OmniArray.Of$ClassPrefix$.nullifyRange(arr,TAIL-1,HEAD);
   #ELSE
-  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,head+1);
+  OmniArray.Of$ClassPrefix$.nullifyRange(arr,HEAD,TAIL+1);
   #ENDIF
 #ENDIF
   this.HEAD=head;
@@ -3177,22 +3640,23 @@ private void fragmentedCollapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNam
   #ENDIF
   #IFSWITCH HEAD==head
     if(INCREMENTHEAD==bound){
-      for(HEAD=0;HEAD!=TAIL;INCREMENTHEAD)
+      for(HEAD=0;;INCREMENTHEAD)
   #ELSE
     if(HEAD==0){
-      for(HEAD=arr.length-1;HEAD!=TAIL;INCREMENTHEAD)
+      for(HEAD=arr.length-1;;INCREMENTHEAD)
   #ENDIF
       {
-        if(!filter.test(($exposedType$)arr[HEAD]))
-        {
+        if(HEAD==TAIL){
+          this.HEAD=head;
+          return;
+        }else if(!filter.test(($exposedType$)arr[HEAD])){
           collapseBodyHelper(arr,head,tail,filter);
-          break;
+          return;
         }
   #IF OfRef
         arr[HEAD]=null;
   #ENDIF
       }
-      return;
     }
   #IFSWITCH HEAD==head
     if(!filter.test(($exposedType$)arr[HEAD]))

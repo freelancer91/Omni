@@ -38,10 +38,10 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class RefArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newWorkStealingPool();
-  private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
+  java.util.concurrent.Executors.newSingleThreadExecutor();
+  private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
-    TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
+    TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
   }
   private static void completeAllTests(){
     try{
@@ -76,7 +76,104 @@ public class RefArrDeqTest{
       throw new Error("There were unfinished tests in the queue");
     }
   }
-  //TODO removeIf
+  @org.junit.jupiter.api.Test
+  public void testremoveIf_Predicate(){
+    for(var checkedType:CheckedType.values()){
+      if(checkedType.checked){
+        continue; //TODO remove
+      }
+      for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
+        if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
+          for(var functionCallType:FunctionCallType.values()){
+            if(functionCallType==FunctionCallType.Boxed){
+              continue;
+            }
+            submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
+            for(int tmpSeqSize=1;tmpSeqSize<=101;tmpSeqSize+=10){
+              final int seqSize=tmpSeqSize;
+              final int inc=Math.max(1,seqSize/10);
+              double[] thresholdArr;
+              long randSeedBound;
+              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+                thresholdArr=new double[]{0.5};
+                randSeedBound=0;
+              }else{
+                thresholdArr=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
+                randSeedBound=100;
+              }
+              for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
+                final long randSeed=tmpRandSeed;
+                for(double threshold:thresholdArr){
+                  for(int tmpHead=0;tmpHead<seqSize;tmpHead+=inc){
+                    final int head=tmpHead;
+                    submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize,head));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    completeAllTests();
+  }
+  private static void testremoveIf_PredicateHelper(CheckedType checkedType,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize,int head
+  ){
+    var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+    initializeAscending(seqMonitor.seq.arr,head,seqSize);
+    final var clone=(OmniCollection.OfRef)seqMonitor.seq.clone();
+    final int numExpectedCalls=seqSize;
+    final int numExpectedRemoved;
+    switch(monitoredRemoveIfPredicateGen){
+      case RemoveFirst:
+      case RemoveLast:
+        numExpectedRemoved=Math.min(1,seqSize);
+        break;
+      case RemoveFirstAndLast:
+        numExpectedRemoved=Math.min(2,seqSize);
+        break;
+      case RemoveAllButFirst:
+      case RemoveAllButLast:
+        numExpectedRemoved=seqSize-Math.min(1,seqSize);
+        break;
+      case RemoveAllButFirstAndLast:
+        numExpectedRemoved=seqSize-Math.min(2,seqSize);
+        break;
+      case RemoveAll:
+        numExpectedRemoved=seqSize;
+        break;
+      case Random:
+        numExpectedRemoved=-1;
+        break;
+      case RemoveNone:
+      case Throw:
+      case ModSeq:
+      case ModParent:
+      case ModRoot:
+      case ThrowModSeq:
+      case ThrowModParent:
+      case ThrowModRoot:
+        numExpectedRemoved=0;
+        break;
+      default:
+        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+    }
+    final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
+    if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
+      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize);
+      return;
+    }else{
+      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    var verifyItr=seqMonitor.verifyPreAlloc();
+    var cloneItr=clone.iterator();
+    while(cloneItr.hasNext()){
+      verifyItr.verifyLiteralIndexAndIterate(cloneItr.next());
+    }
+  }
   @org.junit.jupiter.api.Test
   public void testreadandwriteObject(){
     for(var checkedType:CheckedType.values()){
@@ -1054,6 +1151,7 @@ public class RefArrDeqTest{
         Assertions.assertSame(OmniArray.OfRef.DEFAULT_ARR,deq.arr);
       });
     }
+    completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_int(){
@@ -2264,22 +2362,26 @@ public class RefArrDeqTest{
         }
       }
       @Override SequenceVerificationItr getOffset(int i){
-        int index=currIndex+1;
-        int arrLength;
-        if(index>=(arrLength=seqMonitor.seq.arr.length)){
-          index-=arrLength;
-        }else if(index<0){
-          index+=arrLength;
+        int index=currIndex+i;
+        if(i!=0){
+          int arrLength;
+          if(index>=(arrLength=seqMonitor.seq.arr.length)){
+            index-=arrLength;
+          }else if(index<0){
+            index+=arrLength;
+          }
         }
         return new ArrDeqVerificationItr(index,seqMonitor);
       }
       @Override SequenceVerificationItr skip(int i){
-        currIndex+=i;
-        int arrLength;
-        if(currIndex>=(arrLength=seqMonitor.seq.arr.length)){
-          currIndex-=arrLength;
-        }else if(currIndex<0){
-          currIndex+=arrLength;
+        if(i!=0){
+          currIndex+=i;
+          int arrLength;
+          if(currIndex>=(arrLength=seqMonitor.seq.arr.length)){
+            currIndex-=arrLength;
+          }else if(currIndex<0){
+            currIndex+=arrLength;
+          }
         }
         return this;
       }

@@ -39,9 +39,9 @@ import omni.function.BooleanConsumer;
 public class BooleanArrSeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
   java.util.concurrent.Executors.newWorkStealingPool();
-  private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
+  private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
-    TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
+    TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
   }
   private static void completeAllTests(){
     try{

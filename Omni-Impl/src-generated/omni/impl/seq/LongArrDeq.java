@@ -1669,15 +1669,16 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     for(int bound=arr.length;;)
     {
       if(++head==bound){
-        for(head=0;head!=tail;++head)
+        for(head=0;;++head)
         {
-          if(!filter.test((long)arr[head]))
-          {
+          if(head==tail){
+            this.head=head;
+            return;
+          }else if(!filter.test((long)arr[head])){
             collapseBodyHelper(arr,head,tail,filter);
-            break;
+            return;
           }
         }
-        return;
       }
       if(!filter.test((long)arr[head]))
       {
@@ -1699,15 +1700,16 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     for(;;)
     {
       if(tail==0){
-        for(tail=arr.length-1;tail!=head;--tail)
+        for(tail=arr.length-1;;--tail)
         {
-          if(!filter.test((long)arr[tail]))
-          {
+          if(tail==head){
+            this.tail=head;
+            return;
+          }else if(!filter.test((long)arr[tail])){
             collapseBodyHelper(arr,head,tail,filter);
-            break;
+            return;
           }
         }
-        return;
       }
       if(!filter.test((long)arr[--tail]))
       {
@@ -1835,15 +1837,62 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       //TODO
       return false;
     }
-    //TODO CollapseEnd<true>(head,tail,++)
+    private void collapseheadHelper(long[] arr,int tail,LongPredicate filter,int modCount){
+      if(tail==0){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.head=0;
+        this.tail=0;
+      }else{
+        for(int head=0;;)
+        {
+          if(!filter.test((long)arr[head])){
+            collapseBodyHelper(arr,head,tail,filter,modCount);
+            break;
+          }else if(++head==tail){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.tail=tail;
+            this.head=head;
+            break;
+          }
+        }
+      }
+    }
+    private void fragmentedCollapseheadHelper(long[] arr,int tail,LongPredicate filter,int modCount){
+      if(tail==0){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.head=0;
+      }else{
+        int head;
+        for(head=0;;++head)
+        {
+          if(head==tail){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.head=head;
+            break;
+          }else if(!filter.test((long)arr[head])){
+            collapseBodyHelper(arr,head,tail,filter,modCount);
+            break;
+          }
+        }
+      }
+    }
     private void fragmentedCollapsehead(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      //TODO
+      int newhead;
+      int bound;
+      for(newhead=head+1,bound=arr.length-1;;++newhead){
+        if(newhead>bound){
+          fragmentedCollapseheadHelper(arr,tail,filter,modCount);
+          break;
+        }
+        if(!filter.test((long)arr[newhead])){
+          fragmentedCollapseBodyHelper(arr,newhead,tail,filter,modCount);
+          break;
+        }
+      }
     }
     private void collapsehead(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      for(int srcOffset=head;++srcOffset!=tail;)
-      {
-        if(!filter.test((long)arr[srcOffset]))
-        {
+      for(int srcOffset=head;++srcOffset!=tail;){
+        if(!filter.test((long)arr[srcOffset])){
           collapseBodyHelper(arr,srcOffset,tail,filter,modCount);
           this.modCount=modCount+1;
           return;
@@ -1853,15 +1902,62 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       this.modCount=modCount+1;
       this.head=head;
     }
-    //TODO CollapseEnd<true>(tail,head,--)
+    private void collapsetailHelper(long[] arr,int head,LongPredicate filter,int modCount){
+      int tail;
+      if((tail=arr.length-1)==head){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.tail=tail;
+        this.head=head;
+      }else{
+        for(;;)
+        {
+          if(!filter.test((long)arr[tail])){
+            collapseBodyHelper(arr,head,tail,filter,modCount);
+            break;
+          }else if(--tail==head){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.tail=tail;
+            this.head=head;
+            break;
+          }
+        }
+      }
+    }
+    private void fragmentedCollapsetailHelper(long[] arr,int head,LongPredicate filter,int modCount){
+      int tail;
+      if((tail=arr.length-1)==head){
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.tail=head;
+      }else{
+        for(;;--tail)
+        {
+          if(tail==head){
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.tail=tail;
+            break;
+          }else if(!filter.test((long)arr[tail])){
+            collapseBodyHelper(arr,head,tail,filter,modCount);
+            break;
+          }
+        }
+      }
+    }
     private void fragmentedCollapsetail(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      //TODO
+      int newtail;
+      for(newtail=tail-1;;--newtail){
+        if(newtail==-1){
+          fragmentedCollapsetailHelper(arr,head,filter,modCount);
+          break;
+        }
+        if(!filter.test((long)arr[newtail])){
+          fragmentedCollapseBodyHelper(arr,head,newtail,filter,modCount);
+          break;
+        }
+      }
     }
     private void collapsetail(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      for(int srcOffset=tail;--srcOffset!=head;)
-      {
-        if(!filter.test((long)arr[srcOffset]))
-        {
+      for(int srcOffset=tail;--srcOffset!=head;){
+        if(!filter.test((long)arr[srcOffset])){
           collapseBodyHelper(arr,head,srcOffset,filter,modCount);
           this.modCount=modCount+1;
           return;
@@ -1874,38 +1970,89 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     private void collapseBodyHelper(long[] arr,int head,int tail,LongPredicate filter,int modCount){
       //TODO
     }
+    private void fragmentedCollapseBodyHelper(long[] arr,int head,int tail,LongPredicate filter,int modCount){
+      //TODO
+    }
+    private void fragmentedCollapseHeadAndTail(long[] arr,int head,int tail,LongPredicate filter,int modCount){
+      int newTail=tail-1,newHead=head+1,bound=arr.length-1;
+      for(;;--newTail){
+        if(newTail==-1){
+          for(;;++newHead){
+            if(newHead>bound){
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.tail=-1;
+              break;
+            }else if(!filter.test((long)arr[newHead])){
+              collapsetailHelper(arr,newHead,filter,modCount);
+              break;
+            }
+          }
+          break;
+        }else if(!filter.test((long)arr[newTail])){
+          for(;;++newHead){
+            if(newHead>bound){
+              collapseheadHelper(arr,newTail,filter,modCount);
+              break;
+            }else if(!filter.test((long)arr[newHead])){
+              fragmentedCollapseBodyHelper(arr,newHead,newTail,filter,modCount);
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
     private void collapseHeadAndTail(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      for(int headOffset=head+1;headOffset!=tail;++headOffset)
-      {
-        if(!filter.test((long)arr[headOffset]))
-        {
-          for(int tailOffset=tail-1;tailOffset!=headOffset;--tailOffset)
-          {
-            if(!filter.test((long)arr[tailOffset]))
-            {
+      for(int headOffset=head+1;headOffset!=tail;++headOffset){
+        if(!filter.test((long)arr[headOffset])){
+          for(int tailOffset=tail-1;tailOffset!=headOffset;--tailOffset){
+            if(!filter.test((long)arr[tailOffset])){
               collapseBodyHelper(arr,headOffset,tailOffset,filter,modCount);
-              this.modCount=modCount+1;
               return;
             }
           }
           CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
           this.head=headOffset;
           this.tail=headOffset;
           return;
         }
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
-      this.modCount=modCount+1;
       this.tail=-1;
     }
     private boolean collapseBody(long[] arr,int head,int tail,LongPredicate filter,int modCount){
       //TODO
       return false;
     }
-    @Override boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
+    private boolean fragmentedCollapseBody(long[] arr,int head,int tail,LongPredicate filter,int modCount){
       //TODO
       return false;
+    }
+    @Override boolean fragmentedRemoveIf(int head,int tail,LongPredicate filter){
+      int modCount=this.modCount;
+      try{
+        final long[] arr;
+        if(filter.test((long)(arr=this.arr)[head])){
+          if(filter.test((long)arr[tail])){
+            fragmentedCollapseHeadAndTail(arr,head,tail,filter,modCount);
+          }else{
+            fragmentedCollapsehead(arr,head,tail,filter,modCount);
+          }
+          this.modCount=modCount+1;
+          return true;
+        }else{
+          if(filter.test((long)arr[tail])){
+            fragmentedCollapsetail(arr,head,tail,filter,modCount);
+            this.modCount=modCount+1;
+            return true;
+          }
+          return fragmentedCollapseBody(arr,head,tail,filter,modCount);
+        }
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
     }
     @Override boolean nonfragmentedRemoveIf(int head,int tail,LongPredicate filter){
       final int modCount=this.modCount;
@@ -1914,17 +2061,18 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         if(filter.test((long)(arr=this.arr)[head])){
           if(head==tail){
             CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
             this.tail=-1;
           }else if(filter.test((long)arr[tail])){
             collapseHeadAndTail(arr,head,tail,filter,modCount);
           }else{
             collapsehead(arr,head,tail,filter,modCount);
           }
+          this.modCount=modCount+1;
           return true;
         }else if(head!=tail){
           if(filter.test((long)arr[tail])){
             collapsetail(arr,head,tail,filter,modCount);
+            this.modCount=modCount+1;
             return true;
           }
           return collapseBody(arr,head,tail,filter,modCount);

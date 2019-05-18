@@ -36,10 +36,10 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class BooleanArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newWorkStealingPool();
-  private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
+  java.util.concurrent.Executors.newSingleThreadExecutor();
+  private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
-    TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
+    TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
   }
   private static void completeAllTests(){
     try{
@@ -80,9 +80,6 @@ public class BooleanArrDeqTest{
   public void testMASSIVEtoString_void(){
     int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
     boolean[] arr=new boolean[seqLength];
-    int numThreads=Runtime.getRuntime().availableProcessors();
-    int threadSpan=seqLength/numThreads;
-    int threadBound=numThreads-1;
     for(int i=0;i<seqLength;++i){
       arr[i]=TypeConversionUtil.convertToboolean(1);
     }
@@ -98,21 +95,116 @@ public class BooleanArrDeqTest{
         Assertions.assertEquals('[',string.charAt(0));
         Assertions.assertEquals(']',string.charAt(string.length()-1));
         seqMonitor.verifyStructuralIntegrity();
-        int nextWayPointIndex=0;
         var verifyItr=seqMonitor.verifyPreAlloc();
-        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
-          final int finalWayPointBound=nextWayPointIndex+threadSpan;
-          final int finalWayPointIndex=nextWayPointIndex;
-          submitTest(()->AbstractBooleanSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
-          verifyItr.skip(threadSpan);
-          nextWayPointIndex=finalWayPointBound;
-        }
-        AbstractBooleanSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
-        completeAllTests();
+        AbstractBooleanSeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
       }
     }
   }
-  //TODO removeIf
+  @org.junit.jupiter.api.Test
+  public void testremoveIf_Predicate(){
+    for(var checkedType:CheckedType.values()){
+      for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
+        if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
+          for(var functionCallType:FunctionCallType.values()){
+            submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,0,functionCallType,0,0,0,0));
+            for(int tmpSeqSize=0;tmpSeqSize<=10;++tmpSeqSize){
+              final int seqSize=tmpSeqSize;
+              long randSeedBound;
+              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+                randSeedBound=0;
+              }else{
+                randSeedBound=100;
+              }
+              for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
+                final long randSeed=tmpRandSeed;
+                for(int tmpPeriod=1,inc=Math.max(1,seqSize/10);;tmpPeriod+=inc){
+                  final int period=tmpPeriod;
+                  for(int tmpInitVal=0;tmpInitVal<=1;++tmpInitVal){
+                    final int initVal=tmpInitVal;
+                    for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+                      final int head=tmpHead;
+                      submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,head,initVal,period));
+                    }
+                  }
+                  if(period>=seqSize){
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    completeAllTests();
+  }
+  private static void testremoveIf_PredicateHelper(CheckedType checkedType,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize,int head
+  ,int initVal,int period
+  ){
+    var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+    int trueCount=0;
+    if(seqSize!=0){
+      var arr=seqMonitor.seq.arr;
+      int index=seqMonitor.seq.head;
+      int bound=arr.length;
+      for(int i=0;i<seqSize;){
+        arr[index]=TypeConversionUtil.convertToboolean(initVal);
+        if((initVal&1)!=0){
+          ++trueCount;
+        }
+        if((++i)%period==0){
+          ++initVal;
+        }
+        if(++index==bound){
+          index=0;
+        }
+      }
+    }
+    final var clone=(OmniCollection.OfBoolean)seqMonitor.seq.clone();
+    final int numExpectedCalls=seqMonitor.seq.contains(true)?seqMonitor.seq.contains(false)?2:1:seqMonitor.seq.contains(false)?1:0;
+    final int numExpectedRemoved;
+    switch(monitoredRemoveIfPredicateGen){
+      case RemoveTrue:
+        numExpectedRemoved=trueCount;
+        break;
+      case RemoveFalse:
+        numExpectedRemoved=seqSize-trueCount;
+        break;
+      case RemoveAll:
+        numExpectedRemoved=seqSize;
+        break;
+      case Random:
+        numExpectedRemoved=-1;
+        break;
+      case RemoveNone:
+      case Throw:
+      case ModSeq:
+      case ModParent:
+      case ModRoot:
+      case ThrowModSeq:
+      case ThrowModParent:
+      case ThrowModRoot:
+        numExpectedRemoved=0;
+        break;
+      default:
+        throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
+    }
+    final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
+    if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
+      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
+      seqMonitor.verifyStructuralIntegrity();
+      seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize);
+      return;
+    }else{
+      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+    }
+    seqMonitor.verifyStructuralIntegrity();
+    var verifyItr=seqMonitor.verifyPreAlloc();
+    var cloneItr=clone.iterator();
+    while(cloneItr.hasNext()){
+      verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextBoolean());
+    }
+  }
   @org.junit.jupiter.api.Test
   public void testreadandwriteObject(){
     for(var checkedType:CheckedType.values()){
@@ -1056,6 +1148,7 @@ public class BooleanArrDeqTest{
         Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,deq.arr);
       });
     }
+    completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_int(){
@@ -1914,22 +2007,26 @@ public class BooleanArrDeqTest{
         }
       }
       @Override SequenceVerificationItr getOffset(int i){
-        int index=currIndex+1;
-        int arrLength;
-        if(index>=(arrLength=seqMonitor.seq.arr.length)){
-          index-=arrLength;
-        }else if(index<0){
-          index+=arrLength;
+        int index=currIndex+i;
+        if(i!=0){
+          int arrLength;
+          if(index>=(arrLength=seqMonitor.seq.arr.length)){
+            index-=arrLength;
+          }else if(index<0){
+            index+=arrLength;
+          }
         }
         return new ArrDeqVerificationItr(index,seqMonitor);
       }
       @Override SequenceVerificationItr skip(int i){
-        currIndex+=i;
-        int arrLength;
-        if(currIndex>=(arrLength=seqMonitor.seq.arr.length)){
-          currIndex-=arrLength;
-        }else if(currIndex<0){
-          currIndex+=arrLength;
+        if(i!=0){
+          currIndex+=i;
+          int arrLength;
+          if(currIndex>=(arrLength=seqMonitor.seq.arr.length)){
+            currIndex-=arrLength;
+          }else if(currIndex<0){
+            currIndex+=arrLength;
+          }
         }
         return this;
       }

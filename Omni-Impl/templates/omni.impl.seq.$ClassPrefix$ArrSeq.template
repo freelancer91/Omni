@@ -526,7 +526,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
                     modCountChecker.checkModCount();
                     if(numSurvivors!=0){
                       if(numSurvivors==n){
-                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
+                        System.arraycopy(arr,srcOffset-1,arr,dstOffset,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }else{
                         arr[dstOffset]=before;

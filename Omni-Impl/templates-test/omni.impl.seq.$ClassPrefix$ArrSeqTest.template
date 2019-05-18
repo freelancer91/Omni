@@ -61,10 +61,6 @@ public class $ClassPrefix$ArrSeqTest{
 #MACRO ParallelizationCode<PARALLEL>()
 #MACRO testMASSIVEtoString_void<PARALLEL>()
 #ENDDEF
-  
-  
-  
-  
   @org.junit.jupiter.api.Test
   public void testConstructor_int(){
     for(var nestedType:NestedType.values()){
@@ -4889,10 +4885,10 @@ java.util.concurrent.Executors.newWorkStealingPool();
 #ELSE
 java.util.concurrent.Executors.newSingleThreadExecutor();
 #ENDIF
-private static final java.util.ArrayDeque<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayDeque<>();
+private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
 
 private static void submitTest(Runnable test){
-  TESTQUEUE.addLast(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
+  TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
 }
 private static void completeAllTests(){
   try{

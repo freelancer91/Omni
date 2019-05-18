@@ -2166,7 +2166,7 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         if(filter.test(false)){
           this.tail=-1;
         }else{
-          setRange(arr,size-=-(trueCount+1),false);
+          setRange(arr,size-=(trueCount+1),false);
           this.head=0;
           this.tail=size;
         }
@@ -2254,8 +2254,69 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       return false;
     }
     @Override boolean fragmentedRemoveIf(int head,int tail,BooleanPredicate filter){
-      //TODO
-      return false;
+      final boolean[] arr;
+      int trueCount=0,bound=(arr=this.arr).length;
+      for(int i=head;;){
+        if(arr[i]){
+          ++trueCount;
+        }
+        if(++i==bound){
+          for(i=0;;++i){
+            if(arr[i]){
+              ++trueCount;
+            }
+            if(i==tail){
+              break;
+            }
+          }
+          break;
+        }
+      }
+      int modCount=this.modCount;
+      try{
+        if(trueCount!=0){
+          if(trueCount!=(bound+=(tail-head+1))){
+            head=(filter.test(true)?0b01:0b00)|(filter.test(false)?0b10:0b00);
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            switch(head){
+              case 0b00:
+                return false;
+              case 0b01:
+                setRange(arr,bound-=(trueCount+1),false);
+                this.tail=bound;
+                this.head=0;
+                break;
+              case 0b10:
+                setRange(arr,--trueCount,true);
+                this.tail=trueCount;
+                this.head=0;
+                break;
+              default:
+                this.tail=-1;
+            }
+          }else{
+            boolean removeTrue=filter.test(true);
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            if(!removeTrue){
+              return false;
+            }
+            this.tail=-1;
+          }
+        }else{
+          boolean removeFalse=filter.test(false);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if(!removeFalse){
+             return false; 
+          }
+          this.tail=-1;
+        }
+        this.modCount=modCount+1;
+        return true;
+      }catch(ConcurrentModificationException e){
+        throw e;
+      }catch(RuntimeException e){
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
     }
     @Override boolean nonfragmentedRemoveIf(int head,int tail,BooleanPredicate filter){
       final var arr=this.arr;
@@ -2270,51 +2331,49 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       }
       final int modCount=this.modCount;
       try{
-        int size;
-        if(trueCount==(size=tail-head+1)){
-          if(filter.test(true)){
+        if(trueCount!=0){
+          if(trueCount!=(tail-=(head-1))){
+            head=(filter.test(true)?0b01:0b00)|(filter.test(false)?0b10:0b00);
             CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-            this.tail=-1;
-            return true;
-          }
-        }else if(trueCount==0){
-          if(filter.test(false)){
+            switch(head){
+              case 0b00:
+                return false;
+              case 0b01:
+                setRange(arr,tail-=(trueCount+1),false);
+                this.tail=tail;
+                this.head=0;
+                break;
+              case 0b10:
+                setRange(arr,--trueCount,true);
+                this.tail=trueCount;
+                this.head=0;
+                break;
+              default:
+                this.tail=-1;
+            }
+          }else{
+            boolean removeTrue=filter.test(true);
             CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
+            if(!removeTrue){
+               return false; 
+            }
             this.tail=-1;
-            return true;
           }
         }else{
-          if(filter.test(true)){
-            if(filter.test(false)){
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-              this.tail=-1;
-            }else{
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.modCount=modCount+1;
-              setRange(arr,size-=-(trueCount+1),false);
-              this.head=0;
-              this.tail=size;
-            }
-            return true;
-          }else if(filter.test(false)){
-            CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-            setRange(arr,--trueCount,true);
-            this.head=0;
-            this.tail=trueCount;
-            return true;
+          boolean removeFalse=filter.test(false);
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          if(!removeFalse){
+             return false; 
           }
+          this.tail=-1;
         }
+        this.modCount=modCount+1;
+        return true;
       }catch(ConcurrentModificationException e){
         throw e;
       }catch(RuntimeException e){
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
-      CheckedCollection.checkModCount(modCount,this.modCount);
-      return false;
     }
     @Override public OmniIterator.OfBoolean iterator(){
       return new AscendingItr(this);
