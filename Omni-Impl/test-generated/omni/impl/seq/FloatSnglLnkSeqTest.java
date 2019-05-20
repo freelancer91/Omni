@@ -385,6 +385,7 @@ public class FloatSnglLnkSeqTest{
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
       seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
+      Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
       return;
     }else{
       Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));

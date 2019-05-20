@@ -2070,6 +2070,7 @@ public class ByteArrSeqTest{
         seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
         seqMonitor.verifyStructuralIntegrity();
         seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize).verifyPostAlloc();
+        Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
         return;
       }else{
         Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));

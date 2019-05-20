@@ -103,6 +103,10 @@ public class DoubleArrDeqTest{
                 final long randSeed=tmpRandSeed;
                 for(double threshold:thresholdArr){
                   for(int tmpHead=0;tmpHead<seqSize;tmpHead+=inc){
+                    if(tmpHead!=0 && checkedType.checked) //TODO remove
+                    {
+                      continue;
+                    }
                     final int head=tmpHead;
                     submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize,head));
                   }
@@ -161,6 +165,7 @@ public class DoubleArrDeqTest{
       seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize);
+      Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
       return;
     }else{
       Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));

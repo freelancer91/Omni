@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.HashSet;
+import java.util.TreeSet;
 import omni.api.OmniCollection;
 import java.io.ObjectOutputStream;
 import java.util.Random;
@@ -2492,9 +2492,12 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
   }
   static abstract class MonitoredRemoveIfPredicate implements Predicate
   {
-    final HashSet removedVals=new HashSet();
+    final TreeSet removedVals=new TreeSet();
     int callCounter;
     int numRemoved;
+    @Override public String toString(){
+      return removedVals.toString();
+    }
     abstract boolean testImpl(Object val);
     @Override public MonitoredRemoveIfPredicate negate()
     {

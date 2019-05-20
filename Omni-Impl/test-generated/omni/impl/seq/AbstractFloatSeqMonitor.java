@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.HashSet;
+import java.util.TreeSet;
 import omni.api.OmniCollection;
 import java.io.ObjectOutputStream;
 import java.util.Random;
@@ -2240,9 +2240,12 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
   static abstract class MonitoredRemoveIfPredicate implements FloatPredicate
     ,Predicate<Float>
   {
-    final HashSet removedVals=new HashSet();
+    final TreeSet removedVals=new TreeSet();
     int callCounter;
     int numRemoved;
+    @Override public String toString(){
+      return removedVals.toString();
+    }
     abstract boolean testImpl(float val);
     @Override public MonitoredRemoveIfPredicate negate()
     {

@@ -1891,7 +1891,8 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
     }
     private void collapsehead(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      for(int srcOffset=head;++srcOffset!=tail;){
+      int srcOffset;
+      for(srcOffset=head;++srcOffset!=tail;){
         if(!filter.test((long)arr[srcOffset])){
           collapseBodyHelper(arr,srcOffset,tail,filter,modCount);
           this.modCount=modCount+1;
@@ -1900,7 +1901,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       this.modCount=modCount+1;
-      this.head=head;
+      this.head=srcOffset;
     }
     private void collapsetailHelper(long[] arr,int head,LongPredicate filter,int modCount){
       int tail;
@@ -1956,7 +1957,8 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
     }
     private void collapsetail(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      for(int srcOffset=tail;--srcOffset!=head;){
+      int srcOffset;
+      for(srcOffset=tail;--srcOffset!=head;){
         if(!filter.test((long)arr[srcOffset])){
           collapseBodyHelper(arr,head,srcOffset,filter,modCount);
           this.modCount=modCount+1;
@@ -1965,7 +1967,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       this.modCount=modCount+1;
-      this.tail=head;
+      this.tail=srcOffset;
     }
     private void noElementsLeftToMark(long[] arr,int head,int gapBegin,int gapEnd,int tail){
       //there were no elements left to mark, so finalize the collapse
@@ -2013,7 +2015,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
       abstract void arrSeqPullDown(long[] arr,int srcOffset,int dstOffset,int dstBound);
       abstract void pullSurvivorsDown(long[] arr,int dstOffset,int survivorIndex,int dstBound);
-      abstract void pullSurvivorsUp(long[] arr,int dstOffset,int survivorIndex,int dstBound);
+      abstract void pullSurvivorsUp(long[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound);
       private void collapse(int head,int gapBegin,int gapEnd,int tail){
         int numSurvivors,survivorsBeforeBiggestRun,survivorsAfterBiggestRun,biggestRunLength;
         if((numSurvivors=
@@ -2029,21 +2031,31 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
             Checked deq;
             var arr=(deq=this.deq).arr;
             if(biggestRunLength>(numLeft=gapBegin-head)){
-              int biggestRunBegin;
-              ArrCopy.uncheckedCopy(arr,head,arr,numSurvivors=(survivorsBeforeBiggestRun=(biggestRunBegin=this.biggestRunBegin)-survivorsBeforeBiggestRun)-numLeft-1,numLeft);
-              if(biggestRunBegin==survivorsBeforeBiggestRun){
-                arr[survivorsBeforeBiggestRun]=arr[tail];
-                pullSurvivorsDown(arr,biggestRunBegin+=biggestRunLength,biggestRunBegin-(++gapEnd),biggestRunBegin+=survivorsAfterBiggestRun);
-              }else{
-                arr[survivorsBeforeBiggestRun]=arr[gapEnd];
-                pullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-(++gapEnd),survivorsBeforeBiggestRun);
-                if((biggestRunBegin+=biggestRunLength)!=tail){
+              int biggestRunBegin=this.biggestRunBegin;
+              if(survivorsBeforeBiggestRun==0)
+              {
+                arr[numSurvivors=biggestRunBegin-1]=arr[gapEnd];
+                biggestRunBegin+=biggestRunLength;
+                if(survivorsAfterBiggestRun!=0)
+                {
                   pullSurvivorsDown(arr,biggestRunBegin,biggestRunBegin-gapEnd,biggestRunBegin+=survivorsAfterBiggestRun);
-                  arr[biggestRunBegin]=arr[tail];
                 }
+                arr[biggestRunBegin]=arr[tail];
               }
+              else
+              {
+                pullSurvivorsUp(arr,biggestRunBegin-2,numSurvivors=biggestRunBegin,numSurvivors-gapEnd-3,(numSurvivors-=(survivorsBeforeBiggestRun)));
+                arr[--numSurvivors]=arr[gapEnd];
+                biggestRunBegin+=biggestRunLength;
+                if(survivorsAfterBiggestRun!=0)
+                {
+                  pullSurvivorsDown(arr,biggestRunBegin,biggestRunBegin-gapEnd,biggestRunBegin+=survivorsAfterBiggestRun);
+                }
+                arr[biggestRunBegin]=arr[tail];
+              }
+              ArrCopy.uncheckedCopy(arr,head,arr,numSurvivors-=numLeft,numLeft);
               deq.head=numSurvivors;
-              deq.tail=biggestRunBegin;
+              deq.tail=biggestRunBegin;          
             }else{
               arr[gapBegin]=arr[gapEnd];
               arrSeqPullDown(arr,++gapEnd,++gapBegin,gapBegin+=numSurvivors);
@@ -2102,7 +2114,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         int wordOffset;
         long[] survivorSet;
         long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6]>>>survivorIndex;
-        for(int s=dstOffset,srcOffset=dstOffset+(64-(survivorIndex&0b111111));;word=survivorSet[++wordOffset],s=srcOffset,srcOffset+=64){
+        for(int s=dstOffset+1,srcOffset=s+(64-(survivorIndex&0b111111));;word=survivorSet[++wordOffset],s=srcOffset,srcOffset+=64){
           for(;;s+=survivorIndex,word>>>=survivorIndex){
             if((survivorIndex=Long.numberOfTrailingZeros(word))==64){
               break;
@@ -2117,37 +2129,35 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
           }
         }
       }
-      @Override void pullSurvivorsUp(long[] arr,int dstOffset,int survivorIndex,int dstBound){
+      @Override void pullSurvivorsUp(long[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         int wordOffset;
         long[] survivorSet;
         long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6];
         long marker=1L<<survivorIndex;
-        int srcOffset;
-        for(srcOffset=dstOffset;;){
+        for(;;){
           //TODO use batch copying in this section
           if((marker&word)!=0L){
-            arr[dstOffset]=arr[srcOffset];
-            if(--dstOffset==dstBound){
+            arr[--dstOffset]=arr[srcOffset];
+            if(dstOffset==dstBound){
               return;
             }
           }
-          --srcOffset;
           if((marker>>>=1)==0L){
             break;
           }
+          --srcOffset;
         }
         for(;;srcOffset-=64){
           word=survivorSet[--wordOffset];
           for(int s=srcOffset;;){
-            int numToSkip;
-            if((numToSkip=Long.numberOfLeadingZeros(word))==64){
+            if((survivorIndex=Long.numberOfLeadingZeros(word))==64){
               break;
             }
-            int numToRetain=Long.numberOfLeadingZeros(~(word<<=numToSkip));
-            ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToRetain=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=numToRetain,numToRetain);
+            int numToRetain;
+            ArrCopy.uncheckedCopy(arr,s-=(survivorIndex+(numToRetain=Long.numberOfLeadingZeros(~(word<<=survivorIndex)))),arr,dstOffset-=numToRetain,numToRetain);
             if(numToRetain==64){
               break;
-            }else if(dstOffset>=dstBound){
+            }else if(dstOffset<=dstBound){
               return;
             }
             word<<=numToRetain;
@@ -2171,14 +2181,12 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
     }
     private static class SmallCollapseData extends CollapseData{
-      @Override void pullSurvivorsUp(long[] arr,int dstOffset,int survivorIndex,int dstBound){
+      @Override void pullSurvivorsUp(long[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         //TODO use batch copying
-        long marker=1L<<survivorIndex;
-        long word=this.survivorWord;
-        for(int srcOffset=dstOffset;;--srcOffset,marker>>>=1){
+        for(long marker=1L<<survivorIndex,word=this.survivorWord;;--srcOffset,marker>>>=1){
           if((word&marker)!=0L){
-            arr[dstOffset]=arr[srcOffset];
-            if(--dstOffset==dstBound){
+            arr[--dstOffset]=arr[srcOffset];
+            if(dstOffset==dstBound){
               return;
             }
           }
@@ -2188,7 +2196,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         LongArrSeq.pullSurvivorsDown(arr,srcOffset,dstOffset,dstBound,survivorWord);
       }
       @Override void pullSurvivorsDown(long[] arr,int dstOffset,int survivorIndex,int dstBound){
-        LongArrSeq.pullSurvivorsDown(arr,dstOffset,dstOffset,dstBound,this.survivorWord>>>survivorIndex);
+        LongArrSeq.pullSurvivorsDown(arr,dstOffset+1,dstOffset,dstBound,this.survivorWord>>>survivorIndex);
       }
       final long survivorWord;
       SmallCollapseData(Checked deq,int srcOffset,int numLeft,LongPredicate filter){
@@ -2238,6 +2246,7 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
               //begin marking any indices that remain
               int numLeft,srcOffset;
               if((numLeft=tail-(srcOffset=gapEnd+1))==0){
+                CheckedCollection.checkModCount(modCount,this.modCount);
                 noElementsLeftToMark(arr,head,gapBegin,gapEnd,tail);
               }else{
                 CollapseData collapseData=numLeft>64?new BigCollapseData(this,srcOffset,numLeft,filter):new SmallCollapseData(this,srcOffset,numLeft,filter);
@@ -2267,7 +2276,33 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       //TODO
     }
     private boolean collapseBody(long[] arr,int head,int tail,LongPredicate filter,int modCount){
-      //TODO
+      for(int gapBegin=head+1;gapBegin!=tail;++gapBegin){
+        if(filter.test((long)arr[gapBegin])){
+          for(int gapEnd=gapBegin+1;gapEnd!=tail;++gapEnd){
+            if(!filter.test((long)arr[gapEnd])){
+              //we found the end of the first gap
+              //begin marking any indices that remain
+              int numLeft,srcOffset;
+              if((numLeft=tail-(srcOffset=gapEnd+1))==0){
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                noElementsLeftToMark(arr,head,gapBegin,gapEnd,tail);
+              }else{
+                CollapseData collapseData=numLeft>64?new BigCollapseData(this,srcOffset,numLeft,filter):new SmallCollapseData(this,srcOffset,numLeft,filter);
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                collapseData.collapse(head,gapBegin,gapEnd,tail);
+              }
+              this.modCount=modCount+1;
+              return true;
+            }
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          arr[gapBegin]=arr[tail];
+          this.tail=gapBegin;
+          return true;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
     private boolean fragmentedCollapseBody(long[] arr,int head,int tail,LongPredicate filter,int modCount){
