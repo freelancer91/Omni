@@ -1427,228 +1427,338 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
 #IFNOT OfBoolean
     #MACRO CollapseEnd<true,head,tail>(++)
     #MACRO CollapseEnd<true,tail,head>(--)
-
-    private class CollapseBodyData
-    {
-      int biggestRunLength;
-      int biggestRunBegin;
-      final int numLeft;
-      final int srcOffset;
-      final int dstOffset;
-      fianl int srcBound;
-      CollapseBodyData(int numLeft,int srcOffset,int dstOffset,int srcBound){
-        this.numLeft=numLeft;
-        this.srcOffset=srcOffset;
-        this.dstOffset=dstOffset;
-        this.srcBound=srcBound;
+   
+    private void noElementsLeftToMark($ArrayType$[] arr,int head,int gapBegin,int gapEnd,int tail){
+      //there were no elements left to mark, so finalize the collapse
+      if((gapBegin-head)==1){
+        arr[--gapEnd]=arr[head];
+        this.head=gapEnd;
+#IF OfRef
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,gapEnd-1,head);
+#ENDIF
+        this.tail=tail;
+      }else{
+        arr[gapBegin]=arr[gapEnd];
+        arr[++gapBegin]=arr[tail];
+        this.head=head;
+#IF OfRef
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,gapBegin+1);
+#ENDIF
+        this.tail=gapBegin;
       }
-      #MACRO SuppressUnchecked()
-      private long markSurvivors($TypeNameModifier$Predicate$<? super E>$ filter){
-        var arr=Checked.this.arr;
-        int currentRunLength=0,srcOffset=this.srcOffset,srcBound=this.srcBound;
-        for(long word=0L,marker=1L;;marker<<=1){
-          if(!filter.test(($exposedType$)arr[srcOffset])){
-            word|=marker;
-            if(++currentRunLength>biggestRunLength){
-              biggestRunLength=currentRunLength;
-              biggestRunBegin=srcOffset-currentRunLength-1;
-            }
+    }
+    private void collapseHelper(int head,int gapBegin,int gapEnd,int numLeft,int tail){
+      final var arr=this.arr;
+      int beforeLength;
+      if((numLeft+=2)<(beforeLength=gapBegin-head)){
+        ArrCopy.uncheckedSelfCopy(arr,gapBegin,gapEnd,numLeft);
+#IF OfRef
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,gapBegin+=numLeft);
+        this.tail=gapBegin-1;
+#ELSE
+        this.tail=gapBegin+numLeft-1;
+#ENDIF
+        this.head=head;
+      }else{
+        ArrCopy.uncheckedCopy(arr,head,arr,gapEnd-=beforeLength,beforeLength);
+#IF OfRef
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,gapEnd-1,head);
+#ENDIF
+        this.tail=tail;
+        this.head=gapEnd;
+      }
+    }
+    private void collapseHelper(int head,int gapBegin,int gapEnd,int tail){
+      final $ArrayType$[] arr;
+      (arr=this.arr)[gapBegin]=arr[gapEnd];
+      arr[++gapBegin]=arr[tail];
+#IF OfRef
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,gapBegin+1);
+#ENDIF
+      this.head=head;
+      this.tail=gapBegin;
+    }
+    private static abstract class CollapseData$<E>${
+      final Checked$<E>$ deq;
+      final int numLeft;
+      int survivorsBeforeBiggestRun;
+      int survivorsAfterBiggestRun;
+      int biggestRunBegin;
+      int biggestRunLength;
+      CollapseData(Checked$<E>$ deq,int numLeft){
+        this.deq=deq;
+        this.numLeft=numLeft;
+      }
+      abstract void arrSeqPullDown($ArrayType$[] arr,int srcOffset,int dstOffset,int dstBound);
+      abstract void pullSurvivorsDown($ArrayType$[] arr,int dstOffset,int survivorIndex,int dstBound);
+      abstract void pullSurvivorsUp($ArrayType$[] arr,int dstOffset,int survivorIndex,int dstBound);
+      private void collapse(int head,int gapBegin,int gapEnd,int tail){
+        int numSurvivors,survivorsBeforeBiggestRun,survivorsAfterBiggestRun,biggestRunLength;
+        if((numSurvivors=
+           (survivorsBeforeBiggestRun=this.survivorsBeforeBiggestRun)
+          +(survivorsAfterBiggestRun=this.survivorsAfterBiggestRun)
+          +(biggestRunLength=this.biggestRunLength))==0){
+          deq.collapseHelper(head,gapBegin,gapEnd,tail);
+        }else{
+          int numLeft;
+          if((numLeft=this.numLeft)==numSurvivors){
+            deq.collapseHelper(head,gapBegin,gapEnd,numLeft,tail);
           }else{
-            currentRunLength=0;
-          }
-          if(++srcOffset==srcBound){
-            return word;
+            Checked$<E>$ deq;
+            var arr=(deq=this.deq).arr;
+            if(biggestRunLength>(numLeft=gapBegin-head)){
+              int biggestRunBegin;
+              ArrCopy.uncheckedCopy(arr,head,arr,numSurvivors=(survivorsBeforeBiggestRun=(biggestRunBegin=this.biggestRunBegin)-survivorsBeforeBiggestRun)-numLeft-1,numLeft);
+#IF OfRef
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,numSurvivors-1,head);
+#ENDIF
+              if(biggestRunBegin==survivorsBeforeBiggestRun){
+                arr[survivorsBeforeBiggestRun]=arr[tail];
+                pullSurvivorsDown(arr,biggestRunBegin+=biggestRunLength,biggestRunBegin-(++gapEnd),biggestRunBegin+=survivorsAfterBiggestRun);
+#IF OfRef
+                OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,biggestRunBegin+1);
+#ENDIF
+              }else{
+                arr[survivorsBeforeBiggestRun]=arr[gapEnd];
+                pullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-(++gapEnd),survivorsBeforeBiggestRun);
+                if((biggestRunBegin+=biggestRunLength)!=tail){
+                  pullSurvivorsDown(arr,biggestRunBegin,biggestRunBegin-gapEnd,biggestRunBegin+=survivorsAfterBiggestRun);
+                  arr[biggestRunBegin]=arr[tail];
+#IF OfRef
+                  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,biggestRunBegin+1);
+#ENDIF
+                }
+              }
+              deq.head=numSurvivors;
+              deq.tail=biggestRunBegin;
+            }else{
+              arr[gapBegin]=arr[gapEnd];
+              arrSeqPullDown(arr,++gapEnd,++gapBegin,gapBegin+=numSurvivors);
+              
+              arr[gapBegin]=arr[tail];
+#IF OfRef
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,gapBegin+1);
+#ENDIF
+              deq.head=head;
+              deq.tail=gapBegin;
+            }
           }
         }
       }
-      #MACRO SuppressUnchecked()
-      private int markSurvivors($TypeNameModifier$Predicate$<? super E>$ filter,long[] survivorSet){
-        var arr=Checked.this.arr;
-        for(int numSurvivors=0,currentRunLength=0,wordOffset=0,srcOffset=this.srcOffset,srcBound=this.srcBound;;){
+    }
+    private static class BigCollapseData$<E>$ extends CollapseData$<E>${
+      final long[] survivorSet;
+      BigCollapseData(Checked$<E>$ deq,int srcOffset,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
+        super(deq,numLeft);
+        var survivorSet=new long[((numLeft-1)>>6)+1];
+        numLeft+=srcOffset;
+        final var arr=deq.arr;
+        for(int wordOffset=0,survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;;){
           long word=0L,marker=1L;
           do{
-            if(!filter.test(($exposedType$)arr[srcOffset])){
-              word|=marker;
-              ++numSurvivors;
-              if(++currentRunLength>biggestRunLength){
-                biggestRunLength=currentRunLength;
-                biggestRunBegin=srcOffset-currentRunLength-1;
-              }
-            }else{
+            if(filter.test(($exposedType$)arr[srcOffset])){
               currentRunLength=0;
+            }else{
+              word|=marker;
+              if(currentRunLength==0){
+                currentRunBegin=srcOffset;
+              }
+              if(currentRunLength==biggestRunLength){
+                survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
+                survivorsAfterBiggestRun=0;
+                biggestRunBegin=currentRunBegin;
+                biggestRunLength=++currentRunLength;
+              }else{
+                ++currentRunLength;
+                ++survivorsAfterBiggestRun;
+              }
             }
-            if(++srcOffset==tail){
+            if(++srcOffset==numLeft){
               survivorSet[wordOffset]=word;
-              return numSurvivors;
+              this.biggestRunBegin=biggestRunBegin;
+              this.biggestRunLength=biggestRunLength;
+              this.survivorsBeforeBiggestRun=survivorsBeforeBiggestRun;
+              this.survivorsAfterBiggestRun=survivorsAfterBiggestRun;
+              this.survivorSet=survivorSet;
+              return;
             }
-          }
-          while((marker<<=1)!=0L);
+          }while((marker<<=1)!=0L);
           survivorSet[wordOffset++]=word;
         }
       }
-      private $<E>$ void collapseSurvivors(int numSurvivors,int head,long[] survivorSet){
-        final Checked$<E>$ deq
-        final var arr=(deq=Checked.this).arr;
-        if(numSurvivors!=0){
-          int numLeft;
-          if(numSurvivors==(numLeft=this.numLeft)){
-            int dstOffset;
-            if((numSurvivors=(dstOffset=this.dstOffset)-head)<=(numLeft+=2)){
-              ArrCopy.uncheckedCopy(arr,head,arr,dstOffset=this.srcOffset-1-numSurvivors,numSurvivors);
-              deq.head=dstOffset;
-#IF OfRef
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,dstOffset-1,head);
-#ENDIF
-              deq.tail=srcBound;
-            }else{
-              System.arraycopy(arr,this.srcOffset-1,arr,dstOffset,numLeft);
-              
-#IF OfRef
-              deq.tail=dstOffset+=numLeft;
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcBound,dstOffset+1);
-#ELSE
-              deq.tail=dstOffset+numLeft;
-#ENDIF
-              deq.head=head;
+      @Override void arrSeqPullDown($ArrayType$[] arr,int srcOffset,int dstOffset,int dstBound){
+        $ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,dstOffset,dstBound,survivorSet);
+      }
+      @Override void pullSurvivorsDown($ArrayType$[] arr,int dstOffset,int survivorIndex,int dstBound){
+        int wordOffset;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6]>>>survivorIndex;
+        for(int s=dstOffset,srcOffset=dstOffset+(64-(survivorIndex&0b111111));;word=survivorSet[++wordOffset],s=srcOffset,srcOffset+=64){
+          for(;;s+=survivorIndex,word>>>=survivorIndex){
+            if((survivorIndex=Long.numberOfTrailingZeros(word))==64){
+              break;
             }
-          }else{
-            int beforeBiggestRun=this.biggestRunBegin-1;
-            int afterBiggestRun=beforeBiggestRun+biggestRunLength+1
-            //TODO
+            ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=survivorIndex,survivorIndex=Long.numberOfTrailingZeros(~(word>>>=survivorIndex)));
+            dstOffset+=survivorIndex;
+            if(survivorIndex==64){
+              break;
+            }else if(dstOffset>=dstBound){
+              return;
+            }
           }
-        }else{
-          int dstOffset;
-          arr[dstOffset=this.dstOffset]=arr[srcOffset-1];
-#IF OfRef
-          arr[++dstOffset]=arr[numSurvivors=srcBound];
-          OmniArray.nullifyRange(arr,numSurvivors,dstOffset+1);
-#ELSE
-          arr[++dstOffset]=arr[srcBound];
-#ENDIF
-          deq.tail=dstOffset;
-          deq.head=head;
         }
       }
-      private $<E>$ void collapseSurvivors(int head,long survivorWord){
-        final Checked deq;
-        final var arr=(deq=Checked.this).arr;
-        int numSurvivors;
-        if((numSurvivors=Long.bitCount(survivorWord))!=0){
-          int numLeft;
-          if(numSurvivors==(numLeft=this.numLeft)){
-            int dstOffset;
-            if((numSurvivors=(dstOffset=this.dstOffset)-head)<=(numLeft+=2)){
-              ArrCopy.uncheckedCopy(arr,head,arr,dstOffset=this.srcOffset-1-numSurvivors,numSurvivors);
-              deq.head=dstOffset;
-#IF OfRef
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,dstOffset-1,head);
-#ENDIF
-              deq.tail=srcBound;
-            }else{
-              ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numLeft);
-#IF OfRef
-              deq.tail=dstOffset+=numLeft;
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcBound,dstOffset+1);
-#ELSE
-              deq.tail=dstOffset+numLeft;
-#ENDIF
-              deq.head=head;
+      @Override void pullSurvivorsUp($ArrayType$[] arr,int dstOffset,int survivorIndex,int dstBound){
+        int wordOffset;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6];
+        long marker=1L<<survivorIndex;
+        int srcOffset;
+        for(srcOffset=dstOffset;;){
+          //TODO use batch copying in this section
+          if((marker&word)!=0L){
+            arr[dstOffset]=arr[srcOffset];
+            if(--dstOffset==dstBound){
+              return;
             }
-          }else{
-            int beforeBiggestRun=this.biggestRunBegin-1;
-            int afterBiggestRun=beforeBiggestRun+biggestRunLength+1
-            //TODO
           }
-        }else{
-          int dstOffset;
-          arr[dstOffset=this.dstOffset]=arr[srcOffset-1];
-#IF OfRef
-          arr[++dstOffset]=arr[numSurvivors=srcBound];
-          OmniArray.nullifyRange(arr,numSurvivors,dstOffset+1);
-#ELSE
-          arr[++dstOffset]=arr[srcBound];
-#ENDIF
-          deq.tail=dstOffset;
-          deq.head=head;
+          --srcOffset;
+          if((marker>>>=1)==0L){
+            break;
+          }
+        }
+        for(;;srcOffset-=64){
+          word=survivorSet[--wordOffset];
+          for(int s=srcOffset;;){
+            int numToSkip;
+            if((numToSkip=Long.numberOfLeadingZeros(word))==64){
+              break;
+            }
+            int numToRetain=Long.numberOfLeadingZeros(~(word<<=numToSkip));
+            ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToRetain=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=numToRetain,numToRetain);
+            if(numToRetain==64){
+              break;
+            }else if(dstOffset>=dstBound){
+              return;
+            }
+            word<<=numToRetain;
+          }
+        }
+        //TODO use batch copying
+        //int wordOffset;
+        //long[] survivorSet;
+        //long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6];
+        //long marker=1L<<survivorIndex;
+        //for(int s=dstOffset,srcOffset=dstOffset+(64-(survivorIndex&0b111111));;word=survivorSet[--wordOffset],s=srcOffset,srcOffset-=64){
+        //  for(;;--s){
+        //    if((marker&word)!=0){
+        //      arr[dstOffset]=arr[s];
+        //      if(--dstOffset==dstBound){
+        //        return;
+        //      }
+        //    }
+        //  }
+        //}
+      }
+    }
+    private static class SmallCollapseData$<E>$ extends CollapseData$<E>${
+      @Override void pullSurvivorsUp($ArrayType$[] arr,int dstOffset,int survivorIndex,int dstBound){
+        //TODO use batch copying
+        long marker=1L<<survivorIndex;
+        long word=this.survivorWord;
+        for(int srcOffset=dstOffset;;--srcOffset,marker>>>=1){
+          if((word&marker)!=0L){
+            arr[dstOffset]=arr[srcOffset];
+            if(--dstOffset==dstBound){
+              return;
+            }
+          }
+        }
+      }
+      @Override void arrSeqPullDown($ArrayType$[] arr,int srcOffset,int dstOffset,int dstBound){
+        $ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,dstOffset,dstBound,survivorWord);
+      }
+      @Override void pullSurvivorsDown($ArrayType$[] arr,int dstOffset,int survivorIndex,int dstBound){
+        $ClassPrefix$ArrSeq.pullSurvivorsDown(arr,dstOffset,dstOffset,dstBound,this.survivorWord>>>survivorIndex);
+      }
+      final long survivorWord;
+      SmallCollapseData(Checked$<E>$ deq,int srcOffset,int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter){
+        super(deq,numLeft);
+        numLeft+=srcOffset;
+        final var arr=deq.arr;
+        int survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;
+        for(long word=0L,marker=1L;;marker<<=1){
+          if(filter.test(($exposedType$)arr[srcOffset])){
+            currentRunLength=0;
+          }else{
+            word|=marker;
+            if(currentRunLength==0){
+              currentRunBegin=srcOffset;
+            }
+            if(currentRunLength==biggestRunLength){
+              survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
+              survivorsAfterBiggestRun=0;
+              biggestRunBegin=currentRunBegin;
+              biggestRunLength=++currentRunLength;
+            }else{
+              ++currentRunLength;
+              ++survivorsAfterBiggestRun;
+            }
+          }
+          if(++srcOffset==numLeft){
+            this.survivorWord=word;
+            this.biggestRunBegin=biggestRunBegin;
+            this.biggestRunLength=biggestRunLength;
+            this.survivorsBeforeBiggestRun=survivorsBeforeBiggestRun;
+            this.survivorsAfterBiggestRun=survivorsAfterBiggestRun;
+            return;
+          }
         }
       }
     }
     #MACRO SuppressUnchecked()
     private void collapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
-      for(int srcOffset=head+1;;)
-      {
-        if(srcOffset==tail)
-        {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.head=head;
-          this.tail=tail;
-          break;
-        }
-        if(filter.test(($exposedType$)arr[srcOffset]))
-        {
-          int dstOffset=srcOffset;
-          outer:for(;;)
-          {
-            if(++srcOffset==tail)
-            {
-              CheckedCollection.checkModCount(modCount,this.modCount);
-              this.head=head;
-              arr[dstOffset]=arr[tail];
-#IF OfRef
-              OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,dstOffset+1);
-#ENDIF
-              this.tail=dstOffset;
-              return;
-            }
-            if(!filter.test(($exposedType$)arr[srcOffset]))
-            {
-              int numLeft;
-              if((numLeft=tail-(++srcOffset))!=0)
-              {
-                var collapseBodyData=new CollapseBodyData(numLeft,srcOffset,dstOffset);
-                if(numLeft>64)
-                {
-                  long[] survivorSet;
-                  int numSurvivors=collapseBodyData.markSurvivors(filter,survivorSet=new long[((numLeft-1)>>6)+1]);
-                  CheckedCollection.checkModCount(modCount,this.modCount);
-                  collapseBodyData.collapseSurvivors(numSurvivors,head,survivorSet);
-                }
-                else
-                {
-                  long survivorWord=collapseBodyData.markSurvivors(filter);
-                  CheckedCollection.checkModCount(modCount,this.modCount);
-                  collapseBodyData.collapseSurvivors(head,survivorWord);
-                }
-              }
-              else
-              {
+      //head is to be retained
+      //tail is to be retained
+      //begin searching for the first index to not retain
+      for(int gapBegin=head+1;gapBegin!=tail;++gapBegin){
+        if(filter.test(($exposedType$)arr[gapBegin])){
+          //we have found the beginning of the first gap
+          for(int gapEnd=gapBegin+1;gapEnd!=tail;++gapEnd){
+            if(!filter.test(($exposedType$)arr[gapEnd])){
+              //we found the end of the first gap
+              //begin marking any indices that remain
+              int numLeft,srcOffset;
+              if((numLeft=tail-(srcOffset=gapEnd+1))==0){
+                noElementsLeftToMark(arr,head,gapBegin,gapEnd,tail);
+              }else{
+                CollapseData collapseData=numLeft>64?new BigCollapseData(this,srcOffset,numLeft,filter):new SmallCollapseData(this,srcOffset,numLeft,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
-                if(dstOffset-head<2)
-                {
-                  arr[--srcOffset]=arr[head];
-#IF OfRef
-                  OmniArray.Of$ClassPrefix$.nullifyRange(arr,srcOffset-1,head);
-#ENDIF
-                  this.head=srcOffset;
-                  this.tail=tail;
-                }
-                else
-                {
-                  arr[dstOffset]=arr[srcOffset-1];
-                  arr[++dstOffset]=arr[tail];
-#IF OfRef
-                  OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,dstOffset+1);
-#ENDIF
-                  this.tail=dstOffset;
-                  this.head=head;
-                }
+                collapseData.collapse(head,gapBegin,gapEnd,tail);
               }
               return;
             }
           }
+          //We have reached the tail without finding an index to retain between the
+          //gap begin and the tail
+          //check the modcount, shift the tail down, and set the head and tail
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.head=head;
+          arr[gapBegin]=arr[tail];
+#IF OfRef
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,gapBegin+1);
+#ENDIF
+          this.tail=gapBegin;
+          return;
         }
       }
+      //all of the elements in the body were retained
+      //check the modcount and set the head and the tail
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.head=head;
+      this.tail=tail;
     }
+    
     #MACRO SuppressUnchecked()
     private void fragmentedCollapseBodyHelper($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,int modCount){
       //TODO

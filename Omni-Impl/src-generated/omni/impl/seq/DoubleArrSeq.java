@@ -97,7 +97,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       survivorSet[wordOffset++]=word;
     }
   }
-  private static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long word){
+  static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long word){
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
       ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
@@ -105,7 +105,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
   }
-  private static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet){
+  static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet){
     for(int wordOffset=0;;){
       long word=survivorSet[wordOffset];
       for(int s=srcOffset;;){
@@ -685,7 +685,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
                     modCountChecker.checkModCount();
                     if(numSurvivors!=0){
                       if(numSurvivors==n){
-                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
+                        System.arraycopy(arr,srcOffset-1,arr,dstOffset,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }else{
                         arr[dstOffset]=before;
