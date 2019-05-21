@@ -2625,7 +2625,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
               }
               else
               {
-                pullSurvivorsUp(arr,biggestRunBegin-2,(numSurvivors=biggestRunBegin)-1,numSurvivors-gapEnd-3,(numSurvivors-=(survivorsBeforeBiggestRun)));
+                pullSurvivorsUp(arr,biggestRunBegin-1,(numSurvivors=biggestRunBegin),numSurvivors-gapEnd-2,(numSurvivors-=(survivorsBeforeBiggestRun)));
                 arr[--numSurvivors]=arr[gapEnd];
                 biggestRunBegin+=biggestRunLength;
                 if(survivorsAfterBiggestRun!=0)
@@ -2720,43 +2720,25 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       @Override void pullSurvivorsUp(Object[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         int wordOffset;
         long[] survivorSet;
-        long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6]<<(64-(survivorIndex&0b111111));
-        //long marker=1L<<survivorIndex;
-        //for(;;){
-        //  //TODO use batch copying in this section
-        //  if((marker&word)!=0L){
-        //    arr[--dstOffset]=arr[srcOffset];
-        //    if(dstOffset==dstBound){
-        //      return;
-        //    }
-        //  }
-        //  if((marker>>>=1)==0L){
-        //    break;
-        //  }
-        //  --srcOffset;
-        //}
-        for(;;srcOffset-=64){
-          //word=survivorSet[--wordOffset];
-          for(int s=srcOffset;;){
+        long word=(survivorSet=this.survivorSet)[wordOffset=(survivorIndex-1)>>6]<<(64-(survivorIndex&0b111111));
+        int s;
+        for(srcOffset=(s=srcOffset)-(((survivorIndex-1)&0b111111)+1);;word=survivorSet[--wordOffset],s=srcOffset,srcOffset-=64){
+          for(;;word<<=survivorIndex){
             if((survivorIndex=Long.numberOfLeadingZeros(word))==64){
               break;
             }
-            int numToRetain;
-            ArrCopy.uncheckedCopy(arr,s-=(survivorIndex+(numToRetain=Long.numberOfLeadingZeros(~(word<<=survivorIndex)))),arr,dstOffset-=numToRetain,numToRetain);
-            if(numToRetain==64){
+            ArrCopy.uncheckedCopy(arr,s-=(survivorIndex+(survivorIndex=Long.numberOfLeadingZeros(~(word<<=survivorIndex)))),arr,dstOffset-=survivorIndex,survivorIndex);
+            if(survivorIndex==64){
               break;
             }else if(dstOffset<=dstBound){
               return;
             }
-            word<<=numToRetain;
           }
-          word=survivorSet[--wordOffset];
         }
       }
     }
     private static class SmallCollapseData<E> extends CollapseData<E>{
       @Override void pullSurvivorsUp(Object[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
-        //TODO use batch copying
         long word=this.survivorWord<<(64-(0b111111&survivorIndex));
         for(;;){
           int numToRetain;
@@ -2766,14 +2748,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           }
           word<<=numToRetain;
         }
-        //for(long marker=1L<<survivorIndex,word=this.survivorWord;;--srcOffset,marker>>>=1){
-        //  if((word&marker)!=0L){
-        //    arr[--dstOffset]=arr[srcOffset];
-        //    if(dstOffset==dstBound){
-        //      return;
-        //    }
-        //  }
-        //}
       }
       @Override void arrSeqPullDown(Object[] arr,int srcOffset,int dstOffset,int dstBound){
         RefArrSeq.pullSurvivorsDown(arr,srcOffset,dstOffset,dstBound,survivorWord);

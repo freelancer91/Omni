@@ -103,11 +103,6 @@ public class ByteArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
     for(var checkedType:CheckedType.values()){
-//#IFNOT OfBoolean
-//      if(checkedType.checked){
-//        continue; //TODO remove
-//      }
-//#ENDIF
       for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
         if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){
