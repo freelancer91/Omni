@@ -1535,6 +1535,117 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
       this.head=gapEnd;
     }
+    private void collapseAcrossGap(int head,int gapBing,int gapEnd,int tail){
+      #MACRO Assert(head<gapBegin)
+      #MACRO Assert(gapBegin<arr.length)
+      #MACRO Assert(gapEnd>0)
+      #MACRO Assert(gapEnd<tail)
+      #MACRO Assert(tail<head)
+      if(gapBegin-head==1){
+        this.tail=tail;
+        $ArrayType$[] arr;
+        (arr=this.arr)[--tail]=arr[gapEnd];
+        arr[--tail]=arr[head];
+        this.head=tail;
+#IF OfRef
+        if(tail!=0)
+        {
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail-1,0);
+        }
+        OmniArray.Of$ClassPrefix$.nullifyRange(arr,arr.length-1,head);
+#ENDIF
+      }else{
+        this.head=head;
+        if(++gapBegin==(head=arr.length))
+        {
+          arr[0]=arr[gapEnd];
+          arr[1]=arr[tail];
+          this.tail=1
+#IF OfRef
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,2);
+#ENDIF
+        }
+        else
+        {
+          arr[gapBegin]=arr[gapEnd];
+          if(++gapBegin==head)
+          {
+            arr[0]=arr[tail];
+            this.tail=0;
+#IF OfRef
+            OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,1);
+#ENDIF
+          }
+          else
+          {
+            this.tail=gapBegin;
+            arr[gapBegin]=arr[tail];
+#IF OfRef
+            if(++gapBegin!=head)
+            {
+              OmniArray.Of$ClassPrefix$.nullifyRange(arr,head-1,gapBegin);
+            }
+            OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,0);
+#ENDIF
+          }
+        }
+      }
+    }
+    private void collapseGapInSplit(int head,int gapBegin,int gapEnd,int tail){
+      #MACRO Assert(gapBegin>=0)
+      #MACRO Assert(gapEnd>gapBegin)
+      #MACRO assert(tail>gapEnd)
+      #MACRO Assert(head>tail)
+      #MACRO Assert(arr.length>head)
+      int headLength,tailLength;
+      if((headLength=gapBegin-head)<=(tailLength=tail+1-gapEnd)){
+        this.tail=tail;
+        if((tail=headLength-gapEnd)<=0){
+          ArrCopy.uncheckedCopy(arr,head,arr,gapEnd-=headLength,headLength);
+#IF OfRef
+          if(gapEnd!=0)
+          {
+            OmniArray.Of$ClassPrefix$.nullifyRange(arr,gapEnd-1,0);
+          }
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,arr.length-1,head);
+#ENDIF
+        }else{
+          ArrCopy.uncheckedCopy(arr,head+tail,arr,0,gapEnd);
+          ArrCopy.uncheckedCopy(arr,head,arr,gapEnd=arr.length-tail,tail);
+#IF OfRef
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,gapEnd-1,head);
+#ENDIF
+        }
+        this.head=gapEnd;
+      }else{
+        this.head=head;
+#IF OfRef
+        int overflow;
+        if((overflow=tailLength-(head=(headLength=arr.length)-gapBegin))<=0){
+          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,tailLength);
+          this.tail=gapBegin+=tailLength;
+          if(++gapBegin!=headLength)
+          {
+            OmniArray.of$ClassPrefix$.nullifyRange(arr,headLength-1,gapBegin);
+          }
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,0);
+        }else{
+          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,head);
+          ArrCopy.uncheckedCopy(arr,gapEnd+head,arr,0,overflow);
+          this.tail=overflow-1;
+          OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,overflow);
+#ELSE
+        if((headLength=tailLength-(head=arr.length-gapBegin))<=0){
+          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,tailLength);
+          this.tail=gapBegin+tailLength;
+        }else{
+          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,head);
+          ArrCopy.uncheckedCopy(arr,gapEnd+head,arr,0,headLength);
+          this.tail=headLength-1;
+#ENDIF
+        }
+      }
+    }
     private void collapseGapAfterSplit(int head,int gapBegin,int gapEnd,int tail){
       #MACRO Assert(gapBegin>=0)
       #MACRO Assert(gapEnd>gapBegin)
@@ -1606,23 +1717,18 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         int biggestRunBegin=this.biggestRunBegin;
         int survivorsBeforeOrAfter;
         int newHead;
-        if((survivorsBeforeOrAfter=this.survivorsBeforeBiggestRun)==0)
-        {
+        if((survivorsBeforeOrAfter=this.survivorsBeforeBiggestRun)==0){
           newHead=biggestRunBegin-1;
-        }
-        else
-        {
+        }else{
           pullSurvivorsUp(arr,biggestRunBegin-1,(newHead=biggestRunBegin),newHead-gapEnd-2,(newHead-=(survivorsBeforeOrAfter)));
           --newHead;
         }
         arr[newHead]=arr[gapEnd];
         biggestRunBegin+=this.biggestRunLength;
-        if((survivorsBeforeOrAfter=this.survivorsAfterBiggestRun)!=0)
-        {
+        if((survivorsBeforeOrAfter=this.survivorsAfterBiggestRun)!=0){
           pullSurvivorsDown(arr,biggestRunBegin,biggestRunBegin-gapEnd,biggestRunBegin+=survivorsBeforeOrAfter);
         }
-        if(biggestRunBegin!=tail)
-        {
+        if(biggestRunBegin!=tail){
           arr[biggestRunBegin]=arr[tail];
 #IF OfRef
           OmniArray.Of$ClassPrefix$.nullifyRange(arr,tail,biggestRunBegin+1);
@@ -1683,7 +1789,42 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         #MACRO Assert(gapEnd<tail)
         #MACRO Assert(tail<head)
         //0 < gapEnd < tail < head < gapBegin < arr.length
-        //TODO
+        int numSurvivors,survivorsBeforeBiggestRun,survivorsAfterBiggestRun,biggestRunLength;
+        if((numSurvivors=
+           (survivorsBeforeBiggestRun=this.survivorsBeforeBiggestRun)
+          +(survivorsAfterBiggestRun=this.survivorsAfterBiggestRun)
+          +(biggestRunLength=this.biggestRunLength))==0){
+          deq.collapseAcrossGap(head,gapBegin,gapEnd,tail);
+        }else{
+          int numLeft;
+          if((numLeft=this.numLeft)==numSurvivors){
+            deq.collapseGapInSplit(head,gapBegin,gapEnd,tail);
+          }else{
+            final Checked$<E>$ deq;
+            final var arr=(deq=this.deq).arr;
+            if(biggestRunLength>(numLeft=gapBegin-head)){
+              if((tail=numLeft-(gapEnd=collapseTailHelper(arr,gapEnd,tail)))<=0){
+                ArrCopy.uncheckedCopy(arr,head,arr,gapEnd-=numLeft,numLeft);
+#IF OfRef
+                if(gapEnd!=0)
+                {
+                  OmniArray.Of$ClassPrefix$.nullifyRange(arr,gapEnd,0);
+                }
+                OmniArray.Of$ClassPrefix$.nullifyRange(arr,arr.length-1,head);
+#ENDIF
+              }else{
+                ArrCopy.uncheckedCopy(arr,head+tail,0,gapEnd);
+                ArrCopy.uncheckedCopy(arr,head,arr,gapEnd=arr.length-tail,tail);
+#IF OfRef
+                OmniArray.Of$ClassPrefix$.nullifyRange(arr,gapEnd-1,head);
+#ENDIF
+              }
+              this.head=gapEnd;
+            }else{
+              //TODO
+            }
+          }
+        }
       }
       private void collapse(int head,int gapBegin,int gapEnd,int tail){
         #MACRO Assert(head>=0)
