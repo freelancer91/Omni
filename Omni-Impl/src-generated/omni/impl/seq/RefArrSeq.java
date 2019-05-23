@@ -95,7 +95,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       survivorSet[wordOffset++]=word;
     }
   }
-  static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long word){
+  static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,long word){
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
       ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
@@ -763,8 +763,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
                         dstOffset+=numSurvivors;
                       }else{
                         arr[dstOffset]=before;
-                        pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
-                        arr[dstOffset++]=after;
+                        pullSurvivorsDown(arr,srcOffset,++dstOffset,survivorWord);
+                        arr[dstOffset+=numSurvivors]=after;
+                        ++dstOffset;
                       }
                       break outer;
                     }

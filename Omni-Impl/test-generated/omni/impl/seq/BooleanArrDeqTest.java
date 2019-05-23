@@ -120,9 +120,12 @@ public class BooleanArrDeqTest{
           for(var functionCallType:FunctionCallType.values()){
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,0,functionCallType,0,0,0,0));
             for(int tmpSeqSize=0;tmpSeqSize<=10;++tmpSeqSize){
+              if(functionCallType==FunctionCallType.Boxed && tmpSeqSize>2){
+                break;
+              }
               final int seqSize=tmpSeqSize;
               long randSeedBound;
-              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized || functionCallType==FunctionCallType.Boxed){
                 randSeedBound=0;
               }else{
                 randSeedBound=100;
@@ -130,10 +133,19 @@ public class BooleanArrDeqTest{
               for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
                 final long randSeed=tmpRandSeed;
                 for(int tmpPeriod=1,inc=Math.max(1,seqSize/10);;tmpPeriod+=inc){
+                  if(tmpPeriod>1 && functionCallType==FunctionCallType.Boxed){
+                    break;
+                  }
                   final int period=tmpPeriod;
                   for(int tmpInitVal=0;tmpInitVal<=1;++tmpInitVal){
+                    if(tmpInitVal!=0 && functionCallType==FunctionCallType.Boxed){
+                      break;
+                    }
                     final int initVal=tmpInitVal;
                     for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
+                      if(tmpHead>1 && functionCallType==FunctionCallType.Boxed){
+                        break;
+                      }
                       final int head=tmpHead;
                       submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,head,initVal,period));
                     }

@@ -120,12 +120,15 @@ public class ShortArrDeqTest{
           for(var functionCallType:FunctionCallType.values()){
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=101;tmpSeqSize+=10){
+              if(functionCallType==FunctionCallType.Boxed && tmpSeqSize>11){
+                break;
+              }
               final int seqSize=tmpSeqSize;
               //final int inc=Math.max(1,seqSize/10);
               final int inc=1;
               double[] thresholdArr;
               long randSeedBound;
-              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
+              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized || functionCallType==FunctionCallType.Boxed){
                 thresholdArr=new double[]{0.5};
                 randSeedBound=0;
               }else{
@@ -133,9 +136,15 @@ public class ShortArrDeqTest{
                 randSeedBound=100;
               }
               for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
+                if(functionCallType==FunctionCallType.Boxed && tmpRandSeed>0){
+                  break;
+                }
                 final long randSeed=tmpRandSeed;
                 for(double threshold:thresholdArr){
                   for(int tmpHead=0;tmpHead<seqSize;tmpHead+=inc){
+                    if(functionCallType==FunctionCallType.Boxed && tmpHead>1){
+                      break;
+                    }
                     //if(tmpHead!=0 && checkedType.checked) //TODO remove
                     //{
                     //  continue;
