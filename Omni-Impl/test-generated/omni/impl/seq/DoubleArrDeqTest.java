@@ -37,7 +37,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class DoubleArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newSingleThreadExecutor();
+  java.util.concurrent.Executors.newWorkStealingPool();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -84,7 +84,8 @@ public class DoubleArrDeqTest{
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=101;tmpSeqSize+=10){
               final int seqSize=tmpSeqSize;
-              final int inc=Math.max(1,seqSize/10);
+              //final int inc=Math.max(1,seqSize/10);
+              final int inc=1;
               double[] thresholdArr;
               long randSeedBound;
               if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){

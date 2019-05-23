@@ -2413,7 +2413,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             break;
           }
         }
-        OmniArray.OfRef.nullifyRange(arr,head-1,0);
+        if(head!=0)
+        {
+          OmniArray.OfRef.nullifyRange(arr,head-1,0);
+        }
       }
     }
     @SuppressWarnings("unchecked")
@@ -2434,7 +2437,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             break;
           }
         }
-        OmniArray.OfRef.nullifyRange(arr,head-1,0);
+        if(head!=0)
+        {
+          OmniArray.OfRef.nullifyRange(arr,head-1,0);
+        }
       }
     }
     @SuppressWarnings("unchecked")
@@ -2489,7 +2495,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             break;
           }
         }
-        OmniArray.OfRef.nullifyRange(arr,bound,tail+1);
+        if(tail!=bound)
+        {
+          OmniArray.OfRef.nullifyRange(arr,bound,tail+1);
+        }
       }
     }
     @SuppressWarnings("unchecked")
@@ -2511,7 +2520,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             break;
           }
         }
-        OmniArray.OfRef.nullifyRange(arr,bound,tail+1);
+        if(tail!=bound)
+        {
+          OmniArray.OfRef.nullifyRange(arr,bound,tail+1);
+        }
       }
     }
     @SuppressWarnings("unchecked")
@@ -2561,7 +2573,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         this.head=head;
         arr[gapBegin]=arr[head=arr.length-1];
         arr[++gapBegin]=arr[0];
-        OmniArray.OfRef.nullifyRange(arr,head,gapBegin+1);
+        if(head!=gapBegin)
+        {
+          OmniArray.OfRef.nullifyRange(arr,head,gapBegin+1);
+        }
         arr[0]=null;
         this.tail=gapBegin;
       }
@@ -2582,7 +2597,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         arr[gapBegin]=arr[++gapEnd];
         if(++gapBegin!=(head=arr.length))
         {
-          OmniArray.OfRef.nullifyRange(arr,gapBegin,head-1);
+          OmniArray.OfRef.nullifyRange(arr,head-1,gapBegin);
         }
         OmniArray.OfRef.nullifyRange(arr,gapEnd,0);
       }
@@ -2612,185 +2627,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         this.tail=gapBegin;
       }
     }
-    private void collapseGapBeforeSplit(int head,int gapBegin,int gapEnd,int tail){
-      Object[] arr=this.arr;
-      int headLength,tailLength;
-      if((headLength=gapBegin-head)>(tailLength=tail-gapEnd)){
-        int overflow;
-        this.head=head;
-        int arrBound;
-        if((overflow=tailLength-((arrBound=arr.length)-gapBegin))>0){
-          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,tailLength-=overflow);
-          ArrCopy.uncheckedCopy(arr,gapEnd+tailLength,arr,0,overflow);
-          this.tail=overflow-1;
-          OmniArray.OfRef.nullifyRange(arr,tail,overflow);
-        }else{
-          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,tailLength);
-          if((gapBegin+=(tailLength))!=arrBound){
-            OmniArray.OfRef.nullifyRange(arr,arrBound-1,gapBegin);
-          }
-          this.tail=gapBegin-1;
-        }
-      }else{
-        int overflow;
-        this.tail=tail;
-        if((overflow=headLength-gapEnd)>0){
-          ArrCopy.uncheckedCopy(arr,head+overflow,arr,0,gapEnd);
-          ArrCopy.uncheckedCopy(arr,head,arr,tail=arr.length-overflow,overflow);
-          this.head=tail;
-          OmniArray.OfRef.nullifyRange(arr,tail-1,head);
-        }else{
-          ArrCopy.uncheckedCopy(arr,head,arr,overflow=-overflow,headLength);
-          this.head=overflow;
-          if(overflow!=0){
-            OmniArray.OfRef.nullifyRange(arr,overflow-1,0);
-          }
-          OmniArray.OfRef.nullifyRange(arr,arr.length-1,head);
-        }
-      }
-    }
-    private void pullDownAcrossSplit(int head,int gapBegin,int gapEnd,int tail){
-      this.head=head;
-      Object[] arr;
-      (arr=this.arr)[gapBegin]=arr[gapEnd];
-      int arrLength;
-      if(++gapBegin==(arrLength=arr.length)){
-        arr[0]=arr[tail];
-        this.tail=1;
-        OmniArray.OfRef.nullifyRange(arr,tail,1);
-      }else{
-        arr[gapBegin]=arr[tail];
-        this.tail=gapBegin;
-        if(++gapBegin!=arrLength){
-          OmniArray.OfRef.nullifyRange(arr,arrLength-1,gapBegin);
-        }
-        OmniArray.OfRef.nullifyRange(arr,tail,0);
-      }
-    }
-    private void pullUpAcrossSplit(Object[] arr,int head,int gapBegin,int gapEnd){
-      ArrCopy.semicheckedCopy(arr,0,arr,gapEnd-=gapBegin,gapBegin);
-      int overFlow,arrLength;
-      if((overFlow=(gapBegin=(arrLength=arr.length)-head)-gapEnd)<=0){
-        ArrCopy.uncheckedCopy(arr,head,arr,gapEnd-=gapBegin,gapBegin);
-        if(gapEnd!=0){
-          OmniArray.OfRef.nullifyRange(arr,gapEnd-1,0);
-        }
-        OmniArray.OfRef.nullifyRange(arr,arrLength-1,head);
-      }else{
-        ArrCopy.uncheckedCopy(arr,arrLength-gapEnd,arr,0,gapEnd);
-        ArrCopy.uncheckedCopy(arr,head,arr,gapEnd=arrLength-overFlow,overFlow);
-        OmniArray.OfRef.nullifyRange(arr,gapEnd-1,head);
-      }
-      this.head=gapEnd;
-    }
-    private void collapseAcrossGap(int head,int gapBegin,int gapEnd,int tail){
-      assert head<gapBegin;
-      assert gapBegin<arr.length;
-      assert gapEnd>0;
-      assert gapEnd<tail;
-      assert tail<head;
-      if(gapBegin-head==1){
-        this.tail=tail;
-        Object[] arr;
-        (arr=this.arr)[--tail]=arr[gapEnd];
-        arr[--tail]=arr[head];
-        this.head=tail;
-        if(tail!=0)
-        {
-          OmniArray.OfRef.nullifyRange(arr,tail-1,0);
-        }
-        OmniArray.OfRef.nullifyRange(arr,arr.length-1,head);
-      }else{
-        this.head=head;
-        if(++gapBegin==(head=arr.length))
-        {
-          arr[0]=arr[gapEnd];
-          arr[1]=arr[tail];
-          this.tail=1;
-          OmniArray.OfRef.nullifyRange(arr,tail,2);
-        }
-        else
-        {
-          arr[gapBegin]=arr[gapEnd];
-          if(++gapBegin==head)
-          {
-            arr[0]=arr[tail];
-            this.tail=0;
-            OmniArray.OfRef.nullifyRange(arr,tail,1);
-          }
-          else
-          {
-            this.tail=gapBegin;
-            arr[gapBegin]=arr[tail];
-            if(++gapBegin!=head)
-            {
-              OmniArray.OfRef.nullifyRange(arr,head-1,gapBegin);
-            }
-            OmniArray.OfRef.nullifyRange(arr,tail,0);
-          }
-        }
-      }
-    }
-    private void collapseGapInSplit(int head,int gapBegin,int gapEnd,int tail){
-      assert gapBegin>=0;
-      assert gapEnd>gapBegin;
-      assert tail>gapEnd;
-      assert head>tail;
-      assert arr.length>head;
-      int headLength,tailLength;
-      if((headLength=gapBegin-head)<=(tailLength=tail+1-gapEnd)){
-        this.tail=tail;
-        if((tail=headLength-gapEnd)<=0){
-          ArrCopy.uncheckedCopy(arr,head,arr,gapEnd-=headLength,headLength);
-          if(gapEnd!=0)
-          {
-            OmniArray.OfRef.nullifyRange(arr,gapEnd-1,0);
-          }
-          OmniArray.OfRef.nullifyRange(arr,arr.length-1,head);
-        }else{
-          ArrCopy.uncheckedCopy(arr,head+tail,arr,0,gapEnd);
-          ArrCopy.uncheckedCopy(arr,head,arr,gapEnd=arr.length-tail,tail);
-          OmniArray.OfRef.nullifyRange(arr,gapEnd-1,head);
-        }
-        this.head=gapEnd;
-      }else{
-        this.head=head;
-        int overflow;
-        if((overflow=tailLength-(head=(headLength=arr.length)-gapBegin))<=0){
-          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,tailLength);
-          this.tail=gapBegin+=tailLength;
-          if(++gapBegin!=headLength)
-          {
-            OmniArray.OfRef.nullifyRange(arr,headLength-1,gapBegin);
-          }
-          OmniArray.OfRef.nullifyRange(arr,tail,0);
-        }else{
-          ArrCopy.uncheckedCopy(arr,gapEnd,arr,gapBegin,head);
-          ArrCopy.uncheckedCopy(arr,gapEnd+head,arr,0,overflow);
-          this.tail=overflow-1;
-          OmniArray.OfRef.nullifyRange(arr,tail,overflow);
-        }
-      }
-    }
-    private void collapseGapAfterSplit(int head,int gapBegin,int gapEnd,int tail){
-      assert gapBegin>=0;
-      assert gapEnd>gapBegin;
-      assert tail>gapEnd;
-      assert head>tail;
-      assert arr.length>head;
-      Object[] arr;
-      int tailLength;
-      if((((arr=this.arr).length)-head)+gapBegin<(tailLength=tail+1-gapEnd)){
-        this.tail=tail;
-        pullUpAcrossSplit(arr,head,gapBegin,gapEnd);
-      }else{
-        this.head=head;
-        ArrCopy.uncheckedSelfCopy(arr,gapBegin,gapEnd,tailLength);
-        this.tail=(gapBegin+=(tailLength-1));
-        OmniArray.OfRef.nullifyRange(arr,tail,gapBegin+1);
-      }
-    }
-    private void collapseHelper(int head,int gapBegin,int gapEnd,int numLeft,int tail){
+    private void nonfragmentedCollapseAllSurvived(int head,int gapBegin,int gapEnd,int numLeft,int tail){
       final var arr=this.arr;
       int beforeLength;
       if((numLeft+=2)<(beforeLength=gapBegin-head)){
@@ -2805,7 +2642,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         this.head=gapEnd;
       }
     }
-    private void collapseHelper(int head,int gapBegin,int gapEnd,int tail){
+    private void nonfragmentedCollapseNoSurvivors(int head,int gapBegin,int gapEnd,int tail){
       final Object[] arr;
       (arr=this.arr)[gapBegin]=arr[gapEnd];
       arr[++gapBegin]=arr[tail];
@@ -2824,9 +2661,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         this.deq=deq;
         this.numLeft=numLeft;
       }
-      abstract void collapseAcrossSplit(int headBegin,int gapBegin,int gapEnd,int tail);
-      abstract void pullDownAcrossSplit(int headBegin,int gapBegin,int gapEnd,int tail);
-      abstract void pullDownAcrossSplit(Object[] arr,int srcOffset,int dstOffset,int dstBound);
       abstract void arrSeqPullDown(Object[] arr,int srcOffset,int dstOffset,int dstBound);
       abstract void pullSurvivorsDown(Object[] arr,int dstOffset,int survivorIndex,int dstBound);
       abstract void pullSurvivorsUp(Object[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound);
@@ -2852,132 +2686,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         deq.tail=biggestRunBegin;
         return newHead;
       }
-      private void collapseGapAfterSplit(int head,int gapBegin,int gapEnd,int tail){
-        assert gapBegin>=0;
-        assert gapEnd>gapBegin;
-        assert tail>gapEnd;
-        assert head>tail;
-        assert deq.arr.length>head;
-        //0 <= gapBegin < gapEnd < tail < head < arr.length
-        int numSurvivors,biggestRunLength;
-        if((numSurvivors=
-           (this.survivorsBeforeBiggestRun)
-          +(this.survivorsAfterBiggestRun)
-          +(biggestRunLength=this.biggestRunLength))==0){
-          deq.collapseHelper(head,gapBegin,gapEnd,tail);
-        }else{
-          if((this.numLeft)==numSurvivors){
-            deq.collapseGapAfterSplit(head,gapBegin,gapEnd,tail);
-          }else{
-            final Checked<E> deq;
-            final Object[] arr;
-            if(biggestRunLength>(gapBegin+((arr=(deq=this.deq).arr).length)-head)){
-              deq.pullUpAcrossSplit(arr,head,gapBegin,collapseTailHelper(arr,gapEnd,tail));
-            }else{
-              arr[gapBegin]=arr[gapEnd];
-              arrSeqPullDown(arr,++gapEnd,++gapBegin,gapBegin+=numSurvivors);
-              arr[gapBegin]=arr[tail];
-              OmniArray.OfRef.nullifyRange(arr,tail,gapBegin+1);
-              deq.head=head;
-              deq.tail=gapBegin;
-            }
-          }
-        }
-      }
-      private void collapseGapBeforeSplit(int head,int gapBegin,int gapEnd,int tail){
-        assert head<gapBegin;
-        assert gapBegin<gapEnd;
-        assert gapEnd<=deq.arr.length;
-        assert tail>=0;
-        assert tail<head;
-        //0 <= tail < head < gapBegin < gapEnd <= arr.length
-        int numSurvivors,biggestRunLength;
-        if((numSurvivors=
-           (this.survivorsBeforeBiggestRun)
-          +(this.survivorsAfterBiggestRun)
-          +(biggestRunLength=this.biggestRunLength))==0){
-           deq.pullDownAcrossSplit(head,gapBegin,gapEnd,tail);
-        }else{
-          if(this.numLeft==numSurvivors){
-            deq.collapseGapBeforeSplit(head,gapBegin,gapEnd,tail);
-          }else{
-            if(biggestRunLength>(gapBegin-head)){
-             collapseAcrossSplit(head,gapBegin,gapEnd,tail);
-            }else{
-             pullDownAcrossSplit(head,gapBegin,gapEnd,tail);
-            }
-          }
-        }
-      }
-      private void collapseGapInSplit(int head,int gapBegin,int gapEnd,int tail){
-        assert head<gapBegin;
-        assert gapBegin<deq.arr.length;
-        assert gapEnd>0;
-        assert gapEnd<tail;
-        assert tail<head;
-        //0 < gapEnd < tail < head < gapBegin < arr.length
-        int numSurvivors,biggestRunLength;
-        if((numSurvivors=
-           (this.survivorsBeforeBiggestRun)
-          +(this.survivorsAfterBiggestRun)
-          +(biggestRunLength=this.biggestRunLength))==0){
-          deq.collapseAcrossGap(head,gapBegin,gapEnd,tail);
-        }else{
-          int numLeft;
-          if((numLeft=this.numLeft)==numSurvivors){
-            deq.collapseGapInSplit(head,gapBegin,gapEnd,tail);
-          }else{
-            final Checked<E> deq;
-            final var arr=(deq=this.deq).arr;
-            if(biggestRunLength>(numLeft=gapBegin-head)){
-              if((tail=numLeft-(gapEnd=collapseTailHelper(arr,gapEnd,tail)))<=0){
-                ArrCopy.uncheckedCopy(arr,head,arr,gapEnd-=numLeft,numLeft);
-                if(gapEnd!=0)
-                {
-                  OmniArray.OfRef.nullifyRange(arr,gapEnd,0);
-                }
-                OmniArray.OfRef.nullifyRange(arr,arr.length-1,head);
-              }else{
-                ArrCopy.uncheckedCopy(arr,head+tail,arr,0,gapEnd);
-                ArrCopy.uncheckedCopy(arr,head,arr,gapEnd=arr.length-tail,tail);
-                OmniArray.OfRef.nullifyRange(arr,gapEnd-1,head);
-              }
-              deq.head=gapEnd;
-            }else{
-              deq.head=head;
-              arr[gapBegin]=arr[gapEnd];
-              int arrLength;
-              if((arrLength=arr.length)==++gapBegin){
-                arrSeqPullDown(arr,++gapEnd,0,numSurvivors);
-                arr[numSurvivors]=arr[tail];
-                OmniArray.OfRef.nullifyRange(arr,tail,numSurvivors+1);
-                deq.tail=numSurvivors;
-              }else{
-                if((head=(numSurvivors+=gapBegin)-arrLength)>0){
-                  pullDownAcrossSplit(arr,++gapEnd,gapBegin,head);
-                  arr[head]=arr[tail];
-                  deq.tail=head;
-                  OmniArray.OfRef.nullifyRange(arr,tail,head+1);
-                }else{
-                  arrSeqPullDown(arr,++gapEnd,gapBegin,numSurvivors);
-                  if(numSurvivors==arrLength){
-                    arr[0]=arr[tail];
-                    deq.tail=0;
-                    OmniArray.OfRef.nullifyRange(arr,tail,1);
-                  }else{
-                    arr[numSurvivors]=arr[tail];
-                    deq.tail=numSurvivors;
-                    if(++numSurvivors!=arrLength){
-                      OmniArray.OfRef.nullifyRange(arr,arrLength-1,numSurvivors);
-                    }
-                    OmniArray.OfRef.nullifyRange(arr,0,tail);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
       private void collapse(int head,int gapBegin,int gapEnd,int tail){
         assert head>=0;
         assert gapBegin>head;
@@ -2990,11 +2698,11 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
            (this.survivorsBeforeBiggestRun)
           +(this.survivorsAfterBiggestRun)
           +(biggestRunLength=this.biggestRunLength))==0){
-          deq.collapseHelper(head,gapBegin,gapEnd,tail);
+          deq.nonfragmentedCollapseNoSurvivors(head,gapBegin,gapEnd,tail);
         }else{
           int numLeft;
           if((numLeft=this.numLeft)==numSurvivors){
-            deq.collapseHelper(head,gapBegin,gapEnd,numLeft,tail);
+            deq.nonfragmentedCollapseAllSurvived(head,gapBegin,gapEnd,numLeft,tail);
           }else{
             final Checked<E> deq;
             final var arr=(deq=this.deq).arr;
@@ -3015,78 +2723,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
     }
     private static class BigCollapseData<E> extends CollapseData<E>{
-      final long[] survivorSet;
-      @SuppressWarnings("unchecked")
-      BigCollapseData(Checked<E> deq,int srcOffset,int numLeft,Predicate<? super E> filter,int arrBound){
-        super(deq,numLeft);
-        assert deq.tail<deq.head;
-        assert srcOffset<arrBound;
-        assert numLeft>64;
-        assert srcOffset-2>deq.head;
-        assert srcOffset+numLeft-arrBound<=deq.tail;
-        assert srcOffset+numLeft-arrBound>=0;
-        var survivorSet=new long[((numLeft-1)>>6)+1];
-        numLeft+=srcOffset;
-        final var arr=deq.arr;
-        for(int wordOffset=0,survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;;){
-          long word=0L,marker=1L;
-          do{
-            if(filter.test((E)arr[srcOffset])){
-              currentRunLength=0;
-            }else{
-              word|=marker;
-              if(currentRunLength==0){
-                currentRunBegin=srcOffset;
-              }
-              if(currentRunLength==biggestRunLength){
-                survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
-                survivorsAfterBiggestRun=0;
-                biggestRunBegin=currentRunBegin;
-                biggestRunLength=++currentRunLength;
-              }else{
-                ++currentRunLength;
-                ++survivorsAfterBiggestRun;
-              }
-            }
-            if(++srcOffset==arrBound){
-              for(currentRunLength=0;;){
-                while((marker<<=1)!=0L){
-                  if(filter.test((E)arr[srcOffset-arrBound])){
-                    currentRunLength=0;
-                  }else{
-                    word|=marker;
-                    if(currentRunLength==0){
-                      currentRunBegin=srcOffset;
-                    }
-                    if(currentRunLength==biggestRunLength){
-                      survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
-                      survivorsAfterBiggestRun=0;
-                      biggestRunBegin=currentRunBegin;
-                      biggestRunLength=++currentRunLength;
-                    }else{
-                      ++currentRunLength;
-                      ++survivorsAfterBiggestRun;
-                    }
-                  }
-                  if(++srcOffset==numLeft){
-                    survivorSet[wordOffset]=word;
-                    this.biggestRunBegin=biggestRunBegin;
-                    this.biggestRunLength=biggestRunLength;
-                    this.survivorsBeforeBiggestRun=survivorsBeforeBiggestRun;
-                    this.survivorsAfterBiggestRun=survivorsAfterBiggestRun;
-                    this.survivorSet=survivorSet;
-                    return;
-                  }
-                }
-                survivorSet[wordOffset++]=word;
-                word=0L;
-                marker=1L;
-              }
-            }
-          }while((marker<<=1)!=0L);
-          survivorSet[wordOffset++]=word;
-        }
-      }
+      final long[] survivorSet;      
       @SuppressWarnings("unchecked")
       BigCollapseData(Checked<E> deq,int srcOffset,int numLeft,Predicate<? super E> filter){
         super(deq,numLeft);
@@ -3181,32 +2818,8 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           }
         }
       }
-      @Override void pullDownAcrossSplit(Object[] arr,int srcOffset,int dstOffset,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
-      @Override void pullDownAcrossSplit(int head,int gapBegin,int gapEnd,int tail){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
-      @Override void collapseAcrossSplit(int head,int gapBegin,int gapEnd,int tail){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
     }
     private static class SmallCollapseData<E> extends CollapseData<E>{
-      @Override void pullDownAcrossSplit(int head,int gapBegin,int gapEnd,int tail){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
-      @Override void collapseAcrossSplit(int head,int gapBegin,int gapEnd,int tail){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
-      @Override void pullDownAcrossSplit(Object[] arr,int srcOffset,int dstOffset,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
       @Override void pullSurvivorsUp(Object[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         assert srcOffset<dstOffset;
         assert srcOffset>=0;
@@ -3239,68 +2852,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         RefArrSeq.pullSurvivorsDown(arr,dstOffset+1,dstOffset,dstBound,this.survivorWord>>>survivorIndex);
       }
       final long survivorWord;
-      @SuppressWarnings("unchecked")
-      SmallCollapseData(Checked<E> deq,int srcOffset,int numLeft,Predicate<? super E> filter,int arrBound){
-        super(deq,numLeft);
-        assert deq.tail<deq.head;
-        assert srcOffset<arrBound;
-        assert numLeft<=64;
-        assert srcOffset-2>deq.head;
-        assert srcOffset+numLeft-arrBound<=deq.tail;
-        assert srcOffset+numLeft-arrBound>=0;
-        numLeft+=srcOffset;
-        final var arr=deq.arr;
-        int survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;
-        for(long word=0L,marker=1L;;marker<<=1){
-          if(filter.test((E)arr[srcOffset])){
-            currentRunLength=0;
-          }else{
-            word|=marker;
-            if(currentRunLength==0){
-              currentRunBegin=srcOffset;
-            }
-            if(currentRunLength==biggestRunLength){
-              survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
-              survivorsAfterBiggestRun=0;
-              biggestRunBegin=currentRunBegin;
-              biggestRunLength=++currentRunLength;
-            }else{
-              ++currentRunLength;
-              ++survivorsAfterBiggestRun;
-            }
-          }
-          if(++srcOffset==arrBound){
-            for(currentRunLength=0;;){
-              marker<<=1;
-              if(filter.test((E)arr[srcOffset-arrBound])){
-                currentRunLength=0;
-              }else{
-                word|=marker;
-                if(currentRunLength==0){
-                  currentRunBegin=srcOffset;
-                }
-                if(currentRunLength==biggestRunLength){
-                  survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
-                  survivorsAfterBiggestRun=0;
-                  biggestRunBegin=currentRunBegin;
-                  biggestRunLength=++currentRunLength;
-                }else{
-                  ++currentRunLength;
-                  ++survivorsAfterBiggestRun;
-                }
-              }
-              if(++srcOffset==numLeft){
-                this.survivorWord=word;
-                this.biggestRunBegin=biggestRunBegin;
-                this.biggestRunLength=biggestRunLength;
-                this.survivorsBeforeBiggestRun=survivorsBeforeBiggestRun;
-                this.survivorsAfterBiggestRun=survivorsAfterBiggestRun;
-                return;
-              }
-            }
-          }
-        }
-      }
       @SuppressWarnings("unchecked")
       SmallCollapseData(Checked<E> deq,int srcOffset,int numLeft,Predicate<? super E> filter){
         super(deq,numLeft);
@@ -3411,9 +2962,9 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 noElementsLeftToMarkFragmentedBefore(arr,head,gapBegin);
               }else{
                 CollapseData<E> collapseData;
-                int overflow,srcBound;
                 if(srcOffset+numLeft==arrBound)
                 {
+                  assert tail==0;
                   if(numLeft>64)
                   {
                     //TODO
@@ -3421,7 +2972,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   }
                   else
                   {
-                    collapseData=new SmallCollapseData(this,srcOffset,numLeft,filter);
+                    throw new UnsupportedOperationException();
                   }
                 }
                 else
@@ -3437,9 +2988,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                     throw new UnsupportedOperationException();
                   }
                 }
-                //CollapseData<E> collapseData=srcOffset!=arrBound?numLeft>64?new BigCollapseData<E>(this,srcOffset,numLeft,filter,arrBound):new SmallCollapseData<E>(this,srcOffset,numLeft,filter,arrBound):numLeft>64?new BigCollapseData<E>(this,srcOffset,numLeft,filter):new SmallCollapseData<E>(this,srcOffset,numLeft,filter);
-                CheckedCollection.checkModCount(modCount,this.modCount);
-                collapseData.collapseGapBeforeSplit(head,gapBegin,gapEnd,tail);
               }
               return;
             }
@@ -3452,10 +3000,11 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 noElementsLeftToMarkFragmentedGap(arr,head,gapBegin,gapEnd);
               }else{
                 //TODO
-                throw new UnsupportedOperationException();
-                //CollapseData<E> collapseData=numLeft>64?new BigCollapseData<E>(this,arrBound,numLeft,filter):new SmallCollapseData<E>(this,arrBound,numLeft,filter);
-                //CheckedCollection.checkModCount(modCount,this.modCount);
-                //collapseData.collapseGapInSplit(head,gapBegin,gapEnd,tail);
+                if(numLeft>64){
+                  throw new UnsupportedOperationException();
+                }else{
+                  throw new UnsupportedOperationException();
+                }
               }
               return;
             }
@@ -3483,10 +3032,11 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 noElementsLeftToMarkFragmentedAfter(arr,head,gapBegin,gapEnd);
               }else{
                 //TODO
-                throw new UnsupportedOperationException();
-                //CollapseData<E> collapseData=numLeft>64?new BigCollapseData<E>(this,srcOffset,numLeft,filter):new SmallCollapseData<E>(this,srcOffset,numLeft,filter);
-                //CheckedCollection.checkModCount(modCount,this.modCount);
-                //collapseData.collapseGapAfterSplit(head,gapBegin,gapEnd,tail);
+                if(numLeft>64){
+                  throw new UnsupportedOperationException();
+                }else{
+                  throw new UnsupportedOperationException();
+                }
               }
               return;
             }
@@ -3515,11 +3065,33 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 noElementsLeftToMarkFragmentedBefore(arr,head,gapBegin);
               }else{
-                //TODO
-                throw new UnsupportedOperationException();
-                //CollapseData<E> collapseData=srcOffset!=arrBound?numLeft>64?new BigCollapseData<E>(this,srcOffset,numLeft,filter,arrBound):new SmallCollapseData<E>(this,srcOffset,numLeft,filter,arrBound):numLeft>64?new BigCollapseData<E>(this,srcOffset,numLeft,filter):new SmallCollapseData<E>(this,srcOffset,numLeft,filter);
-                //CheckedCollection.checkModCount(modCount,this.modCount);
-                //collapseData.collapseGapBeforeSplit(head,gapBegin,gapEnd,tail);
+                CollapseData<E> collapseData;
+                if(srcOffset+numLeft==arrBound)
+                {
+                  assert tail==0;
+                  if(numLeft>64)
+                  {
+                    //TODO
+                    throw new UnsupportedOperationException();
+                  }
+                  else
+                  {
+                    throw new UnsupportedOperationException();
+                  }
+                }
+                else
+                {
+                  if(numLeft>64)
+                  {
+                    //TODO
+                    throw new UnsupportedOperationException();
+                  }
+                  else
+                  {
+                    //TODO
+                    throw new UnsupportedOperationException();
+                  }
+                }
               }
               this.modCount=modCount+1;
               return true;
@@ -3533,10 +3105,11 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 noElementsLeftToMarkFragmentedGap(arr,head,gapBegin,gapEnd);
               }else{
                 //TODO
-                throw new UnsupportedOperationException();
-                //CollapseData<E> collapseData=numLeft>64?new BigCollapseData<E>(this,arrBound,numLeft,filter):new SmallCollapseData<E>(this,arrBound,numLeft,filter);
-                //CheckedCollection.checkModCount(modCount,this.modCount);
-                //collapseData.collapseGapInSplit(head,gapBegin,gapEnd,tail);
+                if(numLeft>64){
+                  throw new UnsupportedOperationException();
+                }else{
+                  throw new UnsupportedOperationException();
+                }
               }
               this.modCount=modCount+1;
               return true;
@@ -3564,10 +3137,11 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 noElementsLeftToMarkFragmentedAfter(arr,head,gapBegin,gapEnd);
               }else{
                 //TODO
-                throw new UnsupportedOperationException();
-                //CollapseData<E> collapseData=numLeft>64?new BigCollapseData<E>(this,srcOffset,numLeft,filter):new SmallCollapseData<E>(this,srcOffset,numLeft,filter);
-                //CheckedCollection.checkModCount(modCount,this.modCount);
-                //collapseData.collapseGapAfterSplit(head,gapBegin,gapEnd,tail);
+                if(numLeft>64){
+                  throw new UnsupportedOperationException();
+                }else{
+                  throw new UnsupportedOperationException();
+                }
               }
               this.modCount=modCount+1;
               return true;

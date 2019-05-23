@@ -36,7 +36,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class IntArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newSingleThreadExecutor();
+  java.util.concurrent.Executors.newWorkStealingPool();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -80,6 +80,9 @@ public class IntArrDeqTest{
   public void testMASSIVEtoString_void(){
     int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
     int[] arr=new int[seqLength];
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int threadSpan=seqLength/numThreads;
+    int threadBound=numThreads-1;
     for(int i=0;i<seqLength;++i){
       arr[i]=TypeConversionUtil.convertToint(1);
     }
@@ -95,8 +98,17 @@ public class IntArrDeqTest{
         Assertions.assertEquals('[',string.charAt(0));
         Assertions.assertEquals(']',string.charAt(string.length()-1));
         seqMonitor.verifyStructuralIntegrity();
+        int nextWayPointIndex=0;
         var verifyItr=seqMonitor.verifyPreAlloc();
-        AbstractIntSeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
+        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
+          final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          final int finalWayPointIndex=nextWayPointIndex;
+          submitTest(()->AbstractIntSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
+          verifyItr.skip(threadSpan);
+          nextWayPointIndex=finalWayPointBound;
+        }
+        AbstractIntSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+        completeAllTests();
       }
     }
   }
@@ -109,7 +121,8 @@ public class IntArrDeqTest{
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=101;tmpSeqSize+=10){
               final int seqSize=tmpSeqSize;
-              final int inc=Math.max(1,seqSize/10);
+              //final int inc=Math.max(1,seqSize/10);
+              final int inc=1;
               double[] thresholdArr;
               long randSeedBound;
               if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){

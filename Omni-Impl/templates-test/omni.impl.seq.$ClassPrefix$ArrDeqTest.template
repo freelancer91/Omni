@@ -57,7 +57,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class $ClassPrefix$ArrDeqTest{
 
-  #MACRO TestMethods(false)
+  #MACRO TestMethods(true)
 #MACRODEF TestMethods(PARALLEL)
 #MACRO ParallelizationCode<PARALLEL>()
 #MACRO testMASSIVEtoString_void<PARALLEL>()
@@ -104,7 +104,8 @@ public class $ClassPrefix$ArrDeqTest{
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=101;tmpSeqSize+=10){
               final int seqSize=tmpSeqSize;
-              final int inc=Math.max(1,seqSize/10);
+              //final int inc=Math.max(1,seqSize/10);
+              final int inc=1;
               double[] thresholdArr;
               long randSeedBound;
               if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized){
