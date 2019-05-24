@@ -36,7 +36,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class IntArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newWorkStealingPool();
+  java.util.concurrent.Executors.newSingleThreadExecutor();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -80,9 +80,6 @@ public class IntArrDeqTest{
   public void testMASSIVEtoString_void(){
     int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
     int[] arr=new int[seqLength];
-    int numThreads=Runtime.getRuntime().availableProcessors();
-    int threadSpan=seqLength/numThreads;
-    int threadBound=numThreads-1;
     for(int i=0;i<seqLength;++i){
       arr[i]=TypeConversionUtil.convertToint(1);
     }
@@ -98,23 +95,17 @@ public class IntArrDeqTest{
         Assertions.assertEquals('[',string.charAt(0));
         Assertions.assertEquals(']',string.charAt(string.length()-1));
         seqMonitor.verifyStructuralIntegrity();
-        int nextWayPointIndex=0;
         var verifyItr=seqMonitor.verifyPreAlloc();
-        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
-          final int finalWayPointBound=nextWayPointIndex+threadSpan;
-          final int finalWayPointIndex=nextWayPointIndex;
-          submitTest(()->AbstractIntSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
-          verifyItr.skip(threadSpan);
-          nextWayPointIndex=finalWayPointBound;
-        }
-        AbstractIntSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
-        completeAllTests();
+        AbstractIntSeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
       }
     }
   }
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
     for(var checkedType:CheckedType.values()){
+      if(!checkedType.checked){
+        continue; //TODO remove
+      }
       for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
         if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){
@@ -145,10 +136,6 @@ public class IntArrDeqTest{
                     if(functionCallType==FunctionCallType.Boxed && tmpHead>1){
                       break;
                     }
-                    //if(tmpHead!=0 && checkedType.checked) //TODO remove
-                    //{
-                    //  continue;
-                    //}
                     final int head=tmpHead;
                     submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize,head));
                   }

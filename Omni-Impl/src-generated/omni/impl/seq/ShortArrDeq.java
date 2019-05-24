@@ -2352,8 +2352,8 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
       abstract void arrSeqPullDown(short[] arr,int srcOffset,int dstOffset,int dstBound);
       abstract void pullSurvivorsDown(short[] arr,int dstOffset,int survivorIndex,int dstBound);
       abstract void pullSurvivorsUp(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound);
-      abstract void pullDownMarkRangeSpansSplit(short[] arr,int srcOffset,int dstOffset,int dstBound);
-      abstract void pullDownMarkRangeSpansSplitDstBoundGoesBoundSplit(short[] arr,int srcOffset,int dstOffset,int dstBound);
+      abstract void pullDownMarkRangeSpansSplit(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound);
+      abstract void pullDownMarkRangeSpansSplitDstBoundGoesBeyondSplit(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound);
       private int collapseTailHelper(short[] arr,int gapEnd,int tail){
         int biggestRunBegin=this.biggestRunBegin;
         int survivorsBeforeOrAfter;
@@ -2375,6 +2375,70 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
         deq.tail=biggestRunBegin;
         return newHead;
       }
+      private void markRangeSpansSplitCollapseToBiggestRun(int head,int headLength,int gapEnd,int tail){
+        final Checked deq;
+        final short[] arr;
+        int arrLength=(arr=(deq=this.deq).arr).length;
+        int biggestRunBegin,biggestRunEnd=this.biggestRunLength+(biggestRunBegin=this.biggestRunBegin),survivorIndex;
+        if(biggestRunBegin>head){
+          int overflow;
+          if((overflow=biggestRunEnd-arrLength)<0){
+            int numSurvivorsBeforeAndAfter;
+            switch(Integer.signum(overflow+=(numSurvivorsBeforeAndAfter=this.survivorsAfterBiggestRun))){
+              case 1:
+                //the dstBound will bleed over into the head run
+                pullDownMarkRangeSpansSplitDstBoundGoesBeyondSplit(arr,biggestRunEnd,biggestRunEnd,biggestRunEnd-gapEnd-1,overflow);
+                arr[overflow]=arr[tail];
+                deq.tail=overflow;
+                break;
+              case 0:
+                //the dstBound will be exactly equal to the array length
+                pullDownMarkRangeSpansSplit(arr,biggestRunEnd,biggestRunEnd,biggestRunEnd-gapEnd-1,biggestRunEnd+=numSurvivorsBeforeAndAfter);
+                arr[0]=arr[tail];
+                deq.tail=0;
+                break;       
+              default:
+                //the dstBound will be inside the array length
+                if(numSurvivorsBeforeAndAfter!=0)
+                {
+                  pullDownMarkRangeSpansSplit(arr,biggestRunEnd,biggestRunEnd,biggestRunEnd-gapEnd-1,biggestRunEnd+=numSurvivorsBeforeAndAfter);
+                }
+                arr[biggestRunEnd]=arr[tail];
+                deq.tail=biggestRunEnd;
+            }
+            if((numSurvivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0)
+            {
+              pullSurvivorsUp(arr,biggestRunBegin-1,biggestRunBegin,biggestRunBegin-gapEnd-2,biggestRunBegin-=numSurvivorsBeforeAndAfter);
+            }
+            arr[--biggestRunBegin]=arr[gapEnd];
+            ArrCopy.uncheckedCopy(arr,head,arr,biggestRunBegin-=headLength,headLength);
+            deq.head=biggestRunBegin;
+            return;
+          }else{
+            survivorIndex=biggestRunEnd;
+            biggestRunEnd=overflow;
+          }
+        }else{
+          if(biggestRunBegin!=0){
+            //TODO biggest run begins in the head run AFTER zero
+            //return;
+            throw new UnsupportedOperationException();
+          }else{
+            survivorIndex=biggestRunEnd+(biggestRunBegin=arrLength);
+          }
+        }
+        if((arrLength=this.survivorsAfterBiggestRun)!=0){
+          pullSurvivorsDown(arr,biggestRunEnd,survivorIndex-gapEnd,biggestRunEnd+=arrLength);
+        }
+        arr[biggestRunEnd]=arr[tail];
+        deq.tail=biggestRunEnd;
+        if((arrLength=this.survivorsBeforeBiggestRun)!=0){
+          pullSurvivorsUp(arr,biggestRunBegin-1,biggestRunBegin,biggestRunBegin-gapEnd-2,biggestRunBegin-=arrLength);
+        }
+        arr[--biggestRunBegin]=arr[gapEnd];
+        ArrCopy.uncheckedCopy(arr,head,arr,biggestRunBegin-=headLength,headLength);
+        deq.head=biggestRunBegin;
+      }
       private void fragmentedCollapseMarkRangeSpansSplit(int head,int gapBegin,int gapEnd,int tail){
         assert tail<head;
         assert tail>0;
@@ -2392,27 +2456,26 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
           if((numLeft=this.numLeft)==numSurvivors){
             deq.fragmentedCollapseMarkRangeSpansSplitAllSurvived(head,gapBegin,gapEnd,tail);
           }else{
-            final Checked deq;
-            final var arr=(deq=this.deq).arr;
             if(biggestRunLength>(numLeft=gapBegin-head)){
-               //TODO
-               throw new UnsupportedOperationException();
+              markRangeSpansSplitCollapseToBiggestRun(head,numLeft,gapEnd,tail);
             }else{
-               deq.head=head;
-               arr[gapBegin]=arr[gapEnd++];
+               final Checked deq;
+               (deq=this.deq).head=head;
+               short[] arr;
+               (arr=deq.arr)[gapBegin]=arr[gapEnd++];
                switch(Integer.signum(head=(numSurvivors+=(++gapBegin))-arr.length)){
                  case -1:
-                   pullDownMarkRangeSpansSplit(arr,gapEnd,gapBegin,numSurvivors);
+                   pullDownMarkRangeSpansSplit(arr,gapEnd,gapBegin,0,numSurvivors);
                    arr[numSurvivors]=arr[tail];
                    deq.tail=numSurvivors;
                    break;
                  case 0:
-                   pullDownMarkRangeSpansSplit(arr,gapEnd,gapBegin,numSurvivors);
+                   pullDownMarkRangeSpansSplit(arr,gapEnd,gapBegin,0,numSurvivors);
                    arr[0]=arr[tail];
                    deq.tail=0;
                    break;
                  default:
-                   pullDownMarkRangeSpansSplitDstBoundGoesBoundSplit(arr,gapEnd,gapBegin,head);
+                   pullDownMarkRangeSpansSplitDstBoundGoesBeyondSplit(arr,gapEnd,gapBegin,0,head);
                    arr[head]=arr[tail];
                    deq.tail=head;
                }
@@ -2534,34 +2597,37 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
               }
             }
             if(++srcOffset==arrBound){
-              for(srcOffset=0,currentRunLength=0;;survivorSet[wordOffset++]=word,word=0L,marker=1L){
-                while((marker<<=1)!=0L){
-                  if(filter.test((short)arr[srcOffset])){
-                    currentRunLength=0;
+              for(srcOffset=0;;){
+                if((marker<<=1)==0L){
+                  survivorSet[wordOffset++]=word;
+                  word=0L;
+                  marker=1L;
+                }
+                if(filter.test((short)arr[srcOffset])){
+                  currentRunLength=0;
+                }else{
+                  word|=marker;
+                  if(currentRunLength==0){
+                    currentRunBegin=srcOffset;
+                  }
+                  if(currentRunLength==biggestRunLength){
+                    survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
+                    survivorsAfterBiggestRun=0;
+                    biggestRunBegin=currentRunBegin;
+                    biggestRunLength=++currentRunLength;
                   }else{
-                    word|=marker;
-                    if(currentRunLength==0){
-                      currentRunBegin=srcOffset;
-                    }
-                    if(currentRunLength==biggestRunLength){
-                      survivorsBeforeBiggestRun+=survivorsAfterBiggestRun;
-                      survivorsAfterBiggestRun=0;
-                      biggestRunBegin=currentRunBegin;
-                      biggestRunLength=++currentRunLength;
-                    }else{
-                      ++currentRunLength;
-                      ++survivorsAfterBiggestRun;
-                    }
+                    ++currentRunLength;
+                    ++survivorsAfterBiggestRun;
                   }
-                  if(++srcOffset==numLeft){
-                    survivorSet[wordOffset]=word;
-                    this.biggestRunBegin=biggestRunBegin;
-                    this.biggestRunLength=biggestRunLength;
-                    this.survivorsBeforeBiggestRun=survivorsBeforeBiggestRun;
-                    this.survivorsAfterBiggestRun=survivorsAfterBiggestRun;
-                    this.survivorSet=survivorSet;
-                    return;
-                  }
+                }
+                if(++srcOffset==numLeft){
+                  survivorSet[wordOffset]=word;
+                  this.biggestRunBegin=biggestRunBegin;
+                  this.biggestRunLength=biggestRunLength;
+                  this.survivorsBeforeBiggestRun=survivorsBeforeBiggestRun;
+                  this.survivorsAfterBiggestRun=survivorsAfterBiggestRun;
+                  this.survivorSet=survivorSet;
+                  return;
                 }
               }
             }
@@ -2623,7 +2689,8 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
         int wordOffset;
         long[] survivorSet;
         long word=(survivorSet=this.survivorSet)[wordOffset=survivorIndex>>6]>>>survivorIndex;
-        for(int s=dstOffset+1,srcOffset=s+(64-(survivorIndex&0b111111));;word=survivorSet[++wordOffset],s=srcOffset,srcOffset+=64){
+        //srcOffset is initalized to be 64-bit aligned
+        for(int s=dstOffset+1,srcOffset=s+(-survivorIndex&63);;word=survivorSet[++wordOffset],s=srcOffset,srcOffset+=64){
           for(;;s+=survivorIndex,word>>>=survivorIndex){
             if((survivorIndex=Long.numberOfTrailingZeros(word))==64){
               break;
@@ -2641,14 +2708,16 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
       @Override void pullSurvivorsUp(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         assert srcOffset<dstOffset;
         assert srcOffset>=0;
-        assert dstOffset<arr.length;
+        //#MACRO Assert(dstOffset<arr.length)
         assert survivorIndex>=0;
         assert dstOffset>dstBound;
         int wordOffset;
         long[] survivorSet;
-        long word=(survivorSet=this.survivorSet)[wordOffset=(survivorIndex-1)>>6]<<(64-(survivorIndex&0b111111));
+        //the negation of survivorIndex is intentional
+        long word=(survivorSet=this.survivorSet)[wordOffset=(survivorIndex-1)>>6]<<(-survivorIndex);
         int s;
-        for(srcOffset=(s=srcOffset)-(((survivorIndex-1)&0b111111)+1);;word=survivorSet[--wordOffset],s=srcOffset,srcOffset-=64){
+        //srcOffset is initalized to be 64-bit aligned
+        for(srcOffset=(s=srcOffset)-(survivorIndex&63);;word=survivorSet[--wordOffset],s=srcOffset,srcOffset-=64){
           for(;;word<<=survivorIndex){
             if((survivorIndex=Long.numberOfLeadingZeros(word))==64){
               break;
@@ -2662,33 +2731,27 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
           }
         }
       }
-      @Override void pullDownMarkRangeSpansSplit(short[] arr,int srcOffset,int dstOffset,int dstBound){
+      @Override void pullDownMarkRangeSpansSplit(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
+        //TODO
         throw new UnsupportedOperationException();
       }
-      @Override void pullDownMarkRangeSpansSplitDstBoundGoesBoundSplit(short[] arr,int srcOffset,int dstOffset,int dstBound){
+      @Override void pullDownMarkRangeSpansSplitDstBoundGoesBeyondSplit(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
+        //TODO
         throw new UnsupportedOperationException();
       }
     }
     private static class SmallCollapseData extends CollapseData{
-      @Override void pullDownMarkRangeSpansSplit(short[] arr,int srcOffset,int dstOffset,int dstBound){
+      @Override void pullDownMarkRangeSpansSplit(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         long word;
-        int numToRetain,numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord);
-        for(int arrLength=arr.length;;)
-        {
-          int overflow;
-          if((overflow=(srcOffset+=numToSkip)-arrLength)>=0)
-          {
-            srcOffset=overflow;
-            break;
-          }
-          int srcBound;
-          if((overflow=(srcBound=srcOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)>0){
-            ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,arrLength=numToRetain-overflow);
-            ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+arrLength,overflow);
+        int numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord>>>survivorIndex);
+        for(int arrLength=arr.length,numToRetain,srcBound;(survivorIndex=(srcOffset+=numToSkip)-arrLength)<0;srcOffset=srcBound,dstOffset+=numToRetain){
+          if((survivorIndex=(srcBound=srcOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)>0){
+            ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,arrLength=numToRetain-survivorIndex);
+            ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+arrLength,survivorIndex);
             if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
               return;
             }
-            srcOffset=overflow+numToSkip;
+            survivorIndex+=numToSkip;
             dstOffset+=numToRetain;
             break;
           }
@@ -2696,133 +2759,119 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
           if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
             return;
           }
-          srcOffset=srcBound;
-          dstOffset+=numToRetain;
         }
-        for(;;){
-          ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
+        finalizePullDown(arr,survivorIndex,dstOffset,word>>>numToSkip);
+      }
+      private void finalizePullDown(short[] arr,int srcOffset,int dstOffset,long word){
+        for(int numToSkip,numToRetain;;){
+          ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain=Long.numberOfTrailingZeros(~(word)));
           if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
             return;
           }
-          dstOffset+=numToRetain;
           srcOffset+=(numToSkip+numToRetain);
+          dstOffset+=numToRetain;
+          word>>>=numToSkip;
         }
       }
-      @Override void pullDownMarkRangeSpansSplitDstBoundGoesBoundSplit(short[] arr,int srcOffset,int dstOffset,int dstBound){
-        //TODO refactor this function to make it smaller
+      @Override void pullDownMarkRangeSpansSplitDstBoundGoesBeyondSplit(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         long word;
-        int numToRetain,numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord);
-        outerLoop:for(int arrLength=arr.length;;){
-          innerLoop:for(;;){
-            int srcOverflow;
-            if((srcOverflow=(srcOffset+=numToSkip)-arrLength)>=0){
-              int dstOverflow;
-              switch(Integer.signum(dstOverflow=(dstBound=dstOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
+        int srcOverflow,numToRetain,numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord>>>survivorIndex),arrLength=arr.length;
+        while((srcOverflow=(srcOffset+=numToSkip)-arrLength)<0){
+          int srcBound;
+          switch(Integer.signum(srcOverflow=(srcBound=srcOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
+            case 0:
+              //the source goes right up to the end of the array. wrap around
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
+              pullDownFromTailSpanToHeadSpan(arr,numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain),dstOffset+numToRetain,word>>>numToSkip);
+              return;
+            default:
+              //the source overflows
+              switch(Integer.signum(survivorIndex=(dstBound=dstOffset+numToRetain)-arrLength)){
+                case -1:
+                  //there is source overflow, but no destination overflow
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,survivorIndex=numToRetain-srcOverflow);
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+survivorIndex,srcOverflow);
+                  pullDownFromTailSpanToHeadSpan(arr,srcOverflow+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain)),dstBound,word>>>numToSkip);
+                  return;
                 case 0:
-                  ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
+                  //the source overflows and the destination goes right up to the end of the array
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,arrLength=numToRetain-srcOverflow);
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+arrLength,srcOverflow);
                   dstOffset=0;
-                  srcOffset=srcOverflow+numToRetain+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain));
-                  break outerLoop;
+                  numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain);
+                  break;
                 default:
-                  ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,arrLength=numToRetain-dstOverflow);
-                  ArrCopy.uncheckedSelfCopy(arr,0,srcOverflow+=arrLength,dstOverflow);
+                  //the source AND the destination overflow
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,arrLength=numToRetain-srcOverflow);
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+arrLength,srcOverflow-=survivorIndex);
+                  ArrCopy.uncheckedSelfCopy(arr,0,srcOverflow,survivorIndex);
                   if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
                     return;
                   }
-                  srcOffset=srcOverflow+dstOverflow+numToSkip;
-                  dstOffset=dstOverflow;
-                  break outerLoop;
-                case -1:
-                  ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
-                  dstOffset=dstBound;
-                  srcOffset=srcOverflow+numToRetain+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain));
+                  dstOffset=survivorIndex;
               }
-              break;
-            }
-            int srcBound;
-            switch(Integer.signum(srcOverflow=(srcBound=srcOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
-              case 0:
-                //the source goes right up to the end of the array. wrap around
-                ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
-                dstOffset+=numToRetain;
-                srcOffset=numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain);
-                break innerLoop;
-              default:
-                //the source overflows
-                int dstOverflow;
-                switch(Integer.signum(dstOverflow=(dstBound=dstOffset+numToRetain)-arrLength)){
-                  case -1:
-                    //there is source overflow, but no destination overflow
-                    ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,dstOverflow=numToRetain-srcOverflow);
-                    ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+dstOverflow,srcOverflow);
-                    dstOffset=dstBound;
-                    srcOffset=srcOverflow+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain));
-                    break innerLoop;
-                  case 0:
-                    //the source overflows and the destination goes right up to the end of the array
-                    ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,arrLength=numToRetain-srcOverflow);
-                    ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+arrLength,srcOverflow);
-                    dstOffset=0;
-                    srcOffset=srcOverflow+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain));
-                    break outerLoop;
-                  default:
-                    //the source AND the destination overflow
-                    ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,arrLength=numToRetain-srcOverflow);
-                    ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+arrLength,srcOverflow-=dstOverflow);
-                    ArrCopy.uncheckedSelfCopy(arr,0,srcOverflow,dstOverflow);
-                    if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
-                      return;
-                    }
-                    dstOffset=dstOverflow;
-                    srcOffset=srcOverflow+dstOverflow+numToSkip;
-                    break outerLoop;
-                }
-              case -1:
-                //no overflow of either the source or the destination
-                ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
-                srcOffset=srcBound;
-                dstOffset+=numToRetain;
-                numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain);
-            }
-          }
-          for(;;){
-            int dstOverflow;
-            switch(Integer.signum(dstOverflow=(dstBound=dstOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
-              case 0:
-                ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain);
-                dstOffset=0;
-                srcOffset+=(numToRetain+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain)));
-                break outerLoop;
-              default:
-                ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,arrLength=numToRetain-dstOverflow);
-                ArrCopy.uncheckedSelfCopy(arr,0,srcOffset+arrLength,dstOverflow);
-                if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
-                  return;
-                }
-                dstOffset=dstOverflow;
-                srcOffset+=(numToRetain+numToSkip);
-                break outerLoop;
-              case -1:
-                //still no destination overflow
-                ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain);
-                dstOffset+=numToRetain;
-                srcOffset+=(numToRetain+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain)));
-            }
+              finalizePullDown(arr,srcOffset=srcOverflow+survivorIndex+numToSkip,dstOffset,word>>>numToSkip);
+              return;
+            case -1:
+              //no overflow of either the source or the destination
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
+              srcOffset=srcBound;
+              dstOffset+=numToRetain;
+              numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain);
           }
         }
-        for(;;){
-          ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
-          if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+        switch(Integer.signum(survivorIndex=(dstBound=dstOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
+          case -1:
+            ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
+            pullDownFromTailSpanToHeadSpan(arr,srcOverflow+numToRetain+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain)),dstBound,word>>>numToSkip);
             return;
+          case 0:
+            ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
+            numToSkip=Long.numberOfTrailingZeros(word>>>=(survivorIndex=numToRetain));
+            dstOffset=0;
+            break;
+          default:
+            ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,arrLength=numToRetain-survivorIndex);
+            ArrCopy.uncheckedSelfCopy(arr,0,srcOverflow+=arrLength,survivorIndex);
+            if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+              return;
+            }
+            dstOffset=survivorIndex;
+        }
+        finalizePullDown(arr,srcOverflow+survivorIndex+numToSkip,dstOffset,word>>>numToSkip);
+      }
+      private void pullDownFromTailSpanToHeadSpan(short[] arr,int srcOffset,int dstOffset,long word){
+        for(int arrLength=arr.length;;){
+          int dstOverflow,dstBound,numToRetain,numToSkip;
+          switch(Integer.signum(dstOverflow=(dstBound=dstOffset+(numToRetain=Long.numberOfTrailingZeros(~(word))))-arrLength)){
+            case -1:
+              //still no destination overflow
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain);
+              srcOffset+=(numToRetain+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain)));
+              dstOffset=dstBound;
+              word>>>=numToSkip;
+              continue;
+            case 0:
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain);
+              numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain);
+              dstOffset=0;
+              break;
+            default:
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,arrLength=numToRetain-dstOverflow);
+              ArrCopy.uncheckedSelfCopy(arr,0,srcOffset+arrLength,dstOverflow);
+              if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+                return;
+              }
+              dstOffset=dstOverflow;
           }
-          srcOffset+=(numToRetain+numToSkip);
-          dstOffset+=numToRetain;
+          finalizePullDown(arr,srcOffset+numToRetain+numToSkip,dstOffset,word>>>numToSkip);
+          return;
         }
       }
       @Override void pullSurvivorsUp(short[] arr,int srcOffset,int dstOffset,int survivorIndex,int dstBound){
         assert srcOffset<dstOffset;
         assert srcOffset>=0;
-        assert dstOffset<arr.length;
+        //#MACRO Assert(dstOffset<arr.length)
         assert survivorIndex>=0;
         assert dstOffset>dstBound;
         assert dstOffset-dstBound<64;
@@ -2915,7 +2964,7 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
             }
           }
           if(++srcOffset==arrBound){
-            for(srcOffset=0,currentRunLength=0;;){
+            for(srcOffset=0;;){
               marker<<=1;
               if(filter.test((short)arr[srcOffset])){
                 currentRunLength=0;

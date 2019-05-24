@@ -37,7 +37,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class DoubleArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newWorkStealingPool();
+  java.util.concurrent.Executors.newSingleThreadExecutor();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -78,6 +78,9 @@ public class DoubleArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
     for(var checkedType:CheckedType.values()){
+      if(!checkedType.checked){
+        continue; //TODO remove
+      }
       for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
         if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){
@@ -108,10 +111,6 @@ public class DoubleArrDeqTest{
                     if(functionCallType==FunctionCallType.Boxed && tmpHead>1){
                       break;
                     }
-                    //if(tmpHead!=0 && checkedType.checked) //TODO remove
-                    //{
-                    //  continue;
-                    //}
                     final int head=tmpHead;
                     submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize,head));
                   }
