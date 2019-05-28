@@ -2394,27 +2394,28 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
       }
       @Override void fragmentedPullSurvivorsDownToNonFragmented(short[] arr,int dstOffset,int numToSkip,int dstBound){
         long word;
-        int srcOffset=dstOffset+1+(numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord>>>numToSkip));
-        dstBound=arr.length;
-        for(;;)
-        {
-          int srcOverflow;
-          if((srcOverflow=srcOffset-dstBound)>=0)
-          {
-            //the source offset overflowed
-            srcOffset=srcOverflow;
-            //TODO
-            throw new UnsupportedOperationException();
+        int srcOffset,numToRetain,srcOverflow;
+        for(dstBound=arr.length,srcOffset=dstOffset+1+(numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord>>>numToSkip));;){
+          numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip));
+          if((srcOverflow=srcOffset-dstBound)>=0){
+            //the source offset overflowed on a skip
+            ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
+            //if(numToRetain==64){
+            //  return;
+            //}
+            srcOverflow+=numToRetain;
+            break;
           }
-          int numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip));
           int srcBound;
-          switch(Integer.signum(srcOverflow=(srcBound=srcOffset+numToRetain)-dstBound))
-          {
+          switch(Integer.signum(srcOverflow=(srcBound=srcOffset+numToRetain)-dstBound)){
             default:
               //no overflow detected yet
               ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
+              if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+                return;
+              }
               dstOffset+=numToRetain;
-              srcOffset=srcBound+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain));
+              srcOffset=srcBound+numToSkip;
               continue;
             case 1:
               //the source bound overflowed, so wrap around
@@ -2425,10 +2426,10 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
               //the source bound goes right up to arrLength, so the next skip will overflow
               ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
           }
-          if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))!=64){
-            finalizeFragmentedPullDown(arr,dstOffset+numToRetain,srcOverflow+numToSkip,word>>>numToSkip);
-          }
-          return;
+          break;
+        }
+        if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))!=64){
+          finalizeFragmentedPullDown(arr,dstOffset+numToRetain,srcOverflow+numToSkip,word>>>numToSkip);
         }
       }
       private static void finalizeFragmentedPullDown(short[] arr,int dstOffset,int srcOffset,long word){
@@ -2647,13 +2648,12 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
                 int newTail;
                 switch(Integer.signum(overflow=(newTail=biggestRunEnd+survivorsAfter)-arrLength)){
                   case -1:
-                    if(tail==0)
-                    {
-                      collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
-                    }
-                    else
-                    {
-                      collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                    if(survivorsAfter!=0){
+                      if(tail==0){
+                        collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                      }else{
+                        collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                      }
                     }
                     arr[newTail]=arr[tail];
                     overflow=newTail;
@@ -2768,13 +2768,12 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
                 int newTail;
                 switch(Integer.signum(overflow=(newTail=biggestRunEnd+survivorsAfter)-arrLength)){
                   case -1:
-                    if(tail==0)
-                    {
-                      collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
-                    }
-                    else
-                    {
-                      collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                    if(survivorsAfter!=0){
+                      if(tail==0){
+                        collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                      }else{
+                        collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                      }
                     }
                     arr[newTail]=arr[tail];
                     overflow=newTail;

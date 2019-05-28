@@ -37,7 +37,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class DoubleArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newSingleThreadExecutor();
+  java.util.concurrent.Executors.newWorkStealingPool();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -187,17 +187,19 @@ public class DoubleArrDeqTest{
       default:
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
+    /*
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==11
-      && randSeed==62
-      && threshold==0.75
-      && head==5
+      && seqSize==8
+      && randSeed==1
+      && threshold==0.5
+      && head==2
     )
     {
       System.out.println("Trigger point");
     }
+    */
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       try{
