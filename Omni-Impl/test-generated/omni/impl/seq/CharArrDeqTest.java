@@ -74,6 +74,23 @@ public class CharArrDeqTest{
       throw new Error("There were unfinished tests in the queue");
     }
   }
+  private static final int[] REMOVE_IF_SIZES=new int[66+(8*5)];
+  static{
+    for(int i=1;i<67;++i)
+    {
+      REMOVE_IF_SIZES[i-1]=i;
+    }
+    int index=67;
+    for(int j=2;j<10;++j)
+    {
+      for(int i=-2;i<=2;++i)
+      {
+        REMOVE_IF_SIZES[(index++)-1]=(j*64)+i;
+      }
+    }
+  }
+  private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
+  private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
     for(var checkedType:CheckedType.values()){
@@ -84,11 +101,14 @@ public class CharArrDeqTest{
         if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
-            for(int tmpSeqSize=1;tmpSeqSize<=101;tmpSeqSize+=10){
-              if(functionCallType==FunctionCallType.Boxed && tmpSeqSize>11){
+            for(int seqSize:REMOVE_IF_SIZES){
+              //if(seqSize<190 || monitoredRemoveIfPredicateGen != MonitoredRemoveIfPredicateGen.Random)
+              //{
+              //  continue; //TODO remove
+              //}
+              if(functionCallType==FunctionCallType.Boxed && seqSize>2){
                 break;
               }
-              final int seqSize=tmpSeqSize;
               //final int inc=Math.max(1,seqSize/10);
               final int inc=1;
               double[] thresholdArr;
@@ -121,6 +141,9 @@ public class CharArrDeqTest{
       }
     }
     completeAllTests();
+    int skipped=skippedTests.get();
+    int total=totalTests.get();
+    System.out.println("skipped tests = "+skipped+", totalTests="+total+", percent = "+(((double)skipped/(double)total)*100.0)+"%");
   }
   private static void testremoveIf_PredicateHelper(CheckedType checkedType,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize,int head
   ){
@@ -163,13 +186,26 @@ public class CharArrDeqTest{
       default:
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
+    if(
+      checkedType.checked
+      && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
+      && seqSize==11
+      && randSeed==62
+      && threshold==0.75
+      && head==5
+    )
+    {
+      System.out.println("Trigger point");
+    }
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       try{
+        totalTests.incrementAndGet();
         seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
       }catch(UnsupportedOperationException e){
+        skippedTests.incrementAndGet();
         //TODO remove
-        System.out.println("skipping test {monitoredRemoveIfPredicateGen="+monitoredRemoveIfPredicateGen+",threshold="+threshold+",randSeed="+randSeed+",functionCallType="+functionCallType+",seqSize="+seqSize+",head="+head+"}");
+        //System.out.println("skipping test {monitoredRemoveIfPredicateGen="+monitoredRemoveIfPredicateGen+",threshold="+threshold+",randSeed="+randSeed+",functionCallType="+functionCallType+",seqSize="+seqSize+",head="+head+"}");
         return;
       }
       seqMonitor.verifyStructuralIntegrity();
@@ -178,11 +214,13 @@ public class CharArrDeqTest{
       return;
     }else{
       try{
+        totalTests.incrementAndGet();
         seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
       }catch(Throwable e){
         if(e instanceof UnsupportedOperationException){
+          skippedTests.incrementAndGet();
           //TODO remove
-          System.out.println("skipping test {monitoredRemoveIfPredicateGen="+monitoredRemoveIfPredicateGen+",threshold="+threshold+",randSeed="+randSeed+",functionCallType="+functionCallType+",seqSize="+seqSize+",head="+head+"}");
+          //System.out.println("skipping test {monitoredRemoveIfPredicateGen="+monitoredRemoveIfPredicateGen+",threshold="+threshold+",randSeed="+randSeed+",functionCallType="+functionCallType+",seqSize="+seqSize+",head="+head+"}");
           return;
         }
         Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->{
