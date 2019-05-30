@@ -2188,45 +2188,6 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
           survivorSet[++wordOffset]=word;
         }
       }
-      /*
-      @Override void nonfragmentedPullSurvivorsUp(int[] arr,int dstOffset,int numToSkip,int dstBound){
-        int wordOffset;
-        long[] survivorSet;
-        long word=(survivorSet=this.survivorSet)[wordOffset=((--numToSkip)-1)>>6]<<(-numToSkip);
-        for(int s=dstOffset-1,srcOffset=s-(((numToSkip-1)&63)+1);;word=survivorSet[--wordOffset],s=srcOffset,srcOffset-=64){
-          for(;;){
-            if((numToSkip=Long.numberOfLeadingZeros(word))==64){
-              break;
-            }
-            ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToSkip=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=(numToSkip),numToSkip);
-            if(dstOffset<=dstBound){
-              return;
-            }else if(numToSkip==64){
-              break;
-            }
-            word<<=numToSkip;
-          }
-        }
-      }
-      @Override void nonfragmentedPullSurvivorsDown(int[] arr,int dstOffset,int numToSkip,int dstBound){
-        int wordOffset;
-        long[] survivorSet;
-        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]>>>numToSkip;
-        for(int s=dstOffset+1,srcOffset=s+(((-numToSkip)-1)&63)+1;;word=survivorSet[++wordOffset],s=srcOffset,srcOffset+=64){
-          for(;;s+=numToSkip,word>>>=numToSkip){
-            if((numToSkip=Long.numberOfTrailingZeros(word))==64){
-              break;
-            }
-            ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numToSkip,numToSkip=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
-            if((dstOffset+=numToSkip)>=dstBound){
-              return;
-            }else if(numToSkip==64){
-              break;
-            }
-          }
-        }
-      }
-      */
       @Override void fragmentedCollapseBiggestRunInHead(int head,IntArrDeq deq,int tail){
         int overflow;
         int biggestRunEnd;
@@ -2264,7 +2225,7 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
         }
         deq.tail=overflow;
         if((survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0){
-          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-head,biggestRunBegin-=survivorsBeforeAndAfter);
+          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,(biggestRunBegin-head)-3,biggestRunBegin-=survivorsBeforeAndAfter);
         }
         arr[--biggestRunBegin]=arr[head];
         deq.head=biggestRunBegin;
@@ -2274,20 +2235,127 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
         throw new UnsupportedOperationException();
       }
       private void fragmentedPullSurvivorsDownToNonFragmented(int[] arr,int dstOffset,int numToSkip,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
+        int wordOffset;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]>>>numToSkip;
+        int s=dstOffset+1;
+        int srcOffset=s+(((-numToSkip)-1)&63)+1;
+        int arrLength=arr.length;
+        int numToRetain;
+        int srcOverflow;
+        for(;;)
+        {
+          if((numToSkip=Long.numberOfTrailingZeros(word))==64)
+          {
+            s=srcOffset;
+            srcOffset+=64;
+            word=survivorSet[++wordOffset];
+            continue;
+          }
+          numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip));
+          if((srcOverflow=(s+=numToSkip)-arrLength)>=0)
+          {
+            ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
+            srcOverflow+=numToRetain;
+            break;
+          }
+          int srcBound;
+          switch(Integer.signum(srcOverflow=(srcBound=s+numToRetain)-arrLength))
+          {
+            default:
+              //no overflow detected yet
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,numToRetain);
+              if((dstOffset+=numToRetain)==dstBound)
+              {
+                return;
+              }
+              s=srcBound;
+              word>>>=numToRetain;
+              continue;
+            case 1:
+              //the source bound overflowed, so wrap around
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,srcBound=numToRetain-srcOverflow);
+              ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+srcBound,srcOverflow);
+              break;
+            case 0:
+              //the source bound goes right up to arrLength, so the next skip will overflow
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,numToRetain);
+          }
+          break;
+        }
+        if((dstOffset+=numToRetain)!=dstBound)
+        {
+          for(srcOffset-=arrLength,word>>>=numToRetain;;)
+          {
+            if((numToSkip=Long.numberOfTrailingZeros(word))==64)
+            {
+              srcOverflow=srcOffset;
+              srcOffset+=64;
+              word=survivorSet[++wordOffset];
+              continue;
+            }
+            ArrCopy.uncheckedCopy(arr,srcOverflow+=numToSkip,arr,dstOffset,numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
+            if((dstOffset+=numToRetain)==dstBound)
+            {
+              return;
+            }
+            srcOverflow+=numToRetain;
+            word>>>=numToRetain;
+          }
+        }
+      }
+      private void nonfragmentedPullSurvivorsUp(int[] arr,int dstOffset,int numToSkip,int dstBound){
+        int wordOffset;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]<<(-(numToSkip+1));
+        for(int s,srcOffset=(s=dstOffset-1)-(((numToSkip)&63)+1);;)
+        {
+          while((numToSkip=Long.numberOfLeadingZeros(word))!=64)
+          {
+            ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToSkip=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=numToSkip,numToSkip);
+            if(dstOffset==dstBound)
+            {
+              return;
+            }
+            //else if(numToSkip==64)
+            //{
+            //  break;
+            //}
+            word<<=numToSkip;
+          }
+          word=survivorSet[--wordOffset];
+          s=srcOffset;
+          srcOffset-=64;
+        }
       }
       private void fragmentedPullSurvivorsDown(int[] arr,int dstOffset,int numToSkip,int dstBound){
         //TODO
         throw new UnsupportedOperationException();
       }
-      private void nonfragmentedPullSurvivorsUp(int[] arr,int dstOffset,int numToSkip,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
       private void nonfragmentedPullSurvivorsDown(int[] arr,int dstOffset,int numToSkip,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
+        int wordOffset;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]>>>numToSkip;
+        for(int s=dstOffset+1,srcOffset=s+(((-numToSkip)-1)&63)+1;;)
+        {
+          while((numToSkip=Long.numberOfTrailingZeros(word))!=64)
+          {
+            ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numToSkip,numToSkip=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
+            if((dstOffset+=numToSkip)==dstBound)
+            {
+              return;
+            }
+            else if(numToSkip==64)
+            {
+              break;
+            }
+            s+=numToSkip;
+            word>>>=numToSkip;
+          }
+          word=survivorSet[++wordOffset];
+          s=srcOffset;
+          srcOffset+=64;
+        }
       }
       @Override void nonfragmentedCollapse(int head,IntArrDeq deq,int tail){
         final var arr=deq.arr;
@@ -2300,7 +2368,7 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
         arr[biggestRunEnd]=arr[tail];
         deq.tail=biggestRunEnd;
         if((survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0){
-          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-head,biggestRunBegin-=survivorsBeforeAndAfter);
+          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,(biggestRunBegin-head)-3,biggestRunBegin-=survivorsBeforeAndAfter);
         }
         arr[--biggestRunBegin]=arr[head];
         deq.head=biggestRunBegin;
@@ -2460,8 +2528,8 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
                 case -1:
                   //dst overflow detected
                   ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-srcOffset,srcOffset);
-                  ArrCopy.uncheckedCopy(arr,srcOffset=(dstOffset=arr.length)-srcOffset,arr,0,srcBound=dstBound-srcBound);
-                  ArrCopy.uncheckedCopy(arr,srcOffset-=srcBound,arr,dstOffset-=dstBound,dstBound);
+                  ArrCopy.uncheckedCopy(arr,srcOffset=(dstOffset=arr.length)-(srcBound=dstBound-srcBound),arr,0,srcBound);
+                  ArrCopy.uncheckedCopy(arr,srcOffset+=dstBound,arr,dstOffset+=dstBound,-dstBound);
                   if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
                   {
                     return;
@@ -2470,11 +2538,11 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
                 case 0:
                   //the dst bound goes right to zero, so the next copy will wrap
                   ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-srcOffset,srcOffset);
-                  ArrCopy.uncheckedCopy(arr,srcOffset=(dstOffset=arr.length)-srcOffset,arr,0,-srcBound);
+                  ArrCopy.uncheckedCopy(arr,srcOffset=(dstOffset=arr.length)+srcBound,arr,0,-srcBound);
                   lead0s=Long.numberOfLeadingZeros(word<<=lead0s);
                   break;
               }
-              finalizeNonfragmentedPullUp(arr,dstOffset,srcOffset,word<<lead0s);
+              finalizeNonfragmentedPullUp(arr,dstOffset,srcOffset-=lead0s,word<<lead0s);
               return;
             case 0:
               //the source bound goes right to zero, so the next skip will overflow
@@ -2773,7 +2841,6 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
             arr[biggestRunEnd=arrLength-1]=arr[head];
             break;
           default:
-<<<<<<< HEAD
             if(biggestRunBegin==0)
             {
               nonfragmentedPullSurvivorsUp(arr,arrLength,this.survivorWord<<(2-overflow));
@@ -2782,10 +2849,7 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
             {
               fragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
             }
-=======
-            fragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-            arr[biggestRunEnd+=arrLength]=arr[head];
+            arr[biggestRunEnd+=(arrLength-1)]=arr[head];
         }
         deq.head=biggestRunEnd;
       }

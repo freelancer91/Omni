@@ -108,10 +108,10 @@ public class RefArrDeqTest{
             }
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int seqSize:REMOVE_IF_SIZES){
-              //if(seqSize<190 || monitoredRemoveIfPredicateGen != MonitoredRemoveIfPredicateGen.Random)
-              //{
-              //  continue; //TODO remove
-              //}
+              if(seqSize<=66)
+              {
+                continue; //TODO remove
+              }
               if(functionCallType==FunctionCallType.Boxed && seqSize>2){
                 break;
               }
@@ -196,10 +196,10 @@ public class RefArrDeqTest{
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==5
-      && randSeed==2
-      && threshold==0.95
-      && head==2
+      && seqSize==126
+      && randSeed==13
+      && threshold==0.9
+      && head==0
     )
     {
       System.out.println("Trigger point");

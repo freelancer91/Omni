@@ -226,10 +226,10 @@ public class BooleanArrDeqTest{
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==5
-      && randSeed==2
-      && threshold==0.95
-      && head==2
+      && seqSize==126
+      && randSeed==13
+      && threshold==0.9
+      && head==0
     )
     {
       System.out.println("Trigger point");
