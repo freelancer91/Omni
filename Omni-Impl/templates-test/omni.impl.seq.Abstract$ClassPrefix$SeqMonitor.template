@@ -351,15 +351,20 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
         }else{
           numRemoved=numTrue;
           Assertions.assertFalse(seq.contains(true));
+          Assertions.assertEquals(numFalse,seq.size());
         }
       }else{
         numRemoved=numFalse;
         Assertions.assertFalse(seq.contains(false));
+        Assertions.assertEquals(numTrue,seq.size());
       }
 #ELSE
       numRemoved=pred.numRemoved;
       for(var removedVal:pred.removedVals){
         Assertions.assertFalse(seq.contains(removedVal));
+      }
+      for(var retainedVal:seq){
+        Assertions.assertFalse(pred.removedVals.contains(retainedVal));
       }
 #ENDIF
       verifyBatchRemove(numRemoved);

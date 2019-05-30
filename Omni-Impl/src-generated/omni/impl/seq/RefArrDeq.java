@@ -2689,6 +2689,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           survivorSet[++wordOffset]=word;
         }
       }
+      /*
       @Override void nonfragmentedPullSurvivorsUp(Object[] arr,int dstOffset,int numToSkip,int dstBound){
         int wordOffset;
         long[] survivorSet;
@@ -2726,40 +2727,303 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           }
         }
       }
-      @Override void fragmentedPullSurvivorsDownToNonFragmented(Object[] arr,int dstOffset,int numToSkip,int dstBound){
+      */
+      @Override void fragmentedCollapseBiggestRunInHead(int head,RefArrDeq<E> deq,int tail){
+        int overflow;
+        int biggestRunEnd;
+        int arrLength;
+        int biggestRunBegin;
+        Object[] arr;
+        int survivorsBeforeAndAfter=this.survivorsAfterBiggestRun;
+        if((overflow=(biggestRunEnd=(biggestRunBegin=this.biggestRunBegin)+this.biggestRunLength)-(arrLength=(arr=deq.arr).length))>=0){
+          if(survivorsBeforeAndAfter!=0){
+            nonfragmentedPullSurvivorsDown(arr,overflow,biggestRunEnd-head,overflow+=survivorsBeforeAndAfter);
+          }
+          if(overflow!=tail){
+            arr[overflow]=arr[tail];
+            OmniArray.OfRef.nullifyRange(arr,tail,overflow+1);
+          }
+        }else{
+          int newTail;
+          switch(Integer.signum(overflow=(newTail=biggestRunEnd+survivorsBeforeAndAfter)-arrLength)){
+            case -1:
+              if(survivorsBeforeAndAfter!=0){
+                if(tail==0){
+                  nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                }else{
+                  fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
+                }
+              }
+              if(newTail!=--arrLength){
+                OmniArray.OfRef.nullifyRange(arr,arrLength,newTail+1);
+              }
+              arr[newTail]=arr[tail];
+              overflow=newTail;
+              newTail=0;
+              break;
+            case 0:
+              fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);             
+              arr[0]=arr[tail];
+              newTail=1;
+              break;
+            default:
+              fragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,overflow);
+              arr[overflow]=arr[tail];
+              newTail=overflow+1;
+          }
+          OmniArray.OfRef.nullifyRange(arr,tail,newTail);
+        }
+        deq.tail=overflow;
+        if((survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0){
+          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-head,biggestRunBegin-=survivorsBeforeAndAfter);
+        }
+        if(--biggestRunBegin!=head){
+          arr[biggestRunBegin]=arr[head];
+          OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
+        }
+        deq.head=biggestRunBegin;
+      }
+      @Override void fragmentedCollapseBiggestRunInTail(int head,RefArrDeq<E> deq,int tail){
         //TODO
         throw new UnsupportedOperationException();
       }
-      @Override void fragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound){
+      private void fragmentedPullSurvivorsDownToNonFragmented(Object[] arr,int dstOffset,int numToSkip,int dstBound){
         //TODO
         throw new UnsupportedOperationException();
+      }
+      private void fragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound){
+        //TODO
+        throw new UnsupportedOperationException();
+      }
+      private void nonfragmentedPullSurvivorsUp(Object[] arr,int dstOffset,int numToSkip,int dstBound){
+        //TODO
+        throw new UnsupportedOperationException();
+      }
+      private void nonfragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound){
+        //TODO
+        throw new UnsupportedOperationException();
+      }
+      @Override void nonfragmentedCollapse(int head,RefArrDeq<E> deq,int tail){
+        final var arr=deq.arr;
+        int biggestRunBegin;
+        int biggestRunEnd=(biggestRunBegin=this.biggestRunBegin)+this.biggestRunLength;
+        int survivorsBeforeAndAfter;
+        if((survivorsBeforeAndAfter=this.survivorsAfterBiggestRun)!=0){
+          nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,biggestRunEnd+=survivorsBeforeAndAfter);
+        }
+        arr[biggestRunEnd]=arr[tail];
+        if(biggestRunEnd!=tail){
+          OmniArray.OfRef.nullifyRange(arr,tail,biggestRunEnd+1);
+        }
+        deq.tail=biggestRunEnd;
+        if((survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0){
+          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-head,biggestRunBegin-=survivorsBeforeAndAfter);
+        }
+        arr[--biggestRunBegin]=arr[head];
+        if(biggestRunBegin!=head){
+          OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
+        }
+        deq.head=biggestRunBegin;
       }
     }
     private static class SmallCollapseData<E> extends CollapseData<E>{
-      @Override void fragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
+      private static void fragmentedPullSurvivorsDownHelper(Object[] arr,int dstOffset,int srcOffset,long word){
+        for(int arrLength=arr.length;;){
+          //check to see if a dst bound overflow occurred
+          int dstOverflow,numToRetain,dstBound;
+          switch(Integer.signum(dstOverflow=(dstBound=dstOffset+(numToRetain=Long.numberOfTrailingZeros(~(word))))-arrLength)){
+            default:
+              //no dst bound overflow detected yet
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain);
+              dstOffset=dstBound;
+              srcOffset+=(numToRetain+(dstBound=Long.numberOfTrailingZeros(word>>>=numToRetain)));
+              word>>>=dstBound;
+              continue;
+            case 0:
+              //the dst bound goes right up to the array bound. The next copy will wrap
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numToRetain);
+              dstBound=Long.numberOfTrailingZeros(word>>>=numToRetain);
+              break;
+            case 1:
+              //dst bound overflow detected
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,dstOffset=numToRetain-dstOverflow);
+              ArrCopy.uncheckedSelfCopy(arr,0,srcOffset+dstOffset,dstOverflow);
+              if((dstBound=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+                return;
+              }
+          }
+          finalizeNonfragmentedPullDown(arr,dstOverflow,srcOffset+numToRetain+dstBound,word>>>dstBound);
+          return;
+        }
       }
-      @Override void fragmentedPullSurvivorsDownToNonFragmented(Object[] arr,int dstOffset,int numToSkip,int dstBound){
-        long word;
-        int srcOffset,numToRetain,srcOverflow;
-        for(dstBound=arr.length,srcOffset=dstOffset+1+(numToSkip=Long.numberOfTrailingZeros(word=this.survivorWord>>>numToSkip));;){
+      private static void fragmentedPullSurvivorsUpHelper(Object[] arr,int dstOffset,int srcOffset,long word)
+      {
+        for(;;)
+        {
+          //check to see if dst bound overflow occurred
+          int lead0s,dstBound;
+          switch(Integer.signum(dstBound=dstOffset-(lead0s=Long.numberOfLeadingZeros(~word))))
+          {
+            default:
+              //no dst bound overflow detected yet
+               ArrCopy.uncheckedCopy(arr,srcOffset-=lead0s,arr,dstOffset=dstBound,lead0s);
+               srcOffset-=(lead0s=Long.numberOfLeadingZeros(word<<=lead0s));
+               word<<=lead0s;
+               continue;
+            case 0:
+              //the dst bound goes right down to zero. The next copy will wrap
+              ArrCopy.uncheckedCopy(arr,srcOffset-=lead0s,arr,0,lead0s);
+              lead0s=Long.numberOfLeadingZeros(word<<=lead0s);
+              dstOffset=arr.length;
+              break;
+            case -1:
+              //dst bound overflow detected
+              ArrCopy.uncheckedCopy(arr,srcOffset-dstOffset,arr,0,dstOffset);
+              ArrCopy.uncheckedCopy(arr,srcOffset-=lead0s,arr,dstOffset=arr.length+dstBound,-dstBound);
+              if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
+              {
+                return;
+              }
+          }
+          finalizeNonfragmentedPullUp(arr,dstOffset,srcOffset-lead0s,word<<lead0s);
+          return;
+        }
+      }
+      private static void fragmentedPullSurvivorsDown(Object[] arr,int dstOffset,long word)
+      {
+        int numToSkip;
+        for(int arrLength=arr.length,srcOffset=dstOffset+1+(numToSkip=Long.numberOfTrailingZeros(word));;)
+        {
+          int srcOverflow;
+          if((srcOverflow=srcOffset-arrLength)>=0)
+          {
+            //the source offset overflowed on a skip
+            fragmentedPullSurvivorsDownHelper(arr,dstOffset,srcOverflow,word>>>numToSkip);
+            return;
+          }
+          int srcBound,numToRetain;
+          switch(Integer.signum(srcOverflow=(srcBound=srcOffset+(numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength))
+          {
+            default:
+              //no overflow detected yet
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
+              dstOffset+=numToRetain;
+              srcOffset=srcBound+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain));
+              continue;
+            case 1:
+              //source bound overflowed, check to see if dst overflowed
+              int dstOverflow;
+              switch(Integer.signum(dstOverflow=(srcBound=dstOffset+numToRetain)-arrLength))
+              {
+                default:
+                  //no dst overflow detected
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,dstOverflow=numToRetain-srcOverflow);
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+dstOverflow,srcOverflow);
+                  fragmentedPullSurvivorsDownHelper(arr,srcBound,srcOverflow+(numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain)),word>>>numToSkip);
+                  return;
+                case 1:
+                  //dst overflow detected
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,srcBound=numToRetain-srcOverflow);
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+srcBound,srcBound=srcOverflow-dstOverflow);
+                  ArrCopy.uncheckedSelfCopy(arr,0,srcBound,dstOverflow);
+                  if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64)
+                  {
+                    return;
+                  }
+                  break;
+                case 0:
+                  //dst bound goes right up to the end, next copy will overflow
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,srcBound=numToRetain-srcOverflow);
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+srcBound,srcOverflow);
+                  numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain);
+              }
+              finalizeNonfragmentedPullDown(arr,dstOverflow,srcOverflow+numToSkip,word>>>numToSkip);
+              return;
+            case 0:
+              //the source bound goes right up to arrLength, so the next skip will overflow
+              ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
+              fragmentedPullSurvivorsDownHelper(arr,dstOffset+numToRetain,numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain),word>>>numToSkip);
+              return;
+          }
+        }
+      }
+      private static void fragmentedPullSurvivorsUp(Object[] arr,int dstOffset,long word)
+      {
+        int lead0s;
+        for(int srcOffset=dstOffset-1-(lead0s=Long.numberOfLeadingZeros(word));;)
+        {
+          if(srcOffset<=0)
+          {
+            //the source offset overflowed on a skip
+            fragmentedPullSurvivorsUpHelper(arr,dstOffset,srcOffset+arr.length,word<<lead0s);
+            return;
+          }
+          int srcBound;
+          switch(Integer.signum(srcBound=srcOffset-(lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s)))))
+          {
+            default:
+              //no overflow detected yet
+              ArrCopy.uncheckedCopy(arr,srcBound,arr,dstOffset-=lead0s,lead0s);
+              srcOffset=srcBound-(lead0s=Long.numberOfLeadingZeros(word<<=lead0s));
+              continue;
+            case -1:
+              //the source bound overflowed, check to see if dst overflowed
+              int dstBound;
+              switch(Integer.signum(dstBound=dstOffset-lead0s))
+              {
+                default:
+                  //no dst overflow detected
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-srcOffset,srcOffset);
+                  ArrCopy.uncheckedCopy(arr,srcOffset=arr.length+srcBound,arr,dstBound,-srcBound);
+                  fragmentedPullSurvivorsUpHelper(arr,dstBound,srcOffset-(lead0s=Long.numberOfLeadingZeros(word<<=lead0s)),word<<lead0s);
+                  return;
+                case -1:
+                  //dst overflow detected
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-srcOffset,srcOffset);
+                  ArrCopy.uncheckedCopy(arr,srcOffset=(dstOffset=arr.length)-srcOffset,arr,0,srcBound=dstBound-srcBound);
+                  ArrCopy.uncheckedCopy(arr,srcOffset-=srcBound,arr,dstOffset-=dstBound,dstBound);
+                  if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
+                  {
+                    return;
+                  }
+                  break;
+                case 0:
+                  //the dst bound goes right to zero, so the next copy will wrap
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-srcOffset,srcOffset);
+                  ArrCopy.uncheckedCopy(arr,srcOffset=(dstOffset=arr.length)-srcOffset,arr,0,-srcBound);
+                  lead0s=Long.numberOfLeadingZeros(word<<=lead0s);
+                  break;
+              }
+              finalizeNonfragmentedPullUp(arr,dstOffset,srcOffset,word<<lead0s);
+              return;
+            case 0:
+              //the source bound goes right to zero, so the next skip will overflow
+              ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-=lead0s,lead0s);
+              fragmentedPullSurvivorsUpHelper(arr,dstOffset,arr.length-(lead0s=Long.numberOfLeadingZeros(word<<=lead0s)),word<<lead0s);
+              return;
+          }
+        }
+      }
+      private static void fragmentedPullSurvivorsDownToNonFragmented(Object[] arr,int dstOffset,long word){
+        int numToRetain,srcOverflow,numToSkip;
+        for(int arrLength=arr.length,srcOffset=dstOffset+1+(numToSkip=Long.numberOfTrailingZeros(word));;)
+        {
           numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip));
-          if((srcOverflow=srcOffset-dstBound)>=0){
+          if((srcOverflow=srcOffset-arrLength)>=0)
+          {
             //the source offset overflowed on a skip
             ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
-            //if(numToRetain==64){
-            //  return;
-            //}
             srcOverflow+=numToRetain;
             break;
           }
           int srcBound;
-          switch(Integer.signum(srcOverflow=(srcBound=srcOffset+numToRetain)-dstBound)){
+          switch(Integer.signum(srcOverflow=(srcBound=srcOffset+numToRetain)-arrLength))
+          {
             default:
               //no overflow detected yet
               ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain);
-              if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+              if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64)
+              {
                 return;
               }
               dstOffset+=numToRetain;
@@ -2776,8 +3040,75 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           }
           break;
         }
-        if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))!=64){
+        if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))!=64)
+        {
           finalizeFragmentedPullDown(arr,dstOffset+numToRetain,srcOverflow+numToSkip,word>>>numToSkip);
+        }
+      }
+      private static void fragmentedPullSurvivorsUpToNonFragmented(Object[] arr,int dstOffset,long word)
+      {
+        int lead0s,srcOffset;
+        for(srcOffset=dstOffset-1-(lead0s=Long.numberOfLeadingZeros(word));;)
+        {
+          lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s));
+          if(srcOffset<=0)
+          {
+            //the source offset overflowed on a kip
+            ArrCopy.uncheckedCopy(arr,srcOffset+=(arr.length-lead0s),arr,dstOffset-=lead0s,lead0s);
+            break;
+          }
+          int srcBound;
+          switch(Integer.signum(srcBound=srcOffset-lead0s))
+          {
+            default:
+              //no overflow detected yet
+              ArrCopy.uncheckedCopy(arr,srcBound,arr,dstOffset-=lead0s,lead0s);
+              if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
+              {
+                return;
+              }
+              srcOffset=srcBound-lead0s;
+              continue;
+            case -1:
+              //the source bound overflowed, so wrap around
+              ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-srcOffset,srcOffset);
+              ArrCopy.uncheckedCopy(arr,srcOffset=arr.length+srcBound,arr,dstOffset-=lead0s,-srcBound);
+              break;
+            case 0:
+              //the source bound goes right to zero, so the next skip will overflow
+              ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-=lead0s,lead0s);
+              srcOffset=arr.length;
+          }
+          break;
+        }
+        if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))!=64)
+        {
+          finalizeFragmentedPullUp(arr,dstOffset,srcOffset-lead0s,word<<lead0s);
+        }
+      }
+      private static void finalizeNonfragmentedPullUp(Object[] arr,int dstOffset,int srcOffset,long word){
+        for(;;){
+          int lead0s;
+          ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~word)),arr,dstOffset-=lead0s,lead0s);
+          if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
+          {
+            return;
+          }
+          srcOffset-=lead0s;
+          word<<=lead0s;
+        }
+      }
+      private static void finalizeNonfragmentedPullDown(Object[] arr,int dstOffset,int srcOffset,long word){
+        for(;;){
+          int numToRetain;
+          ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain=Long.numberOfTrailingZeros(~word));
+          int numToSkip;
+          if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+            return;
+          }
+          srcOffset+=(numToSkip+numToRetain);
+          dstOffset+=numToRetain;
+          word>>>=numToSkip;
         }
       }
       private static void finalizeFragmentedPullDown(Object[] arr,int dstOffset,int srcOffset,long word){
@@ -2793,28 +3124,46 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           word>>>=numToSkip;
         }
       }
-      @Override void nonfragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound){
-        long word;
-        if((dstBound=Long.numberOfTrailingZeros(word=this.survivorWord>>>numToSkip))!=64){
-          for(numToSkip=dstOffset+1+dstBound;;)        {
-            int numToRetain;
-            ArrCopy.uncheckedSelfCopy(arr,dstOffset,numToSkip,numToRetain=Long.numberOfTrailingZeros(~(word>>>=dstBound)));
-            if((dstBound=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
-              return;
-            }
-            dstOffset+=numToRetain;
-            numToSkip+=(dstBound+numToRetain);
+      private static void finalizeFragmentedPullUp(Object[] arr,int dstOffset,int srcOffset,long word)
+      {
+        for(;;)
+        {
+          int lead0s;
+          ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~word)),arr,dstOffset-=lead0s,lead0s);
+          if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
+          {
+            return;
           }
+          srcOffset-=lead0s;
+          word<<=lead0s;
         }
       }
-      @Override void nonfragmentedPullSurvivorsUp(Object[] arr,int dstOffset,int numToSkip,int dstBound){
-        long word;
-        if((dstBound=Long.numberOfLeadingZeros(word=this.survivorWord<<(1-numToSkip)))!=64){
-          for(numToSkip=dstOffset-1-dstBound;;numToSkip-=dstBound){
-            ArrCopy.uncheckedCopy(arr,numToSkip-=(dstBound=Long.numberOfLeadingZeros(~(word<<=dstBound))),arr,dstOffset-=dstBound,dstBound);
-            if((dstBound=Long.numberOfLeadingZeros(word<<=dstBound))==64){
+      private static void nonfragmentedPullSurvivorsDown(Object[] arr,int dstOffset,long word){
+        int numToSkip;
+        for(int srcOffset=dstOffset+1+(numToSkip=Long.numberOfTrailingZeros(word));;)
+        {
+          int numToRetain;
+          ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset,numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
+          if((numToSkip=Long.numberOfTrailingZeros(word>>>=numToRetain))==64){
+            return;
+          }
+          dstOffset+=numToRetain;
+          srcOffset+=(numToSkip+numToRetain);
+        }
+      }
+      private static void nonfragmentedPullSurvivorsUp(Object[] arr,int dstOffset,long word)
+      {
+        int lead0s;
+        if((lead0s=Long.numberOfLeadingZeros(word))!=64)
+        {
+          for(int srcOffset=dstOffset-1-lead0s;;)
+          {
+            ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s))),arr,dstOffset-=lead0s,lead0s);
+            if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
+            {
               return;
             }
+            srcOffset-=lead0s;
           }
         }
       }
@@ -2908,16 +3257,154 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           }
         }
       }
+      @Override void fragmentedCollapseBiggestRunInTail(int head,RefArrDeq<E> deq,int tail){
+        int biggestRunBegin;
+        int biggestRunEnd=(biggestRunBegin=this.biggestRunBegin)+this.biggestRunLength;
+        Object[] arr;
+        int arrLength;
+        int overflow=(arrLength=(arr=deq.arr).length)-head;
+        int survivorsBeforeAndAfter;
+        if((survivorsBeforeAndAfter=this.survivorsAfterBiggestRun)!=0)
+        {
+          nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,this.survivorWord>>>(biggestRunEnd+overflow));
+        }
+        if((biggestRunEnd+=survivorsBeforeAndAfter)!=tail)
+        {
+          arr[biggestRunEnd]=arr[tail];
+          OmniArray.OfRef.nullifyRange(arr,tail,biggestRunEnd+1);
+        }
+        deq.tail=biggestRunEnd;
+        switch(Integer.signum(biggestRunEnd=biggestRunBegin-(survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)))
+        {
+          case 1:
+            //no overflow detected
+            if(survivorsBeforeAndAfter!=0)
+            {
+              if(overflow==1)
+              {
+                nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(1-biggestRunBegin));
+              }
+              else
+              {
+                fragmentedPullSurvivorsUpToNonFragmented(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
+              }
+            }
+            if(biggestRunEnd!=1)
+            {
+              OmniArray.OfRef.nullifyRange(arr,biggestRunEnd-2,0);
+            }
+            arr[--biggestRunEnd]=arr[head];
+            --arrLength;
+            break;
+          case 0:
+            if(survivorsBeforeAndAfter!=0)
+            {
+              fragmentedPullSurvivorsUpToNonFragmented(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
+            }
+            arr[biggestRunEnd=--arrLength]=arr[head];
+            --arrLength;
+            break;
+          default:
+            fragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
+            arr[biggestRunEnd+=arrLength]=arr[head];
+            arrLength=biggestRunEnd-1;      
+        }
+        deq.head=biggestRunEnd;
+        if(head<=arrLength)
+        {
+          OmniArray.OfRef.nullifyRange(arr,arrLength,head);
+        }
+      }
+      @Override void fragmentedCollapseBiggestRunInHead(int head,final RefArrDeq<E> deq,int tail){
+        int overflow;
+        int biggestRunEnd;
+        int arrLength;
+        int biggestRunBegin;
+        Object[] arr;
+        int survivorsBeforeAndAfter=this.survivorsAfterBiggestRun;
+        if((overflow=(biggestRunEnd=(biggestRunBegin=this.biggestRunBegin)+this.biggestRunLength)-(arrLength=(arr=deq.arr).length))>=0){
+          if(survivorsBeforeAndAfter!=0){
+            nonfragmentedPullSurvivorsDown(arr,overflow,this.survivorWord>>>(biggestRunEnd-head));
+          }
+          if((overflow+=survivorsBeforeAndAfter)!=tail){
+            arr[overflow]=arr[tail];
+            OmniArray.OfRef.nullifyRange(arr,tail,overflow+1);
+          }
+        }else{
+          int newTail;
+          switch(Integer.signum(overflow=(newTail=biggestRunEnd+survivorsBeforeAndAfter)-arrLength)){
+            case -1:
+              if(survivorsBeforeAndAfter!=0){
+                if(tail==0){
+                  nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,this.survivorWord>>>(biggestRunEnd-head));
+                }else{
+                  fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,this.survivorWord>>>(biggestRunEnd-head));
+                }
+              }
+              if(newTail!=--arrLength){
+                OmniArray.OfRef.nullifyRange(arr,arrLength,newTail+1);
+              }
+              arr[newTail]=arr[tail];
+              overflow=newTail;
+              newTail=0;
+              break;
+            case 0:
+              fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,this.survivorWord>>>(biggestRunEnd-head));             
+              arr[0]=arr[tail];
+              newTail=1;
+              break;
+            default:
+              fragmentedPullSurvivorsDown(arr,biggestRunEnd,this.survivorWord>>>(biggestRunEnd-head));
+              arr[overflow]=arr[tail];
+              newTail=overflow+1;
+          }
+          OmniArray.OfRef.nullifyRange(arr,tail,newTail);
+        }
+        deq.tail=overflow;
+        if((survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0){
+          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin-head)));
+        }
+        if((biggestRunBegin-=(survivorsBeforeAndAfter+1))!=head){
+          arr[biggestRunBegin]=arr[head];
+          OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
+        }
+        deq.head=biggestRunBegin;
+      }
+      @Override void nonfragmentedCollapse(int head,RefArrDeq<E> deq,int tail)
+      {
+        final var arr=deq.arr;
+        int biggestRunBegin;
+        int biggestRunEnd=(biggestRunBegin=this.biggestRunBegin)+this.biggestRunLength;
+        int survivorsBeforeAndAfter;
+        if((survivorsBeforeAndAfter=this.survivorsAfterBiggestRun)!=0){
+          nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,this.survivorWord>>>(biggestRunEnd-head));
+        }
+        arr[biggestRunEnd+=survivorsBeforeAndAfter]=arr[tail];
+        if(biggestRunEnd!=tail){
+          OmniArray.OfRef.nullifyRange(arr,tail,biggestRunEnd+1);
+        }
+        deq.tail=biggestRunEnd;
+        if((survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun)!=0){
+          nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin-head)));
+        }
+        arr[biggestRunBegin-=(survivorsBeforeAndAfter+1)]=arr[head];
+        if(biggestRunBegin!=head){
+          OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
+        }
+        deq.head=biggestRunBegin;
+      }
     }
     private static abstract class CollapseData<E>{
       int survivorsBeforeBiggestRun;
       int survivorsAfterBiggestRun;
       int biggestRunBegin;
       int biggestRunLength;
-      abstract void nonfragmentedPullSurvivorsUp(Object[] arr,int dstOffset,int numToSkip,int dstBound);
-      abstract void nonfragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound);
-      abstract void fragmentedPullSurvivorsDownToNonFragmented(Object[] arr,int dstOffset,int numToSkip,int dstBound);
-      abstract void fragmentedPullSurvivorsDown(Object[] arr,int dstOffset,int numToSkip,int dstBound);
+      abstract void fragmentedCollapseBiggestRunInHead(int head,RefArrDeq<E> deq,int tail);
+      abstract void fragmentedCollapseBiggestRunInTail(int head,RefArrDeq<E> deq,int tail);
+      abstract void nonfragmentedCollapse(int head,RefArrDeq<E> deq,int tail);
+      private int getNumSurvivors(){
+        return this.survivorsBeforeBiggestRun+this.biggestRunLength+this.survivorsAfterBiggestRun;
+      }
     }
     private void collapseBodyHelper(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
       int numLeft,srcOffset;
@@ -2929,35 +3416,12 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           collapseData=new SmallCollapseData<E>(arr,srcOffset,tail-1,filter);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
-        int numSurvivors,biggestRunLength,survivorsBefore,survivorsAfter;
-        if((numSurvivors=
-          (biggestRunLength=collapseData.biggestRunLength)+
-          (survivorsBefore=collapseData.survivorsBeforeBiggestRun)+
-          (survivorsAfter=collapseData.survivorsAfterBiggestRun))!=numLeft){
+        int numSurvivors;
+        if((numSurvivors=collapseData.getNumSurvivors())!=numLeft){
           if(numSurvivors==0){
-            this.head=head;
-            this.tail=srcOffset;
-            arr[srcOffset]=arr[tail];
-            OmniArray.OfRef.nullifyRange(arr,tail,srcOffset+1);
+            nonfragmentedCollapseAll(head,tail);
           }else{
-            int biggestRunBegin;
-            int biggestRunEnd=(biggestRunBegin=collapseData.biggestRunBegin)+biggestRunLength;
-            if(survivorsAfter!=0){
-              collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,biggestRunEnd+=survivorsAfter);
-            }
-            arr[biggestRunEnd]=arr[tail];
-            if(biggestRunEnd!=tail){
-              OmniArray.OfRef.nullifyRange(arr,tail,biggestRunEnd+1);
-            }
-            this.tail=biggestRunEnd;
-            if(survivorsBefore!=0){
-              collapseData.nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-srcOffset,biggestRunBegin-=survivorsBefore);
-            }
-            arr[--biggestRunBegin]=arr[head];
-            if(biggestRunBegin!=head){
-              OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
-            }
-            this.head=biggestRunBegin;
+            collapseData.nonfragmentedCollapse(head,this,tail);
           }
           return;
         }
@@ -2966,6 +3430,29 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
       this.head=head;
       this.tail=tail;
+    }
+    private void fragmentedCollapseAll(int head,int tail){
+      this.tail=tail;
+      final var arr=this.arr;
+      if(tail==0){
+        arr[tail=arr.length-1]=arr[head];
+        this.head=tail;
+        OmniArray.OfRef.nullifyRange(arr,tail-1,head);
+      }else{
+        arr[--tail]=arr[head];
+        this.head=tail;
+        OmniArray.OfRef.nullifyRange(arr,arr.length-1,head);
+        if(tail!=0){
+          OmniArray.OfRef.nullifyRange(arr,tail-1,0);
+        }
+      }
+    }
+    private void nonfragmentedCollapseAll(int head,int tail){
+      this.head=head;
+      this.tail=++head;
+      Object[] arr;
+      (arr=this.arr)[head]=arr[tail];
+      OmniArray.OfRef.nullifyRange(arr,tail,head+1);
     }
     private void fragmentedCollapseBodyHelper(Object[] arr,int head,int tail,Predicate<? super E> filter,int modCount){
       int numLeft,arrLength,srcOffset;
@@ -2977,80 +3464,15 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           collapseData=new SmallCollapseData<E>(arr,srcOffset,tail,filter,arrLength);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
-        int numSurvivors,biggestRunLength,survivorsBefore,survivorsAfter;
-        if((numSurvivors=
-          (biggestRunLength=collapseData.biggestRunLength)+
-          (survivorsBefore=collapseData.survivorsBeforeBiggestRun)+
-          (survivorsAfter=collapseData.survivorsAfterBiggestRun))!=numLeft){
+        int numSurvivors;
+        if((numSurvivors=collapseData.getNumSurvivors())!=numLeft){
           if(numSurvivors==0){
-            this.tail=tail;
-            if(tail==0){
-              arr[--arrLength]=arr[head];
-              this.head=arrLength;
-              OmniArray.OfRef.nullifyRange(arr,arrLength-1,head);
-            }else{
-              arr[srcOffset=tail-1]=arr[head];
-              this.head=srcOffset;
-              OmniArray.OfRef.nullifyRange(arr,arrLength-1,head);
-              if(srcOffset!=0){
-                OmniArray.OfRef.nullifyRange(arr,srcOffset,0);
-              }
-            }
+            fragmentedCollapseAll(head,tail);
           }else{
-            int biggestRunBegin;
-            int biggestRunEnd=(biggestRunBegin=collapseData.biggestRunBegin)+biggestRunLength;
-            if(biggestRunBegin>head){
-              int overflow;
-              if((overflow=biggestRunEnd-arrLength)>=0){
-                if(survivorsAfter!=0){
-                  collapseData.nonfragmentedPullSurvivorsDown(arr,overflow,biggestRunEnd-head,overflow+=survivorsAfter);
-                }
-                if(overflow!=tail){
-                  arr[overflow]=arr[tail];
-                  OmniArray.OfRef.nullifyRange(arr,tail,overflow+1);
-                }
-              }else{
-                int newTail;
-                switch(Integer.signum(overflow=(newTail=biggestRunEnd+survivorsAfter)-arrLength)){
-                  case -1:
-                    if(survivorsAfter!=0){
-                      if(tail==0){
-                        collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
-                      }else{
-                        collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
-                      }
-                    }
-                    if(newTail!=--arrLength){
-                      OmniArray.OfRef.nullifyRange(arr,arrLength,newTail+1);
-                    }
-                    arr[newTail]=arr[tail];
-                    overflow=newTail;
-                    newTail=0;
-                    break;
-                  case 0:
-                    collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,arrLength);             
-                    arr[0]=arr[tail];
-                    newTail=1;
-                    break;
-                  default:
-                    collapseData.fragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,overflow);
-                    arr[overflow]=arr[tail];
-                    newTail=overflow+1;
-                }
-                OmniArray.OfRef.nullifyRange(arr,tail,0);
-              }
-              this.tail=overflow;
-              if(survivorsBefore!=0){
-                collapseData.nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-srcOffset,biggestRunBegin-=survivorsBefore);
-              }
-              if(--biggestRunBegin!=head){
-                arr[biggestRunBegin]=arr[head];
-                OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
-              }
-              this.head=biggestRunBegin;
+            if(collapseData.biggestRunBegin>head){
+              collapseData.fragmentedCollapseBiggestRunInHead(head,this,tail);
             }else{
-              //TODO
-              throw new UnsupportedOperationException();
+              collapseData.fragmentedCollapseBiggestRunInTail(head,this,tail);
             }
           }
           return;
@@ -3071,35 +3493,12 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           collapseData=new SmallCollapseData<E>(arr,srcOffset,tail-1,filter);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
-        int numSurvivors,biggestRunLength,survivorsBefore,survivorsAfter;
-        if((numSurvivors=
-          (biggestRunLength=collapseData.biggestRunLength)+
-          (survivorsBefore=collapseData.survivorsBeforeBiggestRun)+
-          (survivorsAfter=collapseData.survivorsAfterBiggestRun))!=numLeft){
+        int numSurvivors;
+        if((numSurvivors=collapseData.getNumSurvivors())!=numLeft){
           if(numSurvivors==0){
-            this.head=head;
-            this.tail=srcOffset;
-            arr[srcOffset]=arr[tail];
-            OmniArray.OfRef.nullifyRange(arr,tail,srcOffset+1);
+            nonfragmentedCollapseAll(head,tail);
           }else{
-            int biggestRunBegin;
-            int biggestRunEnd=(biggestRunBegin=collapseData.biggestRunBegin)+biggestRunLength;
-            if(survivorsAfter!=0){
-              collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,biggestRunEnd+=survivorsAfter);
-            }
-            arr[biggestRunEnd]=arr[tail];
-            if(biggestRunEnd!=tail){
-              OmniArray.OfRef.nullifyRange(arr,tail,biggestRunEnd+1);
-              this.tail=biggestRunEnd;
-            }
-            if(survivorsBefore!=0){
-              collapseData.nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-srcOffset,biggestRunBegin-=survivorsBefore);
-            }
-            arr[--biggestRunBegin]=arr[head];
-            if(biggestRunBegin!=head){
-              OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
-              this.head=biggestRunBegin;
-            }
+            collapseData.nonfragmentedCollapse(head,this,tail);
           }
           this.modCount=modCount+1;
           return true;
@@ -3119,80 +3518,15 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
           collapseData=new SmallCollapseData<E>(arr,srcOffset,tail,filter,arrLength);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
-        int numSurvivors,biggestRunLength,survivorsBefore,survivorsAfter;
-        if((numSurvivors=
-          (biggestRunLength=collapseData.biggestRunLength)+
-          (survivorsBefore=collapseData.survivorsBeforeBiggestRun)+
-          (survivorsAfter=collapseData.survivorsAfterBiggestRun))!=numLeft){
+        int numSurvivors;
+        if((numSurvivors=collapseData.getNumSurvivors())!=numLeft){
           if(numSurvivors==0){
-            this.tail=tail;
-            if(tail==0){
-              arr[--arrLength]=arr[head];
-              this.head=arrLength;
-              OmniArray.OfRef.nullifyRange(arr,arrLength-1,head);
-            }else{
-              arr[srcOffset=tail-1]=arr[head];
-              this.head=srcOffset;
-              OmniArray.OfRef.nullifyRange(arr,arrLength-1,head);
-              if(srcOffset!=0){
-                OmniArray.OfRef.nullifyRange(arr,srcOffset,0);
-              }
-            }
+            fragmentedCollapseAll(head,tail);
           }else{
-            int biggestRunBegin;
-            int biggestRunEnd=(biggestRunBegin=collapseData.biggestRunBegin)+biggestRunLength;
-            if(biggestRunBegin>head){
-              int overflow;
-              if((overflow=biggestRunEnd-arrLength)>=0){
-                if(survivorsAfter!=0){
-                  collapseData.nonfragmentedPullSurvivorsDown(arr,overflow,biggestRunEnd-head,overflow+=survivorsAfter);
-                }
-                if(overflow!=tail){
-                  arr[overflow]=arr[tail];
-                  OmniArray.OfRef.nullifyRange(arr,tail,overflow+1);
-                }
-              }else{
-                int newTail;
-                switch(Integer.signum(overflow=(newTail=biggestRunEnd+survivorsAfter)-arrLength)){
-                  case -1:
-                    if(survivorsAfter!=0){
-                      if(tail==0){
-                        collapseData.nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,newTail);
-                      }else{
-                        collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,newTail);
-                      }
-                    }
-                    if(newTail!=--arrLength){
-                      OmniArray.OfRef.nullifyRange(arr,arrLength,newTail+1);
-                    }
-                    arr[newTail]=arr[tail];
-                    overflow=newTail;
-                    newTail=0;
-                    break;
-                  case 0:
-                    collapseData.fragmentedPullSurvivorsDownToNonFragmented(arr,biggestRunEnd,biggestRunEnd-head,arrLength);             
-                    arr[0]=arr[tail];
-                    newTail=1;
-                    break;
-                  default:
-                    collapseData.fragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd-head,overflow);
-                    arr[overflow]=arr[tail];
-                    newTail=overflow+1;
-                }
-                OmniArray.OfRef.nullifyRange(arr,tail,0);
-              }
-              this.tail=overflow;
-              if(survivorsBefore!=0){
-                collapseData.nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-srcOffset,biggestRunBegin-=survivorsBefore);
-              }
-              if(--biggestRunBegin!=head){
-                arr[biggestRunBegin]=arr[head];
-                OmniArray.OfRef.nullifyRange(arr,biggestRunBegin-1,head);
-                this.head=biggestRunBegin;
-              }
+            if(collapseData.biggestRunBegin>head){
+              collapseData.fragmentedCollapseBiggestRunInHead(head,this,tail);
             }else{
-              //TODO
-              throw new UnsupportedOperationException();
+              collapseData.fragmentedCollapseBiggestRunInTail(head,this,tail);
             }
           }
           this.modCount=modCount+1;

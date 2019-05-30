@@ -316,10 +316,12 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
         }else{
           numRemoved=numTrue;
           Assertions.assertFalse(seq.contains(true));
+          Assertions.assertEquals(numFalse,seq.size());
         }
       }else{
         numRemoved=numFalse;
         Assertions.assertFalse(seq.contains(false));
+        Assertions.assertEquals(numTrue,seq.size());
       }
       verifyBatchRemove(numRemoved);
       if(expectedNumRemoved!=-1){
