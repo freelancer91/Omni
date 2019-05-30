@@ -296,6 +296,9 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       for(var removedVal:pred.removedVals){
         Assertions.assertFalse(seq.contains(removedVal));
       }
+      for(var retainedVal:seq){
+        Assertions.assertFalse(pred.removedVals.contains(retainedVal));
+      }
       verifyBatchRemove(numRemoved);
       if(expectedNumRemoved!=-1){
         Assertions.assertEquals(expectedNumRemoved,numRemoved);

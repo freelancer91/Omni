@@ -92,6 +92,7 @@ public class CharArrDeqTest{
   private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
   private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
   @org.junit.jupiter.api.Test
+  @Tag("RemoveIf")
   public void testremoveIf_Predicate(){
     for(var checkedType:CheckedType.values()){
       if(!checkedType.checked){
@@ -190,9 +191,9 @@ public class CharArrDeqTest{
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==8
-      && randSeed==1
-      && threshold==0.5
+      && seqSize==5
+      && randSeed==2
+      && threshold==0.95
       && head==2
     )
     {
