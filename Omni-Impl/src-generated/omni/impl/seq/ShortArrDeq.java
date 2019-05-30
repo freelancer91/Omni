@@ -2926,6 +2926,7 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
             arr[biggestRunEnd=arrLength-1]=arr[head];
             break;
           default:
+<<<<<<< HEAD
             if(biggestRunBegin==0)
             {
               nonfragmentedPullSurvivorsUp(arr,arrLength,this.survivorWord<<(2-overflow));
@@ -2934,6 +2935,9 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
             {
               fragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
             }
+=======
+            fragmentedPullSurvivorsUp(arr,biggestRunBegin,this.survivorWord<<(2-(biggestRunBegin+overflow)));
+>>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
             arr[biggestRunEnd+=arrLength]=arr[head];
         }
         deq.head=biggestRunEnd;
