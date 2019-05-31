@@ -57,7 +57,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class $ClassPrefix$ArrDeqTest{
 
-  #MACRO TestMethods(true)
+  #MACRO TestMethods(false)
 #MACRODEF TestMethods(PARALLEL)
 #MACRO ParallelizationCode<PARALLEL>()
 #MACRO testMASSIVEtoString_void<PARALLEL>()
@@ -140,6 +140,10 @@ public class $ClassPrefix$ArrDeqTest{
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int seqSize:REMOVE_IF_SIZES){
               if(seqSize<=66)
+              {
+                continue; //TODO remove
+              }
+              if(seqSize<254)
               {
                 continue; //TODO remove
               }
@@ -261,19 +265,19 @@ public class $ClassPrefix$ArrDeqTest{
       default:
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
-    /*
+    
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==126
-      && randSeed==13
-      && threshold==0.9
-      && head==0
+      && seqSize==254
+      && randSeed==3
+      && threshold==0.99
+      && head==2
     )
     {
       System.out.println("Trigger point");
     }
-    */
+    
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       try{

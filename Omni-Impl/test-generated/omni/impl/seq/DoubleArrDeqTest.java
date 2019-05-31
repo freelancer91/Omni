@@ -37,7 +37,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class DoubleArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newWorkStealingPool();
+  java.util.concurrent.Executors.newSingleThreadExecutor();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -105,6 +105,10 @@ public class DoubleArrDeqTest{
             submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
             for(int seqSize:REMOVE_IF_SIZES){
               if(seqSize<=66)
+              {
+                continue; //TODO remove
+              }
+              if(seqSize<254)
               {
                 continue; //TODO remove
               }
@@ -188,19 +192,17 @@ public class DoubleArrDeqTest{
       default:
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
-    /*
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==126
-      && randSeed==13
-      && threshold==0.9
-      && head==0
+      && seqSize==254
+      && randSeed==3
+      && threshold==0.99
+      && head==2
     )
     {
       System.out.println("Trigger point");
     }
-    */
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       try{

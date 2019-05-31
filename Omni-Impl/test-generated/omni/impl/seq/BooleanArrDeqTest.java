@@ -36,7 +36,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class BooleanArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newWorkStealingPool();
+  java.util.concurrent.Executors.newSingleThreadExecutor();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -80,9 +80,6 @@ public class BooleanArrDeqTest{
   public void testMASSIVEtoString_void(){
     int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
     boolean[] arr=new boolean[seqLength];
-    int numThreads=Runtime.getRuntime().availableProcessors();
-    int threadSpan=seqLength/numThreads;
-    int threadBound=numThreads-1;
     for(int i=0;i<seqLength;++i){
       arr[i]=TypeConversionUtil.convertToboolean(1);
     }
@@ -98,17 +95,8 @@ public class BooleanArrDeqTest{
         Assertions.assertEquals('[',string.charAt(0));
         Assertions.assertEquals(']',string.charAt(string.length()-1));
         seqMonitor.verifyStructuralIntegrity();
-        int nextWayPointIndex=0;
         var verifyItr=seqMonitor.verifyPreAlloc();
-        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
-          final int finalWayPointBound=nextWayPointIndex+threadSpan;
-          final int finalWayPointIndex=nextWayPointIndex;
-          submitTest(()->AbstractBooleanSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
-          verifyItr.skip(threadSpan);
-          nextWayPointIndex=finalWayPointBound;
-        }
-        AbstractBooleanSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
-        completeAllTests();
+        AbstractBooleanSeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
       }
     }
   }
@@ -222,19 +210,17 @@ public class BooleanArrDeqTest{
       default:
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
-    /*
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==126
-      && randSeed==13
-      && threshold==0.9
-      && head==0
+      && seqSize==254
+      && randSeed==3
+      && threshold==0.99
+      && head==2
     )
     {
       System.out.println("Trigger point");
     }
-    */
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       try{
