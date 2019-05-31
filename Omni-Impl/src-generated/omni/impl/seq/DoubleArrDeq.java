@@ -2516,42 +2516,374 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         deq.head=biggestRunBegin;
       }
       @Override void fragmentedCollapseBiggestRunInTail(int head,DoubleArrDeq deq,int tail){
-        //TODO
-        throw new UnsupportedOperationException();
+        int biggestRunBegin;
+        int biggestRunEnd=(biggestRunBegin=this.biggestRunBegin)+this.biggestRunLength;
+        double[] arr;
+        int arrLength;
+        int overflow=(arrLength=(arr=deq.arr).length)-head;
+        int survivorsBeforeAndAfter;
+        if((survivorsBeforeAndAfter=this.survivorsAfterBiggestRun)!=0){
+          nonfragmentedPullSurvivorsDown(arr,biggestRunEnd,biggestRunEnd+overflow,biggestRunEnd+=survivorsBeforeAndAfter);
+        }
+        arr[biggestRunEnd]=arr[tail];
+        deq.tail=biggestRunEnd;
+        switch(Integer.signum(biggestRunEnd=biggestRunBegin-(survivorsBeforeAndAfter=this.survivorsBeforeBiggestRun))){
+          case 1:
+            //no overflow detected
+            if(survivorsBeforeAndAfter!=0){
+              if(overflow==1){
+                nonfragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin-2,biggestRunEnd);
+              }else{
+                fragmentedPullSurvivorsUpToNonFragmented(arr,biggestRunBegin,biggestRunBegin+overflow-3,biggestRunEnd);
+              }
+            }
+            arr[--biggestRunEnd]=arr[head];
+            break;  
+          case 0:
+            if(survivorsBeforeAndAfter!=0){
+              fragmentedPullSurvivorsUpToNonFragmented(arr,biggestRunBegin,biggestRunBegin+overflow-3,0);
+            }
+            arr[biggestRunEnd=arrLength-1]=arr[head];
+            break;
+          default:
+            biggestRunEnd+=arrLength;
+            if(biggestRunBegin==0){
+              nonfragmentedPullSurvivorsUp(arr,arrLength,overflow-3,biggestRunEnd);
+            }else{
+               fragmentedPullSurvivorsUp(arr,biggestRunBegin,biggestRunBegin+overflow-3,biggestRunEnd);
+            }
+            arr[--biggestRunEnd]=arr[head];
+        }
+        deq.head=biggestRunEnd;
       }
-      private void fragmentedPullSurvivorsDownToNonFragmented(double[] arr,int dstOffset,int numToSkip,int dstBound){
-        int wordOffset;
+      private void fragmentedPullSurvivorsUpToNonFragmented(double[] arr,int dstOffset,int numToSkip,int dstBound){
+        int wordOffset,s,numToRetain;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]<<(-(numToSkip+1));
+        int srcOffset=(s=dstOffset-1)-(((numToSkip)&63)+1);
+        for(;;){
+          if((numToSkip=Long.numberOfLeadingZeros(word))==64){
+            //go to the next word
+            s=srcOffset;
+            srcOffset-=64;
+            word=survivorSet[--wordOffset];
+            continue;
+          }else if((numToRetain=Long.numberOfLeadingZeros(~(word<<=numToSkip)))==64){
+            //corner case. When all 64 elements of a word are copied, deplete the word before continuing the copy
+            word=0;
+          }
+          if((s-=numToSkip)<=0){
+            //overflow detected on a skip
+            ArrCopy.uncheckedCopy(arr,s+=((numToSkip=arr.length)-numToRetain),arr,dstOffset-=numToRetain,numToRetain);
+            break;
+          }
+          int srcBound;
+          switch(Integer.signum(srcBound=s-numToRetain)){
+            default:
+              //no overflow detected yet
+              ArrCopy.uncheckedCopy(arr,srcBound,arr,dstOffset-=numToRetain,numToRetain);
+              if(dstOffset==dstBound){
+                return;
+              }
+              s=srcBound;
+              word<<=numToRetain;
+              continue;
+            case -1:
+              //the source bound overflowed, so wrap around
+              ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-s,s);
+              ArrCopy.uncheckedCopy(arr,s=(numToSkip=arr.length)+srcBound,arr,dstOffset-=numToRetain,-srcBound);
+              break;
+            case 0:
+              //the source bound goes right down to zero, so the next skip will overflow
+              ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-=numToRetain,numToRetain);
+              s=numToSkip=arr.length;
+          }
+          break;
+        }
+        if(dstOffset!=dstBound){
+          for(srcOffset+=numToSkip,word<<=numToRetain;;){
+            while((numToSkip=Long.numberOfLeadingZeros(word))!=64){
+              ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToRetain=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=numToRetain,numToRetain);
+              if(dstOffset==dstBound){
+                //the end has been reached
+                return;
+              }else if(numToRetain==64){
+                //corner case. when all 64 elements of a word have been copied, skip to the next word
+                break;
+              }
+              word<<=numToRetain;
+            }
+            s=srcOffset;
+            srcOffset-=64;
+            word=survivorSet[--wordOffset];
+          }
+        }
+      }
+      private void fragmentedPullSurvivorsUp(double[] arr,int dstOffset,int numToSkip,int dstBound){
+        int wordOffset,s;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]<<(-(numToSkip+1));
+        int srcOffset=(s=dstOffset-1)-(((numToSkip)&63)+1);
+        int arrLength=arr.length;
+        headCopy: for(;;){
+          tailToTailCopy: while((numToSkip=Long.numberOfLeadingZeros(word))!=64){
+            if((s-=numToSkip)>0){
+              int srcBound;
+              headToTailCopy: switch(Integer.signum(srcBound=s-(numToSkip=Long.numberOfLeadingZeros(~(word<<=numToSkip))))){
+                default:
+                  //no overflow detected
+                  ArrCopy.uncheckedCopy(arr,s=srcBound,arr,dstOffset-=numToSkip,numToSkip);
+                  if(numToSkip==64){
+                    break tailToTailCopy;
+                  }
+                  word<<=numToSkip;
+                  continue;
+                case -1:
+                  //source bound overflow detected
+                  //check if dst overflowed as well
+                  int dBound;
+                  switch(Integer.signum(dBound=dstOffset-numToSkip)){
+                    default:
+                      //no dst overflow detected
+                      ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-s,s);
+                      ArrCopy.uncheckedCopy(arr,s=arrLength+srcBound,arr,dstOffset=dBound,-srcBound);
+                      break headToTailCopy;
+                    case -1:
+                      //dst overflow detected
+                      ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-s,s);
+                      ArrCopy.uncheckedCopy(arr,s=arrLength+(srcBound-=dBound),arr,0,-srcBound);
+                      ArrCopy.uncheckedCopy(arr,s+=dBound,arr,dstOffset=arrLength+dBound,-dBound);
+                      if(dstOffset==dstBound){
+                        return;
+                      }
+                      break;
+                    case 0:
+                      //dst bound goes down to zero. The next copy will overflow
+                      ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-s,s);
+                      ArrCopy.uncheckedCopy(arr,s=arrLength+srcBound,arr,0,-srcBound);
+                      dstOffset=arrLength;
+                  }
+                  srcOffset+=arrLength;
+                  break headCopy;
+                case 0:
+                  //source bound goes right to zero. The next skip will overflow
+                  ArrCopy.uncheckedCopy(arr,0,arr,dstOffset-=numToSkip,numToSkip);
+                  s=arrLength;
+              }
+              srcOffset+=arrLength;
+              if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+                do{
+                  s=srcOffset;
+                  srcOffset-=64;
+                  word=survivorSet[--wordOffset];
+                }while((numToSkip=Long.numberOfLeadingZeros(word))==64);
+              }
+              s-=numToSkip;
+            }else{
+              s+=arrLength;
+              srcOffset+=arrLength;
+            }
+            for(;;){
+              int dBound;
+              switch(Integer.signum(dBound=dstOffset-(numToSkip=Long.numberOfLeadingZeros(~(word<<=numToSkip))))){
+                default:
+                  //no dst overflow detected yet
+                  ArrCopy.uncheckedCopy(arr,s-=numToSkip,arr,dstOffset=dBound,numToSkip);
+                  if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+                    do{
+                      s=srcOffset;
+                      srcOffset-=64;
+                      word=survivorSet[--wordOffset];
+                    }while((numToSkip=Long.numberOfLeadingZeros(word))==64);
+                  }
+                  s-=numToSkip;
+                  continue;
+                case -1:
+                  //dst overflow detected
+                  ArrCopy.uncheckedCopy(arr,s-dstOffset,arr,0,dstOffset);
+                  ArrCopy.uncheckedCopy(arr,s-=numToSkip,arr,dstOffset=arrLength+dBound,-dBound);
+                  if(dstOffset==dstBound){
+                    return;
+                  }
+                  break;
+                case 0:
+                  //dst bound goes right to zero, so the next copy will overflow
+                  ArrCopy.uncheckedCopy(arr,s-=numToSkip,arr,0,numToSkip);
+                  dstOffset=arrLength;
+              }
+              break headCopy;
+            }
+          }
+          s=srcOffset;
+          srcOffset-=64;
+          word=survivorSet[--wordOffset];
+        }
+        do{
+          if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+            do{
+              s=srcOffset;
+              srcOffset-=64;
+              word=survivorSet[--wordOffset];
+            }while((numToSkip=Long.numberOfLeadingZeros(word))==64);
+          }
+          ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToSkip=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=numToSkip,numToSkip);
+        }while(dstOffset!=dstBound);
+      }
+      private void fragmentedPullSurvivorsDown(double[] arr,int dstOffset,int numToSkip,int dstBound){
+        int wordOffset,s;
         long[] survivorSet;
         long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]>>>numToSkip;
-        int s=dstOffset+1;
-        int srcOffset=s+(((-numToSkip)-1)&63)+1;
+        int srcOffset=(s=dstOffset+1)+(((-numToSkip)-1)&63)+1;
         int arrLength=arr.length;
-        int numToRetain;
-        int srcOverflow;
-        for(;;)
-        {
-          if((numToSkip=Long.numberOfTrailingZeros(word))==64)
-          {
+        tailCopy: for(;;){
+          headToHeadCopy: while((numToSkip=Long.numberOfTrailingZeros(word))!=64){
+            int srcOverflow;
+            if((srcOverflow=(s+=numToSkip)-arrLength)<0){
+              int srcBound;
+              tailToHeadCopy: switch(Integer.signum(srcOverflow=(srcBound=s+(numToSkip=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
+                default:
+                  //no overflow detected
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,numToSkip);
+                  dstOffset+=numToSkip;
+                  if(numToSkip==64){
+                    break headToHeadCopy;
+                  }
+                  s+=numToSkip;
+                  word>>>=numToSkip;
+                  continue;
+                case 1:
+                  //source bound overflow detected
+                  //check if dst overflowed as well
+                  int dBound,dstOverflow;
+                  switch(Integer.signum(dstOverflow=(dBound=dstOffset+numToSkip)-arrLength)){
+                    default:
+                      //no dst overflow detected
+                      ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,srcBound=numToSkip-srcOverflow);
+                      ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+srcBound,s=srcOverflow);
+                      dstOffset=dBound;
+                      break tailToHeadCopy;
+                    case 1:
+                      //dst overflow detected
+                      ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,srcBound=numToSkip-srcOverflow);
+                      ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+srcBound,srcBound=srcOverflow-dstOverflow);
+                      ArrCopy.uncheckedSelfCopy(arr,0,srcBound,dstOverflow);
+                      if(dstOverflow==dstBound){
+                        return;
+                      }
+                      s=srcBound+(dstOffset=dstOverflow);
+                      break;
+                    case 0:
+                      //dst bound goes right up to array length. THe next copy will overflow
+                      ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,srcBound=numToSkip-srcOverflow);
+                      ArrCopy.uncheckedCopy(arr,0,arr,dstOffset+srcBound,s=srcOverflow);
+                      dstOffset=0;
+                  }
+                  srcOffset-=arrLength;
+                  break tailCopy;
+                case 0:
+                  //source bound goes right up to arrLength, the next skip will overflow
+                  ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,numToSkip);
+                  s=0;
+                  dstOffset+=numToSkip;
+              }
+              srcOffset-=arrLength;
+              if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+                do{
+                  s=srcOffset;
+                  srcOffset+=64;
+                  word=survivorSet[++wordOffset];
+                }while((numToSkip=Long.numberOfTrailingZeros(word))==64);
+              }
+              s+=numToSkip;
+            }else{
+              s-=arrLength;
+              srcOffset-=arrLength;
+            }
+            for(;;){
+              int dBound,dstOverflow;
+              switch(Integer.signum(dstOverflow=(dBound=dstOffset+(numToSkip=Long.numberOfTrailingZeros(~(word>>>=numToSkip))))-arrLength)){
+                default:
+                  //no dst overflow detected yet
+                  ArrCopy.uncheckedCopy(arr,s,arr,dstOffset,numToSkip);
+                  s+=numToSkip;
+                  dstOffset=dBound;
+                  if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+                    do{
+                      s=srcOffset;
+                      srcOffset+=64;
+                      word=survivorSet[++wordOffset];
+                    }
+                    while((numToSkip=Long.numberOfTrailingZeros(word))==64);
+                  }
+                  s+=numToSkip;
+                  continue;
+                case 1:
+                  //dst overflow detected
+                  ArrCopy.uncheckedCopy(arr,s,arr,dstOffset,dBound=numToSkip-dstOverflow);
+                  ArrCopy.uncheckedSelfCopy(arr,0,s+dBound,dstOverflow);
+                  if(dstOverflow==dstBound){
+                    return;
+                  }
+                  dstOffset=dstOverflow;
+                  break;
+                case 0:
+                  //dst bound goes right to the array length,so the next copy will overflow
+                  ArrCopy.uncheckedCopy(arr,s,arr,dstOffset,numToSkip);
+                  dstOffset=0;
+              }
+              s+=numToSkip;
+              break tailCopy;
+            }
+          }
+          s=srcOffset;
+          srcOffset+=64;
+          word=survivorSet[++wordOffset];
+        }
+        for(;;){
+          if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+            do{
+              s=srcOffset;
+              srcOffset+=64;
+              word=survivorSet[++wordOffset];
+            }while((numToSkip=Long.numberOfTrailingZeros(word))==64);
+          }
+          ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numToSkip,numToSkip=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
+          if((dstOffset+=numToSkip)==dstBound){
+            return;
+          }
+          s+=numToSkip;
+        }
+      }
+      private void fragmentedPullSurvivorsDownToNonFragmented(double[] arr,int dstOffset,int numToSkip,int dstBound){
+        int wordOffset,s,numToRetain,srcOverflow;
+        long[] survivorSet;
+        long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]>>>numToSkip;
+        int srcOffset=(s=dstOffset+1)+(((-numToSkip)-1)&63)+1;
+        int arrLength=arr.length;
+        for(;;){
+          if((numToSkip=Long.numberOfTrailingZeros(word))==64){
+            //go to the next word
             s=srcOffset;
             srcOffset+=64;
             word=survivorSet[++wordOffset];
             continue;
+          }else if((numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)))==64){
+            //corner case. When all 64 elements of a word are copied, deplete the word before continuing the copy
+            word=0;
           }
-          numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip));
-          if((srcOverflow=(s+=numToSkip)-arrLength)>=0)
-          {
+          if((srcOverflow=(s+=numToSkip)-arrLength)>=0){
+            //overflow detected on a skip
             ArrCopy.uncheckedCopy(arr,srcOverflow,arr,dstOffset,numToRetain);
             srcOverflow+=numToRetain;
             break;
           }
           int srcBound;
-          switch(Integer.signum(srcOverflow=(srcBound=s+numToRetain)-arrLength))
-          {
+          switch(Integer.signum(srcOverflow=(srcBound=s+numToRetain)-arrLength)){
             default:
               //no overflow detected yet
               ArrCopy.uncheckedSelfCopy(arr,dstOffset,s,numToRetain);
-              if((dstOffset+=numToRetain)==dstBound)
-              {
+              if((dstOffset+=numToRetain)==dstBound){
+                //the end has been reached
                 return;
               }
               s=srcBound;
@@ -2568,24 +2900,24 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
           }
           break;
         }
-        if((dstOffset+=numToRetain)!=dstBound)
-        {
-          for(srcOffset-=arrLength,word>>>=numToRetain;;)
-          {
-            if((numToSkip=Long.numberOfTrailingZeros(word))==64)
-            {
-              srcOverflow=srcOffset;
-              srcOffset+=64;
-              word=survivorSet[++wordOffset];
-              continue;
+        if((dstOffset+=numToRetain)!=dstBound){
+          for(srcOffset-=arrLength,word>>>=numToRetain;;){
+            while((numToSkip=Long.numberOfTrailingZeros(word))!=64){
+              ArrCopy.uncheckedCopy(arr,srcOverflow+=numToSkip,arr,dstOffset,numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
+              if((dstOffset+=numToRetain)==dstBound){
+                //the end has been reached
+                return;
+              }else if(numToRetain==64){
+                //corner case. when all 64 elements of a word have been copied, skip to the next word
+                break;
+              }
+              srcOverflow+=numToRetain;
+              word>>>=numToRetain;
             }
-            ArrCopy.uncheckedCopy(arr,srcOverflow+=numToSkip,arr,dstOffset,numToRetain=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
-            if((dstOffset+=numToRetain)==dstBound)
-            {
-              return;
-            }
-            srcOverflow+=numToRetain;
-            word>>>=numToRetain;
+            //go to the next word
+            srcOverflow=srcOffset;
+            srcOffset+=64;
+            word=survivorSet[++wordOffset];
           }
         }
       }
@@ -2593,50 +2925,42 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         int wordOffset;
         long[] survivorSet;
         long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]<<(-(numToSkip+1));
-        for(int s,srcOffset=(s=dstOffset-1)-(((numToSkip)&63)+1);;)
-        {
-          while((numToSkip=Long.numberOfLeadingZeros(word))!=64)
-          {
+        for(int s,srcOffset=(s=dstOffset-1)-(((numToSkip)&63)+1);;){
+          while((numToSkip=Long.numberOfLeadingZeros(word))!=64){
             ArrCopy.uncheckedCopy(arr,s-=(numToSkip+(numToSkip=Long.numberOfLeadingZeros(~(word<<=numToSkip)))),arr,dstOffset-=numToSkip,numToSkip);
-            if(dstOffset==dstBound)
-            {
+            if(dstOffset==dstBound){
+              //the end has been reached
               return;
+            }else if(numToSkip==64){
+              //corner case. when all 64 elements of a word have been copied, skip to the next word
+              break;
             }
-            //else if(numToSkip==64)
-            //{
-            //  break;
-            //}
             word<<=numToSkip;
           }
+          //go to the next word
           word=survivorSet[--wordOffset];
           s=srcOffset;
           srcOffset-=64;
         }
       }
-      private void fragmentedPullSurvivorsDown(double[] arr,int dstOffset,int numToSkip,int dstBound){
-        //TODO
-        throw new UnsupportedOperationException();
-      }
       private void nonfragmentedPullSurvivorsDown(double[] arr,int dstOffset,int numToSkip,int dstBound){
         int wordOffset;
         long[] survivorSet;
         long word=(survivorSet=this.survivorSet)[wordOffset=numToSkip>>6]>>>numToSkip;
-        for(int s=dstOffset+1,srcOffset=s+(((-numToSkip)-1)&63)+1;;)
-        {
-          while((numToSkip=Long.numberOfTrailingZeros(word))!=64)
-          {
+        for(int s=dstOffset+1,srcOffset=s+(((-numToSkip)-1)&63)+1;;){
+          while((numToSkip=Long.numberOfTrailingZeros(word))!=64){
             ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numToSkip,numToSkip=Long.numberOfTrailingZeros(~(word>>>=numToSkip)));
-            if((dstOffset+=numToSkip)==dstBound)
-            {
+            if((dstOffset+=numToSkip)==dstBound){
+              //the end has been reached
               return;
-            }
-            else if(numToSkip==64)
-            {
+            }else if(numToSkip==64){
+              //corner case. when all 64 elements of a word have been copied, skip to the next word
               break;
             }
             s+=numToSkip;
             word>>>=numToSkip;
           }
+          //go to the next word
           word=survivorSet[++wordOffset];
           s=srcOffset;
           srcOffset+=64;

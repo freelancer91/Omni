@@ -36,7 +36,7 @@ import omni.api.OmniDeque;
 @Tag("ArrDeqTest")
 public class LongArrDeqTest{
   private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-  java.util.concurrent.Executors.newSingleThreadExecutor();
+  java.util.concurrent.Executors.newWorkStealingPool();
   private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
   private static void submitTest(Runnable test){
     TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
@@ -80,6 +80,9 @@ public class LongArrDeqTest{
   public void testMASSIVEtoString_void(){
     int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
     long[] arr=new long[seqLength];
+    int numThreads=Runtime.getRuntime().availableProcessors();
+    int threadSpan=seqLength/numThreads;
+    int threadBound=numThreads-1;
     for(int i=0;i<seqLength;++i){
       arr[i]=TypeConversionUtil.convertTolong(1);
     }
@@ -95,8 +98,17 @@ public class LongArrDeqTest{
         Assertions.assertEquals('[',string.charAt(0));
         Assertions.assertEquals(']',string.charAt(string.length()-1));
         seqMonitor.verifyStructuralIntegrity();
+        int nextWayPointIndex=0;
         var verifyItr=seqMonitor.verifyPreAlloc();
-        AbstractLongSeqMonitor.verifyLargeStr(string,0,seqLength,verifyItr);
+        for(int threadIndex=0;threadIndex<threadBound;++threadIndex){
+          final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          final int finalWayPointIndex=nextWayPointIndex;
+          submitTest(()->AbstractLongSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
+          verifyItr.skip(threadSpan);
+          nextWayPointIndex=finalWayPointBound;
+        }
+        AbstractLongSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
+        completeAllTests();
       }
     }
   }
@@ -115,8 +127,8 @@ public class LongArrDeqTest{
       }
     }
   }
-  private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
-  private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
+  //private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
+  //private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
   @org.junit.jupiter.api.Test
   @Tag("RemoveIf")
   public void testremoveIf_Predicate(){
@@ -133,10 +145,10 @@ public class LongArrDeqTest{
               {
                 continue; //TODO remove
               }
-              if(seqSize<254)
-              {
-                continue; //TODO remove
-              }
+              //if(seqSize<254)
+              //{
+              //  continue; //TODO remove
+              //}
               if(functionCallType==FunctionCallType.Boxed && seqSize>2){
                 break;
               }
@@ -172,9 +184,9 @@ public class LongArrDeqTest{
       }
     }
     completeAllTests();
-    int skipped=skippedTests.get();
-    int total=totalTests.get();
-    System.out.println("skipped tests = "+skipped+", totalTests="+total+", percent = "+(((double)skipped/(double)total)*100.0)+"%");
+    //int skipped=skippedTests.get();
+    //int total=totalTests.get();
+    //System.out.println("skipped tests = "+skipped+", totalTests="+total+", percent = "+(((double)skipped/(double)total)*100.0)+"%");
   }
   private static void testremoveIf_PredicateHelper(CheckedType checkedType,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize,int head
   ){
@@ -217,48 +229,28 @@ public class LongArrDeqTest{
       default:
         throw new Error("Unknown monitoredRemoveIfPredicateGen "+monitoredRemoveIfPredicateGen);
     }
+    /*
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==254
-      && randSeed==3
-      && threshold==0.99
-      && head==2
+      && seqSize==126
+      && randSeed==0
+      && threshold==0.1
+      && head==86
     )
     {
       System.out.println("Trigger point");
     }
+    */
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
-      try{
-        totalTests.incrementAndGet();
-        seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
-      }catch(UnsupportedOperationException e){
-        skippedTests.incrementAndGet();
-        //TODO remove
-        //System.out.println("skipping test {monitoredRemoveIfPredicateGen="+monitoredRemoveIfPredicateGen+",threshold="+threshold+",randSeed="+randSeed+",functionCallType="+functionCallType+",seqSize="+seqSize+",head="+head+"}");
-        return;
-      }
+      seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
       seqMonitor.verifyStructuralIntegrity();
       seqMonitor.verifyPreAlloc().skip(seqMonitor.expectedSeqSize);
       Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
       return;
     }else{
-      try{
-        totalTests.incrementAndGet();
-        seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
-      }catch(Throwable e){
-        if(e instanceof UnsupportedOperationException){
-          skippedTests.incrementAndGet();
-          //TODO remove
-          //System.out.println("skipping test {monitoredRemoveIfPredicateGen="+monitoredRemoveIfPredicateGen+",threshold="+threshold+",randSeed="+randSeed+",functionCallType="+functionCallType+",seqSize="+seqSize+",head="+head+"}");
-          return;
-        }
-        Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->{
-          throw e;
-        });
-      }
-      //Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
+      Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
     }
     seqMonitor.verifyStructuralIntegrity();
     var verifyItr=seqMonitor.verifyPreAlloc();
