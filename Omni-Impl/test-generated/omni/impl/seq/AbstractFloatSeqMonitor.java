@@ -301,7 +301,6 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
     {
       retVal=seq.removeIf((FloatPredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -357,7 +356,6 @@ abstract class AbstractFloatSeqMonitor<SEQ extends OmniCollection.OfFloat>{
         Assertions.assertEquals(seqItr.nextFloat(),cloneItr.nextFloat());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;

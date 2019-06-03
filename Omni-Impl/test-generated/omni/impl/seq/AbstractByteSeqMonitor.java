@@ -301,7 +301,6 @@ abstract class AbstractByteSeqMonitor<SEQ extends OmniCollection.OfByte>{
     {
       retVal=seq.removeIf((BytePredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -357,7 +356,6 @@ abstract class AbstractByteSeqMonitor<SEQ extends OmniCollection.OfByte>{
         Assertions.assertEquals(seqItr.nextByte(),cloneItr.nextByte());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;

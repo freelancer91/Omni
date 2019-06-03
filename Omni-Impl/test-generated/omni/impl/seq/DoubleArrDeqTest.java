@@ -1,8 +1,10 @@
 package omni.impl.seq;
 import java.util.function.DoubleConsumer;
+import java.util.function.DoublePredicate;
 import java.util.Arrays;
 import omni.util.ArrCopy;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.io.IOException;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
@@ -55,20 +57,21 @@ public class DoubleArrDeqTest{
   public static void cleanUp(){
     EXECUTORSERVICE=null;
   }
-  private static final int[] REMOVE_IF_SIZES=new int[66+(12*5)];
+  private static final int[] REMOVE_IF_SIZES=new int[66+(8*5)+1];
   static{
     for(int i=1;i<67;++i)
     {
       REMOVE_IF_SIZES[i-1]=i;
     }
     int index=67;
-    for(int j=2;j<14;++j)
+    for(int j=2;j<10;++j)
     {
       for(int i=-2;i<=2;++i)
       {
         REMOVE_IF_SIZES[(index++)-1]=(j*64)+i;
       }
     }
+    REMOVE_IF_SIZES[REMOVE_IF_SIZES.length-1]=16384;
   }
   //private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
   //private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
@@ -80,44 +83,26 @@ public class DoubleArrDeqTest{
         if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){
             EXECUTORSERVICE.submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0,0,functionCallType,0,0));
-            for(int tmpSeqSize=1;tmpSeqSize<=5000;++tmpSeqSize){
-              final int seqSize=tmpSeqSize;
-            //for(int seqSize:REMOVE_IF_SIZES){
-              if(!checkedType.checked && seqSize>66){
-                break;
-              }
+            for(int seqSize:REMOVE_IF_SIZES){
               if(functionCallType==FunctionCallType.Boxed && seqSize>2){
-                break;
+                continue;
               }
-              if(monitoredRemoveIfPredicateGen.expectedException!=null && seqSize>126){
-                break;
+              if((monitoredRemoveIfPredicateGen.expectedException!=null || !monitoredRemoveIfPredicateGen.isRandomized && !checkedType.checked) && seqSize>126){
+                continue;
               }
-              //if(!monitoredRemoveIfPredicateGen.isRandomized && seqSize>256)
-              //{
-              //  // this is to avoid a limitation of the predicate
-              //  break;
-              //}
-              if(monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random && checkedType.checked){
-                System.out.println("tmpSeqSize="+seqSize);
-              }
-              final int inc=Math.max(1,seqSize/100);
-              //final int inc=1;
+              final int inc=Math.max(1,seqSize/128);
               double[] thresholdArr;
               long randSeedBound;
-              if(seqSize==0 || !monitoredRemoveIfPredicateGen.isRandomized || functionCallType==FunctionCallType.Boxed){
+              if(seqSize==0 || (!monitoredRemoveIfPredicateGen.isRandomized) || functionCallType==FunctionCallType.Boxed){
                 thresholdArr=new double[]{0.5};
                 randSeedBound=0;
               }else{
-                if(seqSize>=256 && checkedType.checked){
-                  thresholdArr=new double[]{0.001,0.01/*,0.05*/,0.10,0.25,0.50,0.75,0.90,/*0.95,*/0.99,0.999};
+                if(checkedType.checked){
+                  thresholdArr=new double[]{0.001,0.01,0.10,0.25,0.50,0.75,0.90,0.99,0.999};
                 }else{
-                  thresholdArr=new double[]{0.01/*,0.05*/,0.10,0.25,0.50,0.75,0.90,/*0.95,*/0.99};
+                  thresholdArr=new double[]{0.01,0.10,0.25,0.50,0.75,0.90,0.99};
                 }
-                if(seqSize<100){
-                  randSeedBound=100;
-                }else{
-                  randSeedBound=seqSize;
-                }
+                randSeedBound=100;
               }
               for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
                 if(functionCallType==FunctionCallType.Boxed && tmpRandSeed>0){
@@ -144,7 +129,8 @@ public class DoubleArrDeqTest{
   private static void testremoveIf_PredicateHelper(CheckedType checkedType,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize,int head
   ){
     var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
-    initializeAscending(seqMonitor.seq.arr,head,seqSize);
+    initializeAscendingRepeating(seqMonitor.seq.arr,head,seqSize);
+    //initializeAscending(seqMonitor.seq.arr,head,seqSize);
     OmniCollection.OfDouble clone=(OmniCollection.OfDouble)seqMonitor.seq.clone();
     final int numExpectedCalls=seqSize;
     final int numExpectedRemoved;
@@ -186,9 +172,9 @@ public class DoubleArrDeqTest{
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==257
-      && randSeed==2
-      && threshold==0.75
+      && seqSize==512
+      && randSeed==0
+      && threshold==0.01
       && head==0
     )
     {
@@ -198,18 +184,18 @@ public class DoubleArrDeqTest{
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
-      //seqMonitor.verifyStructuralIntegrity();
-      //Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
+      seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
       return;
     }else{
       Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
     }
-    //seqMonitor.verifyStructuralIntegrity();
-    //var verifyItr=seqMonitor.verifyPreAlloc();
-    //var cloneItr=clone.iterator();
-    //while(cloneItr.hasNext()){
-    //  verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextDouble());
-    //}
+    seqMonitor.verifyStructuralIntegrity();
+    var verifyItr=seqMonitor.verifyPreAlloc();
+    var cloneItr=clone.iterator();
+    while(cloneItr.hasNext()){
+      verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextDouble());
+    }
   }
   @org.junit.jupiter.api.Test
   public void testreadandwriteObject(){
@@ -1567,6 +1553,30 @@ public class DoubleArrDeqTest{
       EXECUTORSERVICE.completeAllTests();
     }
   }
+  private static void initializeAscendingRepeating(double[] arr,int head,int size)
+  {
+    if(size!=0)
+    {
+      int stripeLength=Math.max(1,size/256);
+      int val=0;
+      int i=0;
+      int threshold=stripeLength;
+      int arrLength=arr.length;
+      for(;;){
+        if(i>=size){
+          return;
+        }
+        arr[head]=TypeConversionUtil.convertTodouble(val);
+        if(++head==arrLength){
+          head=0;
+        }
+        if(++i==threshold){
+          ++val;
+          threshold+=stripeLength;
+        }
+      }
+    }
+  }
   private static void initializeAscending(double[] arr,int head,int size)
   {
     if(size!=0)
@@ -2027,6 +2037,99 @@ public class DoubleArrDeqTest{
     }
     SequenceVerificationItr verifyPreAlloc(){
       return new ArrDeqVerificationItr(seq.head,this);
+    }
+    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfDouble clone,boolean forward){
+      int seqSize=expectedSeqSize;
+      boolean retVal;
+      if(functionCallType==FunctionCallType.Boxed){
+        retVal=seq.removeIf((Predicate)pred);
+      }
+      else
+      {
+        retVal=seq.removeIf((DoublePredicate)pred);
+      }
+      if(retVal){
+        verifyFunctionalModification();
+        int numRemoved;
+        int stripeLength=Math.max(1,seqSize/256);
+        int threshold=stripeLength;
+        numRemoved=pred.numRemoved;
+        var itr=seq.iterator();
+        var removedVals=pred.removedVals;
+        Object nextVal=null;
+        if(itr.hasNext()){
+          nextVal=itr.nextDouble();
+        }
+        if(forward){
+          int val=0;
+          for(int i=0;;){
+            if(i==threshold){
+              ++val;
+              threshold+=stripeLength;
+            }
+            var currVal=TypeConversionUtil.convertTodouble(val);
+            if(removedVals.contains(currVal)){
+              Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+            }else{
+              Assertions.assertEquals((Object)nextVal,(Object)currVal);
+              if(itr.hasNext()){
+                nextVal=itr.nextDouble();
+              }
+            }
+            if(++i==seqSize){
+              Assertions.assertFalse(itr.hasNext());
+              break;
+            }
+          }
+        }else{
+          int val=seqSize-1;
+          for(int i=0;;){
+            if(i==threshold){
+              --val;
+              threshold+=stripeLength;
+            }
+            var currVal=TypeConversionUtil.convertTodouble(val);
+            if(removedVals.contains(currVal)){
+              Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+            }else{
+              Assertions.assertEquals((Object)nextVal,(Object)currVal);
+              if(itr.hasNext()){
+                nextVal=itr.nextDouble();
+              }
+            }
+            if(++i==seqSize){
+              Assertions.assertFalse(itr.hasNext());
+              break;
+            }
+          }
+          for(int i=seqSize-1;;--i){
+            var currVal=TypeConversionUtil.convertTodouble(i);
+            if(removedVals.contains(currVal)){
+              Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+            }else{
+              Assertions.assertEquals((Object)nextVal,(Object)currVal);
+              if(itr.hasNext()){
+                nextVal=itr.nextDouble();
+              }
+            }
+            if(i==0){
+              Assertions.assertFalse(itr.hasNext());
+              break;
+            }
+          }
+        }
+        verifyBatchRemove(numRemoved);
+        //if(expectedNumRemoved!=-1){
+        //  Assertions.assertEquals(expectedNumRemoved,numRemoved);
+        //}
+      }else{
+        Assertions.assertEquals(expectedSeqSize,clone.size());
+        var seqItr=seq.iterator();
+        var cloneItr=clone.iterator();
+        for(int i=0;i<expectedSeqSize;++i){
+          Assertions.assertEquals(seqItr.nextDouble(),cloneItr.nextDouble());
+        }
+      }
     }
     private static class ArrDeqVerificationItr extends SequenceVerificationItr{
       int currIndex;

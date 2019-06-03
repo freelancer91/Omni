@@ -2452,7 +2452,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                 //the end has been reached
                 return;
               }else if(numToRetain==64){
-                System.out.println("arr.length="+arr.length+" fragmentedPullSurvivorsUpToNonFragmented corner case. when all 64 elements of a word have been copied, skip to the next word");
                 //corner case. when all 64 elements of a word have been copied, skip to the next word
                 break;
               }
@@ -2758,7 +2757,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                 //the end has been reached
                 return;
               }else if(numToRetain==64){
-                System.out.println("arr.length="+arr.length+" fragmentedPullSurvivorsDownToNonFragmented corner case. when all 64 elements of a word have been copied, skip to the next word");
                 //corner case. when all 64 elements of a word have been copied, skip to the next word
                 break;
               }

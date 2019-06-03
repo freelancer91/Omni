@@ -301,7 +301,6 @@ abstract class AbstractLongSeqMonitor<SEQ extends OmniCollection.OfLong>{
     {
       retVal=seq.removeIf((LongPredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -357,7 +356,6 @@ abstract class AbstractLongSeqMonitor<SEQ extends OmniCollection.OfLong>{
         Assertions.assertEquals(seqItr.nextLong(),cloneItr.nextLong());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;
@@ -2283,6 +2281,7 @@ abstract class AbstractLongSeqMonitor<SEQ extends OmniCollection.OfLong>{
     ,Predicate<Long>
   {
     final HashSet removedVals=new HashSet();
+    final HashSet retainedVals=new HashSet();
     int callCounter;
     int numRemoved;
     @Override public String toString(){
@@ -2297,6 +2296,10 @@ abstract class AbstractLongSeqMonitor<SEQ extends OmniCollection.OfLong>{
     @Override public boolean test(long val)
     {
       ++callCounter;
+      if(retainedVals.contains(val))
+      {
+        return false;
+      }
       if(removedVals.contains(val))
       {
         ++numRemoved;
@@ -2308,6 +2311,7 @@ abstract class AbstractLongSeqMonitor<SEQ extends OmniCollection.OfLong>{
         removedVals.add(val);
         return true;
       }
+      retainedVals.add(val);
       return false;
     }
     @Override public boolean test(Long val)

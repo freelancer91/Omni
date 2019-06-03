@@ -300,7 +300,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
     {
       retVal=seq.removeIf((BooleanPredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -339,7 +338,6 @@ abstract class AbstractBooleanSeqMonitor<SEQ extends OmniCollection.OfBoolean>{
         Assertions.assertEquals(seqItr.nextBoolean(),cloneItr.nextBoolean());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;

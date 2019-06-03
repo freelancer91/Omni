@@ -1,8 +1,10 @@
 package omni.impl.seq;
 import omni.function.BooleanConsumer;
+import omni.function.BooleanPredicate;
 import java.util.Arrays;
 import omni.util.ArrCopy;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.io.IOException;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
@@ -201,9 +203,9 @@ public class BooleanArrDeqTest{
     if(
       checkedType.checked
       && monitoredRemoveIfPredicateGen==MonitoredRemoveIfPredicateGen.Random
-      && seqSize==257
-      && randSeed==2
-      && threshold==0.75
+      && seqSize==512
+      && randSeed==0
+      && threshold==0.01
       && head==0
     )
     {
@@ -213,18 +215,18 @@ public class BooleanArrDeqTest{
     final var monitoredRemoveIfPredicate=monitoredRemoveIfPredicateGen.getMonitoredRemoveIfPredicate(seqMonitor,randSeed,numExpectedCalls,threshold);
     if(monitoredRemoveIfPredicateGen.expectedException==null || seqSize==0){
       seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone);
-      //seqMonitor.verifyStructuralIntegrity();
-      //Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
+      seqMonitor.verifyStructuralIntegrity();
+      Assertions.assertEquals(numExpectedCalls,monitoredRemoveIfPredicate.callCounter);
       return;
     }else{
       Assertions.assertThrows(monitoredRemoveIfPredicateGen.expectedException,()->seqMonitor.verifyRemoveIf(monitoredRemoveIfPredicate,functionCallType,numExpectedRemoved,clone));
     }
-    //seqMonitor.verifyStructuralIntegrity();
-    //var verifyItr=seqMonitor.verifyPreAlloc();
-    //var cloneItr=clone.iterator();
-    //while(cloneItr.hasNext()){
-    //  verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextBoolean());
-    //}
+    seqMonitor.verifyStructuralIntegrity();
+    var verifyItr=seqMonitor.verifyPreAlloc();
+    var cloneItr=clone.iterator();
+    while(cloneItr.hasNext()){
+      verifyItr.verifyLiteralIndexAndIterate(cloneItr.nextBoolean());
+    }
   }
   @org.junit.jupiter.api.Test
   public void testreadandwriteObject(){
@@ -1516,6 +1518,30 @@ public class BooleanArrDeqTest{
       EXECUTORSERVICE.completeAllTests();
     }
   }
+  private static void initializeAscendingRepeating(boolean[] arr,int head,int size)
+  {
+    if(size!=0)
+    {
+      int stripeLength=Math.max(1,size/256);
+      int val=0;
+      int i=0;
+      int threshold=stripeLength;
+      int arrLength=arr.length;
+      for(;;){
+        if(i>=size){
+          return;
+        }
+        arr[head]=TypeConversionUtil.convertToboolean(val);
+        if(++head==arrLength){
+          head=0;
+        }
+        if(++i==threshold){
+          ++val;
+          threshold+=stripeLength;
+        }
+      }
+    }
+  }
   private static void initializeAscending(boolean[] arr,int head,int size)
   {
     if(size!=0)
@@ -1990,6 +2016,55 @@ public class BooleanArrDeqTest{
     }
     SequenceVerificationItr verifyPreAlloc(){
       return new ArrDeqVerificationItr(seq.head,this);
+    }
+    void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfBoolean clone,boolean forward){
+      int seqSize=expectedSeqSize;
+      boolean retVal;
+      if(functionCallType==FunctionCallType.Boxed){
+        retVal=seq.removeIf((Predicate)pred);
+      }
+      else
+      {
+        retVal=seq.removeIf((BooleanPredicate)pred);
+      }
+      if(retVal){
+        verifyFunctionalModification();
+        int numRemoved;
+        int numTrue=0,numFalse=0;
+        var cloneItr=clone.iterator();
+        while(cloneItr.hasNext()){
+          if(cloneItr.nextBoolean()){
+            ++numTrue;
+          }else{
+            ++numFalse;
+          }
+        }
+        if(pred.removedVals.contains(true)){
+          if(pred.removedVals.contains(false)){
+            numRemoved=seqSize;
+            Assertions.assertTrue(seq.isEmpty());
+          }else{
+            numRemoved=numTrue;
+            Assertions.assertFalse(seq.contains(true));
+            Assertions.assertEquals(numFalse,seq.size());
+          }
+        }else{
+          numRemoved=numFalse;
+          Assertions.assertFalse(seq.contains(false));
+          Assertions.assertEquals(numTrue,seq.size());
+        }
+        verifyBatchRemove(numRemoved);
+        //if(expectedNumRemoved!=-1){
+        //  Assertions.assertEquals(expectedNumRemoved,numRemoved);
+        //}
+      }else{
+        Assertions.assertEquals(expectedSeqSize,clone.size());
+        var seqItr=seq.iterator();
+        var cloneItr=clone.iterator();
+        for(int i=0;i<expectedSeqSize;++i){
+          Assertions.assertEquals(seqItr.nextBoolean(),cloneItr.nextBoolean());
+        }
+      }
     }
     private static class ArrDeqVerificationItr extends SequenceVerificationItr{
       int currIndex;

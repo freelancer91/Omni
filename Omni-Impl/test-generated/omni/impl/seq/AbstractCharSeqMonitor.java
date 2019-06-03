@@ -301,7 +301,6 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
     {
       retVal=seq.removeIf((CharPredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -357,7 +356,6 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
         Assertions.assertEquals(seqItr.nextChar(),cloneItr.nextChar());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;

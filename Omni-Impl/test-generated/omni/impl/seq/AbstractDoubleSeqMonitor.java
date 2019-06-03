@@ -301,7 +301,6 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
     {
       retVal=seq.removeIf((DoublePredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -357,7 +356,6 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
         Assertions.assertEquals(seqItr.nextDouble(),cloneItr.nextDouble());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;
@@ -2283,6 +2281,7 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
     ,Predicate<Double>
   {
     final HashSet removedVals=new HashSet();
+    final HashSet retainedVals=new HashSet();
     int callCounter;
     int numRemoved;
     @Override public String toString(){
@@ -2297,6 +2296,10 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
     @Override public boolean test(double val)
     {
       ++callCounter;
+      if(retainedVals.contains(val))
+      {
+        return false;
+      }
       if(removedVals.contains(val))
       {
         ++numRemoved;
@@ -2308,6 +2311,7 @@ abstract class AbstractDoubleSeqMonitor<SEQ extends OmniCollection.OfDouble>{
         removedVals.add(val);
         return true;
       }
+      retainedVals.add(val);
       return false;
     }
     @Override public boolean test(Double val)

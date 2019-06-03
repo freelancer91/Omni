@@ -301,7 +301,6 @@ abstract class AbstractShortSeqMonitor<SEQ extends OmniCollection.OfShort>{
     {
       retVal=seq.removeIf((ShortPredicate)pred);
     }
-    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -357,7 +356,6 @@ abstract class AbstractShortSeqMonitor<SEQ extends OmniCollection.OfShort>{
         Assertions.assertEquals(seqItr.nextShort(),cloneItr.nextShort());
       }
     }
-    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;

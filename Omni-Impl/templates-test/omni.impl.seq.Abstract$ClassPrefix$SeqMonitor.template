@@ -332,7 +332,7 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
     {
       retVal=seq.removeIf(($TypeNameModifier$Predicate)pred);
     }
-    /*
+    
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -418,7 +418,7 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
 #ENDIF
       }
     }
-    */
+    
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;
@@ -2392,9 +2392,7 @@ boolean METHODNAME(INPUTTYPE obj)
 #ENDIF
   {
     final HashSet removedVals=new HashSet();
-#IFNOT OfInt,OfLong,OfDouble,OfRef
     final HashSet retainedVals=new HashSet();
-#ENDIF
     int callCounter;
 #IFNOT OfBoolean
     int numRemoved;
@@ -2412,12 +2410,10 @@ boolean METHODNAME(INPUTTYPE obj)
     @Override public boolean test($ArrayType$ val)
     {
       ++callCounter;
-#IFNOT OfInt,OfLong,OfDouble,OfRef
       if(retainedVals.contains(val))
       {
         return false;
       }
-#ENDIF
       if(removedVals.contains(val))
       {
 #IFNOT OfBoolean
@@ -2433,9 +2429,7 @@ boolean METHODNAME(INPUTTYPE obj)
         removedVals.add(val);
         return true;
       }
-#IFNOT OfInt,OfLong,OfDouble,OfRef
       retainedVals.add(val);
-#ENDIF
       return false;
     }
 #IFNOT OfRef
