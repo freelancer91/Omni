@@ -269,5 +269,5 @@ static GENERICPARAM void semicheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst
 }
 #ENDDEF
 #MACRODEF Assert(expr)
-assert expr;
+//assert expr;
 #ENDDEF

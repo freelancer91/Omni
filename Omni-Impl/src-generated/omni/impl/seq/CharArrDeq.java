@@ -2190,10 +2190,10 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     private static class BigCollapseData extends CollapseData{
       final long[] survivorSet;
       BigCollapseData(char[] arr,int srcOffset,int numLeft,CharPredicate filter,int arrBound){
-        assert srcOffset>0;
-        assert numLeft>64;
-        assert srcOffset+numLeft>=arrBound;
-        assert srcOffset<=arrBound;
+        //assert srcOffset>0;
+        //assert numLeft>64;
+        //assert srcOffset+numLeft>=arrBound;
+        //assert srcOffset<=arrBound;
         var survivorSet=new long[((numLeft-1)>>6)+1];
         numLeft+=(srcOffset-arrBound);
         int wordOffset=-1,survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;
@@ -2280,8 +2280,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
         this.survivorSet=survivorSet;
       }
       BigCollapseData(char[] arr,int srcOffset,int numLeft,CharPredicate filter){
-        assert srcOffset>=0;
-        assert numLeft>64;
+        //assert srcOffset>=0;
+        //assert numLeft>64;
         var survivorSet=new long[((numLeft-1)>>6)+1];
         numLeft+=srcOffset;
         for(int wordOffset=-1,survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;;){
@@ -2452,6 +2452,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                 //the end has been reached
                 return;
               }else if(numToRetain==64){
+                System.out.println("arr.length="+arr.length+" fragmentedPullSurvivorsUpToNonFragmented corner case. when all 64 elements of a word have been copied, skip to the next word");
                 //corner case. when all 64 elements of a word have been copied, skip to the next word
                 break;
               }
@@ -2515,7 +2516,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                   s=arrLength;
               }
               srcOffset+=arrLength;
-              if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+              if(numToSkip==64 
+              || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
                 do{
                   s=srcOffset;
                   srcOffset-=64;
@@ -2533,7 +2535,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                 default:
                   //no dst overflow detected yet
                   ArrCopy.uncheckedCopy(arr,s-=numToSkip,arr,dstOffset=dBound,numToSkip);
-                  if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+                  if(numToSkip==64 ||
+                  (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
                     do{
                       s=srcOffset;
                       srcOffset-=64;
@@ -2631,7 +2634,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                   dstOffset+=numToSkip;
               }
               srcOffset-=arrLength;
-              if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+              if(numToSkip==64 
+              || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
                 do{
                   s=srcOffset;
                   srcOffset+=64;
@@ -2651,7 +2655,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                   ArrCopy.uncheckedCopy(arr,s,arr,dstOffset,numToSkip);
                   s+=numToSkip;
                   dstOffset=dBound;
-                  if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+                  if(numToSkip==64 ||
+                   (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
                     do{
                       s=srcOffset;
                       srcOffset+=64;
@@ -2684,7 +2689,8 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
           word=survivorSet[++wordOffset];
         }
         for(;;){
-          if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+          if(numToSkip==64 || 
+          (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
             do{
               s=srcOffset;
               srcOffset+=64;
@@ -2752,6 +2758,7 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
                 //the end has been reached
                 return;
               }else if(numToRetain==64){
+                System.out.println("arr.length="+arr.length+" fragmentedPullSurvivorsDownToNonFragmented corner case. when all 64 elements of a word have been copied, skip to the next word");
                 //corner case. when all 64 elements of a word have been copied, skip to the next word
                 break;
               }
@@ -3155,23 +3162,20 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
       private static void nonfragmentedPullSurvivorsUp(char[] arr,int dstOffset,long word)
       {
         int lead0s;
-        if((lead0s=Long.numberOfLeadingZeros(word))!=64)
+        for(int srcOffset=dstOffset-1-(lead0s=Long.numberOfLeadingZeros(word));;)
         {
-          for(int srcOffset=dstOffset-1-lead0s;;)
+          ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s))),arr,dstOffset-=lead0s,lead0s);
+          if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
           {
-            ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s))),arr,dstOffset-=lead0s,lead0s);
-            if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
-            {
-              return;
-            }
-            srcOffset-=lead0s;
+            return;
           }
+          srcOffset-=lead0s;
         }
       }
       final long survivorWord;
       SmallCollapseData(char[] arr,int head,int tail,CharPredicate filter){
-        assert head>=0;
-        assert tail+1-head<=64;
+        //assert head>=0;
+        //assert tail+1-head<=64;
         int survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;
         for(long word=0L,marker=1L;;++head,marker<<=1){
           if(filter.test((char)arr[head])){
@@ -3202,10 +3206,10 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
         }
       }
       SmallCollapseData(char[] arr,int head,int tail,CharPredicate filter,int arrBound){
-        assert tail<head;
-        assert tail>=0;
-        assert head<=arrBound;
-        assert tail-head+arrBound<=64;
+        //assert tail<head;
+        //assert tail>=0;
+        //assert head<=arrBound;
+        //assert tail-head+arrBound<=64;
         int survivorsBeforeBiggestRun=0,survivorsAfterBiggestRun=0,currentRunLength=0,currentRunBegin=0,biggestRunLength=0,biggestRunBegin=0;
         for(long word=0L,marker=1L;;++head,marker<<=1){
           if(head==arrBound){

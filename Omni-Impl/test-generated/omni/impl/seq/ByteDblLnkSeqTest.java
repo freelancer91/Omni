@@ -38,48 +38,28 @@ import java.util.ArrayList;
 import omni.api.OmniDeque;
 import omni.api.OmniList;
 import java.util.Comparator;
+import omni.util.TestExecutorService;
 import omni.function.ByteComparator;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("DblLnkSeqTest")
 public class ByteDblLnkSeqTest{
-    private static final java.util.concurrent.ExecutorService EXECUTORSERVICE=
-    java.util.concurrent.Executors.newWorkStealingPool();
-    private static final java.util.ArrayList<java.util.concurrent.Future<Object>> TESTQUEUE=new java.util.ArrayList<>();
-    private static void submitTest(Runnable test){
-      TESTQUEUE.add(EXECUTORSERVICE.submit(java.util.concurrent.Executors.callable(test)));
-    }
-    private static void completeAllTests(){
-      try{
-        TESTQUEUE.forEach(test->{
-          try{
-            test.get();
-          }catch(InterruptedException|java.util.concurrent.ExecutionException e){
-            var cause=e.getCause();
-            if(cause instanceof RuntimeException){
-              throw (RuntimeException)cause;
-            }
-            if(cause instanceof Error){
-              throw (Error)cause;
-            }
-            throw new Error(cause);
-          }
-        });
-      }finally{
-        TESTQUEUE.clear();
-      }
+    private static TestExecutorService EXECUTORSERVICE;
+    @org.junit.jupiter.api.BeforeAll
+    public static void init(){
+      EXECUTORSERVICE=new TestExecutorService(0);
     }
     @org.junit.jupiter.api.AfterEach
     public void verifyAllExecuted(){
-      if(!TESTQUEUE.isEmpty()){
-        System.err.println("Warning: there were "+TESTQUEUE.size()+" tests that were not completed");
+      int numTestsRemaining;
+      if((numTestsRemaining=EXECUTORSERVICE.getNumRemainingTasks())!=0)
+      {
+        System.err.println("Warning: there were "+numTestsRemaining+" tests that were not completed");
       }
+      EXECUTORSERVICE.reset();
     }
     @org.junit.jupiter.api.AfterAll
     public static void cleanUp(){
-      java.util.List<Runnable> stillRunning=EXECUTORSERVICE.shutdownNow();
-      if(!TESTQUEUE.isEmpty() || !stillRunning.isEmpty()){
-        throw new Error("There were unfinished tests in the queue");
-      }
+      EXECUTORSERVICE=null;
     }
       private static final int MAX_TOSTRING_LENGTH=4;
     @Tag("MASSIVEtoString")
@@ -88,22 +68,22 @@ public class ByteDblLnkSeqTest{
       final int seqLength=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
       var head=new ByteDblLnkNode(TypeConversionUtil.convertTobyte(1));
       var tail=head;
-      int numThreads=Runtime.getRuntime().availableProcessors();
-      int threadSpan=seqLength/numThreads;
-      var wayPointNodes=new ByteDblLnkNode[numThreads];
+      int numBatches=100;
+      int batchSpan=seqLength/numBatches;
+      var wayPointNodes=new ByteDblLnkNode[numBatches];
       wayPointNodes[0]=head;
-      int nextWayPointIndex=threadSpan;
-      int threadIndex=0;
-      int threadBound=numThreads-1;
+      int nextWayPointIndex=batchSpan;
+      int batchIndex=0;
+      int batchBound=numBatches-1;
       for(int i=1;i<seqLength;++i)
       {
         tail=tail.next=new ByteDblLnkNode(tail,TypeConversionUtil.convertTobyte(1));
         if(i==nextWayPointIndex){
-          wayPointNodes[++threadIndex]=tail;
-          if(threadIndex==threadBound){
+          wayPointNodes[++batchIndex]=tail;
+          if(batchIndex==batchBound){
             nextWayPointIndex=Integer.MIN_VALUE;
           }else{
-            nextWayPointIndex+=threadSpan;
+            nextWayPointIndex+=batchSpan;
           }
         }
       }
@@ -114,16 +94,17 @@ public class ByteDblLnkSeqTest{
           Assertions.assertEquals('[',string.charAt(0));
           Assertions.assertEquals(']',string.charAt(string.length()-1));
           seqMonitor.verifyStructuralIntegrity();
-          for(threadIndex=0,nextWayPointIndex=0;threadIndex<threadBound;++threadIndex){
-            var verifyItr=new SeqMonitor.DblLnkSeqVerificationItr(nextWayPointIndex,wayPointNodes[threadIndex],seqMonitor);
-            final int finalWayPointBound=nextWayPointIndex+threadSpan;
+          for(batchIndex=0,nextWayPointIndex=0;batchIndex<batchBound;++batchIndex){
+            var verifyItr=new SeqMonitor.DblLnkSeqVerificationItr(nextWayPointIndex,wayPointNodes[batchIndex],seqMonitor);
+            final int finalWayPointBound=nextWayPointIndex+batchSpan;
             final int finalWayPointIndex=nextWayPointIndex;
-            submitTest(()->AbstractByteSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr));
+            EXECUTORSERVICE.submitTest(()->AbstractByteSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr));
             nextWayPointIndex=finalWayPointBound;
           }
-          var verifyItr=new SeqMonitor.DblLnkSeqVerificationItr(nextWayPointIndex,wayPointNodes[threadIndex],seqMonitor);
-          AbstractByteSeqMonitor.verifyLargeStr(string,nextWayPointIndex,seqLength,verifyItr);
-          completeAllTests();
+          var verifyItr=new SeqMonitor.DblLnkSeqVerificationItr(nextWayPointIndex,wayPointNodes[batchIndex],seqMonitor);
+          final int finalWayPointIndex=nextWayPointIndex;
+          EXECUTORSERVICE.submitTest(()->AbstractByteSeqMonitor.verifyLargeStr(string,finalWayPointIndex,seqLength,verifyItr));
+          EXECUTORSERVICE.completeAllTests("ByteDblLnkSeqTest.testMASSIVEtoString_void checkedType="+checkedType+"; nestedType="+nestedType);
           verifyItr.verifyPostAlloc(1);
         }
       }
@@ -150,7 +131,7 @@ public class ByteDblLnkSeqTest{
                           break;
                         }
                       case LISTDEQUE:
-                        submitTest(()->testListItradd_valHelper(new SeqMonitor(nestedType,checkedType),preModScenario,finalSeqSize,seqLocation,inputArgType));
+                        EXECUTORSERVICE.submitTest(()->testListItradd_valHelper(new SeqMonitor(nestedType,checkedType),preModScenario,finalSeqSize,seqLocation,inputArgType));
                     }
                   }
                 }
@@ -160,7 +141,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListItradd_valHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,ByteInputTestArgType inputArgType){
     if(preModScenario.expectedException!=null || seqLocation.expectedException!=null){
@@ -275,7 +256,7 @@ public class ByteDblLnkSeqTest{
                     break;
                   }
                 case LISTDEQUE:
-                  submitTest(()->testclear_voidHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
+                  EXECUTORSERVICE.submitTest(()->testclear_voidHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
                   break;
                 default:
                   throw new Error("Unknown nested type "+nestedType);
@@ -285,7 +266,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testclear_voidHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
@@ -322,7 +303,7 @@ public class ByteDblLnkSeqTest{
                             break;
                           }
                         case LISTDEQUE:
-                          submitTest(()->testListremoveAt_intHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqSize,outputArgType));
+                          EXECUTORSERVICE.submitTest(()->testListremoveAt_intHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqLocation,seqSize,outputArgType));
                           break;
                         default:
                           throw new Error("Unknown nested type "+nestedType);
@@ -336,7 +317,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListremoveAt_intHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceLocation seqLocation,int numToAdd,ByteOutputTestArgType outputArgType){
     for(int i=0;i<numToAdd;++i){
@@ -441,7 +422,7 @@ public class ByteDblLnkSeqTest{
                           break;
                         }
                       case LISTDEQUE:
-                        submitTest(()->testremoveIf_PredicateHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
+                        EXECUTORSERVICE.submitTest(()->testremoveIf_PredicateHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredRemoveIfPredicateGen,threshold,randSeed,functionCallType,seqSize));
                     }
                   }
                 }
@@ -451,7 +432,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testremoveIf_PredicateHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize
   ){
@@ -572,7 +553,7 @@ public class ByteDblLnkSeqTest{
                             break;
                           }
                         case LISTDEQUE:
-                          submitTest(()->testListadd_int_valHelper(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,finalSeqSize));
+                          EXECUTORSERVICE.submitTest(()->testListadd_int_valHelper(new SeqMonitor(nestedType,checkedType),inputArgType,seqLocation,preModScenario,finalSeqSize));
                           break;
                         default:
                           throw new Error("Unknown nested type "+nestedType);
@@ -586,7 +567,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListadd_int_valHelper(SeqMonitor seqMonitor,ByteInputTestArgType inputArgType,SequenceLocation seqLocation,PreModScenario preModScenario,int numToAdd){
     if(preModScenario.expectedException!=null || seqLocation.expectedException!=null){
@@ -684,7 +665,7 @@ public class ByteDblLnkSeqTest{
     for(var nestedType:NestedType.values()){
       runQueryTests(nestedType,(checkedType,argType,queryCastType,seqLocation,numToAdd,preModScenario
       )->{
-        submitTest(()->{
+        EXECUTORSERVICE.submitTest(()->{
           var seqMonitor=new SeqMonitor(nestedType,checkedType);
           if(numToAdd!=0){
             {
@@ -758,7 +739,7 @@ public class ByteDblLnkSeqTest{
   public void testremoveFirstOccurrence_val(){
       runQueryTests(NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,numToAdd,preModScenario
       )->{
-        submitTest(()->{
+        EXECUTORSERVICE.submitTest(()->{
           var seqMonitor=new SeqMonitor(NestedType.LISTDEQUE,checkedType);
           if(numToAdd!=0){
             {
@@ -801,7 +782,7 @@ public class ByteDblLnkSeqTest{
   public void testremoveLastOccurrence_val(){
       runQueryTests(NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,numToAdd,preModScenario
       )->{
-        submitTest(()->{
+        EXECUTORSERVICE.submitTest(()->{
           var seqMonitor=new SeqMonitor(NestedType.LISTDEQUE,checkedType);
           if(numToAdd!=0){
             {
@@ -845,7 +826,7 @@ public class ByteDblLnkSeqTest{
     for(var nestedType:NestedType.values()){
       runQueryTests(nestedType,(checkedType,argType,queryCastType,seqLocation,numToAdd,preModScenario
       )->{
-        submitTest(()->{
+        EXECUTORSERVICE.submitTest(()->{
           var seqMonitor=new SeqMonitor(nestedType,checkedType);
           int expectedIndex;
           if(numToAdd!=0){
@@ -924,7 +905,7 @@ public class ByteDblLnkSeqTest{
     for(var nestedType:NestedType.values()){
       runQueryTests(nestedType,(checkedType,argType,queryCastType,seqLocation,numToAdd,preModScenario
       )->{
-        submitTest(()->{
+        EXECUTORSERVICE.submitTest(()->{
           var seqMonitor=new SeqMonitor(nestedType,checkedType);
           int expectedIndex;
           if(numToAdd!=0){
@@ -1002,7 +983,7 @@ public class ByteDblLnkSeqTest{
   public void testsearch_val(){
     runQueryTests(NestedType.LISTDEQUE,(checkedType,argType,queryCastType,seqLocation,numToAdd,preModScenario
     )->{
-      submitTest(()->{
+      EXECUTORSERVICE.submitTest(()->{
         var seqMonitor=new SeqMonitor(NestedType.LISTDEQUE,checkedType);
         int expectedIndex;
         if(numToAdd!=0){
@@ -1057,7 +1038,7 @@ public class ByteDblLnkSeqTest{
               break;
             }
           case LISTDEQUE:
-            submitTest(()->testremoveVal_valHelper(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
+            EXECUTORSERVICE.submitTest(()->testremoveVal_valHelper(new SeqMonitor(nestedType,checkedType),argType,queryCastType,seqLocation,seqSize,preModScenario
             ));
             break;
           default:
@@ -1142,7 +1123,7 @@ public class ByteDblLnkSeqTest{
                       break;
                     }
                   case LISTDEQUE:
-                    submitTest(()->testadd_valHelper(new SeqMonitor(nestedType,checkedType),inputArgType,preModScenario,finalSeqSize));
+                    EXECUTORSERVICE.submitTest(()->testadd_valHelper(new SeqMonitor(nestedType,checkedType),inputArgType,preModScenario,finalSeqSize));
                     break;
                   default:
                     throw new Error("Unknown nested type "+nestedType);
@@ -1153,7 +1134,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testadd_valHelper(SeqMonitor seqMonitor,ByteInputTestArgType inputArgType,PreModScenario preModScenario,int numToAdd){
     for(int i=0;i<numToAdd;++i){
@@ -1176,20 +1157,20 @@ public class ByteDblLnkSeqTest{
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_void(){
-    submitTest(()->{
+    EXECUTORSERVICE.submitTest(()->{
       var seq=new ByteDblLnkSeq.CheckedList();
       Assertions.assertNull(seq.head);
       Assertions.assertNull(seq.tail);
       Assertions.assertEquals(0,seq.size);
       Assertions.assertEquals(0,seq.modCount);
     });
-    submitTest(()->{
+    EXECUTORSERVICE.submitTest(()->{
       var seq=new ByteDblLnkSeq.UncheckedList();
       Assertions.assertNull(seq.head);
       Assertions.assertNull(seq.tail);
       Assertions.assertEquals(0,seq.size);
     });
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_Node_int_Node(){
@@ -1198,7 +1179,7 @@ public class ByteDblLnkSeqTest{
     head.next=tail;
     tail.prev=head;
     final int seqSize=2;
-    submitTest(()->{
+    EXECUTORSERVICE.submitTest(()->{
       var seq=new ByteDblLnkSeq.CheckedList(head,seqSize,tail);
       Assertions.assertSame(head,seq.head);
       Assertions.assertSame(tail,seq.tail);
@@ -1209,7 +1190,7 @@ public class ByteDblLnkSeqTest{
       Assertions.assertSame(seq.tail.prev,seq.head);
       Assertions.assertEquals(0,seq.modCount);
     });
-    submitTest(()->{
+    EXECUTORSERVICE.submitTest(()->{
       var seq=new ByteDblLnkSeq.UncheckedList(head,seqSize,tail);
       Assertions.assertSame(head,seq.head);
       Assertions.assertSame(tail,seq.tail);
@@ -1219,7 +1200,7 @@ public class ByteDblLnkSeqTest{
       Assertions.assertSame(seq.head.next,seq.tail);
       Assertions.assertSame(seq.tail.prev,seq.head);
     });
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   interface BasicCollectionTest{
     void runTest(SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd);
@@ -1229,13 +1210,13 @@ public class ByteDblLnkSeqTest{
           for(var preModScenario:PreModScenario.values()){
             if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
               for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
-                submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
+                EXECUTORSERVICE.submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
               }
             }
           }
         }
       }
-      completeAllTests();
+      EXECUTORSERVICE.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
@@ -1351,8 +1332,8 @@ public class ByteDblLnkSeqTest{
                 for(var itrType:ItrType.values()){
                   if((itrType!=ItrType.DescendingItr||nestedType.rootType)){
                     for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
-                      submitTest(()->testItrforEachRemaining_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Unboxed));
-                      submitTest(()->testItrforEachRemaining_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Boxed));
+                      EXECUTORSERVICE.submitTest(()->testItrforEachRemaining_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Unboxed));
+                      EXECUTORSERVICE.submitTest(()->testItrforEachRemaining_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,itrType,seqSize,FunctionCallType.Boxed));
                     }
                   }
                 }
@@ -1362,7 +1343,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testItrforEachRemaining_ConsumerHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,ItrType itrType,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
@@ -1648,7 +1629,7 @@ public class ByteDblLnkSeqTest{
                         if((!nestedType.rootType || (preModScenario!=PreModScenario.ModParent && preModScenario!=PreModScenario.ModRoot)) && (nestedType.rootType || itrType!=ItrType.DescendingItr)){
                           for(var seqLocation:SequenceLocation.values()){
                             if(seqLocation.expectedException==null && (itrType==ItrType.ListItr || (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING))){
-                              submitTest(()->{
+                              EXECUTORSERVICE.submitTest(()->{
                                 var seqMonitor=new SeqMonitor(nestedType,checkedType);
                                 for(int i=0;i<numToAdd;++i){
                                   seqMonitor.add(i);
@@ -2070,7 +2051,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListget_int(){
@@ -2083,7 +2064,7 @@ public class ByteDblLnkSeqTest{
                 for(var seqLocation:SequenceLocation.values()){
                   if((seqLocation==SequenceLocation.BEGINNING && numToAdd!=0) || (checkedType.checked && seqLocation.expectedException!=null)){
                     for(var outputArgType:ByteOutputTestArgType.values()){
-                      submitTest(()->{
+                      EXECUTORSERVICE.submitTest(()->{
                         var seqMonitor=new SeqMonitor(nestedType,checkedType);
                         for(int i=0;i<numToAdd;++i){
                           seqMonitor.add(i);
@@ -2135,7 +2116,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListset_int_val(){
@@ -2147,8 +2128,8 @@ public class ByteDblLnkSeqTest{
               for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
                 for(var seqLocation:SequenceLocation.values()){
                   if((seqLocation==SequenceLocation.BEGINNING && seqSize!=0) || (checkedType.checked && seqLocation.expectedException!=null)){
-                    submitTest(()->testListset_int_valHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Unboxed));
-                    submitTest(()->testListset_int_valHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Boxed));
+                    EXECUTORSERVICE.submitTest(()->testListset_int_valHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Unboxed));
+                    EXECUTORSERVICE.submitTest(()->testListset_int_valHelper(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize,seqLocation,FunctionCallType.Boxed));
                   }
                 }
               }
@@ -2157,7 +2138,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListset_int_valHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,int numToAdd,SequenceLocation seqLocation,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
@@ -2284,7 +2265,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   interface QueryTest
   {
@@ -2303,7 +2284,7 @@ public class ByteDblLnkSeqTest{
           for(int index=0,marker=0b1;index<parentLength;marker<<=1,++index){
             postAllocs[index]=(marker&postAllocBits)!=0?5:0;
           }
-          submitTest(()->testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs)));
+          EXECUTORSERVICE.submitTest(()->testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs)));
         }
       }
     }else{
@@ -2345,7 +2326,7 @@ public class ByteDblLnkSeqTest{
             }
             postAllocs[index]=postAlloc;
           }
-          submitTest(()->testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs)));
+          EXECUTORSERVICE.submitTest(()->testMethod.accept(new SeqMonitor(checkedType,preAllocs,postAllocs)));
         }
       }
     }
@@ -2355,10 +2336,10 @@ public class ByteDblLnkSeqTest{
     private void runTests(){
       for(var checkedType:CheckedType.values()){
         for(var outputType:ByteOutputTestArgType.values()){
-          submitTest(()->runTest(new SeqMonitor(NestedType.LISTDEQUE,checkedType),outputType));
+          EXECUTORSERVICE.submitTest(()->runTest(new SeqMonitor(NestedType.LISTDEQUE,checkedType),outputType));
         }
       }
-      completeAllTests();
+      EXECUTORSERVICE.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
@@ -2557,10 +2538,10 @@ public class ByteDblLnkSeqTest{
     private void runTests(){
       for(var checkedType:CheckedType.values()){
         for(var inputArgType:ByteInputTestArgType.values()){
-          submitTest(()->runTest(new SeqMonitor(NestedType.LISTDEQUE,checkedType),inputArgType));
+          EXECUTORSERVICE.submitTest(()->runTest(new SeqMonitor(NestedType.LISTDEQUE,checkedType),inputArgType));
         }
       }
-      completeAllTests();
+      EXECUTORSERVICE.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
@@ -2640,7 +2621,7 @@ public class ByteDblLnkSeqTest{
                 for(int numToAdd:AbstractByteSeqMonitor.FIB_SEQ){
                   for(int tmpInitVal=0;tmpInitVal<=1;++tmpInitVal){
                     final int initVal=tmpInitVal;
-                    submitTest(()->{
+                    EXECUTORSERVICE.submitTest(()->{
                       var seqMonitor=new SeqMonitor(nestedType,checkedType);
                       for(int i=0;i<numToAdd;++i){
                         seqMonitor.add(i+initVal);
@@ -2703,7 +2684,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListput_int_val(){
@@ -2717,7 +2698,7 @@ public class ByteDblLnkSeqTest{
                   for(int numToAdd:AbstractByteSeqMonitor.FIB_SEQ){
                     if(numToAdd!=0 || seqLocation.expectedException!=null){
                       for(var inputArgType:ByteInputTestArgType.values()){
-                        submitTest(()->{
+                        EXECUTORSERVICE.submitTest(()->{
                           var seqMonitor=new SeqMonitor(nestedType,checkedType);
                           for(int i=0;i<numToAdd;++i){
                             seqMonitor.add(i);
@@ -2782,7 +2763,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testtoArray_void(){
@@ -2792,7 +2773,7 @@ public class ByteDblLnkSeqTest{
           if(preModScenario.expectedException==null || (checkedType.checked && preModScenario!=PreModScenario.ModSeq && !nestedType.rootType)){
             for(int numToAdd:AbstractByteSeqMonitor.FIB_SEQ){
               for(var outputArgType:ByteOutputTestArgType.values()){
-                submitTest(()->{
+                EXECUTORSERVICE.submitTest(()->{
                   var seqMonitor=new SeqMonitor(nestedType,checkedType);
                   for(int i=0;i<numToAdd;++i){
                     seqMonitor.add(i);
@@ -2812,7 +2793,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testtoArray_ObjectArray(){
@@ -2824,7 +2805,7 @@ public class ByteDblLnkSeqTest{
               final int seqSize=tmpSeqSize;
               for(int tmpArrSize=0,tmpArrSizeBound=seqSize+5;tmpArrSize<=tmpArrSizeBound;tmpArrSize+=5){
                 final int arrSize=tmpArrSize;
-                submitTest(()->{
+                EXECUTORSERVICE.submitTest(()->{
                   var seqMonitor=new SeqMonitor(nestedType,checkedType);
                   for(int i=0;i<seqSize;++i){
                     seqMonitor.add(i);
@@ -2864,7 +2845,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testtoArray_IntFunction(){
@@ -2875,7 +2856,7 @@ public class ByteDblLnkSeqTest{
             for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
               if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
                 for(int numToAdd:AbstractByteSeqMonitor.FIB_SEQ){
-                  submitTest(()->{
+                  EXECUTORSERVICE.submitTest(()->{
                     var seqMonitor=new SeqMonitor(nestedType,checkedType);
                     for(int i=0;i<numToAdd;++i){
                       seqMonitor.add(i);
@@ -2943,7 +2924,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   interface NonComparatorSortTest{
     void runTest(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredComparatorGen monitoredComparatorGen,int seqSize);
@@ -2955,7 +2936,7 @@ public class ByteDblLnkSeqTest{
               for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
                 if(monitoredComparatorGen.nullComparator && ((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null))){
                   for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
-                    submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize));
+                    EXECUTORSERVICE.submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredComparatorGen,seqSize));
                   }
                 }
               }
@@ -2963,7 +2944,7 @@ public class ByteDblLnkSeqTest{
           }
         }
       }
-      completeAllTests();
+      EXECUTORSERVICE.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
@@ -3013,7 +2994,7 @@ public class ByteDblLnkSeqTest{
             for(var monitoredComparatorGen:MonitoredComparatorGen.values()){
               if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
                 for(int numToAdd:new int[]{0,2}){
-                  submitTest(()->{
+                  EXECUTORSERVICE.submitTest(()->{
                     var seqMonitor=new SeqMonitor(nestedType,checkedType);
                     monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
                     var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
@@ -3037,7 +3018,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListsort_Comparator(){
@@ -3049,7 +3030,7 @@ public class ByteDblLnkSeqTest{
               if((!nestedType.rootType || monitoredComparatorGen.appliesToRoot) && (checkedType.checked || monitoredComparatorGen.expectedException==null)){
                 for(int numToAdd:new int[]{0,2}){
                   for(var functionCallType:FunctionCallType.values()){
-                    submitTest(()->{
+                    EXECUTORSERVICE.submitTest(()->{
                       var seqMonitor=new SeqMonitor(nestedType,checkedType);
                       monitoredComparatorGen.init(seqMonitor,numToAdd,preModScenario);
                       var sorter=monitoredComparatorGen.getMonitoredComparator(seqMonitor);
@@ -3074,7 +3055,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   interface ToStringAndHashCodeTest
   {
@@ -3086,13 +3067,13 @@ public class ByteDblLnkSeqTest{
           for(var preModScenario:PreModScenario.values()){
             if((checkedType.checked || preModScenario.expectedException==null) && ((nestedType.rootType && preModScenario.expectedException==null)||(!nestedType.rootType && preModScenario.appliesToSubList))){
               for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
-                submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
+                EXECUTORSERVICE.submitTest(()->runTest(new SeqMonitor(nestedType,checkedType),preModScenario,seqSize));
               }
             }
           }
         }
       }
-      completeAllTests();
+      EXECUTORSERVICE.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
@@ -3169,7 +3150,7 @@ public class ByteDblLnkSeqTest{
                   for(int tmpToIndex=-1;tmpToIndex<=seqSize+2;++tmpToIndex){
                     if(checkedType.checked || (tmpToIndex>=fromIndex && tmpToIndex<=seqSize)){
                       final int toIndex=tmpToIndex;
-                      submitTest(()->{
+                      EXECUTORSERVICE.submitTest(()->{
                         var seqMonitor=new SeqMonitor(nestedType,checkedType);
                         for(int i=0;i<seqSize;++i){
                           seqMonitor.add(i);
@@ -3226,7 +3207,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListlistIterator_int(){
@@ -3236,7 +3217,7 @@ public class ByteDblLnkSeqTest{
           if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
             for(var seqLocation:SequenceLocation.values()){
               if(seqLocation.expectedException!=null && checkedType.checked){
-                submitTest(()->{
+                EXECUTORSERVICE.submitTest(()->{
                   var seqMonitor=new SeqMonitor(nestedType,checkedType);
                   for(int i=0;i<100;++i){
                     seqMonitor.add(i);
@@ -3279,7 +3260,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListlistIterator_void(){
@@ -3287,7 +3268,7 @@ public class ByteDblLnkSeqTest{
       for(var checkedType:CheckedType.values()){
         for(var preModScenario:PreModScenario.values()){
           if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
-            submitTest(()->{
+            EXECUTORSERVICE.submitTest(()->{
               var seqMonitor=new SeqMonitor(nestedType,checkedType);
               for(int i=0;i<100;++i){
                 seqMonitor.add(i);
@@ -3307,7 +3288,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testiterator_void(){
@@ -3315,7 +3296,7 @@ public class ByteDblLnkSeqTest{
       for(var checkedType:CheckedType.values()){
         for(var preModScenario:PreModScenario.values()){
           if(preModScenario!=PreModScenario.ModSeq && (preModScenario.expectedException==null || (checkedType.checked && !nestedType.rootType))){
-            submitTest(()->{
+            EXECUTORSERVICE.submitTest(()->{
               var seqMonitor=new SeqMonitor(nestedType,checkedType);
               for(int i=0;i<100;++i){
                 seqMonitor.add(i);
@@ -3334,12 +3315,12 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testdescendingIterator_void(){
     for(var checkedType:CheckedType.values()){
-      submitTest(()->{
+      EXECUTORSERVICE.submitTest(()->{
         var seqMonitor=new SeqMonitor(NestedType.LISTDEQUE,checkedType);
         for(int i=0;i<100;++i){
           seqMonitor.add(i);
@@ -3350,7 +3331,7 @@ public class ByteDblLnkSeqTest{
         seqMonitor.verifyPreAlloc().verifyAscending(100).verifyPostAlloc();
       });
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListreplaceAll_UnaryOperator(){
@@ -3361,8 +3342,8 @@ public class ByteDblLnkSeqTest{
             for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
               if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
                 for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
-                  submitTest(()->testListreplaceAll_UnaryOperatorHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
-                  submitTest(()->testListreplaceAll_UnaryOperatorHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
+                  EXECUTORSERVICE.submitTest(()->testListreplaceAll_UnaryOperatorHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+                  EXECUTORSERVICE.submitTest(()->testListreplaceAll_UnaryOperatorHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
                 }
               }
             }   
@@ -3370,7 +3351,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListreplaceAll_UnaryOperatorHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){
@@ -3633,14 +3614,14 @@ public class ByteDblLnkSeqTest{
         if(checkedType.checked || listItrSetScenario.expectedException==null){
           for(var inputArgType:ByteInputTestArgType.values()){
             if(listItrSetScenario.preModScenario.appliesToRootItr){
-              submitTest(()->testListItrset_valHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),listItrSetScenario,inputArgType));
+              EXECUTORSERVICE.submitTest(()->testListItrset_valHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),listItrSetScenario,inputArgType));
             }
-            submitTest(()->testListItrset_valHelper(new SeqMonitor(NestedType.SUBLIST,checkedType),listItrSetScenario,inputArgType));
+            EXECUTORSERVICE.submitTest(()->testListItrset_valHelper(new SeqMonitor(NestedType.SUBLIST,checkedType),listItrSetScenario,inputArgType));
           }
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListItrset_valHelper(SeqMonitor seqMonitor,ListItrSetScenario listItrSetScenario,ByteInputTestArgType inputArgType){
     int numToAdd=100;
@@ -3723,7 +3704,7 @@ public class ByteDblLnkSeqTest{
                 for(var nestedType:NestedType.values()){
                   if((itrType!=ItrType.DescendingItr || nestedType.rootType) && (itrScenario.preModScenario.appliesToRootItr || !nestedType.rootType)){
                     for(var outputType:ByteOutputTestArgType.values()){
-                      submitTest(()->{
+                      EXECUTORSERVICE.submitTest(()->{
                         var seqMonitor=new SeqMonitor(nestedType,checkedType);
                         for(int i=0;i<numToAdd;++i){
                           seqMonitor.add(i);
@@ -3772,7 +3753,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testListItrprevious_void(){
@@ -3783,16 +3764,16 @@ public class ByteDblLnkSeqTest{
             if(seqSize!=0 || itrScenario.validWithEmptySeq){
               for(var outputType:ByteOutputTestArgType.values()){
                 if(itrScenario.preModScenario.appliesToRootItr){
-                  submitTest(()->testListItrprevious_voidHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),itrScenario,seqSize,outputType));
+                  EXECUTORSERVICE.submitTest(()->testListItrprevious_voidHelper(new SeqMonitor(NestedType.LISTDEQUE,checkedType),itrScenario,seqSize,outputType));
                 }
-                submitTest(()->testListItrprevious_voidHelper(new SeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqSize,outputType));
+                EXECUTORSERVICE.submitTest(()->testListItrprevious_voidHelper(new SeqMonitor(NestedType.SUBLIST,checkedType),itrScenario,seqSize,outputType));
               }
             }
           }
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testListItrprevious_voidHelper(SeqMonitor seqMonitor,IterationScenario itrScenario,int numToAdd,ByteOutputTestArgType outputType){
     for(int i=0;i<numToAdd;++i){
@@ -3835,7 +3816,7 @@ public class ByteDblLnkSeqTest{
   public void testListItrpreviousIndex_void_And_ListItrnextIndex_void(){
     for(var checkedType:CheckedType.values()){
       for(var nestedType:NestedType.values()){
-        submitTest(()->{
+        EXECUTORSERVICE.submitTest(()->{
           var seqMonitor=new SeqMonitor(nestedType,checkedType);
           int numToAdd=100;
           for(int i=0;i<numToAdd;++i){
@@ -3860,7 +3841,7 @@ public class ByteDblLnkSeqTest{
         });
       }  
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testforEach_Consumer(){
@@ -3871,8 +3852,8 @@ public class ByteDblLnkSeqTest{
             for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
               if((checkedType.checked || monitoredFunctionGen.expectedException==null)&&(!nestedType.rootType || monitoredFunctionGen.appliesToRoot) &&(nestedType.rootType || monitoredFunctionGen.appliesToSubList)){
                 for(int seqSize:AbstractByteSeqMonitor.FIB_SEQ){
-                  submitTest(()->testforEach_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
-                  submitTest(()->testforEach_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
+                  EXECUTORSERVICE.submitTest(()->testforEach_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Unboxed));
+                  EXECUTORSERVICE.submitTest(()->testforEach_ConsumerHelper(new SeqMonitor(nestedType,checkedType),preModScenario,monitoredFunctionGen,seqSize,FunctionCallType.Boxed));
                 }
               }
             }
@@ -3880,7 +3861,7 @@ public class ByteDblLnkSeqTest{
         }
       }
     }
-    completeAllTests();
+    EXECUTORSERVICE.completeAllTests();
   }
   private static void testforEach_ConsumerHelper(SeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredFunctionGen monitoredFunctionGen,int numToAdd,FunctionCallType functionCallType){
     for(int i=0;i<numToAdd;++i){

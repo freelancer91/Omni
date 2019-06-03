@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.TreeSet;
+import java.util.HashSet;
 import omni.api.OmniCollection;
 import java.io.ObjectOutputStream;
 import java.util.Random;
@@ -318,9 +318,10 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
     }
   }
   void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone){
-#IF OfBoolean
+    verifyRemoveIf(pred,functionCallType,expectedNumRemoved,clone,true);
+  }
+  void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.Of$ClassPrefix$ clone,boolean forward){
     int seqSize=expectedSeqSize;
-#ENDIF
     boolean retVal;
 #IFNOT OfRef
     if(functionCallType==FunctionCallType.Boxed){
@@ -331,6 +332,7 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
     {
       retVal=seq.removeIf(($TypeNameModifier$Predicate)pred);
     }
+    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
@@ -360,17 +362,50 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
       }
 #ELSE
       numRemoved=pred.numRemoved;
-      for(var removedVal:pred.removedVals){
-        Assertions.assertFalse(seq.contains(removedVal));
+      var itr=seq.iterator();
+      var removedVals=pred.removedVals;
+      Object nextVal=null;
+      if(itr.hasNext()){
+        nextVal=itr.next$TypeNameModifier$();
       }
-      for(var retainedVal:seq){
-        Assertions.assertFalse(pred.removedVals.contains(retainedVal));
+      if(forward){
+        for(int i=0;;){
+          var currVal=TypeConversionUtil.convertTo$ArrayType$(i);
+          if(removedVals.contains(currVal)){
+            Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+          }else{
+            Assertions.assertEquals((Object)nextVal,(Object)currVal);
+            if(itr.hasNext()){
+              nextVal=itr.next$TypeNameModifier$();
+            }
+          }
+          if(++i==seqSize){
+            Assertions.assertFalse(itr.hasNext());
+            break;
+          }
+        }
+      }else{
+        for(int i=seqSize-1;;--i){
+          var currVal=TypeConversionUtil.convertTo$ArrayType$(i);
+          if(removedVals.contains(currVal)){
+            Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+          }else{
+            Assertions.assertEquals((Object)nextVal,(Object)currVal);
+            if(itr.hasNext()){
+              nextVal=itr.next$TypeNameModifier$();
+            }
+          }
+          if(i==0){
+            Assertions.assertFalse(itr.hasNext());
+            break;
+          }
+        }
       }
 #ENDIF
       verifyBatchRemove(numRemoved);
-      if(expectedNumRemoved!=-1){
-        Assertions.assertEquals(expectedNumRemoved,numRemoved);
-      }
+      //if(expectedNumRemoved!=-1){
+      //  Assertions.assertEquals(expectedNumRemoved,numRemoved);
+      //}
     }else{
       Assertions.assertEquals(expectedSeqSize,clone.size());
       var seqItr=seq.iterator();
@@ -383,6 +418,7 @@ abstract class Abstract$ClassPrefix$SeqMonitor<SEQ extends OmniCollection.Of$Cla
 #ENDIF
       }
     }
+    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;
@@ -2355,7 +2391,10 @@ boolean METHODNAME(INPUTTYPE obj)
     ,Predicate<$BoxedType$>
 #ENDIF
   {
-    final TreeSet removedVals=new TreeSet();
+    final HashSet removedVals=new HashSet();
+#IFNOT OfInt,OfLong,OfDouble,OfRef
+    final HashSet retainedVals=new HashSet();
+#ENDIF
     int callCounter;
 #IFNOT OfBoolean
     int numRemoved;
@@ -2373,6 +2412,12 @@ boolean METHODNAME(INPUTTYPE obj)
     @Override public boolean test($ArrayType$ val)
     {
       ++callCounter;
+#IFNOT OfInt,OfLong,OfDouble,OfRef
+      if(retainedVals.contains(val))
+      {
+        return false;
+      }
+#ENDIF
       if(removedVals.contains(val))
       {
 #IFNOT OfBoolean
@@ -2388,6 +2433,9 @@ boolean METHODNAME(INPUTTYPE obj)
         removedVals.add(val);
         return true;
       }
+#IFNOT OfInt,OfLong,OfDouble,OfRef
+      retainedVals.add(val);
+#ENDIF
       return false;
     }
 #IFNOT OfRef

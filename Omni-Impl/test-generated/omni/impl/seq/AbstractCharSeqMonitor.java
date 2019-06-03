@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.TreeSet;
+import java.util.HashSet;
 import omni.api.OmniCollection;
 import java.io.ObjectOutputStream;
 import java.util.Random;
@@ -289,6 +289,10 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
     }
   }
   void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfChar clone){
+    verifyRemoveIf(pred,functionCallType,expectedNumRemoved,clone,true);
+  }
+  void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfChar clone,boolean forward){
+    int seqSize=expectedSeqSize;
     boolean retVal;
     if(functionCallType==FunctionCallType.Boxed){
       retVal=seq.removeIf((Predicate)pred);
@@ -297,20 +301,54 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
     {
       retVal=seq.removeIf((CharPredicate)pred);
     }
+    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
       numRemoved=pred.numRemoved;
-      for(var removedVal:pred.removedVals){
-        Assertions.assertFalse(seq.contains(removedVal));
+      var itr=seq.iterator();
+      var removedVals=pred.removedVals;
+      Object nextVal=null;
+      if(itr.hasNext()){
+        nextVal=itr.nextChar();
       }
-      for(var retainedVal:seq){
-        Assertions.assertFalse(pred.removedVals.contains(retainedVal));
+      if(forward){
+        for(int i=0;;){
+          var currVal=TypeConversionUtil.convertTochar(i);
+          if(removedVals.contains(currVal)){
+            Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+          }else{
+            Assertions.assertEquals((Object)nextVal,(Object)currVal);
+            if(itr.hasNext()){
+              nextVal=itr.nextChar();
+            }
+          }
+          if(++i==seqSize){
+            Assertions.assertFalse(itr.hasNext());
+            break;
+          }
+        }
+      }else{
+        for(int i=seqSize-1;;--i){
+          var currVal=TypeConversionUtil.convertTochar(i);
+          if(removedVals.contains(currVal)){
+            Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+          }else{
+            Assertions.assertEquals((Object)nextVal,(Object)currVal);
+            if(itr.hasNext()){
+              nextVal=itr.nextChar();
+            }
+          }
+          if(i==0){
+            Assertions.assertFalse(itr.hasNext());
+            break;
+          }
+        }
       }
       verifyBatchRemove(numRemoved);
-      if(expectedNumRemoved!=-1){
-        Assertions.assertEquals(expectedNumRemoved,numRemoved);
-      }
+      //if(expectedNumRemoved!=-1){
+      //  Assertions.assertEquals(expectedNumRemoved,numRemoved);
+      //}
     }else{
       Assertions.assertEquals(expectedSeqSize,clone.size());
       var seqItr=seq.iterator();
@@ -319,6 +357,7 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
         Assertions.assertEquals(seqItr.nextChar(),cloneItr.nextChar());
       }
     }
+    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;
@@ -2243,7 +2282,8 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
   static abstract class MonitoredRemoveIfPredicate implements CharPredicate
     ,Predicate<Character>
   {
-    final TreeSet removedVals=new TreeSet();
+    final HashSet removedVals=new HashSet();
+    final HashSet retainedVals=new HashSet();
     int callCounter;
     int numRemoved;
     @Override public String toString(){
@@ -2258,6 +2298,10 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
     @Override public boolean test(char val)
     {
       ++callCounter;
+      if(retainedVals.contains(val))
+      {
+        return false;
+      }
       if(removedVals.contains(val))
       {
         ++numRemoved;
@@ -2269,6 +2313,7 @@ abstract class AbstractCharSeqMonitor<SEQ extends OmniCollection.OfChar>{
         removedVals.add(val);
         return true;
       }
+      retainedVals.add(val);
       return false;
     }
     @Override public boolean test(Character val)

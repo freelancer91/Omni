@@ -1759,6 +1759,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
                 //the end has been reached
                 return;
               }else if(numToRetain==64){
+                System.out.println("arr.length="+arr.length+" fragmentedPullSurvivorsUpToNonFragmented corner case. when all 64 elements of a word have been copied, skip to the next word");
                 //corner case. when all 64 elements of a word have been copied, skip to the next word
                 break;
               }
@@ -1822,7 +1823,8 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
                   s=arrLength;
               }
               srcOffset+=arrLength;
-              if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+              if(numToSkip==64 
+              || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
                 do{
                   s=srcOffset;
                   srcOffset-=64;
@@ -1840,7 +1842,8 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
                 default:
                   //no dst overflow detected yet
                   ArrCopy.uncheckedCopy(arr,s-=numToSkip,arr,dstOffset=dBound,numToSkip);
-                  if(numToSkip==64 || (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
+                  if(numToSkip==64 ||
+                  (numToSkip=Long.numberOfLeadingZeros(word<<=numToSkip))==64){
                     do{
                       s=srcOffset;
                       srcOffset-=64;
@@ -1938,7 +1941,8 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
                   dstOffset+=numToSkip;
               }
               srcOffset-=arrLength;
-              if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+              if(numToSkip==64 
+              || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
                 do{
                   s=srcOffset;
                   srcOffset+=64;
@@ -1958,7 +1962,8 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
                   ArrCopy.uncheckedCopy(arr,s,arr,dstOffset,numToSkip);
                   s+=numToSkip;
                   dstOffset=dBound;
-                  if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+                  if(numToSkip==64 ||
+                   (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
                     do{
                       s=srcOffset;
                       srcOffset+=64;
@@ -1991,7 +1996,8 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
           word=survivorSet[++wordOffset];
         }
         for(;;){
-          if(numToSkip==64 || (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
+          if(numToSkip==64 || 
+          (numToSkip=Long.numberOfTrailingZeros(word>>>=numToSkip))==64){
             do{
               s=srcOffset;
               srcOffset+=64;
@@ -2059,6 +2065,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
                 //the end has been reached
                 return;
               }else if(numToRetain==64){
+                System.out.println("arr.length="+arr.length+" fragmentedPullSurvivorsDownToNonFragmented corner case. when all 64 elements of a word have been copied, skip to the next word");
                 //corner case. when all 64 elements of a word have been copied, skip to the next word
                 break;
               }
@@ -2472,17 +2479,14 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       private static void nonfragmentedPullSurvivorsUp($ArrayType$[] arr,int dstOffset,long word)
       {
         int lead0s;
-        if((lead0s=Long.numberOfLeadingZeros(word))!=64)
+        for(int srcOffset=dstOffset-1-(lead0s=Long.numberOfLeadingZeros(word));;)
         {
-          for(int srcOffset=dstOffset-1-lead0s;;)
+          ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s))),arr,dstOffset-=lead0s,lead0s);
+          if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
           {
-            ArrCopy.uncheckedCopy(arr,srcOffset-=(lead0s=Long.numberOfLeadingZeros(~(word<<=lead0s))),arr,dstOffset-=lead0s,lead0s);
-            if((lead0s=Long.numberOfLeadingZeros(word<<=lead0s))==64)
-            {
-              return;
-            }
-            srcOffset-=lead0s;
+            return;
           }
+          srcOffset-=lead0s;
         }
       }
       final long survivorWord;
@@ -4945,5 +4949,5 @@ private void collapseHEAD($ArrayType$[] arr,int head,int tail,$TypeNameModifier$
 #ENDIF
 #ENDDEF
 #MACRODEF Assert(expr)
-assert expr;
+//assert expr;
 #ENDDEF

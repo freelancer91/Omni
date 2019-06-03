@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.TreeSet;
+import java.util.HashSet;
 import omni.api.OmniCollection;
 import java.io.ObjectOutputStream;
 import java.util.Random;
@@ -289,6 +289,10 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>{
     }
   }
   void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfInt clone){
+    verifyRemoveIf(pred,functionCallType,expectedNumRemoved,clone,true);
+  }
+  void verifyRemoveIf(MonitoredRemoveIfPredicate pred,FunctionCallType functionCallType,int expectedNumRemoved,OmniCollection.OfInt clone,boolean forward){
+    int seqSize=expectedSeqSize;
     boolean retVal;
     if(functionCallType==FunctionCallType.Boxed){
       retVal=seq.removeIf((Predicate)pred);
@@ -297,20 +301,54 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>{
     {
       retVal=seq.removeIf((IntPredicate)pred);
     }
+    /*
     if(retVal){
       verifyFunctionalModification();
       int numRemoved;
       numRemoved=pred.numRemoved;
-      for(var removedVal:pred.removedVals){
-        Assertions.assertFalse(seq.contains(removedVal));
+      var itr=seq.iterator();
+      var removedVals=pred.removedVals;
+      Object nextVal=null;
+      if(itr.hasNext()){
+        nextVal=itr.nextInt();
       }
-      for(var retainedVal:seq){
-        Assertions.assertFalse(pred.removedVals.contains(retainedVal));
+      if(forward){
+        for(int i=0;;){
+          var currVal=TypeConversionUtil.convertToint(i);
+          if(removedVals.contains(currVal)){
+            Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+          }else{
+            Assertions.assertEquals((Object)nextVal,(Object)currVal);
+            if(itr.hasNext()){
+              nextVal=itr.nextInt();
+            }
+          }
+          if(++i==seqSize){
+            Assertions.assertFalse(itr.hasNext());
+            break;
+          }
+        }
+      }else{
+        for(int i=seqSize-1;;--i){
+          var currVal=TypeConversionUtil.convertToint(i);
+          if(removedVals.contains(currVal)){
+            Assertions.assertNotEquals((Object)nextVal,(Object)currVal);
+          }else{
+            Assertions.assertEquals((Object)nextVal,(Object)currVal);
+            if(itr.hasNext()){
+              nextVal=itr.nextInt();
+            }
+          }
+          if(i==0){
+            Assertions.assertFalse(itr.hasNext());
+            break;
+          }
+        }
       }
       verifyBatchRemove(numRemoved);
-      if(expectedNumRemoved!=-1){
-        Assertions.assertEquals(expectedNumRemoved,numRemoved);
-      }
+      //if(expectedNumRemoved!=-1){
+      //  Assertions.assertEquals(expectedNumRemoved,numRemoved);
+      //}
     }else{
       Assertions.assertEquals(expectedSeqSize,clone.size());
       var seqItr=seq.iterator();
@@ -319,6 +357,7 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>{
         Assertions.assertEquals(seqItr.nextInt(),cloneItr.nextInt());
       }
     }
+    */
   }
   AbstractItrMonitor getItrMonitor(SequenceLocation seqLocation,ItrType itrType){
     int offset;
@@ -2243,7 +2282,7 @@ abstract class AbstractIntSeqMonitor<SEQ extends OmniCollection.OfInt>{
   static abstract class MonitoredRemoveIfPredicate implements IntPredicate
     ,Predicate<Integer>
   {
-    final TreeSet removedVals=new TreeSet();
+    final HashSet removedVals=new HashSet();
     int callCounter;
     int numRemoved;
     @Override public String toString(){
