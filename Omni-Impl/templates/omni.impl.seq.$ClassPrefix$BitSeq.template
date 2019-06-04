@@ -1,0 +1,294 @@
+#TYPEDEF OfBoolean
+package omni.impl.seq;
+import java.io.Externalizable;
+import java.util.RandomAccess;
+import omni.impl.Abstract$TypeNameModifier$Itr;
+import omni.util.ToStringUtil;
+import omni.function.$TypeNameModifier$Predicate;
+import omni.function.$TypeNameModifier$Consumer;
+import omni.function.$Comparator$;
+import java.util.ConcurrentModificationException;
+import omni.util.TypeUtil;
+import omni.api.OmniCollection;
+import omni.util.OmniArray;
+import omni.api.OmniList;
+import omni.api.OmniStack;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.util.Comparator;
+import omni.util.ArrCopy;
+import omni.util.$ClassPrefix$SortUtil;
+import omni.impl.CheckedCollection;
+import java.util.NoSuchElementException;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import java.util.function.IntFunction;
+import java.util.function.UnaryOperator;
+public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable,RandomAccess{
+  long[] arr;
+  private $ClassPrefix$BitSeq(){
+    super();
+    this.arr=OmniArray.OfLong.DEFAULT_ARR;
+  }
+  private $ClassPrefix$ArrSeq(int initialCapacity){
+    super();
+    switch(initialCapacity){ 
+    default:
+      this.arr=new long[((initialCapacity-1)>>6)+1];
+      return;
+    case OmniArray.DEFAULT_ARR_SEQ_CAP<<6:
+      this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+    case 0:
+    }
+  }
+  private $ClassPrefix$ArrSeq(int size,long[] arr){
+    super(size);
+    this.arr=arr;
+  }
+  @Override public void writeExternal(ObjectOutput out) throws IOException{
+    int size;
+    out.writeInt(size=this.size);
+    if(size!=0){
+      //TODO make a bit-packed-specific version
+      OmniArray.OfLong.writeArray(arr,0,(size-1)>>>6,out);
+    }
+  }
+  @Override public void readExternal(ObjectInput in) throws IOException){
+    int size;
+    this.size=size=in.readInt();
+    if(size!=0){
+      long[] arr;
+      OmniArray.OfLong.readArray(arr=new long[(size=((size-1)>>6))+1],0,size,in);
+    }
+  }
+  @Override public void clear(){
+    this.size=0;
+  }
+  @Override public int hashCode(){
+    final int size;
+    if((size=this.size)!=0){
+      return uncheckedHashCode(size);
+    }
+    return 1;
+  }
+  @Override public String toString(){
+    int size;
+    if((size=this.size)!=0){
+      final byte[] buffer;
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){
+        (buffer=new byte[size*7])[size=uncheckedToString(size,buffer)]=(byte)']';
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
+      }else{
+        final ToStringUtil.OmniStringBuilderByte builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        builder.uncheckedAppendChar((byte)']');
+        buffer=builder.buffer;
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
+      }
+    }
+    return "[]";
+  }
+  abstract int uncheckedHashCode(int size);
+  abstract int uncheckedToString(int size,byte[] buffer);
+  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
+  #MACRO RootQueryMethods<Root,contains>()
+  #MACRO RootQueryMethods<Root,removeVal>()
+  abstract boolean uncheckedremoveVal(int size,$queryParameterType$ val);
+  abstract void uncheckedForEach(int size,$TypeNameModifier$Consumer$<? super E>$ action);
+  @Override public void forEach($TypeNameModifier$Consumer$<? super E>$ action){
+    final int size;
+    if((size=this.size)!=0){
+      uncheckedForEach(size,action);
+    }
+  }
+  @Override public void forEach(Consumer<? super $BoxedType$> action){
+    final int size;
+    if((size=this.size)!=0){
+      uncheckedForEach(size,action::accept);
+    }
+  }
+  private void uncheckedAppend(int size,$exposedType$ val){
+    long[] arr;
+    int packedSize;
+    if((arr=this.arr).length==(packedSize=((size-1)>>6)+1)){
+      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(packedSize)],0,packedSize);
+      this.arr=arr;
+      arr[packedSize]=TypeUtil.castToLong(val);
+    }else{
+      if(val){
+        arr[packedSize]|=1L<<size;
+      }else{
+        arr[packedSize]&=(~(1L<<size));
+      }
+    }
+    this.size=size+1;
+  }
+  private void uncheckedInit($exposedType$ val){
+    $ArrayType$[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new $ArrayType$[]{TypeUtil.castToLong(val)};
+    }else{
+      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+        this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=TypeUtil.castToLong(val);
+    }
+    this.size=1;
+  }
+  public void push($exposedType$ val){
+    int size;
+    if((size=this.size)!=0){
+      uncheckedAppend(size,val);
+    }else{
+      uncheckedInit(val);
+    }
+  }
+  @Override public boolean add($exposedType$ val){
+    push(val);
+    return true;
+  }
+  @Override public boolean add($BoxedType$ val){
+    push(($exposedType$)val);
+    return true;
+  }
+  abstract void uncheckedCopyInto($ArrayType$[] dst,int length);
+  @Override public <T> T[] toArray(T[] arr){
+    final int size;
+    if((size=this.size)!=0){
+      uncheckedCopyInto(arr=OmniArray.uncheckedArrResize(size,arr),size);
+    }else if(arr.length!=0){
+      arr[0]=null;
+    }
+    return arr;
+  }
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    final int size;
+    T[] dst=arrConstructor.apply(size=this.size);
+    if(size!=0){
+      uncheckedCopyInto(dst,size);
+    }
+    return dst;
+  }
+  #MACRO RootToArrayImpl($ArrayType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
+  abstract void uncheckedCopyInto(Object[] dst,int length);
+  abstract void uncheckedCopyInto($BoxedType$[] dst,int length);
+  #MACRO RootToArrayImpl($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
+  abstract void uncheckedCopyInto(double[] dst,int length);
+  #MACRO RootToArrayImpl(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
+  abstract void uncheckedCopyInto(float[] dst,int length);
+  #MACRO RootToArrayImpl(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
+  abstract void uncheckedCopyInto(long[] dst,int length);
+  #MACRO RootToArrayImpl(long,OmniArray.OfLong.DEFAULT_ARR,Long)
+  abstract void uncheckedCopyInto(int[] dst,int length);
+  #MACRO RootToArrayImpl(int,OmniArray.OfInt.DEFAULT_ARR,Int)
+  abstract void uncheckedCopyInto(short[] dst,int length);
+  #MACRO RootToArrayImpl(short,OmniArray.OfShort.DEFAULT_ARR,Short)
+  abstract void uncheckedCopyInto(byte[] dst,int length);
+  #MACRO RootToArrayImpl(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
+  abstract void uncheckedCopyInto(char[] dst,int length);
+  #MACRO RootToArrayImpl(char,OmniArray.OfChar.DEFAULT_ARR,Char)
+  boolean uncheckedRemoveIf(int end,$TypeNameModifier$Predicate$<? super E>$ filter){
+    final var arr=this.arr;
+    int wordEnd;
+    if(0!=(wordEnd=end>>6)){
+      int wordBitCount;
+      switch(wordBitCount=Long.bitCount(arr[0])){
+        case 0:
+          //only false was found
+          if(filter.test(false)){
+            for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset)
+            {
+              if((wordBitCount=Long.bitCount(arr[wordOffset]))!=0)
+              {
+                if(filter.test(true))
+                {
+                  this.size=0;
+                }else{
+                  //TODO retain true
+                }
+                return true;
+              }
+            }
+            //TODO search for true in the remaining word, if found, test, otherwise, clear all
+            return true;
+          }else{
+            for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset){
+              if((wordBitCount=Long.bitCount(arr[wordOffset]))!=0)
+              {
+                if(filter.test(true)){
+                  //TODO retain false
+                  return true;
+                }
+                return false;
+              }
+            }
+            //TODO search for true in the remaining word, if found, test, otherwise retain all
+            return false;
+          }
+        case 64:
+          //only true was found
+          if(filter.test(true)){
+            for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset){
+              if((wordBitCount+64)!=(wordBitCount+=Long.bitCount(arr[wordOffset]))){
+                if(filter.test(false)){
+                  this.size=0;
+                }else{
+                  //TODO retain false
+                }
+                return true;
+              }
+            }
+            //TODO search for false in the remaining word, if found, test, otherwise clear all
+            return true;
+          }else{
+            for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset){
+              if((wordBitCount+64)!=(wordBitCount+=Long.bitCount(arr[wordOffset]))){
+                if(filter.test(false)){
+                  //TODO retain true
+                  return true;
+                }
+                return false;
+              }
+            }
+            //TODO search for false in the remaining word, if found, test, otherwise retain all
+            return false;
+          }
+        default:
+          //a mix of true and false was found
+          if(filter.test(true){
+            if(filter.test(false)){
+              this.size=0;
+              return true;
+            }else{
+              //TODO retain false
+            }
+          }else{
+            if(filter.test(false)){
+              //TODO retain true
+            }else{
+              return false;
+            }
+          }
+      }
+    }else{
+      //TODO
+      there is only one word
+    }
+    return false;
+  }
+  #MACRO RootRemoveIfImpl($TypeNameModifier$Predicate$<? super E>$,filter)
+  #MACRO RootRemoveIfImpl(Predicate<? super $BoxedType$>,filter::test);
+  
+  //TODO removeIf methods
+  #MACRO StructImpl<UncheckedStack>()
+  #MACRO StructImpl<UncheckedList>()
+  #MACRO StructImpl<UncheckedSubList>()
+  #MACRO StructImpl<CheckedStack>()
+  #MACRO StructImpl<CheckedList>()
+  #MACRO StructImpl<CheckedSubList>()
+}
+#MACRODEF StructIMpl<STRUCTNAME>()
+
+#ENDDEF
