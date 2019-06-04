@@ -95,8 +95,6 @@ public class BooleanArrDeqTest{
       }
     }
   }
-  //private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
-  //private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
   @org.junit.jupiter.api.Test
   @Tag("RemoveIf")
   public void testremoveIf_Predicate(){

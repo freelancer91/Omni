@@ -73,8 +73,6 @@ public class DoubleArrDeqTest{
     }
     REMOVE_IF_SIZES[REMOVE_IF_SIZES.length-1]=16384;
   }
-  //private static final java.util.concurrent.atomic.AtomicInteger totalTests=new java.util.concurrent.atomic.AtomicInteger(0);
-  //private static final java.util.concurrent.atomic.AtomicInteger skippedTests=new java.util.concurrent.atomic.AtomicInteger(0);
   @org.junit.jupiter.api.Test
   @Tag("RemoveIf")
   public void testremoveIf_Predicate(){
@@ -90,18 +88,14 @@ public class DoubleArrDeqTest{
               if((monitoredRemoveIfPredicateGen.expectedException!=null || !monitoredRemoveIfPredicateGen.isRandomized && !checkedType.checked) && seqSize>126){
                 continue;
               }
-              final int inc=Math.max(1,seqSize/128);
+              final int inc=Math.max(1,seqSize/4);
               double[] thresholdArr;
               long randSeedBound;
               if(seqSize==0 || (!monitoredRemoveIfPredicateGen.isRandomized) || functionCallType==FunctionCallType.Boxed){
                 thresholdArr=new double[]{0.5};
                 randSeedBound=0;
               }else{
-                if(checkedType.checked){
-                  thresholdArr=new double[]{0.001,0.01,0.10,0.25,0.50,0.75,0.90,0.99,0.999};
-                }else{
-                  thresholdArr=new double[]{0.01,0.10,0.25,0.50,0.75,0.90,0.99};
-                }
+                thresholdArr=new double[]{0.01,0.10,0.90};
                 randSeedBound=100;
               }
               for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
