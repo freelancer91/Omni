@@ -189,6 +189,23 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
   #MACRO RootToArrayImpl(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
   abstract void uncheckedCopyInto(char[] dst,int length);
   #MACRO RootToArrayImpl(char,OmniArray.OfChar.DEFAULT_ARR,Char)
+  private static boolean removeIfSearchForTrueOrClear(long word,int end){
+    //TODO
+    return false;
+  }
+  private static boolean removeIfSearchForFalseOrRetainAll(long word,int end){
+    //TODO
+    return false;
+  }
+  private static boolean removeIfSearchForFalseOrClear(long word,int end,int wordBitCount){
+    //TODO
+    return false;
+  }
+  private static boolean removeIfSearchForFalseOrRetainAll(long word,int end,int wordBitCount){
+    //TODO
+    return false;
+  }
+  private static boolean removeIfSearchForFalseOrRetainAll(long word,int end,
   boolean uncheckedRemoveIf(int end,$TypeNameModifier$Predicate$<? super E>$ filter){
     final var arr=this.arr;
     int wordEnd;
@@ -198,12 +215,9 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
         case 0:
           //only false was found
           if(filter.test(false)){
-            for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset)
-            {
-              if((wordBitCount=Long.bitCount(arr[wordOffset]))!=0)
-              {
-                if(filter.test(true))
-                {
+            for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset){
+              if((wordBitCount=Long.bitCount(arr[wordOffset]))!=0){
+                if(filter.test(true)){
                   this.size=0;
                 }else{
                   //TODO retain true
@@ -211,12 +225,10 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
                 return true;
               }
             }
-            //TODO search for true in the remaining word, if found, test, otherwise, clear all
-            return true;
+            return removeIfSearchForTrueOrClear(arr[wordEnd],end);
           }else{
             for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset){
-              if((wordBitCount=Long.bitCount(arr[wordOffset]))!=0)
-              {
+              if((wordBitCount=Long.bitCount(arr[wordOffset]))!=0){
                 if(filter.test(true)){
                   //TODO retain false
                   return true;
@@ -224,8 +236,7 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
                 return false;
               }
             }
-            //TODO search for true in the remaining word, if found, test, otherwise retain all
-            return false;
+            return removeIfSearchForFalseOrRetainAll(arr[wordEnd],end);
           }
         case 64:
           //only true was found
@@ -240,8 +251,7 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
                 return true;
               }
             }
-            //TODO search for false in the remaining word, if found, test, otherwise clear all
-            return true;
+           return removeIfSearchForFalseOrClear(arr[wordEnd],end,wordBitCount);
           }else{
             for(int wordOffset=1;wordOffset!=wordEnd;++wordOffset){
               if((wordBitCount+64)!=(wordBitCount+=Long.bitCount(arr[wordOffset]))){
@@ -252,8 +262,7 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
                 return false;
               }
             }
-            //TODO search for false in the remaining word, if found, test, otherwise retain all
-            return false;
+            return removeIfSearchForFalseOrRetainAll(arr[wordEnd],end,wordBitCount);
           }
         default:
           //a mix of true and false was found
@@ -273,6 +282,9 @@ public abstract class $ClassPrefix$BitSeq$<E>$ extends AbstractSeq implements Om
           }
       }
     }else{
+      int bitCount=Long.bitCount(arr[0]);
+      
+      if(bitCount==
       //TODO
       there is only one word
     }
