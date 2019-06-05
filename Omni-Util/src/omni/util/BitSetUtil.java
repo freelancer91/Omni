@@ -1,5 +1,11 @@
 package omni.util;
 
+/**
+ * TODO use this in a bit-sequence class and a bit-deq class
+ *
+ * @author lyonste
+ *
+ */
 public interface BitSetUtil{
 
     public static boolean containsfragmented(long[] arr,int begin,int end,boolean val){
