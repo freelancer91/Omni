@@ -1,9 +1,9 @@
 package omni.impl.set;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ import omni.function.BooleanPredicate;
 import omni.impl.AbstractBooleanItr;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
-public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Serializable{
+public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizable{
     private static final long serialVersionUID=1L;
     transient int state;
     public BooleanSetImpl(){
@@ -25,11 +25,11 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Serializable{
     private BooleanSetImpl(int state){
         this.state=state;
     }
-    private void writeObject(ObjectOutputStream oos) throws IOException{
-        oos.writeByte(state);
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      out.writeByte(state);
     }
-    private void readObject(ObjectInputStream ois) throws IOException{
-        this.state=ois.readUnsignedByte();
+    @Override public void readExternal(ObjectInput in) throws IOException{
+      this.state=in.readUnsignedByte();
     }
     @Override
     public void clear(){
@@ -821,6 +821,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Serializable{
         }
     }
     public static class Checked extends BooleanSetImpl{
+        private static final long serialVersionUID=1L;
         Checked(){
             super();
         }
@@ -833,6 +834,15 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Serializable{
                 throw new ConcurrentModificationException(
                         "Expected state " + expectedState + " but was " + actualState);
             }
+        }
+        @Override public void writeExternal(ObjectOutput out) throws IOException{
+          int state=this.state;
+          try {
+            out.writeByte(state);
+          }finally {
+            checkModCount(state);
+          }
+          
         }
         @Override
         public Object clone(){

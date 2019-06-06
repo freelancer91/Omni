@@ -1,9 +1,9 @@
 package omni.impl.set;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
@@ -11,9 +11,11 @@ import omni.api.OmniSet;
 import omni.function.ByteConsumer;
 import omni.function.BytePredicate;
 import omni.impl.AbstractByteItr;
+import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
-public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
+public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
+  private static final long serialVersionUID=1L;
     transient long word0;
     transient long word1;
     transient long word2;
@@ -27,9 +29,15 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
         this.word2=word2;
         this.word3=word3;
     }
+    ByteSetImpl(ByteSetImpl that){
+      this.word0=that.word0;
+      this.word1=that.word1;
+      this.word2=that.word2;
+      this.word3=that.word3;
+    }
     @Override
     public Object clone(){
-        return new ByteSetImpl(word0,word1,word2,word3);
+        return new ByteSetImpl(this);
     }
     private static int size(long word0,long word1,long word2,long word3){
         return Long.bitCount(word0) + Long.bitCount(word1) + Long.bitCount(word2) + Long.bitCount(word3);
@@ -62,23 +70,38 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
         }while(++valOffset != valBound);
         return numLeft | (long)hash << 32;
     }
+    
+    private static String toStringHelper(long word0,long word1,long word2,long word3,int size) {
+      final byte[] buffer;
+      (buffer=new byte[size * 6])[0]='[';
+      long magicWord;
+      if((int)(magicWord=processWordToString(word0,Byte.MIN_VALUE,-64,buffer,size)) != 0){
+          if((int)(magicWord=processWordToString(word1,-64,0,buffer,magicWord)) != 0){
+              if((int)(magicWord=processWordToString(word2,0,64,buffer,magicWord)) != 0){
+                  magicWord=processWordToString(word3,64,128,buffer,magicWord);
+              }
+          }
+      }
+      buffer[size=(int)(magicWord >>> 32)]=']';
+      return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
+    }
+    private static int hashCodeHelper(long word0,long word1,long word2,long word3,int size) {
+      long magicWord;
+      if((int)(magicWord=processWordHashCode(word0,Byte.MIN_VALUE,-64,size)) != 0){
+          if((int)(magicWord=processWordHashCode(word1,-64,0,magicWord)) != 0){
+              if((int)(magicWord=processWordHashCode(word2,0,64,magicWord)) != 0){
+                  magicWord=processWordHashCode(word3,64,128,magicWord);
+              }
+          }
+      }
+      return (int)(magicWord >>> 32);
+    }
     @Override
     public String toString(){
         int size;
         long word0,word1,word2,word3;
         if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-            final byte[] buffer;
-            (buffer=new byte[size * 6])[0]='[';
-            long magicWord;
-            if((int)(magicWord=processWordToString(word0,Byte.MIN_VALUE,-64,buffer,size)) != 0){
-                if((int)(magicWord=processWordToString(word1,-64,0,buffer,magicWord)) != 0){
-                    if((int)(magicWord=processWordToString(word2,0,64,buffer,magicWord)) != 0){
-                        magicWord=processWordToString(word3,64,128,buffer,magicWord);
-                    }
-                }
-            }
-            buffer[size=(int)(magicWord >>> 32)]=']';
-            return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
+           return toStringHelper(word0,word1,word2,word3,size);
         }
         return "[]";
     }
@@ -87,15 +110,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
         int size;
         long word0,word1,word2,word3;
         if((size=size(word0=this.word0,word1=this.word1,word2=this.word2,word3=this.word3)) != 0){
-            long magicWord;
-            if((int)(magicWord=processWordHashCode(word0,Byte.MIN_VALUE,-64,size)) != 0){
-                if((int)(magicWord=processWordHashCode(word1,-64,0,magicWord)) != 0){
-                    if((int)(magicWord=processWordHashCode(word2,0,64,magicWord)) != 0){
-                        magicWord=processWordHashCode(word3,64,128,magicWord);
-                    }
-                }
-            }
-            return (int)(magicWord >>> 32);
+            return hashCodeHelper(word0,word1,word2,word3,size);
         }
         return 0;
     }
@@ -104,17 +119,17 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
         // TODO
         return false;
     }
-    private void readObject(ObjectInputStream ois) throws IOException{
-        word0=ois.readLong();
-        word1=ois.readLong();
-        word2=ois.readLong();
-        word3=ois.readLong();
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      out.writeLong(word0);
+      out.writeLong(word1);
+      out.writeLong(word2);
+      out.writeLong(word3);
     }
-    private void writeObject(ObjectOutputStream oos) throws IOException{
-        oos.writeLong(word0);
-        oos.writeLong(word1);
-        oos.writeLong(word2);
-        oos.writeLong(word3);
+    @Override public void readExternal(ObjectInput in) throws IOException{
+      word0=in.readLong();
+      word1=in.readLong();
+      word2=in.readLong();
+      word3=in.readLong();
     }
     @Override
     public void clear(){
@@ -669,7 +684,31 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
         }
         @Override
         public void remove(){
-            // TODO
+          var root=this.root;
+          long word;
+          int valOffset;
+          switch(((valOffset=this.valOffset)-1)>>6) {
+          case 1:
+            if((valOffset=Long.numberOfLeadingZeros((word=root.word3)<<-valOffset))!=64) {
+              root.word3=(word&~(1L<<(-1-valOffset)));
+              return;
+            }
+            valOffset=0;
+          case 0:
+            if((valOffset=Long.numberOfLeadingZeros((word=root.word2)<<-valOffset))!=64) {
+              root.word2=(word&~(1L<<(-1-valOffset)));
+              return;
+            }
+            valOffset=0;
+          case -1:
+            if((valOffset=Long.numberOfLeadingZeros((word=root.word1)<<-valOffset))!=64) {
+              root.word1=(word&~(1L<<(-1-valOffset)));
+              return;
+            }
+            valOffset=0;
+          default:
+            root.word0=((word=root.word0)&~(1L<<(-1-(Long.numberOfLeadingZeros(word<<-valOffset)))));
+          }
         }
     }
     @Override
@@ -865,4 +904,205 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Serializable{
             return (word=this.word3) != (this.word3=word | mask);
         }
     }
+    private static class Checked extends ByteSetImpl{
+      int modCount;
+      int size;
+      Checked(){
+        super();
+      }
+      Checked(long word0,long word1,long word2,long word3){
+        super(word0,word1,word2,word3);
+        this.size=size(word0,word1,word2,word3);
+      }
+      Checked(long word0,long word1,long word2,long word3,int size){
+        super(word0,word1,word2,word3);
+        this.size=size;
+      }
+      Checked(Checked that){
+        super(that.word0,that.word1,that.word2,that.word3);
+        this.size=that.size;
+      }
+      @Override public Object clone() {
+        return new Checked(this);
+      }
+      @Override public String toString() {
+        int size;
+        if((size=this.size)!=0) {
+          return toStringHelper(word0,word1,word2,word3,size);
+        }
+        return "[]";
+      }
+      @Override public int hashCode() {
+        int size;
+        if((size=this.size)!=0) {
+          return hashCodeHelper(word0,word1,word2,word3,size);
+        }
+        return 0;
+      }
+      @Override public boolean equals(Object val){
+        // TODO Auto-generated method stub
+        return super.equals(val);
+      }
+      @Override public void writeExternal(ObjectOutput out) throws IOException{
+        int modCount=this.modCount;
+        try {
+          super.writeExternal(out);
+        }finally {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+      @Override public void readExternal(ObjectInput in) throws IOException{
+          this.size=size(word0=in.readLong(),word1=in.readLong(),word2=in.readLong(),word3=in.readLong());
+      }
+      @Override public void clear(){
+        if(this.size!=0) {
+          this.word0=0;
+          this.word0=2;
+          this.word0=0;
+          this.word0=0;
+        }
+      }
+      @Override public boolean contains(Object val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(boolean val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(byte val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(char val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(int val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(long val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(float val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean contains(double val){
+        // TODO Auto-generated method stub
+        return super.contains(val);
+      }
+      @Override public boolean remove(Object val){
+        // TODO Auto-generated method stub
+        return super.remove(val);
+      }
+      @Override public boolean removeVal(boolean val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean removeVal(byte val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean removeVal(char val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean removeVal(int val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean removeVal(long val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean removeVal(float val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean removeVal(double val){
+        // TODO Auto-generated method stub
+        return super.removeVal(val);
+      }
+      @Override public boolean isEmpty(){
+        // TODO Auto-generated method stub
+        return super.isEmpty();
+      }
+      @Override public int size(){
+        // TODO Auto-generated method stub
+        return super.size();
+      }
+      @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        // TODO Auto-generated method stub
+        return super.toArray(arrConstructor);
+      }
+      @Override public <T> T[] toArray(T[] dst){
+        // TODO Auto-generated method stub
+        return super.toArray(dst);
+      }
+      @Override public boolean add(boolean val){
+        // TODO Auto-generated method stub
+        return super.add(val);
+      }
+      @Override public boolean add(Byte val){
+        // TODO Auto-generated method stub
+        return super.add(val);
+      }
+      @Override public void forEach(ByteConsumer action){
+        // TODO Auto-generated method stub
+        super.forEach(action);
+      }
+      @Override public void forEach(Consumer<? super Byte> action){
+        // TODO Auto-generated method stub
+        super.forEach(action);
+      }
+      @Override public boolean removeIf(BytePredicate filter){
+        // TODO Auto-generated method stub
+        return super.removeIf(filter);
+      }
+      @Override public boolean removeIf(Predicate<? super Byte> filter){
+        // TODO Auto-generated method stub
+        return super.removeIf(filter);
+      }
+      @Override public omni.api.OmniIterator.OfByte iterator(){
+        // TODO Auto-generated method stub
+        return super.iterator();
+      }
+      @Override public Byte[] toArray(){
+        // TODO Auto-generated method stub
+        return super.toArray();
+      }
+      @Override public byte[] toByteArray(){
+        // TODO Auto-generated method stub
+        return super.toByteArray();
+      }
+      @Override public double[] toDoubleArray(){
+        // TODO Auto-generated method stub
+        return super.toDoubleArray();
+      }
+      @Override public float[] toFloatArray(){
+        // TODO Auto-generated method stub
+        return super.toFloatArray();
+      }
+      @Override public long[] toLongArray(){
+        // TODO Auto-generated method stub
+        return super.toLongArray();
+      }
+      @Override public int[] toIntArray(){
+        // TODO Auto-generated method stub
+        return super.toIntArray();
+      }
+      @Override public short[] toShortArray(){
+        // TODO Auto-generated method stub
+        return super.toShortArray();
+      }
+      @Override public boolean add(byte val){
+        // TODO Auto-generated method stub
+        return super.add(val);
+      }
+      
+    }
+    
 }
