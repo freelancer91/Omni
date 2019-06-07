@@ -11,6 +11,14 @@ abstract interface LongSubListDefault extends LongListDefault
     return add((long)TypeUtil.castToLong(val));
   }
   @Override
+  public default boolean add(char val){
+    return add((long)val);
+  }
+  @Override
+  public default boolean add(byte val){
+    return add((long)val);
+  }
+  @Override
   public default boolean add(int val)
   {
     return add((long)val);

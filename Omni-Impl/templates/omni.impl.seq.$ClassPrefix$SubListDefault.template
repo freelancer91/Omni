@@ -22,6 +22,18 @@ abstract interface $TypeNameModifier$SubListDefault$<E>$ extends $TypeNameModifi
     return add(($exposedType$)$queryCastBoolean$(val));
   }
 #ENDIF
+#IF OfInt,OfLong
+  @Override
+  public default boolean add(char val){
+    return add(($exposedType$)val);
+  }
+#ENDIF
+#IF OfShort,OfInt,OfLong
+  @Override
+  public default boolean add(byte val){
+    return add(($exposedType$)val);
+  }
+#ENDIF
 #IF OfDouble,OfFloat,OfLong
   @Override
   public default boolean add(int val)

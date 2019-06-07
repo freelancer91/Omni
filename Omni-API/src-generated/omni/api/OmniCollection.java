@@ -307,13 +307,9 @@ public abstract interface OmniCollection extends Cloneable
     public abstract float[] toFloatArray();
     public abstract long[] toLongArray();
     public abstract int[] toIntArray();
-    public default boolean add(byte val)
-    {
-      return add((short)val);
-    }
     public default boolean add(Byte val)
     {
-      return add((short)val.byteValue());
+      return add((byte)val.byteValue());
     }
     public abstract boolean add(short val);
     public default boolean add(Boolean val)
@@ -348,21 +344,9 @@ public abstract interface OmniCollection extends Cloneable
     {
       return removeVal((int)val);
     }
-    public default boolean add(byte val)
-    {
-      return add((int)val);
-    }
-    public default boolean add(Byte val)
-    {
-      return add((int)val.byteValue());
-    }
-    public default boolean add(char val)
-    {
-      return add((int)val);
-    }
     public default boolean add(Character val)
     {
-      return add((int)val.charValue());
+      return add((char)val.charValue());
     }
     public default boolean add(short val)
     {
@@ -371,6 +355,10 @@ public abstract interface OmniCollection extends Cloneable
     public default boolean add(Short val)
     {
       return add((int)val.shortValue());
+    }
+    public default boolean add(Byte val)
+    {
+      return add((byte)val.byteValue());
     }
     public abstract boolean add(int val);
     public default boolean add(Boolean val)
@@ -404,13 +392,9 @@ public abstract interface OmniCollection extends Cloneable
     {
       return removeVal((int)val);
     }
-    public default boolean add(char val)
-    {
-      return add((int)val);
-    }
     public default boolean add(Character val)
     {
-      return add((int)val.charValue());
+      return add((char)val.charValue());
     }
     public default boolean add(short val)
     {
@@ -420,13 +404,9 @@ public abstract interface OmniCollection extends Cloneable
     {
       return add((int)val.shortValue());
     }
-    public default boolean add(byte val)
-    {
-      return add((int)val);
-    }
     public default boolean add(Byte val)
     {
-      return add((int)val.byteValue());
+      return add((byte)val.byteValue());
     }
     public abstract boolean add(int val);
     public default boolean add(Integer val)

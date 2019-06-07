@@ -150,8 +150,7 @@ public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.Of
         final ToStringUtil.OmniStringBuilderByte builder;
         uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
     }
@@ -483,6 +482,14 @@ public abstract class IntArrSeq extends AbstractSeq implements OmniCollection.Of
   }
   @Override public boolean add(boolean val){
     push((int)(int)TypeUtil.castToByte(val));
+    return true;
+  }
+  @Override public boolean add(char val){
+    push((int)val);
+    return true;
+  }
+  @Override public boolean add(byte val){
+    push((int)val);
     return true;
   }
   abstract void uncheckedCopyInto(int[] dst,int length);

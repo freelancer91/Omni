@@ -92,8 +92,7 @@ public abstract class BooleanArrSeq extends AbstractSeq implements OmniCollectio
         final ToStringUtil.OmniStringBuilderByte builder;
         uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
     }

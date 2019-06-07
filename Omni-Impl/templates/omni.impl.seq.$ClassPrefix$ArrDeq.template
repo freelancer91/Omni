@@ -133,6 +133,18 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     addLast(val);
     return true;
   }
+#IF OfInt,OfLong
+  @Override public boolean add(char val){
+    addLast(($exposedType$)val);
+    return true;
+  }
+#ENDIF
+#IF OfInt,OfLong,OfShort
+  @Override public boolean add(byte val){
+    addLast(($exposedType$)val);
+    return true;
+  }
+#ENDIF
   @Override public void addFirst($exposedType$ val){
     push(val);
   }

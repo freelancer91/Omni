@@ -228,8 +228,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
         final ToStringUtil.OmniStringBuilderByte builder;
         uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
   #ENDIF 
@@ -318,6 +317,18 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
     return true;
   }
   #ENDIF
+#ENDIF
+#IF OfInt,OfLong
+  @Override public boolean add(char val){
+    push(($exposedType$)val);
+    return true;
+  }
+#ENDIF
+#IF OfInt,OfLong,OfShort
+  @Override public boolean add(byte val){
+    push(($exposedType$)val);
+    return true;
+  }
 #ENDIF
 #IF OfDouble,OfFloat,OfLong
   @Override public boolean add(int val){

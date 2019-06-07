@@ -92,6 +92,14 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     addLast(val);
     return true;
   }
+  @Override public boolean add(char val){
+    addLast((int)val);
+    return true;
+  }
+  @Override public boolean add(byte val){
+    addLast((int)val);
+    return true;
+  }
   @Override public void addFirst(int val){
     push(val);
   }

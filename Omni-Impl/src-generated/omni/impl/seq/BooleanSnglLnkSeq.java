@@ -107,8 +107,7 @@ public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniColle
         final ToStringUtil.OmniStringBuilderByte builder;
         BooleanSnglLnkNode.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
     }

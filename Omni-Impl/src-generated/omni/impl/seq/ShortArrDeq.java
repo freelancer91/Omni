@@ -92,6 +92,10 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     addLast(val);
     return true;
   }
+  @Override public boolean add(byte val){
+    addLast((short)val);
+    return true;
+  }
   @Override public void addFirst(short val){
     push(val);
   }

@@ -10,4 +10,8 @@ abstract interface ShortSubListDefault extends ShortListDefault
   public default boolean add(boolean val){
     return add((short)(short)TypeUtil.castToByte(val));
   }
+  @Override
+  public default boolean add(byte val){
+    return add((short)val);
+  }
 }

@@ -150,8 +150,7 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
         final ToStringUtil.OmniStringBuilderByte builder;
         uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
     }
@@ -467,6 +466,14 @@ public abstract class LongArrSeq extends AbstractSeq implements OmniCollection.O
   }
   @Override public boolean add(boolean val){
     push((long)TypeUtil.castToLong(val));
+    return true;
+  }
+  @Override public boolean add(char val){
+    push((long)val);
+    return true;
+  }
+  @Override public boolean add(byte val){
+    push((long)val);
     return true;
   }
   @Override public boolean add(int val){

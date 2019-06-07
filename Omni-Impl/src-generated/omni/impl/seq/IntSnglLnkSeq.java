@@ -170,8 +170,7 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
         final ToStringUtil.OmniStringBuilderByte builder;
         IntSnglLnkNode.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
     }
@@ -200,6 +199,14 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
   abstract void push(int val);
   @Override public boolean add(int val){
     push((val));
+    return true;
+  }
+  @Override public boolean add(char val){
+    push((int)(val));
+    return true;
+  }
+  @Override public boolean add(byte val){
+    push((int)(val));
     return true;
   }
   public void push(Integer val){

@@ -92,6 +92,14 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     addLast(val);
     return true;
   }
+  @Override public boolean add(char val){
+    addLast((long)val);
+    return true;
+  }
+  @Override public boolean add(byte val){
+    addLast((long)val);
+    return true;
+  }
   @Override public void addFirst(long val){
     push(val);
   }

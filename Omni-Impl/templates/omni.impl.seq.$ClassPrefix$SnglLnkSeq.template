@@ -271,8 +271,7 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ extends AbstractSeq implement
         final ToStringUtil.OmniStringBuilderByte builder;
         $SNode$.uncheckedToString(head,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
         builder.uncheckedAppendChar((byte)']');
-        buffer=builder.buffer;
-        buffer[0]=(byte)'[';
+        (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
   #ENDIF 
@@ -304,6 +303,12 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ extends AbstractSeq implement
   }
   abstract void push($exposedType$ val);
   #MACRO add($exposedType$,)
+#IF OfInt,OfLong
+  #MACRO add(char,($exposedType$))
+#ENDIF
+#IF OfShort,OfInt,OfLong
+  #MACRO add(byte,($exposedType$))
+#ENDIF
 #IFNOT OfRef
   public void push($BoxedType$ val){
     push(($exposedType$)val);
