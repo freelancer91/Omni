@@ -254,19 +254,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
     return false;
   }
-  @Override public boolean contains(byte val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedcontainsBits(tail,Float.floatToRawIntBits(val));
-        }
-        return uncheckedcontains0(tail);
-      }
-    }
-    return false;
-  }
   @Override public boolean contains(char val)
   {
     {
@@ -429,19 +416,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
             break returnFalse;
           }
         }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(byte val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedremoveValBits(tail,Float.floatToRawIntBits(val));
-        }
-        return uncheckedremoveVal0(tail);
       }
     }
     return false;

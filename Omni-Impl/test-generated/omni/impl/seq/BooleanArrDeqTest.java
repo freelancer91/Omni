@@ -1,8 +1,6 @@
 package omni.impl.seq;
 import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
-import java.util.Arrays;
-import omni.util.ArrCopy;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.io.IOException;
@@ -33,7 +31,6 @@ import java.nio.file.Files;
 import omni.impl.seq.AbstractBooleanSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
-import omni.api.OmniDeque;
 import omni.util.TestExecutorService;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("ArrDeqTest")
@@ -1514,30 +1511,6 @@ public class BooleanArrDeqTest{
         }
       }
       EXECUTORSERVICE.completeAllTests();
-    }
-  }
-  private static void initializeAscendingRepeating(boolean[] arr,int head,int size)
-  {
-    if(size!=0)
-    {
-      int stripeLength=Math.max(1,size/256);
-      int val=0;
-      int i=0;
-      int threshold=stripeLength;
-      int arrLength=arr.length;
-      for(;;){
-        if(i>=size){
-          return;
-        }
-        arr[head]=TypeConversionUtil.convertToboolean(val);
-        if(++head==arrLength){
-          head=0;
-        }
-        if(++i==threshold){
-          ++val;
-          threshold+=stripeLength;
-        }
-      }
     }
   }
   private static void initializeAscending(boolean[] arr,int head,int size)

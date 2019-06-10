@@ -1905,9 +1905,15 @@ public RETTYPE peekSUFFIX(){
   #MACRO QueryMethod<char>( )
     #ENDIF
   #ENDIF
-  #IF OfChar,OfDouble,OfFloat,OfRef,OfShort
+  #IF OfChar,OfRef,OfShort
     #IFSWITCH METHODNAME==removeVal,contains
   #MACRO QueryMethod<byte>( )
+  #MACRO QueryMethod<char>( )
+  #MACRO QueryMethod<short>( )
+    #ENDIF
+  #ENDIF
+  #IF OfFloat
+    #IFSWITCH METHODNAME==removeVal,contains
   #MACRO QueryMethod<char>( )
   #MACRO QueryMethod<short>( )
     #ENDIF

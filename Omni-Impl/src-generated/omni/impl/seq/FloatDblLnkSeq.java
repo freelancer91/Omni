@@ -469,21 +469,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
     }//end val check
     return false;
   }
-  @Override public boolean contains(byte val){
-    {
-      {
-        final FloatDblLnkNode head;
-        if((head=this.head)!=null)
-        {
-          if(val!=0){
-            return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
-          }
-          return FloatDblLnkNode.uncheckedcontains0(head,tail);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
   @Override public boolean contains(char val){
     {
       {
@@ -2016,21 +2001,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       }//end val check
       return false;
     }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final FloatDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Float.floatToRawIntBits(val));
-            }
-            return uncheckedremoveVal0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
     @Override public boolean removeVal(char val){
       {
         {
@@ -2679,22 +2649,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final FloatDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Float.floatToRawIntBits(val));
-            }
-            return uncheckedremoveVal0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
     @Override public boolean removeVal(char val){
       {
         {
@@ -3260,22 +3214,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(byte val){
-      {
-        CheckedCollection.checkModCount(modCount,root.modCount);
-        {
-          final FloatDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return FloatDblLnkNode.uncheckedcontainsBits(head,tail,Float.floatToRawIntBits(val));
-            }
-            return FloatDblLnkNode.uncheckedcontains0(head,tail);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5854,21 +5792,6 @@ public abstract class FloatDblLnkSeq extends AbstractSeq implements
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final FloatDblLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Float.floatToRawIntBits(val));
-            }
-            return uncheckedremoveVal0(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check

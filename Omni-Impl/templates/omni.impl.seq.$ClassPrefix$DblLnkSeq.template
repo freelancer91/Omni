@@ -2552,19 +2552,16 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
   #ENDIF
-  #IF OfDouble
-    #IFSWITCH METHODNAME==removeVal,contains
+  #IF OfChar,OfShort
+    #IFSWITCH METHODNAME==contains,removeVal
 #MACRO QueryMethod<byte>( )
-#MACRO QueryMethod<char>( )
-#MACRO QueryMethod<short>( )
     #ENDIF
-  #ENDIF
-  #IF OfChar,OfFloat,OfShort
-#IFSWITCH METHODNAME==contains,removeVal
-#MACRO QueryMethod<byte>( )
-#ENDIF
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfFloat
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )  
   #ENDIF
   #IF OfRef
 #MACRO QueryMethod<Boolean>((boolean))
@@ -2588,10 +2585,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #MACRO QueryMethod<byte>( )
 #MACRO QueryMethod<char>( )
   #ENDIF
-  #IF OfChar,OfDouble,OfFloat,OfRef,OfShort
+  #IF OfChar,OfRef,OfShort
 #MACRO QueryMethod<byte>( )
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfFloat
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )  
   #ENDIF
   #IF OfRef
 #MACRO QueryMethod<Boolean>((boolean))
@@ -2626,19 +2627,16 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
   #ENDIF
-  #IF OfDouble
+  #IF OfChar,OfShort
     #IFSWITCH METHODNAME==contains
 #MACRO QueryMethod<byte>( )
-#MACRO QueryMethod<char>( )
-#MACRO QueryMethod<short>( )
     #ENDIF
-  #ENDIF
-  #IF OfChar,OfFloat,OfShort
-#IFSWITCH METHODNAME==contains
-#MACRO QueryMethod<byte>( )
-#ENDIF
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
+  #ENDIF
+  #IF OfFloat
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )  
   #ENDIF
   #IF OfRef
 #MACRO QueryMethod<Boolean>((boolean))

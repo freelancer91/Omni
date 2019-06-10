@@ -284,51 +284,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     }//end val check
     return false;
   }
-  @Override public boolean contains(byte val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return OmniArray.OfDouble.uncheckedcontainsBits(this.arr,0,size-1,Double.doubleToRawLongBits(val));
-          }
-          return OmniArray.OfDouble.uncheckedcontains0(this.arr,0,size-1);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
-  @Override public boolean contains(char val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return OmniArray.OfDouble.uncheckedcontainsBits(this.arr,0,size-1,Double.doubleToRawLongBits(val));
-          }
-          return OmniArray.OfDouble.uncheckedcontains0(this.arr,0,size-1);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
-  @Override public boolean contains(short val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return OmniArray.OfDouble.uncheckedcontainsBits(this.arr,0,size-1,Double.doubleToRawLongBits(val));
-          }
-          return OmniArray.OfDouble.uncheckedcontains0(this.arr,0,size-1);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
   @Override public boolean removeVal(boolean val){
     {
       {
@@ -460,51 +415,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
               break returnFalse;
             }
           }
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
-  @Override public boolean removeVal(byte val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
-  @Override public boolean removeVal(char val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
-  @Override public boolean removeVal(short val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -1875,51 +1785,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       }//end val check
       return false;
     }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(char val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(short val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
     @Override public boolean contains(boolean val){
       {
         {
@@ -2073,57 +1938,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(byte val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(char val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(short val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -3759,54 +3573,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override public boolean removeVal(char val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override public boolean removeVal(short val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Double.doubleToRawLongBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
     @Override public boolean contains(boolean val){
       {
         final var root=this.root;
@@ -3993,75 +3759,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-        finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(byte val){
-      {
-        final var root=this.root;
-        final int modCount=this.modCount;
-        try
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          } //end size check
-        } //end checked sublist try modcount
-        finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(char val){
-      {
-        final var root=this.root;
-        final int modCount=this.modCount;
-        try
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          } //end size check
-        } //end checked sublist try modcount
-        finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(short val){
-      {
-        final var root=this.root;
-        final int modCount=this.modCount;
-        try
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
         finally{

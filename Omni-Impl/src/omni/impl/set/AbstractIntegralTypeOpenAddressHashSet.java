@@ -18,6 +18,7 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet extends AbstractOpe
     transient long word1;
     transient long word2;
     transient long word3;
+    transient int tableSize;
     AbstractIntegralTypeOpenAddressHashSet(){
         super();
     }
@@ -33,6 +34,7 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet extends AbstractOpe
         this.word1=that.word1;
         this.word2=that.word2;
         this.word3=that.word3;
+        this.tableSize=that.tableSize;
     }
     AbstractIntegralTypeOpenAddressHashSet(int initialCapacity,float loadFactor){
         super(initialCapacity,loadFactor);
@@ -44,11 +46,8 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet extends AbstractOpe
                 clearTable();
                 tableSize=0;
             }
-            word0=0;
-            word1=0;
-            word2=0;
-            word3=0;
             size=0;
         }
     }
+    abstract void clearTable();
 }

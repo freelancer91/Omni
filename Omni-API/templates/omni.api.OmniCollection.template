@@ -27,6 +27,12 @@ public abstract interface OmniCollection extends Cloneable
   #MACRO ContainsMethodDecl<Object>()
   #MACRO PrimitiveMethods(ContainsMethodDecl)
   #MACRO BoxedMethods(ContainsMethodDecl)
+  public abstract boolean contains(Byte val);
+  public abstract boolean contains(Character val);
+  public abstract boolean contains(Short val);
+  public abstract boolean removeVal(Byte val);
+  public abstract boolean removeVal(Character val);
+  public abstract boolean removeVal(Short val);
   public abstract boolean remove(Object val);
   #MACRO PrimitiveMethods(RemoveValMethodDecl)
   #MACRO BoxedMethods(RemoveValMethodDecl)
@@ -118,6 +124,12 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
 ,CLASSPREFIXInput,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
+  #MACRO ContainsMethodDefault<Byte>()
+  #MACRO ContainsMethodDefault<Character>()
+  #MACRO ContainsMethodDefault<Short>()
+  #MACRO RemoveValMethodDefault<Byte>()
+  #MACRO RemoveValMethodDefault<Character>()
+  #MACRO RemoveValMethodDefault<Short>()
   @Override
   public abstract boolean add(boolean val);
   public abstract boolean add(BOXEDTYPE val);
@@ -187,6 +199,33 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
   public default boolean add(Float val)
   {
     return add(val.floatValue());
+  }
+  #ENDIF
+  #IFSWITCH ARRTYPE==float
+  public default boolean contains(byte val){
+    return contains((short)val);
+  }
+  public default boolean removeVal(byte val){
+    return removeVal((short)val);
+  }
+  #ELSEIFSWITCH ARRTYPE==double
+  public default boolean contains(byte val){
+    return contains((int)val);
+  }
+  public default boolean removeVal(byte val){
+    return removeVal((int)val);
+  }
+  public default boolean contains(short val){
+    return contains((int)val);
+  }
+  public default boolean removeVal(short val){
+    return removeVal((int)val);
+  }
+  public default boolean contains(char val){
+    return contains((int)val);
+  }
+  public default boolean removeVal(char val){
+    return removeVal((int)val);
   }
   #ENDIF
   #IFSWITCH ARRTYPE==float,double
@@ -268,27 +307,41 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
 @Override
 public default boolean contains(INPUTTYPE val)
 {
-  return val!=null && contains(val.
+  return val!=null && contains(
   #IFSWITCH INPUTTYPE==Boolean
-    booleanValue
+    val.booleanValue()
   #ELSEIFSWITCH INPUTTYPE==Byte
-    byteValue
+    #IFSWITCH CLASSPREFIX==Boolean,Int,Long,Double
+    val.intValue()
+    #ELSEIFSWITCH CLASSPREFIX==Short,Float
+    val.shortValue()
+    #ELSE
+    val.byteValue()
+    #ENDIF
   #ELSEIFSWITCH INPUTTYPE==Character
-    charValue
+    #IFSWITCH CLASSPREFIX==Double
+    (int)val.charValue()
+    #ELSE
+    val.charValue()
+    #ENDIF
   #ELSEIFSWITCH INPUTTYPE==Short
-    shortValue
+    #IFSWITCH CLASSPREFIX==Boolean,Byte,Int,Long,Double
+    val.intValue()
+    #ELSE
+    val.shortValue()
+    #ENDIF
   #ELSEIFSWITCH INPUTTYPE==Integer
-    intValue
+    val.intValue()
   #ELSEIFSWITCH INPUTTYPE==Long
-    longValue
+    val.longValue()
   #ELSEIFSWITCH INPUTTYPE==Float
-    floatValue
+    val.floatValue()
   #ELSEIFSWITCH INPUTTYPE==Double
-    doubleValue
+    val.doubleValue()
   #ELSE
     ERROR unknown input type INPUTTYPE
-  #ENDIF
-      ());
+  #ENDIF  
+  );
 }
 #ENDDEF
 
@@ -296,27 +349,41 @@ public default boolean contains(INPUTTYPE val)
 @Override
 public default boolean removeVal(INPUTTYPE val)
 {
-  return val!=null && removeVal(val.
+  return val!=null && removeVal(
   #IFSWITCH INPUTTYPE==Boolean
-    booleanValue
+    val.booleanValue()
   #ELSEIFSWITCH INPUTTYPE==Byte
-    byteValue
+    #IFSWITCH CLASSPREFIX==Boolean,Int,Long,Double
+    val.intValue()
+    #ELSEIFSWITCH CLASSPREFIX==Short,Float
+    val.shortValue()
+    #ELSE
+    val.byteValue()
+    #ENDIF
   #ELSEIFSWITCH INPUTTYPE==Character
-    charValue
+    #IFSWITCH CLASSPREFIX==Double
+    (int)val.charValue()
+    #ELSE
+    val.charValue()
+    #ENDIF
   #ELSEIFSWITCH INPUTTYPE==Short
-    shortValue
+    #IFSWITCH CLASSPREFIX==Boolean,Byte,Int,Long,Double
+    val.intValue()
+    #ELSE
+    val.shortValue()
+    #ENDIF
   #ELSEIFSWITCH INPUTTYPE==Integer
-    intValue
+    val.intValue()
   #ELSEIFSWITCH INPUTTYPE==Long
-    longValue
+    val.longValue()
   #ELSEIFSWITCH INPUTTYPE==Float
-    floatValue
+    val.floatValue()
   #ELSEIFSWITCH INPUTTYPE==Double
-    doubleValue
+    val.doubleValue()
   #ELSE
     ERROR unknown input type INPUTTYPE
-  #ENDIF
-      ());
+  #ENDIF  
+  );
 }
 #ENDDEF
 
@@ -329,9 +396,6 @@ public abstract boolean removeVal(INPUTTYPE val);
 
 #MACRODEF BoxedMethods(METHODMACRO)
 #MACRO METHODMACRO<Boolean>()
-#MACRO METHODMACRO<Byte>()
-#MACRO METHODMACRO<Character>()
-#MACRO METHODMACRO<Short>()
 #MACRO METHODMACRO<Integer>()
 #MACRO METHODMACRO<Long>()
 #MACRO METHODMACRO<Float>()

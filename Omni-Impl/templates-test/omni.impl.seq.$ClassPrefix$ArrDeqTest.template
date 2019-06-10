@@ -18,8 +18,6 @@ import java.util.function.$TypeNameModifier$Predicate;
 #ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Predicate;
 #ENDIF
-import java.util.Arrays;
-import omni.util.ArrCopy;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.io.IOException;
@@ -58,12 +56,10 @@ import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredObject;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
-import omni.api.OmniDeque;
 import omni.util.TestExecutorService;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("ArrDeqTest")
 public class $ClassPrefix$ArrDeqTest{
-
   #MACRO TestMethods(0)
 #MACRODEF TestMethods(PARALLELISM)
 #MACRO ParallelizationCode<PARALLELISM>()
@@ -2058,6 +2054,7 @@ public class $ClassPrefix$ArrDeqTest{
       EXECUTORSERVICE.completeAllTests();
     }
   }
+#IFNOT OfBoolean
   private static void initializeAscendingRepeating($ArrayType$[] arr,int head,int size)
   {
     if(size!=0)
@@ -2081,8 +2078,8 @@ public class $ClassPrefix$ArrDeqTest{
         }
       }
     }
-    
   }
+#ENDIF
   private static void initializeAscending($ArrayType$[] arr,int head,int size)
   {
     if(size!=0)

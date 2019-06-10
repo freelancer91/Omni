@@ -311,21 +311,6 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
     }//end val check
     return false;
   }
-  @Override public boolean contains(byte val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-          }
-          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
   @Override public boolean contains(char val){
     {
       {
@@ -503,21 +488,6 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
               break returnFalse;
             }
           }
-        } //end size check
-      } //end checked sublist try modcount
-    }//end val check
-    return false;
-  }
-  @Override public boolean removeVal(byte val){
-    {
-      {
-        final int size;
-        if((size=this.size)!=0)
-        {
-          if(val!=0){
-            return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-          }
-          return this.uncheckedremoveVal0(size);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -2115,21 +2085,6 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
       }//end val check
       return false;
     }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
     @Override public boolean removeVal(char val){
       {
         {
@@ -2331,23 +2286,6 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(byte val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -4153,22 +4091,6 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
     }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              return this.uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-            }
-            return this.uncheckedremoveVal0(size);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
     @Override public boolean removeVal(char val){
       {
         {
@@ -4405,29 +4327,6 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-        finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(byte val){
-      {
-        final var root=this.root;
-        final int modCount=this.modCount;
-        try
-        {
-          final int size;
-          if((size=this.size)!=0)
-          {
-            if(val!=0){
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           } //end size check
         } //end checked sublist try modcount
         finally{

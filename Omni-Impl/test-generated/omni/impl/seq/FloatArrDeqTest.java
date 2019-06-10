@@ -1,8 +1,6 @@
 package omni.impl.seq;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
-import java.util.Arrays;
-import omni.util.ArrCopy;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.io.IOException;
@@ -34,7 +32,6 @@ import omni.util.HashUtil;
 import omni.impl.seq.AbstractFloatSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
-import omni.api.OmniDeque;
 import omni.util.TestExecutorService;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("ArrDeqTest")

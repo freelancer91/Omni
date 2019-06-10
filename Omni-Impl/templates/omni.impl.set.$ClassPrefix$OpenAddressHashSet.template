@@ -30,6 +30,9 @@ import omni.util.OmniArray;
 #IF OfLong
 import omni.util.TypeUtil;
 #ENDIF
+#IFNOT OfChar
+import omni.util.ToStringUtil;
+#ENDIF
 public class $ClassPrefix$OpenAddressHashSet$<E>$
 #IF OfChar,OfShort,OfInt,OfLong
 extends AbstractIntegralTypeOpenAddressHashSet
@@ -443,7 +446,384 @@ private boolean uncheckedRemoveFromTable(INPUTTYPE val){
 #IF OfLong
   #MACRO UncheckedRemoveFromTable<long>((int)(val^(val>>>32)))
 #ENDIF
-  
+  @Override public boolean removeVal(boolean val){
+    returnFalse:for(;;){
+      returnTrue:for(;;){
+        long word;
+#IF OfChar
+        #MACRO RemoveFromWord(0,((boolean)val)?~2L:~1L)
+#ELSE
+        #MACRO RemoveFromWord(2,((boolean)val)?~2L:~1L)
+#ENDIF
+      }
+      --this.size;
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean removeVal(byte val){
+    returnFalse:for(;;){
+      returnTrue:for(;;){
+        long word;
+#IF OfChar
+        switch(val>>6){
+          case 0:
+            #MACRO RemoveFromWord(0,~(1L<<val))
+          case 1:
+            #MACRO RemoveFromWord(1,~(1L<<val))
+          default:
+            break returnFalse;
+        }
+#ELSE
+        long mask=~(1L<<val);
+        switch(val>>6){
+          case -2:
+            #MACRO RemoveFromWord(0,mask)
+          case -1:
+            #MACRO RemoveFromWord(1,mask)
+          case 0:
+            #MACRO RemoveFromWord(2,mask)
+          default:
+            #MACRO RemoveFromWord(3,mask)
+        }
+#ENDIF
+      }
+      --this.size;
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean removeVal(char val){
+    returnFalse:for(;;){
+      returnTrue:for(;;){
+        long word;
+#IF OfChar
+        switch(val>>6){
+          case 0:
+            #MACRO RemoveFromWord(0,~(1L<<val))
+          case 1:
+            #MACRO RemoveFromWord(1,~(1L<<val))
+          case 2:
+            #MACRO RemoveFromWord(2,~(1L<<val))
+          case 3:
+            #MACRO RemoveFromWord(3,~(1L<<val))
+          default:
+            if(!uncheckedRemoveFromTable(val)){
+              break returnFalse;
+            }
+            break returnTrue;
+        }
+#ELSEIF OfShort
+        switch(val>>6){
+          case 0:
+            #MACRO RemoveFromWord(0,~(1L<<val))
+          case 1:
+            #MACRO RemoveFromWord(1,~(1L<<val))
+          default:
+            if(val>Short.MAX_VALUE || !uncheckedRemoveFromTable(val)){
+              break returnFalse;
+            }
+            break returnTrue;
+        }
+#ELSEIF OfInt,OfLong
+        switch(val>>6){
+          case 0:
+            #MACRO RemoveFromWord(0,~(1L<<val))
+          case 1:
+            #MACRO RemoveFromWord(1,~(1L<<val))
+          default:
+            if(!uncheckedRemoveFromTable(val)){
+              break returnFalse;
+            }
+            break returnTrue;
+        }
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
+      }
+      --this.size;
+      return true;
+    }
+    return false;
+  }
+  @Override public boolean removeVal(int val){
+    int size;
+    if((size=this.size)!=0){
+      returnFalse:for(;;){
+        returnTrue:for(;;){
+          long word;
+          switch(val>>6){
+#IF OfChar
+            case 0:
+              #MACRO RemoveFromWord(0,~(1L<<val))
+            case 1:
+              #MACRO RemoveFromWord(1,~(1L<<val))
+            case 2:
+              #MACRO RemoveFromWord(2,~(1L<<val))
+            case 3:
+              #MACRO RemoveFromWord(3,~(1L<<val))
+            default:
+              if(val>=0 && uncheckedRemoveFromTable(val)){    
+#ELSE
+            case -2:
+              #MACRO RemoveFromWord(0,~(1L<<val))
+            case -1:
+              #MACRO RemoveFromWord(1,~(1L<<val))
+            case 0:
+              #MACRO RemoveFromWord(2,~(1L<<val))
+            case 1:
+              #MACRO RemoveFromWord(3,~(1L<<val))
+            default:
+  #IF OfShort
+              if(val==(short)val && uncheckedRemoveFromTable(val)){
+  #ELSEIF OfInt,OfLong
+              if(uncheckedRemoveFromTable(val)){
+  #ELSE
+ERROR unknown type $ClassPrefix$    
+  #ENDIF
+#ENDIF
+                break returnTrue;
+              }
+              break returnFalse;
+          }
+        }
+        this.size=size-1;
+        return true;
+      }
+    }
+    return false;
+  }
+  @Override public boolean removeVal(long val){
+    int size;
+    if((size=this.size)!=0){
+      returnFalse:for(;;){
+        returnTrue:for(;;){
+#IF OfChar
+          int v;
+          if((v=(char)val)==val){
+            long word;
+            switch(v>>6){
+              case 0:
+                #MACRO RemoveFromWord(0,~(1L<<v))
+              case 1:
+                #MACRO RemoveFromWord(1,~(1L<<v))
+              case 2:
+                #MACRO RemoveFromWord(2,~(1L<<v))
+              case 3:
+              
+#ELSE
+  #IF OfShort
+          int v;
+          if((v=(short)val)==val){
+  #ELSEIF OfInt
+          int v;
+          if((v=(int)val)==val){
+  #ELSEIF OfLong
+          {
+            int v;
+            if((v=(int)val)!=val){
+              if(!uncheckedRemoveFromTable(val)){
+                break returnFalse;
+              }
+              break returnTrue;
+            }
+  #ELSE
+Error unknown type $ClassPrefix$
+  #ENDIF
+            long word;
+            switch(v>>6){
+              case -2:
+                #MACRO RemoveFromWord(0,~(1L<<v))
+              case -1:
+                #MACRO RemoveFromWord(1,~(1L<<v))
+              case 0:
+                #MACRO RemoveFromWord(2,~(1L<<v))
+              case 1:              
+#ENDIF
+                #MACRO RemoveFromWord(3,~(1L<<v))
+              default:
+                if(uncheckedRemoveFromTable(v)){
+                  break returnTrue;
+                }
+            }
+          }
+          break returnFalse;
+        }
+        this.size=size-1;
+        return true;
+      }
+    }
+    return false;
+  }
+  @Override public boolean removeVal(float val){
+    int size;
+    if((size=this.size)!=0){
+      returnFalse:for(;;){
+        returnTrue:for(;;){
+#IF OfChar
+          int v;
+          if((v=(char)val)==val){
+            long word;
+            switch(v>>6){
+              case 0:
+                #MACRO RemoveFromWord(0,~(1L<<v))
+              case 1:
+                #MACRO RemoveFromWord(1,~(1L<<v))
+              case 2:
+                #MACRO RemoveFromWord(2,~(1L<<v))
+              case 3:
+              
+#ELSE
+  #IF OfShort
+          int v;
+          if((v=(short)val)==val){
+  #ELSEIF OfInt
+          int v;
+          if((double)(v=(int)val)==(double)val){
+  #ELSEIF OfLong
+          long l;
+          if(TypeUtil.floatEquals(val,l=(long)val)){
+            int v;
+            if((v=(int)l)!=l){
+              if(!uncheckedRemoveFromTable(l)){
+                break returnFalse;
+              }
+              break returnTrue;
+            }
+  #ELSE
+Error unknown type $ClassPrefix$
+  #ENDIF
+            long word;
+            switch(v>>6){
+              case -2:
+                #MACRO RemoveFromWord(0,~(1L<<v))
+              case -1:
+                #MACRO RemoveFromWord(1,~(1L<<v))
+              case 0:
+                #MACRO RemoveFromWord(2,~(1L<<v))
+              case 1:              
+#ENDIF
+                #MACRO RemoveFromWord(3,~(1L<<v))
+              default:
+                if(uncheckedRemoveFromTable(v)){
+                  break returnTrue;
+                }
+            }
+          }
+          break returnFalse;
+        }
+        this.size=size-1;
+        return true;
+      }
+    }
+    return false;
+  }
+  @Override public boolean removeVal(double val){
+    int size;
+    if((size=this.size)!=0){
+      returnFalse:for(;;){
+        returnTrue:for(;;){
+#IF OfChar
+          int v;
+          if((v=(char)val)==val){
+            long word;
+            switch(v>>6){
+              case 0:
+                #MACRO RemoveFromWord(0,~(1L<<v))
+              case 1:
+                #MACRO RemoveFromWord(1,~(1L<<v))
+              case 2:
+                #MACRO RemoveFromWord(2,~(1L<<v))
+              case 3:
+              
+#ELSE
+  #IF OfShort
+          int v;
+          if((v=(short)val)==val){
+  #ELSEIF OfInt
+          int v;
+          if((v=(int)val)==val){
+  #ELSEIF OfLong
+          long l;
+          if(TypeUtil.doubleEquals(val,l=(long)val)){
+            int v;
+            if((v=(int)l)!=l){
+              if(!uncheckedRemoveFromTable(l)){
+                break returnFalse;
+              }
+              break returnTrue;
+            }
+  #ELSE
+Error unknown type $ClassPrefix$
+  #ENDIF
+            long word;
+            switch(v>>6){
+              case -2:
+                #MACRO RemoveFromWord(0,~(1L<<v))
+              case -1:
+                #MACRO RemoveFromWord(1,~(1L<<v))
+              case 0:
+                #MACRO RemoveFromWord(2,~(1L<<v))
+              case 1:              
+#ENDIF
+                #MACRO RemoveFromWord(3,~(1L<<v))
+              default:
+                if(uncheckedRemoveFromTable(v)){
+                  break returnTrue;
+                }
+            }
+          }
+          break returnFalse;
+        }
+        this.size=size-1;
+        return true;
+      }
+    }
+    return false;
+  }
+#IF OfShort,OfChar
+  @Override public boolean removeVal(short val){
+    int size;
+    if((size=this.size)!=0){
+      returnFalse:for(;;){
+        returnTrue:for(;;){
+          long word;
+          switch(val>>6){
+  #IF OfShort
+            case -2:
+              #MACRO RemoveFromWord(0,~(1L<<val))
+            case -1:
+              #MACRO RemoveFromWord(1,~(1L<<val))
+            case 0:
+              #MACRO RemoveFromWord(2,~(1L<<val))
+            case 1:
+              #MACRO RemoveFromWord(3,~(1L<<val))
+            default:
+              if(uncheckedRemoveFromTable(val)){
+  #ELSE
+            case 0:
+              #MACRO RemoveFromWord(0,~(1L<<val))
+            case 1:
+              #MACRO RemoveFromWord(1,~(1L<<val))
+            case 2:
+              #MACRO RemoveFromWord(2,~(1L<<val))
+            case 3:
+              #MACRO RemoveFromWord(3,~(1L<<val))
+            default:
+              if(val>=0 && uncheckedRemoveFromTable(val)){
+  #ENDIF
+                break returnTrue;
+              }
+              break returnFalse;
+          }
+        }
+        this.size=size-1;
+        return true;
+      }
+    }
+    return false;
+  }
+#ENDIF
   @Override public boolean remove(Object val){
     returnFalse:for(;;){
       int size;
@@ -747,13 +1127,13 @@ private boolean uncheckedRemoveFromTable(INPUTTYPE val){
   public void readExternal(ObjectInput in) throws IOException{
       int size;
       this.size=size=in.readInt();
+      this.loadFactor=0.75f;
       if(size != 0){
           word0=in.readLong();
           word1=in.readLong();
           word2=in.readLong();
           word3=in.readLong();
           tableSize=size=in.readInt();
-          this.loadFactor=0.75f;
           if(size != 0){
               int tableSize;
               maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
@@ -765,6 +1145,8 @@ private boolean uncheckedRemoveFromTable(INPUTTYPE val){
           }else{
               maxTableSize=1;
           }
+      }else{
+        maxTableSize=1;
       }
   }
 #IF OfChar
@@ -783,6 +1165,36 @@ private boolean uncheckedRemoveFromTable(INPUTTYPE val){
       }while(++valOffset != valBound);
       return numLeft | (long)bufferOffset << 32;
   }
+#ELSEIF OfShort,OfInt,OfLong
+  private static long processWordToString(long word,int valOffset,int valBound,byte[] buffer,long magicWord){
+      int bufferOffset=(int)(magicWord >>> 32);
+      int numLeft=(int)magicWord;
+      do{
+          if((word & 1L << valOffset) != 0L){
+              bufferOffset=ToStringUtil.getStringShort(valOffset,buffer,++bufferOffset);
+              if(--numLeft == 0){
+                  break;
+              }
+              buffer[bufferOffset]=',';
+              buffer[++bufferOffset]=' ';
+          }
+      }while(++valOffset != valBound);
+      return numLeft | (long)bufferOffset << 32;
+  }
+  #IF OfInt,OfLong
+  private static int processWordToString(long word,int valOffset,int valBound,ToStringUtil.OmniStringBuilderByte builder,int numLeft){
+      do{
+          if((word & 1L << valOffset) != 0L){
+              builder.uncheckedAppendShort(valOffset);
+              if(--numLeft == 0){
+                  break;
+              }
+              builder.uncheckedAppendCommaAndSpace();
+          }
+      }while(++valOffset != valBound);
+      return numLeft;
+  }
+  #ENDIF
 #ENDIF
   @Override
   public String toString(){
@@ -799,8 +1211,9 @@ private boolean uncheckedRemoveFromTable(INPUTTYPE val){
                           int bufferOffset=(int)(magicWord >>> 32);
                           final var table=this.table;
                           for(int i=0;;++i){
-                              char tableVal;
-                              if((tableVal=table[i]) > 1){
+                              $exposedType$ tableVal;
+                              #MACRO IfIsPresentValue(tableVal=table[i])
+                              {
                                   buffer[++bufferOffset]=tableVal;
                                   if(--size == 0){
                                       break;
@@ -817,12 +1230,115 @@ private boolean uncheckedRemoveFromTable(INPUTTYPE val){
           }
           buffer[size=(int)(magicWord >>> 32) + 1]=']';
           return new String(buffer,0,size + 1);
-#ELSE
-        //TODO toString impl
+#ELSEIF OfShort
+        byte[] buffer;
+        (buffer=new byte[size<<3])[0]='[';
+        long magicWord;
+        if((int)(magicWord=processWordToString(word0,-128,-64,buffer,size)) != 0){
+              if((int)(magicWord=processWordToString(word1,-64,0,buffer,magicWord)) != 0){
+                  if((int)(magicWord=processWordToString(word2,0,64,buffer,magicWord)) != 0){
+                      if((size=(int)(magicWord=processWordToString(word3,64,128,buffer,magicWord))) != 0){
+                          int bufferOffset=(int)(magicWord >>> 32);
+                          final var table=this.table;
+                          for(int i=0;;++i){
+                              $exposedType$ tableVal;
+                              #MACRO IfIsPresentValue(tableVal=table[i])
+                              {
+                                  bufferOffset=ToStringUtil.getStringShort(tableVal,buffer,++bufferOffset);
+                                  if(--size == 0){
+                                      break;
+                                  }
+                                  buffer[bufferOffset]=',';
+                                  buffer[++bufferOffset]=' ';
+                              }
+                          }
+                          buffer[bufferOffset]=']';
+                          return new String(buffer,0,bufferOffset + 1,ToStringUtil.IOS8859CharSet);
+                      }
+                  }
+              }
+          }
+          buffer[size=(int)(magicWord >>> 32) + 1]=']';
+          return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
+#ELSEIF OfInt,OfLong
+  #IF OfInt
+        if(size<=(OmniArray.MAX_ARR_SIZE/13)){
+  #ELSE
+        if(size<=(OmniArray.MAX_ARR_SIZE/22)){
+  #ENDIF
+          return quickToString(size);
+        }else{
+          return massiveToString(size);
+        }
 #ENDIF
       }
       return "[]";
   }
+#IF OfInt,OfLong
+  private String quickToString(int size){
+    byte[] buffer;
+#IF OfInt
+    (buffer=new byte[size*13])[0]='[';
+#ELSE
+    (buffer=new byte[size*22])[0]='[';
+#ENDIF
+    long magicWord;
+    if((int)(magicWord=processWordToString(word0,-128,-64,buffer,size)) != 0){
+      if((int)(magicWord=processWordToString(word1,-64,0,buffer,magicWord)) != 0){
+        if((int)(magicWord=processWordToString(word2,0,64,buffer,magicWord)) != 0){
+          if((size=(int)(magicWord=processWordToString(word3,64,128,buffer,magicWord))) != 0){
+            int bufferOffset=(int)(magicWord >>> 32);
+            final var table=this.table;
+            for(int i=0;;++i){
+              $exposedType$ tableVal;
+              #MACRO IfIsPresentValue(tableVal=table[i])
+              {
+                bufferOffset=ToStringUtil.getString$ClassPrefix$(tableVal,buffer,++bufferOffset);
+                if(--size == 0){
+                  break;
+                }
+                buffer[bufferOffset]=',';
+                buffer[++bufferOffset]=' ';
+              }
+            }
+            buffer[bufferOffset]=']';
+            return new String(buffer,0,bufferOffset + 1,ToStringUtil.IOS8859CharSet);
+          }
+        }
+      }
+    }
+    buffer[size=(int)(magicWord >>> 32) + 1]=']';
+    return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
+  }
+  private String massiveToString(int size){
+    byte[] buffer;
+    ToStringUtil.OmniStringBuilderByte builder;
+    if((size=processWordToString(word0,-128,-64,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]),size)) != 0){
+      if((size=processWordToString(word1,-64,0,builder,size)) != 0){
+        if((size=processWordToString(word2,0,64,builder,size)) != 0){
+          if((size=processWordToString(word3,64,128,builder,size)) != 0){
+            final var table=this.table;
+            for(int i=0;;++i){
+              $exposedType$ tableVal;
+              #MACRO IfIsPresentValue(tableVal=table[i])
+              {
+                builder.uncheckedAppend$ClassPrefix$(tableVal);
+                if(--size == 0){
+                  break;
+                }
+                builder.uncheckedAppendCommaAndSpace();
+              }
+            }
+          }
+        }
+      }
+    }
+    builder.uncheckedAppendChar((byte)']');
+    (buffer=builder.buffer)[0]=(byte)'[';
+    return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
+  }
+#ENDIF
+  
 #MACRODEF WordContains(WORDNUM,MASK)
 return (this.wordWORDNUM & (MASK))!=0;
 #ENDDEF
@@ -830,25 +1346,44 @@ return (this.wordWORDNUM & (MASK))!=0;
   @Override public boolean contains(boolean val){
 #IF OfChar
     #MACRO WordContains(0,val?2L:1L)
-#ELSE
+#ELSEIF OfShort,OfInt,OfLong
     #MACRO WordContains(2,val?2L:1L)
+#ELSE
+ERROR unknown type $ClassPrefix$
 #ENDIF
   }
-#IF OfChar
+
   private boolean uncheckedContainsByte(int val){
+#IF OfChar
     switch(val>>6){
-    case 0:
-      #MACRO WordContains(0,1L<<val)
-    case 1:
-      #MACRO WordContains(1,1L<<val)
-    default:
-      return false;
+      case 0:
+        #MACRO WordContains(0,1L<<val)
+      case 1:
+        #MACRO WordContains(1,1L<<val)
+      default:
+        return false;
     }
+#ELSEIF OfShort,OfInt,OfLong
+    long mask=1L<<val;
+    switch(val>>6){
+      case -2:
+        #MACRO WordContains(0,mask)
+      case -1:
+        #MACRO WordContains(1,mask)
+      case 0:
+        #MACRO WordContains(2,mask)
+      default:
+        #MACRO WordContains(3,mask)
+    }
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
   }
-  @Override public boolean contains(byte val){
-    return uncheckedContainsByte(val);
-  }
+  
+
+
   private boolean uncheckedContainsChar(int val){
+#IF OfChar
     switch(val>>6){
       case 0:
         #MACRO WordContains(0,1L<<val)
@@ -861,31 +1396,151 @@ return (this.wordWORDNUM & (MASK))!=0;
       default:
         return tableContains(val);
     }
+#ELSEIF OfShort
+    switch(val>>6){
+      case 0:
+        #MACRO WordContains(2,1L<<val)
+      case 1:
+        #MACRO WordContains(3,1L<<val)
+      default:
+        return val<Short.MAX_VALUE && tableContains(val);
+    }
+#ELSEIF OfInt,OfLong
+    switch(val>>6){
+      case 0:
+        #MACRO WordContains(2,1L<<val)
+      case 1:
+        #MACRO WordContains(3,1L<<val)
+      default:
+        return tableContains(val);
+    }
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
+  }
+#IF OfShort,OfInt,OfLong
+  private boolean uncheckedContainsInt(int val){
+    switch(val>>6){
+      case -2:
+        #MACRO WordContains(0,1L<<val)
+      case -1:
+        #MACRO WordContains(1,1L<<val)
+      case 0:
+        #MACRO WordContains(2,1L<<val)
+      case 1:
+        #MACRO WordContains(3,1L<<val)
+      default:
+        return tableContains(val);
+    }
+  }
+#ENDIF
+  
+#IF OfShort,OfChar,OfInt,OfLong
+  @Override public boolean contains(byte val){
+    return uncheckedContainsByte(val);
   }
   @Override public boolean contains(char val){
     return uncheckedContainsChar(val);
   }
+#ENDIF
+
   @Override public boolean contains(double val){
+#IF OfChar
     int v;
-    return (v=(char)val)==val && uncheckedContainsChar(v);
+    return size!=0 && (v=(char)val)==val && uncheckedContainsChar(v);
+#ELSEIF OfShort
+    int v;
+    return size!=0 && (v=(short)val)==val && uncheckedContainsInt(v);
+#ELSEIF OfInt
+    int v;
+    return size!=0 && (double)(v=(int)val)==val && uncheckedContainsInt(v);
+#ELSEIF OfLong
+    long l;
+    if(size==0 || !TypeUtil.doubleEquals(val,l=(long)val)){
+      return false;
+    }
+    int v;
+    if((v=(int)l)!=l){
+      return tableContains(l);
+    }
+    return uncheckedContainsInt(v);
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
   }
   @Override public boolean contains(float val){
+#IF OfChar
     int v;
-    return (v=(char)val)==val && uncheckedContainsChar(v);
+    return size!=0 && (v=(char)val)==val && uncheckedContainsChar(v);
+#ELSEIF OfShort
+    int v;
+    return size!=0 && (v=(short)val)==val && uncheckedContainsInt(v);
+#ELSEIF OfInt
+    int v;
+    return size!=0 && (double)(v=(int)val)==(double)val && uncheckedContainsInt(v);
+#ELSEIF OfLong
+    long l;
+    if(size==0 || !TypeUtil.floatEquals(val,l=(long)val)){
+      return false;
+    }
+    int v;
+    if((v=(int)l)!=l){
+      return tableContains(l);
+    }
+    return uncheckedContainsInt(v);
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
   }
   @Override public boolean contains(long val){
+#IF OfChar
     int v;
-    return (v=(char)val)==val && uncheckedContainsChar(v);
-  }
-  @Override public boolean contains(short val){
-    return val>=0 && uncheckedContainsChar(val);
+    return size!=0 && (v=(char)val)==val && uncheckedContainsChar(v);
+#ELSEIF OfShort
+    int v;
+    return size!=0 && (v=(short)val)==val && uncheckedContainsInt(v);
+#ELSEIF OfInt
+    int v;
+    return size!=0 && (v=(int)val)==val && uncheckedContainsInt(v);
+#ELSEIF OfLong
+    if(size==0){
+      return false;
+    }
+    int v;
+    if((v=(int)val)==val){
+      return uncheckedContainsInt(v);
+    }
+    return tableContains(val);
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
   }
   @Override public boolean contains(int val){
+#IF OfChar
     return val==(char)val && uncheckedContainsChar(val);
+#ELSEIF OfShort
+    return val==(short)val && uncheckedContainsInt(val);
+#ELSEIF OfInt,OfLong
+    return uncheckedContainsInt(val);
+#ELSE
+ERROR unknown type $ClassPrefix$    
+#ENDIF
   }
+  
+#IF OfChar,OfShort
+  @Override public boolean contains(short val){
+  #IF OfChar
+    return val>=0 && uncheckedContainsChar(val);
+  #ELSE
+    return uncheckedContainsInt(val);
+  #ENDIF
+  }
+#ENDIF
+
   @Override public boolean contains(Object val){
     if(size!=0){
       returnFalse:for(;;){
+#IF OfChar
         int v;
         if(val instanceof Character){
           v=(char)val;
@@ -920,12 +1575,115 @@ return (this.wordWORDNUM & (MASK))!=0;
           break returnFalse;
         }
         return uncheckedContainsChar(v);
+#ELSEIF OfShort
+        int v;
+        if(val instanceof Short){
+          v=(short)val;
+        }else if(val instanceof Integer){
+          if((v=(int)val)!=(short)v){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          long l;
+          if((l=(long)val)!=(v=(short)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          float f;
+          if((f=(float)val)!=(v=(short)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          double d;
+          if((d=(double)val)!=(v=(short)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Byte){
+          return uncheckedContainsByte((byte)val);
+        }else if(val instanceof Character){
+          return uncheckedContainsChar((char)val);
+        }else if(val instanceof Boolean){
+          #MACRO WordContains(2,((boolean)val)?2L:1L)
+        }else{
+          break returnFalse;
+        }
+        return uncheckedContainsInt(v);
+#ELSEIF OfInt
+        int v;
+        if(val instanceof Integer || val instanceof Short){
+          v=((Number)val).intValue();
+        }else if(val instanceof Long){
+          long l;
+          if((l=(long)val)!=(v=(int)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          float f;
+          if((double)(f=(float)val)!=(double)(v=(int)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          double d;
+          if((d=(double)val)!=(v=(int)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Byte){
+          return uncheckedContainsByte((byte)val);
+        }else if(val instanceof Character){
+          return uncheckedContainsChar((char)val);
+        }else if(val instanceof Boolean){
+          #MACRO WordContains(2,((boolean)val)?2L:1L)
+        }else{
+          break returnFalse;
+        }
+        return uncheckedContainsInt(v);
+#ELSEIF OfLong
+        int v;
+        containsInt:for(;;){
+          long l;
+          if(val instanceof Long){
+            if((l=(long)val)==(v=(int)l)){
+              break containsInt;
+            }
+          }else if(val instanceof Integer || val instanceof Short){
+            v=((Number)val).intValue();
+            break containsInt;
+          }else if(val instanceof Float){
+            float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+            if((v=(int)l)==l){
+              break containsInt;
+            }
+          }else if(val instanceof Double){
+            double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+            if((v=(int)l)==l){
+              break containsInt;
+            }
+          }else if(val instanceof Byte){
+            return uncheckedContainsByte((byte)val);
+          }else if(val instanceof Character){
+            return uncheckedContainsChar((char)val);
+          }else if(val instanceof Boolean){
+            #MACRO WordContains(2,((boolean)val)?2L:1L)
+          }else{
+            break returnFalse;
+          }
+          return tableContains(l);
+        }
+        return uncheckedContainsInt(v);
+#ELSE
+ERROR unknown type $ClassPrefix$
+#ENDIF
       }
     }
-    
     return false;
   }
-#ENDIF
+
 
 #MACRODEF TableContains<INPUTTYPE>(HASHFUNCTION)
 private boolean tableContains(INPUTTYPE val){
@@ -964,9 +1722,980 @@ private boolean tableContains(INPUTTYPE val){
 #IF OfLong
   #MACRO TableContains<long>((int)(val^(val>>>32)))
 #ENDIF
-
-  
-
+  private static $<E>$ int processWordForEach(long word,int valOffset,int valBound,$TypeNameModifier$Consumer$<? super E>$ action,int numLeft){
+    do{
+      if((word & 1L << valOffset) != 0L){
+        action.accept(($exposedType$)valOffset);
+        if(--numLeft == 0){
+          break;
+        }
+      }
+    }while(++valOffset != valBound);
+    return numLeft;
+  }
+  private void forEachHelper(int size,$TypeNameModifier$Consumer$<? super E>$ action){
+#IF OfChar
+      if((size=processWordForEach(word0,0,64,action,size)) != 0){
+          if((size=processWordForEach(word1,64,128,action,size)) != 0){
+              if((size=processWordForEach(word2,128,192,action,size)) != 0){
+                  if((size=processWordForEach(word3,192,256,action,size)) != 0){
+#ELSE
+      if((size=processWordForEach(word0,-128,-64,action,size)) != 0){
+          if((size=processWordForEach(word1,-64,0,action,size)) != 0){
+              if((size=processWordForEach(word2,0,64,action,size)) != 0){
+                  if((size=processWordForEach(word3,64,128,action,size)) != 0){
+#ENDIF
+                      final var table=this.table;
+                      for(int i=0;;++i){
+                          $exposedType$ tableVal;
+                          #MACRO IfIsPresentValue(tableVal=table[i])
+                          {
+                              action.accept(tableVal);
+                              if(--size == 0){
+                                  break;
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  #MACRO ForEach($TypeNameModifier$Consumer$<? super E>$,action)
+  #MACRO ForEach(Consumer<? super $BoxedType$>,action::accept)
+#MACRODEF ForEach(CONSUMER,ACTION)
+@Override public void forEach(CONSUMER action){
+  int size;
+  if((size=this.size)!=0){
+    forEachHelper(size,ACTION);
+  }
+}
+#ENDDEF
+#MACRODEF ToArrayHelper(ARRTYPE,CAST)
+private static int wordCopy(long word,int valOffset,int valBound,ARRTYPE[] dst,int dstOffset,int dstBound){
+  do{
+      if((word & 1L << valOffset) != 0L){
+          dst[dstOffset]=CAST(valBound);
+          if(++dstOffset == dstBound){
+              break;
+          }
+      }
+  }while(++valOffset != valBound);
+  return dstOffset;  
+}
+private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
+    int offset;
+#IF OfChar
+    if((offset=wordCopy(word0,0,64,dst,0,size)) != size){
+        if((offset=wordCopy(word1,64,128,dst,offset,size)) != size){
+            if((offset=wordCopy(word2,128,192,dst,offset,size)) != size){
+                if((offset=wordCopy(word3,192,256,dst,offset,size)) != size){
+#ELSE
+    if((offset=wordCopy(word0,-128,-64,dst,0,size)) != size){
+        if((offset=wordCopy(word1,-64,0,dst,offset,size)) != size){
+            if((offset=wordCopy(word2,0,64,dst,offset,size)) != size){
+                if((offset=wordCopy(word3,64,128,dst,offset,size)) != size){
+#ENDIF
+                    final $ArrayType$[] table=this.table;
+                    for(int i=0;;++i){
+                        $ArrayType$ tableVal;
+                        #MACRO IfIsPresentValue(tableVal=table[i])
+                        {
+                            dst[offset]=CAST(tableVal);
+                            if(++offset == size){
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+#ENDDEF
+#MACRODEF ToArray(RETTYPE,DEFAULTARR,MODIFIER)
+@Override public RETTYPE[] toMODIFIERArray(){
+    int size;
+    if((size=this.size) != 0){
+        RETTYPE[] dst;
+        uncheckedCopyIntoArray(size,dst=new RETTYPE[size]);
+        return dst;
+    }
+    return DEFAULTARR;
+}
+#ENDDEF
+  #MACRO ToArrayHelper(Object,($exposedType$))
+  #MACRO ToArray($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
+  #MACRO ToArray($exposedType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
+  #MACRO ToArray(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
+  #MACRO ToArray(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
+  #MACRO ToArrayHelper($exposedType$,($exposedType$))
+  #MACRO ToArrayHelper($BoxedType$,($BoxedType$)($exposedType$))
+  #MACRO ToArrayHelper(double,(double))
+  #MACRO ToArrayHelper(float,(float))
+#IFNOT OfLong
+  #MACRO ToArrayHelper(long,(long))
+  #MACRO ToArray(long,OmniArray.OfLong.DEFAULT_ARR,Long)
+  #IFNOT OfInt
+  #MACRO ToArrayHelper(int,(int))
+  #MACRO ToArray(int,OmniArray.OfInt.DEFAULT_ARR,Int)
+  #ENDIF
+#ENDIF
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int size;
+    final T[] arr=arrConstructor.apply(size=this.size);
+    if(size != 0){
+        uncheckedCopyIntoArray(size,arr);
+    }
+    return arr;
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int size;
+    if((size=this.size) != 0){
+        uncheckedCopyIntoArray(size,dst=OmniArray.uncheckedArrResize(size,dst));
+    }else if(dst.length != 0){
+        dst[0]=null;
+    }
+    return dst;
+  }
+  @Override public OmniIterator.Of$ClassPrefix$$<E>$ iterator(){
+    return new Itr(this);
+  }
+  private static class Itr extends Abstract$ClassPrefix$Itr{
+      private static $<E>$ void forEachRemainingWordHelper(long word,int valOffset,$TypeNameModifier$Consumer$<? super E>$ action){
+          for(long marker=1L << valOffset;;++valOffset){
+              if((word & marker) != 0){
+                  action.accept(($exposedType$)valOffset);
+              }
+              if((marker<<=1) == 0){
+                  break;
+              }
+          }
+      }
+      private final $ClassPrefix$OpenAddressHashSet root;
+      private int valOffset;
+      Itr($ClassPrefix$OpenAddressHashSet root){
+          this.root=root;
+          if(root.size != 0){
+              int i;
+              if((i=Long.numberOfTrailingZeros(root.word0)) != 64){
+                  valOffset=i;
+              }else if((i=Long.numberOfTrailingZeros(root.word1)) != 64){
+                  valOffset=i + 64;
+              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+                  valOffset=i + 128;
+              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+                  valOffset=i + 192;
+              }else{
+                  final $ArrayType$[] table=root.table;
+                  for(i=0;;++i){
+                      #MACRO IfIsPresentValue(table[i])
+                      {
+                          valOffset=256 + i;
+                          return;
+                      }
+                  }
+              }
+          }else{
+              valOffset=-1;
+          }
+      }
+      @Override
+      public void forEachRemaining($TypeNameModifier$Consumer action){
+          int valOffset;
+          if((valOffset=this.valOffset) < 256){
+#IF OfChar
+              forEachRemainingFromWords(valOffset,action);
+#ELSE
+              forEachRemainingFromWords(valOffset - 128,action);
+#ENDIF
+          }else{
+              forEachRemainingFromTable(valOffset - 256,action);
+          }
+      }
+      @Override
+      public void forEachRemaining(Consumer<? super $BoxedType$> action){
+          int valOffset;
+          if((valOffset=this.valOffset) < 256){
+#IF OfChar
+              forEachRemainingFromWords(valOffset,action::accept);
+#ELSE
+              forEachRemainingFromWords(valOffset - 128,action::accept);
+#ENDIF
+          }else{
+              forEachRemainingFromTable(valOffset - 256,action::accept);
+          }
+      }
+      @Override
+      public boolean hasNext(){
+          return valOffset != -1;
+      }
+      @Override
+      public $exposedType$ next$TypeNameModifier$(){
+          int valOffset;
+          if((valOffset=this.valOffset) < 256){
+#IF OfChar
+              return getNextFromWords(valOffset);
+#ELSE
+              return getNextFromWords(valOffset - 128);
+#ENDIF
+          }else{
+              return getNextFromTable(valOffset - 256);
+          }
+      }
+      @Override
+      public void remove(){
+          $ClassPrefix$OpenAddressHashSet root;
+          long word;
+          int valOffset;
+          --(root=this.root).size;
+          switch((valOffset=this.valOffset) - 1 >> 6){
+          default:
+              $ArrayType$[] table;
+              if((table=root.table) != null){
+                  if(valOffset == -1){
+                      valOffset=table.length;
+                  }else{
+                      valOffset-=256;
+                  }
+                  for(;;){
+                      #MACRO IfIsPresentValue(table[--valOffset])
+                      {
+                          table[valOffset]=1;
+                          --root.tableSize;
+                          return;
+                      }
+                      if(valOffset == 0){
+                          break;
+                      }
+                  }
+              }else{
+                  valOffset=0;
+              }
+          case 3:
+              if((valOffset=Long.numberOfLeadingZeros((word=root.word3) << -valOffset)) != 64){
+                  root.word3=word & ~(1L << -1 - valOffset);
+                  return;
+              }
+              valOffset=0;
+          case 2:
+              if((valOffset=Long.numberOfLeadingZeros((word=root.word2) << -valOffset)) != 64){
+                  root.word2=word & ~(1L << -1 - valOffset);
+                  return;
+              }
+              valOffset=0;
+          case 1:
+              if((valOffset=Long.numberOfLeadingZeros((word=root.word1) << -valOffset)) != 64){
+                  root.word1=word & ~(1L << -1 - valOffset);
+                  return;
+              }
+              valOffset=0;
+          case 0:
+              root.word0=(word=root.word0) & ~(1L << -1 - Long.numberOfLeadingZeros(word << -valOffset));
+          }
+      }
+      private void forEachRemainingFromTable(int valOffset,$TypeNameModifier$Consumer action){
+          $ArrayType$[] table;
+          for(final int tableLength=(table=root.table).length;;){
+              $ArrayType$ tableVal;
+              #MACRO IfIsPresentValue(tableVal=table[valOffset])
+              {
+                  action.accept(tableVal);
+              }
+              if(++valOffset == tableLength){
+                  this.valOffset=-1;
+                  return;
+              }
+          }
+      }
+      private void forEachRemainingFromWords(int valOffset,$TypeNameModifier$Consumer action){
+          final var root=this.root;
+          switch(valOffset >> 6){
+#IF OfChar
+          case 0:
+              forEachRemainingWordHelper(root.word0,valOffset,action);
+              valOffset=64;
+          case 1:
+              forEachRemainingWordHelper(root.word1,valOffset,action);
+              valOffset=128;
+          case 2:
+              forEachRemainingWordHelper(root.word2,valOffset,action);
+              valOffset=192;
+          case 3:
+#ELSE
+          case -2:
+              forEachRemainingWordHelper(root.word0,valOffset,action);
+              valOffset=-64;
+          case -1:
+              forEachRemainingWordHelper(root.word1,valOffset,action);
+              valOffset=0;
+          case 0:
+              forEachRemainingWordHelper(root.word2,valOffset,action);
+              valOffset=64;
+          case 1:
+#ENDIF
+              forEachRemainingWordHelper(root.word3,valOffset,action);
+              int tableSize;
+              if((tableSize=root.tableSize) != 0){
+                  final var table=root.table;
+                  for(valOffset=0;;++valOffset){
+                      $exposedType$ tableVal;
+                      #MACRO IfIsPresentValue(tableVal=table[valOffset])
+                      {
+                          action.accept(tableVal);
+                          if(--tableSize == 0){
+                              break;
+                          }
+                      }
+                  }
+              }
+              this.valOffset=-1;
+          default:
+              return;
+          }
+      }
+      private $exposedType$ getNextFromTable(int valOffset){
+          $ArrayType$[] table;
+          final var ret=($exposedType$)(table=root.table)[valOffset];
+          for(final int tableLength=table.length;;){
+              #MACRO IfIsPresentValue(table[valOffset])
+              {
+                  this.valOffset=valOffset + 256;
+                  break;
+              }
+              if(++valOffset == tableLength){
+                  this.valOffset=-1;
+                  break;
+              }
+          }
+          return ret;
+      }
+      private $exposedType$ getNextFromWords(int valOffset){
+          final var ret=($exposedType$)valOffset;
+            returnVal:for(;;){
+                final var root=this.root;
+                switch(++valOffset >> 6){
+#IF OfChar
+                case 0:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
+                        this.valOffset=valOffset;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                case 1:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
+                        this.valOffset=valOffset + 64;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                case 2:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
+                        this.valOffset=valOffset + 128;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                case 3:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word3 >>> valOffset)) != 64){
+                        this.valOffset=valOffset + 192;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                    break;
+                default:
+                    valOffset-=256;
+#ELSE
+                case -2:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
+                        this.valOffset=valOffset;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                case -1:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
+                        this.valOffset=valOffset + 64;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                case 0:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
+                        this.valOffset=valOffset + 128;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                case 1:
+                    if((valOffset=Long.numberOfTrailingZeros(root.word3 >>> valOffset)) != 64){
+                        this.valOffset=valOffset + 192;
+                        break returnVal;
+                    }
+                    valOffset=0;
+                    break;
+                default:
+                    valOffset-=128;
+#ENDIF
+                }
+                if(root.tableSize != 0){
+                    final var table=root.table;
+                    for(;;++valOffset){
+                        #MACRO IfIsPresentValue(table[valOffset])
+                        {
+                            this.valOffset=valOffset + 256;
+                            break returnVal;
+                        }
+                    }
+                }else{
+                    this.valOffset=-1;
+                }
+                break returnVal;
+            }
+            return ret;
+      }
+  }
+  public static class Checked extends $ClassPrefix$OpenAddressHashSet{
+    transient int modCount;
+    Checked(){
+      super();
+    }
+    Checked($ClassPrefix$OpenAddressHashSet that){
+      super(that);
+    }
+    Checked(int initialCapacity){
+      super(initialCapacity);
+    }
+    @Override public boolean add(boolean val){
+      if(super.add(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#IFNOT OfChar
+    @Override public boolean add(byte val){
+      if(super.add(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+#IF OfLong
+    @Override public boolean add(long val){
+      if(super.add(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+#IF OfInt,OfLong
+    @Override public boolean add(int val){
+      if(super.add(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+#IF OfShort
+    @Override public boolean add(short val){
+      if(super.add(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+#IFNOT OfShort
+    @Override public boolean add(char val){
+      if(super.add(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override public void clear(){
+      if(size != 0){
+          ++modCount;
+          if(tableSize != 0){
+              super.clearTable();
+              tableSize=0;
+          }
+          word0=0;
+          word1=0;
+          word2=0;
+          word3=0;
+          size=0;
+      }
+    }
+    @Override public Object clone(){
+      return new Checked(this);
+    }
+    @Override public boolean equals(Object val){
+      //TODO
+      return false;
+    }
+    @Override public void forEach($TypeNameModifier$Consumer action){
+      int size;
+      if((size=this.size) != 0){
+        final int modCount=this.modCount;
+        try{
+          super.forEachHelper(size,action);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override public void forEach(Consumer<? super $BoxedType$> action){
+      int size;
+      if((size=this.size) != 0){
+        final int modCount=this.modCount;
+        try{
+          super.forEachHelper(size,action::accept);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override public OmniIterator.Of$ClassPrefix$ iterator(){
+      return new CheckedItr(this);
+    }
+    @Override public boolean remove(Object val){
+      if(super.remove(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(boolean val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(byte val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(char val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#IF OfShort,OfChar
+    @Override public boolean removeVal(short val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+#ENDIF
+    @Override public boolean removeVal(int val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(long val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(float val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public boolean removeVal(double val){
+      if(super.removeVal(val)){
+        ++modCount;
+        return true;
+      }
+      return false;
+    }
+    @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+      return super.toArray((arrSize)->{
+        final int modCount=this.modCount;
+        try{
+          return arrConstructor.apply(arrSize);
+        }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      });
+    }
+    @Override public void writeExternal(ObjectOutput out) throws IOException{
+      final int modCount=this.modCount;
+      try{
+        super.writeExternal(out);
+      }finally{
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    @Override boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate filter){
+      long word0;
+      long word1;
+      long word2;
+      long word3;
+      int[] tableIndicesRemoved=null;
+      int numRemovedFromTable=0;
+      int tableSize;
+      final int modCount=this.modCount;
+      int numRemoved;
+      $ArrayType$[] table=null;
+      try{
+#IF OfChar
+          numRemoved=Long.bitCount((word0=this.word0) ^ (word0=wordRemoveIf(word0,0,filter)))
+                  + Long.bitCount((word1=this.word1) ^ (word1=wordRemoveIf(word1,64,filter)))
+                  + Long.bitCount((word2=this.word2) ^ (word2=wordRemoveIf(word2,128,filter)))
+                  + Long.bitCount((word3=this.word3) ^ (word3=wordRemoveIf(word3,192,filter)));
+#ELSE
+          numRemoved=Long.bitCount((word0=this.word0) ^ (word0=wordRemoveIf(word0,-128,filter)))
+                  + Long.bitCount((word1=this.word1) ^ (word1=wordRemoveIf(word1,-64,filter)))
+                  + Long.bitCount((word2=this.word2) ^ (word2=wordRemoveIf(word2,0,filter)))
+                  + Long.bitCount((word3=this.word3) ^ (word3=wordRemoveIf(word3,64,filter)));
+#ENDIF
+          if((tableSize=this.tableSize) != 0){
+              tableIndicesRemoved=new int[tableSize];
+              for(int i=(table=this.table).length;;){
+                  $exposedType$ tableVal;
+                  #MACRO IfIsPresentValue(tableVal=table[--i])
+                  {
+                      if(filter.test(tableVal)){
+                          tableIndicesRemoved[numRemovedFromTable++]=i;
+                          ++numRemoved;
+                      }
+                      if(--tableSize == 0){
+                          break;
+                      }
+                  }
+              }
+          }
+      }finally{
+          CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+      if(numRemoved != 0){
+          this.modCount=modCount + 1;
+          this.size=size - numRemoved;
+          this.word0=word0;
+          this.word1=word1;
+          this.word2=word2;
+          this.word3=word3;
+          if(numRemovedFromTable != 0){
+              this.tableSize=tableSize - numRemovedFromTable;
+              do{
+                  table[tableIndicesRemoved[--numRemovedFromTable]]=1;
+              }while(numRemovedFromTable != 0);
+          }
+      }
+      return false;
+    }
+    private static class CheckedItr extends Abstract$ClassPrefix$Itr{
+      private static int forEachRemainingWordHelper(long word,int valOffset,int lastRet,$TypeNameModifier$Consumer action){
+          for(long marker=1L << valOffset;;++valOffset){
+              if((word & marker) != 0){
+                  action.accept(($exposedType$)valOffset);
+                  lastRet=valOffset;
+              }
+              if((marker<<=1) == 0){
+                  return lastRet;
+              }
+          }
+      }
+      private final Checked root;
+      private int valOffset;
+      private int modCount;
+      private int lastRet;
+      CheckedItr(Checked root){
+          modCount=root.modCount;
+          this.root=root;
+          if(root.size != 0){
+              int i;
+              if((i=Long.numberOfTrailingZeros(root.word0)) != 64){
+                  valOffset=i;
+              }else if((i=Long.numberOfTrailingZeros(root.word1)) != 64){
+                  valOffset=i + 64;
+              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+                  valOffset=i + 128;
+              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+                  valOffset=i + 192;
+              }else{
+                  final var table=root.table;
+                  for(i=0;;++i){
+                      if(table[i] > 1){
+                          valOffset=256 + i;
+                          return;
+                      }
+                  }
+              }
+          }else{
+              valOffset=-1;
+          }
+          lastRet=-1;
+      }
+      @Override
+      public void forEachRemaining($TypeNameModifier$Consumer action){
+          int valOffset;
+          if((valOffset=this.valOffset) != -1){
+              if(valOffset < 256){
+#IF OfChar
+                  forEachRemainingFromWords(valOffset,action);
+#ELSE
+                  forEachRemainingFromWords(valOffset - 128,action);
+#ENDIF
+              }else{
+                  forEachRemainingFromTable(valOffset - 256,action);
+              }
+          }
+      }
+      @Override
+      public void forEachRemaining(Consumer<? super $BoxedType$> action){
+          int valOffset;
+          if((valOffset=this.valOffset) != -1){
+              if(valOffset < 256){
+#IF OfChar
+                  forEachRemainingFromWords(valOffset,action::accept);
+#ELSE
+                  forEachRemainingFromWords(valOffset - 128,action::accept);
+#ENDIF
+              }else{
+                  forEachRemainingFromTable(valOffset - 256,action::accept);
+              }
+          }
+      }
+      @Override
+      public boolean hasNext(){
+          return valOffset != -1;
+      }
+      @Override
+      public $exposedType$ next$TypeNameModifier$(){
+          Checked root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          int valOffset;
+          if((valOffset=this.valOffset) != -1){
+              lastRet=valOffset;
+              if(valOffset < 256){
+#IF OfChar
+                  return getNextFromWords(root,valOffset);
+#ELSE
+                  return getNextFromWords(root,valOffset - 128);
+#ENDIF
+              }else{
+                  return getNextFromTable(root,valOffset - 256);
+              }
+          }
+          throw new NoSuchElementException();
+      }
+      @Override
+      public void remove(){
+          int lastRet;
+          if((lastRet=this.lastRet) != -1){
+              int modCount;
+              Checked root;
+              CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+              root.modCount=++modCount;
+              this.modCount=modCount;
+              --root.size;
+              switch(lastRet >> 6){
+              case 0:
+                  root.word0&=~(1L << lastRet);
+                  break;
+              case 1:
+                  root.word1&=~(1L << lastRet);
+                  break;
+              case 2:
+                  root.word2&=~(1L << lastRet);
+                  break;
+              case 3:
+                  root.word3&=~(1L << lastRet);
+                  break;
+              default:
+                  root.table[lastRet - 256]=1;
+                  --root.tableSize;
+              }
+              this.lastRet=-1;
+          }
+      }
+      private void forEachRemainingFromTable(int valOffset,$TypeNameModifier$Consumer action){
+          final int modCount=this.modCount;
+          final var root=this.root;
+          int lastRet=this.lastRet;
+          try{
+              $ArrayType$[] table;
+              for(final int tableLength=(table=root.table).length;;){
+                  $exposedType$ tableVal;
+                  #MACRO IfIsPresentValue(tableVal=table[valOffset])
+                  {
+                      action.accept(tableVal);
+                      lastRet=valOffset + 256;
+                  }
+                  if(++valOffset == tableLength){
+                      break;
+                  }
+              }
+          }finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+          }
+          this.valOffset=-1;
+          this.lastRet=lastRet;
+      }
+      private void forEachRemainingFromWords(int valOffset,$TypeNameModifier$Consumer action){
+          final var root=this.root;
+          final int modCount=this.modCount;
+          int lastRet=this.lastRet;
+          try{
+              switch(valOffset >> 6){
+#IF OfChar
+              case 0:
+                  lastRet=forEachRemainingWordHelper(root.word0,valOffset,lastRet,action);
+                  valOffset=64;
+              case 1:
+                  lastRet=forEachRemainingWordHelper(root.word1,valOffset,lastRet,action);
+                  valOffset=128;
+              case 2:
+                  lastRet=forEachRemainingWordHelper(root.word2,valOffset,lastRet,action);
+                  valOffset=192;
+#ELSE
+              case -2:
+                  lastRet=forEachRemainingWordHelper(root.word0,valOffset,lastRet,action);
+                  valOffset=-64;
+              case -1:
+                  lastRet=forEachRemainingWordHelper(root.word1,valOffset,lastRet,action);
+                  valOffset=0;
+              case 0:
+                  lastRet=forEachRemainingWordHelper(root.word2,valOffset,lastRet,action);
+                  valOffset=64;
+#ENDIF
+              default:
+                  lastRet=forEachRemainingWordHelper(root.word3,valOffset,lastRet,action);
+                  int tableSize;
+                  if((tableSize=root.tableSize) != 0){
+                      final var table=root.table;
+                      for(valOffset=0;;++valOffset){
+                          $exposedType$ tableVal;
+                          #MACRO IfIsPresentValue(tableVal=table[valOffset])
+                          {
+                              action.accept(tableVal);
+                              lastRet=valOffset + 256;
+                              if(--tableSize == 0){
+                                  break;
+                              }
+                          }
+                      }
+                  }
+              }
+          }finally{
+              CheckedCollection.checkModCount(modCount,root.modCount);
+          }
+          this.lastRet=lastRet;
+          this.valOffset=-1;
+      }
+      private $exposedType$ getNextFromTable(Checked root,int valOffset){
+          $ArrayType$[] table;
+          final var ret=($exposedType$)(table=root.table)[valOffset];
+          for(final int tableLength=table.length;;){
+              #MACRO IfIsPresentValue(table[valOffset])
+              {
+                  this.valOffset=valOffset + 256;
+                  break;
+              }
+              if(++valOffset == tableLength){
+                  this.valOffset=-1;
+                  break;
+              }
+          }
+          return ret;
+      }
+      private $exposedType$ getNextFromWords(Checked root,int valOffset){
+          final var ret=($exposedType$)valOffset;
+          returnVal:for(;;){
+              switch(++valOffset >> 6){
+#IF OfChar
+              case 0:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
+                      this.valOffset=valOffset;
+                      break returnVal;
+                  }
+                  valOffset=0;
+              case 1:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
+                      this.valOffset=valOffset + 64;
+                      break returnVal;
+                  }
+                  valOffset=0;
+              case 2:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
+                      this.valOffset=valOffset + 128;
+                      break returnVal;
+                  }
+                  valOffset=0;
+              case 3:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word3 >>> valOffset)) != 64){
+                      this.valOffset=valOffset + 192;
+                      break returnVal;
+                  }
+                  valOffset=0;
+                  break;
+              default:
+                  valOffset-=256;
+#ELSE
+              case -2:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
+                      this.valOffset=valOffset;
+                      break returnVal;
+                  }
+                  valOffset=0;
+              case -1:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
+                      this.valOffset=valOffset + 64;
+                      break returnVal;
+                  }
+                  valOffset=0;
+              case 0:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
+                      this.valOffset=valOffset + 128;
+                      break returnVal;
+                  }
+                  valOffset=0;
+              case 1:
+                  if((valOffset=Long.numberOfTrailingZeros(root.word3 >>> valOffset)) != 64){
+                      this.valOffset=valOffset + 192;
+                      break returnVal;
+                  }
+                  valOffset=0;
+                  break;
+              default:
+                  valOffset-=128;
+#ENDIF
+              }
+              if(root.tableSize != 0){
+                  final var table=root.table;
+                  for(;;++valOffset){
+                      #MACRO IfIsPresentValue(table[valOffset])
+                      {
+                          this.valOffset=valOffset + 256;
+                          break returnVal;
+                      }
+                  }
+              }else{
+                  this.valOffset=-1;
+              }
+              break returnVal;
+          }
+          return ret;
+      }
+    }
+  }
 }
 #MACRODEF IfIsPresentValue(TABLEVAL)
 if(((TABLEVAL)&-2)!=0)

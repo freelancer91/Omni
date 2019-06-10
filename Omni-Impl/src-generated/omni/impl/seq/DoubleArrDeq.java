@@ -237,45 +237,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
     return false;
   }
-  @Override public boolean contains(byte val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedcontainsBits(tail,Double.doubleToRawLongBits(val));
-        }
-        return uncheckedcontains0(tail);
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(char val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedcontainsBits(tail,Double.doubleToRawLongBits(val));
-        }
-        return uncheckedcontains0(tail);
-      }
-    }
-    return false;
-  }
-  @Override public boolean contains(short val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedcontainsBits(tail,Double.doubleToRawLongBits(val));
-        }
-        return uncheckedcontains0(tail);
-      }
-    }
-    return false;
-  }
   @Override public boolean removeVal(boolean val)
   {
     {
@@ -396,45 +357,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
             break returnFalse;
           }
         }
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(byte val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedremoveValBits(tail,Double.doubleToRawLongBits(val));
-        }
-        return uncheckedremoveVal0(tail);
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(char val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedremoveValBits(tail,Double.doubleToRawLongBits(val));
-        }
-        return uncheckedremoveVal0(tail);
-      }
-    }
-    return false;
-  }
-  @Override public boolean removeVal(short val)
-  {
-    {
-      int tail;
-      if((tail=this.tail)!=-1){
-        if(val!=0){
-          return uncheckedremoveValBits(tail,Double.doubleToRawLongBits(val));
-        }
-        return uncheckedremoveVal0(tail);
       }
     }
     return false;

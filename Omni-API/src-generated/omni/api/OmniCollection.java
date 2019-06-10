@@ -32,13 +32,16 @@ public abstract interface OmniCollection extends Cloneable
   public abstract boolean contains(float val);
   public abstract boolean contains(double val);
   public abstract boolean contains(Boolean val);
-  public abstract boolean contains(Byte val);
-  public abstract boolean contains(Character val);
-  public abstract boolean contains(Short val);
   public abstract boolean contains(Integer val);
   public abstract boolean contains(Long val);
   public abstract boolean contains(Float val);
   public abstract boolean contains(Double val);
+  public abstract boolean contains(Byte val);
+  public abstract boolean contains(Character val);
+  public abstract boolean contains(Short val);
+  public abstract boolean removeVal(Byte val);
+  public abstract boolean removeVal(Character val);
+  public abstract boolean removeVal(Short val);
   public abstract boolean remove(Object val);
   public abstract boolean removeVal(boolean val);
   public abstract boolean removeVal(byte val);
@@ -49,9 +52,6 @@ public abstract interface OmniCollection extends Cloneable
   public abstract boolean removeVal(float val);
   public abstract boolean removeVal(double val);
   public abstract boolean removeVal(Boolean val);
-  public abstract boolean removeVal(Byte val);
-  public abstract boolean removeVal(Character val);
-  public abstract boolean removeVal(Short val);
   public abstract boolean removeVal(Integer val);
   public abstract boolean removeVal(Long val);
   public abstract boolean removeVal(Float val);
@@ -68,119 +68,119 @@ public abstract interface OmniCollection extends Cloneable
     @Override
     public default boolean contains(Boolean val)
     {
-      return val!=null && contains(val.
-        booleanValue
-          ());
-    }
-    @Override
-    public default boolean contains(Byte val)
-    {
-      return val!=null && contains(val.
-        byteValue
-          ());
-    }
-    @Override
-    public default boolean contains(Character val)
-    {
-      return val!=null && contains(val.
-        charValue
-          ());
-    }
-    @Override
-    public default boolean contains(Short val)
-    {
-      return val!=null && contains(val.
-        shortValue
-          ());
+      return val!=null && contains(
+        val.booleanValue()
+      );
     }
     @Override
     public default boolean contains(Integer val)
     {
-      return val!=null && contains(val.
-        intValue
-          ());
+      return val!=null && contains(
+        val.intValue()
+      );
     }
     @Override
     public default boolean contains(Long val)
     {
-      return val!=null && contains(val.
-        longValue
-          ());
+      return val!=null && contains(
+        val.longValue()
+      );
     }
     @Override
     public default boolean contains(Float val)
     {
-      return val!=null && contains(val.
-        floatValue
-          ());
+      return val!=null && contains(
+        val.floatValue()
+      );
     }
     @Override
     public default boolean contains(Double val)
     {
-      return val!=null && contains(val.
-        doubleValue
-          ());
+      return val!=null && contains(
+        val.doubleValue()
+      );
     }
     @Override
     public default boolean removeVal(Boolean val)
     {
-      return val!=null && removeVal(val.
-        booleanValue
-          ());
-    }
-    @Override
-    public default boolean removeVal(Byte val)
-    {
-      return val!=null && removeVal(val.
-        byteValue
-          ());
-    }
-    @Override
-    public default boolean removeVal(Character val)
-    {
-      return val!=null && removeVal(val.
-        charValue
-          ());
-    }
-    @Override
-    public default boolean removeVal(Short val)
-    {
-      return val!=null && removeVal(val.
-        shortValue
-          ());
+      return val!=null && removeVal(
+        val.booleanValue()
+      );
     }
     @Override
     public default boolean removeVal(Integer val)
     {
-      return val!=null && removeVal(val.
-        intValue
-          ());
+      return val!=null && removeVal(
+        val.intValue()
+      );
     }
     @Override
     public default boolean removeVal(Long val)
     {
-      return val!=null && removeVal(val.
-        longValue
-          ());
+      return val!=null && removeVal(
+        val.longValue()
+      );
     }
     @Override
     public default boolean removeVal(Float val)
     {
-      return val!=null && removeVal(val.
-        floatValue
-          ());
+      return val!=null && removeVal(
+        val.floatValue()
+      );
     }
     @Override
     public default boolean removeVal(Double val)
     {
-      return val!=null && removeVal(val.
-        doubleValue
-          ());
+      return val!=null && removeVal(
+        val.doubleValue()
+      );
     }
   }
   public abstract interface OfBoolean extends OfPrimitive,Iterable<Boolean>
   ,BooleanInput,ByteOutput<Boolean>,CharOutput<Boolean>
   {
+    @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
     @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
@@ -234,6 +234,48 @@ public abstract interface OmniCollection extends Cloneable
   ,ByteInput,ByteOutput<Byte>
   {
     @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.byteValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.byteValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Byte val);
     public abstract void forEach(ByteConsumer action);
@@ -269,6 +311,48 @@ public abstract interface OmniCollection extends Cloneable
   ,CharInput,CharOutput<Character>
   {
     @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.byteValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.byteValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.shortValue()
+      );
+    }
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Character val);
     public abstract void forEach(CharConsumer action);
@@ -292,6 +376,48 @@ public abstract interface OmniCollection extends Cloneable
   public abstract interface OfShort extends OfPrimitive,Iterable<Short>
   ,ShortInput,ShortOutput<Short>
   {
+    @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.shortValue()
+      );
+    }
     @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Short val);
@@ -320,6 +446,48 @@ public abstract interface OmniCollection extends Cloneable
   public abstract interface OfInt extends OfPrimitive,Iterable<Integer>
   ,IntInput,IntOutput<Integer>
   {
+    @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
     @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Integer val);
@@ -369,6 +537,48 @@ public abstract interface OmniCollection extends Cloneable
   public abstract interface OfLong extends OfPrimitive,Iterable<Long>
   ,LongInput,LongOutput<Long>
   {
+    @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
     @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Long val);
@@ -423,6 +633,48 @@ public abstract interface OmniCollection extends Cloneable
   ,FloatInput,FloatOutput<Float>
   {
     @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.shortValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.shortValue()
+      );
+    }
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Float val);
     public abstract void forEach(FloatConsumer action);
@@ -434,6 +686,12 @@ public abstract interface OmniCollection extends Cloneable
     public abstract Float[] toArray();
     public abstract float[] toFloatArray();
     public abstract double[] toDoubleArray();
+    public default boolean contains(byte val){
+      return contains((short)val);
+    }
+    public default boolean removeVal(byte val){
+      return removeVal((short)val);
+    }
     public default boolean add(byte val)
     {
       return add((short)val);
@@ -472,6 +730,48 @@ public abstract interface OmniCollection extends Cloneable
   ,FloatInput,DoubleOutput<Double>
   {
     @Override
+    public default boolean contains(Byte val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean contains(Character val)
+    {
+      return val!=null && contains(
+        (int)val.charValue()
+      );
+    }
+    @Override
+    public default boolean contains(Short val)
+    {
+      return val!=null && contains(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Byte val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Character val)
+    {
+      return val!=null && removeVal(
+        (int)val.charValue()
+      );
+    }
+    @Override
+    public default boolean removeVal(Short val)
+    {
+      return val!=null && removeVal(
+        val.intValue()
+      );
+    }
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Double val);
     public abstract void forEach(DoubleConsumer action);
@@ -486,6 +786,24 @@ public abstract interface OmniCollection extends Cloneable
     public default boolean add(Float val)
     {
       return add(val.floatValue());
+    }
+    public default boolean contains(byte val){
+      return contains((int)val);
+    }
+    public default boolean removeVal(byte val){
+      return removeVal((int)val);
+    }
+    public default boolean contains(short val){
+      return contains((int)val);
+    }
+    public default boolean removeVal(short val){
+      return removeVal((int)val);
+    }
+    public default boolean contains(char val){
+      return contains((int)val);
+    }
+    public default boolean removeVal(char val){
+      return removeVal((int)val);
     }
     public default boolean add(byte val)
     {

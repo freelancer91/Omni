@@ -416,21 +416,6 @@ public abstract class FloatSnglLnkSeq extends AbstractSeq implements OmniCollect
       }//end val check
       return false;
     }
-    @Override public boolean contains(byte val){
-      {
-        {
-          final FloatSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return FloatSnglLnkNode.uncheckedcontainsBits(head,Float.floatToRawIntBits(val));
-            }
-            return FloatSnglLnkNode.uncheckedcontains0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
     @Override public boolean contains(char val){
       {
         {
@@ -608,21 +593,6 @@ public abstract class FloatSnglLnkSeq extends AbstractSeq implements OmniCollect
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final FloatSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Float.floatToRawIntBits(val));
-            }
-            return uncheckedremoveVal0(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check

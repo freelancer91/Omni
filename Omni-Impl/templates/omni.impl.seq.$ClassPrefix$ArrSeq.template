@@ -2246,9 +2246,15 @@ public void unstableSort(COMPARATOR sorter)
 #MACRO QueryMethod<char>( )
   #ENDIF
 #ENDIF
-#IF OfChar,OfDouble,OfFloat,OfRef,OfShort
+#IF OfChar,OfRef,OfShort
   #IFSWITCH METHODNAME==removeVal,contains
 #MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+  #ENDIF
+#ENDIF
+#IF OfFloat
+  #IFSWITCH METHODNAME==removeVal,contains
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
   #ENDIF
@@ -2277,10 +2283,14 @@ public void unstableSort(COMPARATOR sorter)
 #MACRO QueryMethod<byte>( )
 #MACRO QueryMethod<char>( )
     #ENDIF
-    #IF OfChar,OfDouble,OfFloat,OfRef,OfShort
+    #IF OfChar,OfRef,OfShort
 #MACRO QueryMethod<byte>( )
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
+    #ENDIF
+    #IF OfFloat
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )    
     #ENDIF
     #IF OfRef
 #MACRO QueryMethod<Boolean>((boolean))
@@ -2377,8 +2387,12 @@ public void unstableSort(COMPARATOR sorter)
 #MACRO QueryMethod<byte>( )
 #MACRO QueryMethod<char>( )
     #ENDIF
-    #IF OfChar,OfDouble,OfFloat,OfRef,OfShort
+    #IF OfChar,OfRef,OfShort
 #MACRO QueryMethod<byte>( )
+#MACRO QueryMethod<char>( )
+#MACRO QueryMethod<short>( )
+    #ENDIF
+    #IF OfFloat
 #MACRO QueryMethod<char>( )
 #MACRO QueryMethod<short>( )
     #ENDIF

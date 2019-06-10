@@ -1,8 +1,6 @@
 package omni.impl.seq;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
-import java.util.Arrays;
-import omni.util.ArrCopy;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.io.IOException;
@@ -33,7 +31,6 @@ import java.nio.file.Files;
 import omni.impl.seq.AbstractIntSeqMonitor.SequenceVerificationItr;
 import omni.api.OmniCollection;
 import java.util.ArrayList;
-import omni.api.OmniDeque;
 import omni.util.TestExecutorService;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("ArrDeqTest")

@@ -384,51 +384,6 @@ public abstract class DoubleSnglLnkSeq extends AbstractSeq implements OmniCollec
       }//end val check
       return false;
     }
-    @Override public boolean contains(byte val){
-      {
-        {
-          final DoubleSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
-            }
-            return DoubleSnglLnkNode.uncheckedcontains0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(char val){
-      {
-        {
-          final DoubleSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
-            }
-            return DoubleSnglLnkNode.uncheckedcontains0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean contains(short val){
-      {
-        {
-          final DoubleSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return DoubleSnglLnkNode.uncheckedcontainsBits(head,Double.doubleToRawLongBits(val));
-            }
-            return DoubleSnglLnkNode.uncheckedcontains0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
     @Override public boolean removeVal(boolean val){
       {
         {
@@ -560,51 +515,6 @@ public abstract class DoubleSnglLnkSeq extends AbstractSeq implements OmniCollec
                 break returnFalse;
               }
             }
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(byte val){
-      {
-        {
-          final DoubleSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
-            }
-            return uncheckedremoveVal0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(char val){
-      {
-        {
-          final DoubleSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
-            }
-            return uncheckedremoveVal0(head);
-          } //end size check
-        } //end checked sublist try modcount
-      }//end val check
-      return false;
-    }
-    @Override public boolean removeVal(short val){
-      {
-        {
-          final DoubleSnglLnkNode head;
-          if((head=this.head)!=null)
-          {
-            if(val!=0){
-              return uncheckedremoveValBits(head,Double.doubleToRawLongBits(val));
-            }
-            return uncheckedremoveVal0(head);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
