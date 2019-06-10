@@ -335,7 +335,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
     push(($exposedType$)val);
     return true;
   }
-  #IFNOT OfLong
+  #IF OfFloat
   @Override public boolean add(char val){
     push(($exposedType$)val);
     return true;
@@ -343,7 +343,9 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements Om
   @Override public boolean add(short val){
     push(($exposedType$)val);
     return true;
-  }
+  }  
+  #ENDIF
+  #IFNOT OfLong
   @Override public boolean add(long val){
     push(($exposedType$)val);
     return true;

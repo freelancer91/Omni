@@ -481,14 +481,6 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     push((double)val);
     return true;
   }
-  @Override public boolean add(char val){
-    push((double)val);
-    return true;
-  }
-  @Override public boolean add(short val){
-    push((double)val);
-    return true;
-  }
   @Override public boolean add(long val){
     push((double)val);
     return true;

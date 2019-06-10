@@ -228,7 +228,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
     return removeVal((int)val);
   }
   #ENDIF
-  #IFSWITCH ARRTYPE==float,double
+  #IFSWITCH ARRTYPE==float
   public default boolean add(byte val)
   {
     return add((short)val);
@@ -251,6 +251,35 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
   public default boolean add(Short val)
   {
     return add(val.shortValue());
+  }
+  #ENDIF
+  #IFSWITCH ARRTYPE==double
+  public default boolean add(byte val)
+  {
+    return add((int)val);
+  }
+  public default boolean add(Byte val)
+  {
+    return add(val.intValue());
+  }
+  public default boolean add(char val){
+    return add((int)val);
+  }
+  public default boolean add(Character val)
+  {
+    return add((int)val.charValue());
+  }
+  public abstract boolean add(long val);
+  public default boolean add(Long val)
+  {
+    return add(val.longValue());
+  }
+  public default boolean add(short val){
+    return add((int)val);
+  }
+  public default boolean add(Short val)
+  {
+    return add(val.intValue());
   }
   #ENDIF
   #IFSWITCH ARRTYPE==int,long

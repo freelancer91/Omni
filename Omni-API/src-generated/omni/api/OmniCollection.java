@@ -807,26 +807,30 @@ public abstract interface OmniCollection extends Cloneable
     }
     public default boolean add(byte val)
     {
-      return add((short)val);
+      return add((int)val);
     }
     public default boolean add(Byte val)
     {
-      return add((short)val.byteValue());
+      return add(val.intValue());
     }
-    public abstract boolean add(char val);
+    public default boolean add(char val){
+      return add((int)val);
+    }
     public default boolean add(Character val)
     {
-      return add(val.charValue());
+      return add((int)val.charValue());
     }
     public abstract boolean add(long val);
     public default boolean add(Long val)
     {
       return add(val.longValue());
     }
-    public abstract boolean add(short val);
+    public default boolean add(short val){
+      return add((int)val);
+    }
     public default boolean add(Short val)
     {
-      return add(val.shortValue());
+      return add(val.intValue());
     }
     public abstract boolean add(int val);
     public default boolean add(Integer val)

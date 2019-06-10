@@ -217,14 +217,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     return true;
   }
     #IF OfDouble,OfFloat
-  @Override public boolean add(char val){
-    addLast(($exposedType$)val);
-    return true;
-  }
-  @Override public boolean add(short val){
-    addLast(($exposedType$)val);
-    return true;
-  }
+  
   @Override public boolean add(long val){
     addLast(($exposedType$)val);
     return true;
@@ -234,6 +227,15 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     addLast(($exposedType$)val);
     return true;
   }
+      #ELSE
+  @Override public boolean add(char val){
+    addLast(($exposedType$)val);
+    return true;
+  }
+  @Override public boolean add(short val){
+    addLast(($exposedType$)val);
+    return true;
+  }    
       #ENDIF
     #ENDIF
   #ENDIF

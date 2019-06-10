@@ -770,14 +770,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     addLast((double)val);
     return true;
   }
-  @Override public boolean add(char val){
-    addLast((double)val);
-    return true;
-  }
-  @Override public boolean add(short val){
-    addLast((double)val);
-    return true;
-  }
   @Override public boolean add(long val){
     addLast((double)val);
     return true;

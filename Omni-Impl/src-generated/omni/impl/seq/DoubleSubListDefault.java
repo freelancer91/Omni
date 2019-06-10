@@ -16,16 +16,6 @@ abstract interface DoubleSubListDefault extends DoubleListDefault
     return add((double)val);
   }
   @Override
-  public default boolean add(char val)
-  {
-    return add((double)val);
-  }
-  @Override
-  public default boolean add(short val)
-  {
-    return add((double)val);
-  }
-  @Override
   public default boolean add(long val)
   {
     return add((double)val);

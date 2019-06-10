@@ -320,9 +320,11 @@ public abstract class $ClassPrefix$SnglLnkSeq$<E>$ extends AbstractSeq implement
 #ENDIF
 #IF OfDouble,OfFloat,OfLong
   #MACRO add(int,($exposedType$))
-  #IFNOT OfLong
+  #IF OfFloat
   #MACRO add(char,($exposedType$))
   #MACRO add(short,($exposedType$))
+  #ENDIF
+  #IFNOT OfLong
   #MACRO add(long,($exposedType$))
     #IFNOT OfFloat
   #MACRO add(float,($exposedType$))

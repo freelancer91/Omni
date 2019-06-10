@@ -40,7 +40,7 @@ abstract interface $TypeNameModifier$SubListDefault$<E>$ extends $TypeNameModifi
   {
     return add(($exposedType$)val);
   }
-  #IFNOT OfLong
+  #IF OfFloat
   @Override
   public default boolean add(char val)
   {
@@ -51,6 +51,8 @@ abstract interface $TypeNameModifier$SubListDefault$<E>$ extends $TypeNameModifi
   {
     return add(($exposedType$)val);
   }
+  #ENDIF
+  #IFNOT OfLong
   @Override
   public default boolean add(long val)
   {

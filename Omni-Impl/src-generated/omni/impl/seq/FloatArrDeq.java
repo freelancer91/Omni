@@ -1000,6 +1000,10 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     addLast((float)val);
     return true;
   }
+  @Override public boolean add(long val){
+    addLast((float)val);
+    return true;
+  }
   @Override public boolean add(char val){
     addLast((float)val);
     return true;
@@ -1007,11 +1011,7 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
   @Override public boolean add(short val){
     addLast((float)val);
     return true;
-  }
-  @Override public boolean add(long val){
-    addLast((float)val);
-    return true;
-  }
+  }    
   @Override public Float getFirst(){
     return floatElement();
   }
