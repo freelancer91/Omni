@@ -4,7 +4,9 @@ import java.util.Set;
 
 public enum UnderlyingStruct{
     ArrSeq,
-    SnglLnkSeq,DblLnkSeq;
+    SnglLnkSeq,
+    DblLnkSeq,
+    ArrDeq;
 
     public final Set<StructType> nestedTypes;
 
@@ -19,7 +21,9 @@ public enum UnderlyingStruct{
         case SnglLnkSeq:
             return Set.of(StructType.Stack,StructType.Queue);
         case DblLnkSeq:
-            return Set.of(StructType.List,StructType.SubList);
+            return Set.of(StructType.ListDeque,StructType.SubList);
+        case ArrDeq:
+            return Set.of(StructType.Deque);
         }
         throw new Error("Unknown underlyingStruct " + underlyingStruct);
     }

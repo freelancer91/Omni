@@ -61,7 +61,7 @@ implements OmniSet.Of$ClassPrefix$$<E>${
     }
   }
 
-  $ArrayType$[] table;
+  transient $ArrayType$[] table;
   public $ClassPrefix$OpenAddressHashSet(){
     super();
   }
