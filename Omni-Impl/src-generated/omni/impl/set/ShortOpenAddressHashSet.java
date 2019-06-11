@@ -36,7 +36,7 @@ implements OmniSet.OfShort{
         ++valOffset;
     }
   }
-  short[] table;
+  transient short[] table;
   public ShortOpenAddressHashSet(){
     super();
   }

@@ -36,7 +36,7 @@ implements OmniSet.OfInt{
         ++valOffset;
     }
   }
-  int[] table;
+  transient int[] table;
   public IntOpenAddressHashSet(){
     super();
   }

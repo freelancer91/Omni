@@ -35,7 +35,7 @@ implements OmniSet.OfChar{
         ++valOffset;
     }
   }
-  char[] table;
+  transient char[] table;
   public CharOpenAddressHashSet(){
     super();
   }

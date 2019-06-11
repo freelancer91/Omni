@@ -37,7 +37,7 @@ implements OmniSet.OfLong{
         ++valOffset;
     }
   }
-  long[] table;
+  transient long[] table;
   public LongOpenAddressHashSet(){
     super();
   }
