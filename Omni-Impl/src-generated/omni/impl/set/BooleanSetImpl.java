@@ -21,7 +21,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
   public BooleanSetImpl(){
     super();
   }
-  private BooleanSetImpl(int state){
+  BooleanSetImpl(int state){
     this.state=state;
   }
   @Override public void writeExternal(ObjectOutput out) throws IOException{

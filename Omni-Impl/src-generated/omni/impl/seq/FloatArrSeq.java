@@ -591,7 +591,7 @@ public abstract class FloatArrSeq extends AbstractSeq implements OmniCollection.
   @Override public boolean add(short val){
     push((float)val);
     return true;
-  }
+  }  
   @Override public boolean add(long val){
     push((float)val);
     return true;
