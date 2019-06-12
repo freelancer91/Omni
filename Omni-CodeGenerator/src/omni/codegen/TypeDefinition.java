@@ -105,6 +105,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsChar"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","char"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
         return defVars;
     }
     private static List<DefVar> getOfDouble(){
@@ -134,6 +136,9 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsDouble"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","double"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","0x7ffc000000000000L"));
+        defVars.add(new DefVar("POS0_TABLE_VAL","0xfffc000000000000L"));
         return defVars;
     }
     private static List<DefVar> getOfFloat(){
@@ -164,6 +169,9 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsFloat"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","float"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","0x7fe00000"));
+        defVars.add(new DefVar("POS0_TABLE_VAL","0xffe00000"));
         return defVars;
     }
     private static List<DefVar> getOfInt(){
@@ -194,6 +202,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsInt"));
         defVars.add(new DefVar("compareMethod","applyAsInt"));
         defVars.add(new DefVar("comparableType","int"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
         return defVars;
     }
     private static List<DefVar> getOfLong(){
@@ -223,6 +233,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsLong"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","long"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
         return defVars;
     }
     private static List<DefVar> getOfString(){
@@ -268,6 +280,9 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","apply"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","Comparable<E>"));
+        defVars.add(new DefVar("queryParameterType","Object"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","null"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","DELETED"));
         return defVars;
     }
     private static List<DefVar> getOfShort(){
@@ -299,6 +314,8 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsShort"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","short"));
+        defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
+        defVars.add(new DefVar("DELETED_TABLE_VAL","1"));
         return defVars;
     }
     boolean matchTypeDef(String...args){
