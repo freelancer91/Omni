@@ -1,4 +1,3 @@
-//#TYPEDEF OfRef
 package omni.impl.set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -281,7 +280,8 @@ implements OmniSet.OfDouble{
     return new Itr(this);
   }
   @Override
-  public void readExternal(ObjectInput in) throws IOException{
+  public void readExternal(ObjectInput in) throws IOException
+  {
       int size;
       this.size=size=in.readInt();
       this.loadFactor=0.75f;
@@ -504,15 +504,6 @@ implements OmniSet.OfDouble{
     }
     return false;
   }
-  @Override public Double[] toArray(){
-    int size;
-    if((size=this.size) != 0){
-      Double[] dst;
-      uncheckedCopyIntoArray(size,dst=new Double[size]);
-      return dst;
-    }
-    return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
-  }
   @Override public double[] toDoubleArray(){
     int size;
     if((size=this.size) != 0){
@@ -522,7 +513,16 @@ implements OmniSet.OfDouble{
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
-  private void uncheckedCopyIntoArray(int size,Object[] dst){
+  @Override public Double[] toArray(){
+    int size;
+    if((size=this.size) != 0){
+      Double[] dst;
+      uncheckedCopyIntoArray(size,dst=new Double[size]);
+      return dst;
+    }
+    return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
+  }
+  private void uncheckedCopyIntoArray(int size,double[] dst){
     var table=this.table;
     for(int i=0;;++i) {
         long tableVal;
@@ -538,7 +538,7 @@ implements OmniSet.OfDouble{
         }
     }
   }
-  private void uncheckedCopyIntoArray(int size,double[] dst){
+  private void uncheckedCopyIntoArray(int size,Object[] dst){
     var table=this.table;
     for(int i=0;;++i) {
         long tableVal;
@@ -828,8 +828,8 @@ implements OmniSet.OfDouble{
     int newSize=0;
     long[] table;
     for(int numLeft=size,i=(table=this.table).length;;){
-        double v;
         long tableVal;
+        double v;
         if((tableVal=table[--i]) == 0 || tableVal == 0x7ffc000000000000L){
             continue;
         }else if(tableVal == 0xfffc000000000000L){
@@ -880,7 +880,8 @@ implements OmniSet.OfDouble{
         table[hash]=val;
     }
   }
-  private static class Itr extends AbstractDoubleItr{
+  private static class Itr
+  extends AbstractDoubleItr{
       private final DoubleOpenAddressHashSet root;
       private int offset;
       Itr(DoubleOpenAddressHashSet root){
@@ -964,14 +965,20 @@ implements OmniSet.OfDouble{
   }
   public static class Checked extends DoubleOpenAddressHashSet{
     transient int modCount;
-    Checked(){
+    public Checked(){
       super();
     }
-    Checked(DoubleOpenAddressHashSet that){
+    public Checked(DoubleOpenAddressHashSet that){
       super(that);
     }
-    Checked(int initialCapacity){
+    public Checked(int initialCapacity){
       super(initialCapacity);
+    }
+    public Checked(float loadFactor){
+        super(loadFactor);
+    }
+    public Checked(int initialCapacity,float loadFactor){
+        super(initialCapacity,loadFactor);
     }
     @Override public void clear(){
       if(this.size != 0){
@@ -1115,7 +1122,8 @@ implements OmniSet.OfDouble{
       }
       return false;
     }
-    private static class Itr extends AbstractDoubleItr{
+    private static class Itr
+    extends AbstractDoubleItr{
       private final Checked root;
       private int offset;
       private int modCount;

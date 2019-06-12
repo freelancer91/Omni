@@ -1,4 +1,3 @@
-//#TYPEDEF OfRef
 package omni.impl.set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -287,7 +286,8 @@ implements OmniSet.OfInt{
     return new Itr(this);
   }
   @Override
-  public void readExternal(ObjectInput in) throws IOException{
+  public void readExternal(ObjectInput in) throws IOException
+  {
       int size;
       this.size=size=in.readInt();
       this.loadFactor=0.75f;
@@ -629,9 +629,9 @@ implements OmniSet.OfInt{
                 }
                 break returnTrue;
               default:
-                if(removeFromTable(v)){
-                  break returnTrue;
-                }
+            }
+            if(removeFromTable(v)){
+              break returnTrue;
             }
           }
           break returnFalse;
@@ -685,15 +685,6 @@ implements OmniSet.OfInt{
     }
     return false;
   }
-  @Override public Integer[] toArray(){
-    int size;
-    if((size=this.size) != 0){
-      Integer[] dst;
-      uncheckedCopyIntoArray(size,dst=new Integer[size]);
-      return dst;
-    }
-    return OmniArray.OfInt.DEFAULT_BOXED_ARR;
-  }
   @Override public int[] toIntArray(){
     int size;
     if((size=this.size) != 0){
@@ -702,6 +693,15 @@ implements OmniSet.OfInt{
       return dst;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
+  }
+  @Override public Integer[] toArray(){
+    int size;
+    if((size=this.size) != 0){
+      Integer[] dst;
+      uncheckedCopyIntoArray(size,dst=new Integer[size]);
+      return dst;
+    }
+    return OmniArray.OfInt.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
     int size;
@@ -730,7 +730,7 @@ implements OmniSet.OfInt{
     }
     return OmniArray.OfLong.DEFAULT_ARR;
   }
-  private static int wordCopy(long word,int valOffset,int valBound,Object[] dst,int dstOffset,int dstBound){
+  private static int wordCopy(long word,int valOffset,int valBound,int[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
             dst[dstOffset]=(int)(valBound);
@@ -741,7 +741,7 @@ implements OmniSet.OfInt{
     }while(++valOffset != valBound);
     return dstOffset;  
   }
-  private void uncheckedCopyIntoArray(int size,Object[] dst){
+  private void uncheckedCopyIntoArray(int size,int[] dst){
       int offset;
       if((offset=wordCopy(word0,-128,-64,dst,0,size)) != size){
           if((offset=wordCopy(word1,-64,0,dst,offset,size)) != size){
@@ -763,7 +763,7 @@ implements OmniSet.OfInt{
           }
       }
   }
-  private static int wordCopy(long word,int valOffset,int valBound,int[] dst,int dstOffset,int dstBound){
+  private static int wordCopy(long word,int valOffset,int valBound,Object[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
             dst[dstOffset]=(int)(valBound);
@@ -774,7 +774,7 @@ implements OmniSet.OfInt{
     }while(++valOffset != valBound);
     return dstOffset;  
   }
-  private void uncheckedCopyIntoArray(int size,int[] dst){
+  private void uncheckedCopyIntoArray(int size,Object[] dst){
       int offset;
       if((offset=wordCopy(word0,-128,-64,dst,0,size)) != size){
           if((offset=wordCopy(word1,-64,0,dst,offset,size)) != size){
@@ -1270,7 +1270,8 @@ implements OmniSet.OfInt{
     }while(++valOffset != valBound);
     return numLeft;
   }
-  private static class Itr extends AbstractIntItr{
+  private static class Itr
+  extends AbstractIntItr{
       private final IntOpenAddressHashSet root;
       private int offset;
       Itr(IntOpenAddressHashSet root){
@@ -1504,14 +1505,20 @@ implements OmniSet.OfInt{
   }
   public static class Checked extends IntOpenAddressHashSet{
     transient int modCount;
-    Checked(){
+    public Checked(){
       super();
     }
-    Checked(IntOpenAddressHashSet that){
+    public Checked(IntOpenAddressHashSet that){
       super(that);
     }
-    Checked(int initialCapacity){
+    public Checked(int initialCapacity){
       super(initialCapacity);
+    }
+    public Checked(float loadFactor){
+        super(loadFactor);
+    }
+    public Checked(int initialCapacity,float loadFactor){
+        super(initialCapacity,loadFactor);
     }
     @Override public boolean add(boolean val){
       if(super.add(val)){
@@ -1713,7 +1720,8 @@ implements OmniSet.OfInt{
       }
       return false;
     }
-    private static class Itr extends AbstractIntItr{
+    private static class Itr
+    extends AbstractIntItr{
       private final Checked root;
       private int offset;
       private int modCount;

@@ -1,4 +1,3 @@
-//#TYPEDEF OfRef
 package omni.impl.set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -241,7 +240,8 @@ implements OmniSet.OfChar{
     return new Itr(this);
   }
   @Override
-  public void readExternal(ObjectInput in) throws IOException{
+  public void readExternal(ObjectInput in) throws IOException
+  {
       int size;
       this.size=size=in.readInt();
       this.loadFactor=0.75f;
@@ -596,9 +596,9 @@ implements OmniSet.OfChar{
                 }
                 break returnTrue;
               default:
-                if(removeFromTable(v)){
-                  break returnTrue;
-                }
+            }
+            if(removeFromTable(v)){
+              break returnTrue;
             }
           }
           break returnFalse;
@@ -652,15 +652,6 @@ implements OmniSet.OfChar{
     }
     return false;
   }
-  @Override public Character[] toArray(){
-    int size;
-    if((size=this.size) != 0){
-      Character[] dst;
-      uncheckedCopyIntoArray(size,dst=new Character[size]);
-      return dst;
-    }
-    return OmniArray.OfChar.DEFAULT_BOXED_ARR;
-  }
   @Override public char[] toCharArray(){
     int size;
     if((size=this.size) != 0){
@@ -669,6 +660,15 @@ implements OmniSet.OfChar{
       return dst;
     }
     return OmniArray.OfChar.DEFAULT_ARR;
+  }
+  @Override public Character[] toArray(){
+    int size;
+    if((size=this.size) != 0){
+      Character[] dst;
+      uncheckedCopyIntoArray(size,dst=new Character[size]);
+      return dst;
+    }
+    return OmniArray.OfChar.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
     int size;
@@ -706,7 +706,7 @@ implements OmniSet.OfChar{
     }
     return OmniArray.OfInt.DEFAULT_ARR;
   }
-  private static int wordCopy(long word,int valOffset,int valBound,Object[] dst,int dstOffset,int dstBound){
+  private static int wordCopy(long word,int valOffset,int valBound,char[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
             dst[dstOffset]=(char)(valBound);
@@ -717,7 +717,7 @@ implements OmniSet.OfChar{
     }while(++valOffset != valBound);
     return dstOffset;  
   }
-  private void uncheckedCopyIntoArray(int size,Object[] dst){
+  private void uncheckedCopyIntoArray(int size,char[] dst){
       int offset;
       if((offset=wordCopy(word0,0,64,dst,0,size)) != size){
           if((offset=wordCopy(word1,64,128,dst,offset,size)) != size){
@@ -739,7 +739,7 @@ implements OmniSet.OfChar{
           }
       }
   }
-  private static int wordCopy(long word,int valOffset,int valBound,char[] dst,int dstOffset,int dstBound){
+  private static int wordCopy(long word,int valOffset,int valBound,Object[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
             dst[dstOffset]=(char)(valBound);
@@ -750,7 +750,7 @@ implements OmniSet.OfChar{
     }while(++valOffset != valBound);
     return dstOffset;  
   }
-  private void uncheckedCopyIntoArray(int size,char[] dst){
+  private void uncheckedCopyIntoArray(int size,Object[] dst){
       int offset;
       if((offset=wordCopy(word0,0,64,dst,0,size)) != size){
           if((offset=wordCopy(word1,64,128,dst,offset,size)) != size){
@@ -1220,7 +1220,8 @@ implements OmniSet.OfChar{
     }while(++valOffset != valBound);
     return numLeft;
   }
-  private static class Itr extends AbstractCharItr{
+  private static class Itr
+  extends AbstractCharItr{
       private final CharOpenAddressHashSet root;
       private int offset;
       Itr(CharOpenAddressHashSet root){
@@ -1454,14 +1455,20 @@ implements OmniSet.OfChar{
   }
   public static class Checked extends CharOpenAddressHashSet{
     transient int modCount;
-    Checked(){
+    public Checked(){
       super();
     }
-    Checked(CharOpenAddressHashSet that){
+    public Checked(CharOpenAddressHashSet that){
       super(that);
     }
-    Checked(int initialCapacity){
+    public Checked(int initialCapacity){
       super(initialCapacity);
+    }
+    public Checked(float loadFactor){
+        super(loadFactor);
+    }
+    public Checked(int initialCapacity,float loadFactor){
+        super(initialCapacity,loadFactor);
     }
     @Override public boolean add(boolean val){
       if(super.add(val)){
@@ -1656,7 +1663,8 @@ implements OmniSet.OfChar{
       }
       return false;
     }
-    private static class Itr extends AbstractCharItr{
+    private static class Itr
+    extends AbstractCharItr{
       private final Checked root;
       private int offset;
       private int modCount;

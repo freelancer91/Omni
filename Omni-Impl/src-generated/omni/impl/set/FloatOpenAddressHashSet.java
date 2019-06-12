@@ -1,4 +1,3 @@
-//#TYPEDEF OfRef
 package omni.impl.set;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -319,7 +318,8 @@ implements OmniSet.OfFloat{
     return new Itr(this);
   }
   @Override
-  public void readExternal(ObjectInput in) throws IOException{
+  public void readExternal(ObjectInput in) throws IOException
+  {
       int size;
       this.size=size=in.readInt();
       this.loadFactor=0.75f;
@@ -595,15 +595,6 @@ implements OmniSet.OfFloat{
     }
     return false;
   }
-  @Override public Float[] toArray(){
-    int size;
-    if((size=this.size) != 0){
-      Float[] dst;
-      uncheckedCopyIntoArray(size,dst=new Float[size]);
-      return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
-  }
   @Override public float[] toFloatArray(){
     int size;
     if((size=this.size) != 0){
@@ -612,6 +603,15 @@ implements OmniSet.OfFloat{
       return dst;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
+  }
+  @Override public Float[] toArray(){
+    int size;
+    if((size=this.size) != 0){
+      Float[] dst;
+      uncheckedCopyIntoArray(size,dst=new Float[size]);
+      return dst;
+    }
+    return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
   }
   @Override public double[] toDoubleArray(){
     int size;
@@ -622,7 +622,7 @@ implements OmniSet.OfFloat{
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
-  private void uncheckedCopyIntoArray(int size,Object[] dst){
+  private void uncheckedCopyIntoArray(int size,float[] dst){
     var table=this.table;
     for(int i=0;;++i) {
         int tableVal;
@@ -641,7 +641,7 @@ implements OmniSet.OfFloat{
         }
     }
   }
-  private void uncheckedCopyIntoArray(int size,float[] dst){
+  private void uncheckedCopyIntoArray(int size,Object[] dst){
     var table=this.table;
     for(int i=0;;++i) {
         int tableVal;
@@ -959,8 +959,8 @@ implements OmniSet.OfFloat{
     int newSize=0;
     int[] table;
     for(int numLeft=size,i=(table=this.table).length;;){
-        float v;
         int tableVal;
+        float v;
         switch(tableVal=table[--i]){
         case 0:
         case 0x7fe00000:
@@ -1073,7 +1073,8 @@ implements OmniSet.OfFloat{
     buffer[bufferOffset]=']';
     return new String(buffer,0,bufferOffset + 1,ToStringUtil.IOS8859CharSet);
   }
-  private static class Itr extends AbstractFloatItr{
+  private static class Itr
+  extends AbstractFloatItr{
       private final FloatOpenAddressHashSet root;
       private int offset;
       Itr(FloatOpenAddressHashSet root){
@@ -1165,14 +1166,20 @@ implements OmniSet.OfFloat{
   }
   public static class Checked extends FloatOpenAddressHashSet{
     transient int modCount;
-    Checked(){
+    public Checked(){
       super();
     }
-    Checked(FloatOpenAddressHashSet that){
+    public Checked(FloatOpenAddressHashSet that){
       super(that);
     }
-    Checked(int initialCapacity){
+    public Checked(int initialCapacity){
       super(initialCapacity);
+    }
+    public Checked(float loadFactor){
+        super(loadFactor);
+    }
+    public Checked(int initialCapacity,float loadFactor){
+        super(initialCapacity,loadFactor);
     }
     @Override public void clear(){
       if(this.size != 0){
@@ -1322,7 +1329,8 @@ implements OmniSet.OfFloat{
       }
       return false;
     }
-    private static class Itr extends AbstractFloatItr{
+    private static class Itr
+    extends AbstractFloatItr{
       private final Checked root;
       private int offset;
       private int modCount;
