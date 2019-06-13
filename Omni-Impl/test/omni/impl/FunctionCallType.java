@@ -1,5 +1,9 @@
 package omni.impl;
 
 public enum FunctionCallType{
-    Boxed,Unboxed;
+    UNBOXED(false),BOXED(true);
+    public boolean boxed;
+    FunctionCallType(boolean boxed){
+        this.boxed=boxed;
+    }
 }
