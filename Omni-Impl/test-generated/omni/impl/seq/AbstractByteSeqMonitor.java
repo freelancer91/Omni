@@ -3,14 +3,14 @@ import org.junit.jupiter.api.Assertions;
 import omni.impl.FunctionCallType;
 import omni.impl.ByteOutputTestArgType;
 import omni.impl.ByteInputTestArgType;
-import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
 import omni.impl.MonitoredObjectInputStream;
 import omni.impl.MonitoredObjectOutputStream;
+import omni.impl.CheckedType;
+import omni.impl.QueryCastType;
+import java.util.ConcurrentModificationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
-import omni.impl.CheckedType;
 import omni.function.ByteComparator;
 import omni.function.BytePredicate;
 import java.util.function.UnaryOperator;
@@ -27,7 +27,6 @@ import java.util.Random;
 import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.util.TypeUtil;
-import omni.impl.QueryCastType;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniStack;
 import omni.api.OmniList;
@@ -1507,67 +1506,6 @@ abstract class AbstractByteSeqMonitor<SEQ extends OmniCollection.OfByte>{
       verifyRootPostAlloc();
       if(preModScenario==PreModScenario.ModRoot){verifyIllegalAdd();}
       return this;
-    }
-  }
-  static enum ItrType{
-    Itr,
-    ListItr,
-    DescendingItr;
-  }
-  static enum ListItrSetScenario{
-    HappyPath(null,PreModScenario.NoMod),
-    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq),
-    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent),
-    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot),
-    ThrowISE(IllegalStateException.class,PreModScenario.NoMod),
-    PostAddThrowISE(IllegalStateException.class,PreModScenario.NoMod),
-    PostRemoveThrowISE(IllegalStateException.class,PreModScenario.NoMod),
-    ThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
-    ThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
-    ThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
-    PostAddThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
-    PostAddThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
-    PostAddThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
-    PostRemoveThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
-    PostRemoveThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
-    PostRemoveThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq);
-    final Class<? extends Throwable> expectedException;
-    final PreModScenario preModScenario;
-    ListItrSetScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario){
-      this.expectedException=expectedException;
-      this.preModScenario=preModScenario;
-    }
-  }
-  static enum ItrRemoveScenario{
-    PostNext(null,false,true),
-    PostPrevious(null,false,false),
-    PostInit(IllegalStateException.class,true,true),
-    PostAdd(IllegalStateException.class,true,false),
-    PostRemove(IllegalStateException.class,false,true);
-    final Class<? extends Throwable> expectedException;
-    final boolean validWithEmptySeq;
-    final boolean validWithForwardItr;
-    ItrRemoveScenario(Class<? extends Throwable> expectedException,boolean validWithEmptySeq,boolean validWithForwardItr){
-      this.expectedException=expectedException;
-      this.validWithEmptySeq=validWithEmptySeq;
-      this.validWithForwardItr=validWithForwardItr;
-    }
-  }
-  static enum IterationScenario{
-    NoMod(NoSuchElementException.class,PreModScenario.NoMod,false),
-    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq,false),
-    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent,false),
-    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot,false),
-    ModSeqSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModSeq,true),
-    ModParentSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModParent,true),
-    ModRootSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModRoot,true);
-    final Class<? extends Throwable> expectedException;
-    final PreModScenario preModScenario;
-    final boolean validWithEmptySeq;
-    IterationScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario,boolean validWithEmptySeq){
-      this.expectedException=expectedException;
-      this.preModScenario=preModScenario;
-      this.validWithEmptySeq=validWithEmptySeq;
     }
   }
   static enum MonitoredRemoveIfPredicateGen

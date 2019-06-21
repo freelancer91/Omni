@@ -17,8 +17,6 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import omni.impl.seq.AbstractShortSeqMonitor.IterationScenario;
-import omni.impl.seq.AbstractShortSeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.AbstractShortSeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.AbstractShortSeqMonitor.MonitoredRemoveIfPredicateGen;
 import omni.impl.seq.AbstractShortSeqMonitor.QueryTester;

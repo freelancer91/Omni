@@ -90,7 +90,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
         }else if(val instanceof Float){
           return (float)val == 1;
         }else if(val instanceof Double){
-          return (double)val == 0;
+          return (double)val == 1;
         }else if(val instanceof Long){
           return 1L == (long)val;
         }else if(val instanceof Character){
@@ -632,7 +632,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
         return this.itrState != 0b00;
     }
   }
-  #MACRO ToArray(Boolean,OmniArray.OfBoolean.DEFAULT_BOXED_ARR,Boolean.TRUE,Boolean.FALSE,)
+  #MACRO ToArray(Boolean,OmniArray.OfBoolean.DEFAULT_BOXED_ARR,Boolean.FALSE,Boolean.TRUE,)
   #MACRO ToArray(boolean,OmniArray.OfBoolean.DEFAULT_ARR,false,true,Boolean)
   #MACRO ToArray(double,OmniArray.OfDouble.DEFAULT_ARR,0D,1D,Double)
   #MACRO ToArray(float,OmniArray.OfFloat.DEFAULT_ARR,0F,1F,Float)
@@ -641,7 +641,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
   #MACRO ToArray(short,OmniArray.OfShort.DEFAULT_ARR,(short)0,(short)1,Short)
   #MACRO ToArray(char,OmniArray.OfChar.DEFAULT_ARR,(char)0,(char)1,Char)
   #MACRO ToArray(byte,OmniArray.OfByte.DEFAULT_ARR,(byte)0,(byte)1,Byte)
-#MACRODEF ToArray(RETTYPE,DEFAULTARR,TRUEVAL,FALSEVAL,MODIFIER)
+#MACRODEF ToArray(RETTYPE,DEFAULTARR,FALSEVAL,TRUEVAL,MODIFIER)
 @Override public RETTYPE[] toMODIFIERArray(){
   switch(state){
     case 0b00:
@@ -657,7 +657,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
 #ENDDEF
   public static class Checked extends BooleanSetImpl{
     private static final long serialVersionUID=1L;
-    Checked(){
+    public Checked(){
         super();
     }
     Checked(int state){
@@ -756,9 +756,13 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
 @Override public boolean removeIf(PREDICATE filter){
   switch(state){
     case 0b11:
-      boolean removeFalse=filter.test(FALSEVAL);
-      boolean removeTrue=filter.test(TRUEVAL);
-      checkModCount(0b11);
+      boolean removeFalse,removeTrue;
+      try{
+        removeFalse=filter.test(FALSEVAL);
+        removeTrue=filter.test(TRUEVAL);
+      }finally{
+        checkModCount(0b11);
+      }
       if(removeFalse){
         this.state=removeTrue?0b00:0b10;
         return true;
@@ -768,63 +772,88 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       }
       break;
     case 0b10:
-      removeTrue=filter.test(TRUEVAL);
-      checkModCount(0b10);
+      try{
+        removeTrue=filter.test(TRUEVAL);
+      }finally{
+        checkModCount(0b10);
+      }
       if(removeTrue){
         this.state=0b00;
         return true;
       }
       break;
     case 0b01:
-      removeFalse=filter.test(FALSEVAL);
-      checkModCount(0b01);
+      try{
+        removeFalse=filter.test(FALSEVAL);
+      }finally{
+        checkModCount(0b01);
+      }
       if(removeFalse){
         this.state=0b00;
         return true;
       }
     case 0b00:
   }
+  
   return false;
 }
 #ENDDEF
     @Override public OmniIterator.OfBoolean iterator(){
-        return new CheckedItr(this);
+        return new Itr(this);
     }
-    private static class CheckedItr extends AbstractBooleanItr{
+    private static class Itr extends AbstractBooleanItr{
       private final Checked root;
       private int itrState;
-      CheckedItr(Checked root){
+      //state  nextResult   removeResult                 forEachResult     notes
+      //0b0000 NSE          ISE                          none              set is empty, no iteration
+      //0b0001 0b0101 false ISE                          0b0101 false      set contains false, no iteration
+      //0b0010 0b1010 true  ISE                          0b1010 true       set contains true, no iteration
+      //0b0011 0b0111 false ISE                          0b1111 false,true set is full, no iteration
+      //0b0100 NSE          ISE                          none              invalid state
+      //0b0101 NSE          removeFalse 0b0100 root=0b00 none              set contains false, false iterated
+      //0b0110 0b1110 true  ISE                          0b1110 true       set contains true, false iterated and removed
+      //0b0111 0b1111 true  removeFalse 0b0110 root=0b10 0b1111 true       set is full, false iterated
+      //0b1000 NSE          ISE                          none              invalid state
+      //0b1001 NSE          ISE                          none              invalid state
+      //0b1010 NSE          removeTrue  0b1000 root=0b00 none              set contains true, true iterated
+      //0b1011 NSE          ISE                          none              invalid state
+      //0b1100 NSE          ISE                          none              invalid state
+      //0b1101 NSE          ISE                          none              invalid state
+      //0b1110 NSE          removeTrue 0b1100 root=0b00 none              set contains true, false iterated and removed, true iterated
+      //0b1111 NSE          removeTrue  0b1101 root=0b01 none              set full, false iterated, true iterated
+      Itr(Checked root){
         this.root=root;
         this.itrState=root.state;
       }
       @Override public void remove(){
-        int itrState;
-        final Checked root;
-        (root=this.root).checkModCount((itrState=this.itrState) & 0b11);
-        switch(itrState){
-        case 0b0101: // remove false
-          root.state=0b00;
-          this.itrState=0b0100;
-          return;
-        case 0b0111: // remove false
-          root.state=0b10;
-          this.itrState=0b0110;
-          return;
-        case 0b1010: // remove true
-          root.state=0b00;
-          this.itrState=0b1000;
-          return;
-        case 0b1110: // remove false
-          root.state=0b00;
-          this.itrState=0b1100;
-          return;
-        case 0b1111: // remove true
-          root.state=0b01;
-          this.itrState=0b1101;
-          return;
-        default:
-          throw new IllegalStateException();
+        int itrState,newRootState,newItrState;
+        switch(itrState=this.itrState){
+          default:
+            throw new IllegalStateException();
+          case 0b0101: //remove false
+            newRootState=0b00;
+            newItrState=0b0100;
+            break;
+          case 0b0111: //remove false
+            newRootState=0b10;
+            newItrState=0b0110;
+            break;
+          case 0b1010: //remove true
+            newRootState=0b00;
+            newItrState=0b1000;
+            break;
+          case 0b1110: //remove true
+            newRootState=0b00;
+            newItrState=0b1100;
+            break;
+          case 0b1111: //remove true
+            newRootState=0b01;
+            newItrState=0b1101;
         }
+        final Checked root;
+        (root=this.root).checkModCount(itrState & 0b11);
+        root.state=newRootState;
+        this.itrState=newItrState;
       }
       #MACRO CheckedforEachRemaining(BooleanConsumer,true,false)
       #MACRO CheckedforEachRemaining(Consumer<? super Boolean>,Boolean.TRUE,Boolean.FALSE)

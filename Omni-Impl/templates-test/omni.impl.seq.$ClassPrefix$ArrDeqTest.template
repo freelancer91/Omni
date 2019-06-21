@@ -37,11 +37,9 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.ItrRemoveScenario;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredFunctionGen;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.MonitoredRemoveIfPredicateGen;
 import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.QueryTester;
-import omni.impl.seq.Abstract$ClassPrefix$SeqMonitor.ItrType;
 import java.nio.file.Files;
 #IF OfDouble,OfFloat
 import omni.util.HashUtil;
