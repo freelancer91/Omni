@@ -5,12 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 public class MonitoredObjectOutputStream extends ObjectOutputStream{
     private ObjectOutputStream wrapped;
     public MonitoredObjectOutputStream(File file) throws FileNotFoundException, IOException {
         super();
         wrapped=new ObjectOutputStream(new FileOutputStream(file));
+    }
+    public MonitoredObjectOutputStream(OutputStream outputStream) throws IOException{
+        super();
+        wrapped=new ObjectOutputStream(outputStream);
     }
     protected void preModCall() {
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.NotActiveException;
 import java.io.ObjectInputStream;
@@ -14,6 +15,10 @@ public class MonitoredObjectInputStream extends ObjectInputStream{
     public MonitoredObjectInputStream(File file) throws FileNotFoundException, IOException {
         super();
         wrapped=new ObjectInputStream(new FileInputStream(file));
+    }
+    public MonitoredObjectInputStream(InputStream inputStream) throws IOException{
+        super();
+        wrapped=new ObjectInputStream(inputStream);
     }
     protected void preModCall() {
 

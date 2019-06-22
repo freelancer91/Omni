@@ -1,5 +1,6 @@
 package omni.impl;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
@@ -127,50 +128,52 @@ public enum DataType{
     private static Set<DataType> initMayBeCastTo(DataType dataType){
         switch(dataType){
         case BOOLEAN:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
                     DataType.CHAR,DataType.BYTE,DataType.BOOLEAN);
         case BYTE:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
                     DataType.BYTE);
         case CHAR:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
         case DOUBLE:
-            return Set.of(DataType.REF,DataType.DOUBLE);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE);
         case FLOAT:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT);
         case INT:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
         case LONG:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG);
         case REF:
-            return Set.of(DataType.REF);
+            return getDataTypeSet(DataType.REF);
         case SHORT:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,
+                    DataType.SHORT);
         }
         throw getUnknownDataTypeException(dataType);
     }
     private static Set<DataType> initMayBeCastFrom(DataType dataType){
         switch(dataType){
         case BOOLEAN:
-            return Set.of(DataType.REF,DataType.BOOLEAN);
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN);
         case BYTE:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.BYTE);
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE);
         case CHAR:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.CHAR);
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.CHAR);
         case FLOAT:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
                     DataType.LONG,DataType.FLOAT);
         case INT:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT);
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,
+                    DataType.INT);
         case LONG:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
                     DataType.LONG);
         case DOUBLE:
         case REF:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
                     DataType.LONG,DataType.FLOAT,DataType.DOUBLE);
         case SHORT:
-            return Set.of(DataType.REF,DataType.BOOLEAN,DataType.BYTE);
+            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE);
         }
         throw getUnknownDataTypeException(dataType);
     }
@@ -185,34 +188,41 @@ public enum DataType{
         case SHORT:
             return dataType.mayBeCastTo;
         case INT:
-            return Set.of(DataType.REF,DataType.DOUBLE,DataType.LONG,DataType.INT);
+            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.LONG,DataType.INT);
         case LONG:
-            return Set.of(DataType.REF,DataType.LONG);
+            return getDataTypeSet(DataType.REF,DataType.LONG);
         }
         throw getUnknownDataTypeException(dataType);
     }
     private static Set<DataType> initSafeCastFrom(DataType dataType){
         switch(dataType){
         case BOOLEAN:
-            return Set.of(DataType.BOOLEAN);
+            return getDataTypeSet(DataType.BOOLEAN);
         case BYTE:
-            return Set.of(DataType.BOOLEAN,DataType.BYTE);
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE);
         case CHAR:
-            return Set.of(DataType.BOOLEAN,DataType.CHAR);
+            return getDataTypeSet(DataType.BOOLEAN,DataType.CHAR);
         case DOUBLE:
-            return Set.of(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,DataType.FLOAT,
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+                    DataType.FLOAT,
                     DataType.DOUBLE);
         case FLOAT:
-            return Set.of(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.FLOAT);
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.FLOAT);
         case INT:
-            return Set.of(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT);
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT);
         case LONG:
-            return Set.of(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,DataType.LONG);
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+                    DataType.LONG);
         case REF:
             return dataType.mayBeCastFrom;
         case SHORT:
-            return Set.of(DataType.BOOLEAN,DataType.BYTE,DataType.SHORT);
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.SHORT);
         }
         throw getUnknownDataTypeException(dataType);
+    }
+    private static final HashMap<Set<DataType>,Set<DataType>> SETS=new HashMap<>();
+    public static synchronized Set<DataType> getDataTypeSet(DataType...dataTypes){
+        Set<DataType> newSet;
+        return SETS.putIfAbsent(newSet=Set.of(dataTypes),newSet);
     }
 }
