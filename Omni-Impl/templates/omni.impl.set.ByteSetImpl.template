@@ -918,7 +918,7 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
 #ENDDEF
       @Override public void remove(){
         int lastRet;
-        if((lastRet=this.lastRet) != 129){
+        if((lastRet=this.lastRet) != -129){
           int modCount;
           Checked root;
           CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -941,7 +941,9 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
             break;
           }
           this.lastRet=-129;
+          return;
         }
+        throw new IllegalStateException();
       }
     }
     #MACRO CheckedToArray(Byte,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
