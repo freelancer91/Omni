@@ -2,8 +2,9 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
+public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>
 {
+  OmniIterator<E> descendingIterator();
   #MACRO RemoveFirstOccurrenceDefault<boolean>()
   #MACRO RemoveFirstOccurrenceDecl<byte>()
   #MACRO RemoveFirstOccurrenceDecl<char>()
@@ -17,7 +18,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
   #MACRO RemoveLastOccurrenceDecl<Object>()
   #MACRO BoxedMethods(RemoveFirstOccurrenceDecl)
   #MACRO BoxedMethods(RemoveLastOccurrenceDecl)
-  public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OmniQueue,OmniStack.OfPrimitive,OmniDeque
+  public abstract interface OfPrimitive<E> extends OmniCollection<E>,OmniCollection.OfPrimitive<E>,OmniStack<E>,OmniQueue<E>,OmniStack.OfPrimitive<E>,OmniDeque<E>
   {
     public abstract void addFirst(boolean val);
     public abstract void addLast(boolean val);
@@ -44,7 +45,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
 }
 #ENDDEF
   }
-  public abstract interface DoubleOutput<E> extends OmniDeque,OmniQueue.DoubleOutput<E>,OmniStack.DoubleOutput<E>
+  public abstract interface DoubleOutput<E> extends OmniDeque<E>,OmniQueue.DoubleOutput<E>,OmniStack.DoubleOutput<E>
   {
     public abstract double getFirstDouble();
     public abstract double removeFirstDouble();
@@ -135,7 +136,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract OmniIterator.ByteOutput<E> descendingIterator();
   }
   
-  public abstract interface BooleanInput extends OmniDeque,OmniQueue.BooleanInput,OmniStack.BooleanInput
+  public abstract interface BooleanInput<E> extends OmniDeque<E>,OmniQueue.BooleanInput<E>,OmniStack.BooleanInput<E>
   {
     public abstract boolean offerLast(boolean val);
     public abstract boolean offerLast(Boolean val);
@@ -146,7 +147,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract void addFirst(boolean val);
     public abstract void addFirst(Boolean val);
   }
-  public abstract interface ByteInput extends BooleanInput,OmniQueue.ByteInput,OmniStack.ByteInput
+  public abstract interface ByteInput<E> extends BooleanInput<E>,OmniQueue.ByteInput<E>,OmniStack.ByteInput<E>
   {
     public abstract boolean offerLast(byte val);
     public abstract boolean offerLast(Byte val);
@@ -157,7 +158,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract void addFirst(byte val);
     public abstract void addFirst(Byte val);
   }
-  public abstract interface CharInput extends BooleanInput,OmniQueue.CharInput,OmniStack.CharInput
+  public abstract interface CharInput<E> extends BooleanInput<E>,OmniQueue.CharInput<E>,OmniStack.CharInput<E>
   {
     public abstract boolean offerLast(char val);
     public abstract boolean offerLast(Character val);
@@ -168,7 +169,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract void addFirst(char val);
     public abstract void addFirst(Character val);
   }
-  public abstract interface ShortInput extends ByteInput,OmniQueue.ShortInput,OmniStack.ShortInput
+  public abstract interface ShortInput<E> extends ByteInput<E>,OmniQueue.ShortInput<E>,OmniStack.ShortInput<E>
   {
     public abstract boolean offerLast(short val);
     public abstract boolean offerLast(Short val);
@@ -179,7 +180,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract void addFirst(short val);
     public abstract void addFirst(Short val);
   }
-  public abstract interface IntInput extends CharInput,ShortInput,OmniQueue.IntInput,OmniStack.IntInput
+  public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>,OmniQueue.IntInput<E>,OmniStack.IntInput<E>
   {
     public abstract boolean offerLast(int val);
     public abstract boolean offerLast(Integer val);
@@ -190,7 +191,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract void addFirst(int val);
     public abstract void addFirst(Integer val);
   }
-  public abstract interface LongInput extends IntInput,OmniQueue.LongInput,OmniStack.LongInput
+  public abstract interface LongInput<E> extends IntInput<E>,OmniQueue.LongInput<E>,OmniStack.LongInput<E>
   {
     public abstract boolean offerLast(long val);
     public abstract boolean offerLast(Long val);
@@ -201,7 +202,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
     public abstract void addFirst(long val);
     public abstract void addFirst(Long val);
   }
-  public abstract interface FloatInput extends LongInput,OmniQueue.FloatInput,OmniStack.FloatInput
+  public abstract interface FloatInput<E> extends LongInput<E>,OmniQueue.FloatInput<E>,OmniStack.FloatInput<E>
   {
     public abstract boolean offerLast(float val);
     public abstract boolean offerLast(Float val);
@@ -223,13 +224,13 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfCLASSPREFIX,OmniQueue,OmniQueue.OfCLASSPREFIX,OmniDeque,OfPrimitive
+public abstract interface OfCLASSPREFIX extends OmniCollection<BOXEDTYPE>,OmniCollection.OfPrimitive<BOXEDTYPE>,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>,OmniStack<BOXEDTYPE>,OmniStack.OfPrimitive<BOXEDTYPE>,OmniStack.OfCLASSPREFIX,OmniQueue<BOXEDTYPE>,OmniQueue.OfCLASSPREFIX,OmniDeque<BOXEDTYPE>,OfPrimitive<BOXEDTYPE>
 #IFSWITCH ARRTYPE==boolean
-,BooleanInput,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
+,BooleanInput<BOXEDTYPE>,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
 #ELSEIFSWITCH ARRTYPE==double
-,FloatInput,DoubleOutput<BOXEDTYPE>
+,FloatInput<BOXEDTYPE>,DoubleOutput<BOXEDTYPE>
 #ELSEIFNOTSWITCH ARRTYPE==Object
-,CLASSPREFIXInput,CLASSPREFIXOutput<BOXEDTYPE>
+,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
 #IFNOTSWITCH ARRTYPE==boolean
@@ -654,7 +655,7 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
   public abstract OmniIterator.OfCLASSPREFIX descendingIterator();
 }
 #ENDDEF
-  public abstract interface OfRef<E> extends OmniCollection,OmniCollection.OfRef<E>,PeekAndPollIfc<E>,OmniStack,OmniStack.OfRef<E>,OmniQueue,OmniQueue.OfRef<E>,OmniDeque
+  public abstract interface OfRef<E> extends OmniCollection<E>,OmniCollection.OfRef<E>,PeekAndPollIfc<E>,OmniStack<E>,OmniStack.OfRef<E>,OmniQueue<E>,OmniQueue.OfRef<E>,OmniDeque<E>
   {
     public abstract void addFirst(E val);
     public abstract void addLast(E val);

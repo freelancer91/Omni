@@ -2,13 +2,12 @@ package omni.impl;
 
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
-public interface MonitoredList<LST extends OmniList>extends MonitoredCollection<LST>{
-    interface MonitoredListIterator<LST extends OmniList>extends MonitoredIterator<LST>{
+public interface MonitoredList<ITR extends OmniListIterator<?>,LST extends OmniList<?>>extends MonitoredCollection<LST>{
+    interface MonitoredListIterator<ITR extends OmniListIterator<?>,LST extends OmniList<?>>extends MonitoredIterator<ITR,LST>{
         @Override
-        MonitoredList<LST> getMonitoredCollection();
+        MonitoredList<ITR,LST> getMonitoredCollection();
         @Override
-        @SuppressWarnings("rawtypes")
-        OmniListIterator getIterator();
+        ITR getIterator();
         void iterateReverse();
         boolean hasPrevious();
         Object verifyPrevious(DataType outputType);
@@ -19,8 +18,8 @@ public interface MonitoredList<LST extends OmniList>extends MonitoredCollection<
         int verifyPreviousIndex();
         void verifyAdd(Object inputVal,DataType inputType,boolean boxed);
     }
-    MonitoredListIterator<LST> getMonitoredListIterator();
-    MonitoredListIterator<LST> getMonitoredListIterator(int index);
+    MonitoredListIterator<ITR,LST> getMonitoredListIterator();
+    MonitoredListIterator<ITR,LST> getMonitoredListIterator(int index);
     Object verifyGet(int index,DataType outputType);
     Object verifySet(Object inputVal,DataType inputType,boolean boxed);
     void verifyPut(Object inputVal,DataType inputType,boolean boxed);
@@ -30,7 +29,7 @@ public interface MonitoredList<LST extends OmniList>extends MonitoredCollection<
             QueryVal.QueryValModification modification);
     int verifyLastIndexOf(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification);
-    OmniList verifySubList(int fromIndex,int toIndex);
+    OmniList<?> verifySubList(int fromIndex,int toIndex);
     void verifyReplaceAll(MonitoredFunctionGen functionGen,FunctionCallType functionCallType);
     // verify sort
 }

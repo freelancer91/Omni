@@ -16,7 +16,9 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class RefSnglLnkSeq<E> extends AbstractSeq implements OmniCollection.OfRef<E>,Externalizable{
+public abstract class RefSnglLnkSeq<E> extends 
+AbstractSeq<E>
+ implements OmniCollection.OfRef<E>,Externalizable{
   private static final long serialVersionUID=1L;
   transient RefSnglLnkNode<E> head;
   private RefSnglLnkSeq(){
@@ -953,6 +955,14 @@ public abstract class RefSnglLnkSeq<E> extends AbstractSeq implements OmniCollec
         this.parent=parent;
         this.modCount=parent.modCount;
       }
+      Itr(Itr<E> itr){
+        super(itr);
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
+      }
       @Override public E next(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
         final RefSnglLnkNode<E> next;
@@ -1370,6 +1380,12 @@ public abstract class RefSnglLnkSeq<E> extends AbstractSeq implements OmniCollec
       Itr(){
         super(UncheckedStack.this.head);
       }
+      Itr(Itr itr){
+        super(itr);
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public void remove(){
         final UncheckedStack<E> parent;
         --(parent=UncheckedStack.this).size;
@@ -1745,6 +1761,14 @@ public abstract class RefSnglLnkSeq<E> extends AbstractSeq implements OmniCollec
         this.parent=parent;
         this.modCount=parent.modCount;
       }
+      Itr(Itr<E> itr){
+        super(itr);
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
+      }
       @Override public E next(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
         final RefSnglLnkNode<E> next;
@@ -2023,6 +2047,12 @@ public abstract class RefSnglLnkSeq<E> extends AbstractSeq implements OmniCollec
       Itr(){
         super(UncheckedQueue.this.head);
       }
+      Itr(Itr itr){
+        super(itr);
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public void remove(){
         final UncheckedQueue<E> parent;
         --(parent=UncheckedQueue.this).size;
@@ -2039,15 +2069,21 @@ public abstract class RefSnglLnkSeq<E> extends AbstractSeq implements OmniCollec
       }
     }
   }
-  private static class AbstractItr<E>
+  private abstract static class AbstractItr<E>
       implements OmniIterator.OfRef<E>
   {
     transient RefSnglLnkNode<E> prev;
     transient RefSnglLnkNode<E> curr;
     transient RefSnglLnkNode<E> next;
+    AbstractItr(AbstractItr<E> itr){
+      this.prev=itr.prev;
+      this.curr=itr.curr;
+      this.next=itr.next;
+    }
     AbstractItr(RefSnglLnkNode<E> next){
       this.next=next; 
     }
+    @Override public abstract Object clone();
     @Override public E next(){
       final RefSnglLnkNode<E> next;
       this.next=(next=this.next).next;

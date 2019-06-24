@@ -15,7 +15,7 @@ import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 public class DoubleOpenAddressHashSet
-extends AbstractOpenAddressHashSet
+extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
   private static void quickInsert(long[] table,long val){
     int tableLength;
@@ -884,6 +884,10 @@ implements OmniSet.OfDouble{
   extends AbstractDoubleItr{
       private final DoubleOpenAddressHashSet root;
       private int offset;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr(DoubleOpenAddressHashSet root){
           this.root=root;
           if(root.size != 0){
@@ -898,6 +902,10 @@ implements OmniSet.OfDouble{
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr(this);
       }
       @Override
       public boolean hasNext(){
@@ -1128,6 +1136,12 @@ implements OmniSet.OfDouble{
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked root){
           this.root=root;
           this.modCount=root.modCount;
@@ -1144,6 +1158,9 @@ implements OmniSet.OfDouble{
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void forEachRemaining(DoubleConsumer action){
         int offset;

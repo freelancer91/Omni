@@ -2,6 +2,7 @@ package omni.impl;
 import omni.api.OmniIterator;
 public abstract class AbstractByteItr implements OmniIterator.OfByte
 {
+  @Override public abstract Object clone();
   @Override
   public Byte next()
   {

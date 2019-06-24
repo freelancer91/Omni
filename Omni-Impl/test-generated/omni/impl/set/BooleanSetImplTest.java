@@ -24,23 +24,14 @@ import omni.function.BooleanConsumer;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("SetTest")
 public class BooleanSetImplTest{
-  private static TestExecutorService EXECUTORSERVICE;
-  @org.junit.jupiter.api.BeforeAll
-  public static void init(){
-    EXECUTORSERVICE=new TestExecutorService(0);
-  }
   @org.junit.jupiter.api.AfterEach
   public void verifyAllExecuted(){
     int numTestsRemaining;
-    if((numTestsRemaining=EXECUTORSERVICE.getNumRemainingTasks())!=0)
+    if((numTestsRemaining=TestExecutorService.getNumRemainingTasks())!=0)
     {
       System.err.println("Warning: there were "+numTestsRemaining+" tests that were not completed");
     }
-    EXECUTORSERVICE.reset();
-  }
-  @org.junit.jupiter.api.AfterAll
-  public static void cleanUp(){
-    EXECUTORSERVICE=null;
+    TestExecutorService.reset();
   }
   private static class SetMonitor extends AbstractBooleanSetMonitor<BooleanSetImpl>{
     int expectedState;
@@ -336,19 +327,19 @@ public class BooleanSetImplTest{
   @org.junit.jupiter.api.Test
   public void testConstructor_void(){
     for(var checkedType:CheckedType.values()){
-      EXECUTORSERVICE.submitTest(()->new SetMonitor(checkedType).verifyStructuralIntegrity());
+      TestExecutorService.submitTest(()->new SetMonitor(checkedType).verifyStructuralIntegrity());
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_int(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->new SetMonitor(checkedType,state).verifyStructuralIntegrity());
+        TestExecutorService.submitTest(()->new SetMonitor(checkedType,state).verifyStructuralIntegrity());
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testReadAndWrite(){
@@ -357,7 +348,7 @@ public class BooleanSetImplTest{
         if(!monitoredFunctionGen.appliesToItr && (checkedType.checked || monitoredFunctionGen.expectedException==null)){
           for(var tmpState=0b00;tmpState<=0b11;++tmpState){
             final var state=tmpState;
-            EXECUTORSERVICE.submitTest(()->{
+            TestExecutorService.submitTest(()->{
               var setMonitor=new SetMonitor(checkedType,state);
               final File file;
               try{
@@ -412,28 +403,28 @@ public class BooleanSetImplTest{
         } 
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testclear_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           setMonitor.clear();
           setMonitor.verifyStructuralIntegrity();
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testclone_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var clone=setMonitor.set.clone();
           setMonitor.verifyStructuralIntegrity();
@@ -447,14 +438,14 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testtoString_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var result=setMonitor.set.toString();
           setMonitor.verifyStructuralIntegrity();
@@ -477,14 +468,14 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testhashCode_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var result=setMonitor.set.hashCode();
           setMonitor.verifyStructuralIntegrity();
@@ -507,14 +498,14 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testisEmpty_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var result=setMonitor.set.isEmpty();
           setMonitor.verifyStructuralIntegrity();
@@ -522,14 +513,14 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testsize_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var result=setMonitor.set.size();
           setMonitor.verifyStructuralIntegrity();
@@ -537,7 +528,7 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testToArray_IntFunction(){
@@ -546,7 +537,7 @@ public class BooleanSetImplTest{
         if(!monitoredFunctionGen.appliesToItr && (checkedType.checked || monitoredFunctionGen.expectedException==null)){
           for(var tmpState=0b00;tmpState<=0b11;++tmpState){
             final var state=tmpState;
-            EXECUTORSERVICE.submitTest(()->{
+            TestExecutorService.submitTest(()->{
               var setMonitor=new SetMonitor(checkedType,state);
               var monitoredArrConstructor=monitoredFunctionGen.getMonitoredArrayConstructor(setMonitor);
               if(monitoredFunctionGen.expectedException==null){
@@ -578,7 +569,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testToArray_ObjectArray(){
@@ -587,7 +578,7 @@ public class BooleanSetImplTest{
         final var state=tmpState;
         for(var tmpArrSize=0;tmpArrSize<=4;++tmpArrSize){
           final var arrSize=tmpArrSize;
-          EXECUTORSERVICE.submitTest(()->{
+          TestExecutorService.submitTest(()->{
             var setMonitor=new SetMonitor(checkedType,state);
             var paramArr=new Object[arrSize];
             for(int i=0;i<arrSize;++i){
@@ -630,7 +621,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testadd_val(){
@@ -640,12 +631,12 @@ public class BooleanSetImplTest{
         for(var tmpAddedVal=0;tmpAddedVal<=1;++tmpAddedVal){
           final var addedVal=tmpAddedVal;
           for(var inputArgType:BooleanInputTestArgType.values()){
-            EXECUTORSERVICE.submitTest(()->new SetMonitor(checkedType,state).verifyAdd(inputArgType,addedVal));
+            TestExecutorService.submitTest(()->new SetMonitor(checkedType,state).verifyAdd(inputArgType,addedVal));
           }
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testforEach_Consumer(){
@@ -655,7 +646,7 @@ public class BooleanSetImplTest{
           if(!monitoredFunctionGen.appliesToItr && (checkedType.checked || monitoredFunctionGen.expectedException==null || tmpState==0b00)){
             final int state=tmpState;
             for(var functionCallType:FunctionCallType.values()){
-              EXECUTORSERVICE.submitTest(()->{
+              TestExecutorService.submitTest(()->{
                 var setMonitor=new SetMonitor(checkedType,state);
                 var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(setMonitor);
                 if(monitoredFunctionGen.expectedException==null || state==0b00){
@@ -689,7 +680,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testremoveIf_Predicate(){
@@ -707,7 +698,7 @@ public class BooleanSetImplTest{
               }
               for(long tmpRandSeed=0;tmpRandSeed<=randSeedBound;++tmpRandSeed){
                 final long randSeed=tmpRandSeed;
-                EXECUTORSERVICE.submitTest(()->{
+                TestExecutorService.submitTest(()->{
                   var setMonitor=new SetMonitor(checkedType,state);
                   final int numExpectedCalls;
                   switch(state){
@@ -736,7 +727,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testtoArray_void(){
@@ -744,7 +735,7 @@ public class BooleanSetImplTest{
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
         for(var outputArgType:BooleanOutputTestArgType.values()){
-          EXECUTORSERVICE.submitTest(()->{
+          TestExecutorService.submitTest(()->{
             var setMonitor=new SetMonitor(checkedType,state);
             outputArgType.verifyToArray(setMonitor.set,Integer.bitCount(state));
             setMonitor.verifyStructuralIntegrity();
@@ -752,14 +743,14 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testiterator_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var itrMonitor=setMonitor.getItrMonitor();
           setMonitor.verifyStructuralIntegrity();
@@ -767,7 +758,7 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testItrremove_void(){
@@ -789,7 +780,7 @@ public class BooleanSetImplTest{
                   }
                   for(;tmpItrCount<=setSize;++tmpItrCount){
                     final var itrCount=tmpItrCount;
-                    EXECUTORSERVICE.submitTest(()->{
+                    TestExecutorService.submitTest(()->{
                       var setMonitor=new SetMonitor(checkedType,state);
                       var itrMonitor=setMonitor.getItrMonitor();
                       for(int i=0;i<itrCount;++i){
@@ -824,7 +815,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testItrforEachRemaining_Consumer(){
@@ -842,7 +833,7 @@ public class BooleanSetImplTest{
                 for(var tmpItrScenario=0;tmpItrScenario<=itrScenarioMax;++tmpItrScenario){
                   var itrScenario=tmpItrScenario;
                   for(var functionCallType:FunctionCallType.values()){
-                    EXECUTORSERVICE.submitTest(()->{
+                    TestExecutorService.submitTest(()->{
                       var setMonitor=new SetMonitor(checkedType,state);
                       var itrMonitor=setMonitor.getItrMonitor();
                       var monitoredConsumer=monitoredFunctionGen.getMonitoredConsumer(itrMonitor);
@@ -902,7 +893,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testItrnext_void(){
@@ -912,7 +903,7 @@ public class BooleanSetImplTest{
           for(var tmpState=0b00;tmpState<=0b11;++tmpState){
             final var state=tmpState;
             for(var outputArgType:BooleanOutputTestArgType.values()){
-              EXECUTORSERVICE.submitTest(()->{
+              TestExecutorService.submitTest(()->{
                 var setMonitor=new SetMonitor(checkedType,state);
                 var itrMonitor=setMonitor.getItrMonitor();
                 setMonitor.illegalMod(preModScenario);
@@ -958,14 +949,14 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testItrhasNext_void(){
     for(var checkedType:CheckedType.values()){
       for(var tmpState=0b00;tmpState<=0b11;++tmpState){
         final var state=tmpState;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           var setMonitor=new SetMonitor(checkedType,state);
           var itrMonitor=setMonitor.getItrMonitor();
           var setSize=Integer.bitCount(state);
@@ -981,7 +972,7 @@ public class BooleanSetImplTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testcontains_val(){
@@ -992,7 +983,7 @@ public class BooleanSetImplTest{
             if(isValidQuery(queryVal,queryInputType,queryCastType)){
               for(var tmpState=0b00;tmpState<=0b11;++tmpState){
                 final var state=tmpState;
-                EXECUTORSERVICE.submitTest(()->{
+                TestExecutorService.submitTest(()->{
                   var setMonitor=new SetMonitor(checkedType,state);
                   boolean expectedResult;
                   switch(queryVal){
@@ -1015,7 +1006,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testremoveVal_val(){
@@ -1026,7 +1017,7 @@ public class BooleanSetImplTest{
             if(isValidQuery(queryVal,queryInputType,queryCastType)){
               for(var tmpState=0b00;tmpState<=0b11;++tmpState){
                 final var state=tmpState;
-                EXECUTORSERVICE.submitTest(()->{
+                TestExecutorService.submitTest(()->{
                   var setMonitor=new SetMonitor(checkedType,state);
                   int newState;
                   switch(queryVal){
@@ -1071,7 +1062,7 @@ public class BooleanSetImplTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   static enum QueryVal{
     TRUE,

@@ -2,6 +2,7 @@ package omni.impl;
 import omni.api.OmniIterator;
 public abstract class AbstractShortItr implements OmniIterator.OfShort
 {
+  @Override public abstract Object clone();
   @Override
   public Short next()
   {

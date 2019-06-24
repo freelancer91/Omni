@@ -1,7 +1,7 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public abstract interface OmniStack extends OmniCollection
+public abstract interface OmniStack<E> extends OmniCollection<E>
 {
     public abstract int search(Object val);
     public abstract int search(boolean val);
@@ -20,7 +20,7 @@ public abstract interface OmniStack extends OmniCollection
     public abstract int search(Long val);
     public abstract int search(Float val);
     public abstract int search(Double val);
-    public abstract interface OfPrimitive extends OmniCollection,OmniStack,OmniCollection.OfPrimitive
+    public abstract interface OfPrimitive<E> extends OmniCollection<E>,OmniStack<E>,OmniCollection.OfPrimitive<E>
     {
       public abstract void push(boolean val);
       @Override
@@ -112,8 +112,8 @@ public abstract interface OmniStack extends OmniCollection
         return -1;
       }
     }
-    public abstract interface OfBoolean extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>
-    ,BooleanInput,ByteOutput<Boolean>,CharOutput<Boolean>
+    public abstract interface OfBoolean extends OmniCollection<Boolean>,OmniStack<Boolean>,OmniCollection.OfPrimitive<Boolean>,OfPrimitive<Boolean>,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>
+    ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
     {
       public abstract Boolean pop();
       public abstract boolean popBoolean();
@@ -164,8 +164,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((int)val);
       }
     }
-    public abstract interface OfByte extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfByte,PeekAndPollIfc.ByteOutput<Byte>
-    ,ByteInput,ByteOutput<Byte>
+    public abstract interface OfByte extends OmniCollection<Byte>,OmniStack<Byte>,OmniCollection.OfPrimitive<Byte>,OfPrimitive<Byte>,OmniCollection.OfByte,PeekAndPollIfc.ByteOutput<Byte>
+    ,ByteInput<Byte>,ByteOutput<Byte>
     {
       public abstract Byte pop();
       public abstract byte popByte();
@@ -210,8 +210,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((int)val);
       }
     }
-    public abstract interface OfChar extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfChar,PeekAndPollIfc.CharOutput<Character>
-    ,CharInput,CharOutput<Character>
+    public abstract interface OfChar extends OmniCollection<Character>,OmniStack<Character>,OmniCollection.OfPrimitive<Character>,OfPrimitive<Character>,OmniCollection.OfChar,PeekAndPollIfc.CharOutput<Character>
+    ,CharInput<Character>,CharOutput<Character>
     {
       public abstract Character pop();
       public abstract char popChar();
@@ -252,8 +252,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((short)val);
       }
     }
-    public abstract interface OfShort extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfShort,PeekAndPollIfc.ShortOutput<Short>
-    ,ShortInput,ShortOutput<Short>
+    public abstract interface OfShort extends OmniCollection<Short>,OmniStack<Short>,OmniCollection.OfPrimitive<Short>,OfPrimitive<Short>,OmniCollection.OfShort,PeekAndPollIfc.ShortOutput<Short>
+    ,ShortInput<Short>,ShortOutput<Short>
     {
       public abstract Short pop();
       public abstract short popShort();
@@ -302,8 +302,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((short)val);
       }
     }
-    public abstract interface OfInt extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfInt,PeekAndPollIfc.IntOutput<Integer>
-    ,IntInput,IntOutput<Integer>
+    public abstract interface OfInt extends OmniCollection<Integer>,OmniStack<Integer>,OmniCollection.OfPrimitive<Integer>,OfPrimitive<Integer>,OmniCollection.OfInt,PeekAndPollIfc.IntOutput<Integer>
+    ,IntInput<Integer>,IntOutput<Integer>
     {
       public abstract Integer pop();
       public abstract int popInt();
@@ -374,8 +374,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((int)val);
       }
     }
-    public abstract interface OfLong extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfLong,PeekAndPollIfc.LongOutput<Long>
-    ,LongInput,LongOutput<Long>
+    public abstract interface OfLong extends OmniCollection<Long>,OmniStack<Long>,OmniCollection.OfPrimitive<Long>,OfPrimitive<Long>,OmniCollection.OfLong,PeekAndPollIfc.LongOutput<Long>
+    ,LongInput<Long>,LongOutput<Long>
     {
       public abstract Long pop();
       public abstract long popLong();
@@ -450,8 +450,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((int)val);
       }
     }
-    public abstract interface OfFloat extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfFloat,PeekAndPollIfc.FloatOutput<Float>
-    ,FloatInput,FloatOutput<Float>
+    public abstract interface OfFloat extends OmniCollection<Float>,OmniStack<Float>,OmniCollection.OfPrimitive<Float>,OfPrimitive<Float>,OmniCollection.OfFloat,PeekAndPollIfc.FloatOutput<Float>
+    ,FloatInput<Float>,FloatOutput<Float>
     {
       public abstract Float pop();
       public abstract float popFloat();
@@ -520,8 +520,8 @@ public abstract interface OmniStack extends OmniCollection
         return search((short)val);
       }
     }
-    public abstract interface OfDouble extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfDouble,PeekAndPollIfc.DoubleOutput<Double>
-    ,FloatInput,DoubleOutput<Double>
+    public abstract interface OfDouble extends OmniCollection<Double>,OmniStack<Double>,OmniCollection.OfPrimitive<Double>,OfPrimitive<Double>,OmniCollection.OfDouble,PeekAndPollIfc.DoubleOutput<Double>
+    ,FloatInput<Double>,DoubleOutput<Double>
     {
       public abstract Double pop();
       public abstract double popDouble();
@@ -604,7 +604,7 @@ public abstract interface OmniStack extends OmniCollection
         return search((int)val);
       }
     }
-    public abstract interface DoubleOutput<E> extends OmniStack,OmniCollection.DoubleOutput<E>
+    public abstract interface DoubleOutput<E> extends OmniStack<E>,OmniCollection.DoubleOutput<E>
     {
       public abstract double popDouble();
     }
@@ -632,35 +632,35 @@ public abstract interface OmniStack extends OmniCollection
     {
       public abstract byte popByte();
     }
-    public abstract interface BooleanInput extends OmniStack,OmniCollection.BooleanInput{
+    public abstract interface BooleanInput<E> extends OmniStack<E>,OmniCollection.BooleanInput<E>{
       public abstract void push(boolean val);
       public abstract void push(Boolean val);
     }
-    public abstract interface ByteInput extends BooleanInput,OmniCollection.ByteInput{
+    public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput<E>{
       public abstract void push(byte val);
       public abstract void push(Byte val);
     }
-    public abstract interface CharInput extends BooleanInput,OmniCollection.CharInput{
+    public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput<E>{
       public abstract void push(char val);
       public abstract void push(Character val);
     }
-    public abstract interface ShortInput extends ByteInput,OmniCollection.ShortInput{
+    public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput<E>{
       public abstract void push(short val);
       public abstract void push(Short val);
     }
-    public abstract interface IntInput extends CharInput,ShortInput,OmniCollection.IntInput{
+    public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>,OmniCollection.IntInput<E>{
       public abstract void push(int val);
       public abstract void push(Integer val);
     }
-    public abstract interface LongInput extends IntInput,OmniCollection.LongInput{
+    public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput<E>{
       public abstract void push(long val);
       public abstract void push(Long val);
     }
-    public abstract interface FloatInput extends LongInput,OmniCollection.FloatInput{
+    public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput<E>{
       public abstract void push(float val);
       public abstract void push(Float val);
     }
-  public abstract interface OfRef<E> extends OmniCollection,OmniStack,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
+  public abstract interface OfRef<E> extends OmniCollection<E>,OmniStack<E>,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
   {
     public abstract E pop();
     public abstract void push(E val);

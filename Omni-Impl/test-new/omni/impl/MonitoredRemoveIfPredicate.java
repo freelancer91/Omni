@@ -24,11 +24,11 @@ LongPredicate,
 FloatPredicate,
 DoublePredicate{
 
-    HashSet<Object> retainedVals=new HashSet<>();
-    HashSet<Object> removedVals=new HashSet<>();
-    int numCalls;
-    int numRetained;
-    int numRemoved;
+    public final HashSet<Object> retainedVals=new HashSet<>();
+    public final HashSet<Object> removedVals=new HashSet<>();
+    public int numCalls;
+    public int numRetained;
+    public int numRemoved;
 
     protected boolean testImpl(){
         throw new UnsupportedOperationException();

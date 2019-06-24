@@ -38,9 +38,11 @@ import omni.util.ToStringUtil;
 #ENDIF
 public class $ClassPrefix$OpenAddressHashSet$<E>$
 #IF OfChar,OfShort,OfInt,OfLong
-extends AbstractIntegralTypeOpenAddressHashSet
+extends AbstractIntegralTypeOpenAddressHashSet<$BoxedType$>
+#ELSEIF OfRef
+extends AbstractOpenAddressHashSet$<E>$
 #ELSE
-extends AbstractOpenAddressHashSet
+extends AbstractOpenAddressHashSet<$BoxedType$>
 #ENDIF
 implements OmniSet.Of$ClassPrefix$$<E>${
   #IF OfRef
@@ -3300,6 +3302,10 @@ return (this.wordWORDNUM & (MASK))!=0;
 #ENDIF
       private final $ClassPrefix$OpenAddressHashSet$<E>$ root;
       private int offset;
+      Itr(Itr$<E>$ itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr($ClassPrefix$OpenAddressHashSet$<E>$ root){
           this.root=root;
           if(root.size != 0){
@@ -3346,6 +3352,10 @@ return (this.wordWORDNUM & (MASK))!=0;
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr$<E>$(this);
       }
       @Override
       public boolean hasNext(){
@@ -4308,6 +4318,12 @@ return (this.wordWORDNUM & (MASK))!=0;
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr$<E>$ itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked$<E>$ root){
           this.root=root;
           this.modCount=root.modCount;
@@ -4355,6 +4371,9 @@ return (this.wordWORDNUM & (MASK))!=0;
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr$<E>$(this);
       }
       #MACRO CheckedForEachRemaining($TypeNameModifier$Consumer$<? super E>$,action)
 #IFNOT OfRef

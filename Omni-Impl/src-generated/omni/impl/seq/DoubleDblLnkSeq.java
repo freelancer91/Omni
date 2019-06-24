@@ -27,7 +27,9 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollection;
-public abstract class DoubleDblLnkSeq extends AbstractSeq implements
+public abstract class DoubleDblLnkSeq extends 
+AbstractSeq<Double>
+ implements
    DoubleSubListDefault
 {
   private static final long serialVersionUID=1L;
@@ -1487,9 +1489,16 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         this.parent=parent;
         this.curr=curr;
       }
+      private AscendingItr(AscendingItr itr){
+        this.parent=itr.parent;
+        this.curr=itr.curr;
+      }
       private AscendingItr(UncheckedSubList parent){
         this.parent=parent;
         this.curr=parent.head;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -1538,12 +1547,20 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfDouble{
       private transient int currIndex;
       private transient DoubleDblLnkNode lastRet;
+      private BidirectionalItr(BidirectionalItr itr){
+        super(itr);
+        this.currIndex=itr.currIndex;
+        this.lastRet=itr.lastRet;
+      }
       private BidirectionalItr(UncheckedSubList parent){
         super(parent);
       }
       private BidirectionalItr(UncheckedSubList parent,DoubleDblLnkNode curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr(this);
       }
       @Override public double nextDouble(){
         final DoubleDblLnkNode curr;
@@ -2085,6 +2102,13 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
       private transient DoubleDblLnkNode curr;
       private transient DoubleDblLnkNode lastRet;
       private transient int currIndex;
+      private BidirectionalItr(BidirectionalItr itr){
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+        this.curr=itr.curr;
+        this.lastRet=itr.lastRet;
+        this.currIndex=itr.currIndex;
+      }
       private BidirectionalItr(CheckedSubList parent){
         this.parent=parent;
         this.modCount=parent.modCount;
@@ -2095,6 +2119,9 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         this.modCount=parent.modCount;
         this.curr=curr;
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr(this);
       }
       @Override public double nextDouble(){
         final CheckedSubList parent;
@@ -4823,6 +4850,13 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
       transient DoubleDblLnkNode curr;
       transient DoubleDblLnkNode lastRet;
       transient int currIndex;
+      private DescendingItr(DescendingItr itr){
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+        this.curr=itr.curr;
+        this.lastRet=itr.lastRet;
+        this.currIndex=itr.currIndex;
+      }
       private DescendingItr(CheckedList parent){
         this.parent=parent;
         this.modCount=parent.modCount;
@@ -4834,6 +4868,9 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
         this.modCount=parent.modCount;
         this.curr=curr;
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
       }
       @Override public boolean hasNext(){
         return this.curr!=null;
@@ -4902,11 +4939,17 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
       }
     }
     private static class BidirectionalItr extends DescendingItr implements OmniListIterator.OfDouble{
+      private BidirectionalItr(BidirectionalItr itr){
+        super(itr);
+      }
       private BidirectionalItr(CheckedList parent){
         super(parent,parent.head,0);
       }
       private BidirectionalItr(CheckedList parent,DoubleDblLnkNode curr,int currIndex){
         super(parent,curr,currIndex);
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr(this);
       }
       @Override public double nextDouble(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
@@ -6056,8 +6099,17 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
       }
     }
     private static class DescendingItr extends AscendingItr{
+      private DescendingItr(DescendingItr itr){
+        super(itr);
+      }
       private DescendingItr(UncheckedList parent){
         super(parent,parent.tail);
+      }
+      private DescendingItr(UncheckedList parent,DoubleDblLnkNode curr){
+        super(parent,curr);
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
       }
       @Override public void remove(){
         final UncheckedList parent;
@@ -6095,6 +6147,10 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
     {
       transient final UncheckedList parent;
       transient DoubleDblLnkNode curr;
+      private AscendingItr(AscendingItr itr){
+        this.parent=itr.parent;
+        this.curr=itr.curr;
+      }
       private AscendingItr(UncheckedList parent,DoubleDblLnkNode curr){
         this.parent=parent;
         this.curr=curr;
@@ -6102,6 +6158,9 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
       private AscendingItr(UncheckedList parent){
         this.parent=parent;
         this.curr=parent.head;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -6155,12 +6214,20 @@ public abstract class DoubleDblLnkSeq extends AbstractSeq implements
     private static class BidirectionalItr extends AscendingItr implements OmniListIterator.OfDouble{
       private transient int currIndex;
       private transient DoubleDblLnkNode lastRet;
+      private BidirectionalItr(BidirectionalItr itr){
+        super(itr);
+        this.currIndex=itr.currIndex;
+        this.lastRet=itr.lastRet;
+      }
       private BidirectionalItr(UncheckedList parent){
         super(parent);
       }
       private BidirectionalItr(UncheckedList parent,DoubleDblLnkNode curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr(this);
       }
       @Override public double nextDouble(){
         final DoubleDblLnkNode curr;

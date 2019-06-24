@@ -20,7 +20,9 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniCollection.OfBoolean,Externalizable{
+public abstract class BooleanSnglLnkSeq extends 
+AbstractSeq<Boolean>
+ implements OmniCollection.OfBoolean,Externalizable{
   private static final long serialVersionUID=1L;
   transient BooleanSnglLnkNode head;
   private BooleanSnglLnkSeq(){
@@ -923,6 +925,14 @@ public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniColle
         this.parent=parent;
         this.modCount=parent.modCount;
       }
+      Itr(Itr itr){
+        super(itr);
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public boolean nextBoolean(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
         final BooleanSnglLnkNode next;
@@ -1342,6 +1352,12 @@ public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniColle
       Itr(){
         super(UncheckedStack.this.head);
       }
+      Itr(Itr itr){
+        super(itr);
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public void remove(){
         final UncheckedStack parent;
         --(parent=UncheckedStack.this).size;
@@ -1714,6 +1730,14 @@ public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniColle
         this.parent=parent;
         this.modCount=parent.modCount;
       }
+      Itr(Itr itr){
+        super(itr);
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public boolean nextBoolean(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
         final BooleanSnglLnkNode next;
@@ -2066,6 +2090,12 @@ public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniColle
       Itr(){
         super(UncheckedQueue.this.head);
       }
+      Itr(Itr itr){
+        super(itr);
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public void remove(){
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
@@ -2082,12 +2112,17 @@ public abstract class BooleanSnglLnkSeq extends AbstractSeq implements OmniColle
       }
     }
   }
-  private static class AbstractItr
+  private abstract static class AbstractItr
       extends AbstractBooleanItr
   {
     transient BooleanSnglLnkNode prev;
     transient BooleanSnglLnkNode curr;
     transient BooleanSnglLnkNode next;
+    AbstractItr(AbstractItr itr){
+      this.prev=itr.prev;
+      this.curr=itr.curr;
+      this.next=itr.next;
+    }
     AbstractItr(BooleanSnglLnkNode next){
       this.next=next; 
     }

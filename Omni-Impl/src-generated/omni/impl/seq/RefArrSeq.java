@@ -24,7 +24,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
-public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection.OfRef<E>,Externalizable,RandomAccess{
+public abstract class RefArrSeq<E> extends 
+AbstractSeq<E>
+ implements OmniCollection.OfRef<E>,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient Object[] arr; 
@@ -1109,9 +1111,20 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     {
       transient final UncheckedStack<E> parent;
       transient int cursor;
+      private Itr(Itr<E> itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+      }
       private Itr(UncheckedStack<E> parent){
         this.parent=parent;
         this.cursor=parent.size;
+      }
+      private Itr(UncheckedStack<E> parent,int cursor){
+        this.parent=parent;
+        this.cursor=cursor;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @Override public boolean hasNext(){
         return this.cursor>0;
@@ -1721,6 +1734,10 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     {
       transient final UncheckedList<E> parent;
       transient int cursor;
+      private Itr(Itr<E> itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+      }
       private Itr(UncheckedList<E> parent){
         this.parent=parent;
         this.cursor=0;
@@ -1728,6 +1745,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       private Itr(UncheckedList<E> parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @Override public boolean hasNext(){
         return this.cursor<parent.size;
@@ -1754,6 +1774,10 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     }
     private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
       transient int lastRet;
+      private ListItr(ListItr<E> itr){
+        super(itr);
+        this.lastRet=itr.lastRet;
+      }
       private ListItr(UncheckedList<E> parent){
         super(parent);
         this.lastRet=-1;
@@ -1761,6 +1785,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       private ListItr(UncheckedList<E> parent,int cursor){
         super(parent,cursor);
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new ListItr<E>(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>0;
@@ -1938,7 +1965,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
   }
   public
     static class UncheckedSubList<E>
-      extends AbstractSeq
+      extends AbstractSeq<E>
       implements OmniList.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -3058,6 +3085,10 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     {
       transient final UncheckedSubList<E> parent;
       transient int cursor;
+      private Itr(Itr<E> itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+      }
       private Itr(UncheckedSubList<E> parent){
         this.parent=parent;
         this.cursor=parent.rootOffset;
@@ -3065,6 +3096,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       private Itr(UncheckedSubList<E> parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @Override public boolean hasNext(){
         final UncheckedSubList<E> parent;
@@ -3096,6 +3130,10 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
     }
     private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
       transient int lastRet;
+      private ListItr(ListItr<E> itr){
+        super(itr);
+        this.lastRet=itr.lastRet;
+      }
       private ListItr(UncheckedSubList<E> parent){
         super(parent);
         this.lastRet=-1;
@@ -3103,6 +3141,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       private ListItr(UncheckedSubList<E> parent,int cursor){
         super(parent,cursor);
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new ListItr<E>(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>parent.rootOffset;
@@ -3522,11 +3563,26 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       transient int cursor;
       transient int lastRet;
       transient int modCount;
+      private Itr(Itr<E> itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+        this.lastRet=itr.lastRet;
+        this.modCount=itr.modCount;
+      }
       private Itr(CheckedStack<E> parent){
         this.parent=parent;
         this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
+      }
+      private Itr(CheckedStack<E> parent,int cursor){
+        this.parent=parent;
+        this.cursor=cursor;
+        this.modCount=parent.modCount;
+        this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @Override public boolean hasNext(){
         return this.cursor>0;
@@ -3845,6 +3901,12 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       transient int cursor;
       transient int lastRet;
       transient int modCount;
+      private Itr(Itr<E> itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+        this.lastRet=itr.lastRet;
+        this.modCount=itr.modCount;
+      }
       private Itr(CheckedList<E> parent){
         this.parent=parent;
         this.cursor=0;
@@ -3856,6 +3918,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @Override public boolean hasNext(){
         return this.cursor<parent.size;
@@ -3908,11 +3973,17 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       return new Itr<E>(this);
     }
     private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
+      private ListItr(ListItr<E> itr){
+        super(itr);
+      }
       private ListItr(CheckedList<E> parent){
         super(parent);
       }
       private ListItr(CheckedList<E> parent,int cursor){
         super(parent,cursor);
+      }
+      @Override public Object clone(){
+        return new ListItr<E>(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>0;
@@ -4172,7 +4243,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
   }
   private
     static class CheckedSubList<E>
-      extends AbstractSeq
+      extends AbstractSeq<E>
       implements OmniList.OfRef<E>,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -5679,6 +5750,12 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       transient int cursor;
       transient int lastRet;
       transient int modCount;
+      private Itr(Itr<E> itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+        this.lastRet=itr.lastRet;
+        this.modCount=itr.modCount;
+      }
       private Itr(CheckedSubList<E> parent){
         this.parent=parent;
         this.cursor=parent.rootOffset;
@@ -5690,6 +5767,9 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @Override public boolean hasNext(){
         final CheckedSubList<E> parent;
@@ -5751,11 +5831,17 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       return new Itr<E>(this);
     }
     private static class ListItr<E> extends Itr<E> implements OmniListIterator.OfRef<E>{
+      private ListItr(ListItr<E> itr){
+        super(itr);
+      }
       private ListItr(CheckedSubList<E> parent){
         super(parent);
       }
       private ListItr(CheckedSubList<E> parent,int cursor){
         super(parent,cursor);
+      }
+      @Override public Object clone(){
+        return new ListItr<E>(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>parent.rootOffset;

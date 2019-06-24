@@ -16,7 +16,7 @@ import omni.util.OmniArray;
 import omni.util.TypeUtil;
 import omni.util.ToStringUtil;
 public class FloatOpenAddressHashSet
-extends AbstractOpenAddressHashSet
+extends AbstractOpenAddressHashSet<Float>
 implements OmniSet.OfFloat{
   private static void quickInsert(int[] table,int val){
     int tableLength;
@@ -1077,6 +1077,10 @@ implements OmniSet.OfFloat{
   extends AbstractFloatItr{
       private final FloatOpenAddressHashSet root;
       private int offset;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr(FloatOpenAddressHashSet root){
           this.root=root;
           if(root.size != 0){
@@ -1093,6 +1097,10 @@ implements OmniSet.OfFloat{
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr(this);
       }
       @Override
       public boolean hasNext(){
@@ -1335,6 +1343,12 @@ implements OmniSet.OfFloat{
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked root){
           this.root=root;
           this.modCount=root.modCount;
@@ -1353,6 +1367,9 @@ implements OmniSet.OfFloat{
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void forEachRemaining(FloatConsumer action){
         int offset;

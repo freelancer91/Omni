@@ -2,6 +2,7 @@ package omni.impl;
 import omni.api.OmniIterator;
 public abstract class AbstractLongItr implements OmniIterator.OfLong
 {
+  @Override public abstract Object clone();
   @Override
   public Long next()
   {

@@ -15,7 +15,7 @@ import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
 public class ShortOpenAddressHashSet
-extends AbstractIntegralTypeOpenAddressHashSet
+extends AbstractIntegralTypeOpenAddressHashSet<Short>
 implements OmniSet.OfShort{
   private static void quickInsert(short[] table,short val){
     int tableLength;
@@ -1300,6 +1300,10 @@ implements OmniSet.OfShort{
   extends AbstractShortItr{
       private final ShortOpenAddressHashSet root;
       private int offset;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr(ShortOpenAddressHashSet root){
           this.root=root;
           if(root.size != 0){
@@ -1325,6 +1329,10 @@ implements OmniSet.OfShort{
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr(this);
       }
       @Override
       public boolean hasNext(){
@@ -1752,6 +1760,12 @@ implements OmniSet.OfShort{
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked root){
           this.root=root;
           this.modCount=root.modCount;
@@ -1778,6 +1792,9 @@ implements OmniSet.OfShort{
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void forEachRemaining(ShortConsumer action){
         int offset;

@@ -57,7 +57,13 @@ import omni.impl.CheckedCollection;
 #IFNOT OfRef,OfDouble,OfChar
 import omni.util.ToStringUtil;
 #ENDIF
-public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements
+public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends 
+#IF OfRef
+AbstractSeq$<E>$
+#ELSE
+AbstractSeq<$BoxedType$>
+#ENDIF
+ implements
 #IF OfRef
    OmniList.Of$ClassPrefix$$<E>$
 #ELSE
@@ -411,9 +417,16 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         this.parent=parent;
         this.curr=curr;
       }
+      private AscendingItr(AscendingItr$<E>$ itr){
+        this.parent=itr.parent;
+        this.curr=itr.curr;
+      }
       private AscendingItr(UncheckedSubList$<E>$ parent){
         this.parent=parent;
         this.curr=parent.head;
+      }
+      @Override public Object clone(){
+        return new AscendingItr$<E>$(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -464,12 +477,20 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
       private transient int currIndex;
       private transient $DNode$$<E>$ lastRet;
+      private BidirectionalItr(BidirectionalItr$<E>$ itr){
+        super(itr);
+        this.currIndex=itr.currIndex;
+        this.lastRet=itr.lastRet;
+      }
       private BidirectionalItr(UncheckedSubList$<E>$ parent){
         super(parent);
       }
       private BidirectionalItr(UncheckedSubList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr$<E>$(this);
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         final $DNode$$<E>$ curr;
@@ -703,6 +724,14 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       private transient $DNode$$<E>$ curr;
       private transient $DNode$$<E>$ lastRet;
       private transient int currIndex;
+      private BidirectionalItr(BidirectionalItr$<E>$ itr){
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+        this.curr=itr.curr;
+        this.lastRet=itr.lastRet;
+        this.currIndex=itr.currIndex;
+      }
+      
       private BidirectionalItr(CheckedSubList$<E>$ parent){
         this.parent=parent;
         this.modCount=parent.modCount;
@@ -713,6 +742,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         this.modCount=parent.modCount;
         this.curr=curr;
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr$<E>$(this);
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         final CheckedSubList$<E>$ parent;
@@ -1712,6 +1744,13 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       transient $DNode$$<E>$ curr;
       transient $DNode$$<E>$ lastRet;
       transient int currIndex;
+      private DescendingItr(DescendingItr$<E>$ itr){
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+        this.curr=itr.curr;
+        this.lastRet=itr.lastRet;
+        this.currIndex=itr.currIndex;
+      }
       private DescendingItr(CheckedList$<E>$ parent){
         this.parent=parent;
         this.modCount=parent.modCount;
@@ -1723,6 +1762,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
         this.modCount=parent.modCount;
         this.curr=curr;
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new DescendingItr$<E>$(this);
       }
       @Override public boolean hasNext(){
         return this.curr!=null;
@@ -1793,11 +1835,17 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF  
     }
     private static class BidirectionalItr$<E>$ extends DescendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
+      private BidirectionalItr(BidirectionalItr$<E>$ itr){
+        super(itr);
+      }
       private BidirectionalItr(CheckedList$<E>$ parent){
         super(parent,parent.head,0);
       }
       private BidirectionalItr(CheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
         super(parent,curr,currIndex);
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr$<E>$(this);
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
@@ -2318,8 +2366,17 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
 #ENDIF
     }
     private static class DescendingItr$<E>$ extends AscendingItr$<E>${
+      private DescendingItr(DescendingItr$<E>$ itr){
+        super(itr);
+      }
       private DescendingItr(UncheckedList$<E>$ parent){
         super(parent,parent.tail);
+      }
+      private DescendingItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr){
+        super(parent,curr);
+      }
+      @Override public Object clone(){
+        return new DescendingItr$<E>$(this);
       }
       @Override public void remove(){
         final UncheckedList$<E>$ parent;
@@ -2361,6 +2418,10 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     {
       transient final UncheckedList$<E>$ parent;
       transient $DNode$$<E>$ curr;
+      private AscendingItr(AscendingItr$<E>$ itr){
+        this.parent=itr.parent;
+        this.curr=itr.curr;
+      }
       private AscendingItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr){
         this.parent=parent;
         this.curr=curr;
@@ -2368,6 +2429,9 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       private AscendingItr(UncheckedList$<E>$ parent){
         this.parent=parent;
         this.curr=parent.head;
+      }
+      @Override public Object clone(){
+        return new AscendingItr$<E>$(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -2423,12 +2487,20 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
     private static class BidirectionalItr$<E>$ extends AscendingItr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>${
       private transient int currIndex;
       private transient $DNode$$<E>$ lastRet;
+      private BidirectionalItr(BidirectionalItr$<E>$ itr){
+        super(itr);
+        this.currIndex=itr.currIndex;
+        this.lastRet=itr.lastRet;
+      }
       private BidirectionalItr(UncheckedList$<E>$ parent){
         super(parent);
       }
       private BidirectionalItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr$<E>$(this);
       }
       @Override public $exposedType$ next$TypeNameModifier$(){
         final $DNode$$<E>$ curr;

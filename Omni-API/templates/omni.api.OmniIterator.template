@@ -17,6 +17,8 @@ public interface OmniIterator<E> extends Iterator<E>
   //@Override
   //public abstract boolean hasNext();
   
+  public abstract Object clone();
+  
   #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
   #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
   #MACRO PrimitiveSubInterface<char,Char,Character>()

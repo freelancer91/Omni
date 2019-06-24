@@ -20,7 +20,9 @@ import java.io.Externalizable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.IOException;
-public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollection.OfInt,Externalizable{
+public abstract class IntSnglLnkSeq extends 
+AbstractSeq<Integer>
+ implements OmniCollection.OfInt,Externalizable{
   private static final long serialVersionUID=1L;
   transient IntSnglLnkNode head;
   private IntSnglLnkSeq(){
@@ -819,6 +821,14 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
         this.parent=parent;
         this.modCount=parent.modCount;
       }
+      Itr(Itr itr){
+        super(itr);
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public int nextInt(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
         final IntSnglLnkNode next;
@@ -1119,6 +1129,12 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
     private class Itr extends AbstractItr{
       Itr(){
         super(UncheckedStack.this.head);
+      }
+      Itr(Itr itr){
+        super(itr);
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void remove(){
         final UncheckedStack parent;
@@ -1458,6 +1474,14 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
         this.parent=parent;
         this.modCount=parent.modCount;
       }
+      Itr(Itr itr){
+        super(itr);
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public int nextInt(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
         final IntSnglLnkNode next;
@@ -1745,6 +1769,12 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
       Itr(){
         super(UncheckedQueue.this.head);
       }
+      Itr(Itr itr){
+        super(itr);
+      }
+      @Override public Object clone(){
+        return new Itr(this);
+      }
       @Override public void remove(){
         final UncheckedQueue parent;
         --(parent=UncheckedQueue.this).size;
@@ -1761,12 +1791,17 @@ public abstract class IntSnglLnkSeq extends AbstractSeq implements OmniCollectio
       }
     }
   }
-  private static class AbstractItr
+  private abstract static class AbstractItr
       extends AbstractIntItr
   {
     transient IntSnglLnkNode prev;
     transient IntSnglLnkNode curr;
     transient IntSnglLnkNode next;
+    AbstractItr(AbstractItr itr){
+      this.prev=itr.prev;
+      this.curr=itr.curr;
+      this.next=itr.next;
+    }
     AbstractItr(IntSnglLnkNode next){
       this.next=next; 
     }

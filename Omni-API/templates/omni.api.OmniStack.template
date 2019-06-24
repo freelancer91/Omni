@@ -2,12 +2,12 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public abstract interface OmniStack extends OmniCollection
+public abstract interface OmniStack<E> extends OmniCollection<E>
 {
     public abstract int search(Object val);
     #MACRO PrimitiveMethods(SearchMethodDecl)
     #MACRO BoxedMethods(SearchMethodDecl)
-    public abstract interface OfPrimitive extends OmniCollection,OmniStack,OmniCollection.OfPrimitive
+    public abstract interface OfPrimitive<E> extends OmniCollection<E>,OmniStack<E>,OmniCollection.OfPrimitive<E>
     {
       public abstract void push(boolean val);
       #MACRO BoxedMethods(SearchMethodDefault)
@@ -21,7 +21,7 @@ public abstract interface OmniStack extends OmniCollection
     #MACRO PrimitiveSubInterface<float,Float,Float>()
     #MACRO PrimitiveSubInterface<double,Double,Double>()
     
-    public abstract interface DoubleOutput<E> extends OmniStack,OmniCollection.DoubleOutput<E>
+    public abstract interface DoubleOutput<E> extends OmniStack<E>,OmniCollection.DoubleOutput<E>
     {
       public abstract double popDouble();
     }
@@ -50,31 +50,31 @@ public abstract interface OmniStack extends OmniCollection
       public abstract byte popByte();
     }
     
-    public abstract interface BooleanInput extends OmniStack,OmniCollection.BooleanInput{
+    public abstract interface BooleanInput<E> extends OmniStack<E>,OmniCollection.BooleanInput<E>{
       public abstract void push(boolean val);
       public abstract void push(Boolean val);
     }
-    public abstract interface ByteInput extends BooleanInput,OmniCollection.ByteInput{
+    public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput<E>{
       public abstract void push(byte val);
       public abstract void push(Byte val);
     }
-    public abstract interface CharInput extends BooleanInput,OmniCollection.CharInput{
+    public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput<E>{
       public abstract void push(char val);
       public abstract void push(Character val);
     }
-    public abstract interface ShortInput extends ByteInput,OmniCollection.ShortInput{
+    public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput<E>{
       public abstract void push(short val);
       public abstract void push(Short val);
     }
-    public abstract interface IntInput extends CharInput,ShortInput,OmniCollection.IntInput{
+    public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>,OmniCollection.IntInput<E>{
       public abstract void push(int val);
       public abstract void push(Integer val);
     }
-    public abstract interface LongInput extends IntInput,OmniCollection.LongInput{
+    public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput<E>{
       public abstract void push(long val);
       public abstract void push(Long val);
     }
-    public abstract interface FloatInput extends LongInput,OmniCollection.FloatInput{
+    public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput<E>{
       public abstract void push(float val);
       public abstract void push(Float val);
     }
@@ -82,13 +82,13 @@ public abstract interface OmniStack extends OmniCollection
     
     
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>
+public abstract interface OfCLASSPREFIX extends OmniCollection<BOXEDTYPE>,OmniStack<BOXEDTYPE>,OmniCollection.OfPrimitive<BOXEDTYPE>,OfPrimitive<BOXEDTYPE>,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>
 #IFSWITCH ARRTYPE==boolean
-,BooleanInput,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
+,BooleanInput<BOXEDTYPE>,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
 #ELSEIFSWITCH ARRTYPE==double
-,FloatInput,DoubleOutput<BOXEDTYPE>
+,FloatInput<BOXEDTYPE>,DoubleOutput<BOXEDTYPE>
 #ELSEIFNOTSWITCH ARRTYPE==Object
-,CLASSPREFIXInput,CLASSPREFIXOutput<BOXEDTYPE>
+,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
   public abstract BOXEDTYPE pop();
@@ -227,7 +227,7 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniStack,OmniCol
 #ENDIF  
 }
 #ENDDEF
-  public abstract interface OfRef<E> extends OmniCollection,OmniStack,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
+  public abstract interface OfRef<E> extends OmniCollection<E>,OmniStack<E>,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
   {
     public abstract E pop();
     public abstract void push(E val);

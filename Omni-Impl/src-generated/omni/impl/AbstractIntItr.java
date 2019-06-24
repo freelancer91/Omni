@@ -2,6 +2,7 @@ package omni.impl;
 import omni.api.OmniIterator;
 public abstract class AbstractIntItr implements OmniIterator.OfInt
 {
+  @Override public abstract Object clone();
   @Override
   public Integer next()
   {

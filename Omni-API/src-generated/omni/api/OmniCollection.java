@@ -19,8 +19,9 @@ import omni.function.FloatPredicate;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 //TODO integration into Java Collection library
-public abstract interface OmniCollection extends Cloneable
-{  
+public abstract interface OmniCollection<E> extends Cloneable
+{
+  public abstract OmniIterator<E> iterator();
   public abstract void clear();
   public abstract boolean contains(Object val);
   public abstract boolean contains(boolean val);
@@ -62,7 +63,7 @@ public abstract interface OmniCollection extends Cloneable
   public abstract <T> T[] toArray(IntFunction<T[]> arrConstructor);
   public abstract <T> T[] toArray(T[] dst);
   public abstract Object clone();
-  public abstract interface OfPrimitive extends OmniCollection
+  public abstract interface OfPrimitive<E> extends OmniCollection<E>
   {
     public abstract boolean add(boolean val);
     @Override
@@ -136,8 +137,8 @@ public abstract interface OmniCollection extends Cloneable
       );
     }
   }
-  public abstract interface OfBoolean extends OfPrimitive,Iterable<Boolean>
-  ,BooleanInput,ByteOutput<Boolean>,CharOutput<Boolean>
+  public abstract interface OfBoolean extends OfPrimitive<Boolean>,Iterable<Boolean>
+  ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
   {
     @Override
     public default boolean contains(Byte val)
@@ -230,8 +231,8 @@ public abstract interface OmniCollection extends Cloneable
       return removeVal((int)val);
     }
   }
-  public abstract interface OfByte extends OfPrimitive,Iterable<Byte>
-  ,ByteInput,ByteOutput<Byte>
+  public abstract interface OfByte extends OfPrimitive<Byte>,Iterable<Byte>
+  ,ByteInput<Byte>,ByteOutput<Byte>
   {
     @Override
     public default boolean contains(Byte val)
@@ -307,8 +308,8 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfChar extends OfPrimitive,Iterable<Character>
-  ,CharInput,CharOutput<Character>
+  public abstract interface OfChar extends OfPrimitive<Character>,Iterable<Character>
+  ,CharInput<Character>,CharOutput<Character>
   {
     @Override
     public default boolean contains(Byte val)
@@ -373,8 +374,8 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfShort extends OfPrimitive,Iterable<Short>
-  ,ShortInput,ShortOutput<Short>
+  public abstract interface OfShort extends OfPrimitive<Short>,Iterable<Short>
+  ,ShortInput<Short>,ShortOutput<Short>
   {
     @Override
     public default boolean contains(Byte val)
@@ -443,8 +444,8 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfInt extends OfPrimitive,Iterable<Integer>
-  ,IntInput,IntOutput<Integer>
+  public abstract interface OfInt extends OfPrimitive<Integer>,Iterable<Integer>
+  ,IntInput<Integer>,IntOutput<Integer>
   {
     @Override
     public default boolean contains(Byte val)
@@ -534,8 +535,8 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfLong extends OfPrimitive,Iterable<Long>
-  ,LongInput,LongOutput<Long>
+  public abstract interface OfLong extends OfPrimitive<Long>,Iterable<Long>
+  ,LongInput<Long>,LongOutput<Long>
   {
     @Override
     public default boolean contains(Byte val)
@@ -629,8 +630,8 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfFloat extends OfPrimitive,Iterable<Float>
-  ,FloatInput,FloatOutput<Float>
+  public abstract interface OfFloat extends OfPrimitive<Float>,Iterable<Float>
+  ,FloatInput<Float>,FloatOutput<Float>
   {
     @Override
     public default boolean contains(Byte val)
@@ -726,8 +727,8 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfDouble extends OfPrimitive,Iterable<Double>
-  ,FloatInput,DoubleOutput<Double>
+  public abstract interface OfDouble extends OfPrimitive<Double>,Iterable<Double>
+  ,FloatInput<Double>,DoubleOutput<Double>
   {
     @Override
     public default boolean contains(Byte val)
@@ -843,7 +844,7 @@ public abstract interface OmniCollection extends Cloneable
       return add(val.booleanValue());
     }
   }
-  public abstract interface DoubleOutput<E> extends OmniCollection{
+  public abstract interface DoubleOutput<E> extends OmniCollection<E>{
     public abstract double[] toDoubleArray();
     public abstract OmniIterator.DoubleOutput<E> iterator(); 
   }
@@ -871,35 +872,35 @@ public abstract interface OmniCollection extends Cloneable
     public abstract byte[] toByteArray();
     public abstract OmniIterator.ByteOutput<E> iterator(); 
   }
-  public abstract interface BooleanInput extends OmniCollection{
+  public abstract interface BooleanInput<E> extends OmniCollection<E>{
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
   }
-  public abstract interface ByteInput extends BooleanInput{
+  public abstract interface ByteInput<E> extends BooleanInput<E>{
     public abstract boolean add(byte val);
     public abstract boolean add(Byte val);
   }
-  public abstract interface CharInput extends BooleanInput{
+  public abstract interface CharInput<E> extends BooleanInput<E>{
     public abstract boolean add(char val);
     public abstract boolean add(Character val);
   }
-  public abstract interface ShortInput extends ByteInput{
+  public abstract interface ShortInput<E> extends ByteInput<E>{
     public abstract boolean add(short val);
     public abstract boolean add(Short val);
   }
-  public abstract interface IntInput extends CharInput,ShortInput{
+  public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>{
     public abstract boolean add(int val);
     public abstract boolean add(Integer val);
   }
-  public abstract interface LongInput extends IntInput{
+  public abstract interface LongInput<E> extends IntInput<E>{
     public abstract boolean add(long val);
     public abstract boolean add(Long val);
   }
-  public abstract interface FloatInput extends LongInput{
+  public abstract interface FloatInput<E> extends LongInput<E>{
     public abstract boolean add(float val);
     public abstract boolean add(Float val);
   }
-  public abstract interface OfRef<E> extends OmniCollection,Iterable<E>
+  public abstract interface OfRef<E> extends OmniCollection<E>,Iterable<E>
   {
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);

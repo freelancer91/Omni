@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollection;
-public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
+public abstract class RefDblLnkSeq<E> extends 
+AbstractSeq<E>
+ implements
    OmniList.OfRef<E>
 {
   private static final long serialVersionUID=1L;
@@ -1751,9 +1753,16 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
         this.parent=parent;
         this.curr=curr;
       }
+      private AscendingItr(AscendingItr<E> itr){
+        this.parent=itr.parent;
+        this.curr=itr.curr;
+      }
       private AscendingItr(UncheckedSubList<E> parent){
         this.parent=parent;
         this.curr=parent.head;
+      }
+      @Override public Object clone(){
+        return new AscendingItr<E>(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -1795,12 +1804,20 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     private static class BidirectionalItr<E> extends AscendingItr<E> implements OmniListIterator.OfRef<E>{
       private transient int currIndex;
       private transient RefDblLnkNode<E> lastRet;
+      private BidirectionalItr(BidirectionalItr<E> itr){
+        super(itr);
+        this.currIndex=itr.currIndex;
+        this.lastRet=itr.lastRet;
+      }
       private BidirectionalItr(UncheckedSubList<E> parent){
         super(parent);
       }
       private BidirectionalItr(UncheckedSubList<E> parent,RefDblLnkNode<E> curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         final RefDblLnkNode<E> curr;
@@ -2436,6 +2453,13 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       private transient RefDblLnkNode<E> curr;
       private transient RefDblLnkNode<E> lastRet;
       private transient int currIndex;
+      private BidirectionalItr(BidirectionalItr<E> itr){
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+        this.curr=itr.curr;
+        this.lastRet=itr.lastRet;
+        this.currIndex=itr.currIndex;
+      }
       private BidirectionalItr(CheckedSubList<E> parent){
         this.parent=parent;
         this.modCount=parent.modCount;
@@ -2446,6 +2470,9 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
         this.modCount=parent.modCount;
         this.curr=curr;
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         final CheckedSubList<E> parent;
@@ -5689,6 +5716,13 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       transient RefDblLnkNode<E> curr;
       transient RefDblLnkNode<E> lastRet;
       transient int currIndex;
+      private DescendingItr(DescendingItr<E> itr){
+        this.parent=itr.parent;
+        this.modCount=itr.modCount;
+        this.curr=itr.curr;
+        this.lastRet=itr.lastRet;
+        this.currIndex=itr.currIndex;
+      }
       private DescendingItr(CheckedList<E> parent){
         this.parent=parent;
         this.modCount=parent.modCount;
@@ -5700,6 +5734,9 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
         this.modCount=parent.modCount;
         this.curr=curr;
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new DescendingItr<E>(this);
       }
       @Override public boolean hasNext(){
         return this.curr!=null;
@@ -5762,11 +5799,17 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       }
     }
     private static class BidirectionalItr<E> extends DescendingItr<E> implements OmniListIterator.OfRef<E>{
+      private BidirectionalItr(BidirectionalItr<E> itr){
+        super(itr);
+      }
       private BidirectionalItr(CheckedList<E> parent){
         super(parent,parent.head,0);
       }
       private BidirectionalItr(CheckedList<E> parent,RefDblLnkNode<E> curr,int currIndex){
         super(parent,curr,currIndex);
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
@@ -7112,8 +7155,17 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       }
     }
     private static class DescendingItr<E> extends AscendingItr<E>{
+      private DescendingItr(DescendingItr<E> itr){
+        super(itr);
+      }
       private DescendingItr(UncheckedList<E> parent){
         super(parent,parent.tail);
+      }
+      private DescendingItr(UncheckedList<E> parent,RefDblLnkNode<E> curr){
+        super(parent,curr);
+      }
+      @Override public Object clone(){
+        return new DescendingItr<E>(this);
       }
       @Override public void remove(){
         final UncheckedList<E> parent;
@@ -7151,6 +7203,10 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     {
       transient final UncheckedList<E> parent;
       transient RefDblLnkNode<E> curr;
+      private AscendingItr(AscendingItr<E> itr){
+        this.parent=itr.parent;
+        this.curr=itr.curr;
+      }
       private AscendingItr(UncheckedList<E> parent,RefDblLnkNode<E> curr){
         this.parent=parent;
         this.curr=curr;
@@ -7158,6 +7214,9 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
       private AscendingItr(UncheckedList<E> parent){
         this.parent=parent;
         this.curr=parent.head;
+      }
+      @Override public Object clone(){
+        return new AscendingItr<E>(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -7204,12 +7263,20 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements
     private static class BidirectionalItr<E> extends AscendingItr<E> implements OmniListIterator.OfRef<E>{
       private transient int currIndex;
       private transient RefDblLnkNode<E> lastRet;
+      private BidirectionalItr(BidirectionalItr<E> itr){
+        super(itr);
+        this.currIndex=itr.currIndex;
+        this.lastRet=itr.lastRet;
+      }
       private BidirectionalItr(UncheckedList<E> parent){
         super(parent);
       }
       private BidirectionalItr(UncheckedList<E> parent,RefDblLnkNode<E> curr,int currIndex){
         super(parent,curr);
         this.currIndex=currIndex;
+      }
+      @Override public Object clone(){
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         final RefDblLnkNode<E> curr;

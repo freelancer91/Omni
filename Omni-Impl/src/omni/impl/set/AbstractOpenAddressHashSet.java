@@ -2,7 +2,7 @@ package omni.impl.set;
 
 import java.io.Externalizable;
 import omni.api.OmniSet;
-public abstract class AbstractOpenAddressHashSet implements OmniSet,Externalizable,Cloneable{
+public abstract class AbstractOpenAddressHashSet<E> implements OmniSet<E>,Externalizable,Cloneable{
     static int tableSizeFor(int n){
         if((n=-1 >>> Integer.numberOfLeadingZeros(n - 1)) < 0){
             return 1;
@@ -18,7 +18,7 @@ public abstract class AbstractOpenAddressHashSet implements OmniSet,Externalizab
         this.maxTableSize=16;
         this.loadFactor=.75f;
     }
-    AbstractOpenAddressHashSet(AbstractOpenAddressHashSet that){
+    AbstractOpenAddressHashSet(AbstractOpenAddressHashSet<? extends E> that){
         this.maxTableSize=that.maxTableSize;
         this.loadFactor=that.loadFactor;
         this.size=that.size;

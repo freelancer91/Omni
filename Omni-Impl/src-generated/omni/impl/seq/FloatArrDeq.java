@@ -1842,6 +1842,9 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     extends AbstractFloatItr
   {
     transient int cursor;
+    AbstractDeqItr(AbstractDeqItr itr){
+      this.cursor=itr.cursor;
+    }
     AbstractDeqItr(int cursor){
       this.cursor=cursor;
     }
@@ -1884,6 +1887,10 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final FloatArrDeq root;
+    private AscendingItr(AscendingItr itr){
+      super(itr);
+      this.root=itr.root;
+    }
     private AscendingItr(FloatArrDeq root){
       super(root.tail!=-1?root.head:-1);
       this.root=root;
@@ -1891,6 +1898,9 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     private AscendingItr(FloatArrDeq root,int cursor){
       super(cursor);
       this.root=root;
+    }
+    @Override public Object clone(){
+      return new AscendingItr(this);
     }
     @Override public float nextFloat(){
       final float[] arr;
@@ -1984,8 +1994,17 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     }
   }
   private static class DescendingItr extends AscendingItr{
+    private DescendingItr(DescendingItr itr){
+      super(itr);
+    }
     private DescendingItr(FloatArrDeq root){
       super(root,root.tail);
+    }
+    private DescendingItr(FloatArrDeq root,int cursor){
+      super(root,cursor);
+    }
+    @Override public Object clone(){
+      return new DescendingItr(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,FloatConsumer action){
       final FloatArrDeq root;
@@ -3955,6 +3974,12 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
       transient int modCount;
       transient int lastRet;
       transient final Checked root;
+      private AscendingItr(AscendingItr itr){
+        super(itr);
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+        this.root=itr.root;
+      }
       private AscendingItr(Checked root){
         super(root.tail==-1?-1:root.head);
         this.root=root;
@@ -3966,6 +3991,9 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
         this.root=root;
         this.modCount=root.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
       }
       @Override public float nextFloat(){
         final Checked root;
@@ -4084,8 +4112,17 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
       }
     }
     private static class DescendingItr extends AscendingItr{
+      private DescendingItr(DescendingItr itr){
+        super(itr);
+      }
       private DescendingItr(Checked root){
         super(root,root.tail);
+      }
+      private DescendingItr(Checked root,int cursor){
+        super(root,cursor);
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
       }
       @Override public float nextFloat(){
         final Checked root;

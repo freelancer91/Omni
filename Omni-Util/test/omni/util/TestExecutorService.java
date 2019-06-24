@@ -4,80 +4,80 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestExecutorService {
-  private final LinkedBlockingQueue<Runnable> testQueue;
-  private final AtomicInteger totalNumTasks;
-  private final AtomicInteger totalCompletedTasks;
-  public final int numWorkers;
+  //private static final TestExecutorService COMMON_SERVICE=new TestExecutorService(Runtime.getRuntime().availableProcessors());
+  private static final Object monitor=new Object();
   
-  public TestExecutorService() {
-    this(Runtime.getRuntime().availableProcessors());
-  }
   
-  public TestExecutorService(int numWorkers){
-    super();
-    if(numWorkers<=0) {
-      numWorkers=Runtime.getRuntime().availableProcessors();
-    }
-    this.numWorkers=numWorkers;
-    this.testQueue=new LinkedBlockingQueue<>();
-    this.totalNumTasks=new AtomicInteger(0);
-    this.totalCompletedTasks=new AtomicInteger(0);
-    if(numWorkers>1) {
+  private static final LinkedBlockingQueue<Runnable> testQueue;
+  private static final AtomicInteger totalNumTasks;
+  private static final AtomicInteger totalCompletedTasks;
+  public static final int numWorkers=Runtime.getRuntime().availableProcessors();
+  
+  static {
+    testQueue=new LinkedBlockingQueue<>();
+    totalNumTasks=new AtomicInteger(0);
+    totalCompletedTasks=new AtomicInteger(0);
+    int nw;
+    if((nw=numWorkers)>1) {
       Thread[] workers;
       
-      workers=new Thread[numWorkers];
-      for(int i=0;i<numWorkers;++i) {
+      workers=new Thread[nw];
+      for(int i=0;i<nw;++i) {
         Thread worker;
-        workers[i]=worker=new Thread(this::worker);
+        workers[i]=worker=new Thread(TestExecutorService::worker);
         worker.start();
       }
     }
     
-    
   }
-  private void worker() {
+  
+  private static void worker() {
     try {
-      for(var testQueue=this.testQueue;;)
+      var tct=totalCompletedTasks;
+      var m=monitor;
+      for(var tq=testQueue;;)
       {
-        testQueue.take().run();
-        totalCompletedTasks.incrementAndGet();
-        synchronized(this) {
-          notify();
+        tq.take().run();
+        tct.incrementAndGet();
+        synchronized(m) {
+          m.notify();
         }
       }
     }catch(InterruptedException t) {
       throw new Error(t);
     }
   }
-  
-  public void submitTest(Runnable test) {
+  public static void submitTest(Runnable test) {
     totalNumTasks.incrementAndGet();
     if(!testQueue.offer(test)) {
       test.run();
       totalCompletedTasks.incrementAndGet();
     }
   }
+ 
 
-  public void completeAllTests() {
+
+  public static void completeAllTests() {
     try {
-      final int totalNumTasks=this.totalNumTasks.get();
-      final var totalCompletedTasks=this.totalCompletedTasks;
-      for(var testQueue=this.testQueue;;){
-        final var myTask=testQueue.poll();
-        if((totalCompletedTasks.get())==totalNumTasks) {
+      final int tnt=totalNumTasks.get();
+      final var tct=totalCompletedTasks;
+      Object m=monitor;
+      for(var tq=testQueue;;){
+        final var myTask=tq.poll();
+        if((tct.get())==tnt) {
           return;
         }
         if(myTask!=null) {
           myTask.run();
-          totalCompletedTasks.incrementAndGet();
+          tct.incrementAndGet();
         }else {
           //wait for the other threads to finish
           for(;;) {
-            if((totalCompletedTasks.get())==totalNumTasks) {
+            if((tct.get())==tnt) {
               return;
             }
-            synchronized(this) {
-              wait(1000);
+            synchronized(m) {
+              m.wait(1000);
             }
           }
         }
@@ -88,18 +88,19 @@ public class TestExecutorService {
       reset();
     }
   }
-  public void completeAllTests(String testName) {
+  public static void completeAllTests(String testName) {
     System.out.print("Running test "+testName+" 0%");
     try {
-      final int totalNumTasks;
+      final int tnt;
       int nextPercent;
-      int threshold=(int)Math.ceil(((double)(nextPercent=1)/100.0)*(double)(totalNumTasks=this.totalNumTasks.get()));
-      final var totalCompletedTasks=this.totalCompletedTasks;
-      for(var testQueue=this.testQueue;;){
-        final var myTask=testQueue.poll();
+      int threshold=(int)Math.ceil(((double)(nextPercent=1)/100.0)*(double)(tnt=totalNumTasks.get()));
+      final var tct=totalCompletedTasks;
+      Object m=monitor;
+      for(var tq=testQueue;;){
+        final var myTask=tq.poll();
         int currCompleted;
-        if((currCompleted=totalCompletedTasks.get())==totalNumTasks) {
-          System.out.println("100% Finished "+totalNumTasks+" tests!");
+        if((currCompleted=tct.get())==tnt) {
+          System.out.println("100% Finished "+tnt+" tests!");
           return;
         }
         while(currCompleted>=threshold) {
@@ -108,16 +109,16 @@ public class TestExecutorService {
           }else {
             System.out.print('.');
           }
-          threshold=(int)Math.ceil(((double)(++nextPercent)/100.0)*(double)totalNumTasks);
+          threshold=(int)Math.ceil(((double)(++nextPercent)/100.0)*(double)tnt);
         }
         if(myTask!=null) {
           myTask.run();
-          totalCompletedTasks.incrementAndGet();
+          tct.incrementAndGet();
         }else {
           //wait for the other threads to finish
           for(;;) {
-            if((currCompleted=totalCompletedTasks.get())==totalNumTasks) {
-              System.out.println("100% Finished "+totalNumTasks+" tests!");
+            if((currCompleted=tct.get())==tnt) {
+              System.out.println("100% Finished "+tnt+" tests!");
               return;
             }else if(currCompleted>=threshold) {
               if(nextPercent%10==0) {
@@ -125,10 +126,10 @@ public class TestExecutorService {
               }else {
                 System.out.print('.');
               }
-              threshold=(int)Math.ceil(((double)(++nextPercent)/100.0)*(double)totalNumTasks);
+              threshold=(int)Math.ceil(((double)(++nextPercent)/100.0)*(double)tnt);
             }
-            synchronized(this) {
-              wait(1000);
+            synchronized(m) {
+              m.wait(1000);
             }
           }
         }
@@ -139,12 +140,12 @@ public class TestExecutorService {
       reset();
     }
   }
-  public int getNumRemainingTasks() {
+  public static int getNumRemainingTasks() {
     return totalNumTasks.get()-totalCompletedTasks.get();
   }
-  public void reset() {
-    this.totalNumTasks.set(0);
-    this.totalCompletedTasks.set(0);
-    this.testQueue.clear();
+  public static void reset() {
+    totalNumTasks.set(0);
+    totalCompletedTasks.set(0);
+    testQueue.clear();
   }
 }

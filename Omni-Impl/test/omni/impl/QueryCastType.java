@@ -8,7 +8,7 @@ import omni.api.OmniStack;
 public enum QueryCastType{
     Unboxed{
         @Override
-        public boolean callremoveVal(OmniCollection collection,Object inputVal,DataType inputType){
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.removeVal((boolean)inputVal);
@@ -31,7 +31,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callcontains(OmniCollection collection,Object inputVal,DataType inputType){
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.contains((boolean)inputVal);
@@ -54,7 +54,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callremoveFirstOccurrence(OmniDeque collection,Object inputVal,DataType inputType){
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.removeFirstOccurrence((boolean)inputVal);
@@ -77,7 +77,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callremoveLastOccurrence(OmniDeque collection,Object inputVal,DataType inputType){
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.removeLastOccurrence((boolean)inputVal);
@@ -100,7 +100,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int callsearch(OmniStack collection,Object inputVal,DataType inputType){
+        public int callsearch(OmniStack<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.search((boolean)inputVal);
@@ -123,7 +123,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int callindexOf(OmniList collection,Object inputVal,DataType inputType){
+        public int callindexOf(OmniList<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.indexOf((boolean)inputVal);
@@ -146,7 +146,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int calllastIndexOf(OmniList collection,Object inputVal,DataType inputType){
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.lastIndexOf((boolean)inputVal);
@@ -171,7 +171,7 @@ public enum QueryCastType{
     },
     ToBoxed{
         @Override
-        public boolean callremoveVal(OmniCollection collection,Object inputVal,DataType inputType){
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.removeVal((Boolean)inputVal);
@@ -194,7 +194,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callcontains(OmniCollection collection,Object inputVal,DataType inputType){
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.contains((Boolean)inputVal);
@@ -217,7 +217,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callremoveFirstOccurrence(OmniDeque collection,Object inputVal,DataType inputType){
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.removeFirstOccurrence((Boolean)inputVal);
@@ -240,7 +240,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callremoveLastOccurrence(OmniDeque collection,Object inputVal,DataType inputType){
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.removeLastOccurrence((Boolean)inputVal);
@@ -263,7 +263,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int callsearch(OmniStack collection,Object inputVal,DataType inputType){
+        public int callsearch(OmniStack<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.search((Boolean)inputVal);
@@ -286,7 +286,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int callindexOf(OmniList collection,Object inputVal,DataType inputType){
+        public int callindexOf(OmniList<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.indexOf((Boolean)inputVal);
@@ -309,7 +309,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int calllastIndexOf(OmniList collection,Object inputVal,DataType inputType){
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
                 return collection.lastIndexOf((Boolean)inputVal);
@@ -334,7 +334,7 @@ public enum QueryCastType{
     },
     ToObject{
         @Override
-        public boolean callremoveVal(OmniCollection collection,Object inputVal,DataType inputType){
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -350,7 +350,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callremoveFirstOccurrence(OmniDeque collection,Object inputVal,DataType inputType){
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -366,7 +366,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callremoveLastOccurrence(OmniDeque collection,Object inputVal,DataType inputType){
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -382,7 +382,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int callindexOf(OmniList collection,Object inputVal,DataType inputType){
+        public int callindexOf(OmniList<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -398,7 +398,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int calllastIndexOf(OmniList collection,Object inputVal,DataType inputType){
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -414,7 +414,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public int callsearch(OmniStack collection,Object inputVal,DataType inputType){
+        public int callsearch(OmniStack<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -430,7 +430,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
         @Override
-        public boolean callcontains(OmniCollection collection,Object inputVal,DataType inputType){
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
             case BOOLEAN:
             case BYTE:
@@ -450,13 +450,13 @@ public enum QueryCastType{
     QueryCastType(){
         this.validDataTypes=initValidDataTypes(this);
     }
-    public abstract int callsearch(OmniStack collection,Object inputVal,DataType inputType);
-    public abstract int calllastIndexOf(OmniList collection,Object inputVal,DataType inputType);
-    public abstract int callindexOf(OmniList collection,Object inputVal,DataType inputType);
-    public abstract boolean callremoveVal(OmniCollection collection,Object inputVal,DataType inputType);
-    public abstract boolean callcontains(OmniCollection collection,Object inputVal,DataType inputType);
-    public abstract boolean callremoveFirstOccurrence(OmniDeque collection,Object inputVal,DataType inputType);
-    public abstract boolean callremoveLastOccurrence(OmniDeque collection,Object inputVal,DataType inputType);
+    public abstract int callsearch(OmniStack<?> collection,Object inputVal,DataType inputType);
+    public abstract int calllastIndexOf(OmniList<?> collection,Object inputVal,DataType inputType);
+    public abstract int callindexOf(OmniList<?> collection,Object inputVal,DataType inputType);
+    public abstract boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType);
+    public abstract boolean callcontains(OmniCollection<?> collection,Object inputVal,DataType inputType);
+    public abstract boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType);
+    public abstract boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,DataType inputType);
     public static final Set<QueryCastType> AllTypes=Set.of(QueryCastType.Unboxed,QueryCastType.ToBoxed,
             QueryCastType.ToObject);
     public static final Set<QueryCastType> NotPrimitive=Set.of(QueryCastType.ToBoxed,QueryCastType.ToObject);

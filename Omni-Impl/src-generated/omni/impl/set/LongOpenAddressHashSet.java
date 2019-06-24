@@ -16,7 +16,7 @@ import omni.util.OmniArray;
 import omni.util.TypeUtil;
 import omni.util.ToStringUtil;
 public class LongOpenAddressHashSet
-extends AbstractIntegralTypeOpenAddressHashSet
+extends AbstractIntegralTypeOpenAddressHashSet<Long>
 implements OmniSet.OfLong{
   private static void quickInsert(long[] table,long val){
     int tableLength;
@@ -1400,6 +1400,10 @@ implements OmniSet.OfLong{
   extends AbstractLongItr{
       private final LongOpenAddressHashSet root;
       private int offset;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr(LongOpenAddressHashSet root){
           this.root=root;
           if(root.size != 0){
@@ -1425,6 +1429,10 @@ implements OmniSet.OfLong{
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr(this);
       }
       @Override
       public boolean hasNext(){
@@ -1859,6 +1867,12 @@ implements OmniSet.OfLong{
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked root){
           this.root=root;
           this.modCount=root.modCount;
@@ -1885,6 +1899,9 @@ implements OmniSet.OfLong{
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void forEachRemaining(LongConsumer action){
         int offset;

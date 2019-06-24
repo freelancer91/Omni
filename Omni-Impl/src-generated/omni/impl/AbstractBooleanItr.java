@@ -3,6 +3,7 @@ import omni.api.OmniIterator;
 import omni.util.TypeUtil;
 public abstract class AbstractBooleanItr implements OmniIterator.OfBoolean
 {
+  @Override public abstract Object clone();
   @Override
   public Boolean next()
   {

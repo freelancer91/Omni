@@ -61,7 +61,13 @@ import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
-public abstract class $ClassPrefix$ArrSeq$<E>$ extends AbstractSeq implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable,RandomAccess{
+public abstract class $ClassPrefix$ArrSeq$<E>$ extends 
+#IF OfRef
+AbstractSeq$<E>$
+#ELSE
+AbstractSeq<$BoxedType$>
+#ENDIF
+ implements OmniCollection.Of$ClassPrefix$$<E>$,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient $ArrayType$[] arr; 
@@ -603,7 +609,11 @@ public
 #ELSEIFSWITCH STRUCTNAME==UncheckedStack,UncheckedList
     extends $ClassPrefix$ArrSeq$<E>$
 #ELSE
-    extends AbstractSeq
+  #IF OfRef
+    extends AbstractSeq$<E>$
+  #ELSE
+    extends AbstractSeq<$BoxedType$>
+  #ENDIF
 #ENDIF
 #IFSWITCH STRUCTNAME==UncheckedList,CheckedSubList,UncheckedSubList
   #IF OfRef
@@ -1239,6 +1249,14 @@ public
     transient int lastRet;
     transient int modCount;
   #ENDIF
+    private Itr(Itr$<E>$ itr){
+      this.parent=itr.parent;
+      this.cursor=itr.cursor;
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+      this.lastRet=itr.lastRet;
+      this.modCount=itr.modCount;
+  #ENDIF
+    }
     private Itr(STRUCTNAME$<E>$ parent){
       this.parent=parent;
   #IFSWITCH STRUCTNAME==CheckedList,UncheckedList
@@ -1253,16 +1271,18 @@ public
       this.lastRet=-1;
   #ENDIF
     }
-  #IFNOTSWITCH STRUCTNAME==UncheckedStack,CheckedStack
+  
     private Itr(STRUCTNAME$<E>$ parent,int cursor){
       this.parent=parent;
       this.cursor=cursor;
-    #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList,CheckedStack
       this.modCount=parent.modCount;
       this.lastRet=-1;
     #ENDIF
     }
-  #ENDIF
+    @Override public Object clone(){
+      return new Itr$<E>$(this);
+    }
     @Override public boolean hasNext(){
   #IFSWITCH STRUCTNAME==CheckedList,UncheckedList
       return this.cursor<parent.size;
@@ -1291,6 +1311,12 @@ public
     #IFSWITCH STRUCTNAME==UncheckedList,UncheckedSubList
     transient int lastRet;
     #ENDIF
+    private ListItr(ListItr$<E>$ itr){
+      super(itr);
+    #IFSWITCH STRUCTNAME==UncheckedList,UncheckedSubList
+      this.lastRet=itr.lastRet;
+    #ENDIF 
+    }
     private ListItr(STRUCTNAME$<E>$ parent){
       super(parent);
     #IFSWITCH STRUCTNAME==UncheckedList,UncheckedSubList
@@ -1302,6 +1328,9 @@ public
     #IFSWITCH STRUCTNAME==UncheckedList,UncheckedSubList
       this.lastRet=-1;
     #ENDIF
+    }
+    @Override public Object clone(){
+      return new ListItr$<E>$(this);
     }
     @Override public boolean hasPrevious(){
     #IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList

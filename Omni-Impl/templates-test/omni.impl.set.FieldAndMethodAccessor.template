@@ -1,13 +1,11 @@
 #TYPEDEF OfGeneric
 package omni.impl.set;
-import java.io.ObjectOutputStream;
 import java.io.ObjectOutput;
 import java.io.Externalizable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 final class FieldAndMethodAccessor{
   private FieldAndMethodAccessor(){
@@ -78,73 +76,7 @@ final class FieldAndMethodAccessor{
       throw new ExceptionInInitializerError(e);
     }
   }
-  /*
-  private static Object readObjectHelper(Object obj,ObjectInputStream ois,Method readResolveMethod) throws IOException,ClassNotFoundException{
-    Object replacement=ois.readObject();
-    try{
-      return readResolveMethod.invoke(replacement);
-    }catch(IllegalAccessException e){
-      throw new Error(e);
-    }catch(InvocationTargetException e){
-      var cause=e.getCause();
-      if(cause instanceof RuntimeException){
-        throw (RuntimeException)cause;
-      }else if(cause instanceof IOException){
-        throw (IOException)cause;
-      }else if(cause instanceof ClassNotFoundException){
-        throw (ClassNotFoundException)cause;
-      }
-      throw new Error(e);
-    }
-  }
-  */
-  private static void writeObjectHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod) throws IOException{
-    Object replacement=null;
-    try{
-      replacement=writeReplaceMethod.invoke(obj);
-    }catch(IllegalAccessException e){
-      throw new Error(e);
-    }catch(InvocationTargetException e){
-      var cause=e.getCause();
-      if(cause instanceof RuntimeException){
-        throw (RuntimeException)cause;
-      }else if(cause instanceof IOException){
-        throw (IOException)cause;
-      }
-      throw new Error(e);
-    }
-    ((Externalizable)replacement).writeExternal(oos);
-    
-  }
-  private static void writeObjectHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod,Method writeObjectMethod) throws IOException{
-    Object replacement=null;
-    try{
-      replacement=writeReplaceMethod.invoke(obj);
-    }catch(IllegalAccessException e){
-      throw new Error(e);
-    }catch(InvocationTargetException e){
-      var cause=e.getCause();
-      if(cause instanceof RuntimeException){
-        throw (RuntimeException)cause;
-      }else if(cause instanceof IOException){
-        throw (IOException)cause;
-      }
-      throw new Error(e);
-    }
-    try{
-      writeObjectMethod.invoke(replacement,oos);
-    }catch(IllegalAccessException e){
-      throw new Error(e);
-    }catch(InvocationTargetException e){
-      var cause=e.getCause();
-      if(cause instanceof RuntimeException){
-        throw (RuntimeException)cause;
-      }else if(cause instanceof IOException){
-        throw (IOException)cause;
-      }
-      throw new Error(e);
-    }
-  }
+  
   private static final char DOLLARSIGN=(char)36;
   #MACRO TypeImpl<Ref>(<?>,Object)
   #MACRO TypeImpl<Boolean>(,boolean)
@@ -155,41 +87,258 @@ final class FieldAndMethodAccessor{
   #MACRO TypeImpl<Long>(,long)
   #MACRO TypeImpl<Float>(,float)
   #MACRO TypeImpl<Double>(,double)
+  
+  static interface AbstractOpenAddressHashSet{
+    public static int size(Object obj){
+      return ((omni.impl.set.AbstractOpenAddressHashSet<?>)obj).size;
+    }
+    public static int maxTableSize(Object obj){
+      return ((omni.impl.set.AbstractOpenAddressHashSet<?>)obj).maxTableSize;
+    }
+    public static float loadFactor(Object obj){
+      return ((omni.impl.set.AbstractOpenAddressHashSet<?>)obj).loadFactor;
+    }
+  }
+  static interface AbstractIntegralTypeOpenAddressHashSet extends AbstractOpenAddressHashSet{
+    public static int size(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).size;
+    }
+    public static int maxTableSize(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).maxTableSize;
+    }
+    public static float loadFactor(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).loadFactor;
+    }
+    public static long word0(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).word0;
+    }
+    public static long word1(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).word1;
+    }
+    public static long word2(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).word2;
+    }
+    public static long word3(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).word3;
+    }
+    public static int tableSize(Object obj){
+      return ((omni.impl.set.AbstractIntegralTypeOpenAddressHashSet<?>)obj).tableSize;
+    }
+  }
+  
 }
 #MACRODEF TypeImpl<CLASSPREFIX>(TYPEPARAMETER,ARRTYPE)
-#IFSWITCH CLASSPREFIX==Boolean
+#IFSWITCH CLASSPREFIX==Boolean,Byte
 static interface CLASSPREFIXSetImpl{
   public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
     ((Externalizable)obj).writeExternal(oos);
   }
+  #IFSWITCH CLASSPREFIX==Boolean
   public static int state(Object obj){
     return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).state;
   }
+  #ELSEIFSWITCH CLASSPREFIX==Byte
+  public static long word0(Object obj){
+    return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word0;
+  }
+  public static long word1(Object obj){
+    return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word1;
+  }
+  public static long word2(Object obj){
+    return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word2;
+  }
+  public static long word3(Object obj){
+    return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word3;
+  }
+  #ENDIF
   public interface Itr{
-    static final Field itrStateField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Itr","itrState");
     static final Field rootField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Itr","root");
     public static omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER root(Object obj){
       return (omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)getValue(rootField,obj);
     }
+  #IFSWITCH CLASSPREFIX==Boolean
+    static final Field itrStateField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Itr","itrState");
     public static int itrState(Object obj){
       return getIntValue(itrStateField,obj);
     }
+  #ELSEIFSWITCH CLASSPREFIX==Byte
+    static final Field valOffsetField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Itr","valOffset");
+    public static int valOffset(Object obj){
+      return getIntValue(valOffsetField,obj);
+    }
+  #ENDIF
+    
   }
   public interface Checked extends CLASSPREFIXSetImpl{
     public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
     }
+  #IFSWITCH CLASSPREFIX==Boolean
     public static int state(Object obj){
       return ((omni.impl.set.CLASSPREFIXSetImpl.CheckedTYPEPARAMETER)obj).state;
     }
+  #ELSEIFSWITCH CLASSPREFIX==Byte
+    public static long word0(Object obj){
+      return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word0;
+    }
+    public static long word1(Object obj){
+      return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word1;
+    }
+    public static long word2(Object obj){
+      return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word2;
+    }
+    public static long word3(Object obj){
+      return ((omni.impl.set.CLASSPREFIXSetImplTYPEPARAMETER)obj).word3;
+    }
+    public static int modCount(Object obj){
+      return ((omni.impl.set.CLASSPREFIXSetImpl.CheckedTYPEPARAMETER)obj).modCount;
+    }
+    public static int size(Object obj){
+      return ((omni.impl.set.CLASSPREFIXSetImpl.CheckedTYPEPARAMETER)obj).size;
+    }
+  #ENDIF
     public interface Itr{
-      static final Field itrStateField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","itrState");
       static final Field rootField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","root");
       public static omni.impl.set.CLASSPREFIXSetImpl.CheckedTYPEPARAMETER root(Object obj){
         return (omni.impl.set.CLASSPREFIXSetImpl.CheckedTYPEPARAMETER)getValue(rootField,obj);
       }
+  #IFSWITCH CLASSPREFIX==Boolean
+      static final Field itrStateField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","itrState");
       public static int itrState(Object obj){
         return getIntValue(itrStateField,obj);
+      }
+  #ELSEIFSWITCH CLASSPREFIX==Byte
+      static final Field valOffsetField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","valOffset");
+      public static int valOffset(Object obj){
+        return getIntValue(valOffsetField,obj);
+      }
+      static final Field modCountField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","modCount");
+      public static int modCount(Object obj){
+        return getIntValue(modCountField,obj);
+      }
+      static final Field lastRetField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXSetImpl"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","lastRet");
+      public static int lastRet(Object obj){
+        return getIntValue(lastRetField,obj);
+      }
+  #ENDIF
+    }
+  }
+}
+#ELSE
+static interface CLASSPREFIXOpenAddressHashSet
+  #IFSWITCH CLASSPREFIX==Char,Short,Int,Long
+  extends AbstractIntegralTypeOpenAddressHashSet{
+  public static long word0(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).word0;
+  }
+  public static long word1(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).word1;
+  }
+  public static long word2(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).word2;
+  }
+  public static long word3(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).word3;
+  }
+  public static int tableSize(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).tableSize;
+  }
+  #ELSE
+  extends AbstractOpenAddressHashSet{
+  #ENDIF
+  public static int size(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).size;
+  }
+  public static int maxTableSize(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).maxTableSize;
+  }
+  public static float loadFactor(Object obj){
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).loadFactor;
+  }
+  public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+    ((Externalizable)obj).writeExternal(oos);
+  }
+  #IFSWITCH CLASSPREFIX==Double
+    public static long[] table(Object obj){
+  #ELSEIFSWITCH CLASSPREFIX==Float
+    public static int[] table(Object obj){
+  #ELSEIFSWITCH CLASSPREFIX==Ref
+    public static Object[] table(Object obj){
+  #ELSE
+    public static ARRTYPE[] table(Object obj){
+  #ENDIF
+    return ((omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)obj).table;
+  }
+  public static interface Itr{
+    static final Field rootField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet"+DOLLARSIGN+"Itr","root");
+    public static omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER root(Object obj){
+      return (omni.impl.set.CLASSPREFIXOpenAddressHashSetTYPEPARAMETER)getValue(rootField,obj);
+    }
+    static final Field offsetField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet"+DOLLARSIGN+"Itr","offset");
+    public static int offset(Object obj){
+      return getIntValue(offsetField,obj);
+    }
+  }
+  public static interface Checked extends CLASSPREFIXOpenAddressHashSet{
+    public static void writeObject(Object obj,ObjectOutput oos) throws IOException{
+      ((Externalizable)obj).writeExternal(oos);
+    }
+    public static int size(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).size;
+    }
+    public static int maxTableSize(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).maxTableSize;
+    }
+    public static float loadFactor(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).loadFactor;
+    }
+    #IFSWITCH CLASSPREFIX==Char,Short,Int,Long
+    public static long word0(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).word0;
+    }
+    public static long word1(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).word1;
+    }
+    public static long word2(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).word2;
+    }
+    public static long word3(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).word3;
+    }
+    public static int tableSize(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).tableSize;
+    }
+    #ENDIF
+    #IFSWITCH CLASSPREFIX==Double
+    public static long[] table(Object obj){
+    #ELSEIFSWITCH CLASSPREFIX==Float
+    public static int[] table(Object obj){
+    #ELSEIFSWITCH CLASSPREFIX==Ref
+    public static Object[] table(Object obj){
+    #ELSE
+    public static ARRTYPE[] table(Object obj){
+    #ENDIF
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).table;
+    }
+    public static int modCount(Object obj){
+      return ((omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)obj).modCount;
+    }
+    public static interface Itr{
+      static final Field rootField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","root");
+      public static omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER root(Object obj){
+        return (omni.impl.set.CLASSPREFIXOpenAddressHashSet.CheckedTYPEPARAMETER)getValue(rootField,obj);
+      }
+      static final Field offsetField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","offset");
+      public static int offset(Object obj){
+        return getIntValue(offsetField,obj);
+      }
+      static final Field modCountField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","modCount");
+      public static int modCount(Object obj){
+        return getIntValue(modCountField,obj);
+      }
+      static final Field lastRetField=prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet"+DOLLARSIGN+"Checked"+DOLLARSIGN+"Itr","lastRet");
+      public static int lastRet(Object obj){
+        return getIntValue(lastRetField,obj);
       }
     }
   }

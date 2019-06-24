@@ -1534,6 +1534,9 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     extends AbstractShortItr
   {
     transient int cursor;
+    AbstractDeqItr(AbstractDeqItr itr){
+      this.cursor=itr.cursor;
+    }
     AbstractDeqItr(int cursor){
       this.cursor=cursor;
     }
@@ -1576,6 +1579,10 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final ShortArrDeq root;
+    private AscendingItr(AscendingItr itr){
+      super(itr);
+      this.root=itr.root;
+    }
     private AscendingItr(ShortArrDeq root){
       super(root.tail!=-1?root.head:-1);
       this.root=root;
@@ -1583,6 +1590,9 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     private AscendingItr(ShortArrDeq root,int cursor){
       super(cursor);
       this.root=root;
+    }
+    @Override public Object clone(){
+      return new AscendingItr(this);
     }
     @Override public short nextShort(){
       final short[] arr;
@@ -1676,8 +1686,17 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     }
   }
   private static class DescendingItr extends AscendingItr{
+    private DescendingItr(DescendingItr itr){
+      super(itr);
+    }
     private DescendingItr(ShortArrDeq root){
       super(root,root.tail);
+    }
+    private DescendingItr(ShortArrDeq root,int cursor){
+      super(root,cursor);
+    }
+    @Override public Object clone(){
+      return new DescendingItr(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,ShortConsumer action){
       final ShortArrDeq root;
@@ -3647,6 +3666,12 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
       transient int modCount;
       transient int lastRet;
       transient final Checked root;
+      private AscendingItr(AscendingItr itr){
+        super(itr);
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+        this.root=itr.root;
+      }
       private AscendingItr(Checked root){
         super(root.tail==-1?-1:root.head);
         this.root=root;
@@ -3658,6 +3683,9 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
         this.root=root;
         this.modCount=root.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
       }
       @Override public short nextShort(){
         final Checked root;
@@ -3776,8 +3804,17 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
       }
     }
     private static class DescendingItr extends AscendingItr{
+      private DescendingItr(DescendingItr itr){
+        super(itr);
+      }
       private DescendingItr(Checked root){
         super(root,root.tail);
+      }
+      private DescendingItr(Checked root,int cursor){
+        super(root,cursor);
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
       }
       @Override public short nextShort(){
         final Checked root;

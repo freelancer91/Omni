@@ -2,7 +2,7 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public abstract interface OmniQueue extends OmniCollection
+public abstract interface OmniQueue<E> extends OmniCollection<E>
 {
   #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
   #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
@@ -13,12 +13,12 @@ public abstract interface OmniQueue extends OmniCollection
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
-  public abstract interface OfPrimitive extends OmniQueue,OmniCollection.OfPrimitive
+  public abstract interface OfPrimitive<E> extends OmniQueue<E>,OmniCollection.OfPrimitive<E>
   {
     public abstract boolean offer(boolean val);
   }
   
-  public abstract interface DoubleOutput<E> extends OmniQueue,OmniCollection.DoubleOutput<E>{
+  public abstract interface DoubleOutput<E> extends OmniQueue<E>,OmniCollection.DoubleOutput<E>{
     public abstract double doubleElement();
     public abstract double removeDouble();
   }
@@ -46,43 +46,43 @@ public abstract interface OmniQueue extends OmniCollection
     public abstract byte byteElement();
     public abstract byte removeByte();
   }
-  public abstract interface BooleanInput extends OmniQueue,OmniCollection.BooleanInput{
+  public abstract interface BooleanInput<E> extends OmniQueue<E>,OmniCollection.BooleanInput<E>{
     public abstract boolean offer(boolean val);
     public abstract boolean offer(Boolean val);
   }
-  public abstract interface ByteInput extends BooleanInput,OmniCollection.ByteInput{
+  public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput<E>{
     public abstract boolean offer(byte val);
     public abstract boolean offer(Byte val);
   }
-  public abstract interface CharInput extends BooleanInput,OmniCollection.CharInput{
+  public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput<E>{
     public abstract boolean offer(char val);
     public abstract boolean offer(Character val);
   }
-  public abstract interface ShortInput extends ByteInput,OmniCollection.ShortInput{
+  public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput<E>{
     public abstract boolean offer(short val);
     public abstract boolean offer(Short val);
   }
-  public abstract interface IntInput extends CharInput,ShortInput,OmniCollection.IntInput{
+  public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>,OmniCollection.IntInput<E>{
     public abstract boolean offer(int val);
     public abstract boolean offer(Integer val);
   }
-  public abstract interface LongInput extends IntInput,OmniCollection.LongInput{
+  public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput<E>{
     public abstract boolean offer(long val);
     public abstract boolean offer(Long val);
   }
-  public abstract interface FloatInput extends LongInput,OmniCollection.FloatInput{
+  public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput<E>{
     public abstract boolean offer(float val);
     public abstract boolean offer(Float val);
   }
   
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>
+public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,OmniCollection<BOXEDTYPE>,OmniQueue<BOXEDTYPE>,OmniCollection.OfPrimitive<BOXEDTYPE>,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc.CLASSPREFIXOutput<BOXEDTYPE>
 #IFSWITCH ARRTYPE==boolean
-,BooleanInput,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
+,BooleanInput<BOXEDTYPE>,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
 #ELSEIFSWITCH ARRTYPE==double
-,FloatInput,DoubleOutput<BOXEDTYPE>
+,FloatInput<BOXEDTYPE>,DoubleOutput<BOXEDTYPE>
 #ELSEIFNOTSWITCH ARRTYPE==Object
-,CLASSPREFIXInput,CLASSPREFIXOutput<BOXEDTYPE>
+,CLASSPREFIXInput<BOXEDTYPE>,CLASSPREFIXOutput<BOXEDTYPE>
 #ENDIF
 {
   public abstract ARRTYPE ARRTYPEElement();
@@ -212,7 +212,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection,OmniQ
 #ENDIF
 }
 #ENDDEF
-  public abstract interface OfRef<E> extends OmniCollection,OmniQueue,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
+  public abstract interface OfRef<E> extends OmniCollection<E>,OmniQueue<E>,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
   {
     public abstract E element();
     public abstract boolean offer(E val);

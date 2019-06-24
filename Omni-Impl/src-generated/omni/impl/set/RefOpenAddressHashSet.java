@@ -12,7 +12,7 @@ import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 import java.util.ConcurrentModificationException;
 public class RefOpenAddressHashSet<E>
-extends AbstractOpenAddressHashSet
+extends AbstractOpenAddressHashSet<E>
 implements OmniSet.OfRef<E>{
   private static final Object NULL=new Object();
   private static final Object DELETED=new Object();
@@ -867,6 +867,10 @@ implements OmniSet.OfRef<E>{
   implements OmniIterator.OfRef<E>{
       private final RefOpenAddressHashSet<E> root;
       private int offset;
+      Itr(Itr<E> itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr(RefOpenAddressHashSet<E> root){
           this.root=root;
           if(root.size != 0){
@@ -881,6 +885,10 @@ implements OmniSet.OfRef<E>{
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr<E>(this);
       }
       @Override
       public boolean hasNext(){
@@ -1194,6 +1202,12 @@ implements OmniSet.OfRef<E>{
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr<E> itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked<E> root){
           this.root=root;
           this.modCount=root.modCount;
@@ -1210,6 +1224,9 @@ implements OmniSet.OfRef<E>{
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr<E>(this);
       }
       @SuppressWarnings("unchecked")
       @Override public void forEachRemaining(Consumer<? super E> action){

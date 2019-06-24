@@ -698,12 +698,18 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
 #ENDIF
   {
     transient int cursor;
+    AbstractDeqItr(AbstractDeqItr$<E>$ itr){
+      this.cursor=itr.cursor;
+    }
     AbstractDeqItr(int cursor){
       this.cursor=cursor;
     }
     @Override public boolean hasNext(){
       return this.cursor!=-1;
     }
+#IF OfRef
+    @Override public abstract Object clone();    
+#ENDIF
     abstract void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action);
     @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
       int cursor;
@@ -763,6 +769,10 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
   private static class AscendingItr$<E>$ extends AbstractDeqItr$<E>$
   {
     transient final $ClassPrefix$ArrDeq$<E>$ root;
+    private AscendingItr(AscendingItr$<E>$ itr){
+      super(itr);
+      this.root=itr.root;
+    }
     private AscendingItr($ClassPrefix$ArrDeq$<E>$ root){
       super(root.tail!=-1?root.head:-1);
       this.root=root;
@@ -770,6 +780,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     private AscendingItr($ClassPrefix$ArrDeq$<E>$ root,int cursor){
       super(cursor);
       this.root=root;
+    }
+    @Override public Object clone(){
+      return new AscendingItr$<E>$(this);
     }
     #MACRO SuppressUnchecked()
     @Override public $exposedType$ next$TypeNameModifier$(){
@@ -873,8 +886,17 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     }
   }
   private static class DescendingItr$<E>$ extends AscendingItr$<E>${
+    private DescendingItr(DescendingItr$<E>$ itr){
+      super(itr);
+    }
     private DescendingItr($ClassPrefix$ArrDeq$<E>$ root){
       super(root,root.tail);
+    }
+    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root,int cursor){
+      super(root,cursor);
+    }
+    @Override public Object clone(){
+      return new DescendingItr$<E>$(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,$TypeNameModifier$Consumer$<? super E>$ action){
       final $ClassPrefix$ArrDeq$<E>$ root;
@@ -3185,6 +3207,12 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       transient int modCount;
       transient int lastRet;
       transient final Checked$<E>$ root;
+      private AscendingItr(AscendingItr$<E>$ itr){
+        super(itr);
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+        this.root=itr.root;
+      }
       private AscendingItr(Checked$<E>$ root){
         super(root.tail==-1?-1:root.head);
         this.root=root;
@@ -3196,6 +3224,9 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         this.root=root;
         this.modCount=root.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new AscendingItr$<E>$(this);
       }
       #MACRO SuppressUnchecked()
       @Override public $exposedType$ next$TypeNameModifier$(){
@@ -3341,8 +3372,17 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
     }
     private static class DescendingItr$<E>$ extends AscendingItr$<E>${
+      private DescendingItr(DescendingItr$<E>$ itr){
+        super(itr);
+      }
       private DescendingItr(Checked$<E>$ root){
         super(root,root.tail);
+      }
+      private DescendingItr(Checked$<E>$ root,int cursor){
+        super(root,cursor);
+      }
+      @Override public Object clone(){
+        return new DescendingItr$<E>$(this);
       }
       #MACRO SuppressUnchecked()
       @Override public $exposedType$ next$TypeNameModifier$(){

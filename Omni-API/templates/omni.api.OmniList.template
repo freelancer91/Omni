@@ -19,8 +19,11 @@ import omni.function.LongComparator;
 import omni.function.ShortComparator;
 import omni.function.ShortUnaryOperator;
 import omni.util.TypeUtil;
-public abstract interface OmniList extends OmniCollection
+public abstract interface OmniList<E> extends OmniCollection<E>
 {
+  OmniListIterator<E> listIterator();
+  OmniListIterator<E> listIterator(int index);
+  OmniList<E> subList(int fromIndex,int toIndex);
   public abstract int indexOf(Object val);
   #MACRO PrimitiveMethods(IndexOfMethodDecl)
   #MACRO BoxedMethods(IndexOfMethodDecl)
@@ -31,14 +34,14 @@ public abstract interface OmniList extends OmniCollection
   public abstract void stableDescendingSort();
   
   
-  public abstract interface OfPrimitive extends OmniList,OmniCollection.OfPrimitive
+  public abstract interface OfPrimitive<E> extends OmniList<E>,OmniCollection.OfPrimitive<E>
   {
      public abstract void add(int index,boolean val);
      #MACRO BoxedMethods(IndexOfMethodDefault)
      #MACRO BoxedMethods(LastIndexOfMethodDefault)
   }
   
-  public abstract interface DoubleOutput<E> extends OmniList,OmniCollection.DoubleOutput<E>
+  public abstract interface DoubleOutput<E> extends OmniList<E>,OmniCollection.DoubleOutput<E>
   {
     public abstract OmniListIterator.DoubleOutput<E> listIterator();
     public abstract OmniListIterator.DoubleOutput<E> listIterator(int index);
@@ -94,7 +97,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract byte getByte(int index);
     public abstract byte removeByteAt(int index);
   }
-  public abstract interface BooleanInput<E> extends OmniList,OmniCollection.BooleanInput
+  public abstract interface BooleanInput<E> extends OmniList<E>,OmniCollection.BooleanInput<E>
   {
     public abstract void add(int index,boolean val);
     public abstract void add(int index,Boolean val);
@@ -104,7 +107,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract OmniListIterator.BooleanInput<E> listIterator(int index);
     public abstract OmniList.BooleanInput<E> subList(int fromIndex,int toIndex);
   }
-  public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput
+  public abstract interface ByteInput<E> extends BooleanInput<E>,OmniCollection.ByteInput<E>
   {
     public abstract void add(int index,byte val);
     public abstract void add(int index,Byte val);
@@ -114,7 +117,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract OmniListIterator.ByteInput<E> listIterator(int index);
     public abstract OmniList.ByteInput<E> subList(int fromIndex,int toIndex);
   }
-  public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput
+  public abstract interface CharInput<E> extends BooleanInput<E>,OmniCollection.CharInput<E>
   {
     public abstract void add(int index,char val);
     public abstract void add(int index,Character val);
@@ -124,7 +127,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract OmniListIterator.CharInput<E> listIterator(int index);
     public abstract OmniList.CharInput<E> subList(int fromIndex,int toIndex);
   }
-  public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput
+  public abstract interface ShortInput<E> extends ByteInput<E>,OmniCollection.ShortInput<E>
   {
     public abstract void add(int index,short val);
     public abstract void add(int index,Short val);
@@ -134,7 +137,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract OmniListIterator.ShortInput<E> listIterator(int index);
     public abstract OmniList.ShortInput<E> subList(int fromIndex,int toIndex);
   }
-  public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>,OmniCollection.IntInput
+  public abstract interface IntInput<E> extends ShortInput<E>,CharInput<E>,OmniCollection.IntInput<E>
   {
     public abstract void add(int index,int val);
     public abstract void add(int index,Integer val);
@@ -144,7 +147,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract OmniListIterator.IntInput<E> listIterator(int index);
     public abstract OmniList.IntInput<E> subList(int fromIndex,int toIndex);
   }
-  public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput
+  public abstract interface LongInput<E> extends IntInput<E>,OmniCollection.LongInput<E>
   {
     public abstract void add(int index,long val);
     public abstract void add(int index,Long val);
@@ -154,7 +157,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract OmniListIterator.LongInput<E> listIterator(int index);
     public abstract OmniList.LongInput<E> subList(int fromIndex,int toIndex);
   }
-  public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput
+  public abstract interface FloatInput<E> extends LongInput<E>,OmniCollection.FloatInput<E>
   {
     public abstract void add(int index,float val);
     public abstract void add(int index,Float val);
@@ -175,7 +178,7 @@ public abstract interface OmniList extends OmniCollection
     #MACRO PrimitiveSubInterface<double,Double,Double>()
     
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection.OfCLASSPREFIX
+public abstract interface OfCLASSPREFIX extends OfPrimitive<BOXEDTYPE>,OmniCollection.OfCLASSPREFIX
 #IFSWITCH ARRTYPE==boolean
 ,BooleanInput<BOXEDTYPE>,ByteOutput<BOXEDTYPE>,CharOutput<BOXEDTYPE>
 #ELSEIFSWITCH ARRTYPE==double
@@ -388,7 +391,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection.OfCLA
 #ENDIF
 }
 #ENDDEF
-  public abstract interface OfRef<E> extends OmniList,OmniCollection.OfRef<E>{
+  public abstract interface OfRef<E> extends OmniList<E>,OmniCollection.OfRef<E>{
     public abstract void add(int index,E val);
     public abstract E get(int index);
     public abstract OmniListIterator.OfRef<E> listIterator();

@@ -849,7 +849,7 @@ static interface CLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return ((omni.impl.seq.AbstractSeq)obj).size;
+      return ((omni.impl.seq.AbstractSeq<?>)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -907,7 +907,7 @@ static interface CLASSPREFIXArrSeq{
       return getIntValue(rootOffsetField,obj);
     }
     static int size(Object obj){
-      return ((omni.impl.seq.AbstractSeq)obj).size;
+      return ((omni.impl.seq.AbstractSeq<?>)obj).size;
     }
     interface Itr{
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");

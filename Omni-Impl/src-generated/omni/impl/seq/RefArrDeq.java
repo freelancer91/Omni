@@ -1802,12 +1802,16 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     implements OmniIterator.OfRef<E>
   {
     transient int cursor;
+    AbstractDeqItr(AbstractDeqItr<E> itr){
+      this.cursor=itr.cursor;
+    }
     AbstractDeqItr(int cursor){
       this.cursor=cursor;
     }
     @Override public boolean hasNext(){
       return this.cursor!=-1;
     }
+    @Override public abstract Object clone();    
     abstract void uncheckedForEachRemaining(int cursor,Consumer<? super E> action);
     @Override public void forEachRemaining(Consumer<? super E> action){
       int cursor;
@@ -1845,6 +1849,10 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
   private static class AscendingItr<E> extends AbstractDeqItr<E>
   {
     transient final RefArrDeq<E> root;
+    private AscendingItr(AscendingItr<E> itr){
+      super(itr);
+      this.root=itr.root;
+    }
     private AscendingItr(RefArrDeq<E> root){
       super(root.tail!=-1?root.head:-1);
       this.root=root;
@@ -1852,6 +1860,9 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     private AscendingItr(RefArrDeq<E> root,int cursor){
       super(cursor);
       this.root=root;
+    }
+    @Override public Object clone(){
+      return new AscendingItr<E>(this);
     }
     @SuppressWarnings("unchecked")
     @Override public E next(){
@@ -1949,8 +1960,17 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     }
   }
   private static class DescendingItr<E> extends AscendingItr<E>{
+    private DescendingItr(DescendingItr<E> itr){
+      super(itr);
+    }
     private DescendingItr(RefArrDeq<E> root){
       super(root,root.tail);
+    }
+    private DescendingItr(RefArrDeq<E> root,int cursor){
+      super(root,cursor);
+    }
+    @Override public Object clone(){
+      return new DescendingItr<E>(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,Consumer<? super E> action){
       final RefArrDeq<E> root;
@@ -4077,6 +4097,12 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       transient int modCount;
       transient int lastRet;
       transient final Checked<E> root;
+      private AscendingItr(AscendingItr<E> itr){
+        super(itr);
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+        this.root=itr.root;
+      }
       private AscendingItr(Checked<E> root){
         super(root.tail==-1?-1:root.head);
         this.root=root;
@@ -4088,6 +4114,9 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         this.root=root;
         this.modCount=root.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new AscendingItr<E>(this);
       }
       @SuppressWarnings("unchecked")
       @Override public E next(){
@@ -4215,8 +4244,17 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
     }
     private static class DescendingItr<E> extends AscendingItr<E>{
+      private DescendingItr(DescendingItr<E> itr){
+        super(itr);
+      }
       private DescendingItr(Checked<E> root){
         super(root,root.tail);
+      }
+      private DescendingItr(Checked<E> root,int cursor){
+        super(root,cursor);
+      }
+      @Override public Object clone(){
+        return new DescendingItr<E>(this);
       }
       @SuppressWarnings("unchecked")
       @Override public E next(){

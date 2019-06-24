@@ -612,6 +612,13 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
         this.root=root;
         this.itrState=root.state;
     }
+    private Itr(Itr itr){
+      this.root=itr.root;
+      this.itrState=itr.itrState;
+    }
+    @Override public Object clone(){
+       return new Itr(this);
+    }
     @Override public void remove(){
         if(itrState == 0b00){
             final BooleanSetImpl root;
@@ -1007,6 +1014,13 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       Itr(Checked root){
         this.root=root;
         this.itrState=root.state;
+      }
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.itrState=itr.itrState;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void remove(){
         int itrState,newRootState,newItrState;

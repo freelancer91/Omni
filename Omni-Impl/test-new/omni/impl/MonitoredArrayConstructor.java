@@ -3,8 +3,8 @@ package omni.impl;
 import java.util.function.IntFunction;
 
 public class MonitoredArrayConstructor<T> implements IntFunction<T[]>{
-    int numCalls;
-    DataType dataType;
+    public int numCalls;
+    public DataType dataType;
     MonitoredArrayConstructor(MonitoredCollection<?> collection){
         this.dataType=collection.getDataType();
     }

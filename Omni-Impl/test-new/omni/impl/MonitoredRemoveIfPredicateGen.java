@@ -1,9 +1,10 @@
 package omni.impl;
 
+import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 public enum MonitoredRemoveIfPredicateGen{
-    Random{
+    Random(null,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -16,7 +17,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    RemoveTrue{
+    RemoveTrue(null,false){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -69,7 +70,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    RemoveFalse{
+    RemoveFalse(null,false){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -123,7 +124,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    RemoveAll{
+    RemoveAll(null,false){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -135,7 +136,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    RemoveNone{
+    RemoveNone(null,false){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -147,7 +148,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    Throw{
+    Throw(IndexOutOfBoundsException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -184,7 +185,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ModCollection{
+    ModCollection(ConcurrentModificationException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -223,7 +224,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ModParent{
+    ModParent(ConcurrentModificationException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -262,7 +263,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ModRoot{
+    ModRoot(ConcurrentModificationException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -301,7 +302,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModCollection{
+    ThrowModCollection(ConcurrentModificationException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -339,7 +340,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModParent{
+    ThrowModParent(ConcurrentModificationException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -377,7 +378,7 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModRoot{
+    ThrowModRoot(ConcurrentModificationException.class,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -415,6 +416,12 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     };
+    public final Class<? extends Throwable> expectedException;
+    public final boolean randomized;
+    MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,boolean randomized){
+      this.expectedException=expectedException;
+      this.randomized=randomized;
+    }
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
             double threshold,long randSeed);
 }

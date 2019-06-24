@@ -2,6 +2,7 @@ package omni.impl;
 import omni.api.OmniIterator;
 public abstract class AbstractCharItr implements OmniIterator.OfChar
 {
+  @Override public abstract Object clone();
   @Override
   public Character next()
   {

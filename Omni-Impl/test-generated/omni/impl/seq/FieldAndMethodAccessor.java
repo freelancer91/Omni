@@ -835,7 +835,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -893,7 +893,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1592,7 +1592,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -1650,7 +1650,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -2349,7 +2349,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -2407,7 +2407,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -3106,7 +3106,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -3164,7 +3164,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -3863,7 +3863,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -3921,7 +3921,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -4620,7 +4620,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -4678,7 +4678,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -5377,7 +5377,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -5435,7 +5435,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -6134,7 +6134,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -6192,7 +6192,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -6891,7 +6891,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
@@ -6949,7 +6949,7 @@ final class FieldAndMethodAccessor{
         return getIntValue(rootOffsetField,obj);
       }
       static int size(Object obj){
-        return ((omni.impl.seq.AbstractSeq)obj).size;
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
       }
       interface Itr{
         static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");

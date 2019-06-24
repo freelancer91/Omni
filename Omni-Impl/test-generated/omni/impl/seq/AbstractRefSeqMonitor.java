@@ -1839,10 +1839,22 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
         return new MonitoredArrayConstructor();
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
-        return new MonitoredObjectInputStream(file);
+        return new MonitoredObjectInputStream(file){
+          @Override protected void throwingCall(){
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.NoThrow;
+          }
+        };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
-        return new MonitoredObjectOutputStream(file);
+        return new MonitoredObjectOutputStream(file){
+          @Override protected void throwingCall(){
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.NoThrow;
+          }
+        };
       }
     },
     Throw(IndexOutOfBoundsException.class,true,true,true){
@@ -1870,15 +1882,21 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.NoThrow;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.NoThrow;
           }
         };
       }
@@ -1931,15 +1949,21 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModCollection;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModSeq);
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModCollection;
           }
         };
       }
@@ -1981,15 +2005,21 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModParent;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModParent);
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModParent;
           }
         };
       }
@@ -2031,15 +2061,21 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModRoot;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModRoot);
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModRoot;
           }
         };
       }
@@ -2095,17 +2131,23 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModSeq);
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModCollection;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModSeq);
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModCollection;
           }
         };
       }
@@ -2149,17 +2191,23 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModParent);
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModParent;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModParent);
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModParent;
           }
         };
       }
@@ -2203,17 +2251,23 @@ abstract class AbstractRefSeqMonitor<SEQ extends OmniCollection.OfRef>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModRoot);
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModRoot;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractRefSeqMonitor seqMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             seqMonitor.illegalAdd(PreModScenario.ModRoot);
             throw new IndexOutOfBoundsException();
+          }
+          @Override public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModRoot;
           }
         };
       }

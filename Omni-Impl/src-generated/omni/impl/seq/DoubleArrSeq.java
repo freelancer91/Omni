@@ -29,7 +29,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.RandomAccess;
-public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection.OfDouble,Externalizable,RandomAccess{
+public abstract class DoubleArrSeq extends 
+AbstractSeq<Double>
+ implements OmniCollection.OfDouble,Externalizable,RandomAccess{
   //TODO refactor the template and/or optimize code generation to make sure that the code generation doesn't take forever
   private static final long serialVersionUID=1L;
   transient double[] arr; 
@@ -859,9 +861,20 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     {
       transient final UncheckedStack parent;
       transient int cursor;
+      private Itr(Itr itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+      }
       private Itr(UncheckedStack parent){
         this.parent=parent;
         this.cursor=parent.size;
+      }
+      private Itr(UncheckedStack parent,int cursor){
+        this.parent=parent;
+        this.cursor=cursor;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         return this.cursor>0;
@@ -1308,6 +1321,10 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     {
       transient final UncheckedList parent;
       transient int cursor;
+      private Itr(Itr itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+      }
       private Itr(UncheckedList parent){
         this.parent=parent;
         this.cursor=0;
@@ -1315,6 +1332,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       private Itr(UncheckedList parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         return this.cursor<parent.size;
@@ -1348,6 +1368,10 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     }
     private static class ListItr extends Itr implements OmniListIterator.OfDouble{
       transient int lastRet;
+      private ListItr(ListItr itr){
+        super(itr);
+        this.lastRet=itr.lastRet;
+      }
       private ListItr(UncheckedList parent){
         super(parent);
         this.lastRet=-1;
@@ -1355,6 +1379,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       private ListItr(UncheckedList parent,int cursor){
         super(parent,cursor);
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new ListItr(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>0;
@@ -1543,7 +1570,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
   }
   public
     static class UncheckedSubList
-      extends AbstractSeq
+      extends AbstractSeq<Double>
       implements DoubleSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -2285,6 +2312,10 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     {
       transient final UncheckedSubList parent;
       transient int cursor;
+      private Itr(Itr itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+      }
       private Itr(UncheckedSubList parent){
         this.parent=parent;
         this.cursor=parent.rootOffset;
@@ -2292,6 +2323,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       private Itr(UncheckedSubList parent,int cursor){
         this.parent=parent;
         this.cursor=cursor;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         final UncheckedSubList parent;
@@ -2330,6 +2364,10 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
     }
     private static class ListItr extends Itr implements OmniListIterator.OfDouble{
       transient int lastRet;
+      private ListItr(ListItr itr){
+        super(itr);
+        this.lastRet=itr.lastRet;
+      }
       private ListItr(UncheckedSubList parent){
         super(parent);
         this.lastRet=-1;
@@ -2337,6 +2375,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       private ListItr(UncheckedSubList parent,int cursor){
         super(parent,cursor);
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new ListItr(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>parent.rootOffset;
@@ -2723,11 +2764,26 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       transient int cursor;
       transient int lastRet;
       transient int modCount;
+      private Itr(Itr itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+        this.lastRet=itr.lastRet;
+        this.modCount=itr.modCount;
+      }
       private Itr(CheckedStack parent){
         this.parent=parent;
         this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
+      }
+      private Itr(CheckedStack parent,int cursor){
+        this.parent=parent;
+        this.cursor=cursor;
+        this.modCount=parent.modCount;
+        this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         return this.cursor>0;
@@ -2974,6 +3030,12 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       transient int cursor;
       transient int lastRet;
       transient int modCount;
+      private Itr(Itr itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+        this.lastRet=itr.lastRet;
+        this.modCount=itr.modCount;
+      }
       private Itr(CheckedList parent){
         this.parent=parent;
         this.cursor=0;
@@ -2985,6 +3047,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
         this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         return this.cursor<parent.size;
@@ -3051,11 +3116,17 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       return new Itr(this);
     }
     private static class ListItr extends Itr implements OmniListIterator.OfDouble{
+      private ListItr(ListItr itr){
+        super(itr);
+      }
       private ListItr(CheckedList parent){
         super(parent);
       }
       private ListItr(CheckedList parent,int cursor){
         super(parent,cursor);
+      }
+      @Override public Object clone(){
+        return new ListItr(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>0;
@@ -3296,7 +3367,7 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
   }
   private
     static class CheckedSubList
-      extends AbstractSeq
+      extends AbstractSeq<Double>
       implements DoubleSubListDefault,Cloneable,RandomAccess
   {
     private static final long serialVersionUID=1L;
@@ -4207,6 +4278,12 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       transient int cursor;
       transient int lastRet;
       transient int modCount;
+      private Itr(Itr itr){
+        this.parent=itr.parent;
+        this.cursor=itr.cursor;
+        this.lastRet=itr.lastRet;
+        this.modCount=itr.modCount;
+      }
       private Itr(CheckedSubList parent){
         this.parent=parent;
         this.cursor=parent.rootOffset;
@@ -4218,6 +4295,9 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
         this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         final CheckedSubList parent;
@@ -4294,11 +4374,17 @@ public abstract class DoubleArrSeq extends AbstractSeq implements OmniCollection
       return new Itr(this);
     }
     private static class ListItr extends Itr implements OmniListIterator.OfDouble{
+      private ListItr(ListItr itr){
+        super(itr);
+      }
       private ListItr(CheckedSubList parent){
         super(parent);
       }
       private ListItr(CheckedSubList parent,int cursor){
         super(parent,cursor);
+      }
+      @Override public Object clone(){
+        return new ListItr(this);
       }
       @Override public boolean hasPrevious(){
         return this.cursor>parent.rootOffset;

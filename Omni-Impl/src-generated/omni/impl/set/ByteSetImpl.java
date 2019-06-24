@@ -729,6 +729,10 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   private static class Itr extends AbstractByteItr{
     private final ByteSetImpl root;
     private int valOffset;
+    private Itr(Itr itr){
+      root=itr.root;
+      valOffset=itr.valOffset;
+    }
     private Itr(ByteSetImpl root){
         this.root=root;
         int tail0s;
@@ -741,6 +745,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         }else{
             this.valOffset=Long.numberOfTrailingZeros(root.word3) + 64;
         }
+    }
+    @Override public Object clone(){
+      return new Itr(this);
     }
     @Override public boolean hasNext(){
         return this.valOffset != 128;
@@ -1145,14 +1152,20 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       return false;
     }
     @Override public OmniIterator.OfByte iterator(){
-      return new CheckedItr(this);
+      return new Itr(this);
     }
-    private static class CheckedItr extends AbstractByteItr{
+    private static class Itr extends AbstractByteItr{
       private final Checked root;
       private int valOffset;
       private int modCount;
       private int lastRet;
-      private CheckedItr(Checked root){
+      private Itr(Itr itr){
+        this.root=itr.root;
+        this.valOffset=itr.valOffset;
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+      }
+      private Itr(Checked root){
         this.root=root;
         int tail0s;
         if((tail0s=Long.numberOfTrailingZeros(root.word0)) != 64){
@@ -1166,6 +1179,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         }
         this.lastRet=-129;
         this.modCount=root.modCount;
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public boolean hasNext(){
         return this.valOffset != 128;

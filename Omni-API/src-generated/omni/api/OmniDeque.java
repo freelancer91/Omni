@@ -1,8 +1,9 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
+public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>
 {
+  OmniIterator<E> descendingIterator();
   public default boolean removeFirstOccurrence(boolean val)
   {
     return removeVal(val);
@@ -52,7 +53,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
   public abstract boolean removeLastOccurrence(Long val);
   public abstract boolean removeLastOccurrence(Float val);
   public abstract boolean removeLastOccurrence(Double val);
-  public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OmniQueue,OmniStack.OfPrimitive,OmniDeque
+  public abstract interface OfPrimitive<E> extends OmniCollection<E>,OmniCollection.OfPrimitive<E>,OmniStack<E>,OmniQueue<E>,OmniStack.OfPrimitive<E>,OmniDeque<E>
   {
     public abstract void addFirst(boolean val);
     public abstract void addLast(boolean val);
@@ -139,7 +140,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
       return val!=null && removeLastOccurrence(val.doubleValue());
     }
   }
-  public abstract interface DoubleOutput<E> extends OmniDeque,OmniQueue.DoubleOutput<E>,OmniStack.DoubleOutput<E>
+  public abstract interface DoubleOutput<E> extends OmniDeque<E>,OmniQueue.DoubleOutput<E>,OmniStack.DoubleOutput<E>
   {
     public abstract double getFirstDouble();
     public abstract double removeFirstDouble();
@@ -223,7 +224,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract byte pollLastByte();
     public abstract OmniIterator.ByteOutput<E> descendingIterator();
   }
-  public abstract interface BooleanInput extends OmniDeque,OmniQueue.BooleanInput,OmniStack.BooleanInput
+  public abstract interface BooleanInput<E> extends OmniDeque<E>,OmniQueue.BooleanInput<E>,OmniStack.BooleanInput<E>
   {
     public abstract boolean offerLast(boolean val);
     public abstract boolean offerLast(Boolean val);
@@ -234,7 +235,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(boolean val);
     public abstract void addFirst(Boolean val);
   }
-  public abstract interface ByteInput extends BooleanInput,OmniQueue.ByteInput,OmniStack.ByteInput
+  public abstract interface ByteInput<E> extends BooleanInput<E>,OmniQueue.ByteInput<E>,OmniStack.ByteInput<E>
   {
     public abstract boolean offerLast(byte val);
     public abstract boolean offerLast(Byte val);
@@ -245,7 +246,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(byte val);
     public abstract void addFirst(Byte val);
   }
-  public abstract interface CharInput extends BooleanInput,OmniQueue.CharInput,OmniStack.CharInput
+  public abstract interface CharInput<E> extends BooleanInput<E>,OmniQueue.CharInput<E>,OmniStack.CharInput<E>
   {
     public abstract boolean offerLast(char val);
     public abstract boolean offerLast(Character val);
@@ -256,7 +257,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(char val);
     public abstract void addFirst(Character val);
   }
-  public abstract interface ShortInput extends ByteInput,OmniQueue.ShortInput,OmniStack.ShortInput
+  public abstract interface ShortInput<E> extends ByteInput<E>,OmniQueue.ShortInput<E>,OmniStack.ShortInput<E>
   {
     public abstract boolean offerLast(short val);
     public abstract boolean offerLast(Short val);
@@ -267,7 +268,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(short val);
     public abstract void addFirst(Short val);
   }
-  public abstract interface IntInput extends CharInput,ShortInput,OmniQueue.IntInput,OmniStack.IntInput
+  public abstract interface IntInput<E> extends CharInput<E>,ShortInput<E>,OmniQueue.IntInput<E>,OmniStack.IntInput<E>
   {
     public abstract boolean offerLast(int val);
     public abstract boolean offerLast(Integer val);
@@ -278,7 +279,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(int val);
     public abstract void addFirst(Integer val);
   }
-  public abstract interface LongInput extends IntInput,OmniQueue.LongInput,OmniStack.LongInput
+  public abstract interface LongInput<E> extends IntInput<E>,OmniQueue.LongInput<E>,OmniStack.LongInput<E>
   {
     public abstract boolean offerLast(long val);
     public abstract boolean offerLast(Long val);
@@ -289,7 +290,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(long val);
     public abstract void addFirst(Long val);
   }
-  public abstract interface FloatInput extends LongInput,OmniQueue.FloatInput,OmniStack.FloatInput
+  public abstract interface FloatInput<E> extends LongInput<E>,OmniQueue.FloatInput<E>,OmniStack.FloatInput<E>
   {
     public abstract boolean offerLast(float val);
     public abstract boolean offerLast(Float val);
@@ -300,8 +301,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     public abstract void addFirst(float val);
     public abstract void addFirst(Float val);
   }
-  public abstract interface OfBoolean extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfBoolean,OmniQueue,OmniQueue.OfBoolean,OmniDeque,OfPrimitive
-  ,BooleanInput,ByteOutput<Boolean>,CharOutput<Boolean>
+  public abstract interface OfBoolean extends OmniCollection<Boolean>,OmniCollection.OfPrimitive<Boolean>,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>,OmniStack<Boolean>,OmniStack.OfPrimitive<Boolean>,OmniStack.OfBoolean,OmniQueue<Boolean>,OmniQueue.OfBoolean,OmniDeque<Boolean>,OfPrimitive<Boolean>
+  ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
   {
     public abstract void addFirst(Boolean val);
     public abstract void addLast(boolean val);
@@ -562,8 +563,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfBoolean descendingIterator();
   }
-  public abstract interface OfByte extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfByte,PeekAndPollIfc.ByteOutput<Byte>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfByte,OmniQueue,OmniQueue.OfByte,OmniDeque,OfPrimitive
-  ,ByteInput,ByteOutput<Byte>
+  public abstract interface OfByte extends OmniCollection<Byte>,OmniCollection.OfPrimitive<Byte>,OmniCollection.OfByte,PeekAndPollIfc.ByteOutput<Byte>,OmniStack<Byte>,OmniStack.OfPrimitive<Byte>,OmniStack.OfByte,OmniQueue<Byte>,OmniQueue.OfByte,OmniDeque<Byte>,OfPrimitive<Byte>
+  ,ByteInput<Byte>,ByteOutput<Byte>
   {
     public default void addFirst(byte val)
     {
@@ -813,8 +814,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfByte descendingIterator();
   }
-  public abstract interface OfChar extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfChar,PeekAndPollIfc.CharOutput<Character>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfChar,OmniQueue,OmniQueue.OfChar,OmniDeque,OfPrimitive
-  ,CharInput,CharOutput<Character>
+  public abstract interface OfChar extends OmniCollection<Character>,OmniCollection.OfPrimitive<Character>,OmniCollection.OfChar,PeekAndPollIfc.CharOutput<Character>,OmniStack<Character>,OmniStack.OfPrimitive<Character>,OmniStack.OfChar,OmniQueue<Character>,OmniQueue.OfChar,OmniDeque<Character>,OfPrimitive<Character>
+  ,CharInput<Character>,CharOutput<Character>
   {
     public default void addFirst(char val)
     {
@@ -1034,8 +1035,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfChar descendingIterator();
   }
-  public abstract interface OfShort extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfShort,PeekAndPollIfc.ShortOutput<Short>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfShort,OmniQueue,OmniQueue.OfShort,OmniDeque,OfPrimitive
-  ,ShortInput,ShortOutput<Short>
+  public abstract interface OfShort extends OmniCollection<Short>,OmniCollection.OfPrimitive<Short>,OmniCollection.OfShort,PeekAndPollIfc.ShortOutput<Short>,OmniStack<Short>,OmniStack.OfPrimitive<Short>,OmniStack.OfShort,OmniQueue<Short>,OmniQueue.OfShort,OmniDeque<Short>,OfPrimitive<Short>
+  ,ShortInput<Short>,ShortOutput<Short>
   {
     public default void addFirst(short val)
     {
@@ -1287,8 +1288,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfShort descendingIterator();
   }
-  public abstract interface OfInt extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfInt,PeekAndPollIfc.IntOutput<Integer>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfInt,OmniQueue,OmniQueue.OfInt,OmniDeque,OfPrimitive
-  ,IntInput,IntOutput<Integer>
+  public abstract interface OfInt extends OmniCollection<Integer>,OmniCollection.OfPrimitive<Integer>,OmniCollection.OfInt,PeekAndPollIfc.IntOutput<Integer>,OmniStack<Integer>,OmniStack.OfPrimitive<Integer>,OmniStack.OfInt,OmniQueue<Integer>,OmniQueue.OfInt,OmniDeque<Integer>,OfPrimitive<Integer>
+  ,IntInput<Integer>,IntOutput<Integer>
   {
     public default void addFirst(int val)
     {
@@ -1592,8 +1593,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfInt descendingIterator();
   }
-  public abstract interface OfLong extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfLong,PeekAndPollIfc.LongOutput<Long>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfLong,OmniQueue,OmniQueue.OfLong,OmniDeque,OfPrimitive
-  ,LongInput,LongOutput<Long>
+  public abstract interface OfLong extends OmniCollection<Long>,OmniCollection.OfPrimitive<Long>,OmniCollection.OfLong,PeekAndPollIfc.LongOutput<Long>,OmniStack<Long>,OmniStack.OfPrimitive<Long>,OmniStack.OfLong,OmniQueue<Long>,OmniQueue.OfLong,OmniDeque<Long>,OfPrimitive<Long>
+  ,LongInput<Long>,LongOutput<Long>
   {
     public default void addFirst(long val)
     {
@@ -1903,8 +1904,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfLong descendingIterator();
   }
-  public abstract interface OfFloat extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfFloat,PeekAndPollIfc.FloatOutput<Float>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfFloat,OmniQueue,OmniQueue.OfFloat,OmniDeque,OfPrimitive
-  ,FloatInput,FloatOutput<Float>
+  public abstract interface OfFloat extends OmniCollection<Float>,OmniCollection.OfPrimitive<Float>,OmniCollection.OfFloat,PeekAndPollIfc.FloatOutput<Float>,OmniStack<Float>,OmniStack.OfPrimitive<Float>,OmniStack.OfFloat,OmniQueue<Float>,OmniQueue.OfFloat,OmniDeque<Float>,OfPrimitive<Float>
+  ,FloatInput<Float>,FloatOutput<Float>
   {
     public default void addFirst(float val)
     {
@@ -2206,8 +2207,8 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfFloat descendingIterator();
   }
-  public abstract interface OfDouble extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfDouble,PeekAndPollIfc.DoubleOutput<Double>,OmniStack,OmniStack.OfPrimitive,OmniStack.OfDouble,OmniQueue,OmniQueue.OfDouble,OmniDeque,OfPrimitive
-  ,FloatInput,DoubleOutput<Double>
+  public abstract interface OfDouble extends OmniCollection<Double>,OmniCollection.OfPrimitive<Double>,OmniCollection.OfDouble,PeekAndPollIfc.DoubleOutput<Double>,OmniStack<Double>,OmniStack.OfPrimitive<Double>,OmniStack.OfDouble,OmniQueue<Double>,OmniQueue.OfDouble,OmniDeque<Double>,OfPrimitive<Double>
+  ,FloatInput<Double>,DoubleOutput<Double>
   {
     public default void addFirst(double val)
     {
@@ -2529,7 +2530,7 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
     //TODO removeLastOccurrence defaults
     public abstract OmniIterator.OfDouble descendingIterator();
   }
-  public abstract interface OfRef<E> extends OmniCollection,OmniCollection.OfRef<E>,PeekAndPollIfc<E>,OmniStack,OmniStack.OfRef<E>,OmniQueue,OmniQueue.OfRef<E>,OmniDeque
+  public abstract interface OfRef<E> extends OmniCollection<E>,OmniCollection.OfRef<E>,PeekAndPollIfc<E>,OmniStack<E>,OmniStack.OfRef<E>,OmniQueue<E>,OmniQueue.OfRef<E>,OmniDeque<E>
   {
     public abstract void addFirst(E val);
     public abstract void addLast(E val);

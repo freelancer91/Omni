@@ -13,7 +13,7 @@ import omni.util.TypeUtil;
 #ENDIF
 public abstract class Abstract$ClassPrefix$Itr implements OmniIterator.Of$ClassPrefix$$<E>$
 {
-
+  @Override public abstract Object clone();
   #MACRO NextImpl($BoxedType$,,($BoxedType$))
 #IFNOT OfDouble
   #MACRO NextImpl(double,Double,$castToDouble$)

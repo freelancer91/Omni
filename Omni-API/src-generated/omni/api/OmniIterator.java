@@ -15,6 +15,7 @@ public interface OmniIterator<E> extends Iterator<E>
 {
   //@Override
   //public abstract boolean hasNext();
+  public abstract Object clone();
   public abstract interface OfBoolean extends OmniIterator<Boolean>
   ,PrimitiveIterator<Boolean,BooleanConsumer>
   ,CharOutput<Boolean>,ByteOutput<Boolean>

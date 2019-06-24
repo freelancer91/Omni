@@ -1576,6 +1576,9 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     extends AbstractDoubleItr
   {
     transient int cursor;
+    AbstractDeqItr(AbstractDeqItr itr){
+      this.cursor=itr.cursor;
+    }
     AbstractDeqItr(int cursor){
       this.cursor=cursor;
     }
@@ -1618,6 +1621,10 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final DoubleArrDeq root;
+    private AscendingItr(AscendingItr itr){
+      super(itr);
+      this.root=itr.root;
+    }
     private AscendingItr(DoubleArrDeq root){
       super(root.tail!=-1?root.head:-1);
       this.root=root;
@@ -1625,6 +1632,9 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     private AscendingItr(DoubleArrDeq root,int cursor){
       super(cursor);
       this.root=root;
+    }
+    @Override public Object clone(){
+      return new AscendingItr(this);
     }
     @Override public double nextDouble(){
       final double[] arr;
@@ -1718,8 +1728,17 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     }
   }
   private static class DescendingItr extends AscendingItr{
+    private DescendingItr(DescendingItr itr){
+      super(itr);
+    }
     private DescendingItr(DoubleArrDeq root){
       super(root,root.tail);
+    }
+    private DescendingItr(DoubleArrDeq root,int cursor){
+      super(root,cursor);
+    }
+    @Override public Object clone(){
+      return new DescendingItr(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,DoubleConsumer action){
       final DoubleArrDeq root;
@@ -3689,6 +3708,12 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       transient int modCount;
       transient int lastRet;
       transient final Checked root;
+      private AscendingItr(AscendingItr itr){
+        super(itr);
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+        this.root=itr.root;
+      }
       private AscendingItr(Checked root){
         super(root.tail==-1?-1:root.head);
         this.root=root;
@@ -3700,6 +3725,9 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
         this.root=root;
         this.modCount=root.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
       }
       @Override public double nextDouble(){
         final Checked root;
@@ -3818,8 +3846,17 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       }
     }
     private static class DescendingItr extends AscendingItr{
+      private DescendingItr(DescendingItr itr){
+        super(itr);
+      }
       private DescendingItr(Checked root){
         super(root,root.tail);
+      }
+      private DescendingItr(Checked root,int cursor){
+        super(root,cursor);
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
       }
       @Override public double nextDouble(){
         final Checked root;

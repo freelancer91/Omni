@@ -31,23 +31,14 @@ import omni.util.TestExecutorService;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Tag("ArrDeqTest")
 public class BooleanArrDeqTest{
-  private static TestExecutorService EXECUTORSERVICE;
-  @org.junit.jupiter.api.BeforeAll
-  public static void init(){
-    EXECUTORSERVICE=new TestExecutorService(0);
-  }
   @org.junit.jupiter.api.AfterEach
   public void verifyAllExecuted(){
     int numTestsRemaining;
-    if((numTestsRemaining=EXECUTORSERVICE.getNumRemainingTasks())!=0)
+    if((numTestsRemaining=TestExecutorService.getNumRemainingTasks())!=0)
     {
       System.err.println("Warning: there were "+numTestsRemaining+" tests that were not completed");
     }
-    EXECUTORSERVICE.reset();
-  }
-  @org.junit.jupiter.api.AfterAll
-  public static void cleanUp(){
-    EXECUTORSERVICE=null;
+    TestExecutorService.reset();
   }
     private static final int MAX_TOSTRING_LENGTH=5;
   @Tag("MASSIVEtoString")
@@ -78,13 +69,13 @@ public class BooleanArrDeqTest{
         for(int batchIndex=0;batchIndex<batchBound;++batchIndex){
           final int finalWayPointBound=nextWayPointIndex+batchSpan;
           final int finalWayPointIndex=nextWayPointIndex;
-          EXECUTORSERVICE.submitTest(()->AbstractBooleanSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
+          TestExecutorService.submitTest(()->AbstractBooleanSeqMonitor.verifyLargeStr(string,finalWayPointIndex,finalWayPointBound,verifyItr.getOffset(0)));
           verifyItr.skip(batchSpan);
           nextWayPointIndex=finalWayPointBound;
         }
         final int finalWayPointIndex=nextWayPointIndex;
-        EXECUTORSERVICE.submitTest(()->AbstractBooleanSeqMonitor.verifyLargeStr(string,finalWayPointIndex,seqLength,verifyItr));
-        EXECUTORSERVICE.completeAllTests("BooleanArrDeq.testMASSIVEtoString_void checkedType="+checkedType+"; tail="+tail);
+        TestExecutorService.submitTest(()->AbstractBooleanSeqMonitor.verifyLargeStr(string,finalWayPointIndex,seqLength,verifyItr));
+        TestExecutorService.completeAllTests("BooleanArrDeq.testMASSIVEtoString_void checkedType="+checkedType+"; tail="+tail);
       }
     }
   }
@@ -95,7 +86,7 @@ public class BooleanArrDeqTest{
       for(var monitoredRemoveIfPredicateGen:MonitoredRemoveIfPredicateGen.values()){
         if(monitoredRemoveIfPredicateGen.expectedException==null || (checkedType.checked && monitoredRemoveIfPredicateGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){
-            EXECUTORSERVICE.submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,0,functionCallType,0,0,0,0));
+            TestExecutorService.submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,0,functionCallType,0,0,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
               if(functionCallType==FunctionCallType.Boxed && tmpSeqSize>2){
                 break;
@@ -124,7 +115,7 @@ public class BooleanArrDeqTest{
                         break;
                       }
                       final int head=tmpHead;
-                      EXECUTORSERVICE.submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,head,initVal,period));
+                      TestExecutorService.submitTest(()->testremoveIf_PredicateHelper(checkedType,monitoredRemoveIfPredicateGen,0.5,randSeed,functionCallType,seqSize,head,initVal,period));
                     }
                   }
                   if(period>=seqSize){
@@ -137,7 +128,7 @@ public class BooleanArrDeqTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests("BooleanArrDeq.testremoveIf_Predicate");
+    TestExecutorService.completeAllTests("BooleanArrDeq.testremoveIf_Predicate");
   }
   private static void testremoveIf_PredicateHelper(CheckedType checkedType,MonitoredRemoveIfPredicateGen monitoredRemoveIfPredicateGen,double threshold,long randSeed,final FunctionCallType functionCallType,int seqSize,int head
   ,int initVal,int period
@@ -224,19 +215,19 @@ public class BooleanArrDeqTest{
     for(var checkedType:CheckedType.values()){
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRoot)){
-          EXECUTORSERVICE.submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,0,0,0));
+          TestExecutorService.submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,0,0,0));
           for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
             int seqSize=tmpSeqSize;
             for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
               int head=tmpHead;
-              EXECUTORSERVICE.submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,seqSize,head,0));
-              EXECUTORSERVICE.submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,seqSize,head,1));
+              TestExecutorService.submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,seqSize,head,0));
+              TestExecutorService.submitTest(()->testreadandwriteObjectHelper(checkedType,monitoredFunctionGen,seqSize,head,1));
             }
           }
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testreadandwriteObjectHelper(CheckedType checkedType,MonitoredFunctionGen monitoredFunctionGen,int seqSize,int head
   ,int initVal
@@ -302,18 +293,18 @@ public class BooleanArrDeqTest{
     for(var checkedType:CheckedType.values()){
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRoot)){
-          EXECUTORSERVICE.submitTest(()->testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,0,0));
+          TestExecutorService.submitTest(()->testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,0,0));
           for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
             int seqSize=tmpSeqSize;
             for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
               int head=tmpHead;
-              EXECUTORSERVICE.submitTest(()->testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,seqSize,head));
+              TestExecutorService.submitTest(()->testtoArray_IntFunctionHelper(checkedType,monitoredFunctionGen,seqSize,head));
             }
           }
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testtoArray_IntFunctionHelper(CheckedType checkedType,MonitoredFunctionGen monitoredFunctionGen,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -356,19 +347,19 @@ public class BooleanArrDeqTest{
       for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
         if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRoot)){
           for(var functionCallType:FunctionCallType.values()){ 
-            EXECUTORSERVICE.submitTest(()->testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,0,0));
+            TestExecutorService.submitTest(()->testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,0,0));
             for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
               int seqSize=tmpSeqSize;
               for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
                 int head=tmpHead;
-                EXECUTORSERVICE.submitTest(()->testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,seqSize,head));
+                TestExecutorService.submitTest(()->testforEach_ConsumerHelper(checkedType,monitoredFunctionGen,functionCallType,seqSize,head));
               }
             }
           }
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testforEach_ConsumerHelper(CheckedType checkedType,MonitoredFunctionGen monitoredFunctionGen,FunctionCallType functionCallType,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -403,12 +394,12 @@ public class BooleanArrDeqTest{
             for(var functionCallType:FunctionCallType.values()){
               for(var monitoredFunctionGen:MonitoredFunctionGen.values()){
                 if(monitoredFunctionGen.expectedException==null || (checkedType.checked && monitoredFunctionGen.appliesToRootItr)){
-                  EXECUTORSERVICE.submitTest(()->testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,0,0));
+                  TestExecutorService.submitTest(()->testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,0,0));
                   for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
                     int seqSize=tmpSeqSize;
                     for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
                       int head=tmpHead;
-                      EXECUTORSERVICE.submitTest(()->testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,seqSize,head));
+                      TestExecutorService.submitTest(()->testItrforEachRemaining_ConsumerHelper(itrType,checkedType,preModScenario,functionCallType,monitoredFunctionGen,seqSize,head));
                     }
                   }
                 }
@@ -418,7 +409,7 @@ public class BooleanArrDeqTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testItrforEachRemaining_ConsumerHelper(ItrType itrType,CheckedType checkedType,PreModScenario preModScenario,FunctionCallType functionCallType,MonitoredFunctionGen monitoredFunctionGen,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -468,16 +459,16 @@ public class BooleanArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testsize_void(){
     for(var checkedType:CheckedType.values()){
-      EXECUTORSERVICE.submitTest(()->testsize_voidHelper(checkedType,0,0));
+      TestExecutorService.submitTest(()->testsize_voidHelper(checkedType,0,0));
       for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
         int seqSize=tmpSeqSize;
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           int head=tmpHead;
-          EXECUTORSERVICE.submitTest(()->testsize_voidHelper(checkedType,seqSize,head));
+          TestExecutorService.submitTest(()->testsize_voidHelper(checkedType,seqSize,head));
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testsize_voidHelper(CheckedType checkedType,int seqSize,int head){
     var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -489,16 +480,16 @@ public class BooleanArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testisEmpty_void(){
     for(var checkedType:CheckedType.values()){
-      EXECUTORSERVICE.submitTest(()->testisEmpty_voidHelper(checkedType,0,0));
+      TestExecutorService.submitTest(()->testisEmpty_voidHelper(checkedType,0,0));
       for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
         int seqSize=tmpSeqSize;
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           int head=tmpHead;
-          EXECUTORSERVICE.submitTest(()->testisEmpty_voidHelper(checkedType,seqSize,head));
+          TestExecutorService.submitTest(()->testisEmpty_voidHelper(checkedType,seqSize,head));
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testisEmpty_voidHelper(CheckedType checkedType,int seqSize,int head){
     var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -518,13 +509,13 @@ public class BooleanArrDeqTest{
                 for(var seqLocation:SequenceLocation.values()){
                   if(seqLocation.expectedException==null && (removeScenario!=ItrRemoveScenario.PostInit || seqLocation==SequenceLocation.BEGINNING)){
                     if(removeScenario.validWithEmptySeq){
-                      EXECUTORSERVICE.submitTest(()->testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,0,0));
+                      TestExecutorService.submitTest(()->testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,0,0));
                     }
                     for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
                       int seqSize=tmpSeqSize;
                       for(int tmpHead=0;tmpHead<tmpSeqSize;++tmpHead){
                         int head=tmpHead;
-                        EXECUTORSERVICE.submitTest(()->testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,seqSize,head));
+                        TestExecutorService.submitTest(()->testItrremove_voidHelper(itrType,checkedType,preModScenario,removeScenario,seqLocation,seqSize,head));
                       }
                     }
                   }
@@ -535,7 +526,7 @@ public class BooleanArrDeqTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testItrremove_voidHelper(ItrType itrType,CheckedType checkedType,PreModScenario preModScenario,ItrRemoveScenario removeScenario,SequenceLocation seqLocation,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -682,12 +673,12 @@ public class BooleanArrDeqTest{
         if(preModScenario.expectedException==null || (preModScenario==PreModScenario.ModSeq && checkedType.checked)){
           for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
             for(var outputArgType:BooleanOutputTestArgType.values()){
-              EXECUTORSERVICE.submitTest(()->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,0,0));
+              TestExecutorService.submitTest(()->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,0,0));
               for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
                 final int seqSize=tmpSeqSize;
                 for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
                   final int head=tmpHead;
-                  EXECUTORSERVICE.submitTest(()->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,head));
+                  TestExecutorService.submitTest(()->testItrnext_voidHelper(checkedType,preModScenario,outputArgType,itrType,seqSize,head));
                 }
               }
             }
@@ -695,7 +686,7 @@ public class BooleanArrDeqTest{
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testItrnext_voidHelper(CheckedType checkedType,PreModScenario preModScenario,BooleanOutputTestArgType outputArgType,ItrType itrType,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -734,16 +725,16 @@ public class BooleanArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testclear_void(){
     for(var checkedType:CheckedType.values()){
-      EXECUTORSERVICE.submitTest(()->testclear_voidHelper(checkedType,0,0));
+      TestExecutorService.submitTest(()->testclear_voidHelper(checkedType,0,0));
       for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
         final int seqSize=tmpSeqSize;
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           final int head=tmpHead;
-          EXECUTORSERVICE.submitTest(()->testclear_voidHelper(checkedType,seqSize,head));
+          TestExecutorService.submitTest(()->testclear_voidHelper(checkedType,seqSize,head));
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testclear_voidHelper(CheckedType checkedType,int seqSize,int head){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -760,17 +751,17 @@ public class BooleanArrDeqTest{
         for(int tmpParamArrSize=0;tmpParamArrSize<=seqSize+5;tmpParamArrSize+=5){
           final int paramArrSize=tmpParamArrSize;
           if(seqSize==0){
-            EXECUTORSERVICE.submitTest(()->testtoArray_ObjectArrayHelper(checkedType,seqSize,0,paramArrSize));
+            TestExecutorService.submitTest(()->testtoArray_ObjectArrayHelper(checkedType,seqSize,0,paramArrSize));
           }else{
             for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
               final int head=tmpHead;
-              EXECUTORSERVICE.submitTest(()->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize));
+              TestExecutorService.submitTest(()->testtoArray_ObjectArrayHelper(checkedType,seqSize,head,paramArrSize));
             }
           }
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testtoArray_ObjectArrayHelper(CheckedType checkedType,int seqSize,int head,int paramArrSize){
     SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -866,31 +857,31 @@ public class BooleanArrDeqTest{
     );
     private void runTests(){
       for(var checkedType:CheckedType.values()){
-        EXECUTORSERVICE.submitTest(()->runTest(checkedType,0,0));
+        TestExecutorService.submitTest(()->runTest(checkedType,0,0));
         for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
           final int seqSize=tmpSeqSize;
           for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
             final int head=tmpHead;
-            EXECUTORSERVICE.submitTest(()->runTest(checkedType,seqSize,head));
+            TestExecutorService.submitTest(()->runTest(checkedType,seqSize,head));
           }
         }
       }
-      EXECUTORSERVICE.completeAllTests();
+      TestExecutorService.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
   public void testclone_void(){
     for(var checkedType:CheckedType.values()){
-      EXECUTORSERVICE.submitTest(()->testclone_voidHelper(checkedType,0,0));
+      TestExecutorService.submitTest(()->testclone_voidHelper(checkedType,0,0));
       for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
         final int seqSize=tmpSeqSize;
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           final int head=tmpHead;
-          EXECUTORSERVICE.submitTest(()->testclone_voidHelper(checkedType,seqSize,head));
+          TestExecutorService.submitTest(()->testclone_voidHelper(checkedType,seqSize,head));
         }
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   private static void testclone_voidHelper(CheckedType checkedType,int seqSize,int head){
     var seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
@@ -1150,7 +1141,7 @@ public class BooleanArrDeqTest{
   @org.junit.jupiter.api.Test
   public void testConstructor_void(){
     for(var checkedType:CheckedType.values()){
-      EXECUTORSERVICE.submitTest(()->{
+      TestExecutorService.submitTest(()->{
         BooleanArrDeq deq;
         if(checkedType.checked){
           Assertions.assertEquals(0,((BooleanArrDeq.Checked)(deq=new BooleanArrDeq.Checked())).modCount);
@@ -1162,14 +1153,14 @@ public class BooleanArrDeqTest{
         Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,deq.arr);
       });
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testConstructor_int(){
     for(var checkedType:CheckedType.values()){
       for(int tmpInitialCapacity=0;tmpInitialCapacity<=15;tmpInitialCapacity+=5){
         final int initialCapacity=tmpInitialCapacity;
-        EXECUTORSERVICE.submitTest(()->{
+        TestExecutorService.submitTest(()->{
           BooleanArrDeq deq;
           if(checkedType.checked){
             Assertions.assertEquals(0,((BooleanArrDeq.Checked)(deq=new BooleanArrDeq.Checked(initialCapacity))).modCount);
@@ -1191,7 +1182,7 @@ public class BooleanArrDeqTest{
         });
       }
     }
-    EXECUTORSERVICE.completeAllTests();
+    TestExecutorService.completeAllTests();
   }
   @org.junit.jupiter.api.Test
   public void testadd_val(){
@@ -1317,18 +1308,18 @@ public class BooleanArrDeqTest{
       for(var checkedType:CheckedType.values()){
         for(var outputArgType:BooleanOutputTestArgType.values()){
           if(allowEmpty || checkedType.checked){
-            EXECUTORSERVICE.submitTest(()->runTest(checkedType,0,0,outputArgType));
+            TestExecutorService.submitTest(()->runTest(checkedType,0,0,outputArgType));
           }
           for(int tmpSeqSize=1;tmpSeqSize<=10;++tmpSeqSize){
             final int seqSize=tmpSeqSize;
             for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
               final int head=tmpHead;
-              EXECUTORSERVICE.submitTest(()->runTest(checkedType,head,seqSize,outputArgType));
+              TestExecutorService.submitTest(()->runTest(checkedType,head,seqSize,outputArgType));
             }
           }
         }
       }
-      EXECUTORSERVICE.completeAllTests();
+      TestExecutorService.completeAllTests();
     }
   }
   interface InputTest{
@@ -1336,21 +1327,21 @@ public class BooleanArrDeqTest{
     private void runTests(){
       for(var checkedType:CheckedType.values()){
         for(var inputArgType:BooleanInputTestArgType.values()){
-          EXECUTORSERVICE.submitTest(()->runTest(checkedType,0,0,0,inputArgType));
+          TestExecutorService.submitTest(()->runTest(checkedType,0,0,0,inputArgType));
           for(int tmpCapacity=1;tmpCapacity<=15;++tmpCapacity){
             final int capacity=tmpCapacity;
-            EXECUTORSERVICE.submitTest(()->runTest(checkedType,capacity,0,0,inputArgType));
+            TestExecutorService.submitTest(()->runTest(checkedType,capacity,0,0,inputArgType));
             for(int tmpSeqSize=1;tmpSeqSize<=capacity;++tmpSeqSize){
               final int seqSize=tmpSeqSize;
               for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
                 final int head=tmpHead;
-                EXECUTORSERVICE.submitTest(()->runTest(checkedType,capacity,head,seqSize,inputArgType));
+                TestExecutorService.submitTest(()->runTest(checkedType,capacity,head,seqSize,inputArgType));
               }
             }
           }
         }
       }
-      EXECUTORSERVICE.completeAllTests();
+      TestExecutorService.completeAllTests();
     }
   }
   @org.junit.jupiter.api.Test
@@ -1432,14 +1423,14 @@ public class BooleanArrDeqTest{
     ){
       if(seqSize==0)
       {
-        EXECUTORSERVICE.submitTest(()->runTest(checkedType,argType,queryCastType,seqLocation,seqSize,0
+        TestExecutorService.submitTest(()->runTest(checkedType,argType,queryCastType,seqLocation,seqSize,0
         ));
       }
       else
       {
         for(int tmpHead=0;tmpHead<seqSize;++tmpHead){
           final int head=tmpHead;
-          EXECUTORSERVICE.submitTest(()->runTest(checkedType,argType,queryCastType,seqLocation,seqSize,head
+          TestExecutorService.submitTest(()->runTest(checkedType,argType,queryCastType,seqLocation,seqSize,head
           ));
         }
       }
@@ -1506,7 +1497,7 @@ public class BooleanArrDeqTest{
           }
         }
       }
-      EXECUTORSERVICE.completeAllTests();
+      TestExecutorService.completeAllTests();
     }
   }
   private static void initializeAscending(boolean[] arr,int head,int size)

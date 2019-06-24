@@ -20,7 +20,7 @@ import omni.function.FloatUnaryOperator;
 import omni.function.ShortConsumer;
 import omni.function.ShortUnaryOperator;
 @SuppressWarnings("rawtypes")
-public class MonitoredFunction extends ArrayList<Object>
+public abstract class MonitoredFunction extends ArrayList<Object>
 implements
 Consumer,
 BooleanConsumer,
@@ -44,8 +44,11 @@ DoubleUnaryOperator{
      *
      */
     private static final long serialVersionUID=1L;
-    protected void throwingCall(){
-    }
+    
+    public abstract MonitoredFunctionGen getMonitoredFunctionGen();
+    
+    
+    protected abstract void throwingCall();
     @Override
     public void accept(Object t){
         super.add(t);

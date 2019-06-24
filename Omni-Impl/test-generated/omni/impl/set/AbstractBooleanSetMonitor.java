@@ -1,14 +1,10 @@
 package omni.impl.set;
-import org.junit.jupiter.api.Assertions;
 import omni.impl.FunctionCallType;
-import omni.impl.BooleanOutputTestArgType;
 import omni.impl.BooleanInputTestArgType;
 import omni.impl.MonitoredObjectInputStream;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.CheckedType;
-import omni.impl.QueryCastType;
 import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.IOException;
 import omni.function.BooleanPredicate;
@@ -22,8 +18,6 @@ import java.util.Random;
 import java.util.HashSet;
 import java.util.ArrayList;
 import omni.api.OmniIterator;
-import omni.util.TypeUtil;
-import omni.util.TypeConversionUtil;
 import java.util.function.UnaryOperator;
 @SuppressWarnings({"rawtypes","unchecked"})
 abstract class AbstractBooleanSetMonitor<SET extends OmniSet.OfBoolean>{
@@ -174,10 +168,20 @@ abstract class AbstractBooleanSetMonitor<SET extends OmniSet.OfBoolean>{
         return new MonitoredArrayConstructor();
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
-        return new MonitoredObjectInputStream(file);
+        return new MonitoredObjectInputStream(file){
+          protected void throwingCall(){}
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.NoThrow;
+          }
+        };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
-        return new MonitoredObjectOutputStream(file);
+        return new MonitoredObjectOutputStream(file){
+          protected void throwingCall(){}
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.NoThrow;
+          }
+        };
       }
     },
     Throw(IndexOutOfBoundsException.class,false){
@@ -205,15 +209,21 @@ abstract class AbstractBooleanSetMonitor<SET extends OmniSet.OfBoolean>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             throw new IndexOutOfBoundsException();
+          }
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOB;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             throw new IndexOutOfBoundsException();
+          }
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOB;
           }
         };
       }
@@ -266,15 +276,21 @@ abstract class AbstractBooleanSetMonitor<SET extends OmniSet.OfBoolean>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             setMonitor.illegalMod(PreModScenario.ModSet);
+          }
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModCollection;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             setMonitor.illegalMod(PreModScenario.ModSet);
+          }
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ModCollection;
           }
         };
       }
@@ -330,17 +346,23 @@ abstract class AbstractBooleanSetMonitor<SET extends OmniSet.OfBoolean>{
       }
       @Override MonitoredObjectInputStream getMonitoredObjectInputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
         return new MonitoredObjectInputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             setMonitor.illegalMod(PreModScenario.ModSet);
             throw new IndexOutOfBoundsException();
+          }
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModCollection;
           }
         };
       }
       @Override MonitoredObjectOutputStream getMonitoredObjectOutputStream(File file,AbstractBooleanSetMonitor setMonitor) throws IOException{
         return new MonitoredObjectOutputStream(file){
-          @Override protected void preModCall(){
+          @Override protected void throwingCall(){
             setMonitor.illegalMod(PreModScenario.ModSet);
             throw new IndexOutOfBoundsException();
+          }
+          public omni.impl.MonitoredFunctionGen getMonitoredFunctionGen(){
+            return omni.impl.MonitoredFunctionGen.ThrowIOBModCollection;
           }
         };
       }

@@ -1,8 +1,8 @@
 package omni.impl;
 
 import omni.api.OmniDeque;
-public interface MonitoredDeque<DEQ extends OmniDeque>extends MonitoredQueue<DEQ>,MonitoredStack<DEQ>{
-    MonitoredIterator<DEQ> getMonitoredDescendingIterator();
+public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<DEQ>,MonitoredStack<DEQ>{
+    MonitoredIterator<?,DEQ> getMonitoredDescendingIterator();
     boolean verifyRemoveFirstOccurrence(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification);
     boolean verifyRemoveLastOccurrence(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,

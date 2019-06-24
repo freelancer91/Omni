@@ -1,6 +1,6 @@
 package omni.impl.set;
 
-public abstract class AbstractIntegralTypeOpenAddressHashSet extends AbstractOpenAddressHashSet{
+public abstract class AbstractIntegralTypeOpenAddressHashSet<E> extends AbstractOpenAddressHashSet<E>{
     static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
         int hash=(int)(magicWord >>> 32);
         int numLeft=(int)magicWord;
@@ -28,7 +28,7 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet extends AbstractOpe
     AbstractIntegralTypeOpenAddressHashSet(float loadFactor){
         super(loadFactor);
     }
-    AbstractIntegralTypeOpenAddressHashSet(AbstractIntegralTypeOpenAddressHashSet that){
+    AbstractIntegralTypeOpenAddressHashSet(AbstractIntegralTypeOpenAddressHashSet<E> that){
         super(that);
         this.word0=that.word0;
         this.word1=that.word1;

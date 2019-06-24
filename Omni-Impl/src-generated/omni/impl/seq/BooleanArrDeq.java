@@ -1837,6 +1837,9 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     extends AbstractBooleanItr
   {
     transient int cursor;
+    AbstractDeqItr(AbstractDeqItr itr){
+      this.cursor=itr.cursor;
+    }
     AbstractDeqItr(int cursor){
       this.cursor=cursor;
     }
@@ -1879,6 +1882,10 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
   private static class AscendingItr extends AbstractDeqItr
   {
     transient final BooleanArrDeq root;
+    private AscendingItr(AscendingItr itr){
+      super(itr);
+      this.root=itr.root;
+    }
     private AscendingItr(BooleanArrDeq root){
       super(root.tail!=-1?root.head:-1);
       this.root=root;
@@ -1886,6 +1893,9 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     private AscendingItr(BooleanArrDeq root,int cursor){
       super(cursor);
       this.root=root;
+    }
+    @Override public Object clone(){
+      return new AscendingItr(this);
     }
     @Override public boolean nextBoolean(){
       final boolean[] arr;
@@ -1979,8 +1989,17 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     }
   }
   private static class DescendingItr extends AscendingItr{
+    private DescendingItr(DescendingItr itr){
+      super(itr);
+    }
     private DescendingItr(BooleanArrDeq root){
       super(root,root.tail);
+    }
+    private DescendingItr(BooleanArrDeq root,int cursor){
+      super(root,cursor);
+    }
+    @Override public Object clone(){
+      return new DescendingItr(this);
     }
     @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
       final BooleanArrDeq root;
@@ -2385,6 +2404,12 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       transient int modCount;
       transient int lastRet;
       transient final Checked root;
+      private AscendingItr(AscendingItr itr){
+        super(itr);
+        this.modCount=itr.modCount;
+        this.lastRet=itr.lastRet;
+        this.root=itr.root;
+      }
       private AscendingItr(Checked root){
         super(root.tail==-1?-1:root.head);
         this.root=root;
@@ -2396,6 +2421,9 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         this.root=root;
         this.modCount=root.modCount;
         this.lastRet=-1;
+      }
+      @Override public Object clone(){
+        return new AscendingItr(this);
       }
       @Override public boolean nextBoolean(){
         final Checked root;
@@ -2514,8 +2542,17 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       }
     }
     private static class DescendingItr extends AscendingItr{
+      private DescendingItr(DescendingItr itr){
+        super(itr);
+      }
       private DescendingItr(Checked root){
         super(root,root.tail);
+      }
+      private DescendingItr(Checked root,int cursor){
+        super(root,cursor);
+      }
+      @Override public Object clone(){
+        return new DescendingItr(this);
       }
       @Override public boolean nextBoolean(){
         final Checked root;

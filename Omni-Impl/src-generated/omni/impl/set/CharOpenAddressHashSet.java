@@ -14,7 +14,7 @@ import omni.impl.AbstractCharItr;
 import omni.impl.CheckedCollection;
 import omni.util.OmniArray;
 public class CharOpenAddressHashSet
-extends AbstractIntegralTypeOpenAddressHashSet
+extends AbstractIntegralTypeOpenAddressHashSet<Character>
 implements OmniSet.OfChar{
   private static void quickInsert(char[] table,char val){
     int tableLength;
@@ -1224,6 +1224,10 @@ implements OmniSet.OfChar{
   extends AbstractCharItr{
       private final CharOpenAddressHashSet root;
       private int offset;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.offset=itr.offset;
+      }
       Itr(CharOpenAddressHashSet root){
           this.root=root;
           if(root.size != 0){
@@ -1249,6 +1253,10 @@ implements OmniSet.OfChar{
           }else{
               this.offset=-1;
           }
+      }
+      @Override
+      public Object clone(){
+        return new Itr(this);
       }
       @Override
       public boolean hasNext(){
@@ -1669,6 +1677,12 @@ implements OmniSet.OfChar{
       private int offset;
       private int modCount;
       private int lastRet;
+      Itr(Itr itr){
+        this.root=itr.root;
+        this.modCount=itr.modCount;
+        this.offset=itr.offset;
+        this.lastRet=itr.lastRet;
+      }
       Itr(Checked root){
           this.root=root;
           this.modCount=root.modCount;
@@ -1695,6 +1709,9 @@ implements OmniSet.OfChar{
           }else{
               this.offset=-1;
           }
+      }
+      @Override public Object clone(){
+        return new Itr(this);
       }
       @Override public void forEachRemaining(CharConsumer action){
         int offset;
