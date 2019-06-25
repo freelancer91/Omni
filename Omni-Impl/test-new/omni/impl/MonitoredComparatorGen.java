@@ -252,7 +252,7 @@ public enum MonitoredComparatorGen{
                 return;
             }
             }
-            throw new UnsupportedOperationException("Unknown dataType " + dataType);
+            throw DataType.invalidDataType(dataType);
         }
     },
     NullComparator(true,ComparatorType.NaturalOrder,null){
@@ -572,7 +572,7 @@ public enum MonitoredComparatorGen{
             return;
         }
         }
-        throw new UnsupportedOperationException("Unknown dataType " + dataType);
+        throw DataType.invalidDataType(dataType);
     }
     void initUnsortedHelper(MonitoredList<?,?> listMonitor,int listSize){
         for(int i=listSize;--i >= 0;){

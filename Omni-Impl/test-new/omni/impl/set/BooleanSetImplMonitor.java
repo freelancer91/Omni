@@ -17,6 +17,15 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
     final BooleanSetImpl set;
     int expectedState;
 
+    BooleanSetImplMonitor(CheckedType checkedType){
+        this.checkedType=checkedType;
+        this.expectedState=0;
+        if(checkedType.checked){
+            this.set=new BooleanSetImpl.Checked();
+        }else{
+            this.set=new BooleanSetImpl();
+        }
+    }
     BooleanSetImplMonitor(CheckedType checkedType,int expectedState){
         this.checkedType=checkedType;
         this.expectedState=expectedState;
@@ -27,7 +36,8 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         }
     }
 
-    @Override public void updateAddState(Object inputVal,DataType inputType,boolean boxed,boolean result){
+    @Override
+    public void updateAddState(Object inputVal,DataType inputType,boolean result){
         boolean v=(boolean)inputVal;
         expectedState|=v?2:1;
     }
@@ -398,4 +408,10 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
 
     }
 
+    @Override
+    public void verifyClear(){
+        set.clear();
+        expectedState=0;
+        verifyCollectionState();
+    }
 }

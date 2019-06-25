@@ -35,6 +35,6 @@ public class MonitoredArrayConstructor<T> implements IntFunction<T[]>{
         case REF:
             return (T[])new Object[arrSize];
         }
-        throw new UnsupportedOperationException("Unknown dataType " + dataType);
+        throw DataType.invalidDataType(dataType);
     }
 }

@@ -5,26 +5,29 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ConcurrentModificationException;
 import java.util.Random;
-import omni.impl.MonitoredCollection.MonitoredIterator;
 
 public enum MonitoredFunctionGen{
     NoThrow(null,false){
-      class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
+        class Impl extends MonitoredFunction {
+            private static final long serialVersionUID=1L;
 
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return NoThrow;
+            @Override
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return NoThrow;
+            }
+            @Override
+            protected void throwingCall(){
+            }
         }
-        protected void throwingCall(){
-        }
-      }
         @Override
         public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
             return new Impl();
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          return new Impl();
-       }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl();
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor);
@@ -34,64 +37,62 @@ public enum MonitoredFunctionGen{
                 InputStream inputStream) throws IOException{
             return new MonitoredObjectInputStream(inputStream) {
 
-              @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                return NoThrow;
-              }
+                @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
+                    return NoThrow;
+                }
 
-              @Override protected void throwingCall(){}
-              
+                @Override protected void throwingCall(){}
+
             };
         }
         @Override
         public MonitoredObjectOutputStream getMonitoredObjectOutputStream(MonitoredCollection<?> collection,
                 OutputStream outputStream) throws IOException{
             return new MonitoredObjectOutputStream(outputStream) {
-              @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                return NoThrow;
-              }
+                @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
+                    return NoThrow;
+                }
 
-              @Override protected void throwingCall(){}
+                @Override protected void throwingCall(){}
             };
         }
     },
-    ModCollection(ConcurrentModificationException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
+    ModCollection(ConcurrentModificationException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
+            private static final long serialVersionUID=1L;
 
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ModCollection;
+            @Override
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ModCollection;
+            }
         }
-      }
         @Override
         public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
-                boolean alreadyModded=false;
+            return new Impl(randSeed,collectionMonitor){
                 private static final long serialVersionUID=1L;
                 @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex && !alreadyModded){
-                        collectionMonitor.illegalMod(IllegalModification.ModCollection);
-                        alreadyModded=true;
-                    }
+                void throwHelper(){
+                    collectionMonitor.illegalMod(IllegalModification.ModCollection);
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-          return new Impl(){
-            boolean alreadyModded=false;
-            private static final long serialVersionUID=1L;
-            @Override
-            protected void throwingCall(){
-              if(this.size() >= throwIndex && !alreadyModded){
-                iteratorMonitor.illegalMod(IllegalModification.ModCollection);
-                alreadyModded=true;
-            }
-            }
-        };
-       }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    iteratorMonitor.illegalMod(IllegalModification.ModCollection);
+                }
+            };
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor){
@@ -111,7 +112,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ModCollection;
+                    return ModCollection;
                 }
             };
         }
@@ -125,49 +126,47 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ModCollection;
-                  }
-            };
-        }
-    },
-    ModParent(ConcurrentModificationException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
-
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ModParent;
-        }
-      }
-        @Override
-        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
-                boolean alreadyModded=false;
-                private static final long serialVersionUID=1L;
-                @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex && !alreadyModded){
-                        collectionMonitor.illegalMod(IllegalModification.ModParent);
-                        alreadyModded=true;
-                    }
+                    return ModCollection;
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-          return new Impl(){
-            boolean alreadyModded=false;
+    },
+    ModParent(ConcurrentModificationException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
             private static final long serialVersionUID=1L;
+
             @Override
-            protected void throwingCall(){
-              if(this.size() >= throwIndex && !alreadyModded){
-                iteratorMonitor.illegalMod(IllegalModification.ModParent);
-                alreadyModded=true;
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ModParent;
             }
-            }
-        };
-       }
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
+            return new Impl(randSeed,collectionMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    collectionMonitor.illegalMod(IllegalModification.ModParent);
+                }
+            };
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    iteratorMonitor.illegalMod(IllegalModification.ModParent);
+                }
+            };
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor){
@@ -187,7 +186,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ModParent;
+                    return ModParent;
                 }
             };
         }
@@ -201,49 +200,49 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ModParent;
-                  }
-            };
-        }
-    },
-    ModRoot(ConcurrentModificationException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
-
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ModRoot;
-        }
-      }
-        @Override
-        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
-                boolean alreadyModded=false;
-                private static final long serialVersionUID=1L;
-                @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex && !alreadyModded){
-                        collectionMonitor.illegalMod(IllegalModification.ModRoot);
-                        alreadyModded=true;
-                    }
+                    return ModParent;
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-          return new Impl(){
-            boolean alreadyModded=false;
+    },
+    ModRoot(ConcurrentModificationException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
             private static final long serialVersionUID=1L;
+
             @Override
-            protected void throwingCall(){
-              if(this.size() >= throwIndex && !alreadyModded){
-                iteratorMonitor.illegalMod(IllegalModification.ModRoot);
-                alreadyModded=true;
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ModRoot;
             }
-            }
-        };
-       }
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
+            return new Impl(randSeed,collectionMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    collectionMonitor.illegalMod(IllegalModification.ModRoot);
+
+                }
+            };
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    iteratorMonitor.illegalMod(IllegalModification.ModRoot);
+
+                }
+            };
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor){
@@ -263,7 +262,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ModRoot;
+                    return ModRoot;
                 }
             };
         }
@@ -277,45 +276,49 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ModRoot;
-                  }
+                    return ModRoot;
+                }
             };
         }
     },
-    ThrowIOB(IndexOutOfBoundsException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
+    ThrowIOB(IndexOutOfBoundsException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
+            private static final long serialVersionUID=1L;
 
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ThrowIOB;
+            @Override
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ThrowIOB;
+            }
         }
-      }
         @Override
         public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
+            return new Impl(randSeed,collectionMonitor){
                 private static final long serialVersionUID=1L;
                 @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex){
-                        throw new IndexOutOfBoundsException();
-                    }
+                void throwHelper(){
+                    throw new IndexOutOfBoundsException();
+
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-          return new Impl(){
-            private static final long serialVersionUID=1L;
-            @Override
-            protected void throwingCall(){
-                if(this.size() >= throwIndex){
-                  throw new IndexOutOfBoundsException();
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    throw new IndexOutOfBoundsException();
+
                 }
-            }
-        };
-       }
+            };
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor){
@@ -335,7 +338,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOB;
+                    return ThrowIOB;
                 }
             };
         }
@@ -349,47 +352,51 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOB;
-                  }
-            };
-        }
-    },
-    ThrowIOBModCollection(ConcurrentModificationException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
-
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ThrowIOBModCollection;
-        }
-      }
-        @Override
-        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
-                private static final long serialVersionUID=1L;
-                @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex){
-                        collectionMonitor.illegalMod(IllegalModification.ModCollection);
-                        throw new IndexOutOfBoundsException();
-                    }
+                    return ThrowIOB;
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-          return new Impl(){
+    },
+    ThrowIOBModCollection(ConcurrentModificationException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
             private static final long serialVersionUID=1L;
+
             @Override
-            protected void throwingCall(){
-                if(this.size() >= throwIndex){
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ThrowIOBModCollection;
+            }
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
+            return new Impl(randSeed,collectionMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    collectionMonitor.illegalMod(IllegalModification.ModCollection);
+                    throw new IndexOutOfBoundsException();
+
+                }
+            };
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
                     iteratorMonitor.illegalMod(IllegalModification.ModCollection);
                     throw new IndexOutOfBoundsException();
+
                 }
-            }
-        };
-       }
+            };
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor){
@@ -411,7 +418,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOBModCollection;
+                    return ThrowIOBModCollection;
                 }
             };
         }
@@ -426,47 +433,51 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOBModCollection;
-                  }
+                    return ThrowIOBModCollection;
+                }
             };
         }
     },
-    ThrowIOBModParent(ConcurrentModificationException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
+    ThrowIOBModParent(ConcurrentModificationException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
+            private static final long serialVersionUID=1L;
 
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ThrowIOBModParent;
+            @Override
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ThrowIOBModParent;
+            }
         }
-      }
         @Override
         public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
+            return new Impl(randSeed,collectionMonitor){
                 private static final long serialVersionUID=1L;
                 @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex){
-                        collectionMonitor.illegalMod(IllegalModification.ModParent);
-                        throw new IndexOutOfBoundsException();
-                    }
+                void throwHelper(){
+                    collectionMonitor.illegalMod(IllegalModification.ModParent);
+                    throw new IndexOutOfBoundsException();
+
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-          final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-          return new Impl(){
-            private static final long serialVersionUID=1L;
-            @Override
-            protected void throwingCall(){
-                if(this.size() >= throwIndex){
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
                     iteratorMonitor.illegalMod(IllegalModification.ModParent);
                     throw new IndexOutOfBoundsException();
+
                 }
-            }
-        };
-       }
+            };
+        }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
             return new MonitoredArrayConstructor<>(collectionMonitor){
@@ -488,7 +499,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOBModParent;
+                    return ThrowIOBModParent;
                 }
             };
         }
@@ -503,46 +514,50 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOBModParent;
-                  }
-            };
-        }
-    },
-    ThrowIOBModRoot(ConcurrentModificationException.class,false){
-      abstract class Impl extends MonitoredFunction {
-        private static final long serialVersionUID=1L;
-
-        public MonitoredFunctionGen getMonitoredFunctionGen() {
-          return ThrowIOBModRoot;
-        }
-      }
-        @Override
-        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-            int numExpectedCalls=collectionMonitor.size();
-            final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-            return new Impl(){
-                private static final long serialVersionUID=1L;
-                @Override
-                protected void throwingCall(){
-                    if(this.size() >= throwIndex){
-                        collectionMonitor.illegalMod(IllegalModification.ModRoot);
-                        throw new IndexOutOfBoundsException();
-                    }
+                    return ThrowIOBModParent;
                 }
             };
         }
-        @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls){
-           final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-           return new Impl(){
-             private static final long serialVersionUID=1L;
-             @Override
-             protected void throwingCall(){
-                 if(this.size() >= throwIndex){
-                     iteratorMonitor.illegalMod(IllegalModification.ModRoot);
-                     throw new IndexOutOfBoundsException();
-                 }
-             }
-         };
+    },
+    ThrowIOBModRoot(ConcurrentModificationException.class,true){
+        abstract class Impl extends AbstractRandomizedImpl{
+            Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+                super(randSeed,monitoredIterator);
+            }
+            Impl(long randSeed,MonitoredCollection<?> monitoredCollection){
+                super(randSeed,monitoredCollection);
+            }
+            private static final long serialVersionUID=1L;
+
+            @Override
+            public MonitoredFunctionGen getMonitoredFunctionGen() {
+                return ThrowIOBModRoot;
+            }
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
+            return new Impl(randSeed,collectionMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    collectionMonitor.illegalMod(IllegalModification.ModRoot);
+                    throw new IndexOutOfBoundsException();
+
+                }
+            };
+        }
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new Impl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                void throwHelper(){
+                    iteratorMonitor.illegalMod(IllegalModification.ModRoot);
+                    throw new IndexOutOfBoundsException();
+
+                }
+            };
         }
         @Override
         public MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
@@ -565,7 +580,7 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOBModRoot;
+                    return ThrowIOBModRoot;
                 }
             };
         }
@@ -580,97 +595,95 @@ public enum MonitoredFunctionGen{
                 }
 
                 @Override public MonitoredFunctionGen getMonitoredFunctionGen(){
-                  return ThrowIOBModRoot;
-                  }
+                    return ThrowIOBModRoot;
+                }
             };
         }
-        
+
     },
     ModItr(ConcurrentModificationException.class,true){
-      @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,
-          int numExpectedCalls){
-        final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-        return new MonitoredFunction(){
-          boolean alreadyModded=false;
-          private static final long serialVersionUID=1L;
-          public MonitoredFunctionGen getMonitoredFunctionGen() {
-            return ModItr;
-          }
-          @Override
-          protected void throwingCall(){
-            if(this.size() >= throwIndex && !alreadyModded){
-              iteratorMonitor.illegalMod(IllegalModification.ModItr);
-              alreadyModded=true;
-          }
-          }
-      };
-     }
-
-      @Override public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-        throw new UnsupportedOperationException();
-      }
-
-      @Override public MonitoredArrayConstructor<Object>
-          getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
-        throw new UnsupportedOperationException();
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new AbstractRandomizedImpl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                public MonitoredFunctionGen getMonitoredFunctionGen() {
+                    return ModItr;
+                }
+                @Override
+                void throwHelper(){
+                    iteratorMonitor.illegalMod(IllegalModification.ModItr);
+                }
+            };
         }
 
-      @Override public MonitoredObjectInputStream getMonitoredObjectInputStream(MonitoredCollection<?> collection,
-          InputStream inputStream) throws IOException{
-        throw new UnsupportedOperationException();
+        @Override public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
+            throw new UnsupportedOperationException();
         }
 
-      @Override public MonitoredObjectOutputStream getMonitoredObjectOutputStream(MonitoredCollection<?> collection,
-          OutputStream inputStream) throws IOException{
-        throw new UnsupportedOperationException();
+        @Override public MonitoredArrayConstructor<Object>
+        getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
+            throw new UnsupportedOperationException();
         }
-      
+
+        @Override public MonitoredObjectInputStream getMonitoredObjectInputStream(MonitoredCollection<?> collection,
+                InputStream inputStream) throws IOException{
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public MonitoredObjectOutputStream getMonitoredObjectOutputStream(MonitoredCollection<?> collection,
+                OutputStream inputStream) throws IOException{
+            throw new UnsupportedOperationException();
+        }
+
     },
     ThrowIOBModItr(ConcurrentModificationException.class,true){
-      @Override public MonitoredFunction getMonitoredFunction(MonitoredIterator<?,?> iteratorMonitor,long randSeed,
-          int numExpectedCalls){
-        final int throwIndex=(int)(new Random(randSeed).nextDouble() * numExpectedCalls);
-        return new MonitoredFunction(){
-          private static final long serialVersionUID=1L;
-          public MonitoredFunctionGen getMonitoredFunctionGen() {
-            return ThrowIOBModItr;
-          }
-          @Override
-          protected void throwingCall(){
-            if(this.size() >= throwIndex){
-              iteratorMonitor.illegalMod(IllegalModification.ModItr);
-              throw new IndexOutOfBoundsException();
-          }
-          }
-      };
-     }
-
-      @Override public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
-        throw new UnsupportedOperationException();
+        @Override
+        public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+                long randSeed){
+            return new AbstractRandomizedImpl(randSeed,iteratorMonitor){
+                private static final long serialVersionUID=1L;
+                @Override
+                public MonitoredFunctionGen getMonitoredFunctionGen() {
+                    return ThrowIOBModItr;
+                }
+                @Override
+                void throwHelper(){
+                    iteratorMonitor.illegalMod(IllegalModification.ModItr);
+                    throw new IndexOutOfBoundsException();
+                }
+            };
         }
 
-      @Override public MonitoredArrayConstructor<Object>
-          getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
-        throw new UnsupportedOperationException();
+        @Override public MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed){
+            throw new UnsupportedOperationException();
         }
 
-      @Override public MonitoredObjectInputStream getMonitoredObjectInputStream(MonitoredCollection<?> collection,
-          InputStream inputStream) throws IOException{
-        throw new UnsupportedOperationException();
+        @Override public MonitoredArrayConstructor<Object>
+        getMonitoredArrayConstructor(MonitoredCollection<?> collectionMonitor){
+            throw new UnsupportedOperationException();
         }
 
-      @Override public MonitoredObjectOutputStream getMonitoredObjectOutputStream(MonitoredCollection<?> collection,
-          OutputStream inputStream) throws IOException{
-        throw new UnsupportedOperationException();
+        @Override public MonitoredObjectInputStream getMonitoredObjectInputStream(MonitoredCollection<?> collection,
+                InputStream inputStream) throws IOException{
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public MonitoredObjectOutputStream getMonitoredObjectOutputStream(MonitoredCollection<?> collection,
+                OutputStream inputStream) throws IOException{
+            throw new UnsupportedOperationException();
         }
     };
     public final Class<? extends Throwable> expectedException;
-    public final boolean appliesToItr;
-    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean appliesToItr){
+    public final boolean randomized;
+    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean randomized){
         this.expectedException=expectedException;
-        this.appliesToItr=appliesToItr;
+        this.randomized=randomized;
     }
-    public abstract MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,long randSeed,int numExpectedCalls);
+
+    public abstract MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
+            long randSeed);
     public abstract MonitoredFunction getMonitoredFunction(MonitoredCollection<?> collectionMonitor,long randSeed);
     public abstract MonitoredArrayConstructor<Object> getMonitoredArrayConstructor(
             MonitoredCollection<?> collectionMonitor);
@@ -678,4 +691,23 @@ public enum MonitoredFunctionGen{
             InputStream inputStream) throws IOException;
     public abstract MonitoredObjectOutputStream getMonitoredObjectOutputStream(MonitoredCollection<?> collection,
             OutputStream inputStream) throws IOException;
+    private abstract static class AbstractRandomizedImpl extends MonitoredFunction{
+        private static final long serialVersionUID=1L;
+        final int throwingIndex;
+        boolean alreadyTriggered;
+        AbstractRandomizedImpl(long randSeed,MonitoredCollection<?> monitoredCollection){
+            this.throwingIndex=new Random(randSeed).nextInt(monitoredCollection.size() + 1);
+        }
+        AbstractRandomizedImpl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
+            this.throwingIndex=new Random(randSeed).nextInt(monitoredIterator.getNumLeft() + 1);
+        }
+        abstract void throwHelper();
+        @Override
+        protected void throwingCall(){
+            if(this.size() >= throwingIndex && !alreadyTriggered){
+                throwHelper();
+                alreadyTriggered=true;
+            }
+        }
+    }
 }

@@ -6,7 +6,7 @@ import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.QueryVal.QueryValModification;
 public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection<SET>{
-    void updateAddState(Object inputVal,DataType inputType,boolean boxed,boolean result);
+    void updateAddState(Object inputVal,DataType inputType,boolean result);
     interface MonitoredSetIterator<ITR extends OmniIterator<?>,SET extends OmniSet<?>> extends MonitoredCollection.MonitoredIterator<ITR,SET>{
         @Override default IteratorType getIteratorType(){
             return IteratorType.AscendingItr;
@@ -68,17 +68,17 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         return result;
     }
     @Override
-    default boolean verifyAdd(Object inputVal,DataType inputType,boolean boxed) {
+    default boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){
         SET collection=getCollection();
-        boolean containsBefore=inputType.callcontains(collection,inputVal,boxed);
+        boolean containsBefore=inputType.callcontains(collection,inputVal,functionCallType);
         int sizeBefore=collection.size();
-        boolean result=inputType.callCollectionAdd(inputVal,collection,boxed);
+        boolean result=inputType.callCollectionAdd(inputVal,collection,functionCallType);
         int sizeAfter=collection.size();
-        boolean containsAfter=inputType.callcontains(collection,inputVal,boxed);
+        boolean containsAfter=inputType.callcontains(collection,inputVal,functionCallType);
         Assertions.assertEquals(!result,containsBefore);
         Assertions.assertTrue(containsAfter);
         Assertions.assertEquals(sizeBefore,result?sizeAfter-1:sizeAfter);
-        updateAddState(inputVal,inputType,boxed,result);
+        updateAddState(inputVal,inputType,result);
         verifyCollectionState();
         return result;
     }

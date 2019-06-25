@@ -1,17 +1,22 @@
 package omni.impl;
 
+import java.util.ConcurrentModificationException;
 import java.util.Set;
 public enum IllegalModification{
-    NoMod{
+    NoMod(null){
     },
-    ModCollection{
+    ModCollection(ConcurrentModificationException.class){
     },
-    ModParent{
+    ModParent(ConcurrentModificationException.class){
     },
-    ModRoot{
+    ModRoot(ConcurrentModificationException.class){
     },
-    ModItr{
+    ModItr(ConcurrentModificationException.class){
     };
+    public final Class<? extends Throwable> expectedException;
+    IllegalModification(Class<? extends Throwable> expectedException){
+        this.expectedException=expectedException;
+    }
     public static final Set<IllegalModification> SUBLIST_ITERATOR_MODS=Set.of(IllegalModification.NoMod,
             IllegalModification.ModCollection,IllegalModification.ModParent,IllegalModification.ModRoot,
             IllegalModification.ModItr);

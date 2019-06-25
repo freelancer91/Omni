@@ -1,4 +1,7 @@
 package omni.impl;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import omni.api.OmniCollection;
 import omni.util.TypeUtil;
@@ -8,6 +11,21 @@ public enum QueryVal{
         @Override
         public Object getRefVal(){
             return null;
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            return collectionType == DataType.REF;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            if(modification == QueryValModification.None){
+                if(inputType == DataType.REF){
+                    return castType == QueryCastType.ToObject;
+                }
+                return castType == QueryCastType.ToBoxed;
+            }
+            return false;
         }
     },
     Pos0{
@@ -161,6 +179,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     Neg0{
         @Override
@@ -252,6 +281,15 @@ public enum QueryVal{
                     initVal=-Double.MAX_VALUE;
                 }
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            return true;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType.isFloatingPoint;
         }
     },
     MaxBoolean{
@@ -409,6 +447,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     MaxByte{
         @Override
@@ -551,6 +600,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     MinByte{
         @Override
@@ -675,6 +735,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     MaxChar{
         @Override
@@ -780,6 +851,17 @@ public enum QueryVal{
                     initVal=-Double.MAX_VALUE;
                 }
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
         }
     },
     MaxShort{
@@ -905,6 +987,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     MinShort{
         @Override
@@ -1011,6 +1104,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     MaxSafeInt{
         @Override
@@ -1094,6 +1198,17 @@ public enum QueryVal{
                     initVal=-Double.MAX_VALUE;
                 }
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
         }
     },
     MinSafeInt{
@@ -1179,6 +1294,17 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            // TODO Auto-generated method stub
+            return false;
+        }
     },
     MaxInt{
         @Override
@@ -1241,6 +1367,96 @@ public enum QueryVal{
                     initVal=-Double.MAX_VALUE;
                 }
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case REF:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+                switch(collectionType){
+                case DOUBLE:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+            case Plus1:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MinInt{
@@ -1305,6 +1521,96 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case REF:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+                switch(collectionType){
+                case DOUBLE:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+            case Plus1:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
     },
     MaxSafeLong{
         @Override
@@ -1341,6 +1647,69 @@ public enum QueryVal{
                     initVal=-Double.MAX_VALUE;
                 }
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(modification){
+            case None:
+                switch(collectionType){
+                case REF:
+                case LONG:
+                case DOUBLE:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(collectionType){
+                case REF:
+                case LONG:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FLOAT:
+                case INT:
+                case SHORT:
+                    return false;
+                }
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case LONG:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case REF:
+                case SHORT:
+                }
+                break;
+            case Plus1:
+                return inputType == DataType.LONG;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MinSafeLong{
@@ -1379,6 +1748,69 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(modification){
+            case None:
+                switch(collectionType){
+                case REF:
+                case LONG:
+                case DOUBLE:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(collectionType){
+                case REF:
+                case LONG:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case DOUBLE:
+                case FLOAT:
+                case INT:
+                case SHORT:
+                    return false;
+                }
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case LONG:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case REF:
+                case SHORT:
+                }
+                break;
+            case Plus1:
+                return inputType == DataType.LONG;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpisolon:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
     },
     MaxLong{
         @Override
@@ -1395,6 +1827,28 @@ public enum QueryVal{
                 collection.add(v);
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case REF:
+            case LONG:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FLOAT:
+            case INT:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType == DataType.LONG;
+        }
     },
     MinLong{
         @Override
@@ -1410,6 +1864,28 @@ public enum QueryVal{
                 }
                 collection.add(v);
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case REF:
+            case LONG:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case DOUBLE:
+            case FLOAT:
+            case INT:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType == DataType.LONG;
         }
     },
     MaxFloat{
@@ -1455,6 +1931,57 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(modification){
+            case None:
+                switch(collectionType){
+                case REF:
+                case DOUBLE:
+                case FLOAT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case Plus1:
+                switch(collectionType){
+                case REF:
+                case DOUBLE:
+                    return true;
+                case FLOAT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+            case PlusFloatEpisolon:
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                return inputType.isFloatingPoint;
+            case PlusDoubleEpsilon:
+            case Plus1:
+                return inputType == DataType.DOUBLE;
+            case PlusFloatEpisolon:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
     },
     MinFloat{
         @Override
@@ -1495,6 +2022,57 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(modification){
+            case None:
+                switch(collectionType){
+                case REF:
+                case DOUBLE:
+                case FLOAT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+                switch(collectionType){
+                case REF:
+                case DOUBLE:
+                    return true;
+                case FLOAT:
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+            case Plus1:
+            case PlusFloatEpisolon:
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                return inputType.isFloatingPoint;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            case Plus1:
+            case PlusFloatEpisolon:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
     },
     MaxDouble{
         @Override
@@ -1514,6 +2092,28 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case DOUBLE:
+            case REF:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType == DataType.DOUBLE;
+        }
     },
     MinDouble{
         @Override
@@ -1532,6 +2132,28 @@ public enum QueryVal{
                     initVal=-Double.MAX_VALUE;
                 }
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case DOUBLE:
+            case REF:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case FLOAT:
+            case INT:
+            case LONG:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType == DataType.DOUBLE;
         }
     },
     PosInfinity{
@@ -1562,6 +2184,28 @@ public enum QueryVal{
                 }
                 collection.add(v);
             }
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case DOUBLE:
+            case FLOAT:
+            case REF:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case INT:
+            case LONG:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType.isFloatingPoint;
         }
     },
     NegInfinity{
@@ -1599,6 +2243,28 @@ public enum QueryVal{
                 }
             }
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case DOUBLE:
+            case FLOAT:
+            case REF:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case INT:
+            case LONG:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType.isFloatingPoint;
+        }
     },
     NaN{
         @Override
@@ -1609,78 +2275,176 @@ public enum QueryVal{
         public double getDoubleVal(){
             return Double.NaN;
         }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
 
+            switch(collectionType){
+            case DOUBLE:
+            case FLOAT:
+            case REF:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case INT:
+            case LONG:
+            case SHORT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType.isFloatingPoint;
+        }
     };
-    public final Set<DataType> validDataTypes;
-    public final Set<DataType> validPlus1;
-    public final Set<DataType> validPlusFloatEpsilon;
-    public final Set<DataType> validPlusDoubleEpsilon;
-    public final Set<QueryCastType> validQueryCasts;
-    QueryVal(){
-        this.validDataTypes=initValidDataTypes(this);
-        this.validPlus1=initValidPlus1(this);
-        this.validPlusFloatEpsilon=initValidPlusFloatEpsilon(this);
-        this.validPlusDoubleEpsilon=initValidPlusDoubleEpsilon(this);
-        this.validQueryCasts=initValidQueryCasts(this);
+    private static UnsupportedOperationException unknownCombo(QueryVal queryVal,DataType inputType,
+            QueryValModification modification,QueryCastType castType,DataType collectionType){
+        return new UnsupportedOperationException("Unknown combo queryVal=" + queryVal + "; inputType=" + inputType
+                + "; modification=" + modification + "; castType=" + castType + "; collectionType=" + collectionType);
     }
+    private static UnsupportedOperationException unknownCombo(QueryVal queryVal,DataType inputType,
+            QueryValModification modification,QueryCastType castType){
+        return new UnsupportedOperationException("Unknown combo queryVal=" + queryVal + "; inputType=" + inputType
+                + "; modification=" + modification + "; castType=" + castType);
+    }
+    public final Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> validQueryCombos;
+    public final Map<QueryVal.QueryValModification,Map<QueryCastType,Map<DataType,Set<DataType>>>> queriesMapReturnTrue;
+    QueryVal(){
+        Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> tmpValidCombos=new HashMap<>();
+        Map<QueryVal.QueryValModification,Map<QueryCastType,Map<DataType,Set<DataType>>>> tmpMayReturnTrue=new HashMap<>();
+        for(var modification:QueryValModification.values()){
+            for(var castType:QueryCastType.values()){
+                for(var dataType:DataType.values()){
+                    if(isValidQuery(modification,castType,dataType)){
+                        for(var collectionType:DataType.values()){
+                            if(queryCanReturnTrue(modification,castType,dataType,collectionType)){
+                                tmpMayReturnTrue.compute(modification,(keyModification,existingVal1)->{
+                                    if(existingVal1 == null){
+                                        existingVal1=new HashMap<>();
+                                    }
+                                    existingVal1.compute(castType,(keyCastType,existingVal2)->{
+                                        if(existingVal2 == null){
+                                            existingVal2=new HashMap<>();
+                                        }
+                                        existingVal2.compute(dataType,(keyDataType,existingVal3)->{
+                                            if(existingVal3 == null){
+                                                existingVal3=new HashSet<>();
+                                            }
+                                            existingVal3.add(collectionType);
+                                            return existingVal3;
+                                        });
+                                        return existingVal2;
+                                    });
+                                    return existingVal1;
+                                });
+                            }
+                        }
+                        tmpValidCombos.compute(modification,(keyModification,existingVal1)->{
+                            if(existingVal1 == null){
+                                existingVal1=new HashMap<>();
+                            }
+                            existingVal1.compute(castType,(keyCastType,existingVal2)->{
+                                if(existingVal2 == null){
+                                    existingVal2=new HashSet<>();
+                                }
+                                existingVal2.add(dataType);
+                                return existingVal2;
+                            });
+                            return existingVal1;
+                        });
+                    }
+                }
+            }
+        }
+        tmpMayReturnTrue.forEach((modification,mapped1)->{
+            mapped1.forEach((castType,mapped2)->{
+                mapped2.replaceAll((dataType,dataTypeSet)->{
+                    return Set.copyOf(dataTypeSet);
+                });
+            });
+        });
+        tmpMayReturnTrue.forEach((modification,mapped1)->{
+            mapped1.replaceAll((castType,mapped2)->{
+                return Map.copyOf(mapped2);
+            });
+        });
+        tmpValidCombos.forEach((modification,mapped)->{
+            mapped.replaceAll((castType,dataTypeSet)->{
+                return Set.copyOf(dataTypeSet);
+            });
+        });
+        tmpMayReturnTrue.replaceAll((modification,mapped)->{
+            return Map.copyOf(mapped);
+        });
+        tmpValidCombos.replaceAll((modification,mapped)->{
+            return Map.copyOf(mapped);
+        });
+        this.queriesMapReturnTrue=Map.copyOf(tmpMayReturnTrue);
+        this.validQueryCombos=Map.copyOf(tmpValidCombos);
+    }
+    public abstract boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,
+            DataType inputType,
+            DataType collectionType);
+    abstract boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType);
     public byte getByteValPlus1(){
-        throw getUOE(DataType.BYTE);
+        throw DataType.invalidDataType(DataType.BYTE);
     }
     public char getCharValPlus1(){
-        throw getUOE(DataType.CHAR);
+        throw DataType.invalidDataType(DataType.CHAR);
     }
     public short getShortValPlus1(){
-        throw getUOE(DataType.SHORT);
+        throw DataType.invalidDataType(DataType.SHORT);
     }
     public int getIntValPlus1(){
-        throw getUOE(DataType.INT);
+        throw DataType.invalidDataType(DataType.INT);
     }
     public long getLongValPlus1(){
-        throw getUOE(DataType.LONG);
+        throw DataType.invalidDataType(DataType.LONG);
     }
     public float getFloatValPlus1(){
-        throw getUOE(DataType.FLOAT);
+        throw DataType.invalidDataType(DataType.FLOAT);
     }
     public float getFloatValPlusFloatEpsilon(){
-        throw getUOE(DataType.FLOAT);
+        throw DataType.invalidDataType(DataType.FLOAT);
     }
     public double getDoubleValPlus1(){
-        throw getUOE(DataType.DOUBLE);
+        throw DataType.invalidDataType(DataType.DOUBLE);
     }
     public double getDoubleValPlusFloatEpsilon(){
-        throw getUOE(DataType.DOUBLE);
+        throw DataType.invalidDataType(DataType.DOUBLE);
     }
     public double getDoubleValPlusDoubleEpsilon(){
-        throw getUOE(DataType.DOUBLE);
+        throw DataType.invalidDataType(DataType.DOUBLE);
     }
     public Object getRefVal(){
-        throw getUOE(DataType.REF);
+        throw DataType.invalidDataType(DataType.REF);
     }
     public boolean getBooleanVal(){
-        throw getUOE(DataType.BOOLEAN);
+        throw DataType.invalidDataType(DataType.BOOLEAN);
     }
     public byte getByteVal(){
-        throw getUOE(DataType.BYTE);
+        throw DataType.invalidDataType(DataType.BYTE);
     }
     public char getCharVal(){
-        throw getUOE(DataType.CHAR);
+        throw DataType.invalidDataType(DataType.CHAR);
     }
     public short getShortVal(){
-        throw getUOE(DataType.SHORT);
+        throw DataType.invalidDataType(DataType.SHORT);
     }
     public int getIntVal(){
-        throw getUOE(DataType.INT);
+        throw DataType.invalidDataType(DataType.INT);
     }
     public long getLongVal(){
-        throw getUOE(DataType.LONG);
+        throw DataType.invalidDataType(DataType.LONG);
     }
     public float getFloatVal(){
-        throw getUOE(DataType.FLOAT);
+        throw DataType.invalidDataType(DataType.FLOAT);
     }
     public double getDoubleVal(){
-        throw getUOE(DataType.DOUBLE);
+        throw DataType.invalidDataType(DataType.DOUBLE);
     }
-
     public Object getInputVal(DataType inputType,QueryValModification queryValModification){
         switch(queryValModification){
         case None:
@@ -1866,195 +2630,99 @@ public enum QueryVal{
         collection.add(val);
         initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
     }
-    public static UnsupportedOperationException getUOE(DataType dataType){
-        return new UnsupportedOperationException("Invalid dataType " + dataType);
-    }
-    private static Set<DataType> initValidDataTypes(QueryVal queryVal){
-        switch(queryVal){
-        case Null:
-            return DataType.getDataTypeSet(DataType.REF);
-        case MaxLong:
-        case MinLong:
-            return DataType.getDataTypeSet(DataType.LONG);
-        case MaxDouble:
-        case MinDouble:
-            return DataType.getDataTypeSet(DataType.DOUBLE);
-        case MinSafeLong:
-        case MaxSafeLong:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG);
-        case NaN:
-        case Neg0:
-        case NegInfinity:
-        case PosInfinity:
-        case MaxFloat:
-        case MinFloat:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT);
-        case MaxInt:
-        case MinInt:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG,DataType.INT);
-        case MinSafeInt:
-        case MaxSafeInt:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
-        case MaxChar:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
-        case MinShort:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
-        case MinByte:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.BYTE);
-        case MaxShort:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.CHAR);
-        case MaxByte:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.CHAR,
-                    DataType.BYTE);
-        case MaxBoolean:
-        case Pos0:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.CHAR,
-                    DataType.BYTE,DataType.BOOLEAN);
-        }
-        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    }
-    private static Set<DataType> initValidPlus1(QueryVal queryVal){
-        switch(queryVal){
-        case Null:
-        case MaxDouble:
-        case MinDouble:
-        case MinFloat:
-        case MaxLong:
-        case MinLong:
-        case NaN:
-        case Neg0:
-        case NegInfinity:
-        case PosInfinity:
-            return Set.of();
-        case MaxSafeLong:
-        case MinSafeLong:
-            return DataType.getDataTypeSet(DataType.LONG);
-        case MaxFloat:
-            return DataType.getDataTypeSet(DataType.DOUBLE);
-        case MaxInt:
-        case MinInt:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG);
-        case MaxSafeInt:
-        case MinSafeInt:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG,DataType.INT);
-        case MinShort:
-        case MaxChar:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
-        case MaxShort:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
-        case MinByte:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
-        case Pos0:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.BYTE);
-        case MaxByte:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.CHAR);
-        case MaxBoolean:
-            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.CHAR,DataType.BYTE);
-        }
-        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    }
-    private static Set<DataType> initValidPlusFloatEpsilon(QueryVal queryVal){
-        switch(queryVal){
-        case Null:
-        case PosInfinity:
-        case NegInfinity:
-        case Neg0:
-        case NaN:
-        case MinLong:
-        case MinSafeLong:
-        case MaxLong:
-        case MaxSafeLong:
-        case MaxDouble:
-        case MaxFloat:
-        case MinDouble:
-        case MinFloat:
-            return DataType.getDataTypeSet();
-        case MaxInt:
-        case MaxSafeInt:
-        case MinInt:
-        case MinSafeInt:
-            return DataType.getDataTypeSet(DataType.DOUBLE);
-        case MaxBoolean:
-        case MaxByte:
-        case MaxChar:
-        case MaxShort:
-        case MinByte:
-        case MinShort:
-        case Pos0:
-            return DataType.getDataTypeSet(DataType.FLOAT,DataType.DOUBLE);
-        }
-        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    }
-    private static Set<DataType> initValidPlusDoubleEpsilon(QueryVal queryVal){
-        switch(queryVal){
-        case Null:
-        case PosInfinity:
-        case NegInfinity:
-        case Neg0:
-        case NaN:
-        case MinLong:
-        case MinSafeLong:
-        case MaxLong:
-        case MaxSafeLong:
-        case MaxDouble:
-        case MinDouble:
-            return DataType.getDataTypeSet();
-        case MaxInt:
-        case MaxSafeInt:
-        case MinInt:
-        case MinSafeInt:
-        case MaxFloat:
-        case MinFloat:
-            return DataType.getDataTypeSet(DataType.DOUBLE);
-        case MaxBoolean:
-        case MaxByte:
-        case MaxChar:
-        case MaxShort:
-        case MinByte:
-        case MinShort:
-        case Pos0:
-            return DataType.getDataTypeSet(DataType.FLOAT,DataType.DOUBLE);
-        }
-        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    }
-    private static Set<QueryCastType> initValidQueryCasts(QueryVal queryVal){
-        switch(queryVal){
-        case MaxBoolean:
-        case MaxByte:
-        case MaxChar:
-        case MaxDouble:
-        case MaxFloat:
-        case MaxInt:
-        case MaxLong:
-        case MaxSafeInt:
-        case MaxSafeLong:
-        case MaxShort:
-        case MinByte:
-        case MinDouble:
-        case MinFloat:
-        case MinInt:
-        case MinLong:
-        case MinSafeInt:
-        case MinSafeLong:
-        case MinShort:
-        case NaN:
-        case Neg0:
-        case NegInfinity:
-        case Pos0:
-        case PosInfinity:
-            return QueryCastType.AllTypes;
-        case Null:
-            return QueryCastType.NotPrimitive;
-        }
-        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    }
+    //    private static Set<DataType> initValidDataTypes(QueryVal queryVal){
+    //        switch(queryVal){
+    //        case MaxInt:
+    //        case MinInt:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG,DataType.INT);
+    //        case MinSafeInt:
+    //        case MaxSafeInt:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
+    //        case MaxChar:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
+    //        case MinShort:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
+    //        case MinByte:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.BYTE);
+    //        case MaxShort:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.CHAR);
+    //        case MaxByte:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.CHAR,
+    //                    DataType.BYTE);
+    //        case MaxBoolean:
+    //        case Pos0:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.CHAR,
+    //                    DataType.BYTE,DataType.BOOLEAN);
+    //        }
+    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
+    //    }
+    //    private static Set<DataType> initValidPlus1(QueryVal queryVal){
+    //        switch(queryVal){
+    //        case MaxInt:
+    //        case MinInt:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG);
+    //        case MaxSafeInt:
+    //        case MinSafeInt:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG,DataType.INT);
+    //        case MinShort:
+    //        case MaxChar:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
+    //        case MaxShort:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
+    //        case MinByte:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
+    //        case Pos0:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.BYTE);
+    //        case MaxByte:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.CHAR);
+    //        case MaxBoolean:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
+    //                    DataType.CHAR,DataType.BYTE);
+    //        }
+    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
+    //    }
+    //    private static Set<DataType> initValidPlusFloatEpsilon(QueryVal queryVal){
+    //        switch(queryVal){
+    //        case MaxInt:
+    //        case MaxSafeInt:
+    //        case MinInt:
+    //        case MinSafeInt:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE);
+    //        case MaxBoolean:
+    //        case MaxByte:
+    //        case MaxChar:
+    //        case MaxShort:
+    //        case MinByte:
+    //        case MinShort:
+    //        case Pos0:
+    //            return DataType.getDataTypeSet(DataType.FLOAT,DataType.DOUBLE);
+    //        }
+    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
+    //    }
+    //    private static Set<DataType> initValidPlusDoubleEpsilon(QueryVal queryVal){
+    //        switch(queryVal){
+    //        case MaxInt:
+    //        case MaxSafeInt:
+    //        case MinInt:
+    //        case MinSafeInt:
+    //            return DataType.getDataTypeSet(DataType.DOUBLE);
+    //        case MaxBoolean:
+    //        case MaxByte:
+    //        case MaxChar:
+    //        case MaxShort:
+    //        case MinByte:
+    //        case MinShort:
+    //        case Pos0:
+    //            return DataType.getDataTypeSet(DataType.FLOAT,DataType.DOUBLE);
+    //        }
+    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
+    //    }
     public enum QueryValModification{
         None,Plus1,PlusFloatEpisolon,PlusDoubleEpsilon;
     }

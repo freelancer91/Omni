@@ -18,7 +18,18 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
     final long[] expectedWords;
     int expectedSize;
     int expectedModCount;
-
+    @Override
+    public void verifyClear(){
+        set.clear();
+        if(expectedSize != 0){
+            for(int i=0;i < 4;++i){
+                expectedWords[i]=0;
+            }
+            expectedSize=0;
+            ++expectedModCount;
+        }
+        verifyCollectionState();
+    }
     private int getExpectedSize() {
         int size=0;
         for(var word:expectedWords) {
@@ -336,7 +347,8 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
     @Override public void verifyArrayIsCopy(Object arr){
         //nothing to do
     }
-    @Override public void updateAddState(Object inputVal,DataType inputType,boolean boxed,boolean result){
+    @Override
+    public void updateAddState(Object inputVal,DataType inputType,boolean result){
         byte v;
         switch(inputType) {
         case BOOLEAN:
@@ -346,7 +358,7 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             v=(byte)inputVal;
             break;
         default:
-            throw new UnsupportedOperationException("Unknown inputType "+inputType);
+            throw DataType.invalidDataType(inputType);
         }
         expectedWords[(v>>6)+2]|=1L<<v;
         if(result) {
@@ -360,5 +372,6 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
         --expectedSize;
         ++expectedModCount;
     }
+
 
 }

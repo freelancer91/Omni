@@ -46,6 +46,10 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet<E> extends Abstract
                 clearTable();
                 tableSize=0;
             }
+            word0=0;
+            word1=0;
+            word2=0;
+            word3=0;
             size=0;
         }
     }

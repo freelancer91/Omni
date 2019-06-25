@@ -70,60 +70,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.OfBoolean)itr).previousBoolean();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.BooleanInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Boolean)inputVal);
             }else {
                 result=cast.add((boolean)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Boolean)inputVal);
             }else {
                 return collection.contains((boolean)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Boolean)inputVal);
             }else {
                 return collection.removeVal((boolean)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Boolean)inputVal);
             }else {
                 return collection.removeFirstOccurrence((boolean)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Boolean)inputVal);
             }else {
                 return collection.removeLastOccurrence((boolean)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Boolean)inputVal);
             }else {
                 return collection.indexOf((boolean)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Boolean)inputVal);
             }else {
                 return collection.lastIndexOf((boolean)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Boolean)inputVal);
             }else {
                 return collection.search((boolean)inputVal);
@@ -166,6 +177,7 @@ public enum DataType{
             return 0;
         }
 
+
     },
     BYTE(true,false,true,Byte.class,byte.class,Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
             ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,ByteDblLnkNode.class,
@@ -191,60 +203,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.ByteOutput<?>)itr).previousByte();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.ByteInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Byte)inputVal);
             }else {
                 result=cast.add((byte)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Byte)inputVal);
             }else {
                 return collection.contains((byte)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Byte)inputVal);
             }else {
                 return collection.removeVal((byte)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Byte)inputVal);
             }else {
                 return collection.removeFirstOccurrence((byte)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Byte)inputVal);
             }else {
                 return collection.removeLastOccurrence((byte)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Byte)inputVal);
             }else {
                 return collection.indexOf((byte)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Byte)inputVal);
             }else {
                 return collection.lastIndexOf((byte)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Byte)inputVal);
             }else {
                 return collection.search((byte)inputVal);
@@ -311,60 +334,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.CharOutput<?>)itr).previousChar();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.CharInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Character)inputVal);
             }else {
                 result=cast.add((char)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Character)inputVal);
             }else {
                 return collection.contains((char)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Character)inputVal);
             }else {
                 return collection.removeVal((char)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Character)inputVal);
             }else {
                 return collection.removeFirstOccurrence((char)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Character)inputVal);
             }else {
                 return collection.removeLastOccurrence((char)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Character)inputVal);
             }else {
                 return collection.indexOf((char)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Character)inputVal);
             }else {
                 return collection.lastIndexOf((char)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Character)inputVal);
             }else {
                 return collection.search((char)inputVal);
@@ -428,60 +462,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.ShortOutput<?>)itr).previousShort();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.ShortInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Short)inputVal);
             }else {
                 result=cast.add((short)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Short)inputVal);
             }else {
                 return collection.contains((short)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Short)inputVal);
             }else {
                 return collection.removeVal((short)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Short)inputVal);
             }else {
                 return collection.removeFirstOccurrence((short)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Short)inputVal);
             }else {
                 return collection.removeLastOccurrence((short)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Short)inputVal);
             }else {
                 return collection.indexOf((short)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Short)inputVal);
             }else {
                 return collection.lastIndexOf((short)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Short)inputVal);
             }else {
                 return collection.search((short)inputVal);
@@ -548,60 +593,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.IntOutput<?>)itr).previousInt();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.IntInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Integer)inputVal);
             }else {
                 result=cast.add((int)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Integer)inputVal);
             }else {
                 return collection.contains((int)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Integer)inputVal);
             }else {
                 return collection.removeVal((int)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Integer)inputVal);
             }else {
                 return collection.removeFirstOccurrence((int)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Integer)inputVal);
             }else {
                 return collection.removeLastOccurrence((int)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Integer)inputVal);
             }else {
                 return collection.indexOf((int)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Integer)inputVal);
             }else {
                 return collection.lastIndexOf((int)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Integer)inputVal);
             }else {
                 return collection.search((int)inputVal);
@@ -668,60 +724,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.LongOutput<?>)itr).previousLong();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.LongInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Long)inputVal);
             }else {
                 result=cast.add((long)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Long)inputVal);
             }else {
                 return collection.contains((long)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Long)inputVal);
             }else {
                 return collection.removeVal((long)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Long)inputVal);
             }else {
                 return collection.removeFirstOccurrence((long)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Long)inputVal);
             }else {
                 return collection.removeLastOccurrence((long)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Long)inputVal);
             }else {
                 return collection.indexOf((long)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Long)inputVal);
             }else {
                 return collection.lastIndexOf((long)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Long)inputVal);
             }else {
                 return collection.search((long)inputVal);
@@ -788,60 +855,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.FloatOutput<?>)itr).previousFloat();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.FloatInput<?>)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Float)inputVal);
             }else {
                 result=cast.add((float)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Float)inputVal);
             }else {
                 return collection.contains((float)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Float)inputVal);
             }else {
                 return collection.removeVal((float)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Float)inputVal);
             }else {
                 return collection.removeFirstOccurrence((float)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Float)inputVal);
             }else {
                 return collection.removeLastOccurrence((float)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Float)inputVal);
             }else {
                 return collection.indexOf((float)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Float)inputVal);
             }else {
                 return collection.lastIndexOf((float)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Float)inputVal);
             }else {
                 return collection.search((float)inputVal);
@@ -893,60 +971,71 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return ((OmniListIterator.DoubleOutput<?>)itr).previousDouble();
         }
-        @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
             boolean result;
             var cast=(OmniCollection.OfDouble)collection;
-            if(boxed) {
+            if(functionCallType.boxed){
                 result=cast.add((Double)inputVal);
             }else {
                 result=cast.add((double)inputVal);
             }
             return result;
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.contains((Double)inputVal);
             }else {
                 return collection.contains((double)inputVal);
             }
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeVal((Double)inputVal);
             }else {
                 return collection.removeVal((double)inputVal);
             }
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeFirstOccurrence((Double)inputVal);
             }else {
                 return collection.removeFirstOccurrence((double)inputVal);
             }
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.removeLastOccurrence((Double)inputVal);
             }else {
                 return collection.removeLastOccurrence((double)inputVal);
             }
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.indexOf((Double)inputVal);
             }else {
                 return collection.indexOf((double)inputVal);
             }
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.lastIndexOf((Double)inputVal);
             }else {
                 return collection.lastIndexOf((double)inputVal);
             }
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 return collection.search((Double)inputVal);
             }else {
                 return collection.search((double)inputVal);
@@ -1035,50 +1124,62 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return itr.previous();
         }
-        @SuppressWarnings({"unchecked","rawtypes"}) @Override public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed){
-            if(boxed) {
+        @SuppressWarnings({"unchecked","rawtypes"})
+        @Override
+        public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return ((OmniCollection.OfRef)collection).add(inputVal);
         }
-        @Override public boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.contains(inputVal);
         }
-        @Override public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.remove(inputVal);
         }
-        @Override public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.removeFirstOccurrence(inputVal);
         }
-        @Override public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.removeLastOccurrence(inputVal);
         }
-        @Override public int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.indexOf(inputVal);
         }
-        @Override public int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.lastIndexOf(inputVal);
         }
-        @Override public int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed){
-            if(boxed) {
+        @Override
+        public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
                 throw new UnsupportedOperationException("Ref cannot be boxed");
             }
             return collection.search(inputVal);
@@ -1086,10 +1187,9 @@ public enum DataType{
 
 
     };
-    public final Set<DataType> mayBeCastTo;
-    public final Set<DataType> mayBeCastFrom;
-    public final Set<DataType> safeCastTo;
-    public final Set<DataType> safeCastFrom;
+    public final Set<DataType> mayBeAddedTo;
+    public final Set<DataType> validOutputTypes;
+
     public final boolean isIntegral;
     public final boolean isFloatingPoint;
     public final boolean isSigned;
@@ -1140,10 +1240,36 @@ public enum DataType{
         this.compareMethodName=compareMethodName;
         this.comparableType=comparableType;
         this.elementMethodName=elementMethodName;
-        this.mayBeCastTo=initMayBeCastTo(this);
-        this.mayBeCastFrom=initMayBeCastFrom(this);
-        this.safeCastTo=initSafeCastTo(this);
-        this.safeCastFrom=initSafeCastFrom(this);
+        this.mayBeAddedTo=initMayBeAddedTo(this);
+        this.validOutputTypes=initValidOutputTypes(this);
+
+    }
+
+    private static Set<DataType> initValidOutputTypes(DataType dataType){
+        switch(dataType){
+        case BOOLEAN:
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
+        case BYTE:
+            return getDataTypeSet(DataType.BYTE,DataType.SHORT,DataType.INT,DataType.LONG,DataType.FLOAT,
+                    DataType.DOUBLE,DataType.REF);
+        case CHAR:
+            return getDataTypeSet(DataType.CHAR,DataType.INT,DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
+        case DOUBLE:
+            return getDataTypeSet(DataType.DOUBLE,DataType.REF);
+        case FLOAT:
+            return getDataTypeSet(DataType.FLOAT,DataType.DOUBLE,DataType.REF);
+        case INT:
+            return getDataTypeSet(DataType.INT,DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
+        case LONG:
+            return getDataTypeSet(DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
+        case REF:
+            return getDataTypeSet(DataType.REF);
+        case SHORT:
+            return getDataTypeSet(DataType.SHORT,DataType.INT,DataType.LONG,DataType.FLOAT,DataType.DOUBLE,
+                    DataType.REF);
+        }
+        throw invalidDataType(dataType);
     }
     public void verifyToString(String result,OmniIterator<?> itr) {
         int offset;
@@ -1165,17 +1291,22 @@ public enum DataType{
         Assertions.assertEquals(offset+1,result.length());
 
     }
-    public abstract boolean callcontains(OmniCollection<?> collection,Object inputVal,boolean boxed);
-    public abstract boolean callremoveVal(OmniCollection<?> collection,Object inputVal,boolean boxed);
-    public abstract int callindexOf(OmniList<?> collection,Object inputVal,boolean boxed);
-    public abstract int calllastIndexOf(OmniList<?> collection,Object inputVal,boolean boxed);
-    public abstract boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed);
-    public abstract boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,boolean boxed);
-    public abstract int callsearch(OmniStack<?> collection,Object inputVal,boolean boxed);
+    public abstract boolean callcontains(OmniCollection<?> collection,Object inputVal,
+            FunctionCallType functionCallType);
+    public abstract boolean callremoveVal(OmniCollection<?> collection,Object inputVal,
+            FunctionCallType functionCallType);
+    public abstract int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType);
+    public abstract int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType);
+    public abstract boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
+            FunctionCallType functionCallType);
+    public abstract boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
+            FunctionCallType functionCallType);
+    public abstract int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType);
     public abstract Object verifyToArray(MonitoredCollection<?> collection);
     public abstract Object callIteratorNext(OmniIterator<?> itr);
     public abstract Object callIteratorPrev(OmniListIterator<?> itr);
-    public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,boolean boxed);
+    public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
+            FunctionCallType functionCallType);
     public int getMaxInt(){
         throw new UnsupportedOperationException();
     }
@@ -1188,107 +1319,41 @@ public enum DataType{
     public long getMinLong(){
         throw new UnsupportedOperationException();
     }
-    private static UnsupportedOperationException getUnknownDataTypeException(DataType dataType){
-        return new UnsupportedOperationException("Unknown dataType " + dataType);
+    public static UnsupportedOperationException invalidDataType(DataType dataType){
+        return new UnsupportedOperationException("Invalid dataType " + dataType);
     }
-    private static Set<DataType> initMayBeCastTo(DataType dataType){
+    private static Set<DataType> initMayBeAddedTo(DataType dataType){
         switch(dataType){
-        case BOOLEAN:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.CHAR,DataType.BYTE,DataType.BOOLEAN);
-        case BYTE:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-                    DataType.BYTE);
-        case CHAR:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
-        case DOUBLE:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE);
-        case FLOAT:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT);
-        case INT:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
-        case LONG:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG);
         case REF:
             return getDataTypeSet(DataType.REF);
-        case SHORT:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,
-                    DataType.SHORT);
-        }
-        throw getUnknownDataTypeException(dataType);
-    }
-    private static Set<DataType> initMayBeCastFrom(DataType dataType){
-        switch(dataType){
-        case BOOLEAN:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN);
-        case BYTE:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE);
-        case CHAR:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.CHAR);
-        case FLOAT:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT);
-        case INT:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,
-                    DataType.INT);
-        case LONG:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG);
-        case DOUBLE:
-        case REF:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE);
-        case SHORT:
-            return getDataTypeSet(DataType.REF,DataType.BOOLEAN,DataType.BYTE);
-        }
-        throw getUnknownDataTypeException(dataType);
-    }
-    private static Set<DataType> initSafeCastTo(DataType dataType){
-        switch(dataType){
-        case BOOLEAN:
-        case BYTE:
-        case CHAR:
-        case DOUBLE:
-        case FLOAT:
-        case REF:
-        case SHORT:
-            return dataType.mayBeCastTo;
-        case INT:
-            return getDataTypeSet(DataType.REF,DataType.DOUBLE,DataType.LONG,DataType.INT);
-        case LONG:
-            return getDataTypeSet(DataType.REF,DataType.LONG);
-        }
-        throw getUnknownDataTypeException(dataType);
-    }
-    private static Set<DataType> initSafeCastFrom(DataType dataType){
-        switch(dataType){
         case BOOLEAN:
             return getDataTypeSet(DataType.BOOLEAN);
         case BYTE:
             return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE);
         case CHAR:
             return getDataTypeSet(DataType.BOOLEAN,DataType.CHAR);
-        case DOUBLE:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.FLOAT,
-                    DataType.DOUBLE);
-        case FLOAT:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.FLOAT);
+        case SHORT:
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.SHORT);
         case INT:
             return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT);
         case LONG:
             return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
                     DataType.LONG);
-        case REF:
-            return dataType.mayBeCastFrom;
-        case SHORT:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.SHORT);
+        case FLOAT:
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+                    DataType.LONG,DataType.FLOAT);
+        case DOUBLE:
+            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
+                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE);
         }
-        throw getUnknownDataTypeException(dataType);
+        throw invalidDataType(dataType);
     }
+
     private static final HashMap<Set<DataType>,Set<DataType>> SETS=new HashMap<>();
     public static synchronized Set<DataType> getDataTypeSet(DataType...dataTypes){
         Set<DataType> newSet;
         return SETS.putIfAbsent(newSet=Set.of(dataTypes),newSet);
     }
+
+
 }

@@ -37,10 +37,11 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     void modParent();
     void modRoot();
     int size();
+    void verifyClear();
     void updateCollectionState();
     void verifyCollectionState();
     void verifyClone(Object clone);
-    boolean verifyAdd(Object inputVal,DataType inputType,boolean boxed);
+    boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType);
     boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,QueryVal.QueryValModification modification);
     void verifyToString(String string);
     void verifyHashCode(int hashCode);
@@ -108,7 +109,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
         }
         }
-        throw new UnsupportedOperationException("Unknown dataType " + dataType);
+        throw DataType.invalidDataType(dataType);
     }
     @SuppressWarnings("unchecked") default boolean add(int val) {
         COL collection=getCollection();
@@ -137,7 +138,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             result=((OmniCollection.OfRef<Object>)collection).add(val);
             break;
         default:
-            throw new UnsupportedOperationException("Unknown dataType " + dataType);
+            throw DataType.invalidDataType(dataType);
         }
         updateCollectionState();
         return result;
@@ -198,7 +199,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             queryVal.initContains((OmniCollection.OfShort)collection,setSize,(int)initialVal,containsPosition);
             break;
         default:
-            throw new UnsupportedOperationException("Unknown dataType " + dataType);
+            throw DataType.invalidDataType(dataType);
         }
         updateCollectionState();
     }
@@ -235,7 +236,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             queryVal.initDoesNotContain((OmniCollection.OfShort)collection,setSize,(int)initialVal);
             break;
         default:
-            throw new UnsupportedOperationException("Unknown dataType " + dataType);
+            throw DataType.invalidDataType(dataType);
         }
         updateCollectionState();
     }
@@ -336,7 +337,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             break;
         }
         default:
-            throw new UnsupportedOperationException("Unknown dataType " + dataType);
+            throw DataType.invalidDataType(dataType);
         }
         verifyCollectionState();
         var itr=collection.iterator();
@@ -506,7 +507,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             break;
         }
         default:
-            throw new UnsupportedOperationException("Unknown dataType "+dataType);
+            throw DataType.invalidDataType(dataType);
         }
         verifyRemoveIf(result,filter);
         verifyCollectionState();
@@ -647,7 +648,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         @SuppressWarnings({"rawtypes","unchecked"}) default void verifyForEachRemaining(MonitoredFunctionGen functionGen,FunctionCallType functionCallType,long randSeed) {
             ITR iterator=getIterator();
             int numLeft=getNumLeft();
-            MonitoredFunction function=functionGen.getMonitoredFunction(this,randSeed,numLeft);
+            MonitoredFunction function=functionGen.getMonitoredFunction(this,randSeed);
             MonitoredCollection<?> monitoredCollection=getMonitoredCollection();
             DataType dataType=monitoredCollection.getDataType();
             if(functionCallType==FunctionCallType.Boxed) {
@@ -685,7 +686,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
                     ((OmniIterator.OfShort)iterator).forEachRemaining((ShortConsumer)function);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown dataType "+dataType);
+                    throw DataType.invalidDataType(dataType);
                 }
             }
             monitoredCollection.verifyCollectionState();
