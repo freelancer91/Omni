@@ -77,6 +77,7 @@ final class FieldAndMethodAccessor{
   private static final char DOLLARSIGN=(char)36;
   static interface RefOpenAddressHashSet
     extends AbstractOpenAddressHashSet{
+    public static final Object DELETED=getValue(prepareFieldForClassName("omni.impl.set.RefOpenAddressHashSet","DELETED"),null);
     public static int size(Object obj){
       return ((omni.impl.set.RefOpenAddressHashSet<?>)obj).size;
     }

@@ -1271,7 +1271,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
       }
       @Override public void remove(){
         int lastRet;
-        if((lastRet=this.lastRet) != 129){
+        if((lastRet=this.lastRet) != -129){
           int modCount;
           Checked root;
           CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -1294,7 +1294,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
             break;
           }
           this.lastRet=-129;
+          return;
         }
+        throw new IllegalStateException();
       }
     }
     @Override public Byte[] toArray(){
