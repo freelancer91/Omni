@@ -1,7 +1,7 @@
 package omni.impl;
 
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
@@ -42,8 +42,10 @@ import omni.function.ShortPredicate;
 import omni.function.ShortUnaryOperator;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
+import omni.util.TypeUtil;
 public enum DataType{
-    BOOLEAN(true,false,false,Boolean.class,boolean.class,Boolean[].class,boolean[].class,"Boolean","Boolean",
+    BOOLEAN("BOOLEAN","BOOLEAN","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Boolean.class,
+            boolean.class,Boolean[].class,boolean[].class,"Boolean","Boolean",
             BooleanPredicate.class,BooleanConsumer.class,BooleanComparator.class,BooleanPredicate.class,Boolean.FALSE,
             BooleanDblLnkNode.class,BooleanSnglLnkNode.class,"removeBooleanAt",boolean.class,"test","compare",
             boolean.class,"booleanElement") {
@@ -177,11 +179,159 @@ public enum DataType{
             return 0;
         }
 
+        @Override
+        public Object convertVal(boolean val){
+            return val;
+        }
+        @Override
+        public Object convertVal(byte val){
+            switch(val){
+            case 0:
+                return false;
+            case 1:
+                return true;
+            default:
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type byte cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(char val){
+            switch(val){
+            case 0:
+                return false;
+            case 1:
+                return true;
+            default:
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type char cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(short val){
+            switch(val){
+            case 0:
+                return false;
+            case 1:
+                return true;
+            default:
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type short cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(int val){
+            switch(val){
+            case 0:
+                return false;
+            case 1:
+                return true;
+            default:
+            }
+            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(long val){
+            if(val == 0){
+                return false;
+            }
+            if(val == 1){
+                return true;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            switch(Float.floatToRawIntBits(val)){
+            case 0:
+            case Integer.MIN_VALUE:
+                return false;
+            case TypeUtil.FLT_TRUE_BITS:
+                return true;
+            default:
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type float cannot be converted to " + this);
+        }
 
+        @Override
+        public Object convertVal(double val){
+            long bits;
+            if(((bits=Double.doubleToRawLongBits(val)) & Long.MAX_VALUE) == 0){
+                return false;
+            }
+            if(bits == TypeUtil.DBL_TRUE_BITS){
+                return true;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
     },
-    BYTE(true,false,true,Byte.class,byte.class,Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
+    BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
+            Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
             ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,ByteDblLnkNode.class,
             ByteSnglLnkNode.class,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement") {
+        @Override
+        public Object convertVal(boolean val){
+            return TypeUtil.castToByte(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            return val;
+        }
+        @Override
+        public Object convertVal(char val){
+            if(val <= Byte.MAX_VALUE){
+                return (byte)val;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type char cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(short val){
+            byte b;
+            if(val == (b=(byte)val)){
+                return b;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type short cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(int val){
+            byte b;
+            if(val == (b=(byte)val)){
+                return b;
+            }
+            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(long val){
+            byte b;
+            if(val == (b=(byte)val)){
+                return b;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            byte b;
+            if(val == (b=(byte)val)){
+                return b;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type float cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(double val){
+            byte b;
+            if(val == (b=(byte)val)){
+                return b;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.ByteOutput<?>)collection.getCollection();
             var result=cast.toByteArray();
@@ -310,9 +460,69 @@ public enum DataType{
             return Byte.MIN_VALUE;
         }
     },
-    CHAR(true,false,false,Character.class,char.class,Character[].class,char[].class,"Char","Char",CharPredicate.class,
-            CharConsumer.class,CharComparator.class,CharUnaryOperator.class,Character.MIN_VALUE,CharDblLnkNode.class,
-            CharSnglLnkNode.class,"removeCharAt",int.class,"applyAsChar","compare",char.class,"charElement") {
+    CHAR("CHAR","BOOLEAN,CHAR","CHAR,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Character.class,char.class,
+            Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
+            CharUnaryOperator.class,Character.MIN_VALUE,CharDblLnkNode.class,CharSnglLnkNode.class,"removeCharAt",
+            int.class,"applyAsChar","compare",char.class,"charElement"){
+        @Override
+        public Object convertVal(boolean val){
+            return TypeUtil.castToChar(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            if(val >= 0){
+                return (char)val;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type byte cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(char val){
+            return val;
+        }
+        @Override
+        public Object convertVal(short val){
+            if(val >= 0){
+                return (char)val;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type short cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(int val){
+            char c;
+            if((c=(char)val) == val){
+                return c;
+            }
+            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(long val){
+            char c;
+            if((c=(char)val) == val){
+                return c;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            char c;
+            if((c=(char)val) == val){
+                return c;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type float cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(double val){
+            char c;
+            if((c=(char)val) == val){
+                return c;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.CharOutput<?>)collection.getCollection();
             var result=cast.toCharArray();
@@ -438,9 +648,65 @@ public enum DataType{
             return 0;
         }
     },
-    SHORT(true,false,true,Short.class,short.class,Short[].class,short[].class,"Short","Short",ShortPredicate.class,
-            ShortConsumer.class,ShortComparator.class,ShortUnaryOperator.class,Short.MIN_VALUE,ShortDblLnkNode.class,
-            ShortSnglLnkNode.class,"removeShortAt",int.class,"applyAsShort","compare",short.class,"shortElement") {
+    SHORT("SHORT","BOOLEAN,BYTE,SHORT","SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Short.class,short.class,
+            Short[].class,short[].class,"Short","Short",ShortPredicate.class,ShortConsumer.class,ShortComparator.class,
+            ShortUnaryOperator.class,Short.MIN_VALUE,ShortDblLnkNode.class,ShortSnglLnkNode.class,"removeShortAt",
+            int.class,"applyAsShort","compare",short.class,"shortElement"){
+        @Override
+        public Object convertVal(boolean val){
+            return (short)TypeUtil.castToByte(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            return (short)val;
+        }
+        @Override
+        public Object convertVal(char val){
+            if(val <= Short.MAX_VALUE){
+                return (short)val;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type char cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(short val){
+            return (short)val;
+        }
+        @Override
+        public Object convertVal(int val){
+            short s;
+            if(val == (s=(short)val)){
+                return s;
+            }
+            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(long val){
+            short v;
+            if((v=(short)val) == val){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            short v;
+            if((v=(short)val) == val){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type float cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(double val){
+            short v;
+            if((v=(short)val) == val){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.ShortOutput<?>)collection.getCollection();
             var result=cast.toShortArray();
@@ -569,9 +835,57 @@ public enum DataType{
             return Short.MIN_VALUE;
         }
     },
-    INT(true,false,true,Integer.class,int.class,Integer[].class,int[].class,"Int","Int",IntPredicate.class,
+    INT("INT","BOOLEAN,BYTE,CHAR,SHORT,INT","INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Integer.class,int.class,
+            Integer[].class,int[].class,"Int","Int",IntPredicate.class,
             IntConsumer.class,IntBinaryOperator.class,IntUnaryOperator.class,Integer.MIN_VALUE,IntDblLnkNode.class,
             IntSnglLnkNode.class,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement") {
+        @Override
+        public Object convertVal(boolean val){
+            return (int)TypeUtil.castToByte(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            return (int)val;
+        }
+        @Override
+        public Object convertVal(char val){
+            return (int)val;
+        }
+        @Override
+        public Object convertVal(short val){
+            return (int)val;
+        }
+        @Override
+        public Object convertVal(int val){
+            return (int)val;
+        }
+        @Override
+        public Object convertVal(long val){
+            int v;
+            if((v=(int)val) == val){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            int v;
+            if((double)(v=(int)val) == (double)val){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type float cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(double val){
+            int v;
+            if((v=(int)val) == val){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.IntOutput<?>)collection.getCollection();
             var result=cast.toIntArray();
@@ -700,9 +1014,52 @@ public enum DataType{
             return Integer.MIN_VALUE;
         }
     },
-    LONG(true,false,true,Long.class,long.class,Long[].class,long[].class,"Long","Long",LongPredicate.class,
+    LONG("LONG","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG","LONG,FLOAT,DOUBLE,REF",true,false,true,Long.class,long.class,
+            Long[].class,long[].class,"Long","Long",LongPredicate.class,
             LongConsumer.class,LongComparator.class,LongUnaryOperator.class,Long.MIN_VALUE,LongDblLnkNode.class,
             LongSnglLnkNode.class,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement") {
+        @Override
+        public Object convertVal(boolean val){
+            return TypeUtil.castToLong(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            return (long)val;
+        }
+        @Override
+        public Object convertVal(char val){
+            return (long)val;
+        }
+        @Override
+        public Object convertVal(short val){
+            return (long)val;
+        }
+        @Override
+        public Object convertVal(int val){
+            return (long)val;
+        }
+        @Override
+        public Object convertVal(long val){
+            return (long)val;
+        }
+        @Override
+        public Object convertVal(float val){
+            long v;
+            if(TypeUtil.floatEquals(val,v=(long)val)){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type float cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(double val){
+            long v;
+            if(TypeUtil.doubleEquals(val,v=(long)val)){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.LongOutput<?>)collection.getCollection();
             var result=cast.toLongArray();
@@ -831,9 +1188,54 @@ public enum DataType{
             return Long.MIN_VALUE;
         }
     },
-    FLOAT(false,true,true,Float.class,float.class,Float[].class,float[].class,"Float","Float",FloatPredicate.class,
+    FLOAT("FLOAT","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT","FLOAT,DOUBLE,REF",false,true,true,Float.class,float.class,
+            Float[].class,float[].class,"Float","Float",FloatPredicate.class,
             FloatConsumer.class,FloatComparator.class,FloatUnaryOperator.class,Float.NaN,FloatDblLnkNode.class,
             FloatSnglLnkNode.class,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement") {
+        @Override
+        public Object convertVal(boolean val){
+            return TypeUtil.castToFloat(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            return (float)val;
+        }
+        @Override
+        public Object convertVal(char val){
+            return (float)val;
+        }
+        @Override
+        public Object convertVal(short val){
+            return (float)val;
+        }
+        @Override
+        public Object convertVal(int val){
+            if(TypeUtil.checkCastToFloat(val)){
+                return (float)val;
+            }
+            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(long val){
+            if(TypeUtil.checkCastToFloat(val)){
+                return (float)val;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            return (double)val;
+        }
+        @Override
+        public Object convertVal(double val){
+            float v;
+            if((v=(float)val) == val || v != v){
+                return v;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type double cannot be converted to " + this);
+        }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.FloatOutput<?>)collection.getCollection();
             var result=cast.toFloatArray();
@@ -946,10 +1348,12 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
     },
-    DOUBLE(false,true,true,Double.class,double.class,Double[].class,double[].class,"Double","Double",
+    DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
+            double.class,Double[].class,double[].class,"Double","Double",
             DoublePredicate.class,DoubleConsumer.class,DoubleComparator.class,DoubleUnaryOperator.class,Double.NaN,
             DoubleDblLnkNode.class,DoubleSnglLnkNode.class,"removeDoubleAt",long.class,"applyAsDouble","compare",
             double.class,"doubleElement") {
+
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.DoubleOutput<?>)collection.getCollection();
             var result=cast.toDoubleArray();
@@ -1061,8 +1465,45 @@ public enum DataType{
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
         }
+        @Override
+        public Object convertVal(boolean val){
+            return TypeUtil.castToDouble(val);
+        }
+        @Override
+        public Object convertVal(byte val){
+            return (double)val;
+        }
+        @Override
+        public Object convertVal(char val){
+            return (double)val;
+        }
+        @Override
+        public Object convertVal(short val){
+            return (double)val;
+        }
+        @Override
+        public Object convertVal(int val){
+            return (double)val;
+        }
+        @Override
+        public Object convertVal(long val){
+            if(TypeUtil.checkCastToDouble(val)){
+                return (double)val;
+            }
+            throw new UnsupportedOperationException(
+                    "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertVal(float val){
+            return (double)val;
+        }
+        @Override
+        public Object convertVal(double val){
+            return val;
+        }
     },
-    REF(false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,RefDblLnkNode.class,
+    REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
+            RefDblLnkNode.class,
             RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element") {
         @Override public Object verifyToArray(MonitoredCollection<?> monitoredCollection){
             var collection=monitoredCollection.getCollection();
@@ -1184,11 +1625,43 @@ public enum DataType{
             }
             return collection.search(inputVal);
         }
-
+        @Override
+        public Object convertVal(boolean val){
+            return val;
+        }
+        @Override
+        public Object convertVal(byte val){
+            return val;
+        }
+        @Override
+        public Object convertVal(char val){
+            return val;
+        }
+        @Override
+        public Object convertVal(short val){
+            return val;
+        }
+        @Override
+        public Object convertVal(int val){
+            return val;
+        }
+        @Override
+        public Object convertVal(long val){
+            return val;
+        }
+        @Override
+        public Object convertVal(float val){
+            return val;
+        }
+        @Override
+        public Object convertVal(double val){
+            return val;
+        }
 
     };
-    public final Set<DataType> mayBeAddedTo;
-    public final Set<DataType> validOutputTypes;
+    public final String name;
+    private final String mayBeAddedTo;
+    private final String validOutputTypes;
 
     public final boolean isIntegral;
     public final boolean isFloatingPoint;
@@ -1212,12 +1685,16 @@ public enum DataType{
     public final String compareMethodName;
     public final Class<?> comparableType;
     public final String elementMethodName;
-    DataType(boolean isIntegral,boolean isFloatingPoint,boolean isSigned,Class<?> boxedClass,Class<?> primitiveClass,
+    DataType(String name,String mayBeAddedTo,String validOutputTypes,boolean isIntegral,boolean isFloatingPoint,
+            boolean isSigned,Class<?> boxedClass,Class<?> primitiveClass,
             Class<?> boxedArrayClass,Class<?> primitiveArrayClass,String classPrefix,String typeNameModifier,
             Class<?> predicateClass,Class<?> consumerClass,Class<?> comparatorClass,Class<?> unaryOperatorClass,
             Object defaultVal,Class<?> dblLnkNodeClass,Class<?> snglLnkNodeClass,String removeAtIndexMethodName,
             Class<?> queryParameterType,String applyMethodName,String compareMethodName,Class<?> comparableType,
             String elementMethodName){
+        this.name=name;
+        this.mayBeAddedTo=mayBeAddedTo;
+        this.validOutputTypes=validOutputTypes;
         this.isIntegral=isIntegral;
         this.isFloatingPoint=isFloatingPoint;
         this.isSigned=isSigned;
@@ -1240,36 +1717,61 @@ public enum DataType{
         this.compareMethodName=compareMethodName;
         this.comparableType=comparableType;
         this.elementMethodName=elementMethodName;
-        this.mayBeAddedTo=initMayBeAddedTo(this);
-        this.validOutputTypes=initValidOutputTypes(this);
+        // this.mayBeAddedTo=initMayBeAddedTo(this);
+        // this.validOutputTypes=initValidOutputTypes(this);
 
     }
 
-    private static Set<DataType> initValidOutputTypes(DataType dataType){
-        switch(dataType){
-        case BOOLEAN:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
-        case BYTE:
-            return getDataTypeSet(DataType.BYTE,DataType.SHORT,DataType.INT,DataType.LONG,DataType.FLOAT,
-                    DataType.DOUBLE,DataType.REF);
-        case CHAR:
-            return getDataTypeSet(DataType.CHAR,DataType.INT,DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
-        case DOUBLE:
-            return getDataTypeSet(DataType.DOUBLE,DataType.REF);
-        case FLOAT:
-            return getDataTypeSet(DataType.FLOAT,DataType.DOUBLE,DataType.REF);
-        case INT:
-            return getDataTypeSet(DataType.INT,DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
-        case LONG:
-            return getDataTypeSet(DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
-        case REF:
-            return getDataTypeSet(DataType.REF);
-        case SHORT:
-            return getDataTypeSet(DataType.SHORT,DataType.INT,DataType.LONG,DataType.FLOAT,DataType.DOUBLE,
-                    DataType.REF);
+    public abstract Object convertVal(boolean val);
+    public abstract Object convertVal(byte val);
+    public abstract Object convertVal(char val);
+    public abstract Object convertVal(short val);
+    public abstract Object convertVal(int val);
+    public abstract Object convertVal(long val);
+    public abstract Object convertVal(float val);
+    public abstract Object convertVal(double val);
+    public final Object convertVal(Object val){
+        if(val instanceof Integer){
+            return convertVal((int)val);
+        }else if(val instanceof Long){
+            return convertVal((long)val);
+        }else if(val instanceof Double){
+            return convertVal((double)val);
+        }else if(val instanceof Float){
+            return convertVal((float)val);
+        }else if(val instanceof Boolean){
+            return convertVal((boolean)val);
+        }else if(val instanceof Byte){
+            return convertVal((byte)val);
+        }else if(val instanceof Character){
+            return convertVal((char)val);
+        }else if(val instanceof Short){
+            return convertVal((short)val);
         }
-        throw invalidDataType(dataType);
+        return val;
+    }
+    public final Object convertVal(DataType inputType,Object val){
+        switch(inputType){
+        case BOOLEAN:
+            return convertVal((boolean)val);
+        case BYTE:
+            return convertVal((byte)val);
+        case CHAR:
+            return convertVal((char)val);
+        case SHORT:
+            return convertVal((short)val);
+        case INT:
+            return convertVal((int)val);
+        case LONG:
+            return convertVal((long)val);
+        case FLOAT:
+            return convertVal((float)val);
+        case DOUBLE:
+            return convertVal((double)val);
+        case REF:
+            return val;
+        }
+        throw invalidDataType(inputType);
     }
     public void verifyToString(String result,OmniIterator<?> itr) {
         int offset;
@@ -1322,38 +1824,32 @@ public enum DataType{
     public static UnsupportedOperationException invalidDataType(DataType dataType){
         return new UnsupportedOperationException("Invalid dataType " + dataType);
     }
-    private static Set<DataType> initMayBeAddedTo(DataType dataType){
-        switch(dataType){
-        case REF:
-            return getDataTypeSet(DataType.REF);
-        case BOOLEAN:
-            return getDataTypeSet(DataType.BOOLEAN);
-        case BYTE:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE);
-        case CHAR:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.CHAR);
-        case SHORT:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.SHORT);
-        case INT:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT);
-        case LONG:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG);
-        case FLOAT:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT);
-        case DOUBLE:
-            return getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE);
-        }
-        throw invalidDataType(dataType);
+    public EnumSet<DataType> mayBeAddedTo(){
+        return getDataTypeSet(this.mayBeAddedTo);
     }
-
-    private static final HashMap<Set<DataType>,Set<DataType>> SETS=new HashMap<>();
-    public static synchronized Set<DataType> getDataTypeSet(DataType...dataTypes){
-        Set<DataType> newSet;
-        return SETS.putIfAbsent(newSet=Set.of(dataTypes),newSet);
+    public EnumSet<DataType> validOutputTypes(){
+        return getDataTypeSet(this.validOutputTypes);
     }
-
+    public synchronized static EnumSet<DataType> getDataTypeSet(String dataTypes){
+        return SETS.computeIfAbsent(dataTypes,dataTypeStr->{
+            String[] tokens=dataTypes.split(",");
+            for(int i=tokens.length;--i >= 0;){
+                tokens[i]=tokens[i].trim().toUpperCase();
+            }
+            switch(tokens.length){
+            case 0:
+                return EnumSet.noneOf(DataType.class);
+            case 1:
+                return EnumSet.of(DataType.valueOf(tokens[0]));
+            default:
+                DataType[] rest=new DataType[tokens.length - 1];
+                for(int i=rest.length;--i >= 0;){
+                    rest[i]=DataType.valueOf(tokens[i + 1]);
+                }
+                return EnumSet.of(DataType.valueOf(tokens[0]),rest);
+            }
+        });
+    }
+    private static final HashMap<String,EnumSet<DataType>> SETS=new HashMap<>();
 
 }

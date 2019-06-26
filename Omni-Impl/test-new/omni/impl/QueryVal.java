@@ -27,44 +27,13 @@ public enum QueryVal{
             }
             return false;
         }
+        @Override
+        public Object getInputVal(DataType inputType,QueryValModification queryValModification){
+            return null;
+        }
     },
     Pos0{
-        @Override
-        public byte getByteValPlus1(){
-            return -1;
-        }
-        @Override
-        public short getShortValPlus1(){
-            return -1;
-        }
-        @Override
-        public int getIntValPlus1(){
-            return -1;
-        }
-        @Override
-        public long getLongValPlus1(){
-            return -1;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return -1;
-        }
-        @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return -Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return -1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return -Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return -Double.MIN_VALUE;
-        }
+
         @Override
         public boolean getBooleanVal(){
             return false;
@@ -182,16 +151,76 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+            case SHORT:
+            case BYTE:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusFloatEpsilon:
+                case PlusDoubleEpsilon:
+                    return false;
+                }
+                break;
+            case BOOLEAN:
+            case CHAR:
+                return modification == QueryValModification.None;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                return inputType != DataType.REF;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case BYTE:
+                    return true;
+                case BOOLEAN:
+                case CHAR:
+                case REF:
+                    return false;
+                }
+                break;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return -1;
+        }
+        @Override
+        double getPlusFloatEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
     },
     Neg0{
+        @Override
+        public boolean getBooleanVal(){
+            return false;
+        }
         @Override
         public float getFloatVal(){
             return -0.0f;
@@ -294,6 +323,10 @@ public enum QueryVal{
     },
     MaxBoolean{
         @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
+        @Override
         public boolean getBooleanVal(){
             return true;
         }
@@ -324,46 +357,6 @@ public enum QueryVal{
         @Override
         public double getDoubleVal(){
             return 1;
-        }
-        @Override
-        public byte getByteValPlus1(){
-            return 2;
-        }
-        @Override
-        public char getCharValPlus1(){
-            return 2;
-        }
-        @Override
-        public short getShortValPlus1(){
-            return 2;
-        }
-        @Override
-        public int getIntValPlus1(){
-            return 2;
-        }
-        @Override
-        public long getLongValPlus1(){
-            return 2;
-        }
-        @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return 1 + Float.MIN_VALUE;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return 2;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)1 + Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return 1 + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return 2;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal){
@@ -450,13 +443,69 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+            case SHORT:
+            case CHAR:
+            case BYTE:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusFloatEpsilon:
+                case PlusDoubleEpsilon:
+                    return false;
+                }
+                break;
+            case BOOLEAN:
+                return modification == QueryValModification.None;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                return inputType != DataType.REF;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case CHAR:
+                case BYTE:
+                    return true;
+                case BOOLEAN:
+                case REF:
+                    return false;
+                }
+                break;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return 1;
+        }
+        @Override
+        double getPlusFloatEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
     },
     MaxByte{
@@ -489,42 +538,6 @@ public enum QueryVal{
             return Byte.MAX_VALUE;
         }
         @Override
-        public char getCharValPlus1(){
-            return Byte.MAX_VALUE + 1;
-        }
-        @Override
-        public short getShortValPlus1(){
-            return Byte.MAX_VALUE + 1;
-        }
-        @Override
-        public int getIntValPlus1(){
-            return Byte.MAX_VALUE + 1;
-        }
-        @Override
-        public long getLongValPlus1(){
-            return Byte.MAX_VALUE + 1;
-        }
-        @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return Byte.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return (float)Byte.MAX_VALUE + 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Byte.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Byte.MAX_VALUE + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Byte.MAX_VALUE + 1;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
             for(int i=0;i < setSize;++i){
                 byte v=(byte)(i + initVal);
@@ -603,13 +616,83 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+            case SHORT:
+            case CHAR:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusFloatEpsilon:
+                case PlusDoubleEpsilon:
+                    return false;
+                }
+                break;
+            case BYTE:
+                return modification == QueryValModification.None;
+            case BOOLEAN:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case BYTE:
+                case CHAR:
+                    return true;
+                case REF:
+                case BOOLEAN:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case CHAR:
+                    return true;
+                case BYTE:
+                case BOOLEAN:
+                case REF:
+                    return false;
+                }
+                break;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return 1;
+        }
+        @Override
+        double getPlusFloatEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
     },
     MinByte{
@@ -638,36 +721,16 @@ public enum QueryVal{
             return Byte.MIN_VALUE;
         }
         @Override
-        public short getShortValPlus1(){
-            return Byte.MIN_VALUE - 1;
+        int getPlus1Direction(){
+            return -1;
         }
         @Override
-        public int getIntValPlus1(){
-            return Byte.MIN_VALUE - 1;
+        double getPlusFloatEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
         @Override
-        public long getLongValPlus1(){
-            return Byte.MIN_VALUE - 1;
-        }
-        @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return Byte.MIN_VALUE - Float.MIN_VALUE;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return (float)Byte.MIN_VALUE - 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Byte.MIN_VALUE - Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Byte.MIN_VALUE - Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Byte.MIN_VALUE - 1;
+        double getPlusDoubleEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
@@ -738,13 +801,71 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+            case SHORT:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusFloatEpsilon:
+                case PlusDoubleEpsilon:
+                    return false;
+                }
+                break;
+            case BYTE:
+                return modification == QueryValModification.None;
+            case CHAR:
+            case BOOLEAN:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case BYTE:
+                    return true;
+                case CHAR:
+                case REF:
+                case BOOLEAN:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                    return true;
+                case CHAR:
+                case BYTE:
+                case BOOLEAN:
+                case REF:
+                    return false;
+                }
+                break;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MaxChar{
@@ -769,32 +890,16 @@ public enum QueryVal{
             return Character.MAX_VALUE;
         }
         @Override
-        public int getIntValPlus1(){
-            return Character.MAX_VALUE + 1;
+        int getPlus1Direction(){
+            return 1;
         }
         @Override
-        public long getLongValPlus1(){
-            return Character.MAX_VALUE + 1;
+        double getPlusFloatEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
         @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return Character.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return (float)Character.MAX_VALUE + 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Character.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Character.MAX_VALUE + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Character.MAX_VALUE + 1;
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
@@ -855,13 +960,71 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusDoubleEpsilon:
+                case PlusFloatEpsilon:
+                    return false;
+                }
+                break;
+            case CHAR:
+                return modification == QueryValModification.None;
+            case SHORT:
+            case BYTE:
+            case BOOLEAN:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case CHAR:
+                    return true;
+                case REF:
+                case SHORT:
+                case BYTE:
+                case BOOLEAN:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                    return true;
+                case REF:
+                case CHAR:
+                case SHORT:
+                case BYTE:
+                case BOOLEAN:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MaxShort{
@@ -890,36 +1053,16 @@ public enum QueryVal{
             return Short.MAX_VALUE;
         }
         @Override
-        public char getCharValPlus1(){
-            return Short.MAX_VALUE + 1;
+        int getPlus1Direction(){
+            return 1;
         }
         @Override
-        public int getIntValPlus1(){
-            return Short.MAX_VALUE + 1;
+        double getPlusFloatEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
         @Override
-        public long getLongValPlus1(){
-            return Short.MAX_VALUE + 1;
-        }
-        @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return Short.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return (float)Short.MAX_VALUE + 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Short.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Short.MAX_VALUE + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Short.MAX_VALUE + 1;
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
@@ -990,13 +1133,71 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+            case CHAR:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusDoubleEpsilon:
+                case PlusFloatEpsilon:
+                    return false;
+                }
+                break;
+            case SHORT:
+                return modification == QueryValModification.None;
+            case BYTE:
+            case BOOLEAN:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case CHAR:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case REF:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case CHAR:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MinShort{
@@ -1021,32 +1222,16 @@ public enum QueryVal{
             return Short.MIN_VALUE;
         }
         @Override
-        public int getIntValPlus1(){
-            return Short.MIN_VALUE - 1;
+        int getPlus1Direction(){
+            return -1;
         }
         @Override
-        public long getLongValPlus1(){
-            return Short.MIN_VALUE - 1;
+        double getPlusFloatEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
         @Override
-        public float getFloatValPlusFloatEpsilon(){
-            return Short.MIN_VALUE - Float.MIN_VALUE;
-        }
-        @Override
-        public float getFloatValPlus1(){
-            return (float)Short.MIN_VALUE - 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Short.MIN_VALUE - Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Short.MIN_VALUE - Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Short.MIN_VALUE - 1;
+        double getPlusDoubleEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
@@ -1107,13 +1292,71 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case FLOAT:
+                return modification != QueryValModification.PlusDoubleEpsilon;
+            case LONG:
+            case INT:
+                switch(modification){
+                case None:
+                case Plus1:
+                    return true;
+                case PlusDoubleEpsilon:
+                case PlusFloatEpsilon:
+                    return false;
+                }
+                break;
+            case SHORT:
+                return modification == QueryValModification.None;
+            case CHAR:
+            case BYTE:
+            case BOOLEAN:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case REF:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+                return inputType == DataType.DOUBLE;
+            case PlusFloatEpsilon:
+                return inputType.isFloatingPoint;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MaxSafeInt{
@@ -1134,24 +1377,16 @@ public enum QueryVal{
             return TypeUtil.MAX_SAFE_INT;
         }
         @Override
-        public int getIntValPlus1(){
-            return TypeUtil.MAX_SAFE_INT + 1;
+        int getPlus1Direction(){
+            return 1;
         }
         @Override
-        public long getLongValPlus1(){
-            return TypeUtil.MAX_SAFE_INT + 1;
+        double getPlusFloatEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
         @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)TypeUtil.MAX_SAFE_INT + Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return TypeUtil.MAX_SAFE_INT + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)TypeUtil.MAX_SAFE_INT + 1;
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
@@ -1202,13 +1437,93 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(collectionType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                case FLOAT:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(collectionType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpsilon:
+                switch(collectionType){
+                case DOUBLE:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                case FLOAT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpsilon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MinSafeInt{
@@ -1229,24 +1544,16 @@ public enum QueryVal{
             return TypeUtil.MIN_SAFE_INT;
         }
         @Override
-        public int getIntValPlus1(){
-            return TypeUtil.MIN_SAFE_INT - 1;
+        int getPlus1Direction(){
+            return -1;
         }
         @Override
-        public long getLongValPlus1(){
-            return TypeUtil.MIN_SAFE_INT - 1;
+        double getPlusFloatEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
         @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)TypeUtil.MIN_SAFE_INT - Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return TypeUtil.MIN_SAFE_INT - Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)TypeUtil.MIN_SAFE_INT - 1;
+        double getPlusDoubleEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
         @Override
         public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
@@ -1297,13 +1604,93 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(collectionType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                case FLOAT:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(collectionType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpsilon:
+                switch(collectionType){
+                case DOUBLE:
+                case REF:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case INT:
+                case LONG:
+                case SHORT:
+                    return false;
+                }
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
         @Override
         boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
-            // TODO Auto-generated method stub
-            return false;
+            switch(modification){
+            case None:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                case FLOAT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case Plus1:
+                switch(inputType){
+                case LONG:
+                case DOUBLE:
+                case INT:
+                    return true;
+                case BOOLEAN:
+                case BYTE:
+                case CHAR:
+                case FLOAT:
+                case REF:
+                case SHORT:
+                    return false;
+                }
+                break;
+            case PlusDoubleEpsilon:
+            case PlusFloatEpsilon:
+                return inputType == DataType.DOUBLE;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
         }
     },
     MaxInt{
@@ -1320,22 +1707,6 @@ public enum QueryVal{
             return Integer.MAX_VALUE;
         }
         @Override
-        public long getLongValPlus1(){
-            return (long)Integer.MAX_VALUE + 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Integer.MAX_VALUE + Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Integer.MAX_VALUE + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Integer.MAX_VALUE + 1;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
             for(int i=0;i < setSize;++i){
                 int v=i + initVal;
@@ -1371,52 +1742,28 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            switch(modification){
-            case None:
-                switch(inputType){
-                case LONG:
-                case DOUBLE:
-                case REF:
-                case INT:
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case LONG:
+                switch(modification){
+                case None:
+                case Plus1:
                     return true;
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case FLOAT:
-                case SHORT:
+                case PlusFloatEpsilon:
+                case PlusDoubleEpsilon:
                     return false;
                 }
                 break;
-            case Plus1:
-                switch(inputType){
-                case LONG:
-                case DOUBLE:
-                case REF:
-                    return true;
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case FLOAT:
-                case INT:
-                case SHORT:
-                    return false;
-                }
-                break;
-            case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
-                switch(collectionType){
-                case DOUBLE:
-                case REF:
-                    return true;
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case FLOAT:
-                case INT:
-                case LONG:
-                case SHORT:
-                    return false;
-                }
+            case INT:
+                return modification == QueryValModification.None;
+            case FLOAT:
+            case SHORT:
+            case CHAR:
+            case BYTE:
+            case BOOLEAN:
+                return false;
             }
             throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
@@ -1453,10 +1800,22 @@ public enum QueryVal{
                 }
                 break;
             case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
                 return inputType == DataType.DOUBLE;
             }
             throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return 1;
+        }
+        @Override
+        double getPlusFloatEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
     },
     MinInt{
@@ -1473,22 +1832,6 @@ public enum QueryVal{
             return Integer.MIN_VALUE;
         }
         @Override
-        public long getLongValPlus1(){
-            return (long)Integer.MIN_VALUE - 1;
-        }
-        @Override
-        public double getDoubleValPlusFloatEpsilon(){
-            return (double)Integer.MIN_VALUE - Float.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Integer.MIN_VALUE - Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Integer.MIN_VALUE - 1;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
             for(int i=0;i < setSize;++i){
                 int v=i + initVal;
@@ -1524,52 +1867,28 @@ public enum QueryVal{
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
-            switch(modification){
-            case None:
-                switch(inputType){
-                case LONG:
-                case DOUBLE:
-                case REF:
-                case INT:
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+                return true;
+            case LONG:
+                switch(modification){
+                case None:
+                case Plus1:
                     return true;
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case FLOAT:
-                case SHORT:
+                case PlusFloatEpsilon:
+                case PlusDoubleEpsilon:
                     return false;
                 }
                 break;
-            case Plus1:
-                switch(inputType){
-                case LONG:
-                case DOUBLE:
-                case REF:
-                    return true;
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case FLOAT:
-                case INT:
-                case SHORT:
-                    return false;
-                }
-                break;
-            case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
-                switch(collectionType){
-                case DOUBLE:
-                case REF:
-                    return true;
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case FLOAT:
-                case INT:
-                case LONG:
-                case SHORT:
-                    return false;
-                }
+            case INT:
+                return modification == QueryValModification.None;
+            case FLOAT:
+            case SHORT:
+            case CHAR:
+            case BYTE:
+            case BOOLEAN:
+                return false;
             }
             throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
@@ -1606,10 +1925,22 @@ public enum QueryVal{
                 }
                 break;
             case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
                 return inputType == DataType.DOUBLE;
             }
             throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return -1;
+        }
+        @Override
+        double getPlusFloatEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
     },
     MaxSafeLong{
@@ -1622,10 +1953,6 @@ public enum QueryVal{
             return TypeUtil.MAX_SAFE_LONG;
         }
         @Override
-        public long getLongValPlus1(){
-            return TypeUtil.MAX_SAFE_LONG + 1;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
             for(int i=0;i < setSize;++i){
                 long v=i + initVal;
@@ -1682,7 +2009,7 @@ public enum QueryVal{
                     return false;
                 }
             case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
             }
             throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
@@ -1701,15 +2028,20 @@ public enum QueryVal{
                 case INT:
                 case REF:
                 case SHORT:
+                    return false;
                 }
                 break;
             case Plus1:
                 return inputType == DataType.LONG;
             case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
                 return false;
             }
             throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return 1;
         }
     },
     MinSafeLong{
@@ -1722,10 +2054,6 @@ public enum QueryVal{
             return TypeUtil.MIN_SAFE_LONG;
         }
         @Override
-        public long getLongValPlus1(){
-            return TypeUtil.MIN_SAFE_LONG - 1;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
             for(int i=0;i < setSize;++i){
                 long v=i + initVal;
@@ -1782,7 +2110,7 @@ public enum QueryVal{
                     return false;
                 }
             case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
             }
             throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
@@ -1801,15 +2129,20 @@ public enum QueryVal{
                 case INT:
                 case REF:
                 case SHORT:
+                    return false;
                 }
                 break;
             case Plus1:
                 return inputType == DataType.LONG;
             case PlusDoubleEpsilon:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
                 return false;
             }
             throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return -1;
         }
     },
     MaxLong{
@@ -1898,14 +2231,6 @@ public enum QueryVal{
             return Float.MAX_VALUE;
         }
         @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Float.MAX_VALUE + Double.MIN_VALUE;
-        }
-        @Override
-        public double getDoubleValPlus1(){
-            return (double)Float.MAX_VALUE + 1;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
             for(int i=0;i < setSize;++i){
                 float v=i + initVal;
@@ -1965,7 +2290,7 @@ public enum QueryVal{
                 case SHORT:
                     return false;
                 }
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
             }
             throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
@@ -1977,10 +2302,18 @@ public enum QueryVal{
             case PlusDoubleEpsilon:
             case Plus1:
                 return inputType == DataType.DOUBLE;
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
                 return false;
             }
             throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        int getPlus1Direction(){
+            return 1;
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.POSITIVE_INFINITY;
         }
     },
     MinFloat{
@@ -1993,10 +2326,6 @@ public enum QueryVal{
             return Float.MIN_VALUE;
         }
         @Override
-        public double getDoubleValPlusDoubleEpsilon(){
-            return Float.MIN_VALUE - Double.MIN_VALUE;
-        }
-        @Override
         public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
             for(int i=0;i < setSize;++i){
                 float v=i + initVal;
@@ -2056,7 +2385,7 @@ public enum QueryVal{
                     return false;
                 }
             case Plus1:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
             }
             throw unknownCombo(this,inputType,modification,castType,collectionType);
         }
@@ -2068,10 +2397,14 @@ public enum QueryVal{
             case PlusDoubleEpsilon:
                 return inputType == DataType.DOUBLE;
             case Plus1:
-            case PlusFloatEpisolon:
+            case PlusFloatEpsilon:
                 return false;
             }
             throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        double getPlusDoubleEpsilonDirection(){
+            return Double.NEGATIVE_INFINITY;
         }
     },
     MaxDouble{
@@ -2116,6 +2449,7 @@ public enum QueryVal{
         }
     },
     MinDouble{
+
         @Override
         public double getDoubleVal(){
             return Double.MIN_VALUE;
@@ -2310,37 +2644,12 @@ public enum QueryVal{
                 + "; modification=" + modification + "; castType=" + castType);
     }
     public final Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> validQueryCombos;
-    public final Map<QueryVal.QueryValModification,Map<QueryCastType,Map<DataType,Set<DataType>>>> queriesMapReturnTrue;
     QueryVal(){
         Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> tmpValidCombos=new HashMap<>();
-        Map<QueryVal.QueryValModification,Map<QueryCastType,Map<DataType,Set<DataType>>>> tmpMayReturnTrue=new HashMap<>();
         for(var modification:QueryValModification.values()){
             for(var castType:QueryCastType.values()){
                 for(var dataType:DataType.values()){
                     if(isValidQuery(modification,castType,dataType)){
-                        for(var collectionType:DataType.values()){
-                            if(queryCanReturnTrue(modification,castType,dataType,collectionType)){
-                                tmpMayReturnTrue.compute(modification,(keyModification,existingVal1)->{
-                                    if(existingVal1 == null){
-                                        existingVal1=new HashMap<>();
-                                    }
-                                    existingVal1.compute(castType,(keyCastType,existingVal2)->{
-                                        if(existingVal2 == null){
-                                            existingVal2=new HashMap<>();
-                                        }
-                                        existingVal2.compute(dataType,(keyDataType,existingVal3)->{
-                                            if(existingVal3 == null){
-                                                existingVal3=new HashSet<>();
-                                            }
-                                            existingVal3.add(collectionType);
-                                            return existingVal3;
-                                        });
-                                        return existingVal2;
-                                    });
-                                    return existingVal1;
-                                });
-                            }
-                        }
                         tmpValidCombos.compute(modification,(keyModification,existingVal1)->{
                             if(existingVal1 == null){
                                 existingVal1=new HashMap<>();
@@ -2358,65 +2667,176 @@ public enum QueryVal{
                 }
             }
         }
-        tmpMayReturnTrue.forEach((modification,mapped1)->{
-            mapped1.forEach((castType,mapped2)->{
-                mapped2.replaceAll((dataType,dataTypeSet)->{
-                    return Set.copyOf(dataTypeSet);
-                });
-            });
-        });
-        tmpMayReturnTrue.forEach((modification,mapped1)->{
-            mapped1.replaceAll((castType,mapped2)->{
-                return Map.copyOf(mapped2);
-            });
-        });
         tmpValidCombos.forEach((modification,mapped)->{
             mapped.replaceAll((castType,dataTypeSet)->{
                 return Set.copyOf(dataTypeSet);
             });
         });
-        tmpMayReturnTrue.replaceAll((modification,mapped)->{
-            return Map.copyOf(mapped);
-        });
         tmpValidCombos.replaceAll((modification,mapped)->{
             return Map.copyOf(mapped);
         });
-        this.queriesMapReturnTrue=Map.copyOf(tmpMayReturnTrue);
         this.validQueryCombos=Map.copyOf(tmpValidCombos);
     }
     public abstract boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,
             DataType inputType,
             DataType collectionType);
     abstract boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType);
-    public byte getByteValPlus1(){
-        throw DataType.invalidDataType(DataType.BYTE);
+    public boolean getBooleanVal(QueryValModification modification){
+        if(modification != QueryValModification.None){
+            throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
+                    + DataType.BOOLEAN + "; modification=" + modification);
+        }
+        return getBooleanVal();
     }
-    public char getCharValPlus1(){
-        throw DataType.invalidDataType(DataType.CHAR);
+    public byte getByteVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getByteVal();
+        case Plus1:
+            return getByteValPlus1();
+        case PlusFloatEpsilon:
+        case PlusDoubleEpsilon:
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.BYTE
+                + "; modification=" + modification);
     }
-    public short getShortValPlus1(){
-        throw DataType.invalidDataType(DataType.SHORT);
+    public char getCharVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getCharVal();
+        case Plus1:
+            return getCharValPlus1();
+        case PlusFloatEpsilon:
+        case PlusDoubleEpsilon:
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.CHAR
+                + "; modification=" + modification);
     }
-    public int getIntValPlus1(){
-        throw DataType.invalidDataType(DataType.INT);
+    public short getShortVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getShortVal();
+        case Plus1:
+            return getShortValPlus1();
+        case PlusFloatEpsilon:
+        case PlusDoubleEpsilon:
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
+                + DataType.SHORT + "; modification=" + modification);
     }
-    public long getLongValPlus1(){
-        throw DataType.invalidDataType(DataType.LONG);
+    public int getIntVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getIntVal();
+        case Plus1:
+            return getIntValPlus1();
+        case PlusFloatEpsilon:
+        case PlusDoubleEpsilon:
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.INT
+                + "; modification=" + modification);
     }
-    public float getFloatValPlus1(){
-        throw DataType.invalidDataType(DataType.FLOAT);
+    public long getLongVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getLongVal();
+        case Plus1:
+            return getLongValPlus1();
+        case PlusFloatEpsilon:
+        case PlusDoubleEpsilon:
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.LONG
+                + "; modification=" + modification);
     }
-    public float getFloatValPlusFloatEpsilon(){
-        throw DataType.invalidDataType(DataType.FLOAT);
+    public float getFloatVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getFloatVal();
+        case Plus1:
+            return getFloatValPlus1();
+        case PlusFloatEpsilon:
+            return getFloatValPlusFloatEpsilon();
+        case PlusDoubleEpsilon:
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
+                + DataType.FLOAT + "; modification=" + modification);
     }
-    public double getDoubleValPlus1(){
-        throw DataType.invalidDataType(DataType.DOUBLE);
+    public double getDoubleVal(QueryValModification modification){
+        switch(modification){
+        case None:
+            return getDoubleVal();
+        case Plus1:
+            return getDoubleValPlus1();
+        case PlusFloatEpsilon:
+            return getDoubleValPlusFloatEpsilon();
+        case PlusDoubleEpsilon:
+            return getDoubleValPlusDoubleEpsilon();
+        }
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
+                + DataType.DOUBLE + "; modification=" + modification);
+    }
+    public Object getRefVal(QueryValModification modification){
+        if(modification != QueryValModification.None){
+            throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
+                    + DataType.REF + "; modification=" + modification);
+        }
+        return getRefVal();
+    }
+    int getPlus1Direction(){
+        throw new UnsupportedOperationException();
+    }
+    double getPlusFloatEpsilonDirection(){
+        throw new UnsupportedOperationException();
+    }
+    double getPlusDoubleEpsilonDirection(){
+        throw new UnsupportedOperationException();
+    }
+    public final byte getByteValPlus1(){
+        int v=getByteVal() + getPlus1Direction();
+        if(v < Byte.MIN_VALUE || v > Byte.MAX_VALUE){
+            throw new ArithmeticException("out of range v=" + v);
+        }
+        return (byte)v;
+    }
+    public final char getCharValPlus1(){
+        int v=getCharVal() + getPlus1Direction();
+        if(v < Character.MIN_VALUE || v > Character.MAX_VALUE){
+            throw new ArithmeticException("out of range v=" + v);
+        }
+        return (char)v;
+    }
+    public final short getShortValPlus1(){
+        int v=getShortVal() + getPlus1Direction();
+        if(v < Short.MIN_VALUE || v > Short.MAX_VALUE){
+            throw new ArithmeticException("out of range v=" + v);
+        }
+        return (short)v;
+    }
+    public final int getIntValPlus1(){
+        return Math.addExact(getIntVal(),getPlus1Direction());
+    }
+    public final long getLongValPlus1(){
+        return Math.addExact(getLongVal(),getPlus1Direction());
+    }
+    public final float getFloatValPlus1(){
+        return getFloatVal() + getPlus1Direction();
+    }
+    public final float getFloatValPlusFloatEpsilon(){
+        return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+    }
+    public final double getDoubleValPlus1(){
+        return getDoubleVal() + getPlus1Direction();
     }
     public double getDoubleValPlusFloatEpsilon(){
-        throw DataType.invalidDataType(DataType.DOUBLE);
+        double v=getDoubleVal();
+        if(getPlusFloatEpsilonDirection() < 0){
+            return v - Float.MIN_VALUE;
+        }else{
+            return v + Float.MIN_VALUE;
+        }
     }
-    public double getDoubleValPlusDoubleEpsilon(){
-        throw DataType.invalidDataType(DataType.DOUBLE);
+    public final double getDoubleValPlusDoubleEpsilon(){
+        return Math.nextAfter(getDoubleVal(),getPlusDoubleEpsilonDirection());
     }
     public Object getRefVal(){
         throw DataType.invalidDataType(DataType.REF);
@@ -2489,7 +2909,7 @@ public enum QueryVal{
             case REF:
             }
             break;
-        case PlusFloatEpisolon:
+        case PlusFloatEpsilon:
             switch(inputType){
             case DOUBLE:
                 return getDoubleValPlusFloatEpsilon();
@@ -2630,100 +3050,7 @@ public enum QueryVal{
         collection.add(val);
         initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
     }
-    //    private static Set<DataType> initValidDataTypes(QueryVal queryVal){
-    //        switch(queryVal){
-    //        case MaxInt:
-    //        case MinInt:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG,DataType.INT);
-    //        case MinSafeInt:
-    //        case MaxSafeInt:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
-    //        case MaxChar:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
-    //        case MinShort:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
-    //        case MinByte:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.BYTE);
-    //        case MaxShort:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.CHAR);
-    //        case MaxByte:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.CHAR,
-    //                    DataType.BYTE);
-    //        case MaxBoolean:
-    //        case Pos0:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.CHAR,
-    //                    DataType.BYTE,DataType.BOOLEAN);
-    //        }
-    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    //    }
-    //    private static Set<DataType> initValidPlus1(QueryVal queryVal){
-    //        switch(queryVal){
-    //        case MaxInt:
-    //        case MinInt:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG);
-    //        case MaxSafeInt:
-    //        case MinSafeInt:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.LONG,DataType.INT);
-    //        case MinShort:
-    //        case MaxChar:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT);
-    //        case MaxShort:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.CHAR);
-    //        case MinByte:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT);
-    //        case Pos0:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.BYTE);
-    //        case MaxByte:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.CHAR);
-    //        case MaxBoolean:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE,DataType.FLOAT,DataType.LONG,DataType.INT,DataType.SHORT,
-    //                    DataType.CHAR,DataType.BYTE);
-    //        }
-    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    //    }
-    //    private static Set<DataType> initValidPlusFloatEpsilon(QueryVal queryVal){
-    //        switch(queryVal){
-    //        case MaxInt:
-    //        case MaxSafeInt:
-    //        case MinInt:
-    //        case MinSafeInt:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE);
-    //        case MaxBoolean:
-    //        case MaxByte:
-    //        case MaxChar:
-    //        case MaxShort:
-    //        case MinByte:
-    //        case MinShort:
-    //        case Pos0:
-    //            return DataType.getDataTypeSet(DataType.FLOAT,DataType.DOUBLE);
-    //        }
-    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    //    }
-    //    private static Set<DataType> initValidPlusDoubleEpsilon(QueryVal queryVal){
-    //        switch(queryVal){
-    //        case MaxInt:
-    //        case MaxSafeInt:
-    //        case MinInt:
-    //        case MinSafeInt:
-    //            return DataType.getDataTypeSet(DataType.DOUBLE);
-    //        case MaxBoolean:
-    //        case MaxByte:
-    //        case MaxChar:
-    //        case MaxShort:
-    //        case MinByte:
-    //        case MinShort:
-    //        case Pos0:
-    //            return DataType.getDataTypeSet(DataType.FLOAT,DataType.DOUBLE);
-    //        }
-    //        throw new UnsupportedOperationException("Unknown queryVal " + queryVal);
-    //    }
     public enum QueryValModification{
-        None,Plus1,PlusFloatEpisolon,PlusDoubleEpsilon;
+        None,Plus1,PlusFloatEpsilon,PlusDoubleEpsilon;
     }
 }

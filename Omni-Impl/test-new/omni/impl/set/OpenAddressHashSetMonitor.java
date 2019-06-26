@@ -1,9 +1,11 @@
 package omni.impl.set;
+import java.io.IOException;
 import java.util.HashSet;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
+import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryVal;
@@ -306,6 +308,10 @@ public class OpenAddressHashSetMonitor implements MonitoredSet<AbstractOpenAddre
             throw DataType.invalidDataType(dataType);
         }
         Assertions.assertEquals(encounteredVals.size(),set.size);
+    }
+    @Override
+    public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+        set.writeExternal(oos);
     }
 
 }

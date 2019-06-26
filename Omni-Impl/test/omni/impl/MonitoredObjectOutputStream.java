@@ -73,7 +73,8 @@ public abstract class MonitoredObjectOutputStream extends ObjectOutputStream{
         wrapped.writeDouble(val);
     }
     public int numwriteObjectCalls;
-    @Override protected void writeObjectOverride(Object obj) throws IOException{
+    @Override
+    protected void writeObjectOverride(Object obj) throws IOException{
         ++numwriteObjectCalls;
         throwingCall();
         wrapped.writeObject(obj);

@@ -30,12 +30,15 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
             updateIteratorState();
         }
         void updateItrNextState();
+        void verifyNextResult(DataType outputType,Object result);
         @Override
         default Object verifyNext(DataType outputType){
             Object result=outputType.callIteratorNext(getIterator());
+            verifyNextResult(outputType,result);
             updateItrNextState();
             verifyIteratorState();
             getMonitoredCollection().verifyCollectionState();
+
             return result;
         }
         void updateItrRemoveState();

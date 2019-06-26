@@ -6,7 +6,7 @@ import omni.api.OmniDeque;
 import omni.api.OmniList;
 import omni.api.OmniStack;
 public enum QueryCastType{
-    Unboxed{
+    Unboxed("Unboxed"){
         @Override
         public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
@@ -169,7 +169,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
     },
-    ToBoxed{
+    ToBoxed("ToBoxed"){
         @Override
         public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
@@ -332,7 +332,7 @@ public enum QueryCastType{
             throw new UnsupportedOperationException("Unknown inputType " + inputType);
         }
     },
-    ToObject{
+    ToObject("ToObject"){
         @Override
         public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,DataType inputType){
             switch(inputType){
@@ -447,7 +447,9 @@ public enum QueryCastType{
         }
     };
     public final Set<DataType> validDataTypes;
-    QueryCastType(){
+    public final String name;
+    QueryCastType(String name){
+        this.name=name;
         this.validDataTypes=initValidDataTypes(this);
     }
     public abstract int callsearch(OmniStack<?> collection,Object inputVal,DataType inputType);
@@ -461,14 +463,12 @@ public enum QueryCastType{
             QueryCastType.ToObject);
     public static final Set<QueryCastType> NotPrimitive=Set.of(QueryCastType.ToBoxed,QueryCastType.ToObject);
     private static Set<DataType> initValidDataTypes(QueryCastType queryCastType){
-        switch(queryCastType){
-        case ToObject:
-            return DataType.getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE,DataType.REF);
-        case ToBoxed:
-        case Unboxed:
-            return DataType.getDataTypeSet(DataType.BOOLEAN,DataType.BYTE,DataType.CHAR,DataType.SHORT,DataType.INT,
-                    DataType.LONG,DataType.FLOAT,DataType.DOUBLE);
+        switch(queryCastType.name){
+        case "ToObject":
+            return DataType.getDataTypeSet("BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF");
+        case "ToBoxed":
+        case "Unboxed":
+            return DataType.getDataTypeSet("BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE");
         }
         throw new UnsupportedOperationException("Unknown queryCastType " + queryCastType);
     }

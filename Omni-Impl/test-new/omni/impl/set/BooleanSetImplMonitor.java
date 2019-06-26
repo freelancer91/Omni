@@ -1,11 +1,13 @@
 package omni.impl.set;
 
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
+import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryVal;
@@ -252,7 +254,7 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         }
 
         @Override public void updateIteratorState(){
-            expectedState=FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr);
+            expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr);
         }
         @Override
         public void updateItrRemoveState(){
@@ -281,6 +283,11 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
             }else{
                 expectedItrState=0b00;
             }
+        }
+
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            Assertions.assertEquals(outputType.convertVal(expectedItrState == 0b10),result);
         }
 
 
@@ -314,7 +321,20 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
                 return 0;
             }
         }
-
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            boolean expected;
+            switch(expectedItrState){
+            case 0b0010:
+            case 0b0110:
+            case 0b0111:
+                expected=true;
+                break;
+            default:
+                expected=false;
+            }
+            Assertions.assertEquals(outputType.convertVal(expected),result);
+        }
         @Override public void verifyForEachRemaining(MonitoredFunction function){
             switch(expectedItrState){
             case 0b0001:
@@ -349,7 +369,7 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         }
 
         @Override public void updateIteratorState(){
-            expectedState=FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr);
+            expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr);
         }
 
         @Override
@@ -413,5 +433,9 @@ public class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         set.clear();
         expectedState=0;
         verifyCollectionState();
+    }
+    @Override
+    public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+        set.writeExternal(oos);
     }
 }

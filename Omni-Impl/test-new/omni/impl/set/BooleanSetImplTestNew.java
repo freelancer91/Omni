@@ -10,6 +10,7 @@ import omni.impl.DataType;
 import omni.impl.FunctionCallType;
 import omni.impl.IteratorRemoveScenario;
 import omni.impl.IteratorType;
+import omni.impl.QueryVal;
 import omni.impl.StructType;
 import omni.util.TestExecutorService;
 
@@ -54,16 +55,8 @@ public class BooleanSetImplTestNew{
             for(var checkedType:CheckedType.values()){
                 if(checkedType.checked || functionGen.expectedException == null){
                     for(var state:STATES){
-                        TestExecutorService.submitTest(()->{
-                            var monitor=new BooleanSetImplMonitor(checkedType,state);
-                            if(functionGen.expectedException == null){
-                                monitor.verifyReadAndWrite(functionGen);
-                            }else{
-                                Assertions.assertThrows(functionGen.expectedException,
-                                        ()->monitor.verifyReadAndWrite(functionGen));
-                                monitor.verifyCollectionState();
-                            }
-                        });
+                        TestExecutorService.submitTest(
+                                ()->new BooleanSetImplMonitor(checkedType,state).verifyReadAndWrite(functionGen));
                     }
                 }
             }
@@ -161,11 +154,11 @@ public class BooleanSetImplTestNew{
     }
     @org.junit.jupiter.api.Test
     public void testadd_val() {
-        for(var checkedType:CheckedType.values()){
-            for(var state:STATES){
-                for(var inputVal:POSSIBLE_VALS){
-                    for(var functionCallType:FunctionCallType.values()){
-                        for(var inputType:DataType.BOOLEAN.mayBeAddedTo){
+        for(var inputType:DataType.BOOLEAN.mayBeAddedTo()){
+            for(var checkedType:CheckedType.values()){
+                for(var state:STATES){
+                    for(var inputVal:POSSIBLE_VALS){
+                        for(var functionCallType:FunctionCallType.values()){
                             TestExecutorService.submitTest(
                                     ()->Assertions.assertEquals(new BooleanSetImplMonitor(checkedType,state).verifyAdd(
                                             inputVal,inputType,functionCallType),(state & (inputVal?2:1)) == 0));
@@ -194,7 +187,7 @@ public class BooleanSetImplTestNew{
                                                     }else{
                                                         Assertions.assertThrows(functionGen.expectedException,
                                                                 ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
-                                        monitor.verifyCollectionState();
+                                                        monitor.verifyCollectionState();
                                                     }
                                                 });
                                             });
@@ -248,7 +241,7 @@ public class BooleanSetImplTestNew{
                                                     }else{
                                                         Assertions.assertThrows(filterGen.expectedException,
                                                                 ()->monitor.verifyRemoveIf(filterGen,functionCallType,0.5,randSeed));
-                                        monitor.verifyCollectionState();
+                                                        monitor.verifyCollectionState();
                                                     }
                                                 });
                                             });
@@ -261,7 +254,7 @@ public class BooleanSetImplTestNew{
     }
     @org.junit.jupiter.api.Test
     public void testtoArray_void(){
-        for(var outputType:DataType.BOOLEAN.validOutputTypes){
+        for(var outputType:DataType.BOOLEAN.validOutputTypes()){
             for(var checkedType:CheckedType.values()){
                 for(var state:STATES){
                     TestExecutorService
@@ -399,7 +392,7 @@ public class BooleanSetImplTestNew{
     }
     @org.junit.jupiter.api.Test
     public void testItrnext_void(){
-        for(var outputType:DataType.BOOLEAN.validOutputTypes){
+        for(var outputType:DataType.BOOLEAN.validOutputTypes()){
             for(var checkedType:CheckedType.values()){
                 for(var preMod:IteratorType.AscendingItr.validPreMods){
                     if(checkedType.checked || preMod.expectedException == null){
@@ -409,16 +402,8 @@ public class BooleanSetImplTestNew{
                                 var itrMonitor=setMonitor.getMonitoredIterator();
                                 itrMonitor.illegalMod(preMod);
                                 if(preMod.expectedException == null){
-                                    switch(state){
-                                    case 0b01:
-                                        Assertions.assertEquals(Boolean.FALSE,itrMonitor.verifyNext(outputType));
-                                        break;
-                                    default:
-                                        Assertions.assertEquals(Boolean.FALSE,itrMonitor.verifyNext(outputType));
-                                    case 0b10:
-                                        Assertions.assertEquals(Boolean.TRUE,itrMonitor.verifyNext(outputType));
-                                        break;
-                                    case 0b00:
+                                    while(itrMonitor.hasNext()){
+                                        itrMonitor.verifyNext(outputType);
                                     }
                                     Assertions.assertFalse(itrMonitor.getIterator().hasNext());
                                     if(checkedType.checked){
@@ -437,6 +422,7 @@ public class BooleanSetImplTestNew{
                 }
             }
         }
+        TestExecutorService.completeAllTests();
     }
     @org.junit.jupiter.api.Test
     public void testItrhasNext_void(){
@@ -457,11 +443,100 @@ public class BooleanSetImplTestNew{
         TestExecutorService.completeAllTests();
     }
     @org.junit.jupiter.api.Test
+    public void testItrclone_void(){
+        for(var checkedType:CheckedType.values()){
+            for(var state:STATES){
+                TestExecutorService.submitTest(
+                        ()->new BooleanSetImplMonitor(checkedType,state).getMonitoredIterator().verifyClone());
+            }
+        }
+        TestExecutorService.completeAllTests();
+    }
+    @org.junit.jupiter.api.Test
     public void testcontains_val(){
-        // TODO
+        for(var queryVal:QueryVal.values()){
+            queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                castTypesToInputTypes.forEach((castType,inputTypes)->{
+                    inputTypes.forEach(inputType->{
+                        boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,inputType,
+                                DataType.BOOLEAN);
+                        for(var checkedType:CheckedType.values()){
+                            for(var state:STATES){
+                                TestExecutorService.submitTest(()->{
+                                    boolean expectedResult;
+                                    if(queryCanReturnTrue){
+                                        boolean booleanInputVal=queryVal.getBooleanVal(modification);
+                                        switch(state){
+                                        case 0b11:
+                                            expectedResult=true;
+                                            break;
+                                        case 0b01:
+                                            expectedResult=!booleanInputVal;
+                                            break;
+                                        case 0b10:
+                                            expectedResult=booleanInputVal;
+                                            break;
+                                        default:
+                                            expectedResult=false;
+                                        }
+                                    }else{
+                                        expectedResult=false;
+                                    }
+                                    var monitor=new BooleanSetImplMonitor(checkedType,state);
+                                    boolean actualResult=monitor.verifyContains(queryVal,inputType,castType,
+                                            modification);
+                                    Assertions.assertEquals(expectedResult,actualResult);
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        }
+        TestExecutorService.completeAllTests();
     }
     @org.junit.jupiter.api.Test
     public void testremoveVal_val(){
-        // TODO
+        for(var queryVal:QueryVal.values()){
+            queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                castTypesToInputTypes.forEach((castType,inputTypes)->{
+                    inputTypes.forEach(inputType->{
+                        boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,inputType,
+                                DataType.BOOLEAN);
+                        for(var checkedType:CheckedType.values()){
+                            for(var state:STATES){
+                                // TestExecutorService.submitTest(()->{
+                                boolean expectedResult;
+                                if(queryCanReturnTrue){
+                                    boolean booleanInputVal=queryVal.getBooleanVal(modification);
+                                    switch(state){
+                                    case 0b11:
+                                        expectedResult=true;
+                                        break;
+                                    case 0b01:
+                                        expectedResult=!booleanInputVal;
+                                        break;
+                                    case 0b10:
+                                        expectedResult=booleanInputVal;
+                                        break;
+                                    default:
+                                        expectedResult=false;
+                                    }
+                                }else{
+                                    expectedResult=false;
+                                }
+                                var monitor=new BooleanSetImplMonitor(checkedType,state);
+                                boolean actualResult=monitor.verifyRemoveVal(queryVal,inputType,castType,
+                                        modification);
+                                Assertions.assertEquals(expectedResult,actualResult);
+                                // });
+                                // TestExecutorService.completeAllTests();
+                            }
+                        }
+                    });
+                });
+            });
+        }
+        // TestExecutorService.completeAllTests();
     }
 }

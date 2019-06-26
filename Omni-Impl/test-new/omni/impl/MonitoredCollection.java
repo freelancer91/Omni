@@ -2,6 +2,8 @@ package omni.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -42,13 +44,15 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     void verifyCollectionState();
     void verifyClone(Object clone);
     boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType);
-    boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,QueryVal.QueryValModification modification);
+    boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
+            QueryVal.QueryValModification modification);
     void verifyToString(String string);
     void verifyHashCode(int hashCode);
     void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter);
     void verifyArrayIsCopy(Object arr);
 
-    default boolean verifyContains(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,QueryValModification modification){
+    default boolean verifyContains(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
+            QueryValModification modification){
         Object inputVal=queryVal.getInputVal(inputType,modification);
         boolean result=queryCastType.callcontains(getCollection(),inputVal,inputType);
         verifyCollectionState();
@@ -384,8 +388,8 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         verifyHashCode(result);
         return result;
     }
+    void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException;
     @SuppressWarnings("unchecked") default void verifyReadAndWrite(MonitoredFunctionGen monitoredFunctionGen) {
-        COL collection=getCollection();
         final File file;
         try{
             file=Files.createTempFile(null,null).toFile();
@@ -393,22 +397,28 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             Assertions.fail(e);
             return;
         }
-        try(var oos=monitoredFunctionGen.getMonitoredObjectOutputStream(this,new FileOutputStream(file));){
-            oos.writeObject(collection);
-            verifyCollectionState();
-        }catch(Exception e){
-            Assertions.fail(e);
+        if(monitoredFunctionGen.expectedException == null){
+            try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
+                oos.writeObject(getCollection());
+            }catch(Exception e){
+                Assertions.fail(e);
+            }
+            COL readCol=null;
+            try(var ois=monitoredFunctionGen.getMonitoredObjectInputStream(this,new FileInputStream(file));){
+                readCol=(COL)ois.readObject();
+                verifyCollectionState();
+            }catch(Exception e){
+                Assertions.fail(e);
+                return;
+            }
+            verifyClone(readCol);
+        }else{
+            Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
+                try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(this,new FileOutputStream(file));){
+                    writeObjectImpl(moos);
+                }
+            });
         }
-        COL readCol=null;
-        try(var ois=monitoredFunctionGen.getMonitoredObjectInputStream(this,new FileInputStream(file));){
-            readCol=(COL)ois.readObject();
-            verifyCollectionState();
-
-        }catch(Exception e){
-            Assertions.fail(e);
-            return;
-        }
-        verifyClone(readCol);
     }
     @SuppressWarnings("unchecked") default boolean verifyRemoveIf(MonitoredRemoveIfPredicateGen filterGen,FunctionCallType functionCallType,double threshold,long randSeed) {
         COL collection=getCollection();

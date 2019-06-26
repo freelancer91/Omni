@@ -1,11 +1,13 @@
 package omni.impl.set;
 
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
+import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryVal;
@@ -36,6 +38,25 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             size+=Long.bitCount(word);
         }
         return size;
+    }
+    ByteSetImplMonitor(CheckedType checkedType){
+        this.checkedType=checkedType;
+        if(checkedType.checked){
+            set=new ByteSetImpl.Checked();
+        }else{
+            set=new ByteSetImpl();
+        }
+        this.expectedWords=new long[4];
+    }
+    ByteSetImplMonitor(CheckedType checkedType,long...expectedWords){
+        this.checkedType=checkedType;
+        this.expectedWords=expectedWords;
+        if(checkedType.checked){
+            set=new ByteSetImpl.Checked(expectedWords[0],expectedWords[1],expectedWords[2],expectedWords[3]);
+        }else{
+            set=new ByteSetImpl(expectedWords[0],expectedWords[1],expectedWords[2],expectedWords[3]);
+        }
+        this.expectedSize=getExpectedSize();
     }
     ByteSetImplMonitor(CheckedType checkedType,ByteSetImpl set){
         this.checkedType=checkedType;
@@ -85,7 +106,10 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             }
             return numLeft;
         }
-
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            Assertions.assertEquals(outputType.convertVal(expectedValOffset),result);
+        }
 
     }
     class UncheckedMonitoredItr extends AbstractMonitoredItr{
@@ -175,6 +199,7 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             Assertions.assertEquals(expectedValOffset,FieldAndMethodAccessor.ByteSetImpl.Itr.valOffset(itr));
             Assertions.assertSame(set,FieldAndMethodAccessor.ByteSetImpl.Itr.root(itr));
         }
+
 
 
     }
@@ -371,6 +396,10 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
         expectedWords[(v>>6)+2]&=~(1L<<v);
         --expectedSize;
         ++expectedModCount;
+    }
+    @Override
+    public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+        set.writeExternal(oos);
     }
 
 

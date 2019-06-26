@@ -2,52 +2,55 @@ package omni.impl;
 
 import java.util.Set;
 public enum IteratorType{
-    AscendingItr,DescendingItr,BidirectionalItr,SubAscendingItr,SubBidirectionalItr;
+    AscendingItr("AscendingItr"),DescendingItr("DescendingItr"),BidirectionalItr("BidirectionalItr"),
+    SubAscendingItr("SubAscendingItr"),SubBidirectionalItr("SubBidirectionalItr");
+    public final String name;
     public final Set<MonitoredFunctionGen> validMonitoredFunctionGens;
     public final Set<IllegalModification> validPreMods;
     public final Set<IteratorRemoveScenario> validItrRemoveScenarios;
-    IteratorType(){
+    IteratorType(String name){
+        this.name=name;
         this.validMonitoredFunctionGens=initValidMonitoredFunctionGens(this);
         this.validPreMods=initValidPreMods(this);
         this.validItrRemoveScenarios=initValidItrRemoveScenarios(this);
     }
     private static Set<IteratorRemoveScenario> initValidItrRemoveScenarios(IteratorType itrType){
-        switch(itrType){
-        case AscendingItr:
-        case DescendingItr:
-        case SubAscendingItr:
+        switch(itrType.name){
+        case "AscendingItr":
+        case "DescendingItr":
+        case "SubAscendingItr":
             return Set.of(IteratorRemoveScenario.PostInit,IteratorRemoveScenario.PostNext,
                     IteratorRemoveScenario.PostRemove);
-        case BidirectionalItr:
-        case SubBidirectionalItr:
+        case "BidirectionalItr":
+        case "SubBidirectionalItr":
             return Set.of(IteratorRemoveScenario.PostAdd,IteratorRemoveScenario.PostInit,
                     IteratorRemoveScenario.PostNext,IteratorRemoveScenario.PostPrev,IteratorRemoveScenario.PostRemove);
         }
         throw new UnsupportedOperationException("Unknown itrType " + itrType);
     }
     private static Set<IllegalModification> initValidPreMods(IteratorType itrType){
-        switch(itrType){
-        case AscendingItr:
-        case BidirectionalItr:
-        case DescendingItr:
+        switch(itrType.name){
+        case "AscendingItr":
+        case "BidirectionalItr":
+        case "DescendingItr":
             return Set.of(IllegalModification.ModCollection,IllegalModification.NoMod);
-        case SubAscendingItr:
-        case SubBidirectionalItr:
+        case "SubAscendingItr":
+        case "SubBidirectionalItr":
             return Set.of(IllegalModification.ModCollection,IllegalModification.NoMod,IllegalModification.ModParent,
                     IllegalModification.ModRoot);
         }
         throw new UnsupportedOperationException("Unknown itrType " + itrType);
     }
     private static Set<MonitoredFunctionGen> initValidMonitoredFunctionGens(IteratorType itrType){
-        switch(itrType){
-        case AscendingItr:
-        case BidirectionalItr:
-        case DescendingItr:
+        switch(itrType.name){
+        case "AscendingItr":
+        case "BidirectionalItr":
+        case "DescendingItr":
             return Set.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.ModItr,MonitoredFunctionGen.NoThrow,
                     MonitoredFunctionGen.ThrowIOB,MonitoredFunctionGen.ThrowIOBModCollection,
                     MonitoredFunctionGen.ThrowIOBModItr);
-        case SubAscendingItr:
-        case SubBidirectionalItr:
+        case "SubAscendingItr":
+        case "SubBidirectionalItr":
             return Set.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.ModItr,MonitoredFunctionGen.NoThrow,
                     MonitoredFunctionGen.ThrowIOB,MonitoredFunctionGen.ThrowIOBModCollection,
                     MonitoredFunctionGen.ThrowIOBModItr,MonitoredFunctionGen.ModParent,MonitoredFunctionGen.ModRoot,

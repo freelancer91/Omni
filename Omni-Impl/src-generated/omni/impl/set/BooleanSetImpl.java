@@ -113,8 +113,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
           }
         }else if(val instanceof Double){
           long bits;
-          return (bits=Double.doubleToRawLongBits((double)val)) == 0L 
-            || bits == Long.MIN_VALUE
+          return ((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0
             || bits == TypeUtil.DBL_TRUE_BITS;
         }else if(val instanceof Long){
           long v;
@@ -190,8 +189,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       return val == 1;
     default:
       long bits;
-      return (bits=Double.doubleToRawLongBits(val)) == 0L 
-        || bits == Long.MIN_VALUE
+      return ((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0
         || bits == TypeUtil.DBL_TRUE_BITS;
     }
   }
@@ -279,7 +277,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
                 }
               }else if(val instanceof Double){
                 long bits;
-                if((bits=Double.doubleToRawLongBits((double)val)) == 0L || bits == Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0){
                   break setTrue;
                 }else if(bits == TypeUtil.DBL_TRUE_BITS){
                   break setFalse;
@@ -439,7 +437,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
           break;
       default:
           long bits;
-          if((bits=Double.doubleToRawLongBits(val)) == 0 || bits == Long.MIN_VALUE){
+          if(((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0){
               this.state=0b10;
               return true;
           }else if(bits == TypeUtil.DBL_TRUE_BITS){
@@ -1022,6 +1020,11 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
       @Override public Object clone(){
         return new Itr(this);
       }
+      private void checkForEachRemainingModCount(int expected){
+        if(expected!=this.itrState || root.state!=(expected&0b11)){
+          throw new ConcurrentModificationException("expected state="+expected+"; actualItrState="+this.itrState+"; actualRootState="+root.state);
+        }
+      }
       @Override public void remove(){
         int itrState,newRootState,newItrState;
         switch(itrState=this.itrState){
@@ -1053,92 +1056,94 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
         this.itrState=newItrState;
       }
       @Override public void forEachRemaining(BooleanConsumer action){
-        switch(this.itrState){
+        int itrState;
+        switch(itrState=this.itrState){
         case 0b0001:
           try{
             action.accept(false);
           }finally{
-            root.checkModCount(0b01);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b0101;
+          this.itrState=0b0101;
           break;
         case 0b0010:
           try{
             action.accept(true);
           }finally{
-            root.checkModCount(0b10);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1010;
+          this.itrState=0b1010;
           break;
         case 0b0011:
           try{
             action.accept(false);
             action.accept(true);
           }finally{
-            root.checkModCount(0b11);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1111;
+          this.itrState=0b1111;
           break;
         case 0b0110:
           try{
             action.accept(true);
           }finally{
-            root.checkModCount(0b10);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1110;
+          this.itrState=0b1110;
           break;
         case 0b0111:
           try{
             action.accept(true);
           }finally{
-            root.checkModCount(0b11);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1111;
+          this.itrState=0b1111;
         default:
         }
       }
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
-        switch(this.itrState){
+        int itrState;
+        switch(itrState=this.itrState){
         case 0b0001:
           try{
             action.accept(Boolean.FALSE);
           }finally{
-            root.checkModCount(0b01);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b0101;
+          this.itrState=0b0101;
           break;
         case 0b0010:
           try{
             action.accept(Boolean.TRUE);
           }finally{
-            root.checkModCount(0b10);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1010;
+          this.itrState=0b1010;
           break;
         case 0b0011:
           try{
             action.accept(Boolean.FALSE);
             action.accept(Boolean.TRUE);
           }finally{
-            root.checkModCount(0b11);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1111;
+          this.itrState=0b1111;
           break;
         case 0b0110:
           try{
             action.accept(Boolean.TRUE);
           }finally{
-            root.checkModCount(0b10);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1110;
+          this.itrState=0b1110;
           break;
         case 0b0111:
           try{
             action.accept(Boolean.TRUE);
           }finally{
-            root.checkModCount(0b11);
+            checkForEachRemainingModCount(itrState);
           }
-          itrState=0b1111;
+          this.itrState=0b1111;
         default:
         }
       }

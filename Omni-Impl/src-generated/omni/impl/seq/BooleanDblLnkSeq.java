@@ -420,7 +420,7 @@ AbstractSeq<Boolean>
           returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+            if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
               v=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
@@ -468,7 +468,7 @@ AbstractSeq<Boolean>
               }
             }else if(val instanceof Double){
               final long bits;
-              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                 b=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 b=true;
@@ -596,7 +596,7 @@ AbstractSeq<Boolean>
           returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+            if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
               v=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
@@ -644,7 +644,7 @@ AbstractSeq<Boolean>
               }
             }else if(val instanceof Double){
               final long bits;
-              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                 b=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 b=true;
@@ -772,7 +772,7 @@ AbstractSeq<Boolean>
           returnFalse:for(;;){
             final boolean v;
             long bits;
-            if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+            if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
               v=false;
             }else if(bits==TypeUtil.DBL_TRUE_BITS){
               v=true;
@@ -820,7 +820,7 @@ AbstractSeq<Boolean>
               }
             }else if(val instanceof Double){
               final long bits;
-              if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                 b=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 b=true;
@@ -1951,7 +1951,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -1999,7 +1999,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -2469,7 +2469,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -2518,7 +2518,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -2652,7 +2652,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -2701,7 +2701,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -2834,7 +2834,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -2883,7 +2883,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -3016,7 +3016,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -3065,7 +3065,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -5590,7 +5590,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -5638,7 +5638,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -5848,7 +5848,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -5896,7 +5896,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;
@@ -6024,7 +6024,7 @@ AbstractSeq<Boolean>
             returnFalse:for(;;){
               final boolean v;
               long bits;
-              if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE){
+              if(((bits=Double.doubleToRawLongBits(val))&(Long.MAX_VALUE))==0){
                 v=false;
               }else if(bits==TypeUtil.DBL_TRUE_BITS){
                 v=true;
@@ -6072,7 +6072,7 @@ AbstractSeq<Boolean>
                 }
               }else if(val instanceof Double){
                 final long bits;
-                if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+                if(((bits=Double.doubleToRawLongBits((double)val))&(Long.MAX_VALUE))==0){
                   b=false;
                 }else if(bits==TypeUtil.DBL_TRUE_BITS){
                   b=true;

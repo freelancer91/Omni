@@ -1,4 +1,5 @@
 package omni.impl.set;
+import java.io.IOException;
 import java.util.HashSet;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
@@ -7,6 +8,7 @@ import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
+import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryVal;
@@ -43,6 +45,7 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                 updateItrNextFromTable(expectedOffset - 256);
             }
         }
+
         private int verifyForEachRemainingHelper(MonitoredFunction function,int expectedLastRet){
             final var monitoredFunctionItr=function.iterator();
             int expectedOffset=this.expectedOffset;
@@ -336,6 +339,43 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
             }
             default:
                 throw DataType.invalidDataType(dataType);
+            }
+        }
+        @Override
+        public void verifyNextResult(DataType outputType,Object result){
+            if(expectedOffset < 256){
+                switch(dataType){
+                case CHAR:
+                    Assertions.assertEquals(outputType.convertVal(expectedOffset),result);
+                    break;
+                case SHORT:
+                case INT:
+                case LONG:
+                    Assertions.assertEquals(outputType.convertVal(expectedOffset - 128),result);
+                    break;
+                default:
+                    throw DataType.invalidDataType(dataType);
+                }
+            }else{
+                switch(dataType){
+                case CHAR:
+                    Assertions.assertEquals(outputType.convertVal(((char[])expectedTable)[expectedOffset - 256]),
+                            result);
+                    break;
+                case SHORT:
+                    Assertions.assertEquals(outputType.convertVal(((short[])expectedTable)[expectedOffset - 256]),
+                            result);
+                    break;
+                case INT:
+                    Assertions.assertEquals(outputType.convertVal(((int[])expectedTable)[expectedOffset - 256]),result);
+                    break;
+                case LONG:
+                    Assertions.assertEquals(outputType.convertVal(((long[])expectedTable)[expectedOffset - 256]),
+                            result);
+                    break;
+                default:
+                    throw DataType.invalidDataType(dataType);
+                }
             }
         }
     }
@@ -1657,6 +1697,10 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
             throw DataType.invalidDataType(dataType);
         }
         Assertions.assertEquals(encounteredVals.size(),set.tableSize);
+    }
+    @Override
+    public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+        set.writeExternal(oos);
     }
 
 }

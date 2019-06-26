@@ -875,7 +875,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   public static class Checked extends ByteSetImpl{
     transient int modCount;
     transient int size;
-    Checked(){
+    public Checked(){
       super();
     }
     Checked(long word0,long word1,long word2,long word3){
