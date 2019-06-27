@@ -3,6 +3,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -51,7 +52,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         if(--numLeft == 0){
           break;
         }
-        buffer[++bufferOffset]=',';
+        buffer[bufferOffset]=',';
         buffer[++bufferOffset]=' ';
       }
     }while(++valOffset != valBound);
@@ -81,7 +82,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         }
       }
     }
-    buffer[size=(int)(magicWord >>> 32) + 1]=']';
+    buffer[size=(int)(magicWord >>> 32)]=']';
     return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
   }
   private static int hashCodeHelper(long word0,long word1,long word2,long word3,int size) {
@@ -758,26 +759,29 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
         var root=this.root;
         switch(++valOffset >> 6){
         case -2:
-            if((valOffset=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
-                this.valOffset=valOffset - 128;
+            int tail0s;
+            if((tail0s=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
+                this.valOffset=valOffset+tail0s;
                 break;
             }
-            valOffset=0;
+            valOffset=-64;
         case -1:
-            if((valOffset=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
-                this.valOffset=valOffset - 64;
+            if((tail0s=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
+                this.valOffset=valOffset+tail0s;
                 break;
             }
             valOffset=0;
         case 0:
-            if((valOffset=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
-                this.valOffset=valOffset;
+            if((tail0s=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
+                this.valOffset=valOffset+tail0s;
                 break;
             }
-            valOffset=0;
+            valOffset=64;
         case 1:
-            this.valOffset=Long.numberOfTrailingZeros(root.word3 >>> valOffset) + 64;
-            break;
+            if((tail0s=Long.numberOfTrailingZeros(root.word3 >>> valOffset)) != 64){
+               this.valOffset=valOffset+tail0s;
+               break;
+            }
         default:
             this.valOffset=128;
         }
@@ -925,9 +929,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     @Override public void clear(){
       if(this.size!=0) {
         this.word0=0;
-        this.word0=2;
-        this.word0=0;
-        this.word0=0;
+        this.word1=0;
+        this.word2=0;
+        this.word3=0;
         this.size=0;
         ++this.modCount;
       }
@@ -1195,26 +1199,29 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
           var ret=(byte)(valOffset=this.valOffset);
           switch(++valOffset >> 6){
           case -2:
-            if((valOffset=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
-              this.valOffset=valOffset - 128;
+            int tail0s;
+            if((tail0s=Long.numberOfTrailingZeros(root.word0 >>> valOffset)) != 64){
+              this.valOffset=valOffset+tail0s;
               break;
             }
-            valOffset=0;
+            valOffset=-64;
           case -1:
-            if((valOffset=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
-              this.valOffset=valOffset - 64;
+            if((tail0s=Long.numberOfTrailingZeros(root.word1 >>> valOffset)) != 64){
+              this.valOffset=valOffset+tail0s;
               break;
             }
             valOffset=0;
           case 0:
-            if((valOffset=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
-              this.valOffset=valOffset;
+            if((tail0s=Long.numberOfTrailingZeros(root.word2 >>> valOffset)) != 64){
+              this.valOffset=valOffset+tail0s;
               break;
             }
-            valOffset=0;
+            valOffset=64;
           case 1:
-            this.valOffset=Long.numberOfTrailingZeros(root.word3 >>> valOffset) + 64;
-            break;
+            if((tail0s=Long.numberOfTrailingZeros(root.word3 >>> valOffset))!=64){
+              this.valOffset=valOffset+tail0s;
+              break;
+            }
           default:
             this.valOffset=128;
           }
@@ -1237,8 +1244,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
           int modCount=this.modCount;
           final var root=this.root;
           int lastRet;
+          int beforeValOffset=valOffset;
           try{
-              switch((lastRet=valOffset) >> 6){
+              switch((lastRet=beforeValOffset) >> 6){
               case -2:
                   lastRet=forEachRemainingHelper(root.word0,valOffset,lastRet,action);
                   valOffset=-64;
@@ -1252,7 +1260,9 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
                   lastRet=forEachRemainingHelper(root.word3,valOffset,lastRet,action);
               }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || beforeValOffset!=this.valOffset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},valOffset{expected="+beforeValOffset+";actual="+this.valOffset+"}");
+              }
           }
           this.valOffset=128;
           this.lastRet=lastRet;

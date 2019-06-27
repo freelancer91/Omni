@@ -1,8 +1,10 @@
 package omni.impl;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import omni.api.OmniCollection;
 import omni.util.TypeUtil;
 public enum QueryVal{
@@ -2643,20 +2645,20 @@ public enum QueryVal{
         return new UnsupportedOperationException("Unknown combo queryVal=" + queryVal + "; inputType=" + inputType
                 + "; modification=" + modification + "; castType=" + castType);
     }
-    public final Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> validQueryCombos;
+    public final SortedMap<QueryVal.QueryValModification,SortedMap<QueryCastType,Set<DataType>>> validQueryCombos;
     QueryVal(){
-        Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> tmpValidCombos=new HashMap<>();
+        TreeMap<QueryVal.QueryValModification,SortedMap<QueryCastType,Set<DataType>>> tmpValidCombos=new TreeMap<>();
         for(var modification:QueryValModification.values()){
             for(var castType:QueryCastType.values()){
                 for(var dataType:DataType.values()){
                     if(isValidQuery(modification,castType,dataType)){
                         tmpValidCombos.compute(modification,(keyModification,existingVal1)->{
                             if(existingVal1 == null){
-                                existingVal1=new HashMap<>();
+                                existingVal1=new TreeMap<>();
                             }
                             existingVal1.compute(castType,(keyCastType,existingVal2)->{
                                 if(existingVal2 == null){
-                                    existingVal2=new HashSet<>();
+                                    existingVal2=new TreeSet<>();
                                 }
                                 existingVal2.add(dataType);
                                 return existingVal2;
@@ -2669,13 +2671,13 @@ public enum QueryVal{
         }
         tmpValidCombos.forEach((modification,mapped)->{
             mapped.replaceAll((castType,dataTypeSet)->{
-                return Set.copyOf(dataTypeSet);
+                return EnumSet.copyOf(dataTypeSet);
             });
         });
         tmpValidCombos.replaceAll((modification,mapped)->{
-            return Map.copyOf(mapped);
+            return Collections.unmodifiableSortedMap(mapped);
         });
-        this.validQueryCombos=Map.copyOf(tmpValidCombos);
+        this.validQueryCombos=Collections.unmodifiableSortedMap(tmpValidCombos);
     }
     public abstract boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,
             DataType inputType,

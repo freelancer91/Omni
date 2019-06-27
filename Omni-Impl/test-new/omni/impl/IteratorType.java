@@ -1,57 +1,59 @@
 package omni.impl;
 
-import java.util.Set;
+import java.util.EnumSet;
 public enum IteratorType{
     AscendingItr("AscendingItr"),DescendingItr("DescendingItr"),BidirectionalItr("BidirectionalItr"),
     SubAscendingItr("SubAscendingItr"),SubBidirectionalItr("SubBidirectionalItr");
     public final String name;
-    public final Set<MonitoredFunctionGen> validMonitoredFunctionGens;
-    public final Set<IllegalModification> validPreMods;
-    public final Set<IteratorRemoveScenario> validItrRemoveScenarios;
+    public final EnumSet<MonitoredFunctionGen> validMonitoredFunctionGens;
+    public final EnumSet<IllegalModification> validPreMods;
+    public final EnumSet<IteratorRemoveScenario> validItrRemoveScenarios;
     IteratorType(String name){
         this.name=name;
         this.validMonitoredFunctionGens=initValidMonitoredFunctionGens(this);
         this.validPreMods=initValidPreMods(this);
         this.validItrRemoveScenarios=initValidItrRemoveScenarios(this);
     }
-    private static Set<IteratorRemoveScenario> initValidItrRemoveScenarios(IteratorType itrType){
+    private static EnumSet<IteratorRemoveScenario> initValidItrRemoveScenarios(IteratorType itrType){
         switch(itrType.name){
         case "AscendingItr":
         case "DescendingItr":
         case "SubAscendingItr":
-            return Set.of(IteratorRemoveScenario.PostInit,IteratorRemoveScenario.PostNext,
+            return EnumSet.of(IteratorRemoveScenario.PostInit,IteratorRemoveScenario.PostNext,
                     IteratorRemoveScenario.PostRemove);
         case "BidirectionalItr":
         case "SubBidirectionalItr":
-            return Set.of(IteratorRemoveScenario.PostAdd,IteratorRemoveScenario.PostInit,
+            return EnumSet.of(IteratorRemoveScenario.PostAdd,IteratorRemoveScenario.PostInit,
                     IteratorRemoveScenario.PostNext,IteratorRemoveScenario.PostPrev,IteratorRemoveScenario.PostRemove);
         }
         throw new UnsupportedOperationException("Unknown itrType " + itrType);
     }
-    private static Set<IllegalModification> initValidPreMods(IteratorType itrType){
+    private static EnumSet<IllegalModification> initValidPreMods(IteratorType itrType){
         switch(itrType.name){
         case "AscendingItr":
         case "BidirectionalItr":
         case "DescendingItr":
-            return Set.of(IllegalModification.ModCollection,IllegalModification.NoMod);
+            return EnumSet.of(IllegalModification.ModCollection,IllegalModification.NoMod);
         case "SubAscendingItr":
         case "SubBidirectionalItr":
-            return Set.of(IllegalModification.ModCollection,IllegalModification.NoMod,IllegalModification.ModParent,
+            return EnumSet.of(IllegalModification.ModCollection,IllegalModification.NoMod,IllegalModification.ModParent,
                     IllegalModification.ModRoot);
         }
         throw new UnsupportedOperationException("Unknown itrType " + itrType);
     }
-    private static Set<MonitoredFunctionGen> initValidMonitoredFunctionGens(IteratorType itrType){
+    private static EnumSet<MonitoredFunctionGen> initValidMonitoredFunctionGens(IteratorType itrType){
         switch(itrType.name){
         case "AscendingItr":
         case "BidirectionalItr":
         case "DescendingItr":
-            return Set.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.ModItr,MonitoredFunctionGen.NoThrow,
+            return EnumSet.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.ModItr,
+                    MonitoredFunctionGen.NoThrow,
                     MonitoredFunctionGen.ThrowIOB,MonitoredFunctionGen.ThrowIOBModCollection,
                     MonitoredFunctionGen.ThrowIOBModItr);
         case "SubAscendingItr":
         case "SubBidirectionalItr":
-            return Set.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.ModItr,MonitoredFunctionGen.NoThrow,
+            return EnumSet.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.ModItr,
+                    MonitoredFunctionGen.NoThrow,
                     MonitoredFunctionGen.ThrowIOB,MonitoredFunctionGen.ThrowIOBModCollection,
                     MonitoredFunctionGen.ThrowIOBModItr,MonitoredFunctionGen.ModParent,MonitoredFunctionGen.ModRoot,
                     MonitoredFunctionGen.ThrowIOBModParent,MonitoredFunctionGen.ThrowIOBModRoot);

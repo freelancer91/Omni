@@ -420,10 +420,11 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             });
         }
     }
-    @SuppressWarnings("unchecked") default boolean verifyRemoveIf(MonitoredRemoveIfPredicateGen filterGen,FunctionCallType functionCallType,double threshold,long randSeed) {
+    @SuppressWarnings("unchecked")
+    default boolean verifyRemoveIf(MonitoredRemoveIfPredicate filter,FunctionCallType functionCallType){
         COL collection=getCollection();
         DataType dataType=getDataType();
-        var filter=filterGen.getMonitoredRemoveIfPredicate(this,threshold,randSeed);
+        // var filter=filterGen.getMonitoredRemoveIfPredicate(this,threshold,randSeed);
         boolean result;
         switch(dataType) {
         case BOOLEAN:

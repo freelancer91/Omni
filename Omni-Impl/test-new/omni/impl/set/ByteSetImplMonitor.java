@@ -1,6 +1,7 @@
 package omni.impl.set;
 
 import java.io.IOException;
+import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
@@ -50,7 +51,7 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
     }
     ByteSetImplMonitor(CheckedType checkedType,long...expectedWords){
         this.checkedType=checkedType;
-        this.expectedWords=expectedWords;
+        this.expectedWords=Arrays.copyOf(expectedWords,4);
         if(checkedType.checked){
             set=new ByteSetImpl.Checked(expectedWords[0],expectedWords[1],expectedWords[2],expectedWords[3]);
         }else{
@@ -101,14 +102,46 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             int numLeft=0;
             int expectedValOffset=this.expectedValOffset;
             for(int i=(expectedValOffset>>6)+2;i<4;++i) {
-                numLeft+=Long.bitCount(expectedWords[i]>>expectedValOffset);
+                numLeft+=Long.bitCount(expectedWords[i] >>> expectedValOffset);
                 expectedValOffset=0;
             }
             return numLeft;
         }
         @Override
         public void verifyNextResult(DataType outputType,Object result){
-            Assertions.assertEquals(outputType.convertVal(expectedValOffset),result);
+            Assertions.assertEquals(outputType.convertVal((byte)expectedValOffset),result);
+        }
+        @Override
+        public void updateItrNextState(){
+            int expectedValOffset;
+            switch((expectedValOffset=this.expectedValOffset + 1) >> 6){
+            case -2:
+                int tail0s;
+                if((tail0s=Long.numberOfTrailingZeros(expectedWords[0] >>> expectedValOffset)) != 64){
+                    this.expectedValOffset=expectedValOffset + tail0s;
+                    break;
+                }
+                expectedValOffset=-64;
+            case -1:
+                if((tail0s=Long.numberOfTrailingZeros(expectedWords[1] >>> expectedValOffset)) != 64){
+                    this.expectedValOffset=expectedValOffset + tail0s;
+                    break;
+                }
+                expectedValOffset=0;
+            case 0:
+                if((tail0s=Long.numberOfTrailingZeros(expectedWords[2] >>> expectedValOffset)) != 64){
+                    this.expectedValOffset=expectedValOffset + tail0s;
+                    break;
+                }
+                expectedValOffset=64;
+            case 1:
+                if((tail0s=Long.numberOfTrailingZeros(expectedWords[3] >>> expectedValOffset)) != 64){
+                    this.expectedValOffset=expectedValOffset + tail0s;
+                    break;
+                }
+            default:
+                this.expectedValOffset=128;
+            }
         }
 
     }
@@ -120,14 +153,21 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
         @Override public void verifyForEachRemaining(MonitoredFunction function){
             var monitoredFunctionItr=function.iterator();
             int expectedValOffset;
-            for(expectedValOffset=this.expectedValOffset;expectedValOffset < 128;++expectedValOffset){
-                if((expectedWords[(expectedValOffset >> 6) + 2] & 1L << expectedValOffset) != 0){
+            if((expectedValOffset=this.expectedValOffset) < 128){
+                outer:for(;;){
                     var v=(Byte)monitoredFunctionItr.next();
                     Assertions.assertEquals(v.byteValue(),expectedValOffset);
+                    for(;++expectedValOffset != 128;){
+                        if((expectedWords[(expectedValOffset >> 6) + 2] & 1L << expectedValOffset) != 0){
+                            continue outer;
+                        }
+                    }
+                    break;
                 }
+            this.expectedValOffset=128;
             }
             Assertions.assertFalse(monitoredFunctionItr.hasNext());
-            this.expectedValOffset=128;
+
         }
 
 
@@ -136,35 +176,6 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
         }
 
 
-        @Override
-        public void updateItrNextState(){
-            int expectedValOffset;
-            switch((expectedValOffset=this.expectedValOffset + 1) >> 6){
-            case -2:
-                if((expectedValOffset=Long.numberOfTrailingZeros(expectedWords[0] >>> expectedValOffset)) != 64){
-                    this.expectedValOffset=expectedValOffset - 128;
-                    break;
-                }
-                expectedValOffset=0;
-            case -1:
-                if((expectedValOffset=Long.numberOfTrailingZeros(expectedWords[1] >>> expectedValOffset)) != 64){
-                    this.expectedValOffset=expectedValOffset - 64;
-                    break;
-                }
-                expectedValOffset=0;
-            case 0:
-                if((expectedValOffset=Long.numberOfTrailingZeros(expectedWords[2] >>> expectedValOffset)) != 64){
-                    this.expectedValOffset=expectedValOffset;
-                    break;
-                }
-                expectedValOffset=0;
-            case 1:
-                this.expectedValOffset=Long.numberOfTrailingZeros(expectedWords[3] >>> expectedValOffset) + 64;
-                break;
-            default:
-                this.expectedValOffset=128;
-            }
-        }
 
         @Override
         public void updateItrRemoveState(){
@@ -212,20 +223,37 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             this.expectedItrModCount=expectedItrModCount;
             this.expectedItrLastRet=-129;
         }
+        @Override
+        public void updateItrNextState(){
+            this.expectedItrLastRet=expectedValOffset;
+            super.updateItrNextState();
+        }
         @Override public void verifyForEachRemaining(MonitoredFunction function){
             var monitoredFunctionItr=function.iterator();
             int expectedValOffset;
-            int expectedLastRet;
-            for(expectedLastRet=expectedValOffset=this.expectedValOffset;expectedValOffset < 128;++expectedValOffset){
-                if((expectedWords[(expectedValOffset >> 6) + 2] & 1L << expectedValOffset) != 0){
+            if((expectedValOffset=this.expectedValOffset) < 128){
+                int expectedLastRet;
+                outer:for(;;){
                     var v=(Byte)monitoredFunctionItr.next();
                     Assertions.assertEquals(v.byteValue(),expectedValOffset);
                     expectedLastRet=expectedValOffset;
+                    for(;++expectedValOffset != 128;){
+                        if((expectedWords[(expectedValOffset >> 6) + 2] & 1L << expectedValOffset) != 0){
+                            continue outer;
+                        }
+                    }
+                    break;
                 }
+                this.expectedValOffset=128;
+                this.expectedItrLastRet=expectedLastRet;
             }
-            Assertions.assertFalse(monitoredFunctionItr.hasNext());
-            this.expectedValOffset=128;
-            this.expectedItrLastRet=expectedLastRet;
+            switch(function.getMonitoredFunctionGen()){
+            default:
+            case ThrowIOBModItr:
+                Assertions.assertFalse(monitoredFunctionItr.hasNext());
+            case ModItr:
+            }
+
         }
         @Override public void updateIteratorState(){
             this.expectedValOffset=FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.valOffset(itr);
@@ -247,36 +275,7 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
             ++expectedItrModCount;
             expectedItrLastRet=-129;
         }
-        @Override
-        public void updateItrNextState(){
-            this.expectedItrLastRet=expectedValOffset;
-            int expectedValOffset;
-            switch((expectedValOffset=this.expectedValOffset + 1) >> 6){
-            case -2:
-                if((expectedValOffset=Long.numberOfTrailingZeros(expectedWords[3] >>> expectedValOffset)) != 64){
-                    this.expectedValOffset=expectedValOffset - 128;
-                    break;
-                }
-                expectedValOffset=0;
-            case -1:
-                if((expectedValOffset=Long.numberOfTrailingZeros(expectedWords[3] >>> expectedValOffset)) != 64){
-                    this.expectedValOffset=expectedValOffset - 64;
-                    break;
-                }
-                expectedValOffset=0;
-            case 0:
-                if((expectedValOffset=Long.numberOfTrailingZeros(expectedWords[3] >>> expectedValOffset)) != 64){
-                    this.expectedValOffset=expectedValOffset;
-                    break;
-                }
-                expectedValOffset=0;
-            case 1:
-                this.expectedValOffset=Long.numberOfTrailingZeros(expectedWords[3] >>> expectedValOffset) + 64;
-                break;
-            default:
-                this.expectedValOffset=128;
-            }
-        }
+
 
 
     }
