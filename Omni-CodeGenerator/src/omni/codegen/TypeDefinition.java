@@ -139,6 +139,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","0x7ffc000000000000L"));
         defVars.add(new DefVar("POS0_TABLE_VAL","0xfffc000000000000L"));
+        defVars.add(new DefVar("convertBitsToVal","Double.longBitsToDouble"));
         return defVars;
     }
     private static List<DefVar> getOfFloat(){
@@ -172,6 +173,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("EMPTY_TABLE_VAL","0"));
         defVars.add(new DefVar("DELETED_TABLE_VAL","0x7fe00000"));
         defVars.add(new DefVar("POS0_TABLE_VAL","0xffe00000"));
+        defVars.add(new DefVar("convertBitsToVal","Float.intBitsToFloat"));
         return defVars;
     }
     private static List<DefVar> getOfInt(){

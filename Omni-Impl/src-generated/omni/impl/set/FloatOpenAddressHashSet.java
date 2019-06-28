@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.function.FloatConsumer;
@@ -322,10 +323,11 @@ implements OmniSet.OfFloat{
   {
       int size;
       this.size=size=in.readInt();
-      this.loadFactor=0.75f;
+      float loadFactor;
+      this.loadFactor=loadFactor=in.readFloat();
       if(size != 0){
         int tableSize;
-        maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
+        maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
         int[] table;
         this.table=table=new int[tableSize];
         do {
@@ -731,6 +733,7 @@ implements OmniSet.OfFloat{
   public void writeExternal(ObjectOutput out) throws IOException{
       int size;
       out.writeInt(size=this.size);
+      out.writeFloat(this.loadFactor);
       if(size != 0){
         int[] table;
         for(int i=(table=this.table).length;--i>=0;) {
@@ -1156,21 +1159,22 @@ implements OmniSet.OfFloat{
           }
       }
       private void uncheckedForEachRemaining(int offset,FloatConsumer action){
-            var table=root.table;
-            do{
-                int tableVal;
-                switch(tableVal=table[offset]){
-                case 0xffe00000:
-                    action.accept(0.0f);
-                    break;
-                default:
-                    action.accept(Float.intBitsToFloat(tableVal));
-                case 0:
-                case 0x7fe00000:
-                }
-            }while(--offset != -1);
-            this.offset=-1;
+        int[] table;
+        int tableVal;
+        action.accept((tableVal=(table=root.table)[offset])==0xffe00000?((float)0):Float.intBitsToFloat(tableVal));
+        while(--offset!=-1){    
+          switch(tableVal=table[offset]){
+            case 0xffe00000:
+                action.accept(0.0f);
+                break;
+            default:
+                action.accept(Float.intBitsToFloat(tableVal));
+            case 0:
+            case 0x7fe00000:
+          }
         }
+        this.offset=-1;
+      }
   }
   public static class Checked extends FloatOpenAddressHashSet{
     transient int modCount;
@@ -1181,13 +1185,16 @@ implements OmniSet.OfFloat{
       super(that);
     }
     public Checked(int initialCapacity){
-      super(initialCapacity);
+      super(validateInitialCapacity(initialCapacity));
     }
     public Checked(float loadFactor){
-        super(loadFactor);
+        super(validateLoadFactor(loadFactor));
     }
     public Checked(int initialCapacity,float loadFactor){
-        super(initialCapacity,loadFactor);
+        super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
+    }
+    @Override void updateMaxTableSize(float loadFactor){
+      super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
     @Override public void clear(){
       if(this.size != 0){
@@ -1372,15 +1379,15 @@ implements OmniSet.OfFloat{
         return new Itr(this);
       }
       @Override public void forEachRemaining(FloatConsumer action){
-        int offset;
-        if((offset=this.offset)!=-1){
-          uncheckedForEachRemaining(offset,action);
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
+          uncheckedForEachRemaining(expectedOffset,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        int offset;
-        if((offset=this.offset)!=-1){
-          uncheckedForEachRemaining(offset,action::accept);
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
+          uncheckedForEachRemaining(expectedOffset,action::accept);
         }
       }
       @Override
@@ -1431,14 +1438,16 @@ implements OmniSet.OfFloat{
           }
           throw new IllegalStateException();
       }
-      private void uncheckedForEachRemaining(int offset,FloatConsumer action){
+      private void uncheckedForEachRemaining(final int expectedOffset,FloatConsumer action){
           var root=this.root;
           int modCount=this.modCount;
-          int lastRet=offset;
+          int lastRet;
+          int offset;
           try{
-              var table=root.table;
-              do{
-                  int tableVal;
+              int[] table;
+              int tableVal;
+              action.accept((tableVal=(table=root.table)[offset=lastRet=expectedOffset])==0xffe00000?((float)0):Float.intBitsToFloat(tableVal));
+              while(--offset!=-1){
                   switch(tableVal=table[offset]){
                   case 0xffe00000:
                       action.accept(0.0f);
@@ -1450,9 +1459,11 @@ implements OmniSet.OfFloat{
                   case 0:
                   case 0x7fe00000:
                   }
-              }while(--offset != -1);
+              }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.offset=-1;
           this.lastRet=lastRet;

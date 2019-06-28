@@ -25,6 +25,11 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
             this.expectedOffset=expectedOffset;
             this.expectedNumLeft=expectedNumLeft;
         }
+        @Override
+        public void iterateForward(){
+            MonitoredSet.MonitoredSetIterator.super.iterateForward();
+            --expectedNumLeft;
+        }
         @Override public OmniIterator<?> getIterator(){
             return itr;
         }
@@ -44,129 +49,137 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
             }else{
                 updateItrNextFromTable(expectedOffset - 256);
             }
+            --expectedNumLeft;
         }
-
+        @Override
+        public void modItr(){
+            MonitoredSet.MonitoredSetIterator.super.modItr();
+            --expectedNumLeft;
+        }
         private int verifyForEachRemainingHelper(MonitoredFunction function,int expectedLastRet){
             final var monitoredFunctionItr=function.iterator();
-            int expectedOffset=this.expectedOffset;
-            switch(dataType){
-            case CHAR:{
-                if(expectedOffset < 256){
-                    do{
-                        if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
-                            final var v=(Character)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.charValue(),expectedOffset);
-                            expectedLastRet=expectedOffset;
-                        }
-                    }while(++expectedOffset != 256);
-                }
-                expectedOffset-=256;
-                int expectedTableSize;
-                if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
-                    final char[] table=(char[])expectedTable;
-                    for(;;++expectedOffset){
-                        char tableVal;
-                        if(((tableVal=table[expectedOffset]) & -2) != 0){
-                            final var v=(Character)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.charValue(),tableVal);
-                            expectedLastRet=expectedOffset + 256;
-                            if(--expectedTableSize == 0){
-                                break;
+            int expectedOffset;
+            if((expectedOffset=this.expectedOffset) != -1){
+                switch(dataType){
+                case CHAR:{
+                    if(expectedOffset < 256){
+                        do{
+                            if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
+                                final var v=(Character)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.charValue(),expectedOffset);
+                                expectedLastRet=expectedOffset;
+                            }
+                        }while(++expectedOffset != 256);
+                    }
+                    expectedOffset-=256;
+                    int expectedTableSize;
+                    if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
+                        final char[] table=(char[])expectedTable;
+                        for(;;++expectedOffset){
+                            char tableVal;
+                            if(((tableVal=table[expectedOffset]) & -2) != 0){
+                                final var v=(Character)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.charValue(),tableVal);
+                                expectedLastRet=expectedOffset + 256;
+                                if(--expectedTableSize == 0){
+                                    break;
+                                }
                             }
                         }
                     }
+                    break;
                 }
-                break;
-            }
-            case SHORT:{
-                if(expectedOffset < 256){
-                    do{
-                        if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
-                            final var v=(Short)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.shortValue(),expectedOffset - 128);
-                            expectedLastRet=expectedOffset;
-                        }
-                    }while(++expectedOffset != 256);
-                }
-                expectedOffset-=256;
-                int expectedTableSize;
-                if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
-                    final short[] table=(short[])expectedTable;
-                    for(;;++expectedOffset){
-                        short tableVal;
-                        if(((tableVal=table[expectedOffset]) & -2) != 0){
-                            final var v=(Short)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.shortValue(),tableVal);
-                            expectedLastRet=expectedOffset + 256;
-                            if(--expectedTableSize == 0){
-                                break;
+                case SHORT:{
+                    if(expectedOffset < 256){
+                        do{
+                            if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
+                                final var v=(Short)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.shortValue(),expectedOffset - 128);
+                                expectedLastRet=expectedOffset;
+                            }
+                        }while(++expectedOffset != 256);
+                    }
+                    expectedOffset-=256;
+                    int expectedTableSize;
+                    if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
+                        final short[] table=(short[])expectedTable;
+                        for(;;++expectedOffset){
+                            short tableVal;
+                            if(((tableVal=table[expectedOffset]) & -2) != 0){
+                                final var v=(Short)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.shortValue(),tableVal);
+                                expectedLastRet=expectedOffset + 256;
+                                if(--expectedTableSize == 0){
+                                    break;
+                                }
                             }
                         }
                     }
+                    break;
                 }
-                break;
-            }
-            case INT:{
-                if(expectedOffset < 256){
-                    do{
-                        if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
-                            final var v=(Integer)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.intValue(),expectedOffset - 128);
-                            expectedLastRet=expectedOffset;
-                        }
-                    }while(++expectedOffset != 256);
-                }
-                expectedOffset-=256;
-                int expectedTableSize;
-                if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
-                    final int[] table=(int[])expectedTable;
-                    for(;;++expectedOffset){
-                        int tableVal;
-                        if(((tableVal=table[expectedOffset]) & -2) != 0){
-                            final var v=(Integer)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.intValue(),tableVal);
-                            expectedLastRet=expectedOffset + 256;
-                            if(--expectedTableSize == 0){
-                                break;
+                case INT:{
+                    if(expectedOffset < 256){
+                        do{
+                            if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
+                                final var v=(Integer)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.intValue(),expectedOffset - 128);
+                                expectedLastRet=expectedOffset;
+                            }
+                        }while(++expectedOffset != 256);
+                    }
+                    expectedOffset-=256;
+                    int expectedTableSize;
+                    if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
+                        final int[] table=(int[])expectedTable;
+                        for(;;++expectedOffset){
+                            int tableVal;
+                            if(((tableVal=table[expectedOffset]) & -2) != 0){
+                                final var v=(Integer)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.intValue(),tableVal);
+                                expectedLastRet=expectedOffset + 256;
+                                if(--expectedTableSize == 0){
+                                    break;
+                                }
                             }
                         }
                     }
+                    break;
                 }
-                break;
-            }
-            case LONG:{
-                if(expectedOffset < 256){
-                    do{
-                        if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
-                            final var v=(Long)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.longValue(),expectedOffset - 128);
-                            expectedLastRet=expectedOffset;
-                        }
-                    }while(++expectedOffset != 256);
-                }
-                expectedOffset-=256;
-                int expectedTableSize;
-                if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
-                    final long[] table=(long[])expectedTable;
-                    for(;;++expectedOffset){
-                        long tableVal;
-                        if(((tableVal=table[expectedOffset]) & -2) != 0){
-                            final var v=(Long)monitoredFunctionItr.next();
-                            Assertions.assertEquals(v.longValue(),tableVal);
-                            expectedLastRet=expectedOffset + 256;
-                            if(--expectedTableSize == 0){
-                                break;
+                case LONG:{
+                    if(expectedOffset < 256){
+                        do{
+                            if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
+                                final var v=(Long)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.longValue(),expectedOffset - 128);
+                                expectedLastRet=expectedOffset;
+                            }
+                        }while(++expectedOffset != 256);
+                    }
+                    expectedOffset-=256;
+                    int expectedTableSize;
+                    if((expectedTableSize=IntegralOpenAddressHashSetMonitor.this.expectedTableSize) != 0){
+                        final long[] table=(long[])expectedTable;
+                        for(;;++expectedOffset){
+                            long tableVal;
+                            if(((tableVal=table[expectedOffset]) & -2) != 0){
+                                final var v=(Long)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.longValue(),tableVal);
+                                expectedLastRet=expectedOffset + 256;
+                                if(--expectedTableSize == 0){
+                                    break;
+                                }
                             }
                         }
                     }
+                    break;
                 }
-                break;
-            }
-            default:
-                throw DataType.invalidDataType(dataType);
+                default:
+                    throw DataType.invalidDataType(dataType);
+                }
             }
             Assertions.assertFalse(monitoredFunctionItr.hasNext());
             this.expectedOffset=-1;
+            this.expectedNumLeft=0;
             return expectedLastRet;
         }
         void updateItrNextFromTable(int expectedOffset){
@@ -174,56 +187,60 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
             case CHAR:{
                 char[] table;
                 for(final int tableLength=(table=(char[])expectedTable).length;;){
-                    if((table[expectedOffset] & -2) != 0){
-                        this.expectedOffset=expectedOffset + 256;
-                        break;
-                    }
                     if(++expectedOffset == tableLength){
                         this.expectedOffset=-1;
                         break;
                     }
+                    if((table[expectedOffset] & -2) != 0){
+                        this.expectedOffset=expectedOffset + 256;
+                        break;
+                    }
+
                 }
                 break;
             }
             case SHORT:{
                 short[] table;
                 for(final int tableLength=(table=(short[])expectedTable).length;;){
-                    if((table[expectedOffset] & -2) != 0){
-                        this.expectedOffset=expectedOffset + 256;
-                        break;
-                    }
                     if(++expectedOffset == tableLength){
                         this.expectedOffset=-1;
                         break;
                     }
+                    if((table[expectedOffset] & -2) != 0){
+                        this.expectedOffset=expectedOffset + 256;
+                        break;
+                    }
+
                 }
                 break;
             }
             case INT:{
                 int[] table;
                 for(final int tableLength=(table=(int[])expectedTable).length;;){
-                    if((table[expectedOffset] & -2) != 0){
-                        this.expectedOffset=expectedOffset + 256;
-                        break;
-                    }
                     if(++expectedOffset == tableLength){
                         this.expectedOffset=-1;
                         break;
                     }
+                    if((table[expectedOffset] & -2) != 0){
+                        this.expectedOffset=expectedOffset + 256;
+                        break;
+                    }
+
                 }
                 break;
             }
             case LONG:{
                 long[] table;
                 for(final int tableLength=(table=(long[])expectedTable).length;;){
-                    if((table[expectedOffset] & -2) != 0){
-                        this.expectedOffset=expectedOffset + 256;
-                        break;
-                    }
                     if(++expectedOffset == tableLength){
                         this.expectedOffset=-1;
                         break;
                     }
+                    if((table[expectedOffset] & -2) != 0){
+                        this.expectedOffset=expectedOffset + 256;
+                        break;
+                    }
+
                 }
                 break;
             }
@@ -232,151 +249,101 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
             }
         }
         void updateItrNextFromWords(int expectedOffset){
-            switch(dataType){
-            case CHAR:{
-                int bitIndex=++expectedOffset >> 6;
-                        if(bitIndex < 4){
-                            do{
-                                if((expectedOffset=Long.numberOfTrailingZeros(expectedWords[bitIndex] >>> expectedOffset)) != 64){
-                                    this.expectedOffset=expectedOffset + (bitIndex << 6);
-                                    return;
-                                }
-                                expectedOffset=0;
-                            }while(++bitIndex < 4);
-                        }else{
-                            expectedOffset-=256;
-                        }
-                        if(expectedTableSize != 0){
-                            final char[] table=(char[])expectedTable;
-                            for(;;++expectedOffset){
-                                if((table[expectedOffset] & -2) != 0){
-                                    this.expectedOffset=expectedOffset + 256;
-                                    return;
-                                }
-                            }
-                        }else{
-                            this.expectedOffset=-1;
-                        }
-                        break;
-            }
-            case SHORT:{
-                int bitIndex=(++expectedOffset >> 6) + 2;
-                if(bitIndex < 4){
-                    do{
-                        if((expectedOffset=Long.numberOfTrailingZeros(expectedWords[bitIndex] >>> expectedOffset)) != 64){
-                            this.expectedOffset=expectedOffset + (bitIndex << 6);
-                            return;
-                        }
-                        expectedOffset=0;
-                    }while(++bitIndex < 4);
-                }else{
-                    expectedOffset-=128;
+            while(++expectedOffset < 256){
+                if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
+                    this.expectedOffset=expectedOffset;
+                    return;
                 }
-                if(expectedTableSize != 0){
+            }
+            expectedOffset-=256;
+            if(expectedTableSize != 0){
+                switch(dataType){
+                case CHAR:{
+                    final char[] table=(char[])expectedTable;
+                    for(;;++expectedOffset){
+                        if((table[expectedOffset] & -2) != 0){
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case SHORT:{
                     final short[] table=(short[])expectedTable;
                     for(;;++expectedOffset){
                         if((table[expectedOffset] & -2) != 0){
-                            this.expectedOffset=expectedOffset + 256;
-                            return;
+                            break;
                         }
                     }
-                }else{
-                    this.expectedOffset=-1;
+                    break;
                 }
-                break;
-            }
-            case INT:{
-                int bitIndex=(++expectedOffset >> 6) + 2;
-                if(bitIndex < 4){
-                    do{
-                        if((expectedOffset=Long.numberOfTrailingZeros(expectedWords[bitIndex] >>> expectedOffset)) != 64){
-                            this.expectedOffset=expectedOffset + (bitIndex << 6);
-                            return;
-                        }
-                        expectedOffset=0;
-                    }while(++bitIndex < 4);
-                }else{
-                    expectedOffset-=128;
-                }
-                if(expectedTableSize != 0){
+                case INT:{
                     final int[] table=(int[])expectedTable;
                     for(;;++expectedOffset){
                         if((table[expectedOffset] & -2) != 0){
-                            this.expectedOffset=expectedOffset + 256;
-                            return;
+                            break;
                         }
                     }
-                }else{
-                    this.expectedOffset=-1;
+                    break;
                 }
-                break;
-            }
-            case LONG:{
-                int bitIndex=(++expectedOffset >> 6) + 2;
-                if(bitIndex < 4){
-                    do{
-                        if((expectedOffset=Long.numberOfTrailingZeros(expectedWords[bitIndex] >>> expectedOffset)) != 64){
-                            this.expectedOffset=expectedOffset + (bitIndex << 6);
-                            return;
-                        }
-                        expectedOffset=0;
-                    }while(++bitIndex < 4);
-                }else{
-                    expectedOffset-=128;
-                }
-                if(expectedTableSize != 0){
+                case LONG:{
                     final long[] table=(long[])expectedTable;
                     for(;;++expectedOffset){
-                        if((table[expectedOffset] & -2) != 0){
-                            this.expectedOffset=expectedOffset + 256;
-                            return;
+                        if((table[expectedOffset] & -2L) != 0){
+                            break;
                         }
                     }
-                }else{
-                    this.expectedOffset=-1;
+                    break;
                 }
-                break;
+                default:
+                    throw DataType.invalidDataType(dataType);
+                }
+                this.expectedOffset=expectedOffset + 256;
+            }else{
+                this.expectedOffset=-1;
             }
-            default:
-                throw DataType.invalidDataType(dataType);
-            }
+
         }
         @Override
         public void verifyNextResult(DataType outputType,Object result){
+            Object expectedResult;
             if(expectedOffset < 256){
+
                 switch(dataType){
                 case CHAR:
-                    Assertions.assertEquals(outputType.convertVal(expectedOffset),result);
+                    expectedResult=outputType.convertVal((char)expectedOffset);
                     break;
                 case SHORT:
+                    expectedResult=outputType.convertVal((short)(expectedOffset - 128));
+                    break;
                 case INT:
+                    expectedResult=outputType.convertVal(expectedOffset - 128);
+                    break;
                 case LONG:
-                    Assertions.assertEquals(outputType.convertVal(expectedOffset - 128),result);
+                    expectedResult=outputType.convertVal((long)(expectedOffset - 128));
                     break;
                 default:
                     throw DataType.invalidDataType(dataType);
                 }
+
             }else{
                 switch(dataType){
                 case CHAR:
-                    Assertions.assertEquals(outputType.convertVal(((char[])expectedTable)[expectedOffset - 256]),
-                            result);
+                    expectedResult=outputType.convertVal(((char[])expectedTable)[expectedOffset - 256]);
                     break;
                 case SHORT:
-                    Assertions.assertEquals(outputType.convertVal(((short[])expectedTable)[expectedOffset - 256]),
-                            result);
+                    expectedResult=outputType.convertVal(((short[])expectedTable)[expectedOffset - 256]);
                     break;
                 case INT:
-                    Assertions.assertEquals(outputType.convertVal(((int[])expectedTable)[expectedOffset - 256]),result);
+                    expectedResult=outputType.convertValUnchecked(((int[])expectedTable)[expectedOffset - 256]);
                     break;
                 case LONG:
-                    Assertions.assertEquals(outputType.convertVal(((long[])expectedTable)[expectedOffset - 256]),
-                            result);
+                    expectedResult=outputType.convertValUnchecked(((long[])expectedTable)[expectedOffset - 256]);
                     break;
                 default:
                     throw DataType.invalidDataType(dataType);
                 }
             }
+            Assertions.assertEquals(expectedResult,result);
         }
     }
     class CheckedItrMonitor extends AbstractItrMonitor{
@@ -686,6 +653,205 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
     int expectedModCount;
     int expectedTableLength;
     Object expectedTable;
+    IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,int initialCapacity,float loadFactor){
+        switch(dataType){
+        case CHAR:
+            if(checkedType.checked){
+                this.set=new CharOpenAddressHashSet.Checked(initialCapacity,loadFactor);
+            }else{
+                this.set=new CharOpenAddressHashSet(initialCapacity,loadFactor);
+            }
+            break;
+        case SHORT:
+            if(checkedType.checked){
+                this.set=new ShortOpenAddressHashSet.Checked(initialCapacity,loadFactor);
+            }else{
+                this.set=new ShortOpenAddressHashSet(initialCapacity,loadFactor);
+            }
+            break;
+        case INT:
+            if(checkedType.checked){
+                this.set=new IntOpenAddressHashSet.Checked(initialCapacity,loadFactor);
+            }else{
+                this.set=new IntOpenAddressHashSet(initialCapacity,loadFactor);
+            }
+            break;
+        case LONG:
+            if(checkedType.checked){
+                this.set=new LongOpenAddressHashSet.Checked(initialCapacity,loadFactor);
+            }else{
+                this.set=new LongOpenAddressHashSet(initialCapacity,loadFactor);
+            }
+            break;
+        default:
+            throw DataType.invalidDataType(dataType);
+        }
+        this.checkedType=checkedType;
+        this.dataType=dataType;
+        this.expectedWords=new long[4];
+        updateCollectionState();
+    }
+    IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,float loadFactor){
+        switch(dataType){
+        case CHAR:
+            if(checkedType.checked){
+                this.set=new CharOpenAddressHashSet.Checked(loadFactor);
+            }else{
+                this.set=new CharOpenAddressHashSet(loadFactor);
+            }
+            break;
+        case SHORT:
+            if(checkedType.checked){
+                this.set=new ShortOpenAddressHashSet.Checked(loadFactor);
+            }else{
+                this.set=new ShortOpenAddressHashSet(loadFactor);
+            }
+            break;
+        case INT:
+            if(checkedType.checked){
+                this.set=new IntOpenAddressHashSet.Checked(loadFactor);
+            }else{
+                this.set=new IntOpenAddressHashSet(loadFactor);
+            }
+            break;
+        case LONG:
+            if(checkedType.checked){
+                this.set=new LongOpenAddressHashSet.Checked(loadFactor);
+            }else{
+                this.set=new LongOpenAddressHashSet(loadFactor);
+            }
+            break;
+        default:
+            throw DataType.invalidDataType(dataType);
+        }
+        this.checkedType=checkedType;
+        this.dataType=dataType;
+        this.expectedWords=new long[4];
+        updateCollectionState();
+    }
+    IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,int initialCapacity){
+        switch(dataType){
+        case CHAR:
+            if(checkedType.checked){
+                this.set=new CharOpenAddressHashSet.Checked(initialCapacity);
+            }else{
+                this.set=new CharOpenAddressHashSet(initialCapacity);
+            }
+            break;
+        case SHORT:
+            if(checkedType.checked){
+                this.set=new ShortOpenAddressHashSet.Checked(initialCapacity);
+            }else{
+                this.set=new ShortOpenAddressHashSet(initialCapacity);
+            }
+            break;
+        case INT:
+            if(checkedType.checked){
+                this.set=new IntOpenAddressHashSet.Checked(initialCapacity);
+            }else{
+                this.set=new IntOpenAddressHashSet(initialCapacity);
+            }
+            break;
+        case LONG:
+            if(checkedType.checked){
+                this.set=new LongOpenAddressHashSet.Checked(initialCapacity);
+            }else{
+                this.set=new LongOpenAddressHashSet(initialCapacity);
+            }
+            break;
+        default:
+            throw DataType.invalidDataType(dataType);
+        }
+        this.checkedType=checkedType;
+        this.dataType=dataType;
+        this.expectedWords=new long[4];
+        updateCollectionState();
+    }
+    IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType){
+        switch(dataType){
+        case CHAR:
+            if(checkedType.checked){
+                this.set=new CharOpenAddressHashSet.Checked();
+            }else{
+                this.set=new CharOpenAddressHashSet();
+            }
+            break;
+        case SHORT:
+            if(checkedType.checked){
+                this.set=new ShortOpenAddressHashSet.Checked();
+            }else{
+                this.set=new ShortOpenAddressHashSet();
+            }
+            break;
+        case INT:
+            if(checkedType.checked){
+                this.set=new IntOpenAddressHashSet.Checked();
+            }else{
+                this.set=new IntOpenAddressHashSet();
+            }
+            break;
+        case LONG:
+            if(checkedType.checked){
+                this.set=new LongOpenAddressHashSet.Checked();
+            }else{
+                this.set=new LongOpenAddressHashSet();
+            }
+            break;
+        default:
+            throw DataType.invalidDataType(dataType);
+        }
+        this.checkedType=checkedType;
+        this.dataType=dataType;
+        this.expectedWords=new long[4];
+        updateCollectionState();
+    }
+    IntegralOpenAddressHashSetMonitor(DataType dataType,CheckedType checkedType,int initialCapacity,float loadFactor,
+            long...expectedWords){
+        switch(dataType){
+        case CHAR:
+            if(checkedType.checked){
+                this.set=new CharOpenAddressHashSet.Checked(initialCapacity,loadFactor,expectedWords[0],
+                        expectedWords[1],expectedWords[2],expectedWords[3]);
+            }else{
+                this.set=new CharOpenAddressHashSet(initialCapacity,loadFactor,expectedWords[0],expectedWords[1],
+                        expectedWords[2],expectedWords[3]);
+            }
+            break;
+        case SHORT:
+            if(checkedType.checked){
+                this.set=new ShortOpenAddressHashSet.Checked(initialCapacity,loadFactor,expectedWords[0],
+                        expectedWords[1],expectedWords[2],expectedWords[3]);
+            }else{
+                this.set=new ShortOpenAddressHashSet(initialCapacity,loadFactor,expectedWords[0],expectedWords[1],
+                        expectedWords[2],expectedWords[3]);
+            }
+            break;
+        case INT:
+            if(checkedType.checked){
+                this.set=new IntOpenAddressHashSet.Checked(initialCapacity,loadFactor,expectedWords[0],expectedWords[1],
+                        expectedWords[2],expectedWords[3]);
+            }else{
+                this.set=new IntOpenAddressHashSet(initialCapacity,loadFactor,expectedWords[0],expectedWords[1],
+                        expectedWords[2],expectedWords[3]);
+            }
+            break;
+        case LONG:
+            if(checkedType.checked){
+                this.set=new LongOpenAddressHashSet.Checked(initialCapacity,loadFactor,expectedWords[0],
+                        expectedWords[1],expectedWords[2],expectedWords[3]);
+            }else{
+                this.set=new LongOpenAddressHashSet(initialCapacity,loadFactor,expectedWords[0],expectedWords[1],
+                        expectedWords[2],expectedWords[3]);
+            }
+            break;
+        default:
+            throw DataType.invalidDataType(dataType);
+        }
+        this.checkedType=checkedType;
+        this.dataType=dataType;
+        this.expectedWords=new long[4];
+        updateCollectionState();
+    }
     IntegralOpenAddressHashSetMonitor(AbstractIntegralTypeOpenAddressHashSet<?> set,CheckedType checkedType,
             DataType dataType){
         this.set=set;
@@ -753,19 +919,16 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
     @Override public MonitoredIterator<? extends OmniIterator<?>,AbstractIntegralTypeOpenAddressHashSet<?>>
     getMonitoredIterator(){
         int expectedOffset;
-        int numLeft=expectedSize;
+        int numLeft;
         if((numLeft=expectedSize) != 0){
             outer:for(;;){
-                int bitIndex=0;
-                while(bitIndex < 4){
-                    if((expectedOffset=Long.numberOfTrailingZeros(expectedWords[bitIndex])) != 64){
-                        expectedOffset+=bitIndex << 6;
-                        break outer;
-                    }
-                    ++bitIndex;
-                }
                 switch(dataType){
                 case CHAR:{
+                    for(expectedOffset=0;expectedOffset < 256;++expectedOffset){
+                        if((expectedWords[expectedOffset >> 6] & 1L << expectedOffset) != 0){
+                            break outer;
+                        }
+                    }
                     final char[] table=(char[])expectedTable;
                     for(expectedOffset=0;;++expectedOffset){
                         if(table[expectedOffset] > 1){
@@ -775,6 +938,12 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                     }
                 }
                 case SHORT:{
+                    for(expectedOffset=-128;expectedOffset < 128;++expectedOffset){
+                        if((expectedWords[(expectedOffset >> 6) + 2] & 1L << expectedOffset) != 0){
+                            expectedOffset+=128;
+                            break outer;
+                        }
+                    }
                     final short[] table=(short[])expectedTable;
                     for(expectedOffset=0;;++expectedOffset){
                         if((table[expectedOffset] & -2) != 0){
@@ -784,6 +953,12 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                     }
                 }
                 case INT:{
+                    for(expectedOffset=-128;expectedOffset < 128;++expectedOffset){
+                        if((expectedWords[(expectedOffset >> 6) + 2] & 1L << expectedOffset) != 0){
+                            expectedOffset+=128;
+                            break outer;
+                        }
+                    }
                     final int[] table=(int[])expectedTable;
                     for(expectedOffset=0;;++expectedOffset){
                         if((table[expectedOffset] & -2) != 0){
@@ -793,6 +968,12 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                     }
                 }
                 case LONG:{
+                    for(expectedOffset=-128;expectedOffset < 128;++expectedOffset){
+                        if((expectedWords[(expectedOffset >> 6) + 2] & 1L << expectedOffset) != 0){
+                            expectedOffset+=128;
+                            break outer;
+                        }
+                    }
                     final long[] table=(long[])expectedTable;
                     for(expectedOffset=0;;++expectedOffset){
                         if((table[expectedOffset] & -2) != 0){
@@ -1025,8 +1206,9 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                 int expectedTableLength,tableLength;
                 if((expectedTableLength=this.expectedTableLength) != (tableLength=table.length)){
                     Object newExpectedTable;
-                    System.arraycopy(table,0,newExpectedTable=new char[tableLength],0,expectedTableLength);
+                    System.arraycopy(table,0,newExpectedTable=new char[tableLength],0,tableLength);
                     expectedTable=newExpectedTable;
+                    this.expectedTableLength=tableLength;
                 }else{
                     System.arraycopy(table,0,expectedTable,0,expectedTableLength);
                 }
@@ -1046,8 +1228,9 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                 int expectedTableLength,tableLength;
                 if((expectedTableLength=this.expectedTableLength) != (tableLength=table.length)){
                     Object newExpectedTable;
-                    System.arraycopy(table,0,newExpectedTable=new int[tableLength],0,expectedTableLength);
+                    System.arraycopy(table,0,newExpectedTable=new int[tableLength],0,tableLength);
                     expectedTable=newExpectedTable;
+                    this.expectedTableLength=tableLength;
                 }else{
                     System.arraycopy(table,0,expectedTable,0,expectedTableLength);
                 }
@@ -1067,8 +1250,9 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                 int expectedTableLength,tableLength;
                 if((expectedTableLength=this.expectedTableLength) != (tableLength=table.length)){
                     Object newExpectedTable;
-                    System.arraycopy(table,0,newExpectedTable=new long[tableLength],0,expectedTableLength);
+                    System.arraycopy(table,0,newExpectedTable=new long[tableLength],0,tableLength);
                     expectedTable=newExpectedTable;
+                    this.expectedTableLength=tableLength;
                 }else{
                     System.arraycopy(table,0,expectedTable,0,expectedTableLength);
                 }
@@ -1088,8 +1272,9 @@ public class IntegralOpenAddressHashSetMonitor implements MonitoredSet<AbstractI
                 int expectedTableLength,tableLength;
                 if((expectedTableLength=this.expectedTableLength) != (tableLength=table.length)){
                     Object newExpectedTable;
-                    System.arraycopy(table,0,newExpectedTable=new short[tableLength],0,expectedTableLength);
+                    System.arraycopy(table,0,newExpectedTable=new short[tableLength],0,tableLength);
                     expectedTable=newExpectedTable;
+                    this.expectedTableLength=tableLength;
                 }else{
                     System.arraycopy(table,0,expectedTable,0,expectedTableLength);
                 }

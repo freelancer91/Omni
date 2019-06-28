@@ -88,6 +88,20 @@ public class TestExecutorService {
             reset();
         }
     }
+    private static void finishWritingProgressBar(int nextPercent,int totalNumTests){
+        while(nextPercent <= 100){
+            nextPercent=incrementProgressBar(nextPercent);
+        }
+        System.out.println(" Finished " + totalNumTests + " tests!");
+    }
+    private static int incrementProgressBar(int nextPercent){
+        if(nextPercent % 10 == 0){
+            System.out.print(nextPercent + "%");
+        }else{
+            System.out.print('.');
+        }
+        return nextPercent + 1;
+    }
     public static void completeAllTests(String testName) {
         System.out.print("Running test "+testName+" 0%");
         try {
@@ -100,16 +114,11 @@ public class TestExecutorService {
                 final var myTask=tq.poll();
                 int currCompleted;
                 if((currCompleted=tct.get())==tnt) {
-                    System.out.println("100% Finished "+tnt+" tests!");
+                    finishWritingProgressBar(nextPercent,tnt);
                     return;
                 }
                 while(currCompleted>=threshold) {
-                    if(nextPercent%10==0) {
-                        System.out.print(nextPercent+"%");
-                    }else {
-                        System.out.print('.');
-                    }
-                    threshold=(int)Math.ceil(++nextPercent/100.0*tnt);
+                    threshold=(int)Math.ceil((nextPercent=incrementProgressBar(nextPercent)) / 100.0 * tnt);
                 }
                 if(myTask!=null) {
                     myTask.run();
@@ -118,15 +127,12 @@ public class TestExecutorService {
                     //wait for the other threads to finish
                     for(;;) {
                         if((currCompleted=tct.get())==tnt) {
-                            System.out.println("100% Finished "+tnt+" tests!");
+                            finishWritingProgressBar(nextPercent,tnt);
                             return;
-                        }else if(currCompleted>=threshold) {
-                            if(nextPercent%10==0) {
-                                System.out.print(nextPercent+"%");
-                            }else {
-                                System.out.print('.');
+                        }else{
+                            while(currCompleted >= threshold){
+                                threshold=(int)Math.ceil((nextPercent=incrementProgressBar(nextPercent)) / 100.0 * tnt);
                             }
-                            threshold=(int)Math.ceil(++nextPercent/100.0*tnt);
                         }
                         synchronized(m) {
                             m.wait(1000);

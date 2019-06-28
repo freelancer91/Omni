@@ -224,6 +224,26 @@ public enum QueryVal{
             return false;
         }
         @Override
+        public byte getByteVal(){
+            return 0;
+        }
+        @Override
+        public char getCharVal(){
+            return 0;
+        }
+        @Override
+        public short getShortVal(){
+            return 0;
+        }
+        @Override
+        public int getIntVal(){
+            return 0;
+        }
+        @Override
+        public long getLongVal(){
+            return 0;
+        }
+        @Override
         public float getFloatVal(){
             return -0.0f;
         }
@@ -512,6 +532,10 @@ public enum QueryVal{
     },
     MaxByte{
         @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
+        @Override
         public byte getByteVal(){
             return Byte.MAX_VALUE;
         }
@@ -698,6 +722,10 @@ public enum QueryVal{
         }
     },
     MinByte{
+        @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
         @Override
         public byte getByteVal(){
             return Byte.MIN_VALUE;

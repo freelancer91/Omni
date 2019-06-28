@@ -49,6 +49,12 @@ public class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
         }
         this.expectedWords=new long[4];
     }
+    ByteSetImplMonitor(int expectedSize,long...expectedWords){
+        this.checkedType=CheckedType.CHECKED;
+        this.expectedWords=Arrays.copyOf(expectedWords,4);
+        set=new ByteSetImpl.Checked(expectedWords[0],expectedWords[1],expectedWords[2],expectedWords[3],expectedSize);
+        this.expectedSize=expectedSize;
+    }
     ByteSetImplMonitor(CheckedType checkedType,long...expectedWords){
         this.checkedType=checkedType;
         this.expectedWords=Arrays.copyOf(expectedWords,4);

@@ -43,6 +43,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     void updateCollectionState();
     void verifyCollectionState();
     void verifyClone(Object clone);
+
     boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType);
     boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification);
@@ -115,6 +116,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }
         throw DataType.invalidDataType(dataType);
     }
+
     @SuppressWarnings("unchecked") default boolean add(int val) {
         COL collection=getCollection();
         DataType dataType=getDataType();

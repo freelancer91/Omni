@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import java.util.function.DoubleConsumer;
@@ -284,10 +285,11 @@ implements OmniSet.OfDouble{
   {
       int size;
       this.size=size=in.readInt();
-      this.loadFactor=0.75f;
+      float loadFactor;
+      this.loadFactor=loadFactor=in.readFloat();
       if(size != 0){
         int tableSize;
-        maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
+        maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
         long[] table;
         this.table=table=new long[tableSize];
         do {
@@ -614,6 +616,7 @@ implements OmniSet.OfDouble{
   public void writeExternal(ObjectOutput out) throws IOException{
       int size;
       out.writeInt(size=this.size);
+      out.writeFloat(this.loadFactor);
       if(size != 0){
         long[] table;
         for(int i=(table=this.table).length;--i>=0;) {
@@ -957,19 +960,16 @@ implements OmniSet.OfDouble{
           }
       }
       private void uncheckedForEachRemaining(int offset,DoubleConsumer action){
-            var table=root.table;
-            do{
-                long tableVal;
-                if((tableVal=table[offset]) != 0 && tableVal != 0x7ffc000000000000L){
-                    if(tableVal == 0xfffc000000000000L){
-                        action.accept(0.0d);
-                    }else{
-                        action.accept(Double.longBitsToDouble(tableVal));
-                    }
-                }
-            }while(--offset != -1);
-            this.offset=-1;
+        long[] table;
+        long tableVal;
+        action.accept((tableVal=(table=root.table)[offset])==0xfffc000000000000L?((double)0):Double.longBitsToDouble(tableVal));
+        while(--offset!=-1){    
+          if((tableVal=table[offset]) != 0 && tableVal != 0x7ffc000000000000L){
+              action.accept(tableVal == 0xfffc000000000000L?0.0d:Double.longBitsToDouble(tableVal));
+          }
         }
+        this.offset=-1;
+      }
   }
   public static class Checked extends DoubleOpenAddressHashSet{
     transient int modCount;
@@ -980,13 +980,16 @@ implements OmniSet.OfDouble{
       super(that);
     }
     public Checked(int initialCapacity){
-      super(initialCapacity);
+      super(validateInitialCapacity(initialCapacity));
     }
     public Checked(float loadFactor){
-        super(loadFactor);
+        super(validateLoadFactor(loadFactor));
     }
     public Checked(int initialCapacity,float loadFactor){
-        super(initialCapacity,loadFactor);
+        super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
+    }
+    @Override void updateMaxTableSize(float loadFactor){
+      super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
     @Override public void clear(){
       if(this.size != 0){
@@ -1163,15 +1166,15 @@ implements OmniSet.OfDouble{
         return new Itr(this);
       }
       @Override public void forEachRemaining(DoubleConsumer action){
-        int offset;
-        if((offset=this.offset)!=-1){
-          uncheckedForEachRemaining(offset,action);
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
+          uncheckedForEachRemaining(expectedOffset,action);
         }
       }
       @Override public void forEachRemaining(Consumer<? super Double> action){
-        int offset;
-        if((offset=this.offset)!=-1){
-          uncheckedForEachRemaining(offset,action::accept);
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
+          uncheckedForEachRemaining(expectedOffset,action::accept);
         }
       }
       @Override
@@ -1220,25 +1223,25 @@ implements OmniSet.OfDouble{
           }
           throw new IllegalStateException();
       }
-      private void uncheckedForEachRemaining(int offset,DoubleConsumer action){
+      private void uncheckedForEachRemaining(final int expectedOffset,DoubleConsumer action){
           var root=this.root;
           int modCount=this.modCount;
-          int lastRet=offset;
+          int lastRet;
+          int offset;
           try{
-              var table=root.table;
-              do{
-                  long tableVal;
+              long[] table;
+              long tableVal;
+              action.accept((tableVal=(table=root.table)[offset=lastRet=expectedOffset])==0xfffc000000000000L?((double)0):Double.longBitsToDouble(tableVal));
+              while(--offset!=-1){
                   if((tableVal=table[offset])!=0 && tableVal!=0x7ffc000000000000L) {
-                      if(tableVal==0xfffc000000000000L) {
-                          action.accept(0.0d);
-                      }else {
-                          action.accept(Double.longBitsToDouble(tableVal));
-                      }
+                      action.accept(tableVal == 0xfffc000000000000L?0.0d:Double.longBitsToDouble(tableVal));
                       lastRet=offset;
                   }
-              }while(--offset != -1);
+              }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.offset=-1;
           this.lastRet=lastRet;

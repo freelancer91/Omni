@@ -182,7 +182,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
   }
   @Override public boolean contains(char val){
-    switch(val){
+    switch(val>>6){
     case 0:
       return (this.word2&(1L<<val))!=0;
     case 1:
@@ -280,7 +280,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
   }
   private boolean uncheckedRemoveChar(int val) {
     long word;
-    switch(val){
+    switch(val>>6){
     case 0:
       return (word=this.word2) != (this.word2=word & (~(1L<<val)));
     case 1:
@@ -325,15 +325,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(byte)(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -353,15 +352,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(byte)(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -391,15 +389,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(byte)(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -429,15 +426,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(short)(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -467,15 +463,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -505,15 +500,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -543,15 +537,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -581,15 +574,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
       if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
         if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
-          int valBound=-64;
-          do{
-            if((word0 & 1L << --valBound) != 0L){
+          for(int valBound=-65;;--valBound){
+            if((word0 & 1L << valBound) != 0L){
               arr[--size]=(valBound);
               if(size == 0){
                   break;
               }
             }
-          }while(valBound != Byte.MIN_VALUE);
+          }
         }
       }
     }
@@ -658,15 +650,14 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     if((size=processWordForEach(word0,Byte.MIN_VALUE,-64,action,size)) != 0){
       if((size=processWordForEach(word1,-64,0,action,size)) != 0){
         if((size=processWordForEach(word2,0,64,action,size)) != 0){
-          int valOffset=64;
-          do{
+          for(int valOffset=64;;++valOffset){
             if((word3 & 1L << valOffset) != 0L){
               action.accept((byte)valOffset);
               if(--size == 0){
                 break;
               }
             }
-          }while(++valOffset != 128);
+          }
         }
       }
     }
@@ -971,6 +962,8 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
             if(!super.uncheckedRemoveBoolean((boolean)val)) {
               break;
             }
+          }else{
+            break;
           }
           ++this.modCount;
           this.size=size-1;
@@ -1240,13 +1233,13 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
           }
         }
       }
-      private void forEachRemainingHelper(int valOffset,ByteConsumer action){
+      private void forEachRemainingHelper(final int expectedValOffset,ByteConsumer action){
           int modCount=this.modCount;
           final var root=this.root;
           int lastRet;
-          int beforeValOffset=valOffset;
+          int valOffset;
           try{
-              switch((lastRet=beforeValOffset) >> 6){
+              switch((lastRet=valOffset=expectedValOffset) >> 6){
               case -2:
                   lastRet=forEachRemainingHelper(root.word0,valOffset,lastRet,action);
                   valOffset=-64;
@@ -1260,8 +1253,8 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
                   lastRet=forEachRemainingHelper(root.word3,valOffset,lastRet,action);
               }
           }finally{
-              if(modCount!=root.modCount || beforeValOffset!=this.valOffset){
-                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},valOffset{expected="+beforeValOffset+";actual="+this.valOffset+"}");
+              if(modCount!=root.modCount || expectedValOffset!=this.valOffset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},valOffset{expected="+expectedValOffset+";actual="+this.valOffset+"}");
               }
           }
           this.valOffset=128;

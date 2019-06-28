@@ -186,7 +186,7 @@ return (this.wordWORDNUM&(MASK))!=0;
     }
   }
   @Override public boolean contains(char val){
-    switch(val){
+    switch(val>>6){
     case 0:
       #MACRO WordContains(2,1L<<val)
     case 1:
@@ -287,7 +287,7 @@ return (word=this.wordWORDNUM) != (this.wordWORDNUM=word & (MASK));
   }
   private boolean uncheckedRemoveChar(int val) {
     long word;
-    switch(val){
+    switch(val>>6){
     case 0:
       #MACRO RemoveFromWord(2,~(1L<<val))
     case 1:
@@ -317,7 +317,7 @@ return (word=this.wordWORDNUM) != (this.wordWORDNUM=word & (MASK));
   @Override public int size(){
     return size(word0,word1,word2,word3);
   }
-#MACRODEF ToArrayHelper<ARRTYPE>(CAST,BOUND1,BOUND2,BOUND3,BOUND4,BOUND5,DEFAULTARR,MODIFIER)
+#MACRODEF ToArrayHelper<ARRTYPE>(CAST,DEFAULTARR,MODIFIER)
 private static int processWordCopyToArray(long word,int valOffset,int valBound,ARRTYPE[] dst,int dstOffset){
   do{
     if((word & 1L << --valBound) != 0L){
@@ -330,18 +330,17 @@ private static int processWordCopyToArray(long word,int valOffset,int valBound,A
   return dstOffset;
 }
 private static void toArrayHelper(long word0,long word1,long word2,long word3,int size,ARRTYPE[] arr) {
-  if((size=processWordCopyToArray(word3,BOUND4,BOUND5,arr,size)) != 0){
-    if((size=processWordCopyToArray(word2,BOUND3,BOUND4,arr,size)) != 0){
-      if((size=processWordCopyToArray(word1,BOUND2,BOUND3,arr,size)) != 0){
-        int valBound=BOUND2;
-        do{
-          if((word0 & 1L << --valBound) != 0L){
+  if((size=processWordCopyToArray(word3,64,128,arr,size)) != 0){
+    if((size=processWordCopyToArray(word2,0,64,arr,size)) != 0){
+      if((size=processWordCopyToArray(word1,-64,0,arr,size)) != 0){
+        for(int valBound=-65;;--valBound){
+          if((word0 & 1L << valBound) != 0L){
             arr[--size]=CAST(valBound);
             if(size == 0){
                 break;
             }
           }
-        }while(valBound != BOUND1);
+        }
       }
     }
   }
@@ -359,14 +358,14 @@ private static void toArrayHelper(long word0,long word1,long word2,long word3,in
 }
 #ENDIF
 #ENDDEF
-  #MACRO ToArrayHelper<Object>((byte),Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
-  #MACRO ToArrayHelper<Byte>((byte),Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfByte.DEFAULT_BOXED_ARR,)
-  #MACRO ToArrayHelper<byte>((byte),Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfByte.DEFAULT_ARR,Byte)
-  #MACRO ToArrayHelper<short>((short),Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfShort.DEFAULT_ARR,Short)
-  #MACRO ToArrayHelper<int>(,Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfInt.DEFAULT_ARR,Int)
-  #MACRO ToArrayHelper<long>(,Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfLong.DEFAULT_ARR,Long)
-  #MACRO ToArrayHelper<float>(,Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfFloat.DEFAULT_ARR,Float)
-  #MACRO ToArrayHelper<double>(,Byte.MIN_VALUE,-64,0,64,128,OmniArray.OfDouble.DEFAULT_ARR,Double)
+  #MACRO ToArrayHelper<Object>((byte),OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+  #MACRO ToArrayHelper<Byte>((byte),OmniArray.OfByte.DEFAULT_BOXED_ARR,)
+  #MACRO ToArrayHelper<byte>((byte),OmniArray.OfByte.DEFAULT_ARR,Byte)
+  #MACRO ToArrayHelper<short>((short),OmniArray.OfShort.DEFAULT_ARR,Short)
+  #MACRO ToArrayHelper<int>(,OmniArray.OfInt.DEFAULT_ARR,Int)
+  #MACRO ToArrayHelper<long>(,OmniArray.OfLong.DEFAULT_ARR,Long)
+  #MACRO ToArrayHelper<float>(,OmniArray.OfFloat.DEFAULT_ARR,Float)
+  #MACRO ToArrayHelper<double>(,OmniArray.OfDouble.DEFAULT_ARR,Double)
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
     long word0,word1,word2,word3;
     int size;
@@ -424,15 +423,14 @@ return (word=this.wordWORDNUM) != (this.wordWORDNUM=word | (MASK));
     if((size=processWordForEach(word0,Byte.MIN_VALUE,-64,action,size)) != 0){
       if((size=processWordForEach(word1,-64,0,action,size)) != 0){
         if((size=processWordForEach(word2,0,64,action,size)) != 0){
-          int valOffset=64;
-          do{
+          for(int valOffset=64;;++valOffset){
             if((word3 & 1L << valOffset) != 0L){
               action.accept((byte)valOffset);
               if(--size == 0){
                 break;
               }
             }
-          }while(++valOffset != 128);
+          }
         }
       }
     }
@@ -692,6 +690,8 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
             if(!super.uncheckedRemoveBoolean((boolean)val)) {
               break;
             }
+          }else{
+            break;
           }
           ++this.modCount;
           this.size=size-1;
@@ -889,13 +889,13 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
           }
         }
       }
-      private void forEachRemainingHelper(int valOffset,ByteConsumer action){
+      private void forEachRemainingHelper(final int expectedValOffset,ByteConsumer action){
           int modCount=this.modCount;
           final var root=this.root;
           int lastRet;
-          int beforeValOffset=valOffset;
+          int valOffset;
           try{
-              switch((lastRet=beforeValOffset) >> 6){
+              switch((lastRet=valOffset=expectedValOffset) >> 6){
               case -2:
                   lastRet=forEachRemainingHelper(root.word0,valOffset,lastRet,action);
                   valOffset=-64;
@@ -909,8 +909,8 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
                   lastRet=forEachRemainingHelper(root.word3,valOffset,lastRet,action);
               }
           }finally{
-              if(modCount!=root.modCount || beforeValOffset!=this.valOffset){
-                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},valOffset{expected="+beforeValOffset+";actual="+this.valOffset+"}");
+              if(modCount!=root.modCount || expectedValOffset!=this.valOffset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},valOffset{expected="+expectedValOffset+";actual="+this.valOffset+"}");
               }
           }
           this.valOffset=128;

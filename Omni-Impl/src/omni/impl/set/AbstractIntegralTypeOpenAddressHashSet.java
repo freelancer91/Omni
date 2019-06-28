@@ -22,6 +22,16 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet<E> extends Abstract
     AbstractIntegralTypeOpenAddressHashSet(){
         super();
     }
+    AbstractIntegralTypeOpenAddressHashSet(int initialCapacity,float loadFactor,long word0,long word1,long word2,
+            long word3){
+        // for testing purposes
+        super(tableSizeFor(initialCapacity),loadFactor,
+                Long.bitCount(word0) + Long.bitCount(word1) + Long.bitCount(word2) + Long.bitCount(word3));
+        this.word0=word0;
+        this.word1=word1;
+        this.word2=word2;
+        this.word3=word3;
+    }
     AbstractIntegralTypeOpenAddressHashSet(int initialCapacity){
         super(initialCapacity);
     }

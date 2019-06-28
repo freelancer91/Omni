@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import java.util.function.LongConsumer;
@@ -76,6 +77,10 @@ implements OmniSet.OfLong{
   }
   public LongOpenAddressHashSet(int initialCapacity,float loadFactor){
     super(initialCapacity,loadFactor);
+  }
+  LongOpenAddressHashSet(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
+    //for testing purposes
+    super(initialCapacity,loadFactor,word0,word1,word2,word3);
   }
   @Override public boolean add(boolean val){
     long word;
@@ -366,7 +371,8 @@ implements OmniSet.OfLong{
   {
       int size;
       this.size=size=in.readInt();
-      this.loadFactor=0.75f;
+      float loadFactor;
+      this.loadFactor=loadFactor=in.readFloat();
       if(size != 0){
           word0=in.readLong();
           word1=in.readLong();
@@ -375,7 +381,7 @@ implements OmniSet.OfLong{
           tableSize=size=in.readInt();
           if(size != 0){
               int tableSize;
-              maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
+              maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
               long[] table;
               this.table=table=new long[tableSize];
               do{
@@ -1026,6 +1032,7 @@ implements OmniSet.OfLong{
   public void writeExternal(ObjectOutput out) throws IOException{
       int size;
       out.writeInt(size=this.size);
+      out.writeFloat(this.loadFactor);
       if(size != 0){
         out.writeLong(word0);
         out.writeLong(word1);
@@ -1414,7 +1421,7 @@ implements OmniSet.OfLong{
                   offset=i + 64;
               }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
                   offset=i + 128;
-              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+              }else if((i=Long.numberOfTrailingZeros(root.word3)) != 64){
                   offset=i + 192;
               }else{
                   final long[] table=root.table;
@@ -1441,7 +1448,7 @@ implements OmniSet.OfLong{
       @Override public void forEachRemaining(LongConsumer action){
         int offset;
         if((offset=this.offset)<256){
-          forEachRemainingFromWords(offset-128,action);
+          forEachRemainingFromWords(offset,action);
         }else{
           forEachRemainingFromTable(offset-256,action);
         }
@@ -1449,7 +1456,7 @@ implements OmniSet.OfLong{
       @Override public void forEachRemaining(Consumer<? super Long> action){
         int offset;
         if((offset=this.offset)<256){
-          forEachRemainingFromWords(offset-128,action::accept);
+          forEachRemainingFromWords(offset,action::accept);
         }else{
           forEachRemainingFromTable(offset-256,action::accept);
         }
@@ -1458,7 +1465,7 @@ implements OmniSet.OfLong{
       public long nextLong(){
           int offset;
           if((offset=this.offset) < 256){
-              return getNextFromWords(offset - 128);
+              return getNextFromWords(offset);
           }else{
               return getNextFromTable(offset - 256);
           }
@@ -1517,7 +1524,7 @@ implements OmniSet.OfLong{
       private static  void forEachRemainingWordHelper(long word,int offset,LongConsumer action){
           for(long marker=1L << offset;;++offset){
               if((word & marker) != 0){
-                  action.accept((long)offset);
+                  action.accept((long)(offset-128));
               }
               if((marker<<=1) == 0){
                   break;
@@ -1526,31 +1533,30 @@ implements OmniSet.OfLong{
       }
       private void forEachRemainingFromTable(int offset,LongConsumer action){
           long[] table;
-          for(final int tableLength=(table=root.table).length;;){
+          final int tableLength=(table=root.table).length;
+          action.accept(table[offset]);
+          while(++offset!=tableLength){
               long tableVal;
               if(((tableVal=table[offset])&-2)!=0)
               {
                   action.accept(tableVal);
               }
-              if(++offset == tableLength){
-                  this.offset=-1;
-                  return;
-              }
           }
+          this.offset=-1;
       }
       private void forEachRemainingFromWords(int offset,LongConsumer action){
           final var root=this.root;
           switch(offset >> 6){
-          case -2:
-              forEachRemainingWordHelper(root.word0,offset,action);
-              offset=-64;
-          case -1:
-              forEachRemainingWordHelper(root.word1,offset,action);
-              offset=0;
           case 0:
-              forEachRemainingWordHelper(root.word2,offset,action);
+              forEachRemainingWordHelper(root.word0,offset,action);
               offset=64;
           case 1:
+              forEachRemainingWordHelper(root.word1,offset,action);
+              offset=128;
+          case 2:
+              forEachRemainingWordHelper(root.word2,offset,action);
+              offset=192;
+          case 3:
               forEachRemainingWordHelper(root.word3,offset,action);
               int tableSize;
               if((tableSize=root.tableSize) != 0){
@@ -1575,50 +1581,51 @@ implements OmniSet.OfLong{
           long[] table;
           final var ret=(long)(table=root.table)[offset];
           for(final int tableLength=table.length;;){
+              if(++offset==tableLength){
+                this.offset=-1;
+                break;
+              }
               if(((table[offset])&-2)!=0)
               {
-                  this.offset=offset + 256;
-                  break;
-              }
-              if(++offset == tableLength){
-                  this.offset=-1;
-                  break;
+                this.offset=offset + 256;
+                break;
               }
           }
           return ret;
       }
       private long getNextFromWords(int offset){
-          final var ret=(long)offset;
+          final var ret=(long)(offset-128);
             returnVal:for(;;){
                 final var root=this.root;
                 switch(++offset >> 6){
-                case -2:
-                    if((offset=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
-                        this.offset=offset;
-                        break returnVal;
-                    }
-                    offset=0;
-                case -1:
-                    if((offset=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
-                        this.offset=offset + 64;
-                        break returnVal;
-                    }
-                    offset=0;
                 case 0:
-                    if((offset=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
-                        this.offset=offset + 128;
+                    int tail0s;
+                    if((tail0s=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
+                        this.offset=offset+tail0s;
                         break returnVal;
                     }
-                    offset=0;
+                    offset=64;
                 case 1:
-                    if((offset=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
-                        this.offset=offset + 192;
+                    if((tail0s=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
+                        this.offset=offset + tail0s;
+                        break returnVal;
+                    }
+                    offset=128;
+                case 2:
+                    if((tail0s=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
+                        this.offset=offset + tail0s;
+                        break returnVal;
+                    }
+                    offset=192;
+                case 3:
+                    if((tail0s=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
+                        this.offset=offset + tail0s;
                         break returnVal;
                     }
                     offset=0;
                     break;
                 default:
-                    offset-=128;
+                    offset-=256;
                 }
                 if(root.tableSize != 0){
                     final var table=root.table;
@@ -1646,13 +1653,20 @@ implements OmniSet.OfLong{
       super(that);
     }
     public Checked(int initialCapacity){
-      super(initialCapacity);
+      super(validateInitialCapacity(initialCapacity));
     }
     public Checked(float loadFactor){
-        super(loadFactor);
+        super(validateLoadFactor(loadFactor));
     }
     public Checked(int initialCapacity,float loadFactor){
-        super(initialCapacity,loadFactor);
+        super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
+    }
+    Checked(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
+      //for testing purposes
+      super(initialCapacity,loadFactor,word0,word1,word2,word3);
+    }
+    @Override void updateMaxTableSize(float loadFactor){
+      super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
     @Override public boolean add(boolean val){
       if(super.add(val)){
@@ -1885,7 +1899,7 @@ implements OmniSet.OfLong{
                   offset=i + 64;
               }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
                   offset=i + 128;
-              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+              }else if((i=Long.numberOfTrailingZeros(root.word3)) != 64){
                   offset=i + 192;
               }else{
                   final var table=root.table;
@@ -1904,22 +1918,22 @@ implements OmniSet.OfLong{
         return new Itr(this);
       }
       @Override public void forEachRemaining(LongConsumer action){
-        int offset;
-        if((offset=this.offset)!=-1){
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
           if(offset<256){
-            forEachRemainingFromWords(offset - 128,action);
+            forEachRemainingFromWords(expectedOffset,action);
           }else{
-            forEachRemainingFromTable(offset - 256,action);
+            forEachRemainingFromTable(expectedOffset,action);
           }
         }
       }
       @Override public void forEachRemaining(Consumer<? super Long> action){
-        int offset;
-        if((offset=this.offset)!=-1){
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
           if(offset<256){
-            forEachRemainingFromWords(offset - 128,action::accept);
+            forEachRemainingFromWords(expectedOffset,action::accept);
           }else{
-            forEachRemainingFromTable(offset - 256,action::accept);
+            forEachRemainingFromTable(expectedOffset,action::accept);
           }
         }
       }
@@ -1935,7 +1949,7 @@ implements OmniSet.OfLong{
           if((offset=this.offset) != -1){
               this.lastRet=offset;
               if(offset < 256){
-                  return getNextFromWords(root,offset - 128);
+                  return getNextFromWords(root,offset);
               }else{
                   return getNextFromTable(root,offset - 256);
               }
@@ -1977,7 +1991,7 @@ implements OmniSet.OfLong{
       private static int forEachRemainingWordHelper(long word,int offset,int lastRet,LongConsumer action){
           for(long marker=1L << offset;;++offset){
               if((word & marker) != 0){
-                  action.accept((long)offset);
+                  action.accept((long)(offset-128));
                   lastRet=offset;
               }
               if((marker<<=1) == 0){
@@ -1985,44 +1999,47 @@ implements OmniSet.OfLong{
               }
           }
       }
-      private void forEachRemainingFromTable(int offset,LongConsumer action){
+      private void forEachRemainingFromTable(final int expectedOffset,LongConsumer action){
           final int modCount=this.modCount;
           final var root=this.root;
-          int lastRet=this.lastRet;
+          int lastRet;
+          int offset;
           try{
               long[] table;
-              for(final int tableLength=(table=root.table).length;;){
+              final int tableLength=(table=root.table).length;
+              action.accept(table[lastRet=offset=expectedOffset-256]);
+              while(++offset!=tableLength){
                   long tableVal;
                   if(((tableVal=table[offset])&-2)!=0)
                   {
                       action.accept(tableVal);
-                      lastRet=offset + 256;
-                  }
-                  if(++offset == tableLength){
-                      break;
+                      lastRet=offset;
                   }
               }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.offset=-1;
-          this.lastRet=lastRet;
+          this.lastRet=lastRet+256;
       }
-      private void forEachRemainingFromWords(int offset,LongConsumer action){
+      private void forEachRemainingFromWords(final int expectedOffset,LongConsumer action){
           final var root=this.root;
           final int modCount=this.modCount;
           int lastRet=this.lastRet;
+          int offset=expectedOffset;
           try{
               switch(offset >> 6){
-              case -2:
-                  lastRet=forEachRemainingWordHelper(root.word0,offset,lastRet,action);
-                  offset=-64;
-              case -1:
-                  lastRet=forEachRemainingWordHelper(root.word1,offset,lastRet,action);
-                  offset=0;
               case 0:
-                  lastRet=forEachRemainingWordHelper(root.word2,offset,lastRet,action);
+                  lastRet=forEachRemainingWordHelper(root.word0,offset,lastRet,action);
                   offset=64;
+              case 1:
+                  lastRet=forEachRemainingWordHelper(root.word1,offset,lastRet,action);
+                  offset=128;
+              case 2:
+                  lastRet=forEachRemainingWordHelper(root.word2,offset,lastRet,action);
+                  offset=192;
               default:
                   lastRet=forEachRemainingWordHelper(root.word3,offset,lastRet,action);
                   int tableSize;
@@ -2033,16 +2050,19 @@ implements OmniSet.OfLong{
                           if(((tableVal=table[offset])&-2)!=0)
                           {
                               action.accept(tableVal);
-                              lastRet=offset + 256;
+                              lastRet=offset;
                               if(--tableSize == 0){
                                   break;
                               }
                           }
                       }
+                      lastRet+=256;
                   }
               }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.lastRet=lastRet;
           this.offset=-1;
@@ -2051,49 +2071,50 @@ implements OmniSet.OfLong{
           long[] table;
           final var ret=(long)(table=root.table)[offset];
           for(final int tableLength=table.length;;){
+              if(++offset==tableLength){
+                this.offset=-1;
+                break;
+              }
               if(((table[offset])&-2)!=0)
               {
                   this.offset=offset + 256;
-                  break;
-              }
-              if(++offset == tableLength){
-                  this.offset=-1;
                   break;
               }
           }
           return ret;
       }
       private long getNextFromWords(Checked root,int offset){
-          final var ret=(long)offset;
+          final var ret=(long)(offset-128);
           returnVal:for(;;){
               switch(++offset >> 6){
-              case -2:
-                  if((offset=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
-                      this.offset=offset;
-                      break returnVal;
-                  }
-                  offset=0;
-              case -1:
-                  if((offset=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
-                      this.offset=offset + 64;
-                      break returnVal;
-                  }
-                  offset=0;
               case 0:
-                  if((offset=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
-                      this.offset=offset + 128;
+                  int tail0s;
+                  if((tail0s=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
                       break returnVal;
                   }
-                  offset=0;
+                  offset=64;
               case 1:
-                  if((offset=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
-                      this.offset=offset + 192;
+                  if((tail0s=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
+                      break returnVal;
+                  }
+                  offset=128;
+              case 2:
+                  if((tail0s=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
+                      break returnVal;
+                  }
+                  offset=192;
+              case 3:
+                  if((tail0s=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
                       break returnVal;
                   }
                   offset=0;
                   break;
               default:
-                  offset-=128;
+                  offset-=256;
               }
               if(root.tableSize != 0){
                   final var table=root.table;

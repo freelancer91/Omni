@@ -4,6 +4,8 @@ import java.io.Externalizable;
 import omni.api.OmniSet;
 public abstract class AbstractOpenAddressHashSet<E> implements OmniSet<E>,Externalizable,Cloneable{
     static int tableSizeFor(int n){
+        // TODO consider an implementation that allows table sizes to not necessarily be
+        // powers of 2
         if((n=-1 >>> Integer.numberOfLeadingZeros(n - 1)) < 0){
             return 1;
         }else if(n >= 1 << 30){
@@ -35,12 +37,31 @@ public abstract class AbstractOpenAddressHashSet<E> implements OmniSet<E>,Extern
         this.maxTableSize=tableSizeFor(initialCapacity);
         this.loadFactor=loadFactor;
     }
+    AbstractOpenAddressHashSet(int maxTableSize,float loadFactor,int size){
+        // for testing purposes
+        this.maxTableSize=maxTableSize;
+        this.loadFactor=loadFactor;
+        this.size=size;
+    }
+    static int validateInitialCapacity(int initialCapacity){
+        if(initialCapacity < 0){
+            throw new IllegalArgumentException("The initial capacity " + initialCapacity + " is invalid. Must be >= 0");
+        }
+        return initialCapacity;
+    }
+    static float validateLoadFactor(float loadFactor){
+        if(loadFactor <= 0.0f || loadFactor > 1.0f || loadFactor != loadFactor){
+            throw new IllegalArgumentException(
+                    "The loadFactor " + loadFactor + " is invalid. Must be between 0 < loadFactor <= 1");
+        }
+        return loadFactor;
+    }
     abstract void updateMaxTableSize(float loadFactor);
     public void setLoadFactor(float loadFactor){
         updateMaxTableSize(loadFactor);
         this.loadFactor=loadFactor;
     }
-    
+
     @Override
     public abstract Object clone();
     @Override

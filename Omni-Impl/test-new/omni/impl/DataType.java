@@ -231,6 +231,10 @@ public enum DataType{
             throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
         }
         @Override
+        public Object convertValUnchecked(int val){
+            return (val & 1) != 0;
+        }
+        @Override
         public Object convertVal(long val){
             if(val == 0){
                 return false;
@@ -240,6 +244,10 @@ public enum DataType{
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (val & 1) != 0;
         }
         @Override
         public Object convertVal(float val){
@@ -267,6 +275,7 @@ public enum DataType{
             throw new UnsupportedOperationException(
                     "The value " + val + " of type double cannot be converted to " + this);
         }
+
     },
     BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
             Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
@@ -306,6 +315,10 @@ public enum DataType{
             throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
         }
         @Override
+        public Object convertValUnchecked(int val){
+            return (byte)val;
+        }
+        @Override
         public Object convertVal(long val){
             byte b;
             if(val == (b=(byte)val)){
@@ -313,6 +326,10 @@ public enum DataType{
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (byte)val;
         }
         @Override
         public Object convertVal(float val){
@@ -459,6 +476,7 @@ public enum DataType{
         public long getMinLong(){
             return Byte.MIN_VALUE;
         }
+
     },
     CHAR("CHAR","BOOLEAN,CHAR","CHAR,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Character.class,char.class,
             Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
@@ -497,6 +515,10 @@ public enum DataType{
             throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
         }
         @Override
+        public Object convertValUnchecked(int val){
+            return (char)val;
+        }
+        @Override
         public Object convertVal(long val){
             char c;
             if((c=(char)val) == val){
@@ -504,6 +526,10 @@ public enum DataType{
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (char)val;
         }
         @Override
         public Object convertVal(float val){
@@ -681,6 +707,10 @@ public enum DataType{
             throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
         }
         @Override
+        public Object convertValUnchecked(int val){
+            return (short)val;
+        }
+        @Override
         public Object convertVal(long val){
             short v;
             if((v=(short)val) == val){
@@ -688,6 +718,10 @@ public enum DataType{
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (short)val;
         }
         @Override
         public Object convertVal(float val){
@@ -834,6 +868,7 @@ public enum DataType{
         public long getMinLong(){
             return Short.MIN_VALUE;
         }
+
     },
     INT("INT","BOOLEAN,BYTE,CHAR,SHORT,INT","INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Integer.class,int.class,
             Integer[].class,int[].class,"Int","Int",IntPredicate.class,
@@ -867,6 +902,10 @@ public enum DataType{
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (int)val;
         }
         @Override
         public Object convertVal(float val){
@@ -1187,6 +1226,7 @@ public enum DataType{
         public long getMinLong(){
             return Long.MIN_VALUE;
         }
+
     },
     FLOAT("FLOAT","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT","FLOAT,DOUBLE,REF",false,true,true,Float.class,float.class,
             Float[].class,float[].class,"Float","Float",FloatPredicate.class,
@@ -1216,12 +1256,20 @@ public enum DataType{
             throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
         }
         @Override
+        public Object convertValUnchecked(int val){
+            return (float)val;
+        }
+        @Override
         public Object convertVal(long val){
             if(TypeUtil.checkCastToFloat(val)){
                 return (float)val;
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (float)val;
         }
         @Override
         public Object convertVal(float val){
@@ -1347,6 +1395,7 @@ public enum DataType{
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
         }
+
     },
     DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
             double.class,Double[].class,double[].class,"Double","Double",
@@ -1492,6 +1541,10 @@ public enum DataType{
             }
             throw new UnsupportedOperationException(
                     "The value " + val + " of type long cannot be converted to " + this);
+        }
+        @Override
+        public Object convertValUnchecked(long val){
+            return (double)val;
         }
         @Override
         public Object convertVal(float val){
@@ -1717,9 +1770,6 @@ public enum DataType{
         this.compareMethodName=compareMethodName;
         this.comparableType=comparableType;
         this.elementMethodName=elementMethodName;
-        // this.mayBeAddedTo=initMayBeAddedTo(this);
-        // this.validOutputTypes=initValidOutputTypes(this);
-
     }
 
     public abstract Object convertVal(boolean val);
@@ -1727,7 +1777,13 @@ public enum DataType{
     public abstract Object convertVal(char val);
     public abstract Object convertVal(short val);
     public abstract Object convertVal(int val);
+    public Object convertValUnchecked(int val){
+        return convertVal(val);
+    }
     public abstract Object convertVal(long val);
+    public Object convertValUnchecked(long val){
+        return convertVal(val);
+    }
     public abstract Object convertVal(float val);
     public abstract Object convertVal(double val);
     public final Object convertVal(Object val){

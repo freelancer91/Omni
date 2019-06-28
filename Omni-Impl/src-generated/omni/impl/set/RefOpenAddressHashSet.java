@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.CheckedCollection;
@@ -241,10 +242,11 @@ implements OmniSet.OfRef<E>{
   {
       int size;
       this.size=size=in.readInt();
-      this.loadFactor=0.75f;
+      float loadFactor;
+      this.loadFactor=loadFactor=in.readFloat();
       if(size != 0){
         int tableSize;
-        maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
+        maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
         Object[] table;
         this.table=table=new Object[tableSize];
         do {
@@ -622,6 +624,7 @@ implements OmniSet.OfRef<E>{
   public void writeExternal(ObjectOutput out) throws IOException{
       int size;
       out.writeInt(size=this.size);
+      out.writeFloat(this.loadFactor);
       if(size != 0){
         Object[] table;
         for(int i=(table=this.table).length;--i>=0;) {
@@ -898,17 +901,14 @@ implements OmniSet.OfRef<E>{
       @Override public void forEachRemaining(Consumer<? super E> action){
         int offset;
         if((offset=this.offset)!=-1){
-          Object[] table=root.table;
-          do{
-              Object tableVal;
-              if((tableVal=table[offset]) != null && tableVal != DELETED){
-                  if(tableVal == NULL){
-                      action.accept(null);
-                  }else{
-                      action.accept((E)tableVal);
-                  }
-              }
-          }while(--offset != -1);
+          Object[] table;
+          Object tableVal;
+          action.accept((E)((tableVal=(table=root.table)[offset])==NULL?null:tableVal));
+          while(--offset!=-1){
+            if((tableVal=table[offset]) != null && tableVal != DELETED){
+              action.accept((E)(tableVal==NULL?null:tableVal));
+            }
+          }
           this.offset=-1;
         }
       }
@@ -956,13 +956,16 @@ implements OmniSet.OfRef<E>{
       super(that);
     }
     public Checked(int initialCapacity){
-      super(initialCapacity);
+      super(validateInitialCapacity(initialCapacity));
     }
     public Checked(float loadFactor){
-        super(loadFactor);
+        super(validateLoadFactor(loadFactor));
     }
     public Checked(int initialCapacity,float loadFactor){
-        super(initialCapacity,loadFactor);
+        super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
+    }
+    @Override void updateMaxTableSize(float loadFactor){
+      super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
     @Override
     public boolean add(E val){
@@ -1230,26 +1233,26 @@ implements OmniSet.OfRef<E>{
       }
       @SuppressWarnings("unchecked")
       @Override public void forEachRemaining(Consumer<? super E> action){
-        int offset;
-        if((offset=this.offset)!=-1){
+        final int expectedOffset;
+        if((expectedOffset=this.offset)!=-1){
           var root=this.root;
           int modCount=this.modCount;
-          int lastRet=offset;
+          int lastRet;
+          int offset;
           try{
               var table=root.table;
-              do{
-                  Object tableVal;
-                  if((tableVal=table[offset]) != null && tableVal != DELETED){
-                      if(tableVal == NULL){
-                          action.accept(null);
-                      }else{
-                          action.accept((E)tableVal);
-                      }
-                      lastRet=offset;
-                  }
-              }while(--offset != -1);
+              Object tableVal;
+              action.accept((E)((tableVal=table[offset=lastRet=expectedOffset])==NULL?null:tableVal));
+              while(--offset!=-1){
+                if((tableVal=table[offset]) != null && tableVal != DELETED){
+                    action.accept((E)(tableVal==NULL?null:tableVal));
+                    lastRet=offset;
+                }
+              }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.offset=-1;
           this.lastRet=lastRet;

@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 #IF OfChar,OfShort,OfFloat
@@ -158,6 +159,12 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   public $ClassPrefix$OpenAddressHashSet(int initialCapacity,float loadFactor){
     super(initialCapacity,loadFactor);
   }
+#IFNOT OfRef,OfDouble,OfFloat
+  $ClassPrefix$OpenAddressHashSet(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
+    //for testing purposes
+    super(initialCapacity,loadFactor,word0,word1,word2,word3);
+  }
+#ENDIF
 #IFNOT OfRef
   @Override public boolean add(boolean val){
   #IF OfDouble,OfFloat
@@ -1105,11 +1112,12 @@ ERROR unknown type $ClassPrefix$
   {
       int size;
       this.size=size=in.readInt();
-      this.loadFactor=0.75f;
+      float loadFactor;
+      this.loadFactor=loadFactor=in.readFloat();
       if(size != 0){
 #IF OfFloat,OfDouble,OfRef
         int tableSize;
-        maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
+        maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
         $queryParameterType$[] table;
         this.table=table=new $queryParameterType$[tableSize];
         do {
@@ -1136,7 +1144,7 @@ ERROR unknown type $ClassPrefix$
           if(size != 0){
 
               int tableSize;
-              maxTableSize=(int)((tableSize=tableSizeFor(size)) * .75f);
+              maxTableSize=(int)((tableSize=tableSizeFor(size)) * loadFactor);
               $ArrayType$[] table;
               this.table=table=new $ArrayType$[tableSize];
               do{
@@ -2370,6 +2378,7 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
   public void writeExternal(ObjectOutput out) throws IOException{
       int size;
       out.writeInt(size=this.size);
+      out.writeFloat(this.loadFactor);
       if(size != 0){
 #IF OfFloat,OfDouble,OfRef
         $queryParameterType$[] table;
@@ -3336,7 +3345,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                   offset=i + 64;
               }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
                   offset=i + 128;
-              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+              }else if((i=Long.numberOfTrailingZeros(root.word3)) != 64){
                   offset=i + 192;
               }else{
                   final $ArrayType$[] table=root.table;
@@ -3373,17 +3382,14 @@ return (this.wordWORDNUM & (MASK))!=0;
   int offset;
 #IF OfRef
   if((offset=this.offset)!=-1){
-    Object[] table=root.table;
-    do{
-        Object tableVal;
-        if((tableVal=table[offset]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
-            if(tableVal == NULL){
-                action.accept(null);
-            }else{
-                action.accept((E)tableVal);
-            }
-        }
-    }while(--offset != -1);
+    Object[] table;
+    Object tableVal;
+    action.accept((E)((tableVal=(table=root.table)[offset])==NULL?null:tableVal));
+    while(--offset!=-1){
+      if((tableVal=table[offset]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
+        action.accept((E)(tableVal==NULL?null:tableVal));
+      }
+    }
     this.offset=-1;
   }
 #ELSEIF OfFloat,OfDouble
@@ -3392,19 +3398,13 @@ return (this.wordWORDNUM & (MASK))!=0;
   }
 #ELSE
   if((offset=this.offset)<256){
-  #IF OfChar
     forEachRemainingFromWords(offset,ACTION);
-  #ELSE
-    forEachRemainingFromWords(offset-128,ACTION);
-  #ENDIF
   }else{
     forEachRemainingFromTable(offset-256,ACTION);
   }
 #ENDIF
 }
 #ENDDEF
-
-
       #IF OfRef
       @SuppressWarnings("unchecked")
       #ENDIF
@@ -3446,11 +3446,7 @@ return (this.wordWORDNUM & (MASK))!=0;
           #ENDIF
 #ELSE
           if((offset=this.offset) < 256){
-  #IF OfChar
               return getNextFromWords(offset);
-  #ELSE
-              return getNextFromWords(offset - 128);
-  #ENDIF
           }else{
               return getNextFromTable(offset - 256);
           }
@@ -3494,7 +3490,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                   for(;;){
                       #MACRO IfIsPresentValue(table[--offset])
                       {
-                          table[offset]=1;
+                          table[offset]=$DELETED_TABLE_VAL$;
                           --root.tableSize;
                           return;
                       }
@@ -3530,36 +3526,37 @@ return (this.wordWORDNUM & (MASK))!=0;
       }
 #IF OfFloat,OfDouble
       private void uncheckedForEachRemaining(int offset,$TypeNameModifier$Consumer$<? super E>$ action){
-            var table=root.table;
-            do{
-                $queryParameterType$ tableVal;
+        $queryParameterType$[] table;
+        $queryParameterType$ tableVal;
+        action.accept((tableVal=(table=root.table)[offset])==$POS0_TABLE_VAL$?(($exposedType$)0):$convertBitsToVal$(tableVal));
+        while(--offset!=-1){    
   #IF OfFloat
-                switch(tableVal=table[offset]){
-                case $POS0_TABLE_VAL$:
-                    action.accept(0.0f);
-                    break;
-                default:
-                    action.accept(Float.intBitsToFloat(tableVal));
-                case $EMPTY_TABLE_VAL$:
-                case $DELETED_TABLE_VAL$:
-                }
+          switch(tableVal=table[offset]){
+            case $POS0_TABLE_VAL$:
+                action.accept(0.0f);
+                break;
+            default:
+                action.accept($convertBitsToVal$(tableVal));
+            case $EMPTY_TABLE_VAL$:
+            case $DELETED_TABLE_VAL$:
+          }
   #ELSE
-                if((tableVal=table[offset]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
-                    if(tableVal == $POS0_TABLE_VAL$){
-                        action.accept(0.0d);
-                    }else{
-                        action.accept(Double.longBitsToDouble(tableVal));
-                    }
-                }
+          if((tableVal=table[offset]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
+              action.accept(tableVal == $POS0_TABLE_VAL$?0.0d:$convertBitsToVal$(tableVal));
+          }
   #ENDIF
-            }while(--offset != -1);
-            this.offset=-1;
         }
+        this.offset=-1;
+      }
 #ELSEIFNOT OfRef
       private static $<E>$ void forEachRemainingWordHelper(long word,int offset,$TypeNameModifier$Consumer$<? super E>$ action){
           for(long marker=1L << offset;;++offset){
               if((word & marker) != 0){
+  #IF OfChar
                   action.accept(($exposedType$)offset);
+  #ELSE
+                  action.accept(($exposedType$)(offset-128));
+  #ENDIF
               }
               if((marker<<=1) == 0){
                   break;
@@ -3568,22 +3565,20 @@ return (this.wordWORDNUM & (MASK))!=0;
       }
       private void forEachRemainingFromTable(int offset,$TypeNameModifier$Consumer action){
           $ArrayType$[] table;
-          for(final int tableLength=(table=root.table).length;;){
+          final int tableLength=(table=root.table).length;
+          action.accept(table[offset]);
+          while(++offset!=tableLength){
               $ArrayType$ tableVal;
               #MACRO IfIsPresentValue(tableVal=table[offset])
               {
                   action.accept(tableVal);
               }
-              if(++offset == tableLength){
-                  this.offset=-1;
-                  return;
-              }
           }
+          this.offset=-1;
       }
       private void forEachRemainingFromWords(int offset,$TypeNameModifier$Consumer action){
           final var root=this.root;
           switch(offset >> 6){
-  #IF OfChar
           case 0:
               forEachRemainingWordHelper(root.word0,offset,action);
               offset=64;
@@ -3594,18 +3589,6 @@ return (this.wordWORDNUM & (MASK))!=0;
               forEachRemainingWordHelper(root.word2,offset,action);
               offset=192;
           case 3:
-  #ELSE
-          case -2:
-              forEachRemainingWordHelper(root.word0,offset,action);
-              offset=-64;
-          case -1:
-              forEachRemainingWordHelper(root.word1,offset,action);
-              offset=0;
-          case 0:
-              forEachRemainingWordHelper(root.word2,offset,action);
-              offset=64;
-          case 1:
-  #ENDIF
               forEachRemainingWordHelper(root.word3,offset,action);
               int tableSize;
               if((tableSize=root.tableSize) != 0){
@@ -3630,80 +3613,55 @@ return (this.wordWORDNUM & (MASK))!=0;
           $ArrayType$[] table;
           final var ret=($exposedType$)(table=root.table)[offset];
           for(final int tableLength=table.length;;){
+              if(++offset==tableLength){
+                this.offset=-1;
+                break;
+              }
               #MACRO IfIsPresentValue(table[offset])
               {
-                  this.offset=offset + 256;
-                  break;
-              }
-              if(++offset == tableLength){
-                  this.offset=-1;
-                  break;
+                this.offset=offset + 256;
+                break;
               }
           }
           return ret;
       }
       private $exposedType$ getNextFromWords(int offset){
+  #IF OfChar
           final var ret=($exposedType$)offset;
+  #ELSE
+          final var ret=($exposedType$)(offset-128);
+  #ENDIF
             returnVal:for(;;){
                 final var root=this.root;
                 switch(++offset >> 6){
-  #IF OfChar
                 case 0:
-                    if((offset=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
-                        this.offset=offset;
+                    int tail0s;
+                    if((tail0s=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
+                        this.offset=offset+tail0s;
                         break returnVal;
                     }
-                    offset=0;
+                    offset=64;
                 case 1:
-                    if((offset=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
-                        this.offset=offset + 64;
+                    if((tail0s=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
+                        this.offset=offset + tail0s;
                         break returnVal;
                     }
-                    offset=0;
+                    offset=128;
                 case 2:
-                    if((offset=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
-                        this.offset=offset + 128;
+                    if((tail0s=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
+                        this.offset=offset + tail0s;
                         break returnVal;
                     }
-                    offset=0;
+                    offset=192;
                 case 3:
-                    if((offset=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
-                        this.offset=offset + 192;
+                    if((tail0s=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
+                        this.offset=offset + tail0s;
                         break returnVal;
                     }
                     offset=0;
                     break;
                 default:
                     offset-=256;
-  #ELSE
-                case -2:
-                    if((offset=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
-                        this.offset=offset;
-                        break returnVal;
-                    }
-                    offset=0;
-                case -1:
-                    if((offset=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
-                        this.offset=offset + 64;
-                        break returnVal;
-                    }
-                    offset=0;
-                case 0:
-                    if((offset=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
-                        this.offset=offset + 128;
-                        break returnVal;
-                    }
-                    offset=0;
-                case 1:
-                    if((offset=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
-                        this.offset=offset + 192;
-                        break returnVal;
-                    }
-                    offset=0;
-                    break;
-                default:
-                    offset-=128;
-  #ENDIF
                 }
                 if(root.tableSize != 0){
                     final var table=root.table;
@@ -3732,13 +3690,22 @@ return (this.wordWORDNUM & (MASK))!=0;
       super(that);
     }
     public Checked(int initialCapacity){
-      super(initialCapacity);
+      super(validateInitialCapacity(initialCapacity));
     }
     public Checked(float loadFactor){
-        super(loadFactor);
+        super(validateLoadFactor(loadFactor));
     }
     public Checked(int initialCapacity,float loadFactor){
-        super(initialCapacity,loadFactor);
+        super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
+    }
+#IFNOT OfRef,OfDouble,OfFloat
+    Checked(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
+      //for testing purposes
+      super(initialCapacity,loadFactor,word0,word1,word2,word3);
+    }
+#ENDIF
+    @Override void updateMaxTableSize(float loadFactor){
+      super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
 #IF OfRef
     @Override
@@ -4356,7 +4323,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                   offset=i + 64;
               }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
                   offset=i + 128;
-              }else if((i=Long.numberOfTrailingZeros(root.word2)) != 64){
+              }else if((i=Long.numberOfTrailingZeros(root.word3)) != 64){
                   offset=i + 192;
               }else{
                   final var table=root.table;
@@ -4384,41 +4351,37 @@ return (this.wordWORDNUM & (MASK))!=0;
 @SuppressWarnings("unchecked")
 #ENDIF
 @Override public void forEachRemaining(CONSUMER action){
-  int offset;
-  if((offset=this.offset)!=-1){
+  final int expectedOffset;
+  if((expectedOffset=this.offset)!=-1){
 #IF OfRef
     var root=this.root;
     int modCount=this.modCount;
-    int lastRet=offset;
+    int lastRet;
+    int offset;
     try{
         var table=root.table;
-        do{
-            Object tableVal;
-            if((tableVal=table[offset]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
-                if(tableVal == NULL){
-                    action.accept(null);
-                }else{
-                    action.accept((E)tableVal);
-                }
-                lastRet=offset;
-            }
-        }while(--offset != -1);
+        Object tableVal;
+        action.accept((E)((tableVal=table[offset=lastRet=expectedOffset])==NULL?null:tableVal));
+        while(--offset!=-1){
+          if((tableVal=table[offset]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
+              action.accept((E)(tableVal==NULL?null:tableVal));
+              lastRet=offset;
+          }
+        }
     }finally{
-        CheckedCollection.checkModCount(modCount,root.modCount);
+        if(modCount!=root.modCount || expectedOffset!=this.offset){
+          throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+        }
     }
     this.offset=-1;
     this.lastRet=lastRet;
 #ELSEIF OfFloat,OfDouble
-    uncheckedForEachRemaining(offset,ACTION);
+    uncheckedForEachRemaining(expectedOffset,ACTION);
 #ELSE
     if(offset<256){
-  #IF OfChar
-      forEachRemainingFromWords(offset,ACTION);
-  #ELSE
-      forEachRemainingFromWords(offset - 128,ACTION);
-  #ENDIF
+      forEachRemainingFromWords(expectedOffset,ACTION);
     }else{
-      forEachRemainingFromTable(offset - 256,ACTION);
+      forEachRemainingFromTable(expectedOffset,ACTION);
     }
 #ENDIF
   }
@@ -4473,11 +4436,7 @@ return (this.wordWORDNUM & (MASK))!=0;
   #ENDIF
 #ELSE
               if(offset < 256){
-  #IF OfChar
                   return getNextFromWords(root,offset);
-  #ELSE
-                  return getNextFromWords(root,offset - 128);
-  #ENDIF
               }else{
                   return getNextFromTable(root,offset - 256);
               }
@@ -4512,7 +4471,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                   root.word3&=~(1L << lastRet);
                   break;
               default:
-                  root.table[lastRet - 256]=1;
+                  root.table[lastRet - 256]=$DELETED_TABLE_VAL$;
                   --root.tableSize;
               }
 #ENDIF
@@ -4522,14 +4481,16 @@ return (this.wordWORDNUM & (MASK))!=0;
           throw new IllegalStateException();
       }
 #IF OfFloat,OfDouble
-      private void uncheckedForEachRemaining(int offset,$TypeNameModifier$Consumer$<? super E>$ action){
+      private void uncheckedForEachRemaining(final int expectedOffset,$TypeNameModifier$Consumer$<? super E>$ action){
           var root=this.root;
           int modCount=this.modCount;
-          int lastRet=offset;
+          int lastRet;
+          int offset;
           try{
-              var table=root.table;
-              do{
-                  $queryParameterType$ tableVal;
+              $queryParameterType$[] table;
+              $queryParameterType$ tableVal;
+              action.accept((tableVal=(table=root.table)[offset=lastRet=expectedOffset])==$POS0_TABLE_VAL$?(($exposedType$)0):$convertBitsToVal$(tableVal));
+              while(--offset!=-1){
   #IF OfFloat
                   switch(tableVal=table[offset]){
                   case $POS0_TABLE_VAL$:
@@ -4537,24 +4498,22 @@ return (this.wordWORDNUM & (MASK))!=0;
                       lastRet=offset;
                       break;
                   default:
-                      action.accept(Float.intBitsToFloat(tableVal));
+                      action.accept($convertBitsToVal$(tableVal));
                       lastRet=offset;
                   case $EMPTY_TABLE_VAL$:
                   case $DELETED_TABLE_VAL$:
                   }
   #ELSE
                   if((tableVal=table[offset])!=$EMPTY_TABLE_VAL$ && tableVal!=$DELETED_TABLE_VAL$) {
-                      if(tableVal==$POS0_TABLE_VAL$) {
-                          action.accept(0.0d);
-                      }else {
-                          action.accept(Double.longBitsToDouble(tableVal));
-                      }
+                      action.accept(tableVal == $POS0_TABLE_VAL$?0.0d:$convertBitsToVal$(tableVal));
                       lastRet=offset;
                   }
   #ENDIF
-              }while(--offset != -1);
+              }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.offset=-1;
           this.lastRet=lastRet;
@@ -4563,7 +4522,11 @@ return (this.wordWORDNUM & (MASK))!=0;
       private static int forEachRemainingWordHelper(long word,int offset,int lastRet,$TypeNameModifier$Consumer action){
           for(long marker=1L << offset;;++offset){
               if((word & marker) != 0){
+  #IF OfChar
                   action.accept(($exposedType$)offset);
+  #ELSE
+                  action.accept(($exposedType$)(offset-128));
+  #ENDIF
                   lastRet=offset;
               }
               if((marker<<=1) == 0){
@@ -4571,36 +4534,38 @@ return (this.wordWORDNUM & (MASK))!=0;
               }
           }
       }
-      private void forEachRemainingFromTable(int offset,$TypeNameModifier$Consumer action){
+      private void forEachRemainingFromTable(final int expectedOffset,$TypeNameModifier$Consumer action){
           final int modCount=this.modCount;
           final var root=this.root;
-          int lastRet=this.lastRet;
+          int lastRet;
+          int offset;
           try{
               $ArrayType$[] table;
-              for(final int tableLength=(table=root.table).length;;){
+              final int tableLength=(table=root.table).length;
+              action.accept(table[lastRet=offset=expectedOffset-256]);
+              while(++offset!=tableLength){
                   $exposedType$ tableVal;
                   #MACRO IfIsPresentValue(tableVal=table[offset])
                   {
                       action.accept(tableVal);
-                      lastRet=offset + 256;
-                  }
-                  if(++offset == tableLength){
-                      break;
+                      lastRet=offset;
                   }
               }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.offset=-1;
-          this.lastRet=lastRet;
+          this.lastRet=lastRet+256;
       }
-      private void forEachRemainingFromWords(int offset,$TypeNameModifier$Consumer action){
+      private void forEachRemainingFromWords(final int expectedOffset,$TypeNameModifier$Consumer action){
           final var root=this.root;
           final int modCount=this.modCount;
           int lastRet=this.lastRet;
+          int offset=expectedOffset;
           try{
               switch(offset >> 6){
-  #IF OfChar
               case 0:
                   lastRet=forEachRemainingWordHelper(root.word0,offset,lastRet,action);
                   offset=64;
@@ -4610,17 +4575,6 @@ return (this.wordWORDNUM & (MASK))!=0;
               case 2:
                   lastRet=forEachRemainingWordHelper(root.word2,offset,lastRet,action);
                   offset=192;
-  #ELSE
-              case -2:
-                  lastRet=forEachRemainingWordHelper(root.word0,offset,lastRet,action);
-                  offset=-64;
-              case -1:
-                  lastRet=forEachRemainingWordHelper(root.word1,offset,lastRet,action);
-                  offset=0;
-              case 0:
-                  lastRet=forEachRemainingWordHelper(root.word2,offset,lastRet,action);
-                  offset=64;
-  #ENDIF
               default:
                   lastRet=forEachRemainingWordHelper(root.word3,offset,lastRet,action);
                   int tableSize;
@@ -4631,16 +4585,19 @@ return (this.wordWORDNUM & (MASK))!=0;
                           #MACRO IfIsPresentValue(tableVal=table[offset])
                           {
                               action.accept(tableVal);
-                              lastRet=offset + 256;
+                              lastRet=offset;
                               if(--tableSize == 0){
                                   break;
                               }
                           }
                       }
+                      lastRet+=256;
                   }
               }
           }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              if(modCount!=root.modCount || expectedOffset!=this.offset){
+                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
+              }
           }
           this.lastRet=lastRet;
           this.offset=-1;
@@ -4649,79 +4606,55 @@ return (this.wordWORDNUM & (MASK))!=0;
           $ArrayType$[] table;
           final var ret=($exposedType$)(table=root.table)[offset];
           for(final int tableLength=table.length;;){
+              if(++offset==tableLength){
+                this.offset=-1;
+                break;
+              }
               #MACRO IfIsPresentValue(table[offset])
               {
                   this.offset=offset + 256;
-                  break;
-              }
-              if(++offset == tableLength){
-                  this.offset=-1;
                   break;
               }
           }
           return ret;
       }
       private $exposedType$ getNextFromWords(Checked root,int offset){
+  #IF OfChar
           final var ret=($exposedType$)offset;
           returnVal:for(;;){
+  #ELSE
+          final var ret=($exposedType$)(offset-128);
+          returnVal:for(;;){
+  #ENDIF
               switch(++offset >> 6){
-  #IF OfChar
               case 0:
-                  if((offset=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
-                      this.offset=offset;
+                  int tail0s;
+                  if((tail0s=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
                       break returnVal;
                   }
-                  offset=0;
+                  offset=64;
               case 1:
-                  if((offset=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
-                      this.offset=offset + 64;
+                  if((tail0s=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
                       break returnVal;
                   }
-                  offset=0;
+                  offset=128;
               case 2:
-                  if((offset=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
-                      this.offset=offset + 128;
+                  if((tail0s=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
                       break returnVal;
                   }
-                  offset=0;
+                  offset=192;
               case 3:
-                  if((offset=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
-                      this.offset=offset + 192;
+                  if((tail0s=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
+                      this.offset=offset+tail0s;
                       break returnVal;
                   }
                   offset=0;
                   break;
               default:
                   offset-=256;
-  #ELSE
-              case -2:
-                  if((offset=Long.numberOfTrailingZeros(root.word0 >>> offset)) != 64){
-                      this.offset=offset;
-                      break returnVal;
-                  }
-                  offset=0;
-              case -1:
-                  if((offset=Long.numberOfTrailingZeros(root.word1 >>> offset)) != 64){
-                      this.offset=offset + 64;
-                      break returnVal;
-                  }
-                  offset=0;
-              case 0:
-                  if((offset=Long.numberOfTrailingZeros(root.word2 >>> offset)) != 64){
-                      this.offset=offset + 128;
-                      break returnVal;
-                  }
-                  offset=0;
-              case 1:
-                  if((offset=Long.numberOfTrailingZeros(root.word3 >>> offset)) != 64){
-                      this.offset=offset + 192;
-                      break returnVal;
-                  }
-                  offset=0;
-                  break;
-              default:
-                  offset-=128;
-  #ENDIF
               }
               if(root.tableSize != 0){
                   final var table=root.table;
