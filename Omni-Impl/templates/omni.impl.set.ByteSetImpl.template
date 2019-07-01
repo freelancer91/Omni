@@ -565,30 +565,31 @@ private static void forEachRemainingHelper(long word,int valOffset,CONSUMER acti
 }
 #ENDDEF
     @Override public void remove(){
-      var root=this.root;
+      final var root=this.root;
       long word;
       int valOffset;
-      switch((valOffset=this.valOffset)-1>>6) {
-      case 1:
-        if((valOffset=Long.numberOfLeadingZeros((word=root.word3)<<-valOffset))!=64) {
-          root.word3=word&~(1L<<-1-valOffset);
-          return;
-        }
-        valOffset=0;
-      case 0:
-        if((valOffset=Long.numberOfLeadingZeros((word=root.word2)<<-valOffset))!=64) {
-          root.word2=word&~(1L<<-1-valOffset);
-          return;
-        }
-        valOffset=0;
-      case -1:
-        if((valOffset=Long.numberOfLeadingZeros((word=root.word1)<<-valOffset))!=64) {
-          root.word1=word&~(1L<<-1-valOffset);
-          return;
-        }
-        valOffset=0;
-      default:
-        root.word0=(word=root.word0)&~(1L<<-1-Long.numberOfLeadingZeros(word<<-valOffset));
+      switch((valOffset=this.valOffset)-1>>6)
+      {
+        case 1:
+          if((valOffset=Long.numberOfLeadingZeros((word=root.word3)&(-1L>>>-valOffset)))!=64){
+            root.word3=word&~(Long.MIN_VALUE>>>valOffset);
+            return;
+          }
+          valOffset=0;
+        case 0:
+          if((valOffset=Long.numberOfLeadingZeros((word=root.word2)&(-1L>>>-valOffset)))!=64){
+            root.word2=word&~(Long.MIN_VALUE>>>valOffset);
+            return;
+          }
+          valOffset=0;
+        case -1:
+          if((valOffset=Long.numberOfLeadingZeros((word=root.word1)&(-1L>>>-valOffset)))!=64){
+            root.word1=word&~(Long.MIN_VALUE>>>valOffset);
+            return;
+          }
+          valOffset=0;
+        default:
+          root.word0=(word=root.word0)&~(Long.MIN_VALUE>>>Long.numberOfLeadingZeros(word&(-1L>>>-valOffset)));
       }
     }
   }

@@ -1,9 +1,9 @@
 package omni.impl;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import omni.api.OmniCollection;
 import omni.util.TypeUtil;
@@ -2673,16 +2673,17 @@ public enum QueryVal{
         return new UnsupportedOperationException("Unknown combo queryVal=" + queryVal + "; inputType=" + inputType
                 + "; modification=" + modification + "; castType=" + castType);
     }
-    public final SortedMap<QueryVal.QueryValModification,SortedMap<QueryCastType,Set<DataType>>> validQueryCombos;
+    public final Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> validQueryCombos;
     QueryVal(){
-        TreeMap<QueryVal.QueryValModification,SortedMap<QueryCastType,Set<DataType>>> tmpValidCombos=new TreeMap<>();
+        EnumMap<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> tmpValidCombos=new EnumMap<>(
+                QueryVal.QueryValModification.class);
         for(var modification:QueryValModification.values()){
             for(var castType:QueryCastType.values()){
                 for(var dataType:DataType.values()){
                     if(isValidQuery(modification,castType,dataType)){
                         tmpValidCombos.compute(modification,(keyModification,existingVal1)->{
                             if(existingVal1 == null){
-                                existingVal1=new TreeMap<>();
+                                existingVal1=new EnumMap<>(QueryCastType.class);
                             }
                             existingVal1.compute(castType,(keyCastType,existingVal2)->{
                                 if(existingVal2 == null){
@@ -2703,9 +2704,9 @@ public enum QueryVal{
             });
         });
         tmpValidCombos.replaceAll((modification,mapped)->{
-            return Collections.unmodifiableSortedMap(mapped);
+            return Collections.unmodifiableMap(mapped);
         });
-        this.validQueryCombos=Collections.unmodifiableSortedMap(tmpValidCombos);
+        this.validQueryCombos=Collections.unmodifiableMap(tmpValidCombos);
     }
     public abstract boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,
             DataType inputType,

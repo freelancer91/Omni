@@ -1,5 +1,6 @@
 package omni.impl.set;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -24,441 +25,444 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.TestExecutorService;
 public class BooleanSetImplTest{
-  private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
-    final CheckedType checkedType;
-    final BooleanSetImpl set;
-    int expectedState;
+    private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
+        final CheckedType checkedType;
+        final BooleanSetImpl set;
+        int expectedState;
 
-    BooleanSetImplMonitor(CheckedType checkedType){
-        this.checkedType=checkedType;
-        this.expectedState=0;
-        if(checkedType.checked){
-            this.set=new BooleanSetImpl.Checked();
-        }else{
-            this.set=new BooleanSetImpl();
-        }
-    }
-    BooleanSetImplMonitor(CheckedType checkedType,int expectedState){
-        this.checkedType=checkedType;
-        this.expectedState=expectedState;
-        if(checkedType.checked) {
-            this.set=new BooleanSetImpl.Checked(expectedState);
-        }else {
-            this.set=new BooleanSetImpl(expectedState);
-        }
-    }
-
-    @Override
-    public void updateAddState(Object inputVal,DataType inputType,boolean result){
-        boolean v=(boolean)inputVal;
-        expectedState|=v?2:1;
-    }
-
-    @Override public CheckedType getCheckedType(){
-        return this.checkedType;
-    }
-
-    @Override public BooleanSetImpl getCollection(){
-        return set;
-    }
-
-    @Override public DataType getDataType(){
-        return DataType.BOOLEAN;
-    }
-
-    @Override public MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImpl> getMonitoredIterator(){
-        if(checkedType.checked) {
-            return new CheckedMonitoredItr();
-        }
-        return new UncheckedMonitoredItr();
-    }
-
-    @Override public StructType getStructType(){
-        return StructType.BooleanSetImpl;
-    }
-
-    @Override public boolean isEmpty(){
-        return expectedState==0;
-    }
-
-    @Override public void modCollection(){
-        set.state=expectedState=expectedState+1&0b11;
-    }
-
-    @Override public int size(){
-        return Integer.bitCount(expectedState);
-    }
-
-    @Override public void updateCollectionState(){
-        expectedState=set.state;
-    }
-
-    @Override public void verifyCollectionState(){
-        Assertions.assertEquals(expectedState,set.state);
-    }
-
-    @Override public void verifyClone(Object clone){
-        var cast=(BooleanSetImpl)clone;
-        Assertions.assertEquals(checkedType.checked,cast instanceof BooleanSetImpl.Checked);
-        Assertions.assertEquals(set.state,cast.state);
-    }
-
-
-
-    @Override public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification) {
-
-        switch(expectedState) {
-        case 0b01:
-        case 0b10:
-            expectedState=0b00;
-            break;
-        default:
-            boolean v=(boolean)queryVal.getInputVal(DataType.BOOLEAN,modification);
-            if(v) {
-                expectedState=0b01;
-            }else {
-                expectedState=0b10;
+        BooleanSetImplMonitor(CheckedType checkedType){
+            this.checkedType=checkedType;
+            this.expectedState=0;
+            if(checkedType.checked){
+                this.set=new BooleanSetImpl.Checked();
+            }else{
+                this.set=new BooleanSetImpl();
             }
         }
-    }
-
-
-
-    @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-        switch(expectedState) {
-        case 0b00:
-            Assertions.assertEquals(0,filter.numCalls);
-            Assertions.assertEquals(0,filter.numRemoved);
-            Assertions.assertEquals(0,filter.numRetained);
-            Assertions.assertTrue(filter.removedVals.isEmpty());
-            Assertions.assertTrue(filter.retainedVals.isEmpty());
-            Assertions.assertFalse(result);
-            Assertions.assertEquals(0b00,set.state);
-            break;
-        case 0b01:
-            Assertions.assertEquals(1,filter.numCalls);
-            if(result) {
-                Assertions.assertEquals(1,filter.numRemoved);
-                Assertions.assertEquals(0,filter.numRetained);
-                Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
-                Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
-                Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-                Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-                Assertions.assertNotEquals(expectedState,set.state);
-                Assertions.assertEquals(0b00,set.state);
+        BooleanSetImplMonitor(CheckedType checkedType,int expectedState){
+            this.checkedType=checkedType;
+            this.expectedState=expectedState;
+            if(checkedType.checked) {
+                this.set=new BooleanSetImpl.Checked(expectedState);
             }else {
-                Assertions.assertEquals(0,filter.numRemoved);
-                Assertions.assertEquals(1,filter.numRetained);
-                Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
-                Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
-                Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
-                Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-                Assertions.assertEquals(0b01,set.state);
+                this.set=new BooleanSetImpl(expectedState);
             }
-            break;
-        case 0b10:
-            Assertions.assertEquals(1,filter.numCalls);
-            if(result) {
-                Assertions.assertEquals(1,filter.numRemoved);
-                Assertions.assertEquals(0,filter.numRetained);
-                Assertions.assertTrue(filter.removedVals.contains(Boolean.TRUE));
-                Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
-                Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-                Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-                Assertions.assertEquals(0b00,set.state);
-            }else {
-                Assertions.assertEquals(0,filter.numRemoved);
-                Assertions.assertEquals(1,filter.numRetained);
-                Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
-                Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
-                Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
-                Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
-                Assertions.assertEquals(0b10,set.state);
+        }
+
+        @Override
+        public void updateAddState(Object inputVal,DataType inputType,boolean result){
+            boolean v=(boolean)inputVal;
+            expectedState|=v?2:1;
+        }
+
+        @Override public CheckedType getCheckedType(){
+            return this.checkedType;
+        }
+
+        @Override public BooleanSetImpl getCollection(){
+            return set;
+        }
+
+        @Override public DataType getDataType(){
+            return DataType.BOOLEAN;
+        }
+
+        @Override public MonitoredIterator<OmniIterator.OfBoolean,BooleanSetImpl> getMonitoredIterator(){
+            if(checkedType.checked) {
+                return new CheckedMonitoredItr();
             }
-            break;
-        default:
-            Assertions.assertEquals(2,filter.numCalls);
-            if(result) {
-                if(filter.removedVals.contains(Boolean.TRUE)) {
-                    if(filter.removedVals.contains(Boolean.FALSE)) {
-                        Assertions.assertEquals(0b00,set.state);
-                        Assertions.assertTrue(filter.retainedVals.isEmpty());
-                        Assertions.assertEquals(2,filter.removedVals.size());
-                    }else{
-                        Assertions.assertEquals(0b01,set.state);
-                        Assertions.assertEquals(1,filter.removedVals.size());
-                        Assertions.assertEquals(1,filter.retainedVals.size());
-                        Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
-                        Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
-                    }
+            return new UncheckedMonitoredItr();
+        }
+
+        @Override public StructType getStructType(){
+            return StructType.BooleanSetImpl;
+        }
+
+        @Override public boolean isEmpty(){
+            return expectedState==0;
+        }
+
+        @Override public void modCollection(){
+            set.state=expectedState=expectedState+1&0b11;
+        }
+
+        @Override public int size(){
+            return Integer.bitCount(expectedState);
+        }
+
+        @Override public void updateCollectionState(){
+            expectedState=set.state;
+        }
+
+        @Override public void verifyCollectionState(){
+            Assertions.assertEquals(expectedState,set.state);
+        }
+
+        @Override public void verifyClone(Object clone){
+            var cast=(BooleanSetImpl)clone;
+            Assertions.assertEquals(checkedType.checked,cast instanceof BooleanSetImpl.Checked);
+            Assertions.assertEquals(set.state,cast.state);
+        }
+
+
+
+        @Override public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification) {
+
+            switch(expectedState) {
+            case 0b01:
+            case 0b10:
+                expectedState=0b00;
+                break;
+            default:
+                boolean v=(boolean)queryVal.getInputVal(DataType.BOOLEAN,modification);
+                if(v) {
+                    expectedState=0b01;
                 }else {
-                    Assertions.assertEquals(0b10,set.state);
-                    Assertions.assertEquals(1,filter.removedVals.size());
-                    Assertions.assertEquals(1,filter.retainedVals.size());
-                    Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
-                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                    expectedState=0b10;
                 }
-            }else {
-                Assertions.assertEquals(2,filter.numRetained);
-                Assertions.assertEquals(0,filter.numRemoved);
-                Assertions.assertTrue(filter.removedVals.isEmpty());
-                Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
-                Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
-                Assertions.assertEquals(2,filter.retainedVals.size());
             }
         }
-        expectedState=set.state;
-    }
 
-    @Override public void verifyArrayIsCopy(Object arr){
-        //nothing to do
-    }
 
-    abstract class AbstractMonitoredItr implements MonitoredSet.MonitoredSetIterator<OmniIterator.OfBoolean,BooleanSetImpl>{
 
-        final OmniIterator.OfBoolean itr;
-        int expectedItrState;
-        AbstractMonitoredItr(){
-            itr=set.iterator();
-            expectedItrState=expectedState;
-        }
-
-        @Override public OmniIterator.OfBoolean getIterator(){
-            return itr;
-        }
-
-        @Override public MonitoredCollection<BooleanSetImpl> getMonitoredCollection(){
-            return BooleanSetImplMonitor.this;
-        }
-    }
-
-    class UncheckedMonitoredItr extends AbstractMonitoredItr{
-
-        @Override public boolean hasNext(){
-            return expectedItrState!=0b00;
-        }
-
-        @Override public int getNumLeft(){
-            return Integer.bitCount(expectedItrState);
-        }
-
-        @Override public void verifyForEachRemaining(MonitoredFunction function){
-            switch(expectedItrState) {
+        @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+            switch(expectedState) {
             case 0b00:
-                Assertions.assertTrue(function.isEmpty());
+                Assertions.assertEquals(0,filter.numCalls);
+                Assertions.assertEquals(0,filter.numRemoved);
+                Assertions.assertEquals(0,filter.numRetained);
+                Assertions.assertTrue(filter.removedVals.isEmpty());
+                Assertions.assertTrue(filter.retainedVals.isEmpty());
+                Assertions.assertFalse(result);
+                Assertions.assertEquals(0b00,set.state);
                 break;
             case 0b01:
-                Assertions.assertEquals(1,function.size());
-                Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                Assertions.assertEquals(1,filter.numCalls);
+                if(result) {
+                    Assertions.assertEquals(1,filter.numRemoved);
+                    Assertions.assertEquals(0,filter.numRetained);
+                    Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                    Assertions.assertNotEquals(expectedState,set.state);
+                    Assertions.assertEquals(0b00,set.state);
+                }else {
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertEquals(1,filter.numRetained);
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                    Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                    Assertions.assertEquals(0b01,set.state);
+                }
                 break;
             case 0b10:
-                Assertions.assertEquals(1,function.size());
-                Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                Assertions.assertEquals(1,filter.numCalls);
+                if(result) {
+                    Assertions.assertEquals(1,filter.numRemoved);
+                    Assertions.assertEquals(0,filter.numRetained);
+                    Assertions.assertTrue(filter.removedVals.contains(Boolean.TRUE));
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                    Assertions.assertEquals(0b00,set.state);
+                }else {
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertEquals(1,filter.numRetained);
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                    Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                    Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                    Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                    Assertions.assertEquals(0b10,set.state);
+                }
                 break;
             default:
-                Assertions.assertEquals(2,function.size());
-                Assertions.assertEquals(Boolean.FALSE,function.get(0));
-                Assertions.assertEquals(Boolean.TRUE,function.get(1));
-            }
-            expectedItrState=0b00;
-        }
-
-        @Override public void updateIteratorState(){
-            expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr);
-        }
-        @Override
-        public void updateItrRemoveState(){
-            if(expectedItrState == 0b00){
-                if(expectedState == 0b11){
-                    expectedState=0b01;
-                }else{
-                    expectedState=0b00;
+                Assertions.assertEquals(2,filter.numCalls);
+                if(result) {
+                    if(filter.removedVals.contains(Boolean.TRUE)) {
+                        if(filter.removedVals.contains(Boolean.FALSE)) {
+                            Assertions.assertEquals(0b00,set.state);
+                            Assertions.assertTrue(filter.retainedVals.isEmpty());
+                            Assertions.assertEquals(2,filter.removedVals.size());
+                        }else{
+                            Assertions.assertEquals(0b01,set.state);
+                            Assertions.assertEquals(1,filter.removedVals.size());
+                            Assertions.assertEquals(1,filter.retainedVals.size());
+                            Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                            Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                        }
+                    }else {
+                        Assertions.assertEquals(0b10,set.state);
+                        Assertions.assertEquals(1,filter.removedVals.size());
+                        Assertions.assertEquals(1,filter.retainedVals.size());
+                        Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                        Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                    }
+                }else {
+                    Assertions.assertEquals(2,filter.numRetained);
+                    Assertions.assertEquals(0,filter.numRemoved);
+                    Assertions.assertTrue(filter.removedVals.isEmpty());
+                    Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                    Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                    Assertions.assertEquals(2,filter.retainedVals.size());
                 }
-            }else{
-                expectedState=0b10;
+            }
+            expectedState=set.state;
+        }
+
+        @Override public void verifyArrayIsCopy(Object arr){
+            //nothing to do
+        }
+
+        abstract class AbstractMonitoredItr implements MonitoredSet.MonitoredSetIterator<OmniIterator.OfBoolean,BooleanSetImpl>{
+
+            final OmniIterator.OfBoolean itr;
+            int expectedItrState;
+            AbstractMonitoredItr(){
+                itr=set.iterator();
+                expectedItrState=expectedState;
+            }
+
+            @Override public OmniIterator.OfBoolean getIterator(){
+                return itr;
+            }
+
+            @Override public MonitoredCollection<BooleanSetImpl> getMonitoredCollection(){
+                return BooleanSetImplMonitor.this;
             }
         }
 
-        @Override
-        public void verifyIteratorState(Object itr){
-            Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Itr.root(itr));
-            Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr));
-        }
+        class UncheckedMonitoredItr extends AbstractMonitoredItr{
 
+            @Override public boolean hasNext(){
+                return expectedItrState!=0b00;
+            }
 
-        @Override
-        public void updateItrNextState(){
-            if(expectedItrState == 0b11){
-                expectedItrState=0b10;
-            }else{
+            @Override public int getNumLeft(){
+                return Integer.bitCount(expectedItrState);
+            }
+
+            @Override public void verifyForEachRemaining(MonitoredFunction function){
+                switch(expectedItrState) {
+                case 0b00:
+                    Assertions.assertTrue(function.isEmpty());
+                    break;
+                case 0b01:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                    break;
+                case 0b10:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                    break;
+                default:
+                    Assertions.assertEquals(2,function.size());
+                    Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                    Assertions.assertEquals(Boolean.TRUE,function.get(1));
+                }
                 expectedItrState=0b00;
             }
+
+            @Override public void updateIteratorState(){
+                expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr);
+            }
+            @Override
+            public void updateItrRemoveState(){
+                if(expectedItrState == 0b00){
+                    if(expectedState == 0b11){
+                        expectedState=0b01;
+                    }else{
+                        expectedState=0b00;
+                    }
+                }else{
+                    expectedState=0b10;
+                }
+            }
+
+            @Override
+            public void verifyIteratorState(Object itr){
+                Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Itr.root(itr));
+                Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr));
+            }
+
+
+            @Override
+            public void updateItrNextState(){
+                if(expectedItrState == 0b11){
+                    expectedItrState=0b10;
+                }else{
+                    expectedItrState=0b00;
+                }
+            }
+
+            @Override
+            public void verifyNextResult(DataType outputType,Object result){
+                Assertions.assertEquals(outputType.convertVal(expectedItrState == 0b10),result);
+            }
+
+
+        }
+
+        class CheckedMonitoredItr extends AbstractMonitoredItr{
+
+            @Override public boolean hasNext(){
+                switch(expectedItrState){
+                case 0b0001:
+                case 0b0010:
+                case 0b0011:
+                case 0b0110:
+                case 0b0111:
+                    return true;
+                default:
+                    return false;
+                }
+            }
+
+            @Override public int getNumLeft(){
+                switch(expectedItrState) {
+                case 0b0011:
+                    return 2;
+                case 0b0001:
+                case 0b0010:
+                case 0b0110:
+                case 0b0111:
+                    return 1;
+                default:
+                    return 0;
+                }
+            }
+            @Override
+            public void verifyNextResult(DataType outputType,Object result){
+                boolean expected;
+                switch(expectedItrState){
+                case 0b0010:
+                case 0b0110:
+                case 0b0111:
+                    expected=true;
+                    break;
+                default:
+                    expected=false;
+                }
+                Assertions.assertEquals(outputType.convertVal(expected),result);
+            }
+            @Override public void verifyForEachRemaining(MonitoredFunction function){
+                switch(expectedItrState){
+                case 0b0001:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                    expectedItrState=0b0101;
+                    break;
+                case 0b0010:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                    expectedItrState=0b1010;
+                    break;
+                case 0b0011:
+                    Assertions.assertEquals(2,function.size());
+                    Assertions.assertEquals(Boolean.FALSE,function.get(0));
+                    Assertions.assertEquals(Boolean.TRUE,function.get(1));
+                    expectedItrState=0b1111;
+                    break;
+                case 0b0110:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                    expectedItrState=0b1110;
+                    break;
+                case 0b0111:
+                    Assertions.assertEquals(1,function.size());
+                    Assertions.assertEquals(Boolean.TRUE,function.get(0));
+                    expectedItrState=0b1111;
+                    break;
+                default:
+                    Assertions.assertTrue(function.isEmpty());
+                }
+            }
+
+            @Override public void updateIteratorState(){
+                expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr);
+            }
+
+            @Override
+            public void updateItrRemoveState(){
+                switch(expectedItrState){
+                default:
+                    expectedState=0b00;
+                    expectedItrState=0b0100;
+                    break;
+                case 0b0111:
+                    expectedState=0b10;
+                    expectedItrState=0b0110;
+                    break;
+                case 0b1010:
+                    expectedState=0b00;
+                    expectedItrState=0b1000;
+                    break;
+                case 0b1110:
+                    expectedState=0b00;
+                    expectedItrState=0b1100;
+                    break;
+                case 0b1111:
+                    expectedState=0b01;
+                    expectedItrState=0b1101;
+                }
+            }
+
+            @Override
+            public void verifyIteratorState(Object itr){
+                Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.root(itr));
+                Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr));
+            }
+
+
+            @Override
+            public void updateItrNextState(){
+                switch(expectedItrState){
+                default:
+                    this.expectedItrState=0b0101;
+                    break;
+                case 0b0010:
+                    this.expectedItrState=0b1010;
+                    break;
+                case 0b0011:
+                    this.expectedItrState=0b0111;
+                    break;
+                case 0b0110:
+                    this.expectedItrState=0b1110;
+                    break;
+                case 0b0111:
+                    this.expectedItrState=0b1111;
+                    break;
+                }
+            }
+
+
         }
 
         @Override
-        public void verifyNextResult(DataType outputType,Object result){
-            Assertions.assertEquals(outputType.convertVal(expectedItrState == 0b10),result);
+        public void verifyClear(){
+            set.clear();
+            expectedState=0;
+            verifyCollectionState();
         }
-
-
+        @Override
+        public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+            set.writeExternal(oos);
+        }
     }
-
-    class CheckedMonitoredItr extends AbstractMonitoredItr{
-
-        @Override public boolean hasNext(){
-            switch(expectedItrState){
-            case 0b0001:
-            case 0b0010:
-            case 0b0011:
-            case 0b0110:
-            case 0b0111:
-                return true;
-            default:
-                return false;
-            }
-        }
-
-        @Override public int getNumLeft(){
-            switch(expectedItrState) {
-            case 0b0011:
-                return 2;
-            case 0b0001:
-            case 0b0010:
-            case 0b0110:
-            case 0b0111:
-                return 1;
-            default:
-                return 0;
-            }
-        }
-        @Override
-        public void verifyNextResult(DataType outputType,Object result){
-            boolean expected;
-            switch(expectedItrState){
-            case 0b0010:
-            case 0b0110:
-            case 0b0111:
-                expected=true;
-                break;
-            default:
-                expected=false;
-            }
-            Assertions.assertEquals(outputType.convertVal(expected),result);
-        }
-        @Override public void verifyForEachRemaining(MonitoredFunction function){
-            switch(expectedItrState){
-            case 0b0001:
-                Assertions.assertEquals(1,function.size());
-                Assertions.assertEquals(Boolean.FALSE,function.get(0));
-                expectedItrState=0b0101;
-                break;
-            case 0b0010:
-                Assertions.assertEquals(1,function.size());
-                Assertions.assertEquals(Boolean.TRUE,function.get(0));
-                expectedItrState=0b1010;
-                break;
-            case 0b0011:
-                Assertions.assertEquals(2,function.size());
-                Assertions.assertEquals(Boolean.FALSE,function.get(0));
-                Assertions.assertEquals(Boolean.TRUE,function.get(1));
-                expectedItrState=0b1111;
-                break;
-            case 0b0110:
-                Assertions.assertEquals(1,function.size());
-                Assertions.assertEquals(Boolean.TRUE,function.get(0));
-                expectedItrState=0b1110;
-                break;
-            case 0b0111:
-                Assertions.assertEquals(1,function.size());
-                Assertions.assertEquals(Boolean.TRUE,function.get(0));
-                expectedItrState=0b1111;
-                break;
-            default:
-                Assertions.assertTrue(function.isEmpty());
-            }
-        }
-
-        @Override public void updateIteratorState(){
-            expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr);
-        }
-
-        @Override
-        public void updateItrRemoveState(){
-            switch(expectedItrState){
-            default:
-                expectedState=0b00;
-                expectedItrState=0b0100;
-                break;
-            case 0b0111:
-                expectedState=0b10;
-                expectedItrState=0b0110;
-                break;
-            case 0b1010:
-                expectedState=0b00;
-                expectedItrState=0b1000;
-                break;
-            case 0b1110:
-                expectedState=0b00;
-                expectedItrState=0b1100;
-                break;
-            case 0b1111:
-                expectedState=0b01;
-                expectedItrState=0b1101;
-            }
-        }
-
-        @Override
-        public void verifyIteratorState(Object itr){
-            Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.root(itr));
-            Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr));
-        }
-
-
-        @Override
-        public void updateItrNextState(){
-            switch(expectedItrState){
-            default:
-                this.expectedItrState=0b0101;
-                break;
-            case 0b0010:
-                this.expectedItrState=0b1010;
-                break;
-            case 0b0011:
-                this.expectedItrState=0b0111;
-                break;
-            case 0b0110:
-                this.expectedItrState=0b1110;
-                break;
-            case 0b0111:
-                this.expectedItrState=0b1111;
-                break;
-            }
-        }
-
-
-    }
-
-    @Override
-    public void verifyClear(){
-        set.clear();
-        expectedState=0;
-        verifyCollectionState();
-    }
-    @Override
-    public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
-        set.writeExternal(oos);
-    }
-}
-    private static final int[] STATES=new int[]{0b00, // empty
-            0b01, // false
-            0b10, // true
-            0b11, // false, true
-    };
+    //    private static final int[] STATES=new int[]{0b00, // empty
+    //            0b01, // false
+    //            0b10, // true
+    //            0b11, // false, true
+    //    };
+    private static final EnumSet<SetInitializationSequence> VALID_INIT_SEQS=EnumSet.of(SetInitializationSequence.Empty,
+            SetInitializationSequence.AddTrue,SetInitializationSequence.AddFalse,
+            SetInitializationSequence.AddTrueAndFalse);
     private static final boolean[] POSSIBLE_VALS=new boolean[]{false,true};
     private static void testforEach_ConsumerHelper(MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
-            long randSeed,CheckedType checkedType,int state){
-        final var monitor=new BooleanSetImplMonitor(checkedType,state);
-        if(functionGen.expectedException == null || state == 0b00){
+            long randSeed,CheckedType checkedType,SetInitializationSequence initSeq){
+        final var monitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
+        if(functionGen.expectedException == null || initSeq.isEmpty){
             monitor.verifyForEach(functionGen,functionCallType,randSeed);
         }else{
             Assertions.assertThrows(functionGen.expectedException,
@@ -468,10 +472,10 @@ public class BooleanSetImplTest{
     }
     private static void testItrforEachRemaining_ConsumerHelper(int itrScenario,IllegalModification preMod,
             MonitoredFunctionGen functionGen,FunctionCallType functionCallType,long randSeed,CheckedType checkedType,
-            int state){
-        final var setMonitor=new BooleanSetImplMonitor(checkedType,state);
+            SetInitializationSequence initSeq){
+        final var setMonitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
         final var itrMonitor=setMonitor.getMonitoredIterator();
-        int adjustedState=state;
+        int adjustedState;
         switch(itrScenario){
         case 1:
             itrMonitor.iterateForward();
@@ -481,7 +485,24 @@ public class BooleanSetImplTest{
             itrMonitor.iterateForward();
             itrMonitor.remove();
             adjustedState=0b10;
+            break;
         default:
+            switch(initSeq){
+            case AddFalse:
+                adjustedState=0b01;
+                break;
+            case AddTrue:
+                adjustedState=0b10;
+                break;
+            case AddTrueAndFalse:
+                adjustedState=0b11;
+                break;
+            case Empty:
+                adjustedState=0b00;
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+            }
         }
         itrMonitor.illegalMod(preMod);
         final Class<? extends Throwable> expectedException=adjustedState == 0b00?null
@@ -496,8 +517,8 @@ public class BooleanSetImplTest{
         }
     }
     private static void testItrnext_voidHelper(IllegalModification preMod,DataType outputType,CheckedType checkedType,
-            int state){
-        final var setMonitor=new BooleanSetImplMonitor(checkedType,state);
+            SetInitializationSequence initSeq){
+        final var setMonitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
         final var itrMonitor=setMonitor.getMonitoredIterator();
         itrMonitor.illegalMod(preMod);
         if(preMod.expectedException == null){
@@ -515,8 +536,8 @@ public class BooleanSetImplTest{
         setMonitor.verifyCollectionState();
     }
     private static void testItrremove_voidHelper(int itrCount,IteratorRemoveScenario itrRemoveScenario,
-            IllegalModification preMod,CheckedType checkedType,int state){
-        final var setMonitor=new BooleanSetImplMonitor(checkedType,state);
+            IllegalModification preMod,CheckedType checkedType,SetInitializationSequence initSeq){
+        final var setMonitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
         final var itrMonitor=setMonitor.getMonitoredIterator();
         for(int i=0;i < itrCount;++i){
             itrMonitor.iterateForward();
@@ -543,8 +564,9 @@ public class BooleanSetImplTest{
         }
     }
     private static void testremoveIf_PredicateHelper(MonitoredRemoveIfPredicateGen filterGen,
-            FunctionCallType functionCallType,long randSeed,CheckedType checkedType,int state){
-        final var monitor=new BooleanSetImplMonitor(checkedType,state);
+            FunctionCallType functionCallType,long randSeed,CheckedType checkedType,SetInitializationSequence initSeq){
+        final var monitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
+        int state=monitor.expectedState;
         var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,0.5,randSeed);
         if(filterGen.expectedException == null || state == 0b00){
             final boolean result=monitor.verifyRemoveIf(filter,functionCallType);
@@ -578,18 +600,24 @@ public class BooleanSetImplTest{
             monitor.verifyCollectionState();
         }
     }
+    private static void testadd_valHelper(SetInitializationSequence initSeq,DataType inputType,CheckedType checkedType,
+            boolean inputVal,FunctionCallType functionCallType){
+        var monitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
+        Assertions.assertEquals(!monitor.set.contains(inputVal),monitor.verifyAdd(inputVal,inputType,functionCallType));
+    }
     @org.junit.jupiter.api.Test
     public void testadd_val(){
-        for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
-            for(final var checkedType:CheckedType.values()){
-                for(final var state:STATES){
+        final var mayBeAddedTo=DataType.BOOLEAN.mayBeAddedTo();
+        for(final var initSeq:VALID_INIT_SEQS){
+            for(final var inputType:mayBeAddedTo){
+                for(final var checkedType:CheckedType.values()){
                     for(final var inputVal:POSSIBLE_VALS){
                         for(final var functionCallType:FunctionCallType.values()){
                             TestExecutorService.submitTest(
-                                    ()->Assertions.assertEquals(new BooleanSetImplMonitor(checkedType,state).verifyAdd(
-                                            inputVal,inputType,functionCallType),(state & (inputVal?2:1)) == 0));
+                                    ()->testadd_valHelper(initSeq,inputType,checkedType,inputVal,functionCallType));
                         }
                     }
+
                 }
             }
         }
@@ -597,17 +625,38 @@ public class BooleanSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testclear_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifyClear();
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .verifyClear();
         test.runAllTests("BooleanSetImplTest.testclear_void");
     }
     @org.junit.jupiter.api.Test
     public void testclone_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifyClone();
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .verifyClone();
         test.runAllTests("BooleanSetImplTest.testclone_void");
     }
     @org.junit.jupiter.api.Test
     public void testConstructor_int(){
-        BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifyCollectionState();
+        BasicTest test=(checkedType,initSeq)->{
+            int state;
+            switch(initSeq){
+            case Empty:
+                state=0b00;
+                break;
+            case AddFalse:
+                state=0b01;
+                break;
+            case AddTrue:
+                state=0b10;
+                break;
+            case AddTrueAndFalse:
+                state=0b11;
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+            }
+            initSeq.initialize(new BooleanSetImplMonitor(checkedType,state)).verifyCollectionState();
+        };
         test.runAllTests("BooleanSetImplTest.testConstructor_int");
     }
     @org.junit.jupiter.api.Test
@@ -625,67 +674,74 @@ public class BooleanSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testforEach_Consumer(){
-        for(final var functionGen:StructType.BooleanSetImpl.validMonitoredFunctionGens){
-            for(final var state:STATES){
+        for(final var initSeq:VALID_INIT_SEQS){
+            for(final var functionGen:StructType.BooleanSetImpl.validMonitoredFunctionGens){
                 for(final var functionCallType:FunctionCallType.values()){
-                    final long randSeedBound=functionGen.randomized && state == 0b11 && !functionCallType.boxed?100:0;
+                    final long randSeedBound=functionGen.randomized
+                            && initSeq == SetInitializationSequence.AddTrueAndFalse && !functionCallType.boxed?100:0;
                     for(final var checkedType:CheckedType.values()){
-                        if(checkedType.checked || functionGen.expectedException == null || state == 0b00){
+                        if(checkedType.checked || functionGen.expectedException == null || initSeq.isEmpty){
                             LongStream.rangeClosed(0,randSeedBound).forEach(
                                     randSeed->TestExecutorService.submitTest(()->testforEach_ConsumerHelper(functionGen,
-                                            functionCallType,randSeed,checkedType,state)));
+                                            functionCallType,randSeed,checkedType,initSeq)));
                         }
                     }
                 }
             }
         }
+
         TestExecutorService.completeAllTests("BooleanSetImplTest.testforEach_Consumer");
     }
     @org.junit.jupiter.api.Test
     public void testhashCode_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifyHashCode();
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .verifyHashCode();
         test.runAllTests("BooleanSetImplTest.testhashCode_void");
     }
     @org.junit.jupiter.api.Test
     public void testisEmpty_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifyIsEmpty();
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .verifyIsEmpty();
         test.runAllTests("BooleanSetImplTest.testisEmpty_void");
     }
     @org.junit.jupiter.api.Test
     public void testiterator_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).getMonitoredIterator()
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .getMonitoredIterator()
                 .verifyIteratorState();
         test.runAllTests("BooleanSetImplTest.testiterator_void");
     }
     @org.junit.jupiter.api.Test
     public void testItrclone_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).getMonitoredIterator()
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .getMonitoredIterator()
                 .verifyClone();
         test.runAllTests("BooleanSetImplTest.testItrclone_void");
     }
     @org.junit.jupiter.api.Test
     public void testItrforEachRemaining_Consumer(){
         for(final var checkedType:CheckedType.values()){
-            for(final var state:STATES){
+            for(var initSeq:VALID_INIT_SEQS){
                 for(final var functionGen:IteratorType.AscendingItr.validMonitoredFunctionGens){
-                    if(checkedType.checked || functionGen.expectedException == null || state == 0b00){
+                    if(checkedType.checked || functionGen.expectedException == null || initSeq.isEmpty){
                         for(final var preMod:IteratorType.AscendingItr.validPreMods){
-                            if(checkedType.checked || preMod.expectedException == null || state == 0b00){
+                            if(checkedType.checked || preMod.expectedException == null || initSeq.isEmpty){
                                 int itrScenarioMax=0;
-                                if(state == 0b11){
+                                if(initSeq == SetInitializationSequence.AddTrueAndFalse){
                                     itrScenarioMax=2;
                                 }
                                 IntStream.rangeClosed(0,itrScenarioMax).forEach(itrScenario->{
                                     LongStream
                                     .rangeClosed(0,
                                             preMod.expectedException == null && functionGen.randomized
-                                            && state == 0b11 && itrScenario == 0?100:0)
+                                                            && initSeq == SetInitializationSequence.AddTrueAndFalse
+                                                            && itrScenario == 0?100:0)
                                     .forEach(randSeed->{
                                         for(final var functionCallType:FunctionCallType.values()){
                                             TestExecutorService.submitTest(
                                                     ()->testItrforEachRemaining_ConsumerHelper(itrScenario,
                                                             preMod,functionGen,functionCallType,randSeed,
-                                                            checkedType,state));
+                                                                    checkedType,initSeq));
                                         }
                                     });
                                 });
@@ -699,10 +755,10 @@ public class BooleanSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testItrhasNext_void(){
-        BasicTest test=(checkedType,state)->{
-            final var setMonitor=new BooleanSetImplMonitor(checkedType,state);
+        BasicTest test=(checkedType,initSeq)->{
+            final var setMonitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
             final var itrMonitor=setMonitor.getMonitoredIterator();
-            final var setSize=Integer.bitCount(state);
+            final var setSize=setMonitor.size();
             for(int i=0;i < setSize;++i){
                 Assertions.assertTrue(itrMonitor.verifyHasNext());
                 itrMonitor.iterateForward();
@@ -717,9 +773,9 @@ public class BooleanSetImplTest{
             for(final var checkedType:CheckedType.values()){
                 for(final var preMod:IteratorType.AscendingItr.validPreMods){
                     if(checkedType.checked || preMod.expectedException == null){
-                        for(final var state:STATES){
+                        for(var initSeq:VALID_INIT_SEQS){
                             TestExecutorService
-                            .submitTest(()->testItrnext_voidHelper(preMod,outputType,checkedType,state));
+                                    .submitTest(()->testItrnext_voidHelper(preMod,outputType,checkedType,initSeq));
                         }
                     }
                 }
@@ -730,10 +786,24 @@ public class BooleanSetImplTest{
     @org.junit.jupiter.api.Test
     public void testItrremove_void(){
         for(final var checkedType:CheckedType.values()){
-            for(final var state:STATES){
-                final int setSize=Integer.bitCount(state);
+            for(var initSeq:VALID_INIT_SEQS){
+                final int setSize;
+                switch(initSeq){
+                case Empty:
+                    setSize=0;
+                    break;
+                case AddTrue:
+                case AddFalse:
+                    setSize=1;
+                    break;
+                case AddTrueAndFalse:
+                    setSize=2;
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                }
                 for(final var itrRemoveScenario:IteratorType.AscendingItr.validItrRemoveScenarios){
-                    if((state != 0b00 || itrRemoveScenario == IteratorRemoveScenario.PostInit)
+                    if((setSize != 0 || itrRemoveScenario == IteratorRemoveScenario.PostInit)
                             && (checkedType.checked || itrRemoveScenario.expectedException == null)){
                         for(final var preMod:IteratorType.AscendingItr.validPreMods){
                             if(checkedType.checked || preMod.expectedException == null){
@@ -746,7 +816,7 @@ public class BooleanSetImplTest{
                                 }
                                 IntStream.rangeClosed(itrOffset,itrBound).forEach(
                                         itrCount->TestExecutorService.submitTest(()->testItrremove_voidHelper(itrCount,
-                                                itrRemoveScenario,preMod,checkedType,state)));
+                                                itrRemoveScenario,preMod,checkedType,initSeq)));
                             }
                         }
                     }
@@ -758,20 +828,21 @@ public class BooleanSetImplTest{
     @org.junit.jupiter.api.Test
     public void testReadAndWrite(){
         final MonitoredFunctionGenTest test=(functionGen,checkedType,
-                state)->new BooleanSetImplMonitor(checkedType,state).verifyReadAndWrite(functionGen);
-        test.runAllTests("BooleanSetImplTest.testReadAndWrite");
+                initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType)).verifyReadAndWrite(functionGen);
+                test.runAllTests("BooleanSetImplTest.testReadAndWrite");
     }
     @org.junit.jupiter.api.Test
     public void testremoveIf_Predicate(){
         for(final var filterGen:StructType.BooleanSetImpl.validMonitoredRemoveIfPredicateGens){
-            for(final var state:STATES){
+            for(final var initSeq:VALID_INIT_SEQS){
                 for(final var functionCallType:FunctionCallType.values()){
-                    final long randSeedBound=filterGen.randomized && state == 0b11 && !functionCallType.boxed?100:0;
+                    final long randSeedBound=filterGen.randomized
+                            && initSeq == SetInitializationSequence.AddTrueAndFalse && !functionCallType.boxed?100:0;
                     for(final var checkedType:CheckedType.values()){
-                        if(checkedType.checked || filterGen.expectedException == null || state == 0b00){
+                        if(checkedType.checked || filterGen.expectedException == null || initSeq.isEmpty){
                             LongStream.rangeClosed(0,randSeedBound).forEach(
                                     randSeed->TestExecutorService.submitTest(()->testremoveIf_PredicateHelper(filterGen,
-                                            functionCallType,randSeed,checkedType,state)));
+                                            functionCallType,randSeed,checkedType,initSeq)));
                         }
                     }
                 }
@@ -787,13 +858,14 @@ public class BooleanSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testsize_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifySize();
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .verifySize();
         test.runAllTests("BooleanSetImplTest.testsize_void");
     }
     @org.junit.jupiter.api.Test
     public void testtoArray_IntFunction(){
-        final MonitoredFunctionGenTest test=(functionGen,checkedType,state)->{
-            final var monitor=new BooleanSetImplMonitor(checkedType,state);
+        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSeq)->{
+            final var monitor=initSeq.initialize(new BooleanSetImplMonitor(checkedType));
             if(functionGen.expectedException == null){
                 monitor.verifyToArray(functionGen);
             }else{
@@ -806,11 +878,27 @@ public class BooleanSetImplTest{
     @org.junit.jupiter.api.Test
     public void testtoArray_ObjectArray(){
         for(final var checkedType:CheckedType.values()){
-            for(final var state:STATES){
-                for(int arrSize=0,bound=Integer.bitCount(state) + 2;arrSize <= bound;++arrSize){
+            for(final var initSeq:VALID_INIT_SEQS){
+                int bound;
+                switch(initSeq){
+                case Empty:
+                    bound=2;
+                    break;
+                case AddTrue:
+                case AddFalse:
+                    bound=3;
+                    break;
+                case AddTrueAndFalse:
+                    bound=4;
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                }
+                for(int arrSize=0;arrSize <= bound;++arrSize){
                     final Object[] paramArr=new Object[arrSize];
                     TestExecutorService
-                    .submitTest(()->new BooleanSetImplMonitor(checkedType,state).verifyToArray(paramArr));
+                            .submitTest(()->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                                    .verifyToArray(paramArr));
                 }
             }
         }
@@ -820,9 +908,10 @@ public class BooleanSetImplTest{
     public void testtoArray_void(){
         for(final var outputType:DataType.BOOLEAN.validOutputTypes()){
             for(final var checkedType:CheckedType.values()){
-                for(final var state:STATES){
+                for(final var initSeq:VALID_INIT_SEQS){
                     TestExecutorService
-                    .submitTest(()->outputType.verifyToArray(new BooleanSetImplMonitor(checkedType,state)));
+                            .submitTest(()->outputType
+                                    .verifyToArray(initSeq.initialize(new BooleanSetImplMonitor(checkedType))));
                 }
             }
 
@@ -831,7 +920,8 @@ public class BooleanSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testtoString_void(){
-        final BasicTest test=(checkedType,state)->new BooleanSetImplMonitor(checkedType,state).verifyToString();
+        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                .verifyToString();
         test.runAllTests("BooleanSetImplTest.testtoString_void");
     }
     @org.junit.jupiter.api.AfterEach
@@ -845,28 +935,28 @@ public class BooleanSetImplTest{
     private static interface BasicTest{
         default void runAllTests(String testName){
             for(final var checkedType:CheckedType.values()){
-                for(final var state:STATES){
-                    TestExecutorService.submitTest(()->runTest(checkedType,state));
+                for(final var initSeq:VALID_INIT_SEQS){
+                    TestExecutorService.submitTest(()->runTest(checkedType,initSeq));
                 }
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(CheckedType checkedType,int state);
+        void runTest(CheckedType checkedType,SetInitializationSequence initSeq);
     }
     private static interface MonitoredFunctionGenTest{
         default void runAllTests(String testName){
             for(final var functionGen:StructType.BooleanSetImpl.validMonitoredFunctionGens){
                 for(final var checkedType:CheckedType.values()){
                     if(checkedType.checked || functionGen.expectedException == null){
-                        for(final var state:STATES){
-                            TestExecutorService.submitTest(()->runTest(functionGen,checkedType,state));
+                        for(final var initSeq:VALID_INIT_SEQS){
+                            TestExecutorService.submitTest(()->runTest(functionGen,checkedType,initSeq));
                         }
                     }
                 }
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(MonitoredFunctionGen functionGen,CheckedType checkedType,int state);
+        void runTest(MonitoredFunctionGen functionGen,CheckedType checkedType,SetInitializationSequence initSeq);
     }
     private static interface QueryTest{
         boolean callMethod(BooleanSetImplMonitor monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
@@ -879,9 +969,9 @@ public class BooleanSetImplTest{
                             final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
                                     inputType,DataType.BOOLEAN);
                             for(final var checkedType:CheckedType.values()){
-                                for(final var state:STATES){
+                                for(final var initSeq:VALID_INIT_SEQS){
                                     TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,modification,
-                                            inputType,castType,checkedType,state));
+                                            inputType,castType,checkedType,initSeq));
                                 }
                             }
                         });
@@ -891,27 +981,31 @@ public class BooleanSetImplTest{
             TestExecutorService.completeAllTests(testName);
         }
         default void runTest(boolean queryCanReturnTrue,QueryVal queryVal,QueryVal.QueryValModification modification,
-                DataType inputType,QueryCastType castType,CheckedType checkedType,int state){
+                DataType inputType,QueryCastType castType,CheckedType checkedType,SetInitializationSequence initSeq){
             boolean expectedResult;
             if(queryCanReturnTrue){
                 final boolean booleanInputVal=queryVal.getBooleanVal(modification);
-                switch(state){
-                case 0b11:
-                    expectedResult=true;
+                switch(initSeq){
+                case Empty:
+                    expectedResult=false;
                     break;
-                case 0b01:
-                    expectedResult=!booleanInputVal;
-                    break;
-                case 0b10:
+                case AddTrue:
                     expectedResult=booleanInputVal;
                     break;
+                case AddFalse:
+                    expectedResult=!booleanInputVal;
+                    break;
+                case AddTrueAndFalse:
+                    expectedResult=true;
+                    break;
                 default:
-                    expectedResult=false;
+                    throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
                 }
             }else{
                 expectedResult=false;
             }
-            final boolean actualResult=callMethod(new BooleanSetImplMonitor(checkedType,state),queryVal,inputType,
+            final boolean actualResult=callMethod(initSeq.initialize(new BooleanSetImplMonitor(checkedType)),queryVal,
+                    inputType,
                     castType,modification);
             Assertions.assertEquals(expectedResult,actualResult);
         }

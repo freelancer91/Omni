@@ -1360,45 +1360,45 @@ implements OmniSet.OfInt{
           default:
               int[] table;
               if((table=root.table) != null){
+                  int tableOffset;
                   if(offset == -1){
-                      offset=table.length;
+                      tableOffset=table.length;
                   }else{
-                      offset-=256;
+                      tableOffset=offset-256;
                   }
                   for(;;){
-                      if(((table[--offset])&-2)!=0)
+                      if(((table[--tableOffset])&-2)!=0)
                       {
-                          table[offset]=1;
+                          table[tableOffset]=1;
                           --root.tableSize;
                           return;
                       }
-                      if(offset == 0){
+                      if(tableOffset == 0){
                           break;
                       }
                   }
-              }else{
-                  offset=0;
               }
+              offset=0;
           case 3:
-              if((offset=Long.numberOfLeadingZeros((word=root.word3) << -offset)) != 64){
-                  root.word3=word & ~(1L << -1 - offset);
-                  return;
+              if((offset=Long.numberOfLeadingZeros((word=root.word3)&(-1L>>>-offset)))!=64){
+                root.word3=word&~(Long.MIN_VALUE>>>offset);
+                return;
               }
               offset=0;
           case 2:
-              if((offset=Long.numberOfLeadingZeros((word=root.word2) << -offset)) != 64){
-                  root.word2=word & ~(1L << -1 - offset);
-                  return;
+              if((offset=Long.numberOfLeadingZeros((word=root.word2)&(-1L>>>-offset)))!=64){
+                root.word2=word&~(Long.MIN_VALUE>>>offset);
+                return;
               }
               offset=0;
           case 1:
-              if((offset=Long.numberOfLeadingZeros((word=root.word1) << -offset)) != 64){
-                  root.word1=word & ~(1L << -1 - offset);
-                  return;
+              if((offset=Long.numberOfLeadingZeros((word=root.word1)&(-1L>>>-offset)))!=64){
+                root.word1=word&~(Long.MIN_VALUE>>>offset);
+                return;
               }
               offset=0;
           case 0:
-              root.word0=(word=root.word0) & ~(1L << -1 - Long.numberOfLeadingZeros(word << -offset));
+              root.word0=(word=root.word0)&~(Long.MIN_VALUE>>>Long.numberOfLeadingZeros(word&(-1L>>>-offset)));
           }
       }
       private static  void forEachRemainingWordHelper(long word,int offset,IntConsumer action){
