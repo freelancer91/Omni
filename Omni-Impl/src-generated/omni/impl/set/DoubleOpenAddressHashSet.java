@@ -432,20 +432,29 @@ implements OmniSet.OfDouble{
   }
   @Override public boolean removeVal(long val){
     int size;
-    if((size=this.size)!=0){
-      returnFalse:for(;;){
-        returnTrue:for(;;){
-          if(val==0) {
-            if(removePos0FromTable()) {
+    if((size=this.size)!=0)
+    {
+      returnFalse:for(;;)
+      {
+        returnTrue:for(;;)
+        {
+          if(val==0)
+          {
+            if(removePos0FromTable())
+            {
               break returnTrue;
             }
-          }else if(TypeUtil.checkCastToDouble(val)) {
-            if(removeFromTable(Double.doubleToRawLongBits(val))) {
+          }
+          else if(TypeUtil.checkCastToDouble(val))
+          {
+            if(removeFromTable(Double.doubleToRawLongBits(val)))
+            {
               break returnTrue;
             }
           }
           break returnFalse;
         }
+        //returnTrue
         this.size=size-1;
         return true;
       }

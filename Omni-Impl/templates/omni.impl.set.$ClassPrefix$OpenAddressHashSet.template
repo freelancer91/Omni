@@ -13,7 +13,9 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+#IFNOT OfRef
 import java.util.ConcurrentModificationException;
+#ENDIF
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 #IF OfChar,OfShort,OfFloat
@@ -1691,20 +1693,29 @@ ERROR unknown type $ClassPrefix$
   }
   @Override public boolean removeVal(long val){
     int size;
-    if((size=this.size)!=0){
+    if((size=this.size)!=0)
+    {
 #IF OfRef
       int hash;
-      if(removeFromTable(val,(hash=(int)(val^(val>>>32)))^(hash>>>16))){
+      if(removeFromTable(val,(hash=(int)(val^(val>>>32)))^(hash>>>16)))
+      {
 #ELSE
-      returnFalse:for(;;){
-        returnTrue:for(;;){
+      returnFalse:for(;;)
+      {
+        returnTrue:for(;;)
+        {
   #IF OfFloat,OfDouble
-          if(val==0) {
-            if(removePos0FromTable()) {
+          if(val==0)
+          {
+            if(removePos0FromTable())
+            {
               break returnTrue;
             }
-          }else if(TypeUtil.checkCastTo$BoxedType$(val)) {
-            if(removeFromTable($convertToBits$(val))) {
+          }
+          else if(TypeUtil.checkCastTo$BoxedType$(val))
+          {
+            if(removeFromTable($convertToBits$(val)))
+            {
               break returnTrue;
             }
           }
@@ -1712,9 +1723,11 @@ ERROR unknown type $ClassPrefix$
   #ELSE
     #IF OfChar
           int v;
-          if((v=(char)val)==val){
+          if((v=(char)val)==val)
+          {
             long word;
-            switch(v>>6){
+            switch(v>>6)
+            {
               case 0:
                 #MACRO RemoveFromWord(0,~(1L<<v))
               case 1:
@@ -1722,46 +1735,47 @@ ERROR unknown type $ClassPrefix$
               case 2:
                 #MACRO RemoveFromWord(2,~(1L<<v))
               case 3:
-              
     #ELSE
       #IF OfShort
           int v;
-          if((v=(short)val)==val){
-      #ELSEIF OfInt
-          int v;
-          if((v=(int)val)==val){
-      #ELSEIF OfLong
+          if((v=(short)val)==val)
           {
-            int v;
-            if((v=(int)val)!=val){
-              if(!removeFromTable(val)){
-                break returnFalse;
-              }
-              break returnTrue;
-            }
+      #ELSEIF OfInt,OfLong
+          int v;
+          if((v=(int)val)==val)
+          {
       #ELSE
-Error unknown type $ClassPrefix$
+Error unknown type $ClassPrefix$      
       #ENDIF
             long word;
-            switch(v>>6){
+            switch(v>>6)
+            {
               case -2:
                 #MACRO RemoveFromWord(0,~(1L<<v))
               case -1:
                 #MACRO RemoveFromWord(1,~(1L<<v))
               case 0:
                 #MACRO RemoveFromWord(2,~(1L<<v))
-              case 1:              
+              case 1:             
     #ENDIF
                 #MACRO RemoveFromWord(3,~(1L<<v))
               default:
+    #IFNOT OfLong
                 if(removeFromTable(v)){
                   break returnTrue;
                 }
+    #ENDIF
             }
           }
+    #IF OfLong
+          if(removeFromTable(val)){
+            break returnTrue;
+          }
+    #ENDIF
           break returnFalse;
   #ENDIF
         }
+        //returnTrue
 #ENDIF
         this.size=size-1;
         return true;
@@ -2439,9 +2453,6 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
 #ELSEIF OfFloat,OfDouble
   #MACRO AddToTable<POS0>($queryParameterType$)
   #MACRO AddToTable<NONE>($queryParameterType$)
-#ELSEIF OfLong
-  #MACRO AddToTable<Int>($ArrayType$)
-  #MACRO AddToTable<NONE>($ArrayType$)
 #ELSE
   #MACRO AddToTable<NONE>($ArrayType$)
 #ENDIF
@@ -2450,8 +2461,6 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
 boolean addPos0ToTable(){
 #ELSEIFSWITCH MODIFIER==Null
 private boolean addNullToTable(){
-#ELSEIFSWITCH MODIFIER==Int
-private boolean addToTable(int val){
 #ELSE
   #IF OfRef
 private boolean addToTable(Object val,int hash){
@@ -2473,8 +2482,6 @@ private boolean addToTable($ArrayType$ val){
 #IFSWITCH MODIFIER==POS0,Null
     tableLength=table.length;
     insertInTable:for(int hash=0;;){
-#ELSEIFSWITCH MODIFIER==Int
-    insertInTable:for(final int initialHash=hash=val&(tableLength=table.length-1);;){
 #ELSE
   #IF OfFloat,OfDouble,OfRef
     insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
@@ -2587,11 +2594,7 @@ private boolean addToTable($ArrayType$ val){
 #ELSE
   this.tableSize=1;
   #IF OfLong
-    #IFSWITCH MODIFIER==Int
-  table[val&(maxTableSize-1)]=val;
-    #ELSE
   table[((int)(val^(val>>>32)))&(maxTableSize-1)]=val;
-    #ENDIF
   #ELSE
   table[val&(maxTableSize-1)]=val;  
   #ENDIF
@@ -2615,9 +2618,7 @@ private boolean addToTable($ArrayType$ val){
   #MACRO ContainsOrRemoveFromTable<True,false>($queryParameterType$)
   #MACRO ContainsOrRemoveFromTable<NONE,false>($queryParameterType$)
 #ELSEIF OfLong
-  #MACRO ContainsOrRemoveFromTable<Int,true>($ArrayType$)
   #MACRO ContainsOrRemoveFromTable<Long,true>($ArrayType$)
-  #MACRO ContainsOrRemoveFromTable<Int,false>($ArrayType$)
   #MACRO ContainsOrRemoveFromTable<Long,false>($ArrayType$)
 #ELSE
   #MACRO ContainsOrRemoveFromTable<NONE,true>($ArrayType$)
@@ -2708,13 +2709,9 @@ private boolean tableContains(int val){
   if((tableVal=(table=this.table)[initialHash=((initialHash=(int)(val ^ val >>> 32)) ^ initialHash >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
     #ENDIF
   #ELSEIF OfLong
-    #IFSWITCH MODIFIER==Long
-  if((tableVal=(table=this.table)[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
-    #ELSE
-  if((tableVal=(table=this.table)[initialHash=val&(tableLength=table.length-1)])!=0){  
-    #ENDIF
+  if((table=this.table)!=null && (tableVal=table[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
   #ELSE
-  if((tableVal=(table=this.table)[initialHash=val&(tableLength=table.length-1)])!=0){
+  if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
   #ENDIF
   #IF OfRef
      do{
@@ -2736,14 +2733,8 @@ private boolean tableContains(int val){
       #ENDIF
     
     #ELSE
-      #IFSWITCH MODIFIER==Int
-    long l=val;
-    do{
-      if(tableVal == l){
-      #ELSE
     do{
       if(tableVal == val){
-      #ENDIF
       #IFSWITCH REMOVE==true
         this.tableSize=tableSize-1;
       #ENDIF
@@ -4020,7 +4011,8 @@ return (this.wordWORDNUM & (MASK))!=0;
         }
         return false;
     }
-  #IF OfRef
+#ENDIF
+#IF OfRef
     @Override
     boolean removeFromTable(Object val,int hash){
         if(super.removeFromTable(val,hash)){
@@ -4037,12 +4029,12 @@ return (this.wordWORDNUM & (MASK))!=0;
         }
         return false;
     }
-  #ELSE
-    #IF OfFloat
+#ELSEIF OfFloat,OfDouble
+  #IF OfFloat
     @Override boolean removeFromTable(int val){
-    #ELSE
+  #ELSE
     @Override boolean removeFromTable(long val){
-    #ENDIF
+  #ENDIF
         if(super.removeFromTable(val)){
             ++this.modCount;
             return true;
@@ -4070,7 +4062,6 @@ return (this.wordWORDNUM & (MASK))!=0;
         }
         return false;
     }
-  #ENDIF
 #ENDIF
     @Override void forEachHelper(int size,$TypeNameModifier$Consumer$<? super E>$ action){
         int modCount=this.modCount;

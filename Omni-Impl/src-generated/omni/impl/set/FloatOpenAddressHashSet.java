@@ -520,20 +520,29 @@ implements OmniSet.OfFloat{
   }
   @Override public boolean removeVal(long val){
     int size;
-    if((size=this.size)!=0){
-      returnFalse:for(;;){
-        returnTrue:for(;;){
-          if(val==0) {
-            if(removePos0FromTable()) {
+    if((size=this.size)!=0)
+    {
+      returnFalse:for(;;)
+      {
+        returnTrue:for(;;)
+        {
+          if(val==0)
+          {
+            if(removePos0FromTable())
+            {
               break returnTrue;
             }
-          }else if(TypeUtil.checkCastToFloat(val)) {
-            if(removeFromTable(Float.floatToRawIntBits(val))) {
+          }
+          else if(TypeUtil.checkCastToFloat(val))
+          {
+            if(removeFromTable(Float.floatToRawIntBits(val)))
+            {
               break returnTrue;
             }
           }
           break returnFalse;
         }
+        //returnTrue
         this.size=size-1;
         return true;
       }

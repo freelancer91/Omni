@@ -531,13 +531,18 @@ implements OmniSet.OfChar{
   }
   @Override public boolean removeVal(long val){
     int size;
-    if((size=this.size)!=0){
-      returnFalse:for(;;){
-        returnTrue:for(;;){
+    if((size=this.size)!=0)
+    {
+      returnFalse:for(;;)
+      {
+        returnTrue:for(;;)
+        {
           int v;
-          if((v=(char)val)==val){
+          if((v=(char)val)==val)
+          {
             long word;
-            switch(v>>6){
+            switch(v>>6)
+            {
               case 0:
                 if((word=this.word0)==(this.word0=(word&(~(1L<<v))))){
                   break returnFalse;
@@ -566,6 +571,7 @@ implements OmniSet.OfChar{
           }
           break returnFalse;
         }
+        //returnTrue
         this.size=size-1;
         return true;
       }
@@ -1063,7 +1069,7 @@ implements OmniSet.OfChar{
     char[] table;
     char tableVal;
     int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=val&(tableLength=table.length-1)])!=0){
+    if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
       int hash=initialHash;
       do{
         if(tableVal == val){
@@ -1079,7 +1085,7 @@ implements OmniSet.OfChar{
     char[] table;
     char tableVal;
     int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=val&(tableLength=table.length-1)])!=0){
+    if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
       int hash=initialHash;
       do{
         if(tableVal == val){

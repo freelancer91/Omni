@@ -4,7 +4,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestExecutorService {
-    //private static final TestExecutorService COMMON_SERVICE=new TestExecutorService(Runtime.getRuntime().availableProcessors());
     private static final Object monitor=new Object();
 
 

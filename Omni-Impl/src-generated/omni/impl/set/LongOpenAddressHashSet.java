@@ -652,19 +652,18 @@ implements OmniSet.OfLong{
   }
   @Override public boolean removeVal(long val){
     int size;
-    if((size=this.size)!=0){
-      returnFalse:for(;;){
-        returnTrue:for(;;){
+    if((size=this.size)!=0)
+    {
+      returnFalse:for(;;)
+      {
+        returnTrue:for(;;)
+        {
+          int v;
+          if((v=(int)val)==val)
           {
-            int v;
-            if((v=(int)val)!=val){
-              if(!removeFromTable(val)){
-                break returnFalse;
-              }
-              break returnTrue;
-            }
             long word;
-            switch(v>>6){
+            switch(v>>6)
+            {
               case -2:
                 if((word=this.word0)==(this.word0=(word&(~(1L<<v))))){
                   break returnFalse;
@@ -680,19 +679,20 @@ implements OmniSet.OfLong{
                   break returnFalse;
                 }
                 break returnTrue;
-              case 1:              
+              case 1:             
                 if((word=this.word3)==(this.word3=(word&(~(1L<<v))))){
                   break returnFalse;
                 }
                 break returnTrue;
               default:
-                if(removeFromTable(v)){
-                  break returnTrue;
-                }
             }
+          }
+          if(removeFromTable(val)){
+            break returnTrue;
           }
           break returnFalse;
         }
+        //returnTrue
         this.size=size-1;
         return true;
       }
@@ -1054,39 +1054,6 @@ implements OmniSet.OfLong{
         }
       }
   }
-  private boolean addToTable(int val){
-    long[] table;
-    if((table=this.table)!=null){
-      int tableLength;
-      int insertHere=-1;
-      int hash;
-      insertInTable:for(final int initialHash=hash=val&(tableLength=table.length-1);;){
-        long tableVal;
-        if((tableVal=table[hash])==0L){
-          if(insertHere==-1){
-            insertHere=hash;
-          }
-          break insertInTable;
-        }else if(tableVal==1L){
-          insertHere=hash;
-        }else if(tableVal==val){
-          //already contains
-          return false;
-        }
-        if((hash=hash + 1 & tableLength) == initialHash){
-          break insertInTable;
-        }
-      }
-      insert(table,insertHere,val);
-      return true;
-    }
-    int maxTableSize;
-    this.table=table=new long[maxTableSize=this.maxTableSize];
-    this.tableSize=1;
-    table[val&(maxTableSize-1)]=val;
-    this.maxTableSize=(int)(maxTableSize*loadFactor);
-    return true;
-  }
   private boolean addToTable(long val){
     long[] table;
     if((table=this.table)!=null){
@@ -1120,28 +1087,11 @@ implements OmniSet.OfLong{
     this.maxTableSize=(int)(maxTableSize*loadFactor);
     return true;
   }
-  private boolean removeFromTable(int val){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=val&(tableLength=table.length-1)])!=0){  
-      int hash=initialHash;
-      long l=val;
-      do{
-        if(tableVal == l){
-          this.tableSize=tableSize-1;
-          table[hash]=1;
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
   private boolean removeFromTable(long val){
     long[] table;
     long tableVal;
     int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
+    if((table=this.table)!=null && (tableVal=table[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
       int hash=initialHash;
       do{
         if(tableVal == val){
@@ -1153,26 +1103,11 @@ implements OmniSet.OfLong{
     }
     return false;
   }
-  private boolean tableContains(int val){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=val&(tableLength=table.length-1)])!=0){  
-      int hash=initialHash;
-      long l=val;
-      do{
-        if(tableVal == l){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
   private boolean tableContains(long val){
     long[] table;
     long tableVal;
     int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
+    if((table=this.table)!=null && (tableVal=table[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
       int hash=initialHash;
       do{
         if(tableVal == val){

@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.CheckedCollection;
@@ -342,9 +341,11 @@ implements OmniSet.OfRef<E>{
   }
   @Override public boolean removeVal(long val){
     int size;
-    if((size=this.size)!=0){
+    if((size=this.size)!=0)
+    {
       int hash;
-      if(removeFromTable(val,(hash=(int)(val^(val>>>32)))^(hash>>>16))){
+      if(removeFromTable(val,(hash=(int)(val^(val>>>32)))^(hash>>>16)))
+      {
         this.size=size-1;
         return true;
       }
@@ -1122,6 +1123,22 @@ implements OmniSet.OfRef<E>{
       }finally{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
+    }
+    @Override
+    boolean removeFromTable(Object val,int hash){
+        if(super.removeFromTable(val,hash)){
+            ++this.modCount;
+            return true;
+        }
+        return false;
+    }
+    @Override
+    boolean removeNullFromTable(){
+        if(super.removeNullFromTable()){
+            ++this.modCount;
+            return true;
+        }
+        return false;
     }
     @Override void forEachHelper(int size,Consumer<? super E> action){
         int modCount=this.modCount;
