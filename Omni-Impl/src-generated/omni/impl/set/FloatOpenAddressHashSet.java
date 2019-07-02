@@ -19,6 +19,7 @@ import omni.util.ToStringUtil;
 public class FloatOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Float>
 implements OmniSet.OfFloat{
+  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
   private static void quickInsert(int[] table,int val){
     int tableLength;
     int hash;
@@ -39,11 +40,13 @@ implements OmniSet.OfFloat{
     int size;
     if((size=that.size)!=0){
       int[] table;
-      this.table=table=new int[tableSizeFor(size)];
+      int tableLength;
+      this.table=table=new int[tableLength=tableSizeFor(size)];
+      this.maxTableSize=(int)(tableLength*loadFactor);
       int[] thatTable;
-      for(int i=(thatTable=that.table).length;;){
+      for(tableLength=(thatTable=that.table).length;;){
         int tableVal;
-        switch(tableVal=thatTable[--i]) {
+        switch(tableVal=thatTable[--tableLength]) {
         case 0x7fe00000:
         case 0:
           continue;
@@ -1011,7 +1014,8 @@ implements OmniSet.OfFloat{
         maxTableSize=(int)((hash=table.length << 1) * loadFactor);
         int[] newTable;
         this.table=newTable=new int[hash];
-        for(int i=0;;++i){
+        if(size!=1){
+          for(int i=0;;++i){
             int tableVal;
             switch(tableVal=table[i]){
             case 0:
@@ -1021,10 +1025,11 @@ implements OmniSet.OfFloat{
             }
             quickInsert(newTable,tableVal);
             if(--size == 1){
-              quickInsert(newTable,val);
-              return;
+              break;
             }
+          }
         }
+        quickInsert(newTable,val);
     }else{
         table[hash]=val;
     }
@@ -1350,6 +1355,7 @@ implements OmniSet.OfFloat{
           do{
             table[tableIndicesRemoved[numRemovedFromTable]]=0x7fe00000;
           }while(--numRemovedFromTable!=-1);
+          return true;
       }
       return false;
     }

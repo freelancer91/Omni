@@ -18,6 +18,20 @@ import omni.util.ToStringUtil;
 public class IntOpenAddressHashSet
 extends AbstractIntegralTypeOpenAddressHashSet<Integer>
 implements OmniSet.OfInt{
+  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
+  private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
+    int hash=(int)(magicWord >>> 32);
+    int numLeft=(int)magicWord;
+    do{
+        if((word & 1L << valOffset) != 0L){
+            hash+=valOffset;
+            if(--numLeft == 0){
+                break;
+            }
+        }
+    }while(++valOffset != valBound);
+    return numLeft | (long)hash << 32;
+  }
   private static void quickInsert(int[] table,int val){
     int tableLength;
     int hash;
@@ -32,18 +46,14 @@ implements OmniSet.OfInt{
   private static  long wordRemoveIf(long word,
   int
   valOffset,IntPredicate filter){
-    long marker=1L;
-    for(;;){
-        if((word & marker) != 0){
-            if(filter.test((int)valOffset)){
-                word&=~marker;
-            }
-        }
-        if((marker<<=1) == 0){
-            return word;
-        }
-        ++valOffset;
+    long newWord=0L;
+    for(int tail0s;(tail0s=Long.numberOfTrailingZeros(word))!=64;++valOffset,word>>>=1){
+      word>>>=tail0s;
+      if(!filter.test((int)(valOffset+=tail0s))){
+        newWord|=(1L<<valOffset);
+      }
     }
+    return newWord;
   }
   transient int[] table;
   public IntOpenAddressHashSet(){
@@ -54,11 +64,13 @@ implements OmniSet.OfInt{
     int tableSize;
     if((tableSize=that.tableSize)!=0){
       int[] table;
-      this.table=table=new int[tableSizeFor(tableSize)];
+      int tableLength;
+      this.table=table=new int[tableLength=tableSizeFor(tableSize)];
+      this.maxTableSize=(int)(tableLength*loadFactor);
       int[] thatTable;
-      for(int i=(thatTable=that.table).length;;){
+      for(tableLength=(thatTable=that.table).length;;){
         int tableVal;
-        if(((tableVal=thatTable[--i])&-2)!=0)
+        if(((tableVal=thatTable[--tableLength])&-2)!=0)
         {
           quickInsert(table,tableVal);
           if(--tableSize==0){
@@ -76,10 +88,6 @@ implements OmniSet.OfInt{
   }
   public IntOpenAddressHashSet(int initialCapacity,float loadFactor){
     super(initialCapacity,loadFactor);
-  }
-  IntOpenAddressHashSet(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
-    //for testing purposes
-    super(initialCapacity,loadFactor,word0,word1,word2,word3);
   }
   @Override public boolean add(boolean val){
     long word;
@@ -501,12 +509,12 @@ implements OmniSet.OfInt{
         long word;
         switch(val>>6){
           case 0:
-            if((word=this.word0)==(this.word0=(word&(~(1L<<val))))){
+            if((word=this.word2)==(this.word2=(word&(~(1L<<val))))){
               break returnFalse;
             }
             break returnTrue;
           case 1:
-            if((word=this.word1)==(this.word1=(word&(~(1L<<val))))){
+            if((word=this.word3)==(this.word3=(word&(~(1L<<val))))){
               break returnFalse;
             }
             break returnTrue;
@@ -745,7 +753,7 @@ implements OmniSet.OfInt{
   private static int wordCopy(long word,int valOffset,int valBound,int[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
-            dst[dstOffset]=(int)(valBound);
+            dst[dstOffset]=(int)(valOffset);
             if(++dstOffset == dstBound){
                 break;
             }
@@ -778,7 +786,7 @@ implements OmniSet.OfInt{
   private static int wordCopy(long word,int valOffset,int valBound,Object[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
-            dst[dstOffset]=(int)(valBound);
+            dst[dstOffset]=(int)(valOffset);
             if(++dstOffset == dstBound){
                 break;
             }
@@ -811,7 +819,7 @@ implements OmniSet.OfInt{
   private static int wordCopy(long word,int valOffset,int valBound,Integer[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
-            dst[dstOffset]=(Integer)(int)(valBound);
+            dst[dstOffset]=(Integer)(int)(valOffset);
             if(++dstOffset == dstBound){
                 break;
             }
@@ -844,7 +852,7 @@ implements OmniSet.OfInt{
   private static int wordCopy(long word,int valOffset,int valBound,double[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
-            dst[dstOffset]=(double)(valBound);
+            dst[dstOffset]=(double)(valOffset);
             if(++dstOffset == dstBound){
                 break;
             }
@@ -877,7 +885,7 @@ implements OmniSet.OfInt{
   private static int wordCopy(long word,int valOffset,int valBound,float[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
-            dst[dstOffset]=(float)(valBound);
+            dst[dstOffset]=(float)(valOffset);
             if(++dstOffset == dstBound){
                 break;
             }
@@ -910,7 +918,7 @@ implements OmniSet.OfInt{
   private static int wordCopy(long word,int valOffset,int valBound,long[] dst,int dstOffset,int dstBound){
     do{
         if((word & 1L << valOffset) != 0L){
-            dst[dstOffset]=(long)(valBound);
+            dst[dstOffset]=(long)(valOffset);
             if(++dstOffset == dstBound){
                 break;
             }
@@ -1129,17 +1137,19 @@ implements OmniSet.OfInt{
       maxTableSize=(int)((hash=table.length<<1)*loadFactor);
       int[] newTable;
       this.table=newTable=new int[hash];
-      for(int i=0;;++i){
-        int tableVal;
-        if(((tableVal=table[i])&-2)!=0)
-        {
-          quickInsert(newTable,tableVal);
-          if(--tableSize==1){
-            quickInsert(newTable,val);
-            return;
+      if(tableSize!=1){
+        for(int i=0;;++i){
+          int tableVal;
+          if(((tableVal=table[i])&-2)!=0)
+          {
+            quickInsert(newTable,tableVal);
+            if(--tableSize==1){
+              break;
+            }
           }
         }
       }
+      quickInsert(newTable,val);
     }else{
       table[hash]=val;
     }
@@ -1199,7 +1209,7 @@ implements OmniSet.OfInt{
         }
       }
     }
-    buffer[size=(int)(magicWord >>> 32) + 1]=']';
+    buffer[size=(int)(magicWord >>> 32)]=']';
     return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
   }
   @Override void clearTable(){
@@ -1541,10 +1551,6 @@ implements OmniSet.OfInt{
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
-    Checked(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
-      //for testing purposes
-      super(initialCapacity,loadFactor,word0,word1,word2,word3);
-    }
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
@@ -1699,15 +1705,15 @@ implements OmniSet.OfInt{
                   + Long.bitCount((word2=this.word2) ^ (word2=wordRemoveIf(word2,0,filter)))
                   + Long.bitCount((word3=this.word3) ^ (word3=wordRemoveIf(word3,64,filter)));
           if((tableSize=this.tableSize) != 0){
-            for(int i=(table=this.table).length;;){
+            for(int i=(table=this.table).length,numLeftInTable=tableSize;;){
               int tableVal;
               if(((tableVal=table[--i])&-2)!=0)
               {
                   if(filter.test(tableVal)){
-                      (tableIndicesRemoved=new int[tableSize])[0]=i;
+                      (tableIndicesRemoved=new int[numLeftInTable])[0]=i;
                       ++numRemoved;
                       outer:for(;;){
-                        if(--tableSize==0){
+                        if(--numLeftInTable==0){
                           break;
                         }
                         for(;;){
@@ -1723,7 +1729,7 @@ implements OmniSet.OfInt{
                       }
                       break;
                   }
-                  if(--tableSize == 0){
+                  if(--numLeftInTable == 0){
                       break;
                   }
                }
@@ -1745,6 +1751,7 @@ implements OmniSet.OfInt{
                   table[tableIndicesRemoved[numRemovedFromTable]]=1;
               }while(--numRemovedFromTable !=-1);
           }
+          return true;
       }
       return false;
     }

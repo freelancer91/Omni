@@ -11,6 +11,22 @@ public enum QueryVal{
     // TODO add support for collection modifying non-null Objects
     Null{
         @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public Object getRefVal(){
             return null;
         }
@@ -41,6 +57,10 @@ public enum QueryVal{
             return false;
         }
         @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
         public byte getByteVal(){
             return 0;
         }
@@ -68,88 +88,7 @@ public enum QueryVal{
         public double getDoubleVal(){
             return 0;
         }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                collection.add(true);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                byte v=(byte)(i + initVal);
-                if(v == 0){
-                    v=(byte)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                char v=(char)(i + initVal);
-                if(v == 0){
-                    v=(char)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == 0){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == 0){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == 0){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == 0){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == 0){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
-        }
+
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
@@ -252,88 +191,6 @@ public enum QueryVal{
             return -0.0d;
         }
         @Override
-        public void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                collection.add(true);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                byte v=(byte)(i + initVal);
-                if(v == 0){
-                    v=(byte)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                char v=(char)(i + initVal);
-                if(v == 0){
-                    v=(char)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == 0){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == 0){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == 0){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == 0){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == 0){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
-        }
-        @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
             return true;
@@ -380,88 +237,7 @@ public enum QueryVal{
         public double getDoubleVal(){
             return 1;
         }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                collection.add(false);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                byte v=(byte)(i + initVal);
-                if(v == 1){
-                    v=(byte)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                char v=(char)(i + initVal);
-                if(v == 1){
-                    v=(char)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == 1){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == 1){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == 1){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == 1){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == 1){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
-        }
+
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
@@ -564,82 +340,6 @@ public enum QueryVal{
             return Byte.MAX_VALUE;
         }
         @Override
-        public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                byte v=(byte)(i + initVal);
-                if(v == Byte.MAX_VALUE){
-                    v=(byte)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                char v=(char)(i + initVal);
-                if(v == Byte.MAX_VALUE){
-                    v=(char)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == Byte.MAX_VALUE){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Byte.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Byte.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Byte.MAX_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Byte.MAX_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
-        }
-        @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
                 DataType collectionType){
             switch(collectionType){
@@ -723,6 +423,10 @@ public enum QueryVal{
     },
     MinByte{
         @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public double getDoubleValPlusFloatEpsilon(){
             return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
         }
@@ -761,72 +465,6 @@ public enum QueryVal{
         @Override
         double getPlusDoubleEpsilonDirection(){
             return Double.NEGATIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                byte v=(byte)(i + initVal);
-                if(v == Byte.MIN_VALUE){
-                    v=(byte)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == Byte.MIN_VALUE){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Byte.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Byte.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Byte.MIN_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Byte.MIN_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -898,7 +536,88 @@ public enum QueryVal{
             throw unknownCombo(this,inputType,modification,castType);
         }
     },
+    TwoHundred{
+        @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
+        @Override
+        public char getCharVal(){
+            return 200;
+        }
+        @Override
+        public short getShortVal(){
+            return 200;
+        }
+        @Override
+        public int getIntVal(){
+            return 200;
+        }
+        @Override
+        public long getLongVal(){
+            return 200;
+        }
+        @Override
+        public float getFloatVal(){
+            return 200;
+        }
+        @Override
+        public double getDoubleVal(){
+            return 200;
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case REF:
+            case DOUBLE:
+            case FLOAT:
+            case LONG:
+            case INT:
+            case SHORT:
+            case CHAR:
+                return true;
+            case BYTE:
+            case BOOLEAN:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType,collectionType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(modification){
+            case None:
+                switch(inputType){
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INT:
+                case SHORT:
+                case CHAR:
+                    return true;
+                case BYTE:
+                case REF:
+                case BOOLEAN:
+                    return false;
+                }
+                break;
+            case Plus1:
+            case PlusFloatEpsilon:
+            case PlusDoubleEpsilon:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+    },
     MaxChar{
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         public char getCharVal(){
             return Character.MAX_VALUE;
@@ -930,62 +649,6 @@ public enum QueryVal{
         @Override
         double getPlusDoubleEpsilonDirection(){
             return Double.POSITIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                char v=(char)(i + initVal);
-                if(v == Character.MAX_VALUE){
-                    v=(char)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Character.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Character.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Character.MAX_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Character.MAX_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1059,6 +722,10 @@ public enum QueryVal{
     },
     MaxShort{
         @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
         public char getCharVal(){
             return Short.MAX_VALUE;
         }
@@ -1093,72 +760,6 @@ public enum QueryVal{
         @Override
         double getPlusDoubleEpsilonDirection(){
             return Double.POSITIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                char v=(char)(i + initVal);
-                if(v == Short.MAX_VALUE){
-                    v=(char)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == Short.MAX_VALUE){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Short.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Short.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Short.MAX_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Short.MAX_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1232,6 +833,14 @@ public enum QueryVal{
     },
     MinShort{
         @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public short getShortVal(){
             return Short.MIN_VALUE;
         }
@@ -1262,62 +871,6 @@ public enum QueryVal{
         @Override
         double getPlusDoubleEpsilonDirection(){
             return Double.NEGATIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                short v=(short)(i + initVal);
-                if(v == Short.MIN_VALUE){
-                    v=(short)(i + (++initVal));
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Short.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Short.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Short.MIN_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Short.MIN_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1391,6 +944,14 @@ public enum QueryVal{
     },
     MaxSafeInt{
         @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public int getIntVal(){
             return TypeUtil.MAX_SAFE_INT;
         }
@@ -1417,52 +978,6 @@ public enum QueryVal{
         @Override
         double getPlusDoubleEpsilonDirection(){
             return Double.POSITIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == TypeUtil.MAX_SAFE_INT){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == TypeUtil.MAX_SAFE_INT){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == TypeUtil.MAX_SAFE_INT){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == TypeUtil.MAX_SAFE_INT){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1558,6 +1073,14 @@ public enum QueryVal{
     },
     MinSafeInt{
         @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public int getIntVal(){
             return TypeUtil.MIN_SAFE_INT;
         }
@@ -1584,52 +1107,6 @@ public enum QueryVal{
         @Override
         double getPlusDoubleEpsilonDirection(){
             return Double.NEGATIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == TypeUtil.MIN_SAFE_INT){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == TypeUtil.MIN_SAFE_INT){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == TypeUtil.MIN_SAFE_INT){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == TypeUtil.MIN_SAFE_INT){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1725,6 +1202,18 @@ public enum QueryVal{
     },
     MaxInt{
         @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
         public int getIntVal(){
             return Integer.MAX_VALUE;
         }
@@ -1735,39 +1224,6 @@ public enum QueryVal{
         @Override
         public double getDoubleVal(){
             return Integer.MAX_VALUE;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Integer.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Integer.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Integer.MAX_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1850,6 +1306,18 @@ public enum QueryVal{
     },
     MinInt{
         @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
         public int getIntVal(){
             return Integer.MIN_VALUE;
         }
@@ -1860,39 +1328,6 @@ public enum QueryVal{
         @Override
         public double getDoubleVal(){
             return Integer.MIN_VALUE;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-            for(int i=0;i < setSize;++i){
-                int v=i + initVal;
-                if(v == Integer.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Integer.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Integer.MIN_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -1975,35 +1410,24 @@ public enum QueryVal{
     },
     MaxSafeLong{
         @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public long getLongVal(){
             return TypeUtil.MAX_SAFE_LONG;
         }
         @Override
         public double getDoubleVal(){
             return TypeUtil.MAX_SAFE_LONG;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == TypeUtil.MAX_SAFE_LONG){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == TypeUtil.MAX_SAFE_LONG){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2076,35 +1500,24 @@ public enum QueryVal{
     },
     MinSafeLong{
         @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public long getLongVal(){
             return TypeUtil.MIN_SAFE_LONG;
         }
         @Override
         public double getDoubleVal(){
             return TypeUtil.MIN_SAFE_LONG;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == TypeUtil.MIN_SAFE_LONG){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == TypeUtil.MIN_SAFE_LONG){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2175,20 +1588,83 @@ public enum QueryVal{
             return -1;
         }
     },
+    OneLShift54{
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        public long getLongVal(){
+            return 1L << 54;
+        }
+        @Override
+        public float getFloatVal(){
+            return 1L << 54;
+        }
+        @Override
+        public double getDoubleVal(){
+            return 1L << 54;
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            switch(collectionType){
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+            case REF:
+                return true;
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case SHORT:
+            case INT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            switch(inputType){
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+                return modification == QueryValModification.None;
+            case REF:
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case SHORT:
+            case INT:
+                return false;
+            }
+            throw unknownCombo(this,inputType,modification,castType);
+        }
+    },
     MaxLong{
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         public long getLongVal(){
             return Long.MAX_VALUE;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Long.MAX_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2215,18 +1691,20 @@ public enum QueryVal{
     },
     MinLong{
         @Override
-        public long getLongVal(){
-            return Long.MIN_VALUE;
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
         }
         @Override
-        public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-            for(int i=0;i < setSize;++i){
-                long v=i + initVal;
-                if(v == Long.MIN_VALUE){
-                    v=i + (++initVal);
-                }
-                collection.add(v);
-            }
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        public long getLongVal(){
+            return Long.MIN_VALUE;
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2253,38 +1731,28 @@ public enum QueryVal{
     },
     MaxFloat{
         @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public float getFloatVal(){
             return Float.MAX_VALUE;
         }
         @Override
         public double getDoubleVal(){
             return Float.MAX_VALUE;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Float.MAX_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Float.MAX_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2348,38 +1816,28 @@ public enum QueryVal{
     },
     MinFloat{
         @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public float getFloatVal(){
             return Float.MIN_VALUE;
         }
         @Override
         public double getDoubleVal(){
             return Float.MIN_VALUE;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Float.MIN_VALUE){
-                    v+=Float.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Float.MIN_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2439,21 +1897,24 @@ public enum QueryVal{
     },
     MaxDouble{
         @Override
-        public double getDoubleVal(){
-            return Double.MAX_VALUE;
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
         }
         @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Double.MAX_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        public double getDoubleVal(){
+            return Double.MAX_VALUE;
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2479,23 +1940,25 @@ public enum QueryVal{
         }
     },
     MinDouble{
-
+        @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         public double getDoubleVal(){
             return Double.MIN_VALUE;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Double.MIN_VALUE){
-                    v+=Double.MIN_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2522,32 +1985,28 @@ public enum QueryVal{
     },
     PosInfinity{
         @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public float getFloatVal(){
             return Float.POSITIVE_INFINITY;
         }
         @Override
         public double getDoubleVal(){
             return Double.POSITIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Float.POSITIVE_INFINITY){
-                    v=initVal=-Float.MAX_VALUE;
-                }
-                collection.add(v);
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Double.POSITIVE_INFINITY){
-                    v=initVal=-Double.MAX_VALUE;
-                }
-                collection.add(v);
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2574,38 +2033,28 @@ public enum QueryVal{
     },
     NegInfinity{
         @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public float getFloatVal(){
             return Float.NEGATIVE_INFINITY;
         }
         @Override
         public double getDoubleVal(){
             return Double.NEGATIVE_INFINITY;
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-            for(int i=0;i < setSize;++i){
-                float v=i + initVal;
-                if(v == Float.NEGATIVE_INFINITY){
-                    v=initVal=-Float.MAX_VALUE;
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    initVal=-Float.MAX_VALUE;
-                }
-            }
-        }
-        @Override
-        public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-            for(int i=0;i < setSize;++i){
-                double v=i + initVal;
-                if(v == Double.NEGATIVE_INFINITY){
-                    v=initVal=-Double.MAX_VALUE;
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    initVal=-Double.MAX_VALUE;
-                }
-            }
         }
         @Override
         public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
@@ -2631,6 +2080,22 @@ public enum QueryVal{
         }
     },
     NaN{
+        @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         public float getFloatVal(){
             return Float.NaN;
@@ -2712,14 +2177,16 @@ public enum QueryVal{
             DataType inputType,
             DataType collectionType);
     abstract boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType);
-    public boolean getBooleanVal(QueryValModification modification){
+
+    public final boolean getBooleanVal(QueryValModification modification){
         if(modification != QueryValModification.None){
             throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
                     + DataType.BOOLEAN + "; modification=" + modification);
         }
         return getBooleanVal();
     }
-    public byte getByteVal(QueryValModification modification){
+
+    public final byte getByteVal(QueryValModification modification){
         switch(modification){
         case None:
             return getByteVal();
@@ -2731,7 +2198,8 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.BYTE
                 + "; modification=" + modification);
     }
-    public char getCharVal(QueryValModification modification){
+
+    public final char getCharVal(QueryValModification modification){
         switch(modification){
         case None:
             return getCharVal();
@@ -2743,7 +2211,7 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.CHAR
                 + "; modification=" + modification);
     }
-    public short getShortVal(QueryValModification modification){
+    public final short getShortVal(QueryValModification modification){
         switch(modification){
         case None:
             return getShortVal();
@@ -2755,7 +2223,7 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
                 + DataType.SHORT + "; modification=" + modification);
     }
-    public int getIntVal(QueryValModification modification){
+    public final int getIntVal(QueryValModification modification){
         switch(modification){
         case None:
             return getIntVal();
@@ -2767,7 +2235,7 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.INT
                 + "; modification=" + modification);
     }
-    public long getLongVal(QueryValModification modification){
+    public final long getLongVal(QueryValModification modification){
         switch(modification){
         case None:
             return getLongVal();
@@ -2779,7 +2247,7 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.LONG
                 + "; modification=" + modification);
     }
-    public float getFloatVal(QueryValModification modification){
+    public final float getFloatVal(QueryValModification modification){
         switch(modification){
         case None:
             return getFloatVal();
@@ -2792,7 +2260,7 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
                 + DataType.FLOAT + "; modification=" + modification);
     }
-    public double getDoubleVal(QueryValModification modification){
+    public final double getDoubleVal(QueryValModification modification){
         switch(modification){
         case None:
             return getDoubleVal();
@@ -2806,7 +2274,7 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
                 + DataType.DOUBLE + "; modification=" + modification);
     }
-    public Object getRefVal(QueryValModification modification){
+    public final Object getRefVal(QueryValModification modification){
         if(modification != QueryValModification.None){
             throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
                     + DataType.REF + "; modification=" + modification);
@@ -2896,6 +2364,7 @@ public enum QueryVal{
     public double getDoubleVal(){
         throw DataType.invalidDataType(DataType.DOUBLE);
     }
+
     public Object getInputVal(DataType inputType,QueryValModification queryValModification){
         switch(queryValModification){
         case None:
@@ -2973,113 +2442,348 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid inputType-queryValModificationCombo; inputType=" + inputType
                 + "; queryValModification=" + queryValModification);
     }
-    public void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add((initVal + i & 1) != 0);
+    public final void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal,
+            QueryValModification modification){
+        if(setSize>0) {
+            int i=0;
+
+            if(modification==QueryValModification.None) {
+                var avoidThis=getBooleanVal();
+                do {
+                    var v=(initVal + i & 1) != 0;
+                    if(v == avoidThis){
+                        v=!v;
+                    }
+                    collection.add(v);
+                }while(++i<setSize);
+            }else {
+                do {
+                    var v=(initVal + i & 1) != 0;
+                    collection.add(v);
+                }while(++i<setSize);
+            }
+
+
+        }
+
+
+    }
+    public final void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal,
+            QueryValModification modification){
+        if(setSize>0) {
+            int i=0;
+            byte avoidThis;
+            switch(modification) {
+            case None:
+            {
+                avoidThis=getByteVal();
+
+                break;
+            }
+            case Plus1:
+            {
+                avoidThis=getByteValPlus1();
+                break;
+            }
+            default:
+                do {
+                    var v=(byte)(i + initVal);
+                    collection.add(v);
+                }while(++i<setSize);
+                return;
+            }
+
+            do {
+                var v=(byte)(i + initVal);
+                if(v==avoidThis) {
+                    ++v;
+                }
+                collection.add(v);
+            }while(++i<setSize);
+
         }
     }
-    public void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add((byte)(i + initVal));
+    boolean isCharValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+            return true;
+        default:
+            return false;
         }
     }
-    public void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add((char)(i + initVal));
+    public final void initDoesNotContain(OmniCollection.OfChar collection,int setSize,int initVal,
+            QueryValModification modification){
+        if(setSize>0) {
+            int i=0;
+            if(isCharValSupported(modification)){
+                var avoidThis=getCharVal(modification);
+                do{
+                    var v=(char)(i + initVal);
+                    if(v == avoidThis){
+                        ++v;
+                    }
+                    collection.add(v);
+                }while(++i < setSize);
+            }else{
+                do {
+                    var v=(char)(i + initVal);
+                    collection.add(v);
+                }while(++i<setSize);
+            }
         }
     }
-    public void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add((short)(i + initVal));
+    boolean isShortValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+            return true;
+        default:
+            return false;
         }
     }
-    public void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add(i + initVal);
+    public final void initDoesNotContain(OmniCollection.OfShort collection,int setSize,int initVal,
+            QueryValModification modification){
+        if(setSize>0) {
+            int i=0;
+            if(isShortValSupported(modification)){
+                var avoidThis=getShortVal(modification);
+                do{
+                    var v=(short)(i + initVal);
+                    if(v == avoidThis){
+                        ++v;
+                    }
+                    collection.add(v);
+                }while(++i < setSize);
+            }else{
+                do {
+                    var v=(short)(i + initVal);
+                    collection.add(v);
+                }while(++i<setSize);
+            }
         }
     }
-    public void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add(i + initVal);
+    boolean isIntValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+            return true;
+        default:
+            return false;
         }
     }
-    public void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add(i + initVal);
+    public final void initDoesNotContain(OmniCollection.OfInt collection,int setSize,int initVal,
+            QueryValModification modification){
+        if(setSize>0) {
+            int i=0;
+            if(isIntValSupported(modification)){
+                var avoidThis=getIntVal(modification);
+                do{
+                    var v=i + initVal;
+                    if(v == avoidThis){
+                        ++v;
+                    }
+                    collection.add(v);
+                }while(++i < setSize);
+            }else{
+                do {
+                    var v=i + initVal;
+                    collection.add(v);
+                }while(++i<setSize);
+            }
         }
     }
-    public void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal){
-        for(int i=0;i < setSize;++i){
-            collection.add(i + initVal);
+    boolean isLongValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+            return true;
+        default:
+            return false;
         }
     }
-    public void initDoesNotContain(OmniCollection.OfRef<Object> collection,int setSize,long initVal){
+    public final void initDoesNotContain(OmniCollection.OfLong collection,int setSize,long initVal,
+            QueryValModification modification){
+        if(setSize>0) {
+            int i=0;
+            if(isLongValSupported(modification)){
+                var avoidThis=getLongVal(modification);
+                do{
+                    var v=i + initVal;
+                    if(v == avoidThis){
+                        ++v;
+                    }
+                    collection.add(v);
+                }while(++i < setSize);
+            }else{
+                do {
+                    var v=i + initVal;
+                    collection.add(v);
+                }while(++i<setSize);
+            }
+        }
+    }
+    public final void initDoesNotContain(OmniCollection.OfFloat collection,int setSize,float initVal,
+            QueryValModification modification){
+        if(setSize > 0){
+            float valOffset=0;
+            int i=0;
+            float avoidThis;
+            switch(modification) {
+            case None:
+                avoidThis=getFloatVal();
+                break;
+            case Plus1:
+                avoidThis=getFloatValPlus1();
+                break;
+            case PlusFloatEpsilon:
+                avoidThis=getFloatValPlusFloatEpsilon();
+                break;
+            default:
+
+                do{
+                    var v=valOffset + initVal;
+                    collection.add(v);
+                    if(v == Float.POSITIVE_INFINITY){
+                        valOffset=-Float.MAX_VALUE;
+                    }
+                }while(++i < setSize);
+                return;
+            }
+            do{
+                var v=valOffset + initVal;
+                if(v == avoidThis){
+                    v=Math.nextAfter(v,Double.POSITIVE_INFINITY);
+                }
+                collection.add(v);
+                if(v == Float.POSITIVE_INFINITY){
+                    valOffset=-Float.MAX_VALUE;
+                }
+            }while(++i < setSize);
+        }
+    }
+    public final void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal,
+            QueryValModification modification){
+        if(setSize > 0){
+            double valOffset=0;
+            int i=0;
+            double avoidThis;
+            switch(modification) {
+            case None:
+                avoidThis=getDoubleVal();
+                break;
+            case Plus1:
+                avoidThis=getDoubleValPlus1();
+                break;
+            case PlusFloatEpsilon:
+                avoidThis=getDoubleValPlusFloatEpsilon();
+                break;
+            case PlusDoubleEpsilon:
+                avoidThis=getDoubleValPlusDoubleEpsilon();
+                break;
+            default:
+
+                do{
+                    var v=valOffset + initVal;
+                    collection.add(v);
+                    if(v == Double.POSITIVE_INFINITY){
+                        valOffset=-Double.MAX_VALUE;
+                    }
+                }while(++i < setSize);
+                return;
+            }
+            do{
+                var v=valOffset + initVal;
+                if(v == avoidThis){
+                    v=Math.nextAfter(v,Double.POSITIVE_INFINITY);
+                }
+                collection.add(v);
+                if(v == Double.POSITIVE_INFINITY){
+                    valOffset=-Double.MAX_VALUE;
+                }
+            }while(++i < setSize);
+        }
+    }
+    public final void initDoesNotContain(OmniCollection.OfRef<Object> collection,int setSize,long initVal,
+            QueryValModification modification){
         for(int i=0;i < setSize;++i){
             collection.add(new Object());
         }
+
     }
-    public void initContains(OmniCollection.OfBoolean collection,int setSize,int initVal,double containsPosition){
-        var val=getBooleanVal();
+    public final void initContains(OmniCollection.OfBoolean collection,int setSize,int initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getBooleanVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfByte collection,int setSize,int initVal,double containsPosition){
-        var val=getByteVal();
+    public final void initContains(OmniCollection.OfByte collection,int setSize,int initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getByteVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfChar collection,int setSize,int initVal,double containsPosition){
-        var val=getCharVal();
+    public final void initContains(OmniCollection.OfChar collection,int setSize,int initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getCharVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfShort collection,int setSize,int initVal,double containsPosition){
-        var val=getShortVal();
+    public final void initContains(OmniCollection.OfShort collection,int setSize,int initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getShortVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfInt collection,int setSize,int initVal,double containsPosition){
-        var val=getIntVal();
+    public final void initContains(OmniCollection.OfInt collection,int setSize,int initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getIntVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfLong collection,int setSize,long initVal,double containsPosition){
-        var val=getLongVal();
+    public final void initContains(OmniCollection.OfLong collection,int setSize,long initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getLongVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfFloat collection,int setSize,float initVal,double containsPosition){
-        var val=getFloatVal();
+    public final void initContains(OmniCollection.OfFloat collection,int setSize,float initVal,double containsPosition,
+            QueryValModification modification){
+        var val=getFloatVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfDouble collection,int setSize,double initVal,double containsPosition){
-        var val=getDoubleVal();
+    public final void initContains(OmniCollection.OfDouble collection,int setSize,double initVal,
+            double containsPosition,
+            QueryValModification modification){
+        var val=getDoubleVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public void initContains(OmniCollection.OfRef<Object> collection,int setSize,long initVal,double containsPosition){
-        var val=getRefVal();
+    public final void initContains(OmniCollection.OfRef<Object> collection,int setSize,long initVal,
+            double containsPosition,
+            QueryValModification modification){
+        var val=getRefVal(modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal);
+        initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex);
+        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
     public enum QueryValModification{
         None,Plus1,PlusFloatEpsilon,PlusDoubleEpsilon;

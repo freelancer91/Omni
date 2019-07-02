@@ -18,6 +18,7 @@ import omni.util.TypeUtil;
 public class DoubleOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
+  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
   private static void quickInsert(long[] table,long val){
     int tableLength;
     int hash;
@@ -38,11 +39,13 @@ implements OmniSet.OfDouble{
     int size;
     if((size=that.size)!=0){
       long[] table;
-      this.table=table=new long[tableSizeFor(size)];
+      int tableLength;
+      this.table=table=new long[tableLength=tableSizeFor(size)];
+      this.maxTableSize=(int)(tableLength*loadFactor);
       long[] thatTable;
-      for(int i=(thatTable=that.table).length;;){
+      for(tableLength=(thatTable=that.table).length;;){
         long tableVal;
-        if((tableVal=thatTable[--i]) == 0 || tableVal == 0x7ffc000000000000L){
+        if((tableVal=thatTable[--tableLength]) == 0 || tableVal == 0x7ffc000000000000L){
           continue;
         }
         quickInsert(table,tableVal);
@@ -877,17 +880,19 @@ implements OmniSet.OfDouble{
         maxTableSize=(int)((hash=table.length << 1) * loadFactor);
         long[] newTable;
         this.table=newTable=new long[hash];
-        for(int i=0;;++i){
+        if(size!=1){
+          for(int i=0;;++i){
             long tableVal;
             if((tableVal=table[i]) == 0 || tableVal == 0x7ffc000000000000L){
               continue;
             }
             quickInsert(newTable,tableVal);
             if(--size == 1){
-              quickInsert(newTable,val);
-              return;
+              break;
             }
+          }
         }
+        quickInsert(newTable,val);
     }else{
         table[hash]=val;
     }
@@ -1139,6 +1144,7 @@ implements OmniSet.OfDouble{
           do{
             table[tableIndicesRemoved[numRemovedFromTable]]=0x7ffc000000000000L;
           }while(--numRemovedFromTable!=-1);
+          return true;
       }
       return false;
     }

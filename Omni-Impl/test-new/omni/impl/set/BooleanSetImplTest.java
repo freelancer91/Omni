@@ -104,10 +104,8 @@ public class BooleanSetImplTest{
             Assertions.assertEquals(set.state,cast.state);
         }
 
-
-
-        @Override public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification) {
-
+        @Override
+        public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification){
             switch(expectedState) {
             case 0b01:
             case 0b10:
@@ -115,7 +113,7 @@ public class BooleanSetImplTest{
                 break;
             default:
                 boolean v=(boolean)queryVal.getInputVal(DataType.BOOLEAN,modification);
-                if(v) {
+                if(v){
                     expectedState=0b01;
                 }else {
                     expectedState=0b10;
@@ -734,14 +732,14 @@ public class BooleanSetImplTest{
                                     LongStream
                                     .rangeClosed(0,
                                             preMod.expectedException == null && functionGen.randomized
-                                                            && initSeq == SetInitializationSequence.AddTrueAndFalse
-                                                            && itrScenario == 0?100:0)
+                                            && initSeq == SetInitializationSequence.AddTrueAndFalse
+                                            && itrScenario == 0?100:0)
                                     .forEach(randSeed->{
                                         for(final var functionCallType:FunctionCallType.values()){
                                             TestExecutorService.submitTest(
                                                     ()->testItrforEachRemaining_ConsumerHelper(itrScenario,
                                                             preMod,functionGen,functionCallType,randSeed,
-                                                                    checkedType,initSeq));
+                                                            checkedType,initSeq));
                                         }
                                     });
                                 });
@@ -775,7 +773,7 @@ public class BooleanSetImplTest{
                     if(checkedType.checked || preMod.expectedException == null){
                         for(var initSeq:VALID_INIT_SEQS){
                             TestExecutorService
-                                    .submitTest(()->testItrnext_voidHelper(preMod,outputType,checkedType,initSeq));
+                            .submitTest(()->testItrnext_voidHelper(preMod,outputType,checkedType,initSeq));
                         }
                     }
                 }
@@ -897,8 +895,8 @@ public class BooleanSetImplTest{
                 for(int arrSize=0;arrSize <= bound;++arrSize){
                     final Object[] paramArr=new Object[arrSize];
                     TestExecutorService
-                            .submitTest(()->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
-                                    .verifyToArray(paramArr));
+                    .submitTest(()->initSeq.initialize(new BooleanSetImplMonitor(checkedType))
+                            .verifyToArray(paramArr));
                 }
             }
         }
@@ -910,8 +908,8 @@ public class BooleanSetImplTest{
             for(final var checkedType:CheckedType.values()){
                 for(final var initSeq:VALID_INIT_SEQS){
                     TestExecutorService
-                            .submitTest(()->outputType
-                                    .verifyToArray(initSeq.initialize(new BooleanSetImplMonitor(checkedType))));
+                    .submitTest(()->outputType
+                            .verifyToArray(initSeq.initialize(new BooleanSetImplMonitor(checkedType))));
                 }
             }
 

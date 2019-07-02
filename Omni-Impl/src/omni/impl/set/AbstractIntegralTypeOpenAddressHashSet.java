@@ -1,19 +1,7 @@
 package omni.impl.set;
 
 public abstract class AbstractIntegralTypeOpenAddressHashSet<E> extends AbstractOpenAddressHashSet<E>{
-    static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
-        int hash=(int)(magicWord >>> 32);
-        int numLeft=(int)magicWord;
-        do{
-            if((word & 1L << valOffset) != 0L){
-                hash+=valOffset;
-                if(--numLeft == 0){
-                    break;
-                }
-            }
-        }while(++valOffset != valBound);
-        return numLeft | (long)hash << 32;
-    }
+
     transient long word0;
     transient long word1;
     transient long word2;
@@ -21,16 +9,6 @@ public abstract class AbstractIntegralTypeOpenAddressHashSet<E> extends Abstract
     transient int tableSize;
     AbstractIntegralTypeOpenAddressHashSet(){
         super();
-    }
-    AbstractIntegralTypeOpenAddressHashSet(int initialCapacity,float loadFactor,long word0,long word1,long word2,
-            long word3){
-        // for testing purposes
-        super(tableSizeFor(initialCapacity),loadFactor,
-                Long.bitCount(word0) + Long.bitCount(word1) + Long.bitCount(word2) + Long.bitCount(word3));
-        this.word0=word0;
-        this.word1=word1;
-        this.word2=word2;
-        this.word3=word3;
     }
     AbstractIntegralTypeOpenAddressHashSet(int initialCapacity){
         super(initialCapacity);

@@ -80,7 +80,7 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         boolean containsAfter=inputType.callcontains(collection,inputVal,functionCallType);
         Assertions.assertEquals(!result,containsBefore);
         Assertions.assertTrue(containsAfter);
-        Assertions.assertEquals(sizeBefore,result?sizeAfter-1:sizeAfter);
+        Assertions.assertEquals(sizeBefore,result?sizeAfter - 1:sizeAfter);
         updateAddState(inputVal,inputType,result);
         verifyCollectionState();
         return result;

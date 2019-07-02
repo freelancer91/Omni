@@ -23,6 +23,7 @@ import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredRemoveIfPredicateGen;
 import omni.impl.MonitoredSet;
+import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
@@ -75,100 +76,111 @@ public class IntegralOpenAddressHashSetTest{
     private static void testadd_valHelper(DataType collectionType,DataType inputType,CheckedType checkedType,
             float loadFactor,int initialCapacity,FunctionCallType functionCallType){
         final var monitor=new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity,loadFactor);
+        if(collectionType != DataType.CHAR){
+            for(int curr=-128;curr < 128;++curr){
+                final Object inputVal=inputType.convertValUnchecked(curr);
+                testadd_valHelper(collectionType,inputType,functionCallType,monitor,inputVal);
+            }
+        }
         long pPrev=0;
         long prev=1;
         for(int i=0;i < 1000;++i){
             final long curr=pPrev + prev;
-            boolean alreadyContains;
+
             final Object inputVal=inputType.convertValUnchecked(curr);
-            switch(collectionType){
-            case CHAR:{
-                final var set=(CharOpenAddressHashSet)monitor.set;
-                switch(inputType){
-                case BOOLEAN:
-                    alreadyContains=set.contains((boolean)inputVal);
-                    break;
-                case CHAR:
-                    alreadyContains=set.contains((char)inputVal);
-                    break;
-                default:
-                    throw DataType.invalidDataType(inputType);
-                }
-                break;
-            }
-            case SHORT:{
-                final var set=(ShortOpenAddressHashSet)monitor.set;
-                switch(inputType){
-                case BOOLEAN:
-                    alreadyContains=set.contains((boolean)inputVal);
-                    break;
-                case BYTE:
-                    alreadyContains=set.contains((byte)inputVal);
-                    break;
-                case SHORT:
-                    alreadyContains=set.contains((short)inputVal);
-                    break;
-                default:
-                    throw DataType.invalidDataType(inputType);
-                }
-                break;
-            }
-            case INT:{
-                final var set=(IntOpenAddressHashSet)monitor.set;
-                switch(inputType){
-                case BOOLEAN:
-                    alreadyContains=set.contains((boolean)inputVal);
-                    break;
-                case BYTE:
-                    alreadyContains=set.contains((byte)inputVal);
-                    break;
-                case CHAR:
-                    alreadyContains=set.contains((char)inputVal);
-                    break;
-                case SHORT:
-                    alreadyContains=set.contains((short)inputVal);
-                    break;
-                case INT:
-                    alreadyContains=set.contains((int)inputVal);
-                    break;
-                default:
-                    throw DataType.invalidDataType(inputType);
-                }
-                break;
-            }
-            case LONG:{
-                final var set=(LongOpenAddressHashSet)monitor.set;
-                switch(inputType){
-                case BOOLEAN:
-                    alreadyContains=set.contains((boolean)inputVal);
-                    break;
-                case BYTE:
-                    alreadyContains=set.contains((byte)inputVal);
-                    break;
-                case CHAR:
-                    alreadyContains=set.contains((char)inputVal);
-                    break;
-                case SHORT:
-                    alreadyContains=set.contains((short)inputVal);
-                    break;
-                case INT:
-                    alreadyContains=set.contains((int)inputVal);
-                    break;
-                case LONG:
-                    alreadyContains=set.contains((long)inputVal);
-                    break;
-                default:
-                    throw DataType.invalidDataType(inputType);
-                }
-                break;
-            }
-            default:
-                throw DataType.invalidDataType(collectionType);
-            }
-            Assertions.assertNotEquals(alreadyContains,monitor.verifyAdd(inputVal,inputType,functionCallType));
+            testadd_valHelper(collectionType,inputType,functionCallType,monitor,inputVal);
             pPrev=prev;
             prev=curr;
         }
+    }
+    private static void testadd_valHelper(DataType collectionType,DataType inputType,FunctionCallType functionCallType,
+            final IntegralOpenAddressHashSetMonitor monitor,final Object inputVal){
+        boolean alreadyContains;
+        switch(collectionType){
+        case CHAR:{
+            final var set=(CharOpenAddressHashSet)monitor.set;
+            switch(inputType){
+            case BOOLEAN:
+                alreadyContains=set.contains((boolean)inputVal);
+                break;
+            case CHAR:
+                alreadyContains=set.contains((char)inputVal);
+                break;
+            default:
+                throw DataType.invalidDataType(inputType);
+            }
+            break;
+        }
+        case SHORT:{
+            final var set=(ShortOpenAddressHashSet)monitor.set;
+            switch(inputType){
+            case BOOLEAN:
+                alreadyContains=set.contains((boolean)inputVal);
+                break;
+            case BYTE:
+                alreadyContains=set.contains((byte)inputVal);
+                break;
+            case SHORT:
+                alreadyContains=set.contains((short)inputVal);
+                break;
+            default:
+                throw DataType.invalidDataType(inputType);
+            }
+            break;
+        }
+        case INT:{
+            final var set=(IntOpenAddressHashSet)monitor.set;
+            switch(inputType){
+            case BOOLEAN:
+                alreadyContains=set.contains((boolean)inputVal);
+                break;
+            case BYTE:
+                alreadyContains=set.contains((byte)inputVal);
+                break;
+            case CHAR:
+                alreadyContains=set.contains((char)inputVal);
+                break;
+            case SHORT:
+                alreadyContains=set.contains((short)inputVal);
+                break;
+            case INT:
+                alreadyContains=set.contains((int)inputVal);
+                break;
+            default:
+                throw DataType.invalidDataType(inputType);
+            }
+            break;
+        }
+        case LONG:{
+            final var set=(LongOpenAddressHashSet)monitor.set;
+            switch(inputType){
+            case BOOLEAN:
+                alreadyContains=set.contains((boolean)inputVal);
+                break;
+            case BYTE:
+                alreadyContains=set.contains((byte)inputVal);
+                break;
+            case CHAR:
+                alreadyContains=set.contains((char)inputVal);
+                break;
+            case SHORT:
+                alreadyContains=set.contains((short)inputVal);
+                break;
+            case INT:
+                alreadyContains=set.contains((int)inputVal);
+                break;
+            case LONG:
+                alreadyContains=set.contains((long)inputVal);
+                break;
+            default:
+                throw DataType.invalidDataType(inputType);
+            }
+            break;
+        }
+        default:
+            throw DataType.invalidDataType(collectionType);
+        }
+        Assertions.assertNotEquals(alreadyContains,monitor.verifyAdd(inputVal,inputType,functionCallType));
     }
     private static void testConstructor_floatHelper(float loadFactor,DataType collectionType,CheckedType checkedType){
         if(loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
@@ -178,6 +190,7 @@ public class IntegralOpenAddressHashSetTest{
                     ()->new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,loadFactor));
         }
     }
+
     private static void testConstructor_intfloatHelper(int initialCapacity,float loadFactor,DataType collectionType,
             CheckedType checkedType){
         if(initialCapacity >= 0 && loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
@@ -194,6 +207,17 @@ public class IntegralOpenAddressHashSetTest{
         }else{
             Assertions.assertThrows(IllegalArgumentException.class,
                     ()->new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity));
+        }
+    }
+    private static void testforEach_ConsumerHelper(DataType collectionType,MonitoredFunctionGen functionGen,
+            FunctionCallType functionCallType,long randSeed,CheckedType checkedType,SetInitializationSequence initSeq){
+        final var monitor=initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
+        if(functionGen.expectedException == null || monitor.size() == 0){
+            monitor.verifyForEach(functionGen,functionCallType,randSeed);
+        }else{
+            Assertions.assertThrows(functionGen.expectedException,
+                    ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+            monitor.verifyCollectionState();
         }
     }
     private static void testItrforEachRemaining_ConsumerHelper(int itrScenario,IllegalModification preMod,
@@ -269,6 +293,48 @@ public class IntegralOpenAddressHashSetTest{
             setMonitor.verifyCollectionState();
         }
     }
+    private static void testremoveIf_PredicateHelper(DataType collectionType,MonitoredRemoveIfPredicateGen filterGen,
+            FunctionCallType functionCallType,long randSeed,double threshold,CheckedType checkedType,
+            SetInitializationSequence initSeq){
+        final var monitor=initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
+        final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,4);
+        final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,randSeed);
+        final int sizeBefore=monitor.size();
+        if(filterGen.expectedException == null || sizeBefore == 0){
+            final boolean result=monitor.verifyRemoveIf(filter,functionCallType);
+            if(sizeBefore == 0b00){
+                Assertions.assertFalse(result);
+            }else{
+                switch(filterGen){
+                case Random:
+                    Assertions.assertEquals(filter.numRemoved != 0,result);
+                    break;
+                case RemoveAll:
+                    Assertions.assertTrue(monitor.set.isEmpty());
+                    Assertions.assertTrue(result);
+                    break;
+                case RemoveFalse:
+                    Assertions.assertFalse(monitor.set.contains(false));
+                    Assertions.assertEquals((expectedWords[collectionType == DataType.CHAR?0:2] & 0b01) != 0,result);
+                    break;
+                case RemoveNone:
+                    Assertions.assertFalse(result);
+                    Assertions.assertFalse(monitor.set.isEmpty());
+                    break;
+                case RemoveTrue:
+                    Assertions.assertFalse(monitor.set.contains(true));
+                    Assertions.assertEquals((expectedWords[collectionType == DataType.CHAR?0:2] & 0b10) != 0,result);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown filterGen " + filterGen);
+                }
+            }
+        }else{
+            Assertions.assertThrows(filterGen.expectedException,()->monitor.verifyRemoveIf(filter,functionCallType));
+            monitor.verifyCollectionState();
+        }
+    }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testadd_val(){
         final float[] loadFactors=new float[]{0.25f,0.5f,0.75f,0.9f,1.0f};
@@ -289,34 +355,23 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testadd_val");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testclear_void(){
-        for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(var checkedType:CheckedType.values()){
-                for(var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->{
-                        initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                        .verifyClear();
-                    });
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testclear_void");
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).verifyClear();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testclear_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testclone_void(){
-        for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(var checkedType:CheckedType.values()){
-                for(var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->{
-                        initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                        .verifyClone();
-                    });
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testclone_void");
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).verifyClone();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testclone_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testConstructor_float(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -331,6 +386,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_float");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testConstructor_int(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -345,6 +401,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_int");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testConstructor_intfloat(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -363,6 +420,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_intfloat");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testConstructor_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -376,19 +434,11 @@ public class IntegralOpenAddressHashSetTest{
     @Disabled
     @org.junit.jupiter.api.Test
     public void testcontains_val(){
-        // TODO
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyContains(queryVal,
+                inputType,castType,modification);
+        test.runAllTests("IntegralOpenAddressHashSetTest.testcontains_val");
     }
-    private static void testforEach_ConsumerHelper(DataType collectionType,MonitoredFunctionGen functionGen,
-            FunctionCallType functionCallType,long randSeed,CheckedType checkedType,SetInitializationSequence initSeq){
-        final var monitor=initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
-        if(functionGen.expectedException == null || monitor.size() == 0){
-            monitor.verifyForEach(functionGen,functionCallType,randSeed);
-        }else{
-            Assertions.assertThrows(functionGen.expectedException,
-                    ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
-            monitor.verifyCollectionState();
-        }
-    }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testforEach_Consumer(){
         for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -413,52 +463,40 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testforEach_Consumer");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testhashCode_void(){
-        for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(var checkedType:CheckedType.values()){
-                for(var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->{
-                        initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                        .verifyHashCode();
-                    });
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testhashCode_void");
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).verifyHashCode();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testhashCode_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testisEmpty_void(){
-        for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(var checkedType:CheckedType.values()){
-                for(var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->{
-                        initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                        .verifyIsEmpty();
-                    });
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testisEmpty_void");
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).verifyIsEmpty();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testisEmpty_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testiterator_void(){
-        for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(final var checkedType:CheckedType.values()){
-                for(final var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(
-                            ()->initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                            .getMonitoredIterator().verifyIteratorState());
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testiterator_void");
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).getMonitoredIterator()
+            .verifyIteratorState();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testiterator_void");
     }
     @Disabled
     @org.junit.jupiter.api.Test
     public void testItrclone_void(){
-        // TODO
+        final BasicTest test=(collectionType,checkedType,initSeq)->initSeq
+                .initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).getMonitoredIterator()
+                .verifyClone();
+        test.runAllTests("IntegralOpenAddressHashSetTest.testItrclone_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testItrforEachRemaining_Consumer(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -520,8 +558,19 @@ public class IntegralOpenAddressHashSetTest{
     @Disabled
     @org.junit.jupiter.api.Test
     public void testItrhasNext_void(){
-        // TODO
+        final BasicTest test=(collectionType,checkedType,initSeq)->{
+            final var setMonitor=initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
+            final var itrMonitor=setMonitor.getMonitoredIterator();
+            final var setSize=setMonitor.size();
+            for(int i=0;i < setSize;++i){
+                Assertions.assertTrue(itrMonitor.verifyHasNext());
+                itrMonitor.iterateForward();
+            }
+            Assertions.assertFalse(itrMonitor.verifyHasNext());
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testItrhasNext_void");
     }
+    // @Disabled
     @org.junit.jupiter.api.Test
     public void testItrnext_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -540,6 +589,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrnext_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testItrremove_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -577,49 +627,12 @@ public class IntegralOpenAddressHashSetTest{
     @Disabled
     @org.junit.jupiter.api.Test
     public void testReadAndWrite(){
-        // TODO
+        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSeq)->initSeq
+                .initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
+                .verifyReadAndWrite(functionGen);
+        test.runAllTests("IntegralOpenAddressHashSetTest.testReadAndWrite");
     }
-    private static void testremoveIf_PredicateHelper(DataType collectionType,MonitoredRemoveIfPredicateGen filterGen,
-            FunctionCallType functionCallType,long randSeed,double threshold,CheckedType checkedType,
-            SetInitializationSequence initSeq){
-        final var monitor=initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
-        final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,4);
-        final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,randSeed);
-        final int sizeBefore=monitor.size();
-        if(filterGen.expectedException == null || sizeBefore == 0){
-            final boolean result=monitor.verifyRemoveIf(filter,functionCallType);
-            if(sizeBefore == 0b00){
-                Assertions.assertFalse(result);
-            }else{
-                switch(filterGen){
-                case Random:
-                    Assertions.assertEquals(filter.numRemoved != 0,result);
-                    break;
-                case RemoveAll:
-                    Assertions.assertTrue(monitor.set.isEmpty());
-                    Assertions.assertTrue(result);
-                    break;
-                case RemoveFalse:
-                    Assertions.assertFalse(monitor.set.contains(false));
-                    Assertions.assertEquals((expectedWords[2] & 0b01) != 0,result);
-                    break;
-                case RemoveNone:
-                    Assertions.assertFalse(result);
-                    Assertions.assertFalse(monitor.set.isEmpty());
-                    break;
-                case RemoveTrue:
-                    Assertions.assertFalse(monitor.set.contains(true));
-                    Assertions.assertEquals((expectedWords[2] & 0b10) != 0,result);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unknown filterGen " + filterGen);
-                }
-            }
-        }else{
-            Assertions.assertThrows(filterGen.expectedException,()->monitor.verifyRemoveIf(filter,functionCallType));
-            monitor.verifyCollectionState();
-        }
-    }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testremoveIf_Predicate(){
         for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -654,27 +667,51 @@ public class IntegralOpenAddressHashSetTest{
     @Disabled
     @org.junit.jupiter.api.Test
     public void testremoveVal_val(){
-        // TODO
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyRemoveVal(queryVal,
+                inputType,castType,modification);
+        test.runAllTests("IntegralOpenAddressHashSetTest.testremoveVal_val");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
-    public void testsize_void(){
-        for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(var checkedType:CheckedType.values()){
+    public void testsetLoadFactor_float(){
+        for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
+            for(final var checkedType:CheckedType.values()){
                 for(var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->{
-                        initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                        .verifySize();
-                    });
+                    for(final float loadFactor:ILLEGAL_LOAD_FACTORS){
+                        if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                            TestExecutorService.submitTest(()->initSeq
+                                    .initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
+                                    .verifySetLoadFactor(loadFactor));
+                        }
+                    }
                 }
             }
         }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testsize_void");
+        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testsetLoadFactor_float");
+    }
+    @Disabled
+    @org.junit.jupiter.api.Test
+    public void testsize_void(){
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).verifySize();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testsize_void");
     }
     @Disabled
     @org.junit.jupiter.api.Test
     public void testtoArray_IntFunction(){
-        // TODO
+        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSeq)->{
+            final var monitor=initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
+            if(functionGen.expectedException == null){
+                monitor.verifyToArray(functionGen);
+            }else{
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
+                monitor.verifyCollectionState();
+            }
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testToArray_IntFunction");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testtoArray_ObjectArray(){
         for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -694,6 +731,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testtoArray_ObjectArray");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testtoArray_void(){
         for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -710,20 +748,15 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testtoArray_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testtoString_void(){
-        for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
-            for(var checkedType:CheckedType.values()){
-                for(var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->{
-                        initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                        .verifyToString();
-                    });
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testtoString_void");
+        BasicTest test=(collectionType,checkedType,initSeq)->{
+            initSeq.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType)).verifyToString();
+        };
+        test.runAllTests("IntegralOpenAddressHashSetTest.testtoString_void");
     }
+
     @org.junit.jupiter.api.AfterEach
     public void verifyAllExecuted(){
         int numTestsRemaining;
@@ -731,6 +764,19 @@ public class IntegralOpenAddressHashSetTest{
             System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
         }
         TestExecutorService.reset();
+    }
+    private interface BasicTest{
+        default void runAllTests(String testName){
+            for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
+                for(var checkedType:CheckedType.values()){
+                    for(var initSeq:VALID_INIT_SEQS){
+                        TestExecutorService.submitTest(()->runTest(collectionType,checkedType,initSeq));
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
+        }
+        void runTest(DataType collectionType,CheckedType checkedType,SetInitializationSequence initSeq);
     }
     private static class IntegralOpenAddressHashSetMonitor
     implements
@@ -1086,6 +1132,97 @@ public class IntegralOpenAddressHashSetTest{
             }
         updateCollectionState();
         }
+        private void updateRemoveState(DataType inputType,Object inputVal,FunctionCallType funtionCallType){
+            switch(dataType){
+            case CHAR:{
+                char v;
+                switch(inputType){
+                case BOOLEAN:
+                    v=(boolean)inputVal?(char)1:(char)0;
+                    break;
+                case CHAR:
+                    v=(char)inputVal;
+                    break;
+                default:
+                    throw DataType.invalidDataType(inputType);
+                }
+                removeVal(v);
+                break;
+            }
+            case SHORT:{
+                short v;
+                switch(inputType){
+                case BOOLEAN:
+                    v=(boolean)inputVal?(short)1:(short)0;
+                    break;
+                case BYTE:
+                    v=(byte)inputVal;
+                    break;
+                case SHORT:
+                    v=(short)inputVal;
+                    break;
+                default:
+                    throw DataType.invalidDataType(inputType);
+                }
+                removeVal(v);
+                break;
+            }
+            case INT:{
+                int v;
+                switch(inputType){
+                case BOOLEAN:
+                    v=(boolean)inputVal?(int)1:(int)0;
+                    break;
+                case BYTE:
+                    v=(byte)inputVal;
+                    break;
+                case SHORT:
+                    v=(short)inputVal;
+                    break;
+                case CHAR:
+                    v=(char)inputVal;
+                    break;
+                case INT:
+                    v=(int)inputVal;
+                    break;
+                default:
+                    throw DataType.invalidDataType(inputType);
+                }
+                removeVal(v);
+                break;
+            }
+            case LONG:{
+                long v;
+                switch(inputType){
+                case BOOLEAN:
+                    v=(boolean)inputVal?(long)1:(long)0;
+                    break;
+                case BYTE:
+                    v=(byte)inputVal;
+                    break;
+                case SHORT:
+                    v=(short)inputVal;
+                    break;
+                case CHAR:
+                    v=(char)inputVal;
+                    break;
+                case INT:
+                    v=(int)inputVal;
+                    break;
+                case LONG:
+                    v=(long)inputVal;
+                    break;
+                default:
+                    throw DataType.invalidDataType(inputType);
+                }
+                removeVal(v);
+                break;
+            }
+            default:
+                throw DataType.invalidDataType(dataType);
+            }
+            ++expectedModCount;
+        }
         @Override
         public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification){
             final Object inputVal=queryVal.getInputVal(dataType,modification);
@@ -1110,6 +1247,25 @@ public class IntegralOpenAddressHashSetTest{
                 throw DataType.invalidDataType(dataType);
             }
             ++expectedModCount;
+        }
+        @Override
+        public boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){
+            boolean containsBefore=inputType.callcontains(set,inputVal,functionCallType);
+            int sizeBefore=expectedSize;
+            boolean result=inputType.callCollectionAdd(inputVal,set,functionCallType);
+            int sizeAfter=set.size();
+            boolean containsAfter=inputType.callcontains(set,inputVal,functionCallType);
+            Assertions.assertEquals(!result,containsBefore);
+            Assertions.assertTrue(containsAfter);
+            Assertions.assertEquals(sizeBefore,result?sizeAfter - 1:sizeAfter);
+            updateAddState(inputVal,inputType,result);
+            Assertions.assertTrue(inputType.callremoveVal(set,inputVal,functionCallType));
+            updateRemoveState(inputType,inputVal,functionCallType);
+            Assertions.assertTrue(inputType.callCollectionAdd(inputVal,set,functionCallType));
+            Assertions.assertFalse(inputType.callCollectionAdd(inputVal,set,functionCallType));
+            updateAddState(inputVal,inputType,true);
+            verifyCollectionState();
+            return result;
         }
         @Override
         public int size(){
@@ -1403,7 +1559,6 @@ public class IntegralOpenAddressHashSetTest{
             AbstractIntegralTypeOpenAddressHashSet<?> cloneSet;
             Assertions.assertEquals(expectedSize,(cloneSet=(AbstractIntegralTypeOpenAddressHashSet<?>)clone).size);
             Assertions.assertEquals(expectedTableSize,cloneSet.tableSize);
-            Assertions.assertEquals(expectedMaxTableSize,cloneSet.maxTableSize);
             Assertions.assertEquals(expectedLoadFactor,cloneSet.loadFactor);
             Assertions.assertEquals(expectedWords[0],cloneSet.word0);
             Assertions.assertEquals(expectedWords[1],cloneSet.word1);
@@ -1418,9 +1573,7 @@ public class IntegralOpenAddressHashSetTest{
                 if(expectedTableLength == 0){
                     Assertions.assertNull(((CharOpenAddressHashSet)cloneSet).table);
                 }else{
-                    char[] expectedTable;
-                    Assertions.assertEquals((expectedTable=(char[])this.expectedTable).length,
-                            ((CharOpenAddressHashSet)cloneSet).table.length);
+                    var expectedTable=(char[])this.expectedTable;
                     while(--expectedTableLength >= 0){
                         char v;
                         switch(v=expectedTable[expectedTableLength]){
@@ -1439,9 +1592,7 @@ public class IntegralOpenAddressHashSetTest{
                 if(expectedTableLength == 0){
                     Assertions.assertNull(((IntOpenAddressHashSet)cloneSet).table);
                 }else{
-                    int[] expectedTable;
-                    Assertions.assertEquals((expectedTable=(int[])this.expectedTable).length,
-                            ((IntOpenAddressHashSet)cloneSet).table.length);
+                    var expectedTable=(int[])this.expectedTable;
                     while(--expectedTableLength >= 0){
                         int v;
                         switch(v=expectedTable[expectedTableLength]){
@@ -1460,9 +1611,7 @@ public class IntegralOpenAddressHashSetTest{
                 if(expectedTableLength == 0){
                     Assertions.assertNull(((LongOpenAddressHashSet)cloneSet).table);
                 }else{
-                    long[] expectedTable;
-                    Assertions.assertEquals((expectedTable=(long[])this.expectedTable).length,
-                            ((LongOpenAddressHashSet)cloneSet).table.length);
+                    var expectedTable=(long[])this.expectedTable;
                     while(--expectedTableLength >= 0){
                         long v;
                         if((v=expectedTable[expectedTableLength]) != 0 && v != 1){
@@ -1478,9 +1627,7 @@ public class IntegralOpenAddressHashSetTest{
                 if(expectedTableLength == 0){
                     Assertions.assertNull(((ShortOpenAddressHashSet)cloneSet).table);
                 }else{
-                    short[] expectedTable;
-                    Assertions.assertEquals((expectedTable=(short[])this.expectedTable).length,
-                            ((ShortOpenAddressHashSet)cloneSet).table.length);
+                    var expectedTable=(short[])this.expectedTable;
                     while(--expectedTableLength >= 0){
                         short v;
                         switch(v=expectedTable[expectedTableLength]){
@@ -1615,6 +1762,35 @@ public class IntegralOpenAddressHashSetTest{
                 }
             }
         }
+        public void verifySetLoadFactor(float newLoadFactor){
+            if(newLoadFactor <= 0.0f || newLoadFactor > 1.0f || newLoadFactor != newLoadFactor){
+                Assertions.assertThrows(IllegalArgumentException.class,()->set.setLoadFactor(newLoadFactor));
+            }else{
+                set.setLoadFactor(newLoadFactor);
+                this.expectedLoadFactor=newLoadFactor;
+                if(expectedTable != null){
+                    int tableLength;
+                    switch(dataType){
+                    case CHAR:
+                        tableLength=((char[])expectedTable).length;
+                        break;
+                    case SHORT:
+                        tableLength=((short[])expectedTable).length;
+                        break;
+                    case INT:
+                        tableLength=((int[])expectedTable).length;
+                        break;
+                    case LONG:
+                        tableLength=((long[])expectedTable).length;
+                        break;
+                    default:
+                        throw DataType.invalidDataType(dataType);
+                    }
+                    this.expectedMaxTableSize=(int)(tableLength * newLoadFactor);
+                }
+            }
+            verifyCollectionState();
+        }
         @Override
         public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
             set.writeExternal(oos);
@@ -1625,16 +1801,18 @@ public class IntegralOpenAddressHashSetTest{
                 expectedMaxTableSize=(int)((hash=table.length << 1) * expectedLoadFactor);
                 char[] newTable;
                 expectedTable=newTable=new char[expectedTableLength=hash];
-                for(int i=0;;++i){
-                    char tableVal;
-                    if((tableVal=table[i]) > 1){
-                        quickInsert(newTable,tableVal);
-                        if(--tableSize == 1){
-                            quickInsert(newTable,inputVal);
-                            return;
+                if(tableSize != 1){
+                    for(int i=0;;++i){
+                        char tableVal;
+                        if((tableVal=table[i]) > 1){
+                            quickInsert(newTable,tableVal);
+                            if(--tableSize == 1){
+                                break;
+                            }
                         }
                     }
                 }
+                quickInsert(newTable,inputVal);
             }else{
                 table[hash]=inputVal;
             }
@@ -1645,16 +1823,18 @@ public class IntegralOpenAddressHashSetTest{
                 expectedMaxTableSize=(int)((hash=table.length << 1) * expectedLoadFactor);
                 int[] newTable;
                 expectedTable=newTable=new int[expectedTableLength=hash];
-                for(int i=0;;++i){
-                    int tableVal;
-                    if(((tableVal=table[i]) & -2) != 0){
-                        quickInsert(newTable,tableVal);
-                        if(--tableSize == 1){
-                            quickInsert(newTable,inputVal);
-                            return;
+                if(tableSize != 1){
+                    for(int i=0;;++i){
+                        int tableVal;
+                        if(((tableVal=table[i]) & -2) != 0){
+                            quickInsert(newTable,tableVal);
+                            if(--tableSize == 1){
+                                break;
+                            }
                         }
                     }
                 }
+                quickInsert(newTable,inputVal);
             }else{
                 table[hash]=inputVal;
             }
@@ -1665,16 +1845,18 @@ public class IntegralOpenAddressHashSetTest{
                 expectedMaxTableSize=(int)((hash=table.length << 1) * expectedLoadFactor);
                 long[] newTable;
                 expectedTable=newTable=new long[expectedTableLength=hash];
-                for(int i=0;;++i){
-                    long tableVal;
-                    if(((tableVal=table[i]) & -2) != 0){
-                        quickInsert(newTable,tableVal);
-                        if(--tableSize == 1){
-                            quickInsert(newTable,inputVal);
-                            return;
+                if(tableSize != 1){
+                    for(int i=0;;++i){
+                        long tableVal;
+                        if(((tableVal=table[i]) & -2) != 0){
+                            quickInsert(newTable,tableVal);
+                            if(--tableSize == 1){
+                                break;
+                            }
                         }
                     }
                 }
+                quickInsert(newTable,inputVal);
             }else{
                 table[hash]=inputVal;
             }
@@ -1685,16 +1867,18 @@ public class IntegralOpenAddressHashSetTest{
                 expectedMaxTableSize=(int)((hash=table.length << 1) * expectedLoadFactor);
                 short[] newTable;
                 expectedTable=newTable=new short[expectedTableLength=hash];
-                for(int i=0;;++i){
-                    short tableVal;
-                    if(((tableVal=table[i]) & -2) != 0){
-                        quickInsert(newTable,tableVal);
-                        if(--tableSize == 1){
-                            quickInsert(newTable,inputVal);
-                            return;
+                if(tableSize != 1){
+                    for(int i=0;;++i){
+                        short tableVal;
+                        if(((tableVal=table[i]) & -2) != 0){
+                            quickInsert(newTable,tableVal);
+                            if(--tableSize == 1){
+                                break;
+                            }
                         }
                     }
                 }
+                quickInsert(newTable,inputVal);
             }else{
                 table[hash]=inputVal;
             }
@@ -1838,7 +2022,7 @@ public class IntegralOpenAddressHashSetTest{
             --expectedSize;
         }
         private void removeVal(int v){
-            if((v & 0xffffff00) == 0){
+            if(v < 128 && v >= -128){
                 expectedWords[(v >> 6) + 2]&=~(1L << v);
             }else{
                 final int[] expectedTable=(int[])this.expectedTable;
@@ -1856,7 +2040,7 @@ public class IntegralOpenAddressHashSetTest{
             --expectedSize;
         }
         private void removeVal(long v){
-            if((v & 0xffffffffffffff00L) == 0){
+            if(v < 128 && v >= -128){
                 int i;
                 expectedWords[((i=(int)v) >> 6) + 2]&=~(1L << i);
             }else{
@@ -1875,7 +2059,7 @@ public class IntegralOpenAddressHashSetTest{
             --expectedSize;
         }
         private void removeVal(short v){
-            if((v & 0xffffff00) == 0){
+            if(v < 128 && v >= -128){
                 expectedWords[(v >> 6) + 2]&=~(1L << v);
             }else{
                 final short[] expectedTable=(short[])this.expectedTable;
@@ -2586,6 +2770,134 @@ public class IntegralOpenAddressHashSetTest{
                     throw DataType.invalidDataType(dataType);
                 }
             }
+        }
+
+    }
+
+    private interface MonitoredFunctionGenTest{
+        default void runAllTests(String testName){
+            for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
+                for(final var functionGen:StructType.IntegralOpenAddressHashSet.validMonitoredFunctionGens){
+                    for(final var checkedType:CheckedType.values()){
+                        if(checkedType.checked || functionGen.expectedException == null){
+                            for(final var initSeq:VALID_INIT_SEQS){
+                                TestExecutorService
+                                .submitTest(()->runTest(collectionType,functionGen,checkedType,initSeq));
+                            }
+                        }
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
+        }
+        void runTest(DataType collectionType,MonitoredFunctionGen functionGen,CheckedType checkedType,
+                SetInitializationSequence initSeq);
+    }
+    private interface QueryTest{
+        boolean callMethod(IntegralOpenAddressHashSetMonitor monitor,QueryVal queryVal,DataType inputType,
+                QueryCastType castType,QueryVal.QueryValModification modification);
+        default void runAllTests(String testName){
+            final int[] sizes=new int[]{0,1,2,3,4,5,8,13,16,21,32,34,55,64,89,128,129,144,233,256,257,377,512,610,987};
+            final float[] loadFactors=new float[]{0.75f,1.0f};
+            for(var loadFactor:loadFactors){
+                for(var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
+                    for(var queryVal:QueryVal.values()){
+                        queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                            castTypesToInputTypes.forEach((castType,inputTypes)->{
+                                inputTypes.forEach(inputType->{
+                                    final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
+                                            inputType,collectionType);
+                                    for(final var checkedType:CheckedType.values()){
+                                        for(var size:sizes){
+                                            TestExecutorService.submitTest(()->runTest(collectionType,queryVal,
+                                                    modification,inputType,castType,checkedType,size,loadFactor,-1.0d));
+                                            if(queryCanReturnTrue && size > 0){
+                                                TestExecutorService.submitTest(()->runTest(collectionType,queryVal,
+                                                        modification,inputType,castType,checkedType,size,loadFactor,
+                                                        0.0d));
+                                                switch(size){
+                                                case 3:
+                                                    TestExecutorService.submitTest(
+                                                            ()->runTest(collectionType,queryVal,modification,inputType,
+                                                                    castType,checkedType,size,loadFactor,0.5d));
+                                                case 2:
+                                                    TestExecutorService.submitTest(
+                                                            ()->runTest(collectionType,queryVal,modification,inputType,
+                                                                    castType,checkedType,size,loadFactor,1.0d));
+                                                case 1:
+                                                    break;
+                                                default:
+                                                    TestExecutorService.submitTest(
+                                                            ()->runTest(collectionType,queryVal,modification,inputType,
+                                                                    castType,checkedType,size,loadFactor,0.5d));
+                                                case 4:
+                                                    TestExecutorService.submitTest(
+                                                            ()->runTest(collectionType,queryVal,modification,inputType,
+                                                                    castType,checkedType,size,loadFactor,0.25d));
+                                                    TestExecutorService.submitTest(
+                                                            ()->runTest(collectionType,queryVal,modification,inputType,
+                                                                    castType,checkedType,size,loadFactor,0.75d));
+                                                    TestExecutorService.submitTest(
+                                                            ()->runTest(collectionType,queryVal,modification,inputType,
+                                                                    castType,checkedType,size,loadFactor,1.0d));
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    }
+                }
+            }
+
+            TestExecutorService.completeAllTests(testName);
+        }
+        default void runTest(DataType collectionType,QueryVal queryVal,QueryVal.QueryValModification modification,
+                DataType inputType,QueryCastType castType,CheckedType checkedType,int setSize,float loadFactor,
+                double position){
+            var monitor=new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,0,loadFactor);
+            boolean expectedResult;
+            if(position < 0){
+                expectedResult=false;
+                switch(collectionType){
+                case CHAR:
+                    queryVal.initDoesNotContain((OmniSet.OfChar)monitor.set,setSize,0,modification);
+                    break;
+                case SHORT:
+                    queryVal.initDoesNotContain((OmniSet.OfShort)monitor.set,setSize,0,modification);
+                    break;
+                case INT:
+                    queryVal.initDoesNotContain((OmniSet.OfInt)monitor.set,setSize,0,modification);
+                    break;
+                case LONG:
+                    queryVal.initDoesNotContain((OmniSet.OfLong)monitor.set,setSize,0,modification);
+                    break;
+                default:
+                    throw DataType.invalidDataType(collectionType);
+                }
+            }else{
+                expectedResult=true;
+                switch(collectionType){
+                case CHAR:
+                    queryVal.initContains((OmniSet.OfChar)monitor.set,setSize,0,position,modification);
+                    break;
+                case SHORT:
+                    queryVal.initContains((OmniSet.OfShort)monitor.set,setSize,0,position,modification);
+                    break;
+                case INT:
+                    queryVal.initContains((OmniSet.OfInt)monitor.set,setSize,0,position,modification);
+                    break;
+                case LONG:
+                    queryVal.initContains((OmniSet.OfLong)monitor.set,setSize,0,position,modification);
+                    break;
+                default:
+                    throw DataType.invalidDataType(collectionType);
+                }
+            }
+            monitor.updateCollectionState();
+            final boolean actualResult=callMethod(monitor,queryVal,inputType,castType,modification);
+            Assertions.assertEquals(expectedResult,actualResult);
         }
     }
 }

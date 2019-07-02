@@ -48,10 +48,31 @@ extends AbstractOpenAddressHashSet$<E>$
 extends AbstractOpenAddressHashSet<$BoxedType$>
 #ENDIF
 implements OmniSet.Of$ClassPrefix$$<E>${
+  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
   #IF OfRef
   private static final Object NULL=new Object();
   private static final Object DELETED=new Object();
   #ENDIF
+#IF OfLong,OfInt,OfShort,OfChar
+  private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
+    int hash=(int)(magicWord >>> 32);
+    int numLeft=(int)magicWord;
+    do{
+        if((word & 1L << valOffset) != 0L){
+  #IF OfLong
+            long v;
+            hash+=(int)((v=valOffset)^(v>>>32));
+  #ELSE
+            hash+=valOffset;
+  #ENDIF
+            if(--numLeft == 0){
+                break;
+            }
+        }
+    }while(++valOffset != valBound);
+    return numLeft | (long)hash << 32;
+  }
+#ENDIF
   
 #MACRODEF QuickInsert(TABLETYPE,VALTYPE,HASHFUNCTION)
 private static void quickInsert(TABLETYPE[] table,VALTYPE val){
@@ -85,18 +106,14 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   int
   #ENDIF
   valOffset,$TypeNameModifier$Predicate$<? super E>$ filter){
-    long marker=1L;
-    for(;;){
-        if((word & marker) != 0){
-            if(filter.test(($exposedType$)valOffset)){
-                word&=~marker;
-            }
-        }
-        if((marker<<=1) == 0){
-            return word;
-        }
-        ++valOffset;
+    long newWord=0L;
+    for(int tail0s;(tail0s=Long.numberOfTrailingZeros(word))!=64;++valOffset,word>>>=1){
+      word>>>=tail0s;
+      if(!filter.test(($exposedType$)(valOffset+=tail0s))){
+        newWord|=(1L<<valOffset);
+      }
     }
+    return newWord;
   }
 #ENDIF
 #IF OfDouble,OfFloat,OfRef
@@ -113,19 +130,21 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
     int size;
     if((size=that.size)!=0){
       $queryParameterType$[] table;
-      this.table=table=new $queryParameterType$[tableSizeFor(size)];
+      int tableLength;
+      this.table=table=new $queryParameterType$[tableLength=tableSizeFor(size)];
+      this.maxTableSize=(int)(tableLength*loadFactor);
       $queryParameterType$[] thatTable;
-      for(int i=(thatTable=that.table).length;;){
+      for(tableLength=(thatTable=that.table).length;;){
         $queryParameterType$ tableVal;
   #IF OfFloat
-        switch(tableVal=thatTable[--i]) {
+        switch(tableVal=thatTable[--tableLength]) {
         case $DELETED_TABLE_VAL$:
         case $EMPTY_TABLE_VAL$:
           continue;
         default:
         }
   #ELSE
-        if((tableVal=thatTable[--i]) == $EMPTY_TABLE_VAL$ || tableVal == $DELETED_TABLE_VAL$){
+        if((tableVal=thatTable[--tableLength]) == $EMPTY_TABLE_VAL$ || tableVal == $DELETED_TABLE_VAL$){
           continue;
         }
   #ENDIF
@@ -137,11 +156,13 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
     int tableSize;
     if((tableSize=that.tableSize)!=0){
       $ArrayType$[] table;
-      this.table=table=new $ArrayType$[tableSizeFor(tableSize)];
+      int tableLength;
+      this.table=table=new $ArrayType$[tableLength=tableSizeFor(tableSize)];
+      this.maxTableSize=(int)(tableLength*loadFactor);
       $ArrayType$[] thatTable;
-      for(int i=(thatTable=that.table).length;;){
+      for(tableLength=(thatTable=that.table).length;;){
         $ArrayType$ tableVal;
-        #MACRO IfIsPresentValue(tableVal=thatTable[--i])
+        #MACRO IfIsPresentValue(tableVal=thatTable[--tableLength])
         {
           quickInsert(table,tableVal);
           if(--tableSize==0){
@@ -161,12 +182,6 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   public $ClassPrefix$OpenAddressHashSet(int initialCapacity,float loadFactor){
     super(initialCapacity,loadFactor);
   }
-#IFNOT OfRef,OfDouble,OfFloat
-  $ClassPrefix$OpenAddressHashSet(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
-    //for testing purposes
-    super(initialCapacity,loadFactor,word0,word1,word2,word3);
-  }
-#ENDIF
 #IFNOT OfRef
   @Override public boolean add(boolean val){
   #IF OfDouble,OfFloat
@@ -1489,12 +1504,12 @@ public boolean removeIf(PREDICATE filter){
   #IF OfFloat,OfRef
     int size;
     if((size=this.size)!=0) {
-  #IF OfRef
+    #IF OfRef
        if(removeFromTable(val,val)){
          this.size=size-1;
          return true;
        }
-  #ELSE
+    #ELSE
       returnFalse:for(;;) {
         returnTrue:for(;;) {
           if(val==0) {
@@ -1509,7 +1524,7 @@ public boolean removeIf(PREDICATE filter){
         this.size=size-1;
         return true;
       }
-   #ENDIF
+    #ENDIF
   #ELSE
     returnFalse:for(;;){
       returnTrue:for(;;){
@@ -1533,9 +1548,9 @@ public boolean removeIf(PREDICATE filter){
     #ELSEIF OfShort
         switch(val>>6){
           case 0:
-            #MACRO RemoveFromWord(0,~(1L<<val))
+            #MACRO RemoveFromWord(2,~(1L<<val))
           case 1:
-            #MACRO RemoveFromWord(1,~(1L<<val))
+            #MACRO RemoveFromWord(3,~(1L<<val))
           default:
             if(val>Short.MAX_VALUE || !removeFromTable(val)){
               break returnFalse;
@@ -1545,9 +1560,9 @@ public boolean removeIf(PREDICATE filter){
     #ELSEIF OfInt,OfLong
         switch(val>>6){
           case 0:
-            #MACRO RemoveFromWord(0,~(1L<<val))
+            #MACRO RemoveFromWord(2,~(1L<<val))
           case 1:
-            #MACRO RemoveFromWord(1,~(1L<<val))
+            #MACRO RemoveFromWord(3,~(1L<<val))
           default:
             if(!removeFromTable(val)){
               break returnFalse;
@@ -1834,10 +1849,12 @@ Error unknown type $ClassPrefix$
           if(TypeUtil.floatEquals(val,l=(long)val)){
             int v;
             if((v=(int)l)!=l){
-              if(!removeFromTable(l)){
-                break returnFalse;
+              if(removeFromTable(l)){
+                break returnTrue;
               }
+              break returnFalse;
             }
+            
       #ELSE
 Error unknown type $ClassPrefix$
       #ENDIF
@@ -2178,7 +2195,7 @@ Error unknown type $ClassPrefix$
 private static int wordCopy(long word,int valOffset,int valBound,ARRTYPE[] dst,int dstOffset,int dstBound){
   do{
       if((word & 1L << valOffset) != 0L){
-          dst[dstOffset]=CAST(valBound);
+          dst[dstOffset]=CAST(valOffset);
           if(++dstOffset == dstBound){
               break;
           }
@@ -2370,7 +2387,7 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
                   }
               }
           }
-          buffer[size=(int)(magicWord >>> 32) + 1]=']';
+          buffer[size=(int)(magicWord >>> 32)]=']';
           return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
 #ELSEIF OfInt,OfLong,OfFloat
   #IF OfInt
@@ -2968,7 +2985,8 @@ private boolean tableContains(int val){
         maxTableSize=(int)((hash=table.length << 1) * loadFactor);
         $queryParameterType$[] newTable;
         this.table=newTable=new $queryParameterType$[hash];
-        for(int i=0;;++i){
+        if(size!=1){
+          for(int i=0;;++i){
             $queryParameterType$ tableVal;
   #IF OfFloat
             switch(tableVal=table[i]){
@@ -2984,10 +3002,11 @@ private boolean tableContains(int val){
   #ENDIF
             quickInsert(newTable,tableVal);
             if(--size == 1){
-              quickInsert(newTable,val);
-              return;
+              break;
             }
+          }
         }
+        quickInsert(newTable,val);
     }else{
         table[hash]=val;
     }
@@ -2999,17 +3018,19 @@ private boolean tableContains(int val){
       maxTableSize=(int)((hash=table.length<<1)*loadFactor);
       $ArrayType$[] newTable;
       this.table=newTable=new $ArrayType$[hash];
-      for(int i=0;;++i){
-        $ArrayType$ tableVal;
-        #MACRO IfIsPresentValue(tableVal=table[i])
-        {
-          quickInsert(newTable,tableVal);
-          if(--tableSize==1){
-            quickInsert(newTable,val);
-            return;
+      if(tableSize!=1){
+        for(int i=0;;++i){
+          $ArrayType$ tableVal;
+          #MACRO IfIsPresentValue(tableVal=table[i])
+          {
+            quickInsert(newTable,tableVal);
+            if(--tableSize==1){
+              break;
+            }
           }
         }
       }
+      quickInsert(newTable,val);
     }else{
       table[hash]=val;
     }
@@ -3127,7 +3148,7 @@ private boolean tableContains(int val){
         }
       }
     }
-    buffer[size=(int)(magicWord >>> 32) + 1]=']';
+    buffer[size=(int)(magicWord >>> 32)]=']';
     return new String(buffer,0,size + 1,ToStringUtil.IOS8859CharSet);
   #ENDIF
   }
@@ -3235,7 +3256,7 @@ ERROR unknown type $ClassPrefix$
       case 1:
         #MACRO WordContains(3,1L<<val)
       default:
-        return val<Short.MAX_VALUE && tableContains(val);
+        return val<=Short.MAX_VALUE && tableContains(val);
     }
   #ELSEIF OfInt,OfLong
     switch(val>>6){
@@ -3689,12 +3710,7 @@ return (this.wordWORDNUM & (MASK))!=0;
     public Checked(int initialCapacity,float loadFactor){
         super(validateInitialCapacity(initialCapacity),validateLoadFactor(loadFactor));
     }
-#IFNOT OfRef,OfDouble,OfFloat
-    Checked(int initialCapacity,float loadFactor,long word0,long word1,long word2,long word3){
-      //for testing purposes
-      super(initialCapacity,loadFactor,word0,word1,word2,word3);
-    }
-#ENDIF
+
     @Override void updateMaxTableSize(float loadFactor){
       super.updateMaxTableSize(validateLoadFactor(loadFactor));
     }
@@ -4183,6 +4199,7 @@ return (this.wordWORDNUM & (MASK))!=0;
           do{
             table[tableIndicesRemoved[numRemovedFromTable]]=$DELETED_TABLE_VAL$;
           }while(--numRemovedFromTable!=-1);
+          return true;
       }
 #ELSE
       long word0;
@@ -4205,15 +4222,15 @@ return (this.wordWORDNUM & (MASK))!=0;
                   + Long.bitCount((word3=this.word3) ^ (word3=wordRemoveIf(word3,64,filter)));
   #ENDIF
           if((tableSize=this.tableSize) != 0){
-            for(int i=(table=this.table).length;;){
+            for(int i=(table=this.table).length,numLeftInTable=tableSize;;){
               $exposedType$ tableVal;
               #MACRO IfIsPresentValue(tableVal=table[--i])
               {
                   if(filter.test(tableVal)){
-                      (tableIndicesRemoved=new int[tableSize])[0]=i;
+                      (tableIndicesRemoved=new int[numLeftInTable])[0]=i;
                       ++numRemoved;
                       outer:for(;;){
-                        if(--tableSize==0){
+                        if(--numLeftInTable==0){
                           break;
                         }
                         for(;;){
@@ -4229,7 +4246,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                       }
                       break;
                   }
-                  if(--tableSize == 0){
+                  if(--numLeftInTable == 0){
                       break;
                   }
                }
@@ -4251,6 +4268,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                   table[tableIndicesRemoved[numRemovedFromTable]]=1;
               }while(--numRemovedFromTable !=-1);
           }
+          return true;
       }
 #ENDIF
       return false;

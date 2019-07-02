@@ -21,7 +21,6 @@ public abstract class AbstractOpenAddressHashSet<E> implements OmniSet<E>,Extern
         this.loadFactor=.75f;
     }
     AbstractOpenAddressHashSet(AbstractOpenAddressHashSet<? extends E> that){
-        this.maxTableSize=that.maxTableSize;
         this.loadFactor=that.loadFactor;
         this.size=that.size;
     }
@@ -36,12 +35,6 @@ public abstract class AbstractOpenAddressHashSet<E> implements OmniSet<E>,Extern
     AbstractOpenAddressHashSet(int initialCapacity,float loadFactor){
         this.maxTableSize=tableSizeFor(initialCapacity);
         this.loadFactor=loadFactor;
-    }
-    AbstractOpenAddressHashSet(int maxTableSize,float loadFactor,int size){
-        // for testing purposes
-        this.maxTableSize=maxTableSize;
-        this.loadFactor=loadFactor;
-        this.size=size;
     }
     static int validateInitialCapacity(int initialCapacity){
         if(initialCapacity < 0){

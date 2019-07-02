@@ -14,6 +14,7 @@ import java.util.ConcurrentModificationException;
 public class RefOpenAddressHashSet<E>
 extends AbstractOpenAddressHashSet<E>
 implements OmniSet.OfRef<E>{
+  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
   private static final Object NULL=new Object();
   private static final Object DELETED=new Object();
   private static void quickInsert(Object[] table,Object val){
@@ -36,11 +37,13 @@ implements OmniSet.OfRef<E>{
     int size;
     if((size=that.size)!=0){
       Object[] table;
-      this.table=table=new Object[tableSizeFor(size)];
+      int tableLength;
+      this.table=table=new Object[tableLength=tableSizeFor(size)];
+      this.maxTableSize=(int)(tableLength*loadFactor);
       Object[] thatTable;
-      for(int i=(thatTable=that.table).length;;){
+      for(tableLength=(thatTable=that.table).length;;){
         Object tableVal;
-        if((tableVal=thatTable[--i]) == null || tableVal == DELETED){
+        if((tableVal=thatTable[--tableLength]) == null || tableVal == DELETED){
           continue;
         }
         quickInsert(table,tableVal);
@@ -852,17 +855,19 @@ implements OmniSet.OfRef<E>{
         maxTableSize=(int)((hash=table.length << 1) * loadFactor);
         Object[] newTable;
         this.table=newTable=new Object[hash];
-        for(int i=0;;++i){
+        if(size!=1){
+          for(int i=0;;++i){
             Object tableVal;
             if((tableVal=table[i]) == null || tableVal == DELETED){
               continue;
             }
             quickInsert(newTable,tableVal);
             if(--size == 1){
-              quickInsert(newTable,val);
-              return;
+              break;
             }
+          }
         }
+        quickInsert(newTable,val);
     }else{
         table[hash]=val;
     }
@@ -1204,6 +1209,7 @@ implements OmniSet.OfRef<E>{
           do{
             table[tableIndicesRemoved[numRemovedFromTable]]=DELETED;
           }while(--numRemovedFromTable!=-1);
+          return true;
       }
       return false;
     }

@@ -171,81 +171,81 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }
         throw new UnsupportedOperationException("Unknown modType " + modType);
     }
-    @SuppressWarnings("unchecked") default void initContains(QueryVal queryVal,int setSize,double containsPosition,
-            Object initialVal){
-        final COL collection=getCollection();
-        final DataType dataType=getDataType();
-        initialVal=convertInitialVal(initialVal);
-        switch(dataType){
-        case BOOLEAN:
-            queryVal.initContains((OmniCollection.OfBoolean)collection,setSize,(int)initialVal,containsPosition);
-            break;
-        case BYTE:
-            queryVal.initContains((OmniCollection.OfByte)collection,setSize,(int)initialVal,containsPosition);
-            break;
-        case CHAR:
-            queryVal.initContains((OmniCollection.OfChar)collection,setSize,(int)initialVal,containsPosition);
-            break;
-        case DOUBLE:
-            queryVal.initContains((OmniCollection.OfDouble)collection,setSize,(double)initialVal,containsPosition);
-            break;
-        case FLOAT:
-            queryVal.initContains((OmniCollection.OfFloat)collection,setSize,(float)initialVal,containsPosition);
-            break;
-        case INT:
-            queryVal.initContains((OmniCollection.OfInt)collection,setSize,(int)initialVal,containsPosition);
-            break;
-        case LONG:
-            queryVal.initContains((OmniCollection.OfLong)collection,setSize,(long)initialVal,containsPosition);
-            break;
-        case REF:
-            queryVal.initContains((OmniCollection.OfRef<Object>)collection,setSize,(long)initialVal,containsPosition);
-            break;
-        case SHORT:
-            queryVal.initContains((OmniCollection.OfShort)collection,setSize,(int)initialVal,containsPosition);
-            break;
-        default:
-            throw DataType.invalidDataType(dataType);
-        }
-        updateCollectionState();
-    }
-    @SuppressWarnings("unchecked") default void initDoesNotContain(QueryVal queryVal,int setSize,Object initialVal){
-        final COL collection=getCollection();
-        final DataType dataType=getDataType();
-        initialVal=convertInitialVal(initialVal);
-        switch(dataType){
-        case BOOLEAN:
-            queryVal.initDoesNotContain((OmniCollection.OfBoolean)collection,setSize,(int)initialVal);
-            break;
-        case BYTE:
-            queryVal.initDoesNotContain((OmniCollection.OfByte)collection,setSize,(int)initialVal);
-            break;
-        case CHAR:
-            queryVal.initDoesNotContain((OmniCollection.OfChar)collection,setSize,(int)initialVal);
-            break;
-        case DOUBLE:
-            queryVal.initDoesNotContain((OmniCollection.OfDouble)collection,setSize,(double)initialVal);
-            break;
-        case FLOAT:
-            queryVal.initDoesNotContain((OmniCollection.OfFloat)collection,setSize,(float)initialVal);
-            break;
-        case INT:
-            queryVal.initDoesNotContain((OmniCollection.OfInt)collection,setSize,(int)initialVal);
-            break;
-        case LONG:
-            queryVal.initDoesNotContain((OmniCollection.OfLong)collection,setSize,(long)initialVal);
-            break;
-        case REF:
-            queryVal.initDoesNotContain((OmniCollection.OfRef<Object>)collection,setSize,(long)initialVal);
-            break;
-        case SHORT:
-            queryVal.initDoesNotContain((OmniCollection.OfShort)collection,setSize,(int)initialVal);
-            break;
-        default:
-            throw DataType.invalidDataType(dataType);
-        }
-        updateCollectionState();
-    }
+    //    @SuppressWarnings("unchecked") default void initContains(QueryVal queryVal,int setSize,double containsPosition,
+    //            Object initialVal){
+    //        final COL collection=getCollection();
+    //        final DataType dataType=getDataType();
+    //        initialVal=convertInitialVal(initialVal);
+    //        switch(dataType){
+    //        case BOOLEAN:
+    //            queryVal.initContains((OmniCollection.OfBoolean)collection,setSize,(int)initialVal,containsPosition);
+    //            break;
+    //        case BYTE:
+    //            queryVal.initContains((OmniCollection.OfByte)collection,setSize,(int)initialVal,containsPosition);
+    //            break;
+    //        case CHAR:
+    //            queryVal.initContains((OmniCollection.OfChar)collection,setSize,(int)initialVal,containsPosition);
+    //            break;
+    //        case DOUBLE:
+    //            queryVal.initContains((OmniCollection.OfDouble)collection,setSize,(double)initialVal,containsPosition);
+    //            break;
+    //        case FLOAT:
+    //            queryVal.initContains((OmniCollection.OfFloat)collection,setSize,(float)initialVal,containsPosition);
+    //            break;
+    //        case INT:
+    //            queryVal.initContains((OmniCollection.OfInt)collection,setSize,(int)initialVal,containsPosition);
+    //            break;
+    //        case LONG:
+    //            queryVal.initContains((OmniCollection.OfLong)collection,setSize,(long)initialVal,containsPosition);
+    //            break;
+    //        case REF:
+    //            queryVal.initContains((OmniCollection.OfRef<Object>)collection,setSize,(long)initialVal,containsPosition);
+    //            break;
+    //        case SHORT:
+    //            queryVal.initContains((OmniCollection.OfShort)collection,setSize,(int)initialVal,containsPosition);
+    //            break;
+    //        default:
+    //            throw DataType.invalidDataType(dataType);
+    //        }
+    //        updateCollectionState();
+    //    }
+    //    @SuppressWarnings("unchecked") default void initDoesNotContain(QueryVal queryVal,int setSize,Object initialVal){
+    //        final COL collection=getCollection();
+    //        final DataType dataType=getDataType();
+    //        initialVal=convertInitialVal(initialVal);
+    //        switch(dataType){
+    //        case BOOLEAN:
+    //            queryVal.initDoesNotContain((OmniCollection.OfBoolean)collection,setSize,(int)initialVal);
+    //            break;
+    //        case BYTE:
+    //            queryVal.initDoesNotContain((OmniCollection.OfByte)collection,setSize,(int)initialVal);
+    //            break;
+    //        case CHAR:
+    //            queryVal.initDoesNotContain((OmniCollection.OfChar)collection,setSize,(int)initialVal);
+    //            break;
+    //        case DOUBLE:
+    //            queryVal.initDoesNotContain((OmniCollection.OfDouble)collection,setSize,(double)initialVal);
+    //            break;
+    //        case FLOAT:
+    //            queryVal.initDoesNotContain((OmniCollection.OfFloat)collection,setSize,(float)initialVal);
+    //            break;
+    //        case INT:
+    //            queryVal.initDoesNotContain((OmniCollection.OfInt)collection,setSize,(int)initialVal);
+    //            break;
+    //        case LONG:
+    //            queryVal.initDoesNotContain((OmniCollection.OfLong)collection,setSize,(long)initialVal);
+    //            break;
+    //        case REF:
+    //            queryVal.initDoesNotContain((OmniCollection.OfRef<Object>)collection,setSize,(long)initialVal);
+    //            break;
+    //        case SHORT:
+    //            queryVal.initDoesNotContain((OmniCollection.OfShort)collection,setSize,(int)initialVal);
+    //            break;
+    //        default:
+    //            throw DataType.invalidDataType(dataType);
+    //        }
+    //        updateCollectionState();
+    //    }
     default Object verifyClone(){
         final COL collection=getCollection();
         final Object clone=collection.clone();
