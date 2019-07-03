@@ -1273,7 +1273,7 @@ public enum DataType{
         }
         @Override
         public Object convertVal(float val){
-            return (double)val;
+            return val;
         }
         @Override
         public Object convertVal(double val){

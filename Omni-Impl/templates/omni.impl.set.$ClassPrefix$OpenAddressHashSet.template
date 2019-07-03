@@ -1095,9 +1095,9 @@ ERROR unknown type $ClassPrefix$
   #ENDIF
               int hash=(int)(magicWord >>> 32);
               $ArrayType$[] table;
-              for(int i=(table=this.table).length;--i >= 0;){
+              for(int i=(table=this.table).length;;){
                 $ArrayType$ tableVal;
-                #MACRO IfIsPresentValue(tableVal=table[i])
+                #MACRO IfIsPresentValue(tableVal=table[--i])
                 {
   #IF OfLong
                   hash+=((int)(tableVal^(tableVal>>>32)));
@@ -2449,9 +2449,9 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
         out.writeInt(size=tableSize);
         if(size != 0){
           $ArrayType$[] table;
-          for(int i=(table=this.table).length;--i >= 0;){
+          for(int i=(table=this.table).length;;){
             $ArrayType$ tableVal;
-            #MACRO IfIsPresentValue(tableVal=table[i])
+            #MACRO IfIsPresentValue(tableVal=table[--i])
             {
               out.write$ClassPrefix$(tableVal);
               if(--size == 0){
@@ -2496,9 +2496,14 @@ private boolean addToTable($ArrayType$ val){
 #IFNOT OfFloat,OfDouble,OfRef
     int hash;
 #ENDIF
-#IFSWITCH MODIFIER==POS0,Null
-    tableLength=table.length;
-    insertInTable:for(int hash=0;;){
+#IFSWITCH MODIFIER==POS0
+  #IF OfFloat
+    insertInTable:for(int hash,initialHash=hash=($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))&(tableLength=table.length-1);;){
+  #ELSE
+    insertInTable:for(int hash,initialHash=hash=((int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16)&(tableLength=table.length-1);;){
+  #ENDIF
+#ELSEIFSWITCH MODIFIER==Null
+    insertInTable:for(int hash,initialHash=hash=((hash=NULL.hashCode())^(hash>>>16))&(tableLength=table.length-1);;){
 #ELSE
   #IF OfFloat,OfDouble,OfRef
     insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
@@ -2580,11 +2585,7 @@ private boolean addToTable($ArrayType$ val){
           }
       }
 #ENDIF
-#IFSWITCH MODIFIER==POS0,Null
-      if(++hash==tableLength){
-#ELSE
       if((hash=hash + 1 & tableLength) == initialHash){
-#ENDIF
         break insertInTable;
       }
     }
@@ -2643,6 +2644,9 @@ private boolean addToTable($ArrayType$ val){
 #ENDIF
 
 
+
+
+
 #MACRODEF ContainsOrRemoveFromTable<MODIFIER,REMOVE>(TABLETYPE)
 #IFSWITCH REMOVE==true
   #IFSWITCH MODIFIER==NaN
@@ -2689,51 +2693,49 @@ private boolean tableContains(int val){
 #ENDIF
   TABLETYPE[] table;
   TABLETYPE tableVal;
-#IFSWITCH MODIFIER==POS0,Null
-  if((tableVal=(table=this.table)[0]) != $EMPTY_TABLE_VAL$){
-    int tableLength=table.length;
-    int hash=0;
-    do{
-  #IF OfRef
-      if(tableVal==NULL){
-  #ELSE
-      if(tableVal==$POS0_TABLE_VAL$){
-  #ENDIF
-  #IFSWITCH REMOVE==true
-        table[hash]=$DELETED_TABLE_VAL$;
-  #ENDIF
-        return true;
-      }
-    }while(++hash != tableLength && (tableVal = table[hash]) != $EMPTY_TABLE_VAL$);
-#ELSE
   int tableLength,initialHash;
-  #IF OfRef
+#IF OfRef
+  #IFSWITCH MODIFIER==Null
+  if((tableVal=(table=this.table)[initialHash=((initialHash=NULL.hashCode()) ^ (initialHash >>> 16)) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ELSE
   if((tableVal=(table=this.table)[initialHash=hash&=(tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSEIF OfFloat
-    #IFSWITCH MODIFIER==NaN
-  if((tableVal=(table=this.table)[initialHash=(0x7fc00000 ^ 0x7fc00000 >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-    #ELSEIFSWITCH MODIFIER==True
-  if((tableVal=(table=this.table)[initialHash=(TypeUtil.FLT_TRUE_BITS ^ TypeUtil.FLT_TRUE_BITS >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){ 
-    #ELSE
-  if((tableVal=(table=this.table)[initialHash=(val ^ val >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-    #ENDIF
-  #ELSEIF OfDouble
-    #IFSWITCH MODIFIER==NaN
-  if((tableVal=(table=this.table)[initialHash=((int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-    #ELSEIFSWITCH MODIFIER==True
-  if((tableVal=(table=this.table)[initialHash=((int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-    #ELSE
-  if((tableVal=(table=this.table)[initialHash=((initialHash=(int)(val ^ val >>> 32)) ^ initialHash >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-    #ENDIF
-  #ELSEIF OfLong
-  if((table=this.table)!=null && (tableVal=table[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
-  #ELSE
-  if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
   #ENDIF
-  #IF OfRef
-     do{
-       if(val.equals(tableVal)){
+#ELSEIF OfFloat
+  #IFSWITCH MODIFIER==POS0
+  if((tableVal=(table=this.table)[initialHash=($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ELSEIFSWITCH MODIFIER==NaN
+  if((tableVal=(table=this.table)[initialHash=(0x7fc00000 ^ 0x7fc00000 >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ELSEIFSWITCH MODIFIER==True
+  if((tableVal=(table=this.table)[initialHash=(TypeUtil.FLT_TRUE_BITS ^ TypeUtil.FLT_TRUE_BITS >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){ 
   #ELSE
+  if((tableVal=(table=this.table)[initialHash=(val ^ val >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ENDIF
+#ELSEIF OfDouble
+  #IFSWITCH MODIFIER==POS0
+  if((tableVal=(table=this.table)[initialHash=((int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ELSEIFSWITCH MODIFIER==NaN
+  if((tableVal=(table=this.table)[initialHash=((int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ELSEIFSWITCH MODIFIER==True
+  if((tableVal=(table=this.table)[initialHash=((int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ELSE
+  if((tableVal=(table=this.table)[initialHash=((initialHash=(int)(val ^ val >>> 32)) ^ initialHash >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
+  #ENDIF
+#ELSEIF OfLong
+  if((table=this.table)!=null && (tableVal=table[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
+#ELSE
+  if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
+#ENDIF
+#IF OfRef
+  #IFSWITCH MODIFIER==Null
+    int hash=initialHash;
+  #ENDIF
+    do{
+  #IFSWITCH MODIFIER==Null
+      if(NULL==tableVal){
+  #ELSE
+      if(val.equals(tableVal)){
+  #ENDIF
+#ELSE
     int hash=initialHash;
     #IF OfFloat,OfDouble
     do{
@@ -2745,10 +2747,11 @@ private boolean tableContains(int val){
         #ENDIF
       #ELSEIFSWITCH MODIFIER==True
       if(tableVal == $TRUE_BITS$){
+      #ELSEIFSWITCH MODIFIER==POS0
+      if(tableVal == $POS0_TABLE_VAL$){
       #ELSE
       if(tableVal == val){
       #ENDIF
-    
     #ELSE
     do{
       if(tableVal == val){
@@ -2756,14 +2759,13 @@ private boolean tableContains(int val){
         this.tableSize=tableSize-1;
       #ENDIF
     #ENDIF
-  #ENDIF
-  #IFSWITCH REMOVE==true
+#ENDIF
+#IFSWITCH REMOVE==true
         table[hash]=$DELETED_TABLE_VAL$;
-  #ENDIF
+#ENDIF
         return true;
       }
     }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != $EMPTY_TABLE_VAL$);
-#ENDIF
   }
   return false;
 }
@@ -3063,24 +3065,17 @@ private boolean tableContains(int val){
       builder.uncheckedAppendCommaAndSpace();
     }
   #ELSE
-    if((size=processWordToString(word0,-128,-64,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]),size)) != 0){
-      if((size=processWordToString(word1,-64,0,builder,size)) != 0){
-        if((size=processWordToString(word2,0,64,builder,size)) != 0){
-          if((size=processWordToString(word3,64,128,builder,size)) != 0){
-            final var table=this.table;
-            for(int i=0;;++i){
-              $exposedType$ tableVal;
-              #MACRO IfIsPresentValue(tableVal=table[i])
-              {
-                builder.uncheckedAppend$ClassPrefix$(tableVal);
-                if(--size == 0){
-                  break;
-                }
-                builder.uncheckedAppendCommaAndSpace();
-              }
-            }
-          }
+    size=processWordToString(word3,64,128,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]),processWordToString(word2,0,64,builder,processWordToString(word1,-64,0,builder,processWordToString(word0,-128,-64,builder,size))));
+    final var table=this.table;
+    for(int i=0;;++i){
+      $exposedType$ tableVal;
+      #MACRO IfIsPresentValue(tableVal=table[i])
+      {
+        builder.uncheckedAppend$ClassPrefix$(tableVal);
+        if(--size == 0){
+          break;
         }
+        builder.uncheckedAppendCommaAndSpace();
       }
     }
   #ENDIF
@@ -3198,9 +3193,7 @@ private boolean tableContains(int val){
       do{
           if((word & 1L << valOffset) != 0L){
               builder.uncheckedAppendShort(valOffset);
-              if(--numLeft == 0){
-                  break;
-              }
+              --numLeft;
               builder.uncheckedAppendCommaAndSpace();
           }
       }while(++valOffset != valBound);
@@ -4102,10 +4095,11 @@ return (this.wordWORDNUM & (MASK))!=0;
     @SuppressWarnings("unchecked")
 #ENDIF
     @Override boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter){
-      int[] tableIndicesRemoved=null;
+      
       int numRemovedFromTable=0;
       final int modCount=this.modCount;
 #IF OfFloat,OfDouble,OfRef
+      int[] tableIndicesRemoved;
       $queryParameterType$[] table;
       try{
           for(int numLeft=size,i=(table=this.table).length;;){
@@ -4187,21 +4181,21 @@ return (this.wordWORDNUM & (MASK))!=0;
                   break;
               }
               if(--numLeft == 0){
-                  break;
+                  return false;
               }
           }
       }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
       }
-      if(tableIndicesRemoved != null){
-          this.modCount=modCount + 1;
-          this.size=size - numRemovedFromTable-1;
-          do{
-            table[tableIndicesRemoved[numRemovedFromTable]]=$DELETED_TABLE_VAL$;
-          }while(--numRemovedFromTable!=-1);
-          return true;
-      }
+      this.modCount=modCount + 1;
+      this.size=size - numRemovedFromTable-1;
+      do{
+        table[tableIndicesRemoved[numRemovedFromTable]]=$DELETED_TABLE_VAL$;
+      }while(--numRemovedFromTable!=-1);
+      return true;
+      
 #ELSE
+      int[] tableIndicesRemoved=null;
       long word0;
       long word1;
       long word2;
@@ -4270,8 +4264,9 @@ return (this.wordWORDNUM & (MASK))!=0;
           }
           return true;
       }
-#ENDIF
       return false;
+#ENDIF
+      
     }
 #IF OfRef
     @Override

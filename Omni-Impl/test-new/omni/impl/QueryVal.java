@@ -11,6 +11,14 @@ public enum QueryVal{
     // TODO add support for collection modifying non-null Objects
     Null{
         @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isCharValSupported(QueryValModification modification){
             return false;
         }
@@ -24,6 +32,14 @@ public enum QueryVal{
         }
         @Override
         boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isDoubleValSupported(QueryValModification modification){
             return false;
         }
         @Override
@@ -611,6 +627,10 @@ public enum QueryVal{
     },
     MaxChar{
         @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
+        @Override
         boolean isCharValSupported(QueryValModification modification){
             return modification == QueryValModification.None;
         }
@@ -722,6 +742,10 @@ public enum QueryVal{
     },
     MaxShort{
         @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
+        @Override
         boolean isShortValSupported(QueryValModification modification){
             return modification == QueryValModification.None;
         }
@@ -832,6 +856,10 @@ public enum QueryVal{
         }
     },
     MinShort{
+        @Override
+        public double getDoubleValPlusFloatEpsilon(){
+            return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
+        }
         @Override
         boolean isShortValSupported(QueryValModification modification){
             return modification == QueryValModification.None;
@@ -1214,6 +1242,10 @@ public enum QueryVal{
             return modification == QueryValModification.None;
         }
         @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public int getIntVal(){
             return Integer.MAX_VALUE;
         }
@@ -1305,6 +1337,10 @@ public enum QueryVal{
         }
     },
     MinInt{
+        @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isShortValSupported(QueryValModification modification){
             return false;
@@ -1410,6 +1446,10 @@ public enum QueryVal{
     },
     MaxSafeLong{
         @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isIntValSupported(QueryValModification modification){
             return false;
         }
@@ -1499,6 +1539,10 @@ public enum QueryVal{
         }
     },
     MinSafeLong{
+        @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isIntValSupported(QueryValModification modification){
             return false;
@@ -1651,6 +1695,14 @@ public enum QueryVal{
     },
     MaxLong{
         @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isDoubleValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isIntValSupported(QueryValModification modification){
             return false;
         }
@@ -1690,6 +1742,14 @@ public enum QueryVal{
         }
     },
     MinLong{
+        @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isDoubleValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isIntValSupported(QueryValModification modification){
             return false;
@@ -1897,6 +1957,10 @@ public enum QueryVal{
     },
     MaxDouble{
         @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;
         }
@@ -1940,6 +2004,10 @@ public enum QueryVal{
         }
     },
     MinDouble{
+        @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;
@@ -2247,6 +2315,16 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.LONG
                 + "; modification=" + modification);
     }
+    boolean isFloatValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+        case PlusFloatEpsilon:
+            return true;
+        case PlusDoubleEpsilon:
+        }
+        return false;
+    }
     public final float getFloatVal(QueryValModification modification){
         switch(modification){
         case None:
@@ -2259,6 +2337,16 @@ public enum QueryVal{
         }
         throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
                 + DataType.FLOAT + "; modification=" + modification);
+    }
+    boolean isDoubleValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+        case PlusFloatEpsilon:
+        case PlusDoubleEpsilon:
+            return true;
+        }
+        return false;
     }
     public final double getDoubleVal(QueryValModification modification){
         switch(modification){
@@ -2442,12 +2530,14 @@ public enum QueryVal{
         throw new UnsupportedOperationException("Invalid inputType-queryValModificationCombo; inputType=" + inputType
                 + "; queryValModification=" + queryValModification);
     }
+    boolean isBooleanValSupported(QueryValModification modification){
+        return modification == QueryValModification.None;
+    }
     public final void initDoesNotContain(OmniCollection.OfBoolean collection,int setSize,int initVal,
             QueryValModification modification){
         if(setSize>0) {
             int i=0;
-
-            if(modification==QueryValModification.None) {
+            if(isBooleanValSupported(modification)){
                 var avoidThis=getBooleanVal();
                 do {
                     var v=(initVal + i & 1) != 0;
@@ -2468,39 +2558,34 @@ public enum QueryVal{
 
 
     }
+    boolean isByteValSupported(QueryValModification modification){
+        switch(modification){
+        case None:
+        case Plus1:
+            return true;
+        default:
+            return false;
+        }
+    }
     public final void initDoesNotContain(OmniCollection.OfByte collection,int setSize,int initVal,
             QueryValModification modification){
         if(setSize>0) {
             int i=0;
-            byte avoidThis;
-            switch(modification) {
-            case None:
-            {
-                avoidThis=getByteVal();
-
-                break;
-            }
-            case Plus1:
-            {
-                avoidThis=getByteValPlus1();
-                break;
-            }
-            default:
+            if(isByteValSupported(modification)){
+                var avoidThis=getByteVal(modification);
+                do{
+                    var v=(byte)(i + initVal);
+                    if(v == avoidThis){
+                        ++v;
+                    }
+                    collection.add(v);
+                }while(++i < setSize);
+            }else{
                 do {
                     var v=(byte)(i + initVal);
                     collection.add(v);
                 }while(++i<setSize);
-                return;
             }
-
-            do {
-                var v=(byte)(i + initVal);
-                if(v==avoidThis) {
-                    ++v;
-                }
-                collection.add(v);
-            }while(++i<setSize);
-
         }
     }
     boolean isCharValSupported(QueryValModification modification){
@@ -2628,19 +2713,19 @@ public enum QueryVal{
         if(setSize > 0){
             float valOffset=0;
             int i=0;
-            float avoidThis;
-            switch(modification) {
-            case None:
-                avoidThis=getFloatVal();
-                break;
-            case Plus1:
-                avoidThis=getFloatValPlus1();
-                break;
-            case PlusFloatEpsilon:
-                avoidThis=getFloatValPlusFloatEpsilon();
-                break;
-            default:
-
+            if(isFloatValSupported(modification)){
+                var avoidThis=getFloatVal(modification);
+                do{
+                    var v=valOffset + initVal;
+                    if(v == avoidThis){
+                        v=Math.nextAfter(v,Double.POSITIVE_INFINITY);
+                    }
+                    collection.add(v);
+                    if(v == Float.POSITIVE_INFINITY){
+                        valOffset=-Float.MAX_VALUE;
+                    }
+                }while(++i < setSize);
+            }else{
                 do{
                     var v=valOffset + initVal;
                     collection.add(v);
@@ -2648,18 +2733,7 @@ public enum QueryVal{
                         valOffset=-Float.MAX_VALUE;
                     }
                 }while(++i < setSize);
-                return;
             }
-            do{
-                var v=valOffset + initVal;
-                if(v == avoidThis){
-                    v=Math.nextAfter(v,Double.POSITIVE_INFINITY);
-                }
-                collection.add(v);
-                if(v == Float.POSITIVE_INFINITY){
-                    valOffset=-Float.MAX_VALUE;
-                }
-            }while(++i < setSize);
         }
     }
     public final void initDoesNotContain(OmniCollection.OfDouble collection,int setSize,double initVal,
@@ -2667,22 +2741,19 @@ public enum QueryVal{
         if(setSize > 0){
             double valOffset=0;
             int i=0;
-            double avoidThis;
-            switch(modification) {
-            case None:
-                avoidThis=getDoubleVal();
-                break;
-            case Plus1:
-                avoidThis=getDoubleValPlus1();
-                break;
-            case PlusFloatEpsilon:
-                avoidThis=getDoubleValPlusFloatEpsilon();
-                break;
-            case PlusDoubleEpsilon:
-                avoidThis=getDoubleValPlusDoubleEpsilon();
-                break;
-            default:
-
+            if(isDoubleValSupported(modification)){
+                var avoidThis=getDoubleVal(modification);
+                do{
+                    var v=valOffset + initVal;
+                    if(v == avoidThis){
+                        v=Math.nextAfter(v,Double.POSITIVE_INFINITY);
+                    }
+                    collection.add(v);
+                    if(v == Double.POSITIVE_INFINITY){
+                        valOffset=-Double.MAX_VALUE;
+                    }
+                }while(++i < setSize);
+            }else{
                 do{
                     var v=valOffset + initVal;
                     collection.add(v);
@@ -2690,18 +2761,7 @@ public enum QueryVal{
                         valOffset=-Double.MAX_VALUE;
                     }
                 }while(++i < setSize);
-                return;
             }
-            do{
-                var v=valOffset + initVal;
-                if(v == avoidThis){
-                    v=Math.nextAfter(v,Double.POSITIVE_INFINITY);
-                }
-                collection.add(v);
-                if(v == Double.POSITIVE_INFINITY){
-                    valOffset=-Double.MAX_VALUE;
-                }
-            }while(++i < setSize);
         }
     }
     public final void initDoesNotContain(OmniCollection.OfRef<Object> collection,int setSize,long initVal,

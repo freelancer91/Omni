@@ -354,9 +354,9 @@ implements OmniSet.OfLong{
             if((size=(int)(magicWord=processWordHashCode(word3,64,128,magicWord))) != 0){
               int hash=(int)(magicWord >>> 32);
               long[] table;
-              for(int i=(table=this.table).length;--i >= 0;){
+              for(int i=(table=this.table).length;;){
                 long tableVal;
-                if(((tableVal=table[i])&-2)!=0)
+                if(((tableVal=table[--i])&-2)!=0)
                 {
                   hash+=((int)(tableVal^(tableVal>>>32)));
                   if(--size == 0){
@@ -1051,9 +1051,9 @@ implements OmniSet.OfLong{
         out.writeInt(size=tableSize);
         if(size != 0){
           long[] table;
-          for(int i=(table=this.table).length;--i >= 0;){
+          for(int i=(table=this.table).length;;){
             long tableVal;
-            if(((tableVal=table[i])&-2)!=0)
+            if(((tableVal=table[--i])&-2)!=0)
             {
               out.writeLong(tableVal);
               if(--size == 0){
@@ -1214,24 +1214,17 @@ implements OmniSet.OfLong{
   private String massiveToString(int size){
     byte[] buffer;
     ToStringUtil.OmniStringBuilderByte builder;
-    if((size=processWordToString(word0,-128,-64,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]),size)) != 0){
-      if((size=processWordToString(word1,-64,0,builder,size)) != 0){
-        if((size=processWordToString(word2,0,64,builder,size)) != 0){
-          if((size=processWordToString(word3,64,128,builder,size)) != 0){
-            final var table=this.table;
-            for(int i=0;;++i){
-              long tableVal;
-              if(((tableVal=table[i])&-2)!=0)
-              {
-                builder.uncheckedAppendLong(tableVal);
-                if(--size == 0){
-                  break;
-                }
-                builder.uncheckedAppendCommaAndSpace();
-              }
-            }
-          }
+    size=processWordToString(word3,64,128,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]),processWordToString(word2,0,64,builder,processWordToString(word1,-64,0,builder,processWordToString(word0,-128,-64,builder,size))));
+    final var table=this.table;
+    for(int i=0;;++i){
+      long tableVal;
+      if(((tableVal=table[i])&-2)!=0)
+      {
+        builder.uncheckedAppendLong(tableVal);
+        if(--size == 0){
+          break;
         }
+        builder.uncheckedAppendCommaAndSpace();
       }
     }
     builder.uncheckedAppendChar((byte)']');
@@ -1294,9 +1287,7 @@ implements OmniSet.OfLong{
       do{
           if((word & 1L << valOffset) != 0L){
               builder.uncheckedAppendShort(valOffset);
-              if(--numLeft == 0){
-                  break;
-              }
+              --numLeft;
               builder.uncheckedAppendCommaAndSpace();
           }
       }while(++valOffset != valBound);
@@ -1753,9 +1744,9 @@ implements OmniSet.OfLong{
         }
     }
     @Override boolean uncheckedRemoveIf(int size,LongPredicate filter){
-      int[] tableIndicesRemoved=null;
       int numRemovedFromTable=0;
       final int modCount=this.modCount;
+      int[] tableIndicesRemoved=null;
       long word0;
       long word1;
       long word2;

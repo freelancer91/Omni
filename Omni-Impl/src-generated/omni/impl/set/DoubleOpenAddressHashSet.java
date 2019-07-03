@@ -647,8 +647,7 @@ implements OmniSet.OfDouble{
     if((table=this.table)!=null){
       int tableLength;
       int insertHere=-1;
-      tableLength=table.length;
-      insertInTable:for(int hash=0;;){
+      insertInTable:for(int hash,initialHash=hash=((int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16)&(tableLength=table.length-1);;){
         long tableVal;
         if((tableVal=table[hash]) == 0){
           if(insertHere == -1){
@@ -661,7 +660,7 @@ implements OmniSet.OfDouble{
           // already contained
           return false;
         }
-        if(++hash==tableLength){
+        if((hash=hash + 1 & tableLength) == initialHash){
           break insertInTable;
         }
       }
@@ -710,15 +709,15 @@ implements OmniSet.OfDouble{
   boolean removePos0FromTable(){
     long[] table;
     long tableVal;
-    if((tableVal=(table=this.table)[0]) != 0){
-      int tableLength=table.length;
-      int hash=0;
+    int tableLength,initialHash;
+    if((tableVal=(table=this.table)[initialHash=((int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
+      int hash=initialHash;
       do{
-        if(tableVal==0xfffc000000000000L){
+        if(tableVal == 0xfffc000000000000L){
           table[hash]=0x7ffc000000000000L;
           return true;
         }
-      }while(++hash != tableLength && (tableVal = table[hash]) != 0);
+      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
     }
     return false;
   }
@@ -770,14 +769,14 @@ implements OmniSet.OfDouble{
   private boolean tableContainsPos0(){
     long[] table;
     long tableVal;
-    if((tableVal=(table=this.table)[0]) != 0){
-      int tableLength=table.length;
-      int hash=0;
+    int tableLength,initialHash;
+    if((tableVal=(table=this.table)[initialHash=((int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
+      int hash=initialHash;
       do{
-        if(tableVal==0xfffc000000000000L){
+        if(tableVal == 0xfffc000000000000L){
           return true;
         }
-      }while(++hash != tableLength && (tableVal = table[hash]) != 0);
+      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
     }
     return false;
   }
@@ -1094,9 +1093,9 @@ implements OmniSet.OfDouble{
         }
     }
     @Override boolean uncheckedRemoveIf(int size,DoublePredicate filter){
-      int[] tableIndicesRemoved=null;
       int numRemovedFromTable=0;
       final int modCount=this.modCount;
+      int[] tableIndicesRemoved;
       long[] table;
       try{
           for(int numLeft=size,i=(table=this.table).length;;){
@@ -1132,21 +1131,18 @@ implements OmniSet.OfDouble{
                   break;
               }
               if(--numLeft == 0){
-                  break;
+                  return false;
               }
           }
       }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
       }
-      if(tableIndicesRemoved != null){
-          this.modCount=modCount + 1;
-          this.size=size - numRemovedFromTable-1;
-          do{
-            table[tableIndicesRemoved[numRemovedFromTable]]=0x7ffc000000000000L;
-          }while(--numRemovedFromTable!=-1);
-          return true;
-      }
-      return false;
+      this.modCount=modCount + 1;
+      this.size=size - numRemovedFromTable-1;
+      do{
+        table[tableIndicesRemoved[numRemovedFromTable]]=0x7ffc000000000000L;
+      }while(--numRemovedFromTable!=-1);
+      return true;
     }
     private static class Itr
     extends AbstractDoubleItr{

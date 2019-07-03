@@ -767,8 +767,7 @@ implements OmniSet.OfFloat{
     if((table=this.table)!=null){
       int tableLength;
       int insertHere=-1;
-      tableLength=table.length;
-      insertInTable:for(int hash=0;;){
+      insertInTable:for(int hash,initialHash=hash=(0xffe00000^(0xffe00000>>>16))&(tableLength=table.length-1);;){
         int tableVal;
         switch(tableVal=table[hash]){
           case 0:
@@ -785,7 +784,7 @@ implements OmniSet.OfFloat{
               return false;
             }
         }
-        if(++hash==tableLength){
+        if((hash=hash + 1 & tableLength) == initialHash){
           break insertInTable;
         }
       }
@@ -838,15 +837,15 @@ implements OmniSet.OfFloat{
   boolean removePos0FromTable(){
     int[] table;
     int tableVal;
-    if((tableVal=(table=this.table)[0]) != 0){
-      int tableLength=table.length;
-      int hash=0;
+    int tableLength,initialHash;
+    if((tableVal=(table=this.table)[initialHash=(0xffe00000 ^ 0xffe00000 >>> 16) & (tableLength=table.length - 1)]) != 0){
+      int hash=initialHash;
       do{
-        if(tableVal==0xffe00000){
+        if(tableVal == 0xffe00000){
           table[hash]=0x7fe00000;
           return true;
         }
-      }while(++hash != tableLength && (tableVal = table[hash]) != 0);
+      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
     }
     return false;
   }
@@ -898,14 +897,14 @@ implements OmniSet.OfFloat{
   private boolean tableContainsPos0(){
     int[] table;
     int tableVal;
-    if((tableVal=(table=this.table)[0]) != 0){
-      int tableLength=table.length;
-      int hash=0;
+    int tableLength,initialHash;
+    if((tableVal=(table=this.table)[initialHash=(0xffe00000 ^ 0xffe00000 >>> 16) & (tableLength=table.length - 1)]) != 0){
+      int hash=initialHash;
       do{
-        if(tableVal==0xffe00000){
+        if(tableVal == 0xffe00000){
           return true;
         }
-      }while(++hash != tableLength && (tableVal = table[hash]) != 0);
+      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
     }
     return false;
   }
@@ -1299,9 +1298,9 @@ implements OmniSet.OfFloat{
         }
     }
     @Override boolean uncheckedRemoveIf(int size,FloatPredicate filter){
-      int[] tableIndicesRemoved=null;
       int numRemovedFromTable=0;
       final int modCount=this.modCount;
+      int[] tableIndicesRemoved;
       int[] table;
       try{
           for(int numLeft=size,i=(table=this.table).length;;){
@@ -1343,21 +1342,18 @@ implements OmniSet.OfFloat{
                   break;
               }
               if(--numLeft == 0){
-                  break;
+                  return false;
               }
           }
       }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
       }
-      if(tableIndicesRemoved != null){
-          this.modCount=modCount + 1;
-          this.size=size - numRemovedFromTable-1;
-          do{
-            table[tableIndicesRemoved[numRemovedFromTable]]=0x7fe00000;
-          }while(--numRemovedFromTable!=-1);
-          return true;
-      }
-      return false;
+      this.modCount=modCount + 1;
+      this.size=size - numRemovedFromTable-1;
+      do{
+        table[tableIndicesRemoved[numRemovedFromTable]]=0x7fe00000;
+      }while(--numRemovedFromTable!=-1);
+      return true;
     }
     private static class Itr
     extends AbstractFloatItr{

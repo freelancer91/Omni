@@ -14,8 +14,14 @@ public enum SetInitializationSequence{
     AddTrue("AddTrue",false){
         @Override
         public <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet){
-            var set=(OmniSet.BooleanInput<?>)monitoredSet.getCollection();
-            set.add(true);
+            if(monitoredSet.getDataType() == DataType.REF){
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                set.add(Boolean.TRUE);
+            }else{
+                var set=(OmniSet.BooleanInput<?>)monitoredSet.getCollection();
+                set.add(true);
+            }
             monitoredSet.updateCollectionState();
             return monitoredSet;
         }
@@ -23,8 +29,14 @@ public enum SetInitializationSequence{
     AddFalse("AddFalse",false){
         @Override
         public <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet){
-            var set=(OmniSet.BooleanInput<?>)monitoredSet.getCollection();
-            set.add(false);
+            if(monitoredSet.getDataType() == DataType.REF){
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                set.add(Boolean.FALSE);
+            }else{
+                var set=(OmniSet.BooleanInput<?>)monitoredSet.getCollection();
+                set.add(false);
+            }
             monitoredSet.updateCollectionState();
             return monitoredSet;
         }
@@ -32,9 +44,16 @@ public enum SetInitializationSequence{
     AddTrueAndFalse("AddTrueAndFalse",false){
         @Override
         public <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet){
-            var set=(OmniSet.BooleanInput<?>)monitoredSet.getCollection();
-            set.add(false);
-            set.add(true);
+            if(monitoredSet.getDataType() == DataType.REF){
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                set.add(Boolean.FALSE);
+                set.add(Boolean.TRUE);
+            }else{
+                var set=(OmniSet.BooleanInput<?>)monitoredSet.getCollection();
+                set.add(false);
+                set.add(true);
+            }
             monitoredSet.updateCollectionState();
             return monitoredSet;
         }
@@ -112,8 +131,26 @@ public enum SetInitializationSequence{
                 }
                 break;
             }
-            case LONG:{
-                final var set=(OmniSet.OfLong)monitoredSet.getCollection();
+            case LONG:
+            case FLOAT:
+            case DOUBLE:{
+                final var set=(OmniSet.LongInput<?>)monitoredSet.getCollection();
+                set.add((long)0);
+                set.add((long)1);
+                set.add((long)2);
+                long pPrev=1;
+                long prev=2;
+                for(int i=3;i < 100;++i){
+                    final long curr=pPrev + prev;
+                    set.add(curr);
+                    pPrev=prev;
+                    prev=curr;
+                }
+                break;
+            }
+            case REF:{
+                @SuppressWarnings("unchecked")
+                final var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
                 set.add((long)0);
                 set.add((long)1);
                 set.add((long)2);
@@ -174,27 +211,22 @@ public enum SetInitializationSequence{
                 }
                 break;
             }
-            case LONG:{
-                var set=(OmniSet.OfLong)monitoredSet.getCollection();
+            case LONG:
+            case FLOAT:
+            case DOUBLE:{
+                var set=(OmniSet.LongInput<?>)monitoredSet.getCollection();
                 for(long i=-128;i < -64;++i){
                     set.add(i);
                 }
                 break;
             }
-            case FLOAT:{
-                var set=(OmniSet.OfFloat)monitoredSet.getCollection();
-                for(int i=-128;i < -64;++i){
-                    set.add((short)i);
-                }
-                break;
-            }
-            case DOUBLE:{
-                var set=(OmniSet.OfDouble)monitoredSet.getCollection();
-                for(int i=-128;i < -64;++i){
+            case REF:
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                for(long i=-128;i < -64;++i){
                     set.add(i);
                 }
                 break;
-            }
             default:
                 throw DataType.invalidDataType(dataType);
             }
@@ -235,27 +267,22 @@ public enum SetInitializationSequence{
                 }
                 break;
             }
-            case LONG:{
-                var set=(OmniSet.OfLong)monitoredSet.getCollection();
+            case LONG:
+            case FLOAT:
+            case DOUBLE:{
+                var set=(OmniSet.LongInput<?>)monitoredSet.getCollection();
                 for(long i=-64;i < 0;++i){
                     set.add(i);
                 }
                 break;
             }
-            case FLOAT:{
-                var set=(OmniSet.OfFloat)monitoredSet.getCollection();
-                for(int i=-64;i < 0;++i){
-                    set.add((short)i);
-                }
-                break;
-            }
-            case DOUBLE:{
-                var set=(OmniSet.OfDouble)monitoredSet.getCollection();
-                for(int i=-64;i < 0;++i){
+            case REF:
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                for(long i=-64;i < 0;++i){
                     set.add(i);
                 }
                 break;
-            }
             default:
                 throw DataType.invalidDataType(dataType);
             }
@@ -296,27 +323,22 @@ public enum SetInitializationSequence{
                 }
                 break;
             }
-            case LONG:{
-                var set=(OmniSet.OfLong)monitoredSet.getCollection();
+            case LONG:
+            case FLOAT:
+            case DOUBLE:{
+                var set=(OmniSet.LongInput<?>)monitoredSet.getCollection();
                 for(long i=0;i < 64;++i){
                     set.add(i);
                 }
                 break;
             }
-            case FLOAT:{
-                var set=(OmniSet.OfFloat)monitoredSet.getCollection();
-                for(int i=0;i < 64;++i){
-                    set.add((short)i);
-                }
-                break;
-            }
-            case DOUBLE:{
-                var set=(OmniSet.OfDouble)monitoredSet.getCollection();
-                for(int i=0;i < 64;++i){
+            case REF:
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                for(long i=0;i < 64;++i){
                     set.add(i);
                 }
                 break;
-            }
             default:
                 throw DataType.invalidDataType(dataType);
             }
@@ -357,27 +379,22 @@ public enum SetInitializationSequence{
                 }
                 break;
             }
-            case LONG:{
-                var set=(OmniSet.OfLong)monitoredSet.getCollection();
+            case LONG:
+            case FLOAT:
+            case DOUBLE:{
+                var set=(OmniSet.LongInput<?>)monitoredSet.getCollection();
                 for(long i=64;i < 128;++i){
                     set.add(i);
                 }
                 break;
             }
-            case FLOAT:{
-                var set=(OmniSet.OfFloat)monitoredSet.getCollection();
-                for(int i=64;i < 128;++i){
-                    set.add((short)i);
-                }
-                break;
-            }
-            case DOUBLE:{
-                var set=(OmniSet.OfDouble)monitoredSet.getCollection();
-                for(int i=64;i < 128;++i){
+            case REF:
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                for(long i=64;i < 128;++i){
                     set.add(i);
                 }
                 break;
-            }
             default:
                 throw DataType.invalidDataType(dataType);
             }

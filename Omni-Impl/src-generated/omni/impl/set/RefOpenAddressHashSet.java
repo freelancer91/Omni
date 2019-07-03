@@ -650,8 +650,7 @@ implements OmniSet.OfRef<E>{
     if((table=this.table)!=null){
       int tableLength;
       int insertHere=-1;
-      tableLength=table.length;
-      insertInTable:for(int hash=0;;){
+      insertInTable:for(int hash,initialHash=hash=((hash=NULL.hashCode())^(hash>>>16))&(tableLength=table.length-1);;){
         Object tableVal;
         if((tableVal=table[hash]) == null){
           if(insertHere == -1){
@@ -664,7 +663,7 @@ implements OmniSet.OfRef<E>{
           // already contained
           return false;
         }
-        if(++hash==tableLength){
+        if((hash=hash + 1 & tableLength) == initialHash){
           break insertInTable;
         }
       }
@@ -713,15 +712,15 @@ implements OmniSet.OfRef<E>{
   boolean removeNullFromTable(){
     Object[] table;
     Object tableVal;
-    if((tableVal=(table=this.table)[0]) != null){
-      int tableLength=table.length;
-      int hash=0;
+    int tableLength,initialHash;
+    if((tableVal=(table=this.table)[initialHash=((initialHash=NULL.hashCode()) ^ (initialHash >>> 16)) & (tableLength=table.length - 1)]) != null){
+      int hash=initialHash;
       do{
-        if(tableVal==NULL){
+        if(NULL==tableVal){
           table[hash]=DELETED;
           return true;
         }
-      }while(++hash != tableLength && (tableVal = table[hash]) != null);
+      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != null);
     }
     return false;
   }
@@ -730,8 +729,8 @@ implements OmniSet.OfRef<E>{
     Object tableVal;
     int tableLength,initialHash;
     if((tableVal=(table=this.table)[initialHash=hash&=(tableLength=table.length - 1)]) != null){
-       do{
-         if(val.equals(tableVal)){
+      do{
+        if(val.equals(tableVal)){
           table[hash]=DELETED;
           return true;
         }
@@ -742,14 +741,14 @@ implements OmniSet.OfRef<E>{
   private boolean tableContainsNull(){
     Object[] table;
     Object tableVal;
-    if((tableVal=(table=this.table)[0]) != null){
-      int tableLength=table.length;
-      int hash=0;
+    int tableLength,initialHash;
+    if((tableVal=(table=this.table)[initialHash=((initialHash=NULL.hashCode()) ^ (initialHash >>> 16)) & (tableLength=table.length - 1)]) != null){
+      int hash=initialHash;
       do{
-        if(tableVal==NULL){
+        if(NULL==tableVal){
           return true;
         }
-      }while(++hash != tableLength && (tableVal = table[hash]) != null);
+      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != null);
     }
     return false;
   }
@@ -758,8 +757,8 @@ implements OmniSet.OfRef<E>{
     Object tableVal;
     int tableLength,initialHash;
     if((tableVal=(table=this.table)[initialHash=hash&=(tableLength=table.length - 1)]) != null){
-       do{
-         if(val.equals(tableVal)){
+      do{
+        if(val.equals(tableVal)){
           return true;
         }
       }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != null);
@@ -1164,9 +1163,9 @@ implements OmniSet.OfRef<E>{
     }
     @SuppressWarnings("unchecked")
     @Override boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
-      int[] tableIndicesRemoved=null;
       int numRemovedFromTable=0;
       final int modCount=this.modCount;
+      int[] tableIndicesRemoved;
       Object[] table;
       try{
           for(int numLeft=size,i=(table=this.table).length;;){
@@ -1197,21 +1196,18 @@ implements OmniSet.OfRef<E>{
                   break;
               }
               if(--numLeft == 0){
-                  break;
+                  return false;
               }
           }
       }finally{
           CheckedCollection.checkModCount(modCount,this.modCount);
       }
-      if(tableIndicesRemoved != null){
-          this.modCount=modCount + 1;
-          this.size=size - numRemovedFromTable-1;
-          do{
-            table[tableIndicesRemoved[numRemovedFromTable]]=DELETED;
-          }while(--numRemovedFromTable!=-1);
-          return true;
-      }
-      return false;
+      this.modCount=modCount + 1;
+      this.size=size - numRemovedFromTable-1;
+      do{
+        table[tableIndicesRemoved[numRemovedFromTable]]=DELETED;
+      }while(--numRemovedFromTable!=-1);
+      return true;
     }
     @Override
     String uncheckedToString(int size){

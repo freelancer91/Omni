@@ -231,9 +231,9 @@ implements OmniSet.OfChar{
             if((size=(int)(magicWord=processWordHashCode(word3,192,256,magicWord))) != 0){
               int hash=(int)(magicWord >>> 32);
               char[] table;
-              for(int i=(table=this.table).length;--i >= 0;){
+              for(int i=(table=this.table).length;;){
                 char tableVal;
-                if(((tableVal=table[i])&-2)!=0)
+                if(((tableVal=table[--i])&-2)!=0)
                 {
                   hash+=tableVal;
                   if(--size == 0){
@@ -1023,9 +1023,9 @@ implements OmniSet.OfChar{
         out.writeInt(size=tableSize);
         if(size != 0){
           char[] table;
-          for(int i=(table=this.table).length;--i >= 0;){
+          for(int i=(table=this.table).length;;){
             char tableVal;
-            if(((tableVal=table[i])&-2)!=0)
+            if(((tableVal=table[--i])&-2)!=0)
             {
               out.writeChar(tableVal);
               if(--size == 0){
@@ -1632,9 +1632,9 @@ implements OmniSet.OfChar{
         }
     }
     @Override boolean uncheckedRemoveIf(int size,CharPredicate filter){
-      int[] tableIndicesRemoved=null;
       int numRemovedFromTable=0;
       final int modCount=this.modCount;
+      int[] tableIndicesRemoved=null;
       long word0;
       long word1;
       long word2;
