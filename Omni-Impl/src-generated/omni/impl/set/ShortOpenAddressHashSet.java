@@ -18,17 +18,16 @@ import omni.util.ToStringUtil;
 public class ShortOpenAddressHashSet
 extends AbstractIntegralTypeOpenAddressHashSet<Short>
 implements OmniSet.OfShort{
-  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
   private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
     int hash=(int)(magicWord >>> 32);
     int numLeft=(int)magicWord;
     do{
-        if((word & 1L << valOffset) != 0L){
-            hash+=valOffset;
-            if(--numLeft == 0){
-                break;
-            }
+      if((word & 1L << valOffset) != 0L){
+        hash+=valOffset;
+        if(--numLeft == 0){
+          break;
         }
+      }
     }while(++valOffset != valBound);
     return numLeft | (long)hash << 32;
   }
@@ -642,7 +641,6 @@ implements OmniSet.OfShort{
           }
           break returnFalse;
         }
-        //returnTrue
         this.size=size-1;
         return true;
       }
@@ -1099,70 +1097,78 @@ implements OmniSet.OfShort{
         }
       }
   }
-  private boolean addToTable(short val){
-    short[] table;
-    if((table=this.table)!=null){
-      int tableLength;
-      int insertHere=-1;
-      int hash;
-      insertInTable:for(final int initialHash=hash=val&(tableLength=table.length-1);;){
-        short tableVal;
-        switch(tableVal=table[hash]){
-          case 0:
-            if(insertHere==-1){
-              insertHere=hash;
-            }
-            break insertInTable;
-          case 1:
+private boolean addToTable(short val){
+  short[] table;
+  if((table=this.table)!=null){
+    int tableLength;
+    int insertHere=-1;
+    int hash;
+    insertInTable:for(final int initialHash=hash=val&(tableLength=table.length-1);;){
+      short tableVal;
+      switch(tableVal=table[hash]){
+        case 0:
+          if(insertHere==-1){
             insertHere=hash;
-            break;
-          default:
-            if(tableVal==val){
-              //already contains
-              return false;
-            }
-        }
-        if((hash=hash + 1 & tableLength) == initialHash){
+          }
           break insertInTable;
-        }
+        case 1:
+          insertHere=hash;
+          break;
+        default:
+          if(tableVal==val){
+            //already contains
+            return false;
+          }
       }
-      insert(table,insertHere,val);
-      return true;
+      if((hash=hash + 1 & tableLength) == initialHash){
+        break insertInTable;
+      }
     }
-    int maxTableSize;
-    this.table=table=new short[maxTableSize=this.maxTableSize];
-    this.tableSize=1;
-    table[val&(maxTableSize-1)]=val;  
-    this.maxTableSize=(int)(maxTableSize*loadFactor);
+    insert(table,insertHere,val);
     return true;
   }
-  private boolean removeFromTable(int val){
+  int maxTableSize;
+  this.table=table=new short[maxTableSize=this.maxTableSize];
+  this.tableSize=1;
+  table[val&(maxTableSize-1)]=val;  
+  this.maxTableSize=(int)(maxTableSize*loadFactor);
+  return true;
+}
+  private
+  boolean removeFromTable(
+  int val){
     short[] table;
     short tableVal;
-    int tableLength,initialHash;
-    if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
-      int hash=initialHash;
+    int tableLength;
+    int hash;
+    int tableSize;
+    if((tableSize=this.tableSize)!=0
+    &&(tableVal=(table=this.table)[hash=((val^(val>>>16))&(tableLength=table.length-1))])!=0){
+      final int initialHash=hash;
       do{
-        if(tableVal == val){
+        if(val==tableVal){
           this.tableSize=tableSize-1;
           table[hash]=1;
           return true;
         }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
     }
     return false;
   }
-  private boolean tableContains(int val){
+  private boolean tableContains(
+  int val){
     short[] table;
     short tableVal;
-    int tableLength,initialHash;
-    if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
-      int hash=initialHash;
+    int tableLength;
+    int hash;
+    if(tableSize!=0
+    &&(tableVal=(table=this.table)[hash=((val^(val>>>16))&(tableLength=table.length-1))])!=0){
+      final int initialHash=hash;
       do{
-        if(tableVal == val){
+        if(val==tableVal){
           return true;
         }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
     }
     return false;
   }

@@ -18,7 +18,10 @@ import omni.util.TypeUtil;
 public class DoubleOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
-  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
+  private static int tableHash(long bits){
+    int tmp;
+    return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
+  }
   private static void quickInsert(long[] table,long val){
     int tableLength;
     int hash;
@@ -65,33 +68,31 @@ implements OmniSet.OfDouble{
     super(initialCapacity,loadFactor);
   }
   @Override public boolean add(boolean val){
-    if(val){
-      return addToTable(TypeUtil.DBL_TRUE_BITS,(int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16);
-    }
-    return addPos0ToTable();
+  if(val){
+    return addToTable(TypeUtil.DBL_TRUE_BITS,(int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16);
+  }
+  return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
   }
   @Override public boolean add(int val){
     if(val == 0){
-      return addPos0ToTable();
+      return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
     }
     long bits;
-    return addToTable(bits=Double.doubleToRawLongBits(val),(val=(int)(bits ^ bits >>> 32)) ^ val >>> 16);
+    return addToTable(bits=Double.doubleToRawLongBits(val),tableHash(bits));
   }
   @Override public boolean add(long val){
     if(val == 0){
-      return addPos0ToTable();
+      return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
     }
-    int hash;
-    return addToTable(val=Double.doubleToRawLongBits(val),(hash=(int)(val ^ val >>> 32)) ^ hash >>> 16);
+    return addToTable(val=Double.doubleToRawLongBits(val),tableHash(val));
   }
   @Override public boolean add(float val){
     if(val == val){
       long bits;
       if((bits=Double.doubleToRawLongBits(val)) == 0){
-        return addPos0ToTable();
+        return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
-      int hash;
-      return addToTable(bits,(hash=(int)(bits ^ bits >>> 32)) ^ hash >>> 16);
+      return addToTable(bits,tableHash(bits));
     }
     return addToTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
   }
@@ -100,10 +101,9 @@ implements OmniSet.OfDouble{
     if(val == val){
       long longBits;
       if((longBits=Double.doubleToRawLongBits(val)) == 0){
-          return addPos0ToTable();
+        return addToTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
-      int hash;
-      return addToTable(longBits,(hash=(int)(longBits ^ longBits >>> 32)) ^ hash >>> 16);
+      return addToTable(longBits,tableHash(longBits));
     }
     return addToTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32)
             ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
@@ -126,19 +126,20 @@ implements OmniSet.OfDouble{
   @Override public boolean contains(boolean val){
     if(size!=0) {
       if(val) {
-        return tableContainsTrue();
+        return tableContains(TypeUtil.DBL_TRUE_BITS,(int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16);
       }
-      return tableContainsPos0();
+      return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
     }
     return false;
   }
   @Override public boolean contains(int val){
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
       {
-        return tableContains(Double.doubleToRawLongBits(val));
+        long bits;
+        return tableContains(bits=Double.doubleToRawLongBits(val),tableHash(bits));
       }
     }
     return false;
@@ -146,9 +147,9 @@ implements OmniSet.OfDouble{
   @Override public boolean contains(long val){
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }else if(TypeUtil.checkCastToDouble(val)) {
-        return tableContains(Double.doubleToRawLongBits(val));
+        return tableContains(val=Double.doubleToRawLongBits(val),tableHash(val));
       }
     }
     return false;
@@ -158,11 +159,11 @@ implements OmniSet.OfDouble{
       if(val==val) {
         long bits;
         if((bits=Double.doubleToRawLongBits(val))!=0) {
-          return tableContains(bits);
+          return tableContains(bits,tableHash(bits));
         }
-        return tableContainsPos0();
+        return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
       }
-      return tableContainsNaN();
+      return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
     }
     return false;
   }
@@ -172,13 +173,13 @@ implements OmniSet.OfDouble{
         long bits;
         if((bits=Double.doubleToRawLongBits(val))==0)
         {
-          return tableContainsPos0();
+        return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
         }
-        return tableContains(bits);
+        return tableContains(bits,tableHash(bits));
       }
       else
       {
-        return tableContainsNaN();
+        return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
       }
     }
     return false;
@@ -228,18 +229,18 @@ implements OmniSet.OfDouble{
               bits=Double.doubleToRawLongBits(v);
             }else if(val instanceof Boolean) {
               if((boolean)val) {
-                return tableContainsTrue();
+                return tableContains(TypeUtil.DBL_TRUE_BITS,(int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16);
               }else {
                 break checkPos0;
               }
             }else {
               break returnFalse;
             }
-            return tableContains(bits);
+            return tableContains(bits,tableHash(bits));
           }
-          return tableContainsPos0();
+          return tableContains(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16);
         }
-        return tableContainsNaN();
+        return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
       }
     }
     return false;
@@ -349,7 +350,7 @@ implements OmniSet.OfDouble{
                 bits=Double.doubleToRawLongBits(v);
               }else if(val instanceof Boolean) {
                 if((boolean)val) {
-                  if(removeTrueFromTable()) {
+                  if(removeFromTable(TypeUtil.DBL_TRUE_BITS,(int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16)) {
                     break returnTrue;
                   }
                   break returnFalse;
@@ -359,17 +360,17 @@ implements OmniSet.OfDouble{
               }else {
                 break returnFalse;
               }
-              if(removeFromTable(bits)) {
+              if(removeFromTable(bits,tableHash(bits))) {
                 break returnTrue;
               }
               break returnFalse;
             }
-            if(removePos0FromTable()) {
+            if(removeFromTable(0xfffc000000000000L,(int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16)) {
                 break returnTrue;
             }
             break returnFalse;
           }
-          if(removeNaNFromTable()) {
+          if(removeFromTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){
             break returnTrue;
           }
           break returnFalse;
@@ -396,10 +397,10 @@ implements OmniSet.OfDouble{
       returnFalse:for(;;) {
         returnTrue:for(;;) {
           if(val) {
-            if(removeTrueFromTable()) {
+            if(removeFromTable(TypeUtil.DBL_TRUE_BITS,((int)(TypeUtil.DBL_TRUE_BITS^(TypeUtil.DBL_TRUE_BITS>>>32)))^(((int)(TypeUtil.DBL_TRUE_BITS^(TypeUtil.DBL_TRUE_BITS>>>32)))>>>16))) {
               break returnTrue;
             }
-          }else if(removePos0FromTable()) {
+          }else if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16))) {
             break returnTrue;
           }
           break returnFalse;
@@ -416,12 +417,13 @@ implements OmniSet.OfDouble{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val==0) {
-            if(removePos0FromTable()) {
+             if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16))) {
               break returnTrue;
             }
           }
           {
-            if(removeFromTable(Double.doubleToRawLongBits(val))) {
+            long bits;
+            if(removeFromTable(bits=Double.doubleToRawLongBits(val),tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -443,21 +445,21 @@ implements OmniSet.OfDouble{
         {
           if(val==0)
           {
-            if(removePos0FromTable())
+            if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16)))
             {
               break returnTrue;
             }
           }
           else if(TypeUtil.checkCastToDouble(val))
           {
-            if(removeFromTable(Double.doubleToRawLongBits(val)))
+            long bits;
+            if(removeFromTable(bits=Double.doubleToRawLongBits(val),tableHash(bits)))
             {
               break returnTrue;
             }
           }
           break returnFalse;
         }
-        //returnTrue
         this.size=size-1;
         return true;
       }
@@ -472,13 +474,13 @@ implements OmniSet.OfDouble{
           if(val==val) {
             long bits;
             if((bits=Double.doubleToRawLongBits(val))!=0) {
-              if(removeFromTable(bits)) {
+              if(removeFromTable(bits,tableHash(bits))) {
                 break returnTrue;
               }
-            }else if(removePos0FromTable()) {
+            }else if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16))) {
               break returnTrue;
             }
-          }else if(removeNaNFromTable()) {
+          }else if(removeFromTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)) {
             break returnTrue;
           }
           break returnFalse;
@@ -497,16 +499,16 @@ implements OmniSet.OfDouble{
           if(val==val){
             long bits;
             if((bits=Double.doubleToRawLongBits(val))==0) {
-              if(removePos0FromTable()) {
+              if(removeFromTable(0xfffc000000000000L,((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))^(((int)(0xfffc000000000000L^(0xfffc000000000000L>>>32)))>>>16))) {
                 break returnTrue;
               }
-            }else if(removeFromTable(bits)) {
+            }else if(removeFromTable(bits,tableHash(bits))) {
               break returnTrue;
             }
           }
           else
           {
-            if(removeNaNFromTable()) {
+            if(removeFromTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)) {
               break returnTrue;
             }
           }
@@ -642,183 +644,66 @@ implements OmniSet.OfDouble{
         }
       }
   }
-  boolean addPos0ToTable(){
-    long[] table;
-    if((table=this.table)!=null){
-      int tableLength;
-      int insertHere=-1;
-      insertInTable:for(int hash,initialHash=hash=((int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16)&(tableLength=table.length-1);;){
-        long tableVal;
-        if((tableVal=table[hash]) == 0){
-          if(insertHere == -1){
-            insertHere=hash;
-          }
-          break;
-        }else if(tableVal == 0x7ffc000000000000L){
+boolean addToTable(long val,int hash){
+  long[] table;
+  if((table=this.table)!=null){
+    int tableLength;
+    int insertHere=-1;
+    insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
+      long tableVal;
+      if((tableVal=table[hash]) == 0){
+        if(insertHere == -1){
           insertHere=hash;
-        }else if(tableVal == 0xfffc000000000000L){
-          // already contained
-          return false;
         }
-        if((hash=hash + 1 & tableLength) == initialHash){
-          break insertInTable;
-        }
+        break;
+      }else if(tableVal == 0x7ffc000000000000L){
+        insertHere=hash;
+      }else if(tableVal == val){
+        // already contained
+        return false;
       }
-      insert(table,insertHere,0xfffc000000000000L);
-      return true;
+      if((hash=hash + 1 & tableLength) == initialHash){
+        break insertInTable;
+      }
     }
-    int maxTableSize;
-    this.table=table=new long[maxTableSize=this.maxTableSize];
-    this.size=1;
-    table[0]=0xfffc000000000000L;
-    this.maxTableSize=(int)(maxTableSize*loadFactor);
+    insert(table,insertHere,val);
     return true;
   }
-  boolean addToTable(long val,int hash){
-    long[] table;
-    if((table=this.table)!=null){
-      int tableLength;
-      int insertHere=-1;
-      insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
-        long tableVal;
-        if((tableVal=table[hash]) == 0){
-          if(insertHere == -1){
-            insertHere=hash;
-          }
-          break;
-        }else if(tableVal == 0x7ffc000000000000L){
-          insertHere=hash;
-        }else if(tableVal == val){
-          // already contained
-          return false;
-        }
-        if((hash=hash + 1 & tableLength) == initialHash){
-          break insertInTable;
-        }
-      }
-      insert(table,insertHere,val);
-      return true;
-    }
-    int maxTableSize;
-    this.table=table=new long[maxTableSize=this.maxTableSize];
-    this.size=1;
-    table[hash & maxTableSize - 1]=val;
-    this.maxTableSize=(int)(maxTableSize*loadFactor);
-    return true;
-  }
-  boolean removePos0FromTable(){
+  int maxTableSize;
+  this.table=table=new long[maxTableSize=this.maxTableSize];
+  this.size=1;
+  table[hash & maxTableSize - 1]=val;
+  this.maxTableSize=(int)(maxTableSize*loadFactor);
+  return true;
+}
+  boolean removeFromTable(
+  long val,int hash){
     long[] table;
     long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
+    int tableLength;
+    if((tableVal=(table=this.table)[hash&=(tableLength=table.length-1)])!=0){
+      final int initialHash=hash;
       do{
-        if(tableVal == 0xfffc000000000000L){
+        if(val==tableVal){
           table[hash]=0x7ffc000000000000L;
           return true;
         }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
     }
     return false;
   }
-  boolean removeNaNFromTable(){
+  private boolean tableContains(
+  long val,int hash){
     long[] table;
     long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
+    int tableLength;
+    if((tableVal=(table=this.table)[hash&=(tableLength=table.length-1)])!=0){
+      final int initialHash=hash;
       do{
-        if(tableVal == 0x7ff8000000000000L){
-          table[hash]=0x7ffc000000000000L;
+        if(val==tableVal){
           return true;
         }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  boolean removeTrueFromTable(){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == TypeUtil.DBL_TRUE_BITS){
-          table[hash]=0x7ffc000000000000L;
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  boolean removeFromTable(long val){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((initialHash=(int)(val ^ val >>> 32)) ^ initialHash >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == val){
-          table[hash]=0x7ffc000000000000L;
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContainsPos0(){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) ^ (int)(0xfffc000000000000L ^ 0xfffc000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == 0xfffc000000000000L){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContainsNaN(){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == 0x7ff8000000000000L){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContainsTrue(){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == TypeUtil.DBL_TRUE_BITS){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContains(long val){
-    long[] table;
-    long tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=((initialHash=(int)(val ^ val >>> 32)) ^ initialHash >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == val){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
     }
     return false;
   }
@@ -1042,13 +927,6 @@ implements OmniSet.OfDouble{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override boolean addPos0ToTable(){
-        if(super.addPos0ToTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
     @Override boolean addToTable(long val,int hash){
         if(super.addToTable(val,hash)){
             ++this.modCount;
@@ -1056,29 +934,9 @@ implements OmniSet.OfDouble{
         }
         return false;
     }
-    @Override boolean removeFromTable(long val){
-        if(super.removeFromTable(val)){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removeNaNFromTable(){
-        if(super.removeNaNFromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removePos0FromTable(){
-        if(super.removePos0FromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removeTrueFromTable(){
-        if(super.removeTrueFromTable()){
+    @Override
+    boolean removeFromTable(long val,int hash){
+        if(super.removeFromTable(val,hash)){
             ++this.modCount;
             return true;
         }

@@ -2838,8 +2838,8 @@ public enum QueryVal{
     }
     public final void initContains(OmniCollection.OfRef<Object> collection,int setSize,long initVal,
             double containsPosition,
-            QueryValModification modification){
-        var val=getRefVal(modification);
+            QueryValModification modification,DataType inputType){
+        var val=getInputVal(inputType,modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
         initDoesNotContain(collection,containsIndex,initVal,modification);
         collection.add(val);

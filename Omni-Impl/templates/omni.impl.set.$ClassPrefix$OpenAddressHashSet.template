@@ -48,32 +48,53 @@ extends AbstractOpenAddressHashSet$<E>$
 extends AbstractOpenAddressHashSet<$BoxedType$>
 #ENDIF
 implements OmniSet.Of$ClassPrefix$$<E>${
-  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
-  #IF OfRef
+#IF OfFloat
+  private static int tableHash(int bits){
+    return bits^(bits>>>16);
+  }
+#ELSEIF OfDouble
+  private static int tableHash(long bits){
+    int tmp;
+    return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
+  }
+#ELSEIF OfRef
+  private static int tableHash(Object val){
+    int tmp;
+    return (tmp=val.hashCode())^(tmp>>>16);
+  }
+  private static int tableHash(long val){
+    int tmp;
+    return (tmp=(int)(val^(val>>>32)))^(tmp>>>16);
+  }
+  private static int tableHash(int val){
+    return val^(val>>>16);
+  }
+#ENDIF
+#IF OfRef
   private static final Object NULL=new Object();
+  private static final int NULLHASH=tableHash(NULL);
   private static final Object DELETED=new Object();
-  #ENDIF
+#ENDIF
 #IF OfLong,OfInt,OfShort,OfChar
   private  static long processWordHashCode(long word,int valOffset,int valBound,long magicWord){
     int hash=(int)(magicWord >>> 32);
     int numLeft=(int)magicWord;
     do{
-        if((word & 1L << valOffset) != 0L){
+      if((word & 1L << valOffset) != 0L){
   #IF OfLong
-            long v;
-            hash+=(int)((v=valOffset)^(v>>>32));
+        long v;
+        hash+=(int)((v=valOffset)^(v>>>32));
   #ELSE
-            hash+=valOffset;
+        hash+=valOffset;
   #ENDIF
-            if(--numLeft == 0){
-                break;
-            }
+        if(--numLeft == 0){
+          break;
         }
+      }
     }while(++valOffset != valBound);
     return numLeft | (long)hash << 32;
   }
 #ENDIF
-  
 #MACRODEF QuickInsert(TABLETYPE,VALTYPE,HASHFUNCTION)
 private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   int tableLength;
@@ -185,21 +206,25 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
 #IFNOT OfRef
   @Override public boolean add(boolean val){
   #IF OfDouble,OfFloat
-    if(val){
+  if(val){
     #IF OfFloat
-      return addToTable($TRUE_BITS$,$TRUE_BITS$^ $TRUE_BITS$ >>> 16);
+    return addToTable($TRUE_BITS$,$TRUE_BITS$^ $TRUE_BITS$ >>> 16);
     #ELSE
-      return addToTable($TRUE_BITS$,(int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) ^ (int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) >>> 16);
+    return addToTable($TRUE_BITS$,(int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) ^ (int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) >>> 16);
     #ENDIF
-    }
-    return addPos0ToTable();
+  }
+    #IF OfFloat
+  return addToTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+    #ELSE
+  return addToTable($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+    #ENDIF
   #ELSE
     long word;
-  #IF OfChar
+    #IF OfChar
     if((word=this.word0)!=(this.word0=word|(val?2L:1L))){
-  #ELSE
+    #ELSE
     if((word=this.word2)!=(this.word2=word|(val?2L:1L))){
-  #ENDIF
+    #ENDIF
       ++this.size;
       return true;
     }
@@ -229,11 +254,11 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   #IFNOT OfShort,OfDouble
   @Override public boolean add(char val){
     #IF OfFloat
-    if(val == 0){
-      return addPos0ToTable();
+    if(val==0){
+      return addToTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
     }
     int intBits;
-    return addToTable(intBits=Float.floatToRawIntBits(val),intBits ^ intBits >>> 16);
+    return addToTable(intBits=Float.floatToRawIntBits(val),tableHash(intBits));
     #ELSE
     returnFalse:for(;;){
       long word;
@@ -266,11 +291,11 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   #IF OfShort,OfFloat
   @Override public boolean add(short val){
     #IF OfFloat
-    if(val == 0){
-      return addPos0ToTable();
+    if(val==0){
+      return addToTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
     }
     int intBits;
-    return addToTable(intBits=Float.floatToRawIntBits(val),intBits ^ intBits >>> 16);
+    return addToTable(intBits=Float.floatToRawIntBits(val),tableHash(intBits));
     #ELSE
     returnFalse:for(;;){
       long word;
@@ -299,13 +324,17 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   @Override public boolean add(int val){
     #IF OfFloat,OfDouble
     if(val == 0){
-      return addPos0ToTable();
+      #IF OfFloat
+      return addToTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+      #ELSE
+      return addToTable($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+      #ENDIF
     }
       #IF OfFloat
-    return addToTable(val=$convertToBits$(val),val ^ val >>> 16);
+    return addToTable(val=$convertToBits$(val),tableHash(val));
       #ELSE
     long bits;
-    return addToTable(bits=$convertToBits$(val),(val=(int)(bits ^ bits >>> 32)) ^ val >>> 16);
+    return addToTable(bits=$convertToBits$(val),tableHash(bits));
       #ENDIF
     #ELSE
     returnFalse:for(;;){
@@ -335,13 +364,18 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
   @Override public boolean add(long val){
     #IF OfFloat,OfDouble
     if(val == 0){
-      return addPos0ToTable();
-    }
-    int hash;
       #IF OfFloat
-    return addToTable(hash=$convertToBits$(val),hash ^ hash >>> 16);
+      return addToTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
       #ELSE
-    return addToTable(val=$convertToBits$(val),(hash=(int)(val ^ val >>> 32)) ^ hash >>> 16);
+      return addToTable($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+      #ENDIF
+    }
+    
+      #IF OfFloat
+    int bits;
+    return addToTable(bits=$convertToBits$(val),tableHash(bits));
+      #ELSE
+    return addToTable(val=$convertToBits$(val),tableHash(val));
       #ENDIF
     #ELSE
     returnFalse:for(;;){
@@ -383,15 +417,18 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
     if(val == val){
       $queryParameterType$ bits;
       if((bits=$convertToBits$(val)) == 0){
-        return addPos0ToTable();
+    #IF OfFloat
+        return addToTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+    #ELSE
+        return addToTable($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+    #ENDIF
       }
     #IF OfFloat
-      return addToTable(bits,bits ^ bits >>> 16);
+      return addToTable(bits,tableHash(bits));
     }
     return addToTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
     #ELSE
-      int hash;
-      return addToTable(bits,(hash=(int)(bits ^ bits >>> 32)) ^ hash >>> 16);
+      return addToTable(bits,tableHash(bits));
     }
     return addToTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
     #ENDIF
@@ -403,10 +440,9 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
     if(val == val){
       long longBits;
       if((longBits=Double.doubleToRawLongBits(val)) == 0){
-          return addPos0ToTable();
+        return addToTable($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
       }
-      int hash;
-      return addToTable(longBits,(hash=(int)(longBits ^ longBits >>> 32)) ^ hash >>> 16);
+      return addToTable(longBits,tableHash(longBits));
     }
     return addToTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32)
             ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
@@ -418,11 +454,10 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
 #ENDIF
 #IF OfRef
   @Override public boolean add($exposedType$ val){
-    if(val!=null){
-      int hash;
-      return addToTable(val,(hash=val.hashCode()) ^ hash >>> 16);
+    if(val==null){
+      return addToTable(NULL,NULLHASH);
     }
-    return addNullToTable();
+    return addToTable(val,tableHash(val));
   }
 #ENDIF
 #IF OfFloat,OfDouble,OfRef
@@ -445,9 +480,17 @@ private static void quickInsert(TABLETYPE[] table,VALTYPE val){
 #ELSEIF OfFloat,OfDouble
     if(size!=0) {
       if(val) {
-        return tableContainsTrue();
+  #IF OfFloat
+        return tableContains($TRUE_BITS$,$TRUE_BITS$^ $TRUE_BITS$ >>> 16);
+  #ELSE
+        return tableContains($TRUE_BITS$,(int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) ^ (int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) >>> 16);
+  #ENDIF
       }
-      return tableContainsPos0();
+#IF OfFloat
+      return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+  #ELSE
+      return tableContains($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+  #ENDIF
     }
     return false;
 #ELSEIF OfChar
@@ -461,7 +504,7 @@ ERROR unknown type $ClassPrefix$
 #IFNOT OfFloat,OfDouble
   @Override public boolean contains(byte val){
   #IF OfRef
-    return size!=0 && tableContains(val,val);
+    return size!=0 && tableContains(val,tableHash(val));
   #ELSE
     return uncheckedContainsByte(val);
   #ENDIF
@@ -474,9 +517,10 @@ ERROR unknown type $ClassPrefix$
   #ELSEIF OfFloat
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
       }
-      return tableContains(Float.floatToRawIntBits(val));
+      int bits;
+      return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
     }
     return false;
   #ELSE
@@ -486,13 +530,14 @@ ERROR unknown type $ClassPrefix$
   #IF OfChar,OfShort,OfFloat,OfRef
   @Override public boolean contains(short val){
     #IF OfRef
-    return size!=0 && tableContains(val,val^(val>>>16));
+    return size!=0 && tableContains(val,tableHash(val));
     #ELSEIF OfFloat
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
       }
-      return tableContains(Float.floatToRawIntBits(val));
+      int bits;
+      return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
     }
     return false;
     #ELSEIF OfChar
@@ -505,17 +550,26 @@ ERROR unknown type $ClassPrefix$
 #ENDIF
   @Override public boolean contains(int val){
 #IF OfRef
-    return size!=0 && tableContains(val,val^(val>>>16));
+    return size!=0 && tableContains(val,tableHash(val));
 #ELSEIF OfFloat,OfDouble
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+  #IF OfFloat
+        return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+  #ELSE
+        return tableContains($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+  #ENDIF
       }
   #IF OfFloat
       else if(TypeUtil.checkCastToFloat(val))
   #ENDIF
       {
-        return tableContains($convertToBits$(val));
+  #IF OfFloat
+        return tableContains(val=$convertToBits$(val),tableHash(val));
+  #ELSE
+        long bits;
+        return tableContains(bits=$convertToBits$(val),tableHash(bits));
+  #ENDIF
       }
     }
     return false;
@@ -531,14 +585,22 @@ ERROR unknown type $ClassPrefix$
   }
   @Override public boolean contains(long val){
 #IF OfRef
-    int hash;
-    return size!=0 && tableContains(val,(hash=(int)(val^(val>>>32)))^(hash>>>16));
+    return size!=0 && tableContains(val,tableHash(val));
 #ELSEIF OfFloat,OfDouble
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        #IF OfFloat
+        return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+  #ELSE
+        return tableContains($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+  #ENDIF
       }else if(TypeUtil.checkCastTo$ClassPrefix$(val)) {
-        return tableContains($convertToBits$(val));
+  #IF OfFloat
+        int bits;
+        return tableContains(bits=$convertToBits$(val),tableHash(bits));
+  #ELSE
+        return tableContains(val=$convertToBits$(val),tableHash(val));
+  #ENDIF
       }
     }
     return false;
@@ -568,8 +630,7 @@ ERROR unknown type $ClassPrefix$
 #IF OfRef
     if(size!=0){
       if(val==val){
-        int hash;
-        return tableContains(val,(hash=Float.floatToRawIntBits(val))^(hash>>>16));
+        return tableContains(val,tableHash(Float.floatToRawIntBits(val)));
       }
       return tableContains(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16);
     }
@@ -579,11 +640,19 @@ ERROR unknown type $ClassPrefix$
       if(val==val) {
         $queryParameterType$ bits;
         if((bits=$convertToBits$(val))!=0) {
-          return tableContains(bits);
+          return tableContains(bits,tableHash(bits));
         }
-        return tableContainsPos0();
+  #IF OfFloat
+        return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+  #ELSE
+        return tableContains($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+  #ENDIF
       }
-      return tableContainsNaN();
+  #IF OfFloat
+      return tableContains(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
+  #ELSE
+      return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
+  #ENDIF
     }
     return false;
 #ELSEIF OfChar
@@ -613,9 +682,7 @@ ERROR unknown type $ClassPrefix$
 #IF OfRef
     if(size!=0){
       if(val==val){
-        long bits;
-        int hash;
-        return tableContains(val,(hash=(int)((bits=Double.doubleToRawLongBits(val))^(bits>>>32)))^(hash>>>16));
+        return tableContains(val,tableHash(Double.doubleToRawLongBits(val)));
       }
       return tableContains(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
     }
@@ -635,16 +702,24 @@ ERROR unknown type $ClassPrefix$
         if((bits=$convertToBits$(val))==0)
   #ENDIF
         {
-          return tableContainsPos0();
+          #IF OfFloat
+        return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+  #ELSE
+        return tableContains($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+  #ENDIF
         }
-        return tableContains(bits);
+        return tableContains(bits,tableHash(bits));
       }
       else
   #IF OfFloat
       if(d!=d)
   #ENDIF
       {
-        return tableContainsNaN();
+  #IF OfFloat
+        return tableContains(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
+  #ELSE
+        return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
+  #ENDIF
       }
     }
     return false;
@@ -684,7 +759,7 @@ checkNaN:for(;;) {
       }else{
         break checkNaN;
       }
-  #IF OfFloat
+#IF OfFloat
     }else if(val instanceof Integer) {
       if((bits=(int)val)==0) {
         break checkPos0;
@@ -722,7 +797,7 @@ checkNaN:for(;;) {
         break checkPos0;
       }
       bits=Float.floatToRawIntBits(bits);
-  #ELSE
+#ELSE
     }else if(val instanceof Integer || val instanceof Byte || val instanceof Short){
       int v;
       if((v=((Number)val).intValue()) == 0){
@@ -751,17 +826,25 @@ checkNaN:for(;;) {
           break checkPos0;
       }
       bits=Double.doubleToRawLongBits(v);
-  #ENDIF
+#ENDIF
     }else if(val instanceof Boolean) {
       if((boolean)val) {
-    #IFSWITCH REMOVE==true
-        if(removeTrueFromTable()) {
+#IFSWITCH REMOVE==true
+  #IF OfFloat
+        if(removeFromTable($TRUE_BITS$,$TRUE_BITS$^ $TRUE_BITS$ >>> 16)) {
+  #ELSE
+        if(removeFromTable($TRUE_BITS$,(int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) ^ (int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) >>> 16)) {
+  #ENDIF
           break returnTrue;
         }
         break returnFalse;
-    #ELSE
-        return tableContainsTrue();
-    #ENDIF
+#ELSE
+  #IF OfFloat
+        return tableContains($TRUE_BITS$,$TRUE_BITS$^ $TRUE_BITS$ >>> 16);
+  #ELSE
+        return tableContains($TRUE_BITS$,(int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) ^ (int)($TRUE_BITS$ ^ $TRUE_BITS$ >>> 32) >>> 16);
+  #ENDIF
+#ENDIF
       }else {
         break checkPos0;
       }
@@ -769,34 +852,50 @@ checkNaN:for(;;) {
       break returnFalse;
     }
 #IFSWITCH REMOVE==true
-    if(removeFromTable(bits)) {
+    if(removeFromTable(bits,tableHash(bits))) {
       break returnTrue;
     }
     break returnFalse;
   }
-  if(removePos0FromTable()) {
+  #IF OfFloat
+  if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16)) {
+  #ELSE
+  if(removeFromTable($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16)) {
+  #ENDIF
       break returnTrue;
   }
   break returnFalse;
 }
-if(removeNaNFromTable()) {
+  #IF OfFloat
+if(removeFromTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16)){
+  #ELSE
+if(removeFromTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){
+  #ENDIF
 #ELSE
-    return tableContains(bits);
+    return tableContains(bits,tableHash(bits));
   }
-  return tableContainsPos0();
+  #IF OfFloat
+  return tableContains($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^ $POS0_TABLE_VAL$ >>> 16);
+  #ELSE
+  return tableContains($POS0_TABLE_VAL$,(int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16);
+  #ENDIF
 }
-return tableContainsNaN();
+  #IF OfFloat
+return tableContains(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
+  #ELSE
+return tableContains(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
+  #ENDIF
 #ENDIF
 #ENDDEF
   
   @Override public boolean contains(Object val){
     if(size!=0){
 #IF OfRef
-      if(val!=null){
-        int hash;
-        return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
       }
-      return tableContainsNull();
+      int hash;
+      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
 #ELSE
       returnFalse:for(;;){
   #IF OfFloat,OfDouble
@@ -948,87 +1047,98 @@ ERROR unknown type $ClassPrefix$
 #IF OfRef
   @Override public boolean contains(Boolean val){
     if(size!=0){
-      if(val!=null){
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
+      }else{
         return tableContains(val,val.hashCode());
       }
-      return tableContainsNull();
+      
     }
     return false;
   }
   @Override public boolean contains(Byte val){
     if(size!=0){
-      if(val!=null){
-        return tableContains(val,val.hashCode());
+      int hash;
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
       }
-      return tableContainsNull();
+      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
     }
     return false;
   }
   @Override public boolean contains(Character val){
     if(size!=0){
-      if(val!=null){
-        return tableContains(val,val.hashCode());
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
       }
-      return tableContainsNull();
+      return tableContains(val,val.hashCode());
     }
     return false;
   }
   @Override public boolean contains(Short val){
     if(size!=0){
-      if(val!=null){
-        int hash;
-        return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
       }
-      return tableContainsNull();
+      int hash;
+      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
     }
     return false;
   }
   @Override public boolean contains(Integer val){
     if(size!=0){
-      if(val!=null){
-        int hash;
-        return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
       }
-      return tableContainsNull();
+      int hash;
+      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
     }
     return false;
   }
   @Override public boolean contains(Long val){
     if(size!=0){
-      if(val!=null){
-        int hash;
-        return tableContains(val,(hash=val.hashCode())^(hash>>>16));
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
       }
-      return tableContainsNull();
+      int hash;
+      return tableContains(val,(hash=val.hashCode())^(hash>>>16));
     }
     return false;
   }
   @Override public boolean contains(Float val){
     if(size!=0){
-      if(val!=null){
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
+      }else{
+        int hash;
         float f;
         if((f=(float)val)==f){
-          int hash;
-          return tableContains(val,(hash=Float.floatToRawIntBits(f))^(hash>>>16));
+          hash=(hash=Float.floatToRawIntBits(f))^(hash>>>16);
+        }else{
+          val=Float.NaN;
+          hash=0x7fc00000 ^ 0x7fc00000 >>> 16;
         }
-        return tableContains(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16);
+        return tableContains(val,hash);
       }
-      return tableContainsNull();
     }
     return false;
   }
   @Override public boolean contains(Double val){
     if(size!=0){
-      if(val!=null){
+      if(val==null){
+        return tableContains(NULL,NULLHASH);
+      }else{
+        int hash;
         double d;
         if((d=(double)val)==d){
           long bits;
-          int hash;
-          return tableContains(val,(hash=(int)((bits=Double.doubleToRawLongBits(d))^(bits>>>32)))^(hash>>>16));
+          hash=(hash=(int)((bits=Double.doubleToRawLongBits(d))^(bits>>>32)))^(hash>>>16);
+        }else{
+          val=Double.NaN;
+          hash=(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16;
         }
-        return tableContains(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16);
-      }
-      return tableContainsNull();
+        return tableContains(val,hash);
+      } 
     }
     return false;
   }
@@ -1186,7 +1296,7 @@ ERROR unknown type $ClassPrefix$
             if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
 #ELSEIF OfFloat,OfDouble
           #MACRO FloatAndDoubleQueryBody<true>()
 #ELSE
@@ -1427,10 +1537,18 @@ public boolean removeIf(PREDICATE filter){
           if(removeFromTable(val,val?1231:1237)){
   #ELSE
           if(val) {
-            if(removeTrueFromTable()) {
+    #IF OfFloat
+            if(removeFromTable($TRUE_BITS$,$TRUE_BITS$^($TRUE_BITS$>>>16))) {
+    #ELSE
+            if(removeFromTable($TRUE_BITS$,((int)($TRUE_BITS$^($TRUE_BITS$>>>32)))^(((int)($TRUE_BITS$^($TRUE_BITS$>>>32)))>>>16))) {
+    #ENDIF
               break returnTrue;
             }
-          }else if(removePos0FromTable()) {
+    #IF OfFloat
+          }else if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))) {
+    #ELSE
+          }else if(removeFromTable($POS0_TABLE_VAL$,((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))^(((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))>>>16))) {
+    #ENDIF
   #ENDIF
             break returnTrue;
           }
@@ -1460,7 +1578,7 @@ public boolean removeIf(PREDICATE filter){
   @Override public boolean removeVal(byte val){
 #IF OfRef
     int size;
-    if((size=this.size)!=0 && removeFromTable(val,val)){
+    if((size=this.size)!=0 && removeFromTable(val,tableHash(val))){
       this.size=size-1;
       return true;
     }
@@ -1513,11 +1631,14 @@ public boolean removeIf(PREDICATE filter){
       returnFalse:for(;;) {
         returnTrue:for(;;) {
           if(val==0) {
-            if(removePos0FromTable()) {
+            if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))) {
               break returnTrue;
             }
-          }else if(removeFromTable(Float.floatToRawIntBits(val))) {
-            break returnTrue;
+          }else{
+            int bits;
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+              break returnTrue;
+            }
           }
           break returnFalse;
         }
@@ -1584,17 +1705,20 @@ ERROR unknown type $ClassPrefix$
     int size;
     if((size=this.size)!=0){
     #IF OfRef
-      if(removeFromTable(val,val^(val>>>16))){
+      if(removeFromTable(val,tableHash(val))){
     #ELSE
       returnFalse:for(;;){
         returnTrue:for(;;){
       #IF OfFloat
           if(val==0) {
-            if(removePos0FromTable()) {
+            if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))) {
               break returnTrue;
             }
-          }else if(removeFromTable(Float.floatToRawIntBits(val))) {
-            break returnTrue;
+          }else{
+            int bits;
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+              break returnTrue;
+            }
           }
           break returnFalse;
       #ELSE
@@ -1642,13 +1766,17 @@ ERROR unknown type $ClassPrefix$
     int size;
     if((size=this.size)!=0){
 #IF OfRef
-      if(removeFromTable(val,val^(val>>>16))){
+      if(removeFromTable(val,tableHash(val))){
 #ELSE
       returnFalse:for(;;){
         returnTrue:for(;;){
   #IF OfFloat,OfDouble
           if(val==0) {
-            if(removePos0FromTable()) {
+    #IF OfFloat
+             if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))) {
+    #ELSE
+             if(removeFromTable($POS0_TABLE_VAL$,((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))^(((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))>>>16))) {
+    #ENDIF
               break returnTrue;
             }
           }
@@ -1656,7 +1784,8 @@ ERROR unknown type $ClassPrefix$
           else if(TypeUtil.checkCastToFloat(val))
     #ENDIF
           {
-            if(removeFromTable($convertToBits$(val))) {
+            $queryParameterType$ bits;
+            if(removeFromTable(bits=$convertToBits$(val),tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -1711,8 +1840,7 @@ ERROR unknown type $ClassPrefix$
     if((size=this.size)!=0)
     {
 #IF OfRef
-      int hash;
-      if(removeFromTable(val,(hash=(int)(val^(val>>>32)))^(hash>>>16)))
+      if(removeFromTable(val,tableHash(val)))
       {
 #ELSE
       returnFalse:for(;;)
@@ -1722,14 +1850,19 @@ ERROR unknown type $ClassPrefix$
   #IF OfFloat,OfDouble
           if(val==0)
           {
-            if(removePos0FromTable())
+    #IF OfFloat
+            if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16)))
+    #ELSE
+            if(removeFromTable($POS0_TABLE_VAL$,((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))^(((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))>>>16)))
+    #ENDIF
             {
               break returnTrue;
             }
           }
           else if(TypeUtil.checkCastTo$BoxedType$(val))
           {
-            if(removeFromTable($convertToBits$(val)))
+            $queryParameterType$ bits;
+            if(removeFromTable(bits=$convertToBits$(val),tableHash(bits)))
             {
               break returnTrue;
             }
@@ -1790,7 +1923,6 @@ Error unknown type $ClassPrefix$
           break returnFalse;
   #ENDIF
         }
-        //returnTrue
 #ENDIF
         this.size=size-1;
         return true;
@@ -1805,8 +1937,7 @@ Error unknown type $ClassPrefix$
         returnTrue:for(;;){
   #IF OfRef
           if(val==val){
-            int hash;
-            if(removeFromTable(val,(hash=Float.floatToRawIntBits(val))^(hash>>>16))){
+            if(removeFromTable(val,tableHash(Float.floatToRawIntBits(val)))){
               break returnTrue;
             }
           }else if(removeFromTable(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16)){
@@ -1815,14 +1946,22 @@ Error unknown type $ClassPrefix$
           if(val==val) {
             $queryParameterType$ bits;
             if((bits=$convertToBits$(val))!=0) {
-              if(removeFromTable(bits)) {
+              if(removeFromTable(bits,tableHash(bits))) {
                 break returnTrue;
               }
-            }else if(removePos0FromTable()) {
+    #IF OfFloat
+            }else if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))) {
               break returnTrue;
             }
-          }else if(removeNaNFromTable()) {
+          }else if(removeFromTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16)) {
             break returnTrue;
+    #ELSE
+            }else if(removeFromTable($POS0_TABLE_VAL$,((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))^(((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))>>>16))) {
+              break returnTrue;
+            }
+          }else if(removeFromTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)) {
+            break returnTrue;
+    #ENDIF
   #ELSE
     #IF OfChar
           int v;
@@ -1891,9 +2030,7 @@ Error unknown type $ClassPrefix$
         returnTrue:for(;;){
 #IF OfRef
           if(val==val){
-            long bits;
-            int hash;
-            if((removeFromTable(val,(hash=(int)((bits=Double.doubleToRawLongBits(val))^(bits>>>32)))^(hash>>>16)))){
+            if(removeFromTable(val,tableHash(Double.doubleToRawLongBits(val)))){
               break returnTrue;
             }
           }else if(removeFromTable(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){
@@ -1905,15 +2042,16 @@ Error unknown type $ClassPrefix$
           if((d=val)==(f=(float)d)){
             $queryParameterType$ bits;
             if((bits=$convertToBits$(f))==0) {
+              if(removeFromTable($POS0_TABLE_VAL$,$POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))) {
   #ELSE
           if(val==val){
             $queryParameterType$ bits;
             if((bits=$convertToBits$(val))==0) {
+              if(removeFromTable($POS0_TABLE_VAL$,((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))^(((int)($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>32)))>>>16))) {
   #ENDIF
-              if(removePos0FromTable()) {
                 break returnTrue;
               }
-            }else if(removeFromTable(bits)) {
+            }else if(removeFromTable(bits,tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -1922,7 +2060,11 @@ Error unknown type $ClassPrefix$
           if(d!=d)
   #ENDIF
           {
-            if(removeNaNFromTable()) {
+  #IF OfFloat
+            if(removeFromTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16)) {
+  #ELSE
+            if(removeFromTable(0x7ff8000000000000L,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)) {
+  #ENDIF
               break returnTrue;
             }
 #ELSE
@@ -1995,7 +2137,7 @@ Error unknown type $ClassPrefix$
             if(removeFromTable(val,val?1231:1237)){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2012,10 +2154,11 @@ Error unknown type $ClassPrefix$
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val!=null){
-            if(removeFromTable(val,val.hashCode())){
+            int hash;
+            if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2035,7 +2178,7 @@ Error unknown type $ClassPrefix$
             if(removeFromTable(val,val.hashCode())){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2056,7 +2199,7 @@ Error unknown type $ClassPrefix$
             if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2077,7 +2220,7 @@ Error unknown type $ClassPrefix$
             if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2098,7 +2241,7 @@ Error unknown type $ClassPrefix$
             if(removeFromTable(val,(hash=val.hashCode())^(hash>>>16))){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2124,7 +2267,7 @@ Error unknown type $ClassPrefix$
             }else if(removeFromTable(Float.NaN,0x7fc00000 ^ 0x7fc00000 >>> 16)){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2151,7 +2294,7 @@ Error unknown type $ClassPrefix$
             }else if(removeFromTable(Double.NaN,(int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16)){
               break returnTrue;
             }
-          }else if(removeNullFromTable()){
+          }else if(removeFromTable(NULL,NULLHASH)){
             break returnTrue;
           }
           break returnFalse;
@@ -2413,10 +2556,10 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
       if(size != 0){
 #IF OfFloat,OfDouble,OfRef
         $queryParameterType$[] table;
-        for(int i=(table=this.table).length;--i>=0;) {
+        for(int i=(table=this.table).length;;) {
           $queryParameterType$ tableVal;
   #IF OfFloat
-          switch(tableVal=table[i]) {
+          switch(tableVal=table[--i]) {
             default:
               out.writeInt(tableVal);
               if(--size==0) {
@@ -2426,7 +2569,7 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
             case $DELETED_TABLE_VAL$:
           }
   #ELSE
-          if((tableVal=table[i]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
+          if((tableVal=table[--i]) != $EMPTY_TABLE_VAL$ && tableVal != $DELETED_TABLE_VAL$){
             #IF OfRef
             if(tableVal == NULL){
                 tableVal=null;
@@ -2463,57 +2606,36 @@ private void uncheckedCopyIntoArray(int size,ARRTYPE[] dst){
 #ENDIF
       }
   }
-
 #IF OfRef
-  #MACRO AddToTable<Null>($queryParameterType$)
-  #MACRO AddToTable<NONE>($queryParameterType$)
-#ELSEIF OfFloat,OfDouble
-  #MACRO AddToTable<POS0>($queryParameterType$)
-  #MACRO AddToTable<NONE>($queryParameterType$)
-#ELSE
-  #MACRO AddToTable<NONE>($ArrayType$)
-#ENDIF
-#MACRODEF AddToTable<MODIFIER>(TABLETYPE)
-#IFSWITCH MODIFIER==POS0
-boolean addPos0ToTable(){
-#ELSEIFSWITCH MODIFIER==Null
-private boolean addNullToTable(){
-#ELSE
-  #IF OfRef
 private boolean addToTable(Object val,int hash){
-  #ELSEIF OfFloat
+#ELSEIF OfFloat
 boolean addToTable(int val,int hash){
-  #ELSEIF OfDouble
+#ELSEIF OfDouble
 boolean addToTable(long val,int hash){
-  #ELSE
+#ELSE
 private boolean addToTable($ArrayType$ val){
-  #ENDIF
 #ENDIF
-  TABLETYPE[] table;
+#IF OfRef,OfFloat,OfDouble
+  $queryParameterType$[] table;
+#ELSE
+  $ArrayType$[] table;
+#ENDIF
   if((table=this.table)!=null){
     int tableLength;
     int insertHere=-1;
 #IFNOT OfFloat,OfDouble,OfRef
     int hash;
 #ENDIF
-#IFSWITCH MODIFIER==POS0
-  #IF OfFloat
-    insertInTable:for(int hash,initialHash=hash=($POS0_TABLE_VAL$^($POS0_TABLE_VAL$>>>16))&(tableLength=table.length-1);;){
-  #ELSE
-    insertInTable:for(int hash,initialHash=hash=((int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16)&(tableLength=table.length-1);;){
-  #ENDIF
-#ELSEIFSWITCH MODIFIER==Null
-    insertInTable:for(int hash,initialHash=hash=((hash=NULL.hashCode())^(hash>>>16))&(tableLength=table.length-1);;){
-#ELSE
-  #IF OfFloat,OfDouble,OfRef
+#IF OfFloat,OfDouble,OfRef
     insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
-  #ELSEIF OfLong
+      $queryParameterType$ tableVal;
+#ELSEIF OfLong
     insertInTable:for(final int initialHash=hash=((int)(val^(val>>>32)))&(tableLength=table.length-1);;){
-  #ELSE
+      $ArrayType$ tableVal;
+#ELSE
     insertInTable:for(final int initialHash=hash=val&(tableLength=table.length-1);;){
-  #ENDIF
+      $ArrayType$ tableVal;
 #ENDIF
-      TABLETYPE tableVal;
 #IF OfDouble,OfRef
       if((tableVal=table[hash]) == $EMPTY_TABLE_VAL$){
         if(insertHere == -1){
@@ -2522,16 +2644,10 @@ private boolean addToTable($ArrayType$ val){
         break;
       }else if(tableVal == $DELETED_TABLE_VAL$){
         insertHere=hash;
-  #IFSWITCH MODIFIER==POS0
-      }else if(tableVal == $POS0_TABLE_VAL$){
-  #ELSEIFSWITCH MODIFIER==Null
-      }else if(tableVal == NULL){
-  #ELSE
-    #IF OfDouble
+  #IF OfDouble
       }else if(tableVal == val){
-    #ELSE
+  #ELSE
       }else if(val.equals(tableVal)){
-    #ENDIF
   #ENDIF
         // already contained
         return false;
@@ -2547,11 +2663,7 @@ private boolean addToTable($ArrayType$ val){
           insertHere=hash;
           break;
         default:
-  #IFSWITCH MODIFIER==POS0
-          if(tableVal==$POS0_TABLE_VAL$){
-  #ELSE
           if(tableVal==val){
-  #ENDIF
             //already contains
             return false;
           }
@@ -2589,27 +2701,16 @@ private boolean addToTable($ArrayType$ val){
         break insertInTable;
       }
     }
-#IFSWITCH MODIFIER==POS0
-    insert(table,insertHere,$POS0_TABLE_VAL$);
-#ELSEIFSWITCH MODIFIER==Null
-    insert(table,insertHere,NULL);
-#ELSE
     insert(table,insertHere,val);
-#ENDIF
     return true;
   }
   int maxTableSize;
-  this.table=table=new TABLETYPE[maxTableSize=this.maxTableSize];
 #IF OfFloat,OfDouble,OfRef
+  this.table=table=new $queryParameterType$[maxTableSize=this.maxTableSize];
   this.size=1;
-  #IFSWITCH MODIFIER==POS0
-  table[0]=$POS0_TABLE_VAL$;
-  #ELSEIFSWITCH MODIFIER==Null
-  table[0]=NULL;
-  #ELSE
   table[hash & maxTableSize - 1]=val;
-  #ENDIF
 #ELSE
+  this.table=table=new $ArrayType$[maxTableSize=this.maxTableSize];
   this.tableSize=1;
   #IF OfLong
   table[((int)(val^(val>>>32)))&(maxTableSize-1)]=val;
@@ -2620,152 +2721,63 @@ private boolean addToTable($ArrayType$ val){
   this.maxTableSize=(int)(maxTableSize*loadFactor);
   return true;
 }
-#ENDDEF
-#IF OfRef
-  #MACRO ContainsOrRemoveFromTable<Null,true>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<None,true>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<Null,false>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<None,false>($queryParameterType$)
-#ELSEIF OfFloat,OfDouble
-  #MACRO ContainsOrRemoveFromTable<POS0,true>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<NaN,true>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<True,true>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<NONE,true>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<POS0,false>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<NaN,false>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<True,false>($queryParameterType$)
-  #MACRO ContainsOrRemoveFromTable<NONE,false>($queryParameterType$)
-#ELSEIF OfLong
-  #MACRO ContainsOrRemoveFromTable<Long,true>($ArrayType$)
-  #MACRO ContainsOrRemoveFromTable<Long,false>($ArrayType$)
-#ELSE
-  #MACRO ContainsOrRemoveFromTable<NONE,true>($ArrayType$)
-  #MACRO ContainsOrRemoveFromTable<NONE,false>($ArrayType$)
-#ENDIF
-
-
-
-
-
-#MACRODEF ContainsOrRemoveFromTable<MODIFIER,REMOVE>(TABLETYPE)
+  #MACRO ContainsOrRemoveFromTable<true>()
+  #MACRO ContainsOrRemoveFromTable<false>()
+#MACRODEF ContainsOrRemoveFromTable<REMOVE>()
 #IFSWITCH REMOVE==true
-  #IFSWITCH MODIFIER==NaN
-boolean removeNaNFromTable(){
-  #ELSEIFSWITCH MODIFIER==Null
-boolean removeNullFromTable(){
-  #ELSEIFSWITCH MODIFIER==POS0
-boolean removePos0FromTable(){
-  #ELSEIFSWITCH MODIFIER==True
-boolean removeTrueFromTable(){
-  #ELSEIFSWITCH MODIFIER==Long
-private boolean removeFromTable(long val){
-  #ELSE
-    #IF OfRef
-boolean removeFromTable(Object val,int hash){
-    #ELSEIF OfFloat
-boolean removeFromTable(int val){
-    #ELSEIF OfDouble
-boolean removeFromTable(long val){
-    #ELSE
-private boolean removeFromTable(int val){
-    #ENDIF
+  #IFNOT OfRef,OfDouble,OfFloat
+private
   #ENDIF
+boolean removeFromTable(
 #ELSE
-  #IFSWITCH MODIFIER==NaN
-private boolean tableContainsNaN(){
-  #ELSEIFSWITCH MODIFIER==Null
-private boolean tableContainsNull(){
-  #ELSEIFSWITCH MODIFIER==POS0
-private boolean tableContainsPos0(){
-  #ELSEIFSWITCH MODIFIER==True
-private boolean tableContainsTrue(){
-  #ELSEIFSWITCH MODIFIER==Long
-private boolean tableContains(long val){
+private boolean tableContains(
+#ENDIF
+#IF OfRef,OfDouble,OfFloat
+$queryParameterType$ val,int hash){
+  $queryParameterType$[] table;
+  $queryParameterType$ tableVal;
+  int tableLength;
+  if((tableVal=(table=this.table)[hash&=(tableLength=table.length-1)])!=$EMPTY_TABLE_VAL$){
+#ELSE
+  #IF OfLong
+long val){
   #ELSE
-    #IF OfRef
-private boolean tableContains(Object val,int hash){
-    #ELSEIF OfDouble
-private boolean tableContains(long val){
-    #ELSE
-private boolean tableContains(int val){
-    #ENDIF
+int val){
+  #ENDIF
+  $ArrayType$[] table;
+  $ArrayType$ tableVal;
+  int tableLength;
+  int hash;
+  #IFSWITCH REMOVE==true
+  int tableSize;
+  if((tableSize=this.tableSize)!=0
+  #ELSE
+  if(tableSize!=0
+  #ENDIF
+  #IF OfLong
+  &&(tableVal=(table=this.table)[hash=(((hash=(int)(val^(val>>>32)))^(hash>>>16))&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
+  #ELSEIF OfChar
+  &&(tableVal=(table=this.table)[hash=(val&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
+  #ELSE
+  &&(tableVal=(table=this.table)[hash=((val^(val>>>16))&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
   #ENDIF
 #ENDIF
-  TABLETYPE[] table;
-  TABLETYPE tableVal;
-  int tableLength,initialHash;
-#IF OfRef
-  #IFSWITCH MODIFIER==Null
-  if((tableVal=(table=this.table)[initialHash=((initialHash=NULL.hashCode()) ^ (initialHash >>> 16)) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSE
-  if((tableVal=(table=this.table)[initialHash=hash&=(tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ENDIF
-#ELSEIF OfFloat
-  #IFSWITCH MODIFIER==POS0
-  if((tableVal=(table=this.table)[initialHash=($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSEIFSWITCH MODIFIER==NaN
-  if((tableVal=(table=this.table)[initialHash=(0x7fc00000 ^ 0x7fc00000 >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSEIFSWITCH MODIFIER==True
-  if((tableVal=(table=this.table)[initialHash=(TypeUtil.FLT_TRUE_BITS ^ TypeUtil.FLT_TRUE_BITS >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){ 
-  #ELSE
-  if((tableVal=(table=this.table)[initialHash=(val ^ val >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ENDIF
-#ELSEIF OfDouble
-  #IFSWITCH MODIFIER==POS0
-  if((tableVal=(table=this.table)[initialHash=((int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) ^ (int)($POS0_TABLE_VAL$ ^ $POS0_TABLE_VAL$ >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSEIFSWITCH MODIFIER==NaN
-  if((tableVal=(table=this.table)[initialHash=((int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) ^ (int)(0x7ff8000000000000L ^ 0x7ff8000000000000L >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSEIFSWITCH MODIFIER==True
-  if((tableVal=(table=this.table)[initialHash=((int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) ^ (int)(TypeUtil.DBL_TRUE_BITS ^ TypeUtil.DBL_TRUE_BITS >>> 32) >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ELSE
-  if((tableVal=(table=this.table)[initialHash=((initialHash=(int)(val ^ val >>> 32)) ^ initialHash >>> 16) & (tableLength=table.length - 1)]) != $EMPTY_TABLE_VAL$){
-  #ENDIF
-#ELSEIF OfLong
-  if((table=this.table)!=null && (tableVal=table[initialHash=((int)(val^(val>>>32)))&(tableLength=table.length-1)])!=0){
-#ELSE
-  if((table=this.table)!=null && (tableVal=table[initialHash=val&(tableLength=table.length-1)])!=0){
-#ENDIF
-#IF OfRef
-  #IFSWITCH MODIFIER==Null
-    int hash=initialHash;
-  #ENDIF
+    final int initialHash=hash;
     do{
-  #IFSWITCH MODIFIER==Null
-      if(NULL==tableVal){
-  #ELSE
+#IF OfRef
       if(val.equals(tableVal)){
-  #ENDIF
 #ELSE
-    int hash=initialHash;
-    #IF OfFloat,OfDouble
-    do{
-      #IFSWITCH MODIFIER==NaN
-        #IF OfDouble
-      if(tableVal == 0x7ff8000000000000L){
-        #ELSE
-      if(tableVal == 0x7fc00000){
-        #ENDIF
-      #ELSEIFSWITCH MODIFIER==True
-      if(tableVal == $TRUE_BITS$){
-      #ELSEIFSWITCH MODIFIER==POS0
-      if(tableVal == $POS0_TABLE_VAL$){
-      #ELSE
-      if(tableVal == val){
-      #ENDIF
-    #ELSE
-    do{
-      if(tableVal == val){
-      #IFSWITCH REMOVE==true
-        this.tableSize=tableSize-1;
-      #ENDIF
-    #ENDIF
+      if(val==tableVal){
 #ENDIF
 #IFSWITCH REMOVE==true
+  #IF OfChar,OfShort,OfInt,OfLong
+        this.tableSize=tableSize-1;
+  #ENDIF
         table[hash]=$DELETED_TABLE_VAL$;
 #ENDIF
         return true;
       }
-    }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != $EMPTY_TABLE_VAL$);
+    }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=$EMPTY_TABLE_VAL$);
   }
   return false;
 }
@@ -3710,17 +3722,18 @@ return (this.wordWORDNUM & (MASK))!=0;
 #IF OfRef
     @Override
     public boolean add($exposedType$ val){
+        int hash;
         if(val != null){
             int modCount=this.modCount;
             try{
-                int hash;
+               
                 return addToTable(modCount,val,(hash=val.hashCode()) ^ hash >>> 16);
             }catch(ConcurrentModificationException e){
                 throw e;
             }catch(RuntimeException e){
                 throw CheckedCollection.checkModCount(modCount,this.modCount,e);
             }
-        }else if(super.addNullToTable()){
+        }else if(super.addToTable(NULL,NULLHASH)){
             ++this.modCount;
             return true;
         }
@@ -3855,7 +3868,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                     CheckedCollection.checkModCount(modCount,this.modCount);
                 }
             }
-            return super.tableContainsNull();
+            return super.tableContains(NULL,NULLHASH);
         }
         return false;
     }
@@ -3887,7 +3900,7 @@ return (this.wordWORDNUM & (MASK))!=0;
                         }catch(RuntimeException e){
                             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
                         }
-                    }else if(super.removeNullFromTable()){
+                    }else if(super.removeFromTable(NULL,NULLHASH)){
                         ++this.modCount;
                         break returnTrue;
                     }
@@ -4002,13 +4015,6 @@ return (this.wordWORDNUM & (MASK))!=0;
       }
     }
 #IF OfFloat,OfDouble
-    @Override boolean addPos0ToTable(){
-        if(super.addPos0ToTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
   #IF OfFloat
     @Override boolean addToTable(int val,int hash){
   #ELSE
@@ -4021,51 +4027,10 @@ return (this.wordWORDNUM & (MASK))!=0;
         return false;
     }
 #ENDIF
-#IF OfRef
+#IF OfRef,OfDouble,OfFloat
     @Override
-    boolean removeFromTable(Object val,int hash){
+    boolean removeFromTable($queryParameterType$ val,int hash){
         if(super.removeFromTable(val,hash)){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override
-    boolean removeNullFromTable(){
-        if(super.removeNullFromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-#ELSEIF OfFloat,OfDouble
-  #IF OfFloat
-    @Override boolean removeFromTable(int val){
-  #ELSE
-    @Override boolean removeFromTable(long val){
-  #ENDIF
-        if(super.removeFromTable(val)){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removeNaNFromTable(){
-        if(super.removeNaNFromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removePos0FromTable(){
-        if(super.removePos0FromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removeTrueFromTable(){
-        if(super.removeTrueFromTable()){
             ++this.modCount;
             return true;
         }

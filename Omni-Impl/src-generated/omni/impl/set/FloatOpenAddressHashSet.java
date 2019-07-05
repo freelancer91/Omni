@@ -19,7 +19,9 @@ import omni.util.ToStringUtil;
 public class FloatOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Float>
 implements OmniSet.OfFloat{
-  //TODO long hash codes for negative values are different from int hashcodes of the same value. This is a problem
+  private static int tableHash(int bits){
+    return bits^(bits>>>16);
+  }
   private static void quickInsert(int[] table,int val){
     int tableLength;
     int hash;
@@ -69,45 +71,45 @@ implements OmniSet.OfFloat{
     super(initialCapacity,loadFactor);
   }
   @Override public boolean add(boolean val){
-    if(val){
-      return addToTable(TypeUtil.FLT_TRUE_BITS,TypeUtil.FLT_TRUE_BITS^ TypeUtil.FLT_TRUE_BITS >>> 16);
-    }
-    return addPos0ToTable();
+  if(val){
+    return addToTable(TypeUtil.FLT_TRUE_BITS,TypeUtil.FLT_TRUE_BITS^ TypeUtil.FLT_TRUE_BITS >>> 16);
+  }
+  return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
   }
   @Override public boolean add(char val){
-    if(val == 0){
-      return addPos0ToTable();
+    if(val==0){
+      return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
     int intBits;
-    return addToTable(intBits=Float.floatToRawIntBits(val),intBits ^ intBits >>> 16);
+    return addToTable(intBits=Float.floatToRawIntBits(val),tableHash(intBits));
   }
   @Override public boolean add(short val){
-    if(val == 0){
-      return addPos0ToTable();
+    if(val==0){
+      return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
     int intBits;
-    return addToTable(intBits=Float.floatToRawIntBits(val),intBits ^ intBits >>> 16);
+    return addToTable(intBits=Float.floatToRawIntBits(val),tableHash(intBits));
   }
   @Override public boolean add(int val){
     if(val == 0){
-      return addPos0ToTable();
+      return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
-    return addToTable(val=Float.floatToRawIntBits(val),val ^ val >>> 16);
+    return addToTable(val=Float.floatToRawIntBits(val),tableHash(val));
   }
   @Override public boolean add(long val){
     if(val == 0){
-      return addPos0ToTable();
+      return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
-    int hash;
-    return addToTable(hash=Float.floatToRawIntBits(val),hash ^ hash >>> 16);
+    int bits;
+    return addToTable(bits=Float.floatToRawIntBits(val),tableHash(bits));
   }
   @Override public boolean add(float val){
     if(val == val){
       int bits;
       if((bits=Float.floatToRawIntBits(val)) == 0){
-        return addPos0ToTable();
+        return addToTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
-      return addToTable(bits,bits ^ bits >>> 16);
+      return addToTable(bits,tableHash(bits));
     }
     return addToTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
   }
@@ -129,38 +131,40 @@ implements OmniSet.OfFloat{
   @Override public boolean contains(boolean val){
     if(size!=0) {
       if(val) {
-        return tableContainsTrue();
+        return tableContains(TypeUtil.FLT_TRUE_BITS,TypeUtil.FLT_TRUE_BITS^ TypeUtil.FLT_TRUE_BITS >>> 16);
       }
-      return tableContainsPos0();
+      return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
     }
     return false;
   }
   @Override public boolean contains(char val){
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
-      return tableContains(Float.floatToRawIntBits(val));
+      int bits;
+      return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
     }
     return false;
   }
   @Override public boolean contains(short val){
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
-      return tableContains(Float.floatToRawIntBits(val));
+      int bits;
+      return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
     }
     return false;
   }
   @Override public boolean contains(int val){
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
       else if(TypeUtil.checkCastToFloat(val))
       {
-        return tableContains(Float.floatToRawIntBits(val));
+        return tableContains(val=Float.floatToRawIntBits(val),tableHash(val));
       }
     }
     return false;
@@ -168,9 +172,10 @@ implements OmniSet.OfFloat{
   @Override public boolean contains(long val){
     if(size!=0) {
       if(val==0) {
-        return tableContainsPos0();
+        return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }else if(TypeUtil.checkCastToFloat(val)) {
-        return tableContains(Float.floatToRawIntBits(val));
+        int bits;
+        return tableContains(bits=Float.floatToRawIntBits(val),tableHash(bits));
       }
     }
     return false;
@@ -180,11 +185,11 @@ implements OmniSet.OfFloat{
       if(val==val) {
         int bits;
         if((bits=Float.floatToRawIntBits(val))!=0) {
-          return tableContains(bits);
+          return tableContains(bits,tableHash(bits));
         }
-        return tableContainsPos0();
+        return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
       }
-      return tableContainsNaN();
+      return tableContains(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
     }
     return false;
   }
@@ -197,14 +202,14 @@ implements OmniSet.OfFloat{
         int bits;
         if((bits=Float.floatToRawIntBits(f))==0)
         {
-          return tableContainsPos0();
+        return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
         }
-        return tableContains(bits);
+        return tableContains(bits,tableHash(bits));
       }
       else
       if(d!=d)
       {
-        return tableContainsNaN();
+        return tableContains(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
       }
     }
     return false;
@@ -263,18 +268,18 @@ implements OmniSet.OfFloat{
               bits=Float.floatToRawIntBits(bits);
             }else if(val instanceof Boolean) {
               if((boolean)val) {
-                return tableContainsTrue();
+                return tableContains(TypeUtil.FLT_TRUE_BITS,TypeUtil.FLT_TRUE_BITS^ TypeUtil.FLT_TRUE_BITS >>> 16);
               }else {
                 break checkPos0;
               }
             }else {
               break returnFalse;
             }
-            return tableContains(bits);
+            return tableContains(bits,tableHash(bits));
           }
-          return tableContainsPos0();
+          return tableContains(0xffe00000,0xffe00000^ 0xffe00000 >>> 16);
         }
-        return tableContainsNaN();
+        return tableContains(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16);
       }
     }
     return false;
@@ -396,7 +401,7 @@ implements OmniSet.OfFloat{
                 bits=Float.floatToRawIntBits(bits);
               }else if(val instanceof Boolean) {
                 if((boolean)val) {
-                  if(removeTrueFromTable()) {
+                  if(removeFromTable(TypeUtil.FLT_TRUE_BITS,TypeUtil.FLT_TRUE_BITS^ TypeUtil.FLT_TRUE_BITS >>> 16)) {
                     break returnTrue;
                   }
                   break returnFalse;
@@ -406,17 +411,17 @@ implements OmniSet.OfFloat{
               }else {
                 break returnFalse;
               }
-              if(removeFromTable(bits)) {
+              if(removeFromTable(bits,tableHash(bits))) {
                 break returnTrue;
               }
               break returnFalse;
             }
-            if(removePos0FromTable()) {
+            if(removeFromTable(0xffe00000,0xffe00000^ 0xffe00000 >>> 16)) {
                 break returnTrue;
             }
             break returnFalse;
           }
-          if(removeNaNFromTable()) {
+          if(removeFromTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16)){
             break returnTrue;
           }
           break returnFalse;
@@ -443,10 +448,10 @@ implements OmniSet.OfFloat{
       returnFalse:for(;;) {
         returnTrue:for(;;) {
           if(val) {
-            if(removeTrueFromTable()) {
+            if(removeFromTable(TypeUtil.FLT_TRUE_BITS,TypeUtil.FLT_TRUE_BITS^(TypeUtil.FLT_TRUE_BITS>>>16))) {
               break returnTrue;
             }
-          }else if(removePos0FromTable()) {
+          }else if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
             break returnTrue;
           }
           break returnFalse;
@@ -463,11 +468,14 @@ implements OmniSet.OfFloat{
       returnFalse:for(;;) {
         returnTrue:for(;;) {
           if(val==0) {
-            if(removePos0FromTable()) {
+            if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
               break returnTrue;
             }
-          }else if(removeFromTable(Float.floatToRawIntBits(val))) {
-            break returnTrue;
+          }else{
+            int bits;
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+              break returnTrue;
+            }
           }
           break returnFalse;
         }
@@ -483,11 +491,14 @@ implements OmniSet.OfFloat{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val==0) {
-            if(removePos0FromTable()) {
+            if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
               break returnTrue;
             }
-          }else if(removeFromTable(Float.floatToRawIntBits(val))) {
-            break returnTrue;
+          }else{
+            int bits;
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
+              break returnTrue;
+            }
           }
           break returnFalse;
         }
@@ -503,13 +514,14 @@ implements OmniSet.OfFloat{
       returnFalse:for(;;){
         returnTrue:for(;;){
           if(val==0) {
-            if(removePos0FromTable()) {
+             if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
               break returnTrue;
             }
           }
           else if(TypeUtil.checkCastToFloat(val))
           {
-            if(removeFromTable(Float.floatToRawIntBits(val))) {
+            int bits;
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits))) {
               break returnTrue;
             }
           }
@@ -531,21 +543,21 @@ implements OmniSet.OfFloat{
         {
           if(val==0)
           {
-            if(removePos0FromTable())
+            if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16)))
             {
               break returnTrue;
             }
           }
           else if(TypeUtil.checkCastToFloat(val))
           {
-            if(removeFromTable(Float.floatToRawIntBits(val)))
+            int bits;
+            if(removeFromTable(bits=Float.floatToRawIntBits(val),tableHash(bits)))
             {
               break returnTrue;
             }
           }
           break returnFalse;
         }
-        //returnTrue
         this.size=size-1;
         return true;
       }
@@ -560,13 +572,13 @@ implements OmniSet.OfFloat{
           if(val==val) {
             int bits;
             if((bits=Float.floatToRawIntBits(val))!=0) {
-              if(removeFromTable(bits)) {
+              if(removeFromTable(bits,tableHash(bits))) {
                 break returnTrue;
               }
-            }else if(removePos0FromTable()) {
+            }else if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
               break returnTrue;
             }
-          }else if(removeNaNFromTable()) {
+          }else if(removeFromTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16)) {
             break returnTrue;
           }
           break returnFalse;
@@ -587,17 +599,17 @@ implements OmniSet.OfFloat{
           if((d=val)==(f=(float)d)){
             int bits;
             if((bits=Float.floatToRawIntBits(f))==0) {
-              if(removePos0FromTable()) {
+              if(removeFromTable(0xffe00000,0xffe00000^(0xffe00000>>>16))) {
                 break returnTrue;
               }
-            }else if(removeFromTable(bits)) {
+            }else if(removeFromTable(bits,tableHash(bits))) {
               break returnTrue;
             }
           }
           else
           if(d!=d)
           {
-            if(removeNaNFromTable()) {
+            if(removeFromTable(0x7fc00000,0x7fc00000 ^ 0x7fc00000 >>> 16)) {
               break returnTrue;
             }
           }
@@ -762,191 +774,70 @@ implements OmniSet.OfFloat{
         }
       }
   }
-  boolean addPos0ToTable(){
-    int[] table;
-    if((table=this.table)!=null){
-      int tableLength;
-      int insertHere=-1;
-      insertInTable:for(int hash,initialHash=hash=(0xffe00000^(0xffe00000>>>16))&(tableLength=table.length-1);;){
-        int tableVal;
-        switch(tableVal=table[hash]){
-          case 0:
-            if(insertHere == -1){
-              insertHere=hash;
-            }
-            break insertInTable;
-          case 0x7fe00000:
+boolean addToTable(int val,int hash){
+  int[] table;
+  if((table=this.table)!=null){
+    int tableLength;
+    int insertHere=-1;
+    insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
+      int tableVal;
+      switch(tableVal=table[hash]){
+        case 0:
+          if(insertHere == -1){
             insertHere=hash;
-            break;
-          default:
-            if(tableVal==0xffe00000){
-              //already contains
-              return false;
-            }
-        }
-        if((hash=hash + 1 & tableLength) == initialHash){
+          }
           break insertInTable;
-        }
+        case 0x7fe00000:
+          insertHere=hash;
+          break;
+        default:
+          if(tableVal==val){
+            //already contains
+            return false;
+          }
       }
-      insert(table,insertHere,0xffe00000);
-      return true;
+      if((hash=hash + 1 & tableLength) == initialHash){
+        break insertInTable;
+      }
     }
-    int maxTableSize;
-    this.table=table=new int[maxTableSize=this.maxTableSize];
-    this.size=1;
-    table[0]=0xffe00000;
-    this.maxTableSize=(int)(maxTableSize*loadFactor);
+    insert(table,insertHere,val);
     return true;
   }
-  boolean addToTable(int val,int hash){
-    int[] table;
-    if((table=this.table)!=null){
-      int tableLength;
-      int insertHere=-1;
-      insertInTable:for(final int initialHash=hash&=tableLength=table.length - 1;;){
-        int tableVal;
-        switch(tableVal=table[hash]){
-          case 0:
-            if(insertHere == -1){
-              insertHere=hash;
-            }
-            break insertInTable;
-          case 0x7fe00000:
-            insertHere=hash;
-            break;
-          default:
-            if(tableVal==val){
-              //already contains
-              return false;
-            }
-        }
-        if((hash=hash + 1 & tableLength) == initialHash){
-          break insertInTable;
-        }
-      }
-      insert(table,insertHere,val);
-      return true;
-    }
-    int maxTableSize;
-    this.table=table=new int[maxTableSize=this.maxTableSize];
-    this.size=1;
-    table[hash & maxTableSize - 1]=val;
-    this.maxTableSize=(int)(maxTableSize*loadFactor);
-    return true;
-  }
-  boolean removePos0FromTable(){
+  int maxTableSize;
+  this.table=table=new int[maxTableSize=this.maxTableSize];
+  this.size=1;
+  table[hash & maxTableSize - 1]=val;
+  this.maxTableSize=(int)(maxTableSize*loadFactor);
+  return true;
+}
+  boolean removeFromTable(
+  int val,int hash){
     int[] table;
     int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(0xffe00000 ^ 0xffe00000 >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
+    int tableLength;
+    if((tableVal=(table=this.table)[hash&=(tableLength=table.length-1)])!=0){
+      final int initialHash=hash;
       do{
-        if(tableVal == 0xffe00000){
+        if(val==tableVal){
           table[hash]=0x7fe00000;
           return true;
         }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
     }
     return false;
   }
-  boolean removeNaNFromTable(){
+  private boolean tableContains(
+  int val,int hash){
     int[] table;
     int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(0x7fc00000 ^ 0x7fc00000 >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
+    int tableLength;
+    if((tableVal=(table=this.table)[hash&=(tableLength=table.length-1)])!=0){
+      final int initialHash=hash;
       do{
-        if(tableVal == 0x7fc00000){
-          table[hash]=0x7fe00000;
+        if(val==tableVal){
           return true;
         }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  boolean removeTrueFromTable(){
-    int[] table;
-    int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(TypeUtil.FLT_TRUE_BITS ^ TypeUtil.FLT_TRUE_BITS >>> 16) & (tableLength=table.length - 1)]) != 0){ 
-      int hash=initialHash;
-      do{
-        if(tableVal == TypeUtil.FLT_TRUE_BITS){
-          table[hash]=0x7fe00000;
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  boolean removeFromTable(int val){
-    int[] table;
-    int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(val ^ val >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == val){
-          table[hash]=0x7fe00000;
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContainsPos0(){
-    int[] table;
-    int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(0xffe00000 ^ 0xffe00000 >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == 0xffe00000){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContainsNaN(){
-    int[] table;
-    int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(0x7fc00000 ^ 0x7fc00000 >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == 0x7fc00000){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContainsTrue(){
-    int[] table;
-    int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(TypeUtil.FLT_TRUE_BITS ^ TypeUtil.FLT_TRUE_BITS >>> 16) & (tableLength=table.length - 1)]) != 0){ 
-      int hash=initialHash;
-      do{
-        if(tableVal == TypeUtil.FLT_TRUE_BITS){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
-    }
-    return false;
-  }
-  private boolean tableContains(int val){
-    int[] table;
-    int tableVal;
-    int tableLength,initialHash;
-    if((tableVal=(table=this.table)[initialHash=(val ^ val >>> 16) & (tableLength=table.length - 1)]) != 0){
-      int hash=initialHash;
-      do{
-        if(tableVal == val){
-          return true;
-        }
-      }while((hash=(hash + 1) & tableLength) != initialHash && (tableVal=table[hash]) != 0);
+      }while((hash=(hash+1)&tableLength)!=initialHash&&(tableVal=table[hash])!=0);
     }
     return false;
   }
@@ -1247,13 +1138,6 @@ implements OmniSet.OfFloat{
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     }
-    @Override boolean addPos0ToTable(){
-        if(super.addPos0ToTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
     @Override boolean addToTable(int val,int hash){
         if(super.addToTable(val,hash)){
             ++this.modCount;
@@ -1261,29 +1145,9 @@ implements OmniSet.OfFloat{
         }
         return false;
     }
-    @Override boolean removeFromTable(int val){
-        if(super.removeFromTable(val)){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removeNaNFromTable(){
-        if(super.removeNaNFromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removePos0FromTable(){
-        if(super.removePos0FromTable()){
-            ++this.modCount;
-            return true;
-        }
-        return false;
-    }
-    @Override boolean removeTrueFromTable(){
-        if(super.removeTrueFromTable()){
+    @Override
+    boolean removeFromTable(int val,int hash){
+        if(super.removeFromTable(val,hash)){
             ++this.modCount;
             return true;
         }
