@@ -20,6 +20,7 @@ public class FloatOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Float>
 implements OmniSet.OfFloat{
   private static int tableHash(int bits){
+  //TODO improve this hash function
     return bits^(bits>>>16);
   }
   private static void quickInsert(int[] table,int val){
@@ -760,9 +761,9 @@ implements OmniSet.OfFloat{
       out.writeFloat(this.loadFactor);
       if(size != 0){
         int[] table;
-        for(int i=(table=this.table).length;--i>=0;) {
+        for(int i=(table=this.table).length;;) {
           int tableVal;
-          switch(tableVal=table[i]) {
+          switch(tableVal=table[--i]) {
             default:
               out.writeInt(tableVal);
               if(--size==0) {

@@ -7,6 +7,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -26,6 +27,7 @@ import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.TestExecutorService;
+@Tag(value="NewTest")
 public class ByteSetImplTest{
     private static final EnumSet<SetInitializationSequence> VALID_INIT_SEQS=EnumSet.of(SetInitializationSequence.Empty,
             SetInitializationSequence.AddTrue,SetInitializationSequence.AddFalse,
@@ -160,7 +162,7 @@ public class ByteSetImplTest{
                     Assertions.assertEquals((expectedWords[2] & 0b10) != 0,result);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown filterGen " + filterGen);
+                    throw filterGen.invalid();
                 }
             }
         }else{
@@ -605,7 +607,7 @@ public class ByteSetImplTest{
                 v=(byte)inputVal;
                 break;
             default:
-                throw DataType.invalidDataType(inputType);
+                throw inputType.invalid();
             }
             expectedWords[(v >> 6) + 2]|=1L << v;
             if(result){
@@ -905,20 +907,22 @@ public class ByteSetImplTest{
                 QueryVal.QueryValModification modification);
         default void runAllTests(String testName){
             for(final var queryVal:QueryVal.values()){
-                queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
-                    castTypesToInputTypes.forEach((castType,inputTypes)->{
-                        inputTypes.forEach(inputType->{
-                            final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
-                                    inputType,DataType.BYTE);
-                            for(final var checkedType:CheckedType.values()){
-                                for(final var initSeq:VALID_INIT_SEQS){
-                                    TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,modification,
-                                            inputType,castType,checkedType,initSeq));
+                if(DataType.BYTE.isValidQueryVal(queryVal)){
+                    queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                        castTypesToInputTypes.forEach((castType,inputTypes)->{
+                            inputTypes.forEach(inputType->{
+                                final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
+                                        inputType,DataType.BYTE);
+                                for(final var checkedType:CheckedType.values()){
+                                    for(final var initSeq:VALID_INIT_SEQS){
+                                        TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,
+                                                modification,inputType,castType,checkedType,initSeq));
+                                    }
                                 }
-                            }
+                            });
                         });
                     });
-                });
+                }
             }
             TestExecutorService.completeAllTests(testName);
         }

@@ -15,14 +15,17 @@ public class RefOpenAddressHashSet<E>
 extends AbstractOpenAddressHashSet<E>
 implements OmniSet.OfRef<E>{
   private static int tableHash(Object val){
+  //TODO improve this hash function
     int tmp;
     return (tmp=val.hashCode())^(tmp>>>16);
   }
   private static int tableHash(long val){
+  //TODO improve this hash function
     int tmp;
     return (tmp=(int)(val^(val>>>32)))^(tmp>>>16);
   }
   private static int tableHash(int val){
+  //TODO improve this hash function
     return val^(val>>>16);
   }
   private static final Object NULL=new Object();
@@ -644,9 +647,9 @@ implements OmniSet.OfRef<E>{
       out.writeFloat(this.loadFactor);
       if(size != 0){
         Object[] table;
-        for(int i=(table=this.table).length;--i>=0;) {
+        for(int i=(table=this.table).length;;) {
           Object tableVal;
-          if((tableVal=table[i]) != null && tableVal != DELETED){
+          if((tableVal=table[--i]) != null && tableVal != DELETED){
             if(tableVal == NULL){
                 tableVal=null;
             }

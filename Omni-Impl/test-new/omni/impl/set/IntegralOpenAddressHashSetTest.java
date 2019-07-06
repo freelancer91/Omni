@@ -8,6 +8,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.CheckedType;
@@ -29,6 +30,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
+@Tag(value="NewTest")
 public class IntegralOpenAddressHashSetTest{
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
@@ -37,7 +39,7 @@ public class IntegralOpenAddressHashSetTest{
             SetInitializationSequence.AddTrueAndFalse,SetInitializationSequence.AddPrime,
             SetInitializationSequence.AddFibSeq,SetInitializationSequence.AddMinByte,
             SetInitializationSequence.FillWord0,SetInitializationSequence.FillWord1,SetInitializationSequence.FillWord2,
-            SetInitializationSequence.FillWord3);
+            SetInitializationSequence.FillWord3,SetInitializationSequence.Add200RemoveThenAdd100More);
     private static final int[] CONSTRUCTOR_INITIAL_CAPACITIES=new int[5 + 29 * 3 + 2];
     private static final float[] LOAD_FACTORS=new float[]{0.1f,0.25f,0.5f,0.75f,0.9f,0.95f,1.0f,1.1f,2.0f,0.0f,-1f,
             -.75f,-.5f,Float.NaN};
@@ -91,7 +93,7 @@ public class IntegralOpenAddressHashSetTest{
                 alreadyContains=set.contains((char)inputVal);
                 break;
             default:
-                throw DataType.invalidDataType(inputType);
+                throw inputType.invalid();
             }
             break;
         }
@@ -108,7 +110,7 @@ public class IntegralOpenAddressHashSetTest{
                 alreadyContains=set.contains((short)inputVal);
                 break;
             default:
-                throw DataType.invalidDataType(inputType);
+                throw inputType.invalid();
             }
             break;
         }
@@ -131,7 +133,7 @@ public class IntegralOpenAddressHashSetTest{
                 alreadyContains=set.contains((int)inputVal);
                 break;
             default:
-                throw DataType.invalidDataType(inputType);
+                throw inputType.invalid();
             }
             break;
         }
@@ -157,12 +159,12 @@ public class IntegralOpenAddressHashSetTest{
                 alreadyContains=set.contains((long)inputVal);
                 break;
             default:
-                throw DataType.invalidDataType(inputType);
+                throw inputType.invalid();
             }
             break;
         }
         default:
-            throw DataType.invalidDataType(collectionType);
+            throw collectionType.invalid();
         }
         Assertions.assertNotEquals(alreadyContains,monitor.verifyAdd(inputVal,inputType,functionCallType));
     }
@@ -317,7 +319,7 @@ public class IntegralOpenAddressHashSetTest{
                     Assertions.assertEquals((expectedWords[collectionType == DataType.CHAR?0:2] & 0b10) != 0,result);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown filterGen " + filterGen);
+                    throw filterGen.invalid();
                 }
             }
         }else{
@@ -507,10 +509,11 @@ public class IntegralOpenAddressHashSetTest{
                         sizeScenario=2;
                         break;
                     case AddFibSeq:
+                    case Add200RemoveThenAdd100More:
                         sizeScenario=3;
                         break;
                     default:
-                        throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                        throw initSeq.invalid();
                     }
                     for(final var functionGen:IteratorType.AscendingItr.validMonitoredFunctionGens){
                         if(checkedType.checked || functionGen.expectedException == null || sizeScenario == 0){
@@ -677,7 +680,7 @@ public class IntegralOpenAddressHashSetTest{
                 ++curr;
             }
             monitor.updateCollectionState();
-            monitor.verifyToString();
+            monitor.verifyMASSIVEToString("IntegralOpenAddressHashSetTest." + collectionType + ".testMASSIVEtoString");
         }
     }
     @org.junit.jupiter.api.Test
@@ -925,7 +928,7 @@ public class IntegralOpenAddressHashSetTest{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             this.checkedType=checkedType;
             this.dataType=dataType;
@@ -963,7 +966,7 @@ public class IntegralOpenAddressHashSetTest{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             this.checkedType=checkedType;
             this.dataType=dataType;
@@ -1001,7 +1004,7 @@ public class IntegralOpenAddressHashSetTest{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             this.checkedType=checkedType;
             this.dataType=dataType;
@@ -1040,7 +1043,7 @@ public class IntegralOpenAddressHashSetTest{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             this.checkedType=checkedType;
             this.dataType=dataType;
@@ -1126,7 +1129,7 @@ public class IntegralOpenAddressHashSetTest{
                         }
                     }
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                 }
             }else{
@@ -1183,7 +1186,7 @@ public class IntegralOpenAddressHashSetTest{
                     }
                 }
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
                 set.clear();
                 break;
@@ -1211,7 +1214,7 @@ public class IntegralOpenAddressHashSetTest{
                 break;
             }
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             ++expectedModCount;
         }
@@ -1233,7 +1236,7 @@ public class IntegralOpenAddressHashSetTest{
                         v=(char)inputVal;
                         break;
                     default:
-                        throw DataType.invalidDataType(inputType);
+                        throw inputType.invalid();
                     }
                     if(v < 256){
                         expectedWords[v >> 6]|=1L << v;
@@ -1255,7 +1258,7 @@ public class IntegralOpenAddressHashSetTest{
                         v=(short)inputVal;
                         break;
                     default:
-                        throw DataType.invalidDataType(inputType);
+                        throw inputType.invalid();
                     }
                     if(v <= Byte.MAX_VALUE && v >= Byte.MIN_VALUE){
                         expectedWords[(v >> 6) + 2]|=1L << v;
@@ -1283,7 +1286,7 @@ public class IntegralOpenAddressHashSetTest{
                         v=(int)inputVal;
                         break;
                     default:
-                        throw DataType.invalidDataType(inputType);
+                        throw inputType.invalid();
                     }
                     if(v <= Byte.MAX_VALUE && v >= Byte.MIN_VALUE){
                         expectedWords[(v >> 6) + 2]|=1L << v;
@@ -1314,7 +1317,7 @@ public class IntegralOpenAddressHashSetTest{
                         v=(long)inputVal;
                         break;
                     default:
-                        throw DataType.invalidDataType(inputType);
+                        throw inputType.invalid();
                     }
                     if(v <= Byte.MAX_VALUE && v >= Byte.MIN_VALUE){
                         int i;
@@ -1325,7 +1328,7 @@ public class IntegralOpenAddressHashSetTest{
                     break;
                 }
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
                 ++expectedModCount;
                 ++expectedSize;
@@ -1433,7 +1436,7 @@ public class IntegralOpenAddressHashSetTest{
                 break;
             }
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
         }
         @Override
@@ -1471,7 +1474,7 @@ public class IntegralOpenAddressHashSetTest{
                 Assertions.assertNotSame(((LongOpenAddressHashSet)set).table,arr);
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
         }
         @Override
@@ -1509,7 +1512,7 @@ public class IntegralOpenAddressHashSetTest{
                         break;
                     }
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                     expectedTableSize=0;
                 }
@@ -1607,7 +1610,7 @@ public class IntegralOpenAddressHashSetTest{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             verifyStructuralIntegrity(cloneSet);
         }
@@ -1665,7 +1668,7 @@ public class IntegralOpenAddressHashSetTest{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             verifyStructuralIntegrity(set);
         }
@@ -1725,7 +1728,7 @@ public class IntegralOpenAddressHashSetTest{
                     break;
                 }
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
         }
@@ -1751,7 +1754,7 @@ public class IntegralOpenAddressHashSetTest{
                         tableLength=((long[])expectedTable).length;
                         break;
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                     expectedMaxTableSize=(int)(tableLength * newLoadFactor);
                 }
@@ -2055,7 +2058,7 @@ public class IntegralOpenAddressHashSetTest{
                     v=(char)inputVal;
                     break;
                 default:
-                    throw DataType.invalidDataType(inputType);
+                    throw inputType.invalid();
                 }
                 removeVal(v);
                 break;
@@ -2073,7 +2076,7 @@ public class IntegralOpenAddressHashSetTest{
                     v=(short)inputVal;
                     break;
                 default:
-                    throw DataType.invalidDataType(inputType);
+                    throw inputType.invalid();
                 }
                 removeVal(v);
                 break;
@@ -2097,7 +2100,7 @@ public class IntegralOpenAddressHashSetTest{
                     v=(int)inputVal;
                     break;
                 default:
-                    throw DataType.invalidDataType(inputType);
+                    throw inputType.invalid();
                 }
                 removeVal(v);
                 break;
@@ -2124,13 +2127,13 @@ public class IntegralOpenAddressHashSetTest{
                     v=(long)inputVal;
                     break;
                 default:
-                    throw DataType.invalidDataType(inputType);
+                    throw inputType.invalid();
                 }
                 removeVal(v);
                 break;
             }
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             ++expectedModCount;
         }
@@ -2220,7 +2223,7 @@ public class IntegralOpenAddressHashSetTest{
                 break;
             }
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             Assertions.assertEquals(encounteredVals.size(),set.tableSize);
         }
@@ -2289,7 +2292,7 @@ public class IntegralOpenAddressHashSetTest{
                         expectedResult=outputType.convertVal((long)(expectedOffset - 128));
                         break;
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                 }else{
                     switch(dataType){
@@ -2306,7 +2309,7 @@ public class IntegralOpenAddressHashSetTest{
                         expectedResult=outputType.convertValUnchecked(((long[])expectedTable)[expectedOffset - 256]);
                         break;
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                 }
                 Assertions.assertEquals(expectedResult,result);
@@ -2370,7 +2373,7 @@ public class IntegralOpenAddressHashSetTest{
                     break;
                 }
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
             void updateItrNextFromWords(int expectedOffset){
@@ -2420,7 +2423,7 @@ public class IntegralOpenAddressHashSetTest{
                         break;
                     }
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                     this.expectedOffset=expectedOffset + 256;
                 }else{
@@ -2553,7 +2556,7 @@ public class IntegralOpenAddressHashSetTest{
                         break;
                     }
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                 }
                 Assertions.assertFalse(monitoredFunctionItr.hasNext());
@@ -2594,7 +2597,7 @@ public class IntegralOpenAddressHashSetTest{
                     expectedItrLastRet=FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.lastRet(itr);
                     break;
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
             @Override
@@ -2619,7 +2622,7 @@ public class IntegralOpenAddressHashSetTest{
                         ((long[])expectedTable)[expectedItrLastRet - 256]=1;
                         break;
                     default:
-                        throw DataType.invalidDataType(dataType);
+                        throw dataType.invalid();
                     }
                     --expectedTableSize;
                 }
@@ -2669,7 +2672,7 @@ public class IntegralOpenAddressHashSetTest{
                             FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.lastRet(itr));
                     break;
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
             @Override
@@ -2703,7 +2706,7 @@ public class IntegralOpenAddressHashSetTest{
                     expectedOffset=FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.offset(itr);
                     break;
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
             @Override
@@ -2777,7 +2780,7 @@ public class IntegralOpenAddressHashSetTest{
                             break;
                         }
                         default:
-                            throw DataType.invalidDataType(dataType);
+                            throw dataType.invalid();
                         }
                     }else{
                         expectedOffset=0;
@@ -2827,7 +2830,7 @@ public class IntegralOpenAddressHashSetTest{
                             FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.offset(itr));
                     break;
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
         }
@@ -2862,50 +2865,52 @@ public class IntegralOpenAddressHashSetTest{
                 if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
                     for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
                         for(final var queryVal:QueryVal.values()){
-                            queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
-                                castTypesToInputTypes.forEach((castType,inputTypes)->{
-                                    inputTypes.forEach(inputType->{
-                                        final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,
-                                                castType,inputType,collectionType);
-                                        for(final var checkedType:CheckedType.values()){
-                                            for(final var size:sizes){
-                                                for(final var position:positions){
-                                                    if(position >= 0){
-                                                        if(!queryCanReturnTrue){
-                                                            continue;
+                            if(collectionType.isValidQueryVal(queryVal)){
+                                queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                                    castTypesToInputTypes.forEach((castType,inputTypes)->{
+                                        inputTypes.forEach(inputType->{
+                                            final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,
+                                                    castType,inputType,collectionType);
+                                            for(final var checkedType:CheckedType.values()){
+                                                for(final var size:sizes){
+                                                    for(final var position:positions){
+                                                        if(position >= 0){
+                                                            if(!queryCanReturnTrue){
+                                                                continue;
+                                                            }
+                                                            switch(size){
+                                                            case 3:
+                                                                if(position == 0.5d){
+                                                                    break;
+                                                                }
+                                                            case 2:
+                                                                if(position == 1.0d){
+                                                                    break;
+                                                                }
+                                                            case 1:
+                                                                if(position == 0.0d){
+                                                                    break;
+                                                                }
+                                                            case 0:
+                                                                continue;
+                                                            case 4:
+                                                                if(position != 0.5d){
+                                                                    break;
+                                                                }
+                                                            default:
+                                                                continue;
+                                                            }
                                                         }
-                                                        switch(size){
-                                                        case 3:
-                                                            if(position == 0.5d){
-                                                                break;
-                                                            }
-                                                        case 2:
-                                                            if(position == 1.0d){
-                                                                break;
-                                                            }
-                                                        case 1:
-                                                            if(position == 0.0d){
-                                                                break;
-                                                            }
-                                                        case 0:
-                                                            continue;
-                                                        case 4:
-                                                            if(position != 0.5d){
-                                                                break;
-                                                            }
-                                                        default:
-                                                            continue;
-                                                        }
+                                                        TestExecutorService.submitTest(()->runTest(collectionType,
+                                                                queryVal,modification,inputType,castType,checkedType,
+                                                                size,loadFactor,position));
                                                     }
-                                                    TestExecutorService.submitTest(
-                                                            ()->runTest(collectionType,queryVal,modification,inputType,
-                                                                    castType,checkedType,size,loadFactor,position));
                                                 }
                                             }
-                                        }
+                                        });
                                     });
                                 });
-                            });
+                            }
                         }
                     }
                 }
@@ -2933,7 +2938,7 @@ public class IntegralOpenAddressHashSetTest{
                     queryVal.initDoesNotContain((OmniSet.OfLong)monitor.set,setSize,0,modification);
                     break;
                 default:
-                    throw DataType.invalidDataType(collectionType);
+                    throw collectionType.invalid();
                 }
             }else{
                 expectedResult=true;
@@ -2951,7 +2956,7 @@ public class IntegralOpenAddressHashSetTest{
                     queryVal.initContains((OmniSet.OfLong)monitor.set,setSize,0,position,modification);
                     break;
                 default:
-                    throw DataType.invalidDataType(collectionType);
+                    throw collectionType.invalid();
                 }
             }
             monitor.updateCollectionState();

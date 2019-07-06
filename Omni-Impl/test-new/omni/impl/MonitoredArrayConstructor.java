@@ -35,6 +35,6 @@ public class MonitoredArrayConstructor<T> implements IntFunction<T[]>{
         case REF:
             return (T[])new Object[arrSize];
         }
-        throw DataType.invalidDataType(dataType);
+        throw dataType.invalid();
     }
 }

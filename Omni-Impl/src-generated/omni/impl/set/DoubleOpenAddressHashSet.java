@@ -19,6 +19,7 @@ public class DoubleOpenAddressHashSet
 extends AbstractOpenAddressHashSet<Double>
 implements OmniSet.OfDouble{
   private static int tableHash(long bits){
+  //TODO improve this hash function
     int tmp;
     return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
   }
@@ -633,9 +634,9 @@ implements OmniSet.OfDouble{
       out.writeFloat(this.loadFactor);
       if(size != 0){
         long[] table;
-        for(int i=(table=this.table).length;--i>=0;) {
+        for(int i=(table=this.table).length;;) {
           long tableVal;
-          if((tableVal=table[i]) != 0 && tableVal != 0x7ffc000000000000L){
+          if((tableVal=table[--i]) != 0 && tableVal != 0x7ffc000000000000L){
             out.writeLong(tableVal);
             if(--size == 0){
               return;

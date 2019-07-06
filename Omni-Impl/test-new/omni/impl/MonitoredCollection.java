@@ -48,10 +48,27 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification);
     void verifyToString(String string);
+    void verifyMASSIVEToString(String string,String testName);
     void verifyHashCode(int hashCode);
     void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter);
     void verifyArrayIsCopy(Object arr);
 
+    default boolean verifyThrowingContains(MonitoredObjectGen monitoredObjectGen){
+        Object inputVal=monitoredObjectGen.getMonitoredObject(this);
+        try{
+            return QueryCastType.ToObject.callcontains(getCollection(),inputVal,DataType.REF);
+        }finally{
+            verifyCollectionState();
+        }
+    }
+    default boolean verifyThrowingRemoveVal(MonitoredObjectGen monitoredObjectGen){
+        Object inputVal=monitoredObjectGen.getMonitoredObject(this);
+        try{
+            return QueryCastType.ToObject.callremoveVal(getCollection(),inputVal,DataType.REF);
+        }finally{
+            verifyCollectionState();
+        }
+    }
     default boolean verifyContains(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryValModification modification){
         Object inputVal=queryVal.getInputVal(inputType,modification);
@@ -59,63 +76,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         verifyCollectionState();
         return result;
     }
-    default Object convertInitialVal(Object initialVal){
-        final var dataType=this.getDataType();
-        switch(dataType){
-        case BOOLEAN:{
-            if(initialVal instanceof Boolean){
-                return (int)(((Boolean)initialVal).booleanValue()?1:0);
-            }else if(initialVal instanceof Number){
-                return (int)((Number)initialVal).intValue();
-            }else if(initialVal instanceof Character){ return (int)((Character)initialVal).charValue(); }
-            throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
-        }
-        case BYTE:
-        case INT:
-        case SHORT:{
-            if(initialVal instanceof Number){
-                return (int)((Number)initialVal).intValue();
-            }else if(initialVal instanceof Boolean){
-                return (int)(((Boolean)initialVal).booleanValue()?1:0);
-            }else if(initialVal instanceof Character){ return (int)((Character)initialVal).charValue(); }
-            throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
-        }
-        case CHAR:{
-            if(initialVal instanceof Character){
-                return (int)((Character)initialVal).charValue();
-            }else if(initialVal instanceof Number){
-                return (int)((Number)initialVal).intValue();
-            }else if(initialVal instanceof Boolean){ return (int)(((Boolean)initialVal).booleanValue()?1:0); }
-            throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
-        }
-        case DOUBLE:{
-            if(initialVal instanceof Number){
-                return (double)((Number)initialVal).doubleValue();
-            }else if(initialVal instanceof Boolean){
-                return (double)(((Boolean)initialVal).booleanValue()?1d:0d);
-            }else if(initialVal instanceof Character){ return (double)((Character)initialVal).charValue(); }
-            throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
-        }
-        case FLOAT:{
-            if(initialVal instanceof Number){
-                return (float)((Number)initialVal).floatValue();
-            }else if(initialVal instanceof Boolean){
-                return (float)(((Boolean)initialVal).booleanValue()?1f:0f);
-            }else if(initialVal instanceof Character){ return (float)((Character)initialVal).charValue(); }
-            throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
-        }
-        case LONG:
-        case REF:{
-            if(initialVal instanceof Number){
-                return (long)((Number)initialVal).longValue();
-            }else if(initialVal instanceof Boolean){
-                return (long)(((Boolean)initialVal).booleanValue()?1L:0L);
-            }else if(initialVal instanceof Character){ return (long)((Character)initialVal).charValue(); }
-            throw new UnsupportedOperationException("Unsupported initialVal " + initialVal);
-        }
-        }
-        throw DataType.invalidDataType(dataType);
-    }
+
 
     @SuppressWarnings("unchecked") default boolean add(int val) {
         COL collection=getCollection();
@@ -144,7 +105,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             result=((OmniCollection.OfRef<Object>)collection).add(val);
             break;
         default:
-            throw DataType.invalidDataType(dataType);
+            throw dataType.invalid();
         }
         updateCollectionState();
         return result;
@@ -169,83 +130,9 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             return;
         case ModItr:
         }
-        throw new UnsupportedOperationException("Unknown modType " + modType);
+        throw modType.invalid();
     }
-    //    @SuppressWarnings("unchecked") default void initContains(QueryVal queryVal,int setSize,double containsPosition,
-    //            Object initialVal){
-    //        final COL collection=getCollection();
-    //        final DataType dataType=getDataType();
-    //        initialVal=convertInitialVal(initialVal);
-    //        switch(dataType){
-    //        case BOOLEAN:
-    //            queryVal.initContains((OmniCollection.OfBoolean)collection,setSize,(int)initialVal,containsPosition);
-    //            break;
-    //        case BYTE:
-    //            queryVal.initContains((OmniCollection.OfByte)collection,setSize,(int)initialVal,containsPosition);
-    //            break;
-    //        case CHAR:
-    //            queryVal.initContains((OmniCollection.OfChar)collection,setSize,(int)initialVal,containsPosition);
-    //            break;
-    //        case DOUBLE:
-    //            queryVal.initContains((OmniCollection.OfDouble)collection,setSize,(double)initialVal,containsPosition);
-    //            break;
-    //        case FLOAT:
-    //            queryVal.initContains((OmniCollection.OfFloat)collection,setSize,(float)initialVal,containsPosition);
-    //            break;
-    //        case INT:
-    //            queryVal.initContains((OmniCollection.OfInt)collection,setSize,(int)initialVal,containsPosition);
-    //            break;
-    //        case LONG:
-    //            queryVal.initContains((OmniCollection.OfLong)collection,setSize,(long)initialVal,containsPosition);
-    //            break;
-    //        case REF:
-    //            queryVal.initContains((OmniCollection.OfRef<Object>)collection,setSize,(long)initialVal,containsPosition);
-    //            break;
-    //        case SHORT:
-    //            queryVal.initContains((OmniCollection.OfShort)collection,setSize,(int)initialVal,containsPosition);
-    //            break;
-    //        default:
-    //            throw DataType.invalidDataType(dataType);
-    //        }
-    //        updateCollectionState();
-    //    }
-    //    @SuppressWarnings("unchecked") default void initDoesNotContain(QueryVal queryVal,int setSize,Object initialVal){
-    //        final COL collection=getCollection();
-    //        final DataType dataType=getDataType();
-    //        initialVal=convertInitialVal(initialVal);
-    //        switch(dataType){
-    //        case BOOLEAN:
-    //            queryVal.initDoesNotContain((OmniCollection.OfBoolean)collection,setSize,(int)initialVal);
-    //            break;
-    //        case BYTE:
-    //            queryVal.initDoesNotContain((OmniCollection.OfByte)collection,setSize,(int)initialVal);
-    //            break;
-    //        case CHAR:
-    //            queryVal.initDoesNotContain((OmniCollection.OfChar)collection,setSize,(int)initialVal);
-    //            break;
-    //        case DOUBLE:
-    //            queryVal.initDoesNotContain((OmniCollection.OfDouble)collection,setSize,(double)initialVal);
-    //            break;
-    //        case FLOAT:
-    //            queryVal.initDoesNotContain((OmniCollection.OfFloat)collection,setSize,(float)initialVal);
-    //            break;
-    //        case INT:
-    //            queryVal.initDoesNotContain((OmniCollection.OfInt)collection,setSize,(int)initialVal);
-    //            break;
-    //        case LONG:
-    //            queryVal.initDoesNotContain((OmniCollection.OfLong)collection,setSize,(long)initialVal);
-    //            break;
-    //        case REF:
-    //            queryVal.initDoesNotContain((OmniCollection.OfRef<Object>)collection,setSize,(long)initialVal);
-    //            break;
-    //        case SHORT:
-    //            queryVal.initDoesNotContain((OmniCollection.OfShort)collection,setSize,(int)initialVal);
-    //            break;
-    //        default:
-    //            throw DataType.invalidDataType(dataType);
-    //        }
-    //        updateCollectionState();
-    //    }
+
     default Object verifyClone(){
         final COL collection=getCollection();
         final Object clone=collection.clone();
@@ -327,7 +214,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         case REF:{
             final var cast=(OmniCollection.OfRef<?>)collection;
             if(functionCallType == FunctionCallType.Boxed){
-                throw new UnsupportedOperationException("Boxed is not suppported for Ref");
+                throw DataType.cannotBeBoxed();
             }else{
                 cast.forEach(monitoredFunction);
             }
@@ -343,7 +230,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             break;
         }
         default:
-            throw DataType.invalidDataType(dataType);
+            throw dataType.invalid();
         }
         verifyCollectionState();
         var itr=collection.iterator();
@@ -375,6 +262,13 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         verifyCollectionState();
         Assertions.assertEquals(expectedSize,actualSize);
         return actualSize;
+    }
+    default String verifyMASSIVEToString(String testName){
+        COL collection=getCollection();
+        String result=collection.toString();
+        verifyCollectionState();
+        verifyMASSIVEToString(result,testName);
+        return result;
     }
     default String verifyToString() {
         COL collection=getCollection();
@@ -503,7 +397,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         {
             var cast=(OmniCollection.OfRef<?>)collection;
             if(functionCallType==FunctionCallType.Boxed) {
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw DataType.cannotBeBoxed();
             }else {
                 result=cast.removeIf(filter);
             }
@@ -520,7 +414,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             break;
         }
         default:
-            throw DataType.invalidDataType(dataType);
+            throw dataType.invalid();
         }
         verifyRemoveIf(result,filter);
         verifyCollectionState();
@@ -635,7 +529,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             case NoMod:
                 return;
             }
-            throw new UnsupportedOperationException("Unknown modType " + modType);
+            throw modType.invalid();
         }
         default void iterateForward() {
             ITR iterator=getIterator();
@@ -666,7 +560,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             DataType dataType=monitoredCollection.getDataType();
             if(functionCallType==FunctionCallType.Boxed) {
                 if(dataType==DataType.REF) {
-                    throw new UnsupportedOperationException("Ref cannot be boxed");
+                    throw DataType.cannotBeBoxed();
                 }
                 iterator.forEachRemaining((Consumer)function);
             }else {
@@ -699,7 +593,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
                     ((OmniIterator.OfShort)iterator).forEachRemaining((ShortConsumer)function);
                     break;
                 default:
-                    throw DataType.invalidDataType(dataType);
+                    throw dataType.invalid();
                 }
             }
             monitoredCollection.verifyCollectionState();

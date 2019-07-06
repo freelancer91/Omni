@@ -64,6 +64,8 @@ public enum MonitoredRemoveIfPredicateGen{
                         return ((Long)val).longValue() == 1L;
                     }else if(val instanceof Number){
                         return ((Number)val).doubleValue() == 1.0;
+                    }else if(val == null){
+                        return false;
                     }
                     throw new UnsupportedOperationException("RemoveTrue not valid for " + val);
                 }
@@ -118,6 +120,8 @@ public enum MonitoredRemoveIfPredicateGen{
                         return ((Long)val).longValue() == 0L;
                     }else if(val instanceof Number){
                         return ((Number)val).doubleValue() == 0.0;
+                    }else if(val == null){
+                        return false;
                     }
                     throw new UnsupportedOperationException("RemoveFalse not valid for " + val);
                 }
@@ -416,11 +420,14 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     };
+    public final UnsupportedOperationException invalid(){
+        return new UnsupportedOperationException("Invalid MonitoredRemoveIfPredicateGen " + this);
+    }
     public final Class<? extends Throwable> expectedException;
     public final boolean randomized;
     MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,boolean randomized){
-      this.expectedException=expectedException;
-      this.randomized=randomized;
+        this.expectedException=expectedException;
+        this.randomized=randomized;
     }
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
             double threshold,long randSeed);

@@ -1,6 +1,7 @@
 package omni.impl.set;
 
 import java.util.EnumSet;
+import java.util.Random;
 import omni.api.OmniSet;
 import omni.impl.DataType;
 import omni.impl.MonitoredSet;
@@ -165,7 +166,7 @@ public enum SetInitializationSequence{
                 break;
             }
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             monitoredSet.updateCollectionState();
             return monitoredSet;
@@ -228,7 +229,7 @@ public enum SetInitializationSequence{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             monitoredSet.updateCollectionState();
             return monitoredSet;
@@ -284,7 +285,7 @@ public enum SetInitializationSequence{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             monitoredSet.updateCollectionState();
             return monitoredSet;
@@ -340,7 +341,7 @@ public enum SetInitializationSequence{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
             }
             monitoredSet.updateCollectionState();
             return monitoredSet;
@@ -396,12 +397,168 @@ public enum SetInitializationSequence{
                 }
                 break;
             default:
-                throw DataType.invalidDataType(dataType);
+                throw dataType.invalid();
+            }
+            monitoredSet.updateCollectionState();
+            return monitoredSet;
+        }
+    },
+    AddNull("AddNull",false){
+        @SuppressWarnings("unchecked")
+        @Override
+        public <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet){
+            ((OmniSet.OfRef<Object>)monitoredSet.getCollection()).add(null);
+            monitoredSet.updateCollectionState();
+            return monitoredSet;
+        }
+    },
+    Add200RemoveThenAdd100More("Add200RemoveThenAdd100More",false){
+        @Override
+        public <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet){
+            final var dataType=monitoredSet.getDataType();
+            switch(dataType){
+            case CHAR:{
+                var set=(OmniSet.OfChar)monitoredSet.getCollection();
+                for(int i=256;i < 456;++i){
+                    set.add((char)i);
+                }
+                for(int i=256;i < 456;++i){
+                    set.removeVal((char)i);
+                }
+                for(int i=456;i < 556;++i){
+                    set.add((char)i);
+                }
+                break;
+            }
+            case SHORT:{
+                var set=(OmniSet.OfShort)monitoredSet.getCollection();
+                for(int i=128;i < 328;++i){
+                    set.add((short)i);
+                }
+                for(int i=128;i < 328;++i){
+                    set.removeVal((short)i);
+                }
+                for(int i=328;i < 428;++i){
+                    set.add((short)i);
+                }
+                break;
+            }
+            case INT:{
+                var set=(OmniSet.OfInt)monitoredSet.getCollection();
+                for(int i=128;i < 328;++i){
+                    set.add(i);
+                }
+                for(int i=128;i < 328;++i){
+                    set.removeVal(i);
+                }
+                for(int i=328;i < 428;++i){
+                    set.add(i);
+                }
+                break;
+            }
+            case LONG:{
+                var set=(OmniSet.OfLong)monitoredSet.getCollection();
+                for(long i=128;i < 328;++i){
+                    set.add(i);
+                }
+                for(long i=128;i < 328;++i){
+                    set.removeVal(i);
+                }
+                for(long i=328;i < 428;++i){
+                    set.add(i);
+                }
+                break;
+            }
+            case FLOAT:{
+
+                var set=(OmniSet.OfFloat)monitoredSet.getCollection();
+                Random rand=new Random(0);
+                {
+                    for(int i=200;;){
+                        if(set.add(rand.nextFloat()) && --i == 0){
+                            break;
+                        }
+                    }
+                }
+                {
+                    var itr=set.iterator();
+                    while(itr.hasNext()){
+                        itr.nextFloat();
+                        itr.remove();
+                    }
+                }
+                {
+                    for(int i=100;;){
+                        if(set.add(rand.nextFloat()) && --i == 0){
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case DOUBLE:{
+                var set=(OmniSet.OfDouble)monitoredSet.getCollection();
+                Random rand=new Random(0);
+                {
+                    for(int i=200;;){
+                        if(set.add(rand.nextDouble()) && --i == 0){
+                            break;
+                        }
+                    }
+                }
+                {
+                    var itr=set.iterator();
+                    while(itr.hasNext()){
+                        itr.nextDouble();
+                        itr.remove();
+                    }
+                }
+                {
+                    for(int i=100;;){
+                        if(set.add(rand.nextDouble()) && --i == 0){
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case REF:
+                @SuppressWarnings("unchecked")
+                var set=(OmniSet.OfRef<Object>)monitoredSet.getCollection();
+                Random rand=new Random(0);{
+                    for(int i=200;;){
+                        if(set.add(rand.nextDouble()) && --i == 0){
+                            break;
+                        }
+                    }
+                }
+                set.add(null);
+                {
+                    var itr=set.iterator();
+                    while(itr.hasNext()){
+                        itr.next();
+                        itr.remove();
+                    }
+                }
+                {
+                    for(int i=100;;){
+                        if(set.add(rand.nextDouble()) && --i == 0){
+                            break;
+                        }
+                    }
+                }
+                set.add(null);
+                break;
+            default:
+                throw dataType.invalid();
             }
             monitoredSet.updateCollectionState();
             return monitoredSet;
         }
     };
+    public final UnsupportedOperationException invalid(){
+        throw new UnsupportedOperationException("Invalid SetInitializationSequence " + this);
+    }
     public final String name;
     public final boolean isEmpty;
     public final EnumSet<DataType> validDataTypes;
@@ -417,7 +574,7 @@ public enum SetInitializationSequence{
         case "AddTrue":
         case "AddFalse":
         case "AddTrueAndFalse":
-            return DataType.getDataTypeSet("BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE");
+            return DataType.getDataTypeSet("BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF");
         case "AddPrime":
         case "AddFibSeq":
         case "AddMinByte":
@@ -425,9 +582,13 @@ public enum SetInitializationSequence{
         case "FillWord1":
         case "FillWord2":
         case "FillWord3":
-            return DataType.getDataTypeSet("BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE");
+            return DataType.getDataTypeSet("BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF");
+        case "Add200RemoveThenAdd100More":
+            return DataType.getDataTypeSet("CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF");
+        case "AddNull":
+            return DataType.getDataTypeSet("REF");
         }
-        throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+        throw initSeq.invalid();
     }
     public abstract <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet);
 }

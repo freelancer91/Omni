@@ -50,23 +50,28 @@ extends AbstractOpenAddressHashSet<$BoxedType$>
 implements OmniSet.Of$ClassPrefix$$<E>${
 #IF OfFloat
   private static int tableHash(int bits){
+  //TODO improve this hash function
     return bits^(bits>>>16);
   }
 #ELSEIF OfDouble
   private static int tableHash(long bits){
+  //TODO improve this hash function
     int tmp;
     return (tmp=(int)(bits^(bits>>>32)))^(tmp>>>16);
   }
 #ELSEIF OfRef
   private static int tableHash(Object val){
+  //TODO improve this hash function
     int tmp;
     return (tmp=val.hashCode())^(tmp>>>16);
   }
   private static int tableHash(long val){
+  //TODO improve this hash function
     int tmp;
     return (tmp=(int)(val^(val>>>32)))^(tmp>>>16);
   }
   private static int tableHash(int val){
+  //TODO improve this hash function
     return val^(val>>>16);
   }
 #ENDIF
@@ -2755,11 +2760,9 @@ int val){
   if(tableSize!=0
   #ENDIF
   #IF OfLong
-  &&(tableVal=(table=this.table)[hash=(((hash=(int)(val^(val>>>32)))^(hash>>>16))&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
-  #ELSEIF OfChar
-  &&(tableVal=(table=this.table)[hash=(val&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
+  &&(tableVal=(table=this.table)[hash=(((int)(val^(val>>>32)))&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
   #ELSE
-  &&(tableVal=(table=this.table)[hash=((val^(val>>>16))&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
+  &&(tableVal=(table=this.table)[hash=(val&(tableLength=table.length-1))])!=$EMPTY_TABLE_VAL$){
   #ENDIF
 #ENDIF
     final int initialHash=hash;

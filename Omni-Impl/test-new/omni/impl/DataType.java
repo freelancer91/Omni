@@ -18,6 +18,7 @@ import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
+import omni.api.OmniSet;
 import omni.api.OmniStack;
 import omni.function.BooleanComparator;
 import omni.function.BooleanConsumer;
@@ -48,7 +49,7 @@ public enum DataType{
             boolean.class,Boolean[].class,boolean[].class,"Boolean","Boolean",
             BooleanPredicate.class,BooleanConsumer.class,BooleanComparator.class,BooleanPredicate.class,Boolean.FALSE,
             BooleanDblLnkNode.class,BooleanSnglLnkNode.class,"removeBooleanAt",boolean.class,"test","compare",
-            boolean.class,"booleanElement") {
+            boolean.class,"booleanElement",OmniArray.MAX_ARR_SIZE / 7){
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.OfBoolean)collection.getCollection();
             var result=cast.toBooleanArray();
@@ -64,7 +65,6 @@ public enum DataType{
             }
             return result;
         }
-
         @Override public Object callIteratorNext(OmniIterator<?> itr){
             return ((OmniIterator.OfBoolean)itr).nextBoolean();
         }
@@ -142,7 +142,9 @@ public enum DataType{
                 return collection.search((boolean)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -161,6 +163,39 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfBoolean)itr;
+                char[] buffer=new char[5];
+                for(;;){
+                    for(int i=0,valLength=ToStringUtil.getStringBoolean(castItr.nextBoolean(),buffer,
+                            0);i < valLength;++i){
+                        Assertions.assertEquals(buffer[i],result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public int getMaxInt(){
@@ -192,8 +227,7 @@ public enum DataType{
                 return true;
             default:
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type byte cannot be converted to " + this);
+            throw super.cannotBeConverted(val,BYTE);
         }
         @Override
         public Object convertVal(char val){
@@ -204,8 +238,7 @@ public enum DataType{
                 return true;
             default:
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type char cannot be converted to " + this);
+            throw super.cannotBeConverted(val,CHAR);
         }
         @Override
         public Object convertVal(short val){
@@ -216,8 +249,7 @@ public enum DataType{
                 return true;
             default:
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type short cannot be converted to " + this);
+            throw super.cannotBeConverted(val,SHORT);
         }
         @Override
         public Object convertVal(int val){
@@ -228,7 +260,7 @@ public enum DataType{
                 return true;
             default:
             }
-            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+            throw super.cannotBeConverted(val,INT);
         }
         @Override
         public Object convertValUnchecked(int val){
@@ -242,8 +274,7 @@ public enum DataType{
             if(val == 1){
                 return true;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -259,8 +290,7 @@ public enum DataType{
                 return true;
             default:
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type float cannot be converted to " + this);
+            throw super.cannotBeConverted(val,FLOAT);
         }
 
         @Override
@@ -272,15 +302,15 @@ public enum DataType{
             if(bits == TypeUtil.DBL_TRUE_BITS){
                 return true;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
 
     },
     BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
             Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
             ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,ByteDblLnkNode.class,
-            ByteSnglLnkNode.class,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement") {
+            ByteSnglLnkNode.class,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement",
+            OmniArray.MAX_ARR_SIZE / 6){
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToByte(val);
@@ -294,8 +324,7 @@ public enum DataType{
             if(val <= Byte.MAX_VALUE){
                 return (byte)val;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type char cannot be converted to " + this);
+            throw super.cannotBeConverted(val,CHAR);
         }
         @Override
         public Object convertVal(short val){
@@ -303,8 +332,7 @@ public enum DataType{
             if(val == (b=(byte)val)){
                 return b;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type short cannot be converted to " + this);
+            throw super.cannotBeConverted(val,SHORT);
         }
         @Override
         public Object convertVal(int val){
@@ -312,7 +340,7 @@ public enum DataType{
             if(val == (b=(byte)val)){
                 return b;
             }
-            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+            throw super.cannotBeConverted(val,INT);
         }
         @Override
         public Object convertValUnchecked(int val){
@@ -324,8 +352,7 @@ public enum DataType{
             if(val == (b=(byte)val)){
                 return b;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -337,8 +364,7 @@ public enum DataType{
             if(val == (b=(byte)val)){
                 return b;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type float cannot be converted to " + this);
+            throw super.cannotBeConverted(val,FLOAT);
         }
         @Override
         public Object convertVal(double val){
@@ -346,8 +372,7 @@ public enum DataType{
             if(val == (b=(byte)val)){
                 return b;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.ByteOutput<?>)collection.getCollection();
@@ -440,7 +465,9 @@ public enum DataType{
                 return collection.search((byte)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -459,6 +486,38 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfByte)itr;
+                char[] buffer=new char[4];
+                for(;;){
+                    for(int i=0,valLength=ToStringUtil.getStringShort(castItr.nextByte(),buffer,0);i < valLength;++i){
+                        Assertions.assertEquals(buffer[i],result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public int getMaxInt(){
@@ -481,7 +540,7 @@ public enum DataType{
     CHAR("CHAR","BOOLEAN,CHAR","CHAR,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Character.class,char.class,
             Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
             CharUnaryOperator.class,Character.MIN_VALUE,CharDblLnkNode.class,CharSnglLnkNode.class,"removeCharAt",
-            int.class,"applyAsChar","compare",char.class,"charElement"){
+            int.class,"applyAsChar","compare",char.class,"charElement",-1){
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToChar(val);
@@ -491,8 +550,7 @@ public enum DataType{
             if(val >= 0){
                 return (char)val;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type byte cannot be converted to " + this);
+            throw super.cannotBeConverted(val,BYTE);
         }
         @Override
         public Object convertVal(char val){
@@ -503,8 +561,7 @@ public enum DataType{
             if(val >= 0){
                 return (char)val;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type short cannot be converted to " + this);
+            throw super.cannotBeConverted(val,SHORT);
         }
         @Override
         public Object convertVal(int val){
@@ -512,7 +569,7 @@ public enum DataType{
             if((c=(char)val) == val){
                 return c;
             }
-            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+            throw super.cannotBeConverted(val,INT);
         }
         @Override
         public Object convertValUnchecked(int val){
@@ -524,8 +581,7 @@ public enum DataType{
             if((c=(char)val) == val){
                 return c;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -537,8 +593,7 @@ public enum DataType{
             if((c=(char)val) == val){
                 return c;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type float cannot be converted to " + this);
+            throw super.cannotBeConverted(val,FLOAT);
         }
         @Override
         public Object convertVal(double val){
@@ -546,8 +601,7 @@ public enum DataType{
             if((c=(char)val) == val){
                 return c;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.CharOutput<?>)collection.getCollection();
@@ -640,7 +694,9 @@ public enum DataType{
                 return collection.search((char)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -656,6 +712,38 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfChar)itr;
+                for(;;){
+                    Assertions.assertEquals(castItr.nextChar(),result.charAt(++offset));
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public int getMaxInt(){
@@ -677,7 +765,7 @@ public enum DataType{
     SHORT("SHORT","BOOLEAN,BYTE,SHORT","SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Short.class,short.class,
             Short[].class,short[].class,"Short","Short",ShortPredicate.class,ShortConsumer.class,ShortComparator.class,
             ShortUnaryOperator.class,Short.MIN_VALUE,ShortDblLnkNode.class,ShortSnglLnkNode.class,"removeShortAt",
-            int.class,"applyAsShort","compare",short.class,"shortElement"){
+            int.class,"applyAsShort","compare",short.class,"shortElement",OmniArray.MAX_ARR_SIZE / 8){
         @Override
         public Object convertVal(boolean val){
             return (short)TypeUtil.castToByte(val);
@@ -691,8 +779,7 @@ public enum DataType{
             if(val <= Short.MAX_VALUE){
                 return (short)val;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type char cannot be converted to " + this);
+            throw super.cannotBeConverted(val,CHAR);
         }
         @Override
         public Object convertVal(short val){
@@ -704,7 +791,7 @@ public enum DataType{
             if(val == (s=(short)val)){
                 return s;
             }
-            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+            throw super.cannotBeConverted(val,INT);
         }
         @Override
         public Object convertValUnchecked(int val){
@@ -716,8 +803,7 @@ public enum DataType{
             if((v=(short)val) == val){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -729,8 +815,7 @@ public enum DataType{
             if((v=(short)val) == val){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type float cannot be converted to " + this);
+            throw super.cannotBeConverted(val,FLOAT);
         }
         @Override
         public Object convertVal(double val){
@@ -738,8 +823,7 @@ public enum DataType{
             if((v=(short)val) == val){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.ShortOutput<?>)collection.getCollection();
@@ -832,7 +916,9 @@ public enum DataType{
                 return collection.search((short)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -851,6 +937,38 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfShort)itr;
+                char[] buffer=new char[6];
+                for(;;){
+                    for(int i=0,valLength=ToStringUtil.getStringShort(castItr.nextShort(),buffer,0);i < valLength;++i){
+                        Assertions.assertEquals(buffer[i],result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public int getMaxInt(){
@@ -873,7 +991,8 @@ public enum DataType{
     INT("INT","BOOLEAN,BYTE,CHAR,SHORT,INT","INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Integer.class,int.class,
             Integer[].class,int[].class,"Int","Int",IntPredicate.class,
             IntConsumer.class,IntBinaryOperator.class,IntUnaryOperator.class,Integer.MIN_VALUE,IntDblLnkNode.class,
-            IntSnglLnkNode.class,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement") {
+            IntSnglLnkNode.class,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement",
+            OmniArray.MAX_ARR_SIZE / 13){
         @Override
         public Object convertVal(boolean val){
             return (int)TypeUtil.castToByte(val);
@@ -900,8 +1019,7 @@ public enum DataType{
             if((v=(int)val) == val){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -913,8 +1031,7 @@ public enum DataType{
             if((double)(v=(int)val) == (double)val){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type float cannot be converted to " + this);
+            throw super.cannotBeConverted(val,FLOAT);
         }
         @Override
         public Object convertVal(double val){
@@ -922,8 +1039,7 @@ public enum DataType{
             if((v=(int)val) == val){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.IntOutput<?>)collection.getCollection();
@@ -1016,7 +1132,9 @@ public enum DataType{
                 return collection.search((int)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -1035,6 +1153,38 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfInt)itr;
+                char[] buffer=new char[11];
+                for(;;){
+                    for(int i=0,valLength=ToStringUtil.getStringInt(castItr.nextInt(),buffer,0);i < valLength;++i){
+                        Assertions.assertEquals(buffer[i],result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public int getMaxInt(){
@@ -1056,7 +1206,8 @@ public enum DataType{
     LONG("LONG","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG","LONG,FLOAT,DOUBLE,REF",true,false,true,Long.class,long.class,
             Long[].class,long[].class,"Long","Long",LongPredicate.class,
             LongConsumer.class,LongComparator.class,LongUnaryOperator.class,Long.MIN_VALUE,LongDblLnkNode.class,
-            LongSnglLnkNode.class,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement") {
+            LongSnglLnkNode.class,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement",
+            OmniArray.MAX_ARR_SIZE / 22){
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToLong(val);
@@ -1087,8 +1238,7 @@ public enum DataType{
             if(TypeUtil.floatEquals(val,v=(long)val)){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type float cannot be converted to " + this);
+            throw super.cannotBeConverted(val,FLOAT);
         }
         @Override
         public Object convertVal(double val){
@@ -1096,8 +1246,7 @@ public enum DataType{
             if(TypeUtil.doubleEquals(val,v=(long)val)){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.LongOutput<?>)collection.getCollection();
@@ -1190,7 +1339,9 @@ public enum DataType{
                 return collection.search((long)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -1209,6 +1360,38 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfLong)itr;
+                char[] buffer=new char[20];
+                for(;;){
+                    for(int i=0,valLength=ToStringUtil.getStringLong(castItr.nextLong(),buffer,0);i < valLength;++i){
+                        Assertions.assertEquals(buffer[i],result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public int getMaxInt(){
@@ -1231,7 +1414,8 @@ public enum DataType{
     FLOAT("FLOAT","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT","FLOAT,DOUBLE,REF",false,true,true,Float.class,float.class,
             Float[].class,float[].class,"Float","Float",FloatPredicate.class,
             FloatConsumer.class,FloatComparator.class,FloatUnaryOperator.class,Float.NaN,FloatDblLnkNode.class,
-            FloatSnglLnkNode.class,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement") {
+            FloatSnglLnkNode.class,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement",
+            OmniArray.MAX_ARR_SIZE / 17){
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToFloat(val);
@@ -1253,7 +1437,7 @@ public enum DataType{
             if(TypeUtil.checkCastToFloat(val)){
                 return (float)val;
             }
-            throw new UnsupportedOperationException("The value " + val + " of type int cannot be converted to " + this);
+            throw super.cannotBeConverted(val,INT);
         }
         @Override
         public Object convertValUnchecked(int val){
@@ -1264,8 +1448,7 @@ public enum DataType{
             if(TypeUtil.checkCastToFloat(val)){
                 return (float)val;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -1281,8 +1464,7 @@ public enum DataType{
             if((v=(float)val) == val || v != v){
                 return v;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type double cannot be converted to " + this);
+            throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.FloatOutput<?>)collection.getCollection();
@@ -1375,7 +1557,9 @@ public enum DataType{
                 return collection.search((float)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -1395,13 +1579,44 @@ public enum DataType{
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
         }
-
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfFloat)itr;
+                char[] buffer=new char[15];
+                for(;;){
+                    for(int i=0,valLength=ToStringUtil.getStringFloat(castItr.nextFloat(),buffer,0);i < valLength;++i){
+                        Assertions.assertEquals(buffer[i],result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
+        }
     },
     DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
             double.class,Double[].class,double[].class,"Double","Double",
             DoublePredicate.class,DoubleConsumer.class,DoubleComparator.class,DoubleUnaryOperator.class,Double.NaN,
             DoubleDblLnkNode.class,DoubleSnglLnkNode.class,"removeDoubleAt",long.class,"applyAsDouble","compare",
-            double.class,"doubleElement") {
+            double.class,"doubleElement",-1){
 
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.DoubleOutput<?>)collection.getCollection();
@@ -1494,7 +1709,9 @@ public enum DataType{
                 return collection.search((double)inputVal);
             }
         }
-        @Override public void verifyToString(String result,OmniIterator<?> itr){
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
             if(itr.hasNext()) {
@@ -1513,6 +1730,38 @@ public enum DataType{
             }
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset+1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                var castItr=(OmniIterator.OfDouble)itr;
+                for(;;){
+                    String strVal;
+                    for(int i=0,valLength=(strVal=Double.toString(castItr.nextDouble())).length();i < valLength;++i){
+                        Assertions.assertEquals(strVal.charAt(i),result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public Object convertVal(boolean val){
@@ -1539,8 +1788,7 @@ public enum DataType{
             if(TypeUtil.checkCastToDouble(val)){
                 return (double)val;
             }
-            throw new UnsupportedOperationException(
-                    "The value " + val + " of type long cannot be converted to " + this);
+            throw super.cannotBeConverted(val,LONG);
         }
         @Override
         public Object convertValUnchecked(long val){
@@ -1557,7 +1805,7 @@ public enum DataType{
     },
     REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
             RefDblLnkNode.class,
-            RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element") {
+            RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element",-1){
         @Override public Object verifyToArray(MonitoredCollection<?> monitoredCollection){
             var collection=monitoredCollection.getCollection();
             var result=collection.toArray();
@@ -1606,7 +1854,7 @@ public enum DataType{
                     defaultArr=OmniArray.OfShort.DEFAULT_BOXED_ARR;
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown dataType "+dataType);
+                    throw dataType.invalid();
                 }
                 Assertions.assertSame(defaultArr,result);
             }
@@ -1623,21 +1871,22 @@ public enum DataType{
         public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
                 FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return ((OmniCollection.OfRef)collection).add(inputVal);
         }
+
         @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.contains(inputVal);
         }
         @Override
         public boolean callremoveVal(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.remove(inputVal);
         }
@@ -1645,7 +1894,7 @@ public enum DataType{
         public boolean callremoveFirstOccurrence(OmniDeque<?> collection,Object inputVal,
                 FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.removeFirstOccurrence(inputVal);
         }
@@ -1653,30 +1902,82 @@ public enum DataType{
         public boolean callremoveLastOccurrence(OmniDeque<?> collection,Object inputVal,
                 FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.removeLastOccurrence(inputVal);
         }
         @Override
         public int callindexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.indexOf(inputVal);
         }
         @Override
         public int calllastIndexOf(OmniList<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.lastIndexOf(inputVal);
         }
         @Override
         public int callsearch(OmniStack<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
-                throw new UnsupportedOperationException("Ref cannot be boxed");
+                throw cannotBeBoxed();
             }
             return collection.search(inputVal);
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            if(itr.hasNext()){
+                for(;;){
+                    String strVal;
+                    for(int i=0,valLength=(strVal=String.valueOf(itr.next())).length();i < valLength;++i){
+                        Assertions.assertEquals(strVal.charAt(i),result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
+        }
+        @Override
+        public void verifyToString(String result,OmniSet<?> collection,String testName){
+            var itr=collection.iterator();
+            int offset;
+            Assertions.assertEquals('[',result.charAt(offset=0));
+            int size=collection.size();
+            System.out.print("Running test " + testName + " 0%");
+            int nextPercent=1;
+            int threshold=(int)Math.ceil(size / 100.0);
+            int numCompleted=0;
+            if(itr.hasNext()){
+                for(;;){
+                    String strVal;
+                    for(int i=0,valLength=(strVal=String.valueOf(itr.next())).length();i < valLength;++i){
+                        Assertions.assertEquals(strVal.charAt(i),result.charAt(++offset));
+                    }
+                    if(!itr.hasNext()){
+                        break;
+                    }
+                    if(++numCompleted >= threshold){
+                        incrementProgressBar(nextPercent);
+                        threshold=(int)Math.ceil(size / 100.0 * ++nextPercent);
+                    }
+                    Assertions.assertEquals(',',result.charAt(++offset));
+                    Assertions.assertEquals(' ',result.charAt(++offset));
+                }
+            }
+            finalizeProgressBar(nextPercent);
+            Assertions.assertEquals(']',result.charAt(++offset));
+            Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
         public Object convertVal(boolean val){
@@ -1710,8 +2011,28 @@ public enum DataType{
         public Object convertVal(double val){
             return val;
         }
+        @Override
+        public boolean isValidQueryVal(QueryVal queryVal){
+            return true;
+        }
 
     };
+    private static void incrementProgressBar(int nextPercent){
+        if(nextPercent % 10 == 0){
+            System.out.print(nextPercent + "%");
+        }else{
+            System.out.print('.');
+        }
+    }
+    private static void finalizeProgressBar(int nextPercent){
+        while(nextPercent <= 100){
+            incrementProgressBar(nextPercent++);
+        }
+        System.out.println(" Finished!");
+    }
+    public static UnsupportedOperationException cannotBeBoxed(){
+        return new UnsupportedOperationException(DataType.REF + " cannot be boxed");
+    }
     public final String name;
     private final String mayBeAddedTo;
     private final String validOutputTypes;
@@ -1738,13 +2059,14 @@ public enum DataType{
     public final String compareMethodName;
     public final Class<?> comparableType;
     public final String elementMethodName;
+    public final int massiveToStringThreshold;
     DataType(String name,String mayBeAddedTo,String validOutputTypes,boolean isIntegral,boolean isFloatingPoint,
             boolean isSigned,Class<?> boxedClass,Class<?> primitiveClass,
             Class<?> boxedArrayClass,Class<?> primitiveArrayClass,String classPrefix,String typeNameModifier,
             Class<?> predicateClass,Class<?> consumerClass,Class<?> comparatorClass,Class<?> unaryOperatorClass,
             Object defaultVal,Class<?> dblLnkNodeClass,Class<?> snglLnkNodeClass,String removeAtIndexMethodName,
             Class<?> queryParameterType,String applyMethodName,String compareMethodName,Class<?> comparableType,
-            String elementMethodName){
+            String elementMethodName,int massiveToStringThreshold){
         this.name=name;
         this.mayBeAddedTo=mayBeAddedTo;
         this.validOutputTypes=validOutputTypes;
@@ -1770,8 +2092,11 @@ public enum DataType{
         this.compareMethodName=compareMethodName;
         this.comparableType=comparableType;
         this.elementMethodName=elementMethodName;
+        this.massiveToStringThreshold=massiveToStringThreshold;
     }
-
+    public boolean isValidQueryVal(QueryVal queryVal){
+        return queryVal != QueryVal.NonNull;
+    }
     public abstract Object convertVal(boolean val);
     public abstract Object convertVal(byte val);
     public abstract Object convertVal(char val);
@@ -1827,28 +2152,10 @@ public enum DataType{
         case REF:
             return val;
         }
-        throw invalidDataType(inputType);
+        throw inputType.invalid();
     }
-    public void verifyToString(String result,OmniIterator<?> itr) {
-        int offset;
-        Assertions.assertEquals('[',result.charAt(offset=0));
-        if(itr.hasNext()) {
-            for(;;) {
-                String strVal;
-                for(int i=0,valLength=(strVal=String.valueOf(itr.next())).length();i<valLength;++i) {
-                    Assertions.assertEquals(strVal.charAt(i),result.charAt(++offset));
-                }
-                if(!itr.hasNext()) {
-                    break;
-                }
-                Assertions.assertEquals(',',result.charAt(++offset));
-                Assertions.assertEquals(' ',result.charAt(++offset));
-            }
-        }
-        Assertions.assertEquals(']',result.charAt(++offset));
-        Assertions.assertEquals(offset+1,result.length());
-
-    }
+    public abstract void verifyToString(String result,OmniSet<?> collection,String testName);
+    public abstract void verifyToString(String result,OmniSet<?> collection);
     public abstract boolean callcontains(OmniCollection<?> collection,Object inputVal,
             FunctionCallType functionCallType);
     public abstract boolean callremoveVal(OmniCollection<?> collection,Object inputVal,
@@ -1877,14 +2184,18 @@ public enum DataType{
     public long getMinLong(){
         throw new UnsupportedOperationException();
     }
-    public static UnsupportedOperationException invalidDataType(DataType dataType){
-        return new UnsupportedOperationException("Invalid dataType " + dataType);
+    public final UnsupportedOperationException invalid(){
+        return new UnsupportedOperationException("Invalid DataType " + this);
     }
-    public EnumSet<DataType> mayBeAddedTo(){
+    public final EnumSet<DataType> mayBeAddedTo(){
         return getDataTypeSet(this.mayBeAddedTo);
     }
-    public EnumSet<DataType> validOutputTypes(){
+    public final EnumSet<DataType> validOutputTypes(){
         return getDataTypeSet(this.validOutputTypes);
+    }
+    private final UnsupportedOperationException cannotBeConverted(Object val,DataType type){
+        return new UnsupportedOperationException(
+                "The value \"" + val + "\" of type " + type + " cannot be converted to " + this);
     }
     public synchronized static EnumSet<DataType> getDataTypeSet(String dataTypes){
         return SETS.computeIfAbsent(dataTypes,dataTypeStr->{
@@ -1906,6 +2217,6 @@ public enum DataType{
             }
         });
     }
-    private static final HashMap<String,EnumSet<DataType>> SETS=new HashMap<>();
 
+    private static final HashMap<String,EnumSet<DataType>> SETS=new HashMap<>();
 }

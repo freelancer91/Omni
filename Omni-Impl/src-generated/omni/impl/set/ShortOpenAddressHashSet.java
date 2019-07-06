@@ -1143,7 +1143,7 @@ private boolean addToTable(short val){
     int hash;
     int tableSize;
     if((tableSize=this.tableSize)!=0
-    &&(tableVal=(table=this.table)[hash=((val^(val>>>16))&(tableLength=table.length-1))])!=0){
+    &&(tableVal=(table=this.table)[hash=(val&(tableLength=table.length-1))])!=0){
       final int initialHash=hash;
       do{
         if(val==tableVal){
@@ -1162,7 +1162,7 @@ private boolean addToTable(short val){
     int tableLength;
     int hash;
     if(tableSize!=0
-    &&(tableVal=(table=this.table)[hash=((val^(val>>>16))&(tableLength=table.length-1))])!=0){
+    &&(tableVal=(table=this.table)[hash=(val&(tableLength=table.length-1))])!=0){
       final int initialHash=hash;
       do{
         if(val==tableVal){

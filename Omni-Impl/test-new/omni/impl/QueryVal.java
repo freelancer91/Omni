@@ -8,7 +8,56 @@ import java.util.TreeSet;
 import omni.api.OmniCollection;
 import omni.util.TypeUtil;
 public enum QueryVal{
+
     // TODO add support for collection modifying non-null Objects
+    NonNull{
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isCharValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isShortValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isIntValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isLongValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isFloatValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isDoubleValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        public boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,DataType inputType,
+                DataType collectionType){
+            return collectionType == DataType.REF;
+        }
+        @Override
+        boolean isValidQuery(QueryValModification modification,QueryCastType castType,DataType inputType){
+            return modification == QueryValModification.None && inputType == DataType.REF
+                    && castType == QueryCastType.ToObject;
+        }
+        @Override
+        public Object getRefVal(){
+            return new Object();
+        }
+    },
     Null{
         @Override
         boolean isBooleanValSupported(QueryValModification modification){
@@ -2196,6 +2245,10 @@ public enum QueryVal{
             return modification == QueryValModification.None && inputType.isFloatingPoint;
         }
     };
+    private static UnsupportedOperationException unknownCombo(DataType inputType,QueryValModification modification){
+        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + inputType
+                + "; modification=" + modification);
+    }
     private static UnsupportedOperationException unknownCombo(QueryVal queryVal,DataType inputType,
             QueryValModification modification,QueryCastType castType,DataType collectionType){
         return new UnsupportedOperationException("Unknown combo queryVal=" + queryVal + "; inputType=" + inputType
@@ -2248,8 +2301,7 @@ public enum QueryVal{
 
     public final boolean getBooleanVal(QueryValModification modification){
         if(modification != QueryValModification.None){
-            throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
-                    + DataType.BOOLEAN + "; modification=" + modification);
+            throw unknownCombo(DataType.BOOLEAN,modification);
         }
         return getBooleanVal();
     }
@@ -2263,8 +2315,7 @@ public enum QueryVal{
         case PlusFloatEpsilon:
         case PlusDoubleEpsilon:
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.BYTE
-                + "; modification=" + modification);
+        throw unknownCombo(DataType.BYTE,modification);
     }
 
     public final char getCharVal(QueryValModification modification){
@@ -2276,8 +2327,7 @@ public enum QueryVal{
         case PlusFloatEpsilon:
         case PlusDoubleEpsilon:
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.CHAR
-                + "; modification=" + modification);
+        throw unknownCombo(DataType.CHAR,modification);
     }
     public final short getShortVal(QueryValModification modification){
         switch(modification){
@@ -2288,8 +2338,7 @@ public enum QueryVal{
         case PlusFloatEpsilon:
         case PlusDoubleEpsilon:
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
-                + DataType.SHORT + "; modification=" + modification);
+        throw unknownCombo(DataType.SHORT,modification);
     }
     public final int getIntVal(QueryValModification modification){
         switch(modification){
@@ -2300,8 +2349,7 @@ public enum QueryVal{
         case PlusFloatEpsilon:
         case PlusDoubleEpsilon:
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.INT
-                + "; modification=" + modification);
+        throw unknownCombo(DataType.INT,modification);
     }
     public final long getLongVal(QueryValModification modification){
         switch(modification){
@@ -2312,8 +2360,7 @@ public enum QueryVal{
         case PlusFloatEpsilon:
         case PlusDoubleEpsilon:
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType=" + DataType.LONG
-                + "; modification=" + modification);
+        throw unknownCombo(DataType.LONG,modification);
     }
     boolean isFloatValSupported(QueryValModification modification){
         switch(modification){
@@ -2335,8 +2382,7 @@ public enum QueryVal{
             return getFloatValPlusFloatEpsilon();
         case PlusDoubleEpsilon:
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
-                + DataType.FLOAT + "; modification=" + modification);
+        throw unknownCombo(DataType.FLOAT,modification);
     }
     boolean isDoubleValSupported(QueryValModification modification){
         switch(modification){
@@ -2359,13 +2405,11 @@ public enum QueryVal{
         case PlusDoubleEpsilon:
             return getDoubleValPlusDoubleEpsilon();
         }
-        throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
-                + DataType.DOUBLE + "; modification=" + modification);
+        throw unknownCombo(DataType.DOUBLE,modification);
     }
     public final Object getRefVal(QueryValModification modification){
         if(modification != QueryValModification.None){
-            throw new UnsupportedOperationException("Invalid dataType/QueryValModification combo. dataType="
-                    + DataType.REF + "; modification=" + modification);
+            throw unknownCombo(DataType.REF,modification);
         }
         return getRefVal();
     }
@@ -2426,31 +2470,31 @@ public enum QueryVal{
         return Math.nextAfter(getDoubleVal(),getPlusDoubleEpsilonDirection());
     }
     public Object getRefVal(){
-        throw DataType.invalidDataType(DataType.REF);
+        throw DataType.REF.invalid();
     }
     public boolean getBooleanVal(){
-        throw DataType.invalidDataType(DataType.BOOLEAN);
+        throw DataType.BOOLEAN.invalid();
     }
     public byte getByteVal(){
-        throw DataType.invalidDataType(DataType.BYTE);
+        throw DataType.BYTE.invalid();
     }
     public char getCharVal(){
-        throw DataType.invalidDataType(DataType.CHAR);
+        throw DataType.CHAR.invalid();
     }
     public short getShortVal(){
-        throw DataType.invalidDataType(DataType.SHORT);
+        throw DataType.SHORT.invalid();
     }
     public int getIntVal(){
-        throw DataType.invalidDataType(DataType.INT);
+        throw DataType.INT.invalid();
     }
     public long getLongVal(){
-        throw DataType.invalidDataType(DataType.LONG);
+        throw DataType.LONG.invalid();
     }
     public float getFloatVal(){
-        throw DataType.invalidDataType(DataType.FLOAT);
+        throw DataType.FLOAT.invalid();
     }
     public double getDoubleVal(){
-        throw DataType.invalidDataType(DataType.DOUBLE);
+        throw DataType.DOUBLE.invalid();
     }
 
     public Object getInputVal(DataType inputType,QueryValModification queryValModification){
@@ -2527,8 +2571,7 @@ public enum QueryVal{
             }
             break;
         }
-        throw new UnsupportedOperationException("Invalid inputType-queryValModificationCombo; inputType=" + inputType
-                + "; queryValModification=" + queryValModification);
+        throw unknownCombo(inputType,queryValModification);
     }
     boolean isBooleanValSupported(QueryValModification modification){
         return modification == QueryValModification.None;
@@ -2723,7 +2766,10 @@ public enum QueryVal{
                     collection.add(v);
                     if(v == Float.POSITIVE_INFINITY){
                         valOffset=-Float.MAX_VALUE;
+                    }else{
+                        valOffset=Math.nextAfter(valOffset,Double.POSITIVE_INFINITY);
                     }
+
                 }while(++i < setSize);
             }else{
                 do{
@@ -2731,6 +2777,8 @@ public enum QueryVal{
                     collection.add(v);
                     if(v == Float.POSITIVE_INFINITY){
                         valOffset=-Float.MAX_VALUE;
+                    }else{
+                        valOffset=Math.nextAfter(valOffset,Double.POSITIVE_INFINITY);
                     }
                 }while(++i < setSize);
             }
@@ -2751,6 +2799,8 @@ public enum QueryVal{
                     collection.add(v);
                     if(v == Double.POSITIVE_INFINITY){
                         valOffset=-Double.MAX_VALUE;
+                    }else{
+                        valOffset=Math.nextAfter(valOffset,Double.POSITIVE_INFINITY);
                     }
                 }while(++i < setSize);
             }else{
@@ -2759,6 +2809,8 @@ public enum QueryVal{
                     collection.add(v);
                     if(v == Double.POSITIVE_INFINITY){
                         valOffset=-Double.MAX_VALUE;
+                    }else{
+                        valOffset=Math.nextAfter(valOffset,Double.POSITIVE_INFINITY);
                     }
                 }while(++i < setSize);
             }

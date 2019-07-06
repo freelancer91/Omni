@@ -17,6 +17,9 @@ public enum IllegalModification{
     IllegalModification(Class<? extends Throwable> expectedException){
         this.expectedException=expectedException;
     }
+    public final UnsupportedOperationException invalid(){
+        return new UnsupportedOperationException("Invalid IllegalModification " + this);
+    }
     public static final Set<IllegalModification> SUBLIST_ITERATOR_MODS=Set.of(IllegalModification.NoMod,
             IllegalModification.ModCollection,IllegalModification.ModParent,IllegalModification.ModRoot,
             IllegalModification.ModItr);

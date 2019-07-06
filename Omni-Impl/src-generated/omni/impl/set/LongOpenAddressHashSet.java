@@ -1104,7 +1104,7 @@ private boolean addToTable(long val){
     int hash;
     int tableSize;
     if((tableSize=this.tableSize)!=0
-    &&(tableVal=(table=this.table)[hash=(((hash=(int)(val^(val>>>32)))^(hash>>>16))&(tableLength=table.length-1))])!=0){
+    &&(tableVal=(table=this.table)[hash=(((int)(val^(val>>>32)))&(tableLength=table.length-1))])!=0){
       final int initialHash=hash;
       do{
         if(val==tableVal){
@@ -1123,7 +1123,7 @@ private boolean addToTable(long val){
     int tableLength;
     int hash;
     if(tableSize!=0
-    &&(tableVal=(table=this.table)[hash=(((hash=(int)(val^(val>>>32)))^(hash>>>16))&(tableLength=table.length-1))])!=0){
+    &&(tableVal=(table=this.table)[hash=(((int)(val^(val>>>32)))&(tableLength=table.length-1))])!=0){
       final int initialHash=hash;
       do{
         if(val==tableVal){

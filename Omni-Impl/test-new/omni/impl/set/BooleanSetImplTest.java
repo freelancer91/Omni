@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -24,6 +25,7 @@ import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.TestExecutorService;
+@Tag(value="NewTest")
 public class BooleanSetImplTest{
     private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         final CheckedType checkedType;
@@ -448,11 +450,6 @@ public class BooleanSetImplTest{
             set.writeExternal(oos);
         }
     }
-    //    private static final int[] STATES=new int[]{0b00, // empty
-    //            0b01, // false
-    //            0b10, // true
-    //            0b11, // false, true
-    //    };
     private static final EnumSet<SetInitializationSequence> VALID_INIT_SEQS=EnumSet.of(SetInitializationSequence.Empty,
             SetInitializationSequence.AddTrue,SetInitializationSequence.AddFalse,
             SetInitializationSequence.AddTrueAndFalse);
@@ -499,7 +496,7 @@ public class BooleanSetImplTest{
                 adjustedState=0b00;
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                throw initSeq.invalid();
             }
         }
         itrMonitor.illegalMod(preMod);
@@ -589,7 +586,7 @@ public class BooleanSetImplTest{
                     Assertions.assertEquals((state & 0b10) != 0,result);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown filterGen " + filterGen);
+                    throw filterGen.invalid();
                 }
             }
         }else{
@@ -651,7 +648,7 @@ public class BooleanSetImplTest{
                 state=0b11;
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                throw initSeq.invalid();
             }
             initSeq.initialize(new BooleanSetImplMonitor(checkedType,state)).verifyCollectionState();
         };
@@ -798,7 +795,7 @@ public class BooleanSetImplTest{
                     setSize=2;
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                    throw initSeq.invalid();
                 }
                 for(final var itrRemoveScenario:IteratorType.AscendingItr.validItrRemoveScenarios){
                     if((setSize != 0 || itrRemoveScenario == IteratorRemoveScenario.PostInit)
@@ -890,7 +887,7 @@ public class BooleanSetImplTest{
                     bound=4;
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                    throw initSeq.invalid();
                 }
                 for(int arrSize=0;arrSize <= bound;++arrSize){
                     final Object[] paramArr=new Object[arrSize];
@@ -961,20 +958,22 @@ public class BooleanSetImplTest{
                 QueryVal.QueryValModification modification);
         default void runAllTests(String testName){
             for(final var queryVal:QueryVal.values()){
-                queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
-                    castTypesToInputTypes.forEach((castType,inputTypes)->{
-                        inputTypes.forEach(inputType->{
-                            final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
-                                    inputType,DataType.BOOLEAN);
-                            for(final var checkedType:CheckedType.values()){
-                                for(final var initSeq:VALID_INIT_SEQS){
-                                    TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,modification,
-                                            inputType,castType,checkedType,initSeq));
+                if(DataType.BOOLEAN.isValidQueryVal(queryVal)){
+                    queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                        castTypesToInputTypes.forEach((castType,inputTypes)->{
+                            inputTypes.forEach(inputType->{
+                                final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
+                                        inputType,DataType.BOOLEAN);
+                                for(final var checkedType:CheckedType.values()){
+                                    for(final var initSeq:VALID_INIT_SEQS){
+                                        TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,
+                                                modification,inputType,castType,checkedType,initSeq));
+                                    }
                                 }
-                            }
+                            });
                         });
                     });
-                });
+                }
             }
             TestExecutorService.completeAllTests(testName);
         }
@@ -997,7 +996,7 @@ public class BooleanSetImplTest{
                     expectedResult=true;
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unknown initSeq " + initSeq);
+                    throw initSeq.invalid();
                 }
             }else{
                 expectedResult=false;

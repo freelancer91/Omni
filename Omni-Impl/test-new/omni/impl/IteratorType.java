@@ -14,6 +14,9 @@ public enum IteratorType{
         this.validPreMods=initValidPreMods(this);
         this.validItrRemoveScenarios=initValidItrRemoveScenarios(this);
     }
+    public final UnsupportedOperationException invalid(){
+        return new UnsupportedOperationException("Invalid IteratorType " + this);
+    }
     private static EnumSet<IteratorRemoveScenario> initValidItrRemoveScenarios(IteratorType itrType){
         switch(itrType.name){
         case "AscendingItr":
@@ -26,7 +29,7 @@ public enum IteratorType{
             return EnumSet.of(IteratorRemoveScenario.PostAdd,IteratorRemoveScenario.PostInit,
                     IteratorRemoveScenario.PostNext,IteratorRemoveScenario.PostPrev,IteratorRemoveScenario.PostRemove);
         }
-        throw new UnsupportedOperationException("Unknown itrType " + itrType);
+        throw itrType.invalid();
     }
     private static EnumSet<IllegalModification> initValidPreMods(IteratorType itrType){
         switch(itrType.name){
@@ -39,7 +42,7 @@ public enum IteratorType{
             return EnumSet.of(IllegalModification.ModCollection,IllegalModification.NoMod,IllegalModification.ModParent,
                     IllegalModification.ModRoot);
         }
-        throw new UnsupportedOperationException("Unknown itrType " + itrType);
+        throw itrType.invalid();
     }
     private static EnumSet<MonitoredFunctionGen> initValidMonitoredFunctionGens(IteratorType itrType){
         switch(itrType.name){
@@ -58,6 +61,6 @@ public enum IteratorType{
                     MonitoredFunctionGen.ThrowIOBModItr,MonitoredFunctionGen.ModParent,MonitoredFunctionGen.ModRoot,
                     MonitoredFunctionGen.ThrowIOBModParent,MonitoredFunctionGen.ThrowIOBModRoot);
         }
-        throw new UnsupportedOperationException("Unknown itrType " + itrType);
+        throw itrType.invalid();
     }
 }

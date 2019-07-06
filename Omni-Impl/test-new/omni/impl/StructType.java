@@ -12,6 +12,7 @@ public enum StructType{
     public final EnumSet<MonitoredFunctionGen> validMonitoredFunctionGens;
     public final EnumSet<MonitoredRemoveIfPredicateGen> validMonitoredRemoveIfPredicateGens;
     public final EnumSet<IllegalModification> validPreMods;
+    public final EnumSet<MonitoredObjectGen> validMonitoredObjectGens;
     StructType(String name){
         this.name=name;
         this.validDataTypes=initValidDataTypes(this);
@@ -19,6 +20,30 @@ public enum StructType{
         this.validMonitoredFunctionGens=initValidMonitoredFunctionGens(this);
         this.validMonitoredRemoveIfPredicateGens=initValidMonitoredRemoveIfPredicateGens(this);
         this.validPreMods=initValidPreMods(this);
+        this.validMonitoredObjectGens=initValidMonitoredObjectGens(this);
+    }
+    private static EnumSet<MonitoredObjectGen> initValidMonitoredObjectGens(StructType structType){
+        switch(structType.name){
+        case "BooleanSetImpl":
+        case "ByteSetImpl":
+        case "IntegralOpenAddressHashSet":
+            return EnumSet.noneOf(MonitoredObjectGen.class);
+        case "ArrDeq":
+        case "ArrList":
+        case "ArrStack":
+        case "DblLnkList":
+        case "OpenAddressHashSet":
+        case "SnglLnkQueue":
+        case "SnglLnkStack":
+            return EnumSet.of(MonitoredObjectGen.ModCollection,MonitoredObjectGen.NoThrow,MonitoredObjectGen.ThrowIOB,
+                    MonitoredObjectGen.ModCollectionThrowIOB);
+        case "ArrSubList":
+        case "DblLnkSubList":
+            return EnumSet.of(MonitoredObjectGen.ModCollection,MonitoredObjectGen.NoThrow,MonitoredObjectGen.ThrowIOB,
+                    MonitoredObjectGen.ModCollectionThrowIOB,MonitoredObjectGen.ModParent,MonitoredObjectGen.ModRoot,
+                    MonitoredObjectGen.ModParentThrowIOB,MonitoredObjectGen.ModRootThrowIOB);
+        }
+        throw structType.invalid();
     }
     private static EnumSet<MonitoredRemoveIfPredicateGen> initValidMonitoredRemoveIfPredicateGens(
             StructType structType){
@@ -50,7 +75,7 @@ public enum StructType{
                     MonitoredRemoveIfPredicateGen.RemoveTrue,MonitoredRemoveIfPredicateGen.Throw,
                     MonitoredRemoveIfPredicateGen.ThrowModCollection);
         }
-        throw new UnsupportedOperationException("Unknown structType " + structType);
+        throw structType.invalid();
     }
     private static EnumSet<IllegalModification> initValidPreMods(StructType structType){
         switch(structType.name){
@@ -69,7 +94,10 @@ public enum StructType{
         case "DblLnkSubList":
             return EnumSet.of(IllegalModification.NoMod,IllegalModification.ModParent,IllegalModification.ModRoot);
         }
-        throw new UnsupportedOperationException("Unknown structType " + structType);
+        throw structType.invalid();
+    }
+    public final UnsupportedOperationException invalid(){
+        return new UnsupportedOperationException("Invalid StructType " + this);
     }
     private static EnumSet<MonitoredFunctionGen> initValidMonitoredFunctionGens(StructType structType){
         switch(structType.name){
@@ -94,7 +122,7 @@ public enum StructType{
                     MonitoredFunctionGen.ModRoot,MonitoredFunctionGen.ThrowIOBModParent,
                     MonitoredFunctionGen.ThrowIOBModRoot);
         }
-        throw new UnsupportedOperationException("Unknown structType " + structType);
+        throw structType.invalid();
     }
     private static EnumSet<QueryMethod> initQueryMethodSet(StructType structType){
         switch(structType.name){
@@ -116,7 +144,7 @@ public enum StructType{
         case "DblLnkList":
             return QueryMethod.LISTDEQUE_METHODS;
         }
-        throw new UnsupportedOperationException("Unknown structType " + structType);
+        throw structType.invalid();
     }
     private static EnumSet<DataType> initValidDataTypes(StructType structType){
         switch(structType.name){
@@ -138,6 +166,6 @@ public enum StructType{
         case "SnglLnkStack":
             return DataType.getDataTypeSet("BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF");
         }
-        throw new UnsupportedOperationException("Unknown structType " + structType);
+        throw structType.invalid();
     }
 }

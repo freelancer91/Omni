@@ -1,7 +1,9 @@
 package omni.impl;
 
+import java.util.ConcurrentModificationException;
+
 public enum MonitoredObjectGen{
-    NoThrow{
+    NoThrow(null){
         @Override
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection){
             return new MonitoredObject();
@@ -10,8 +12,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new MonitoredObject(val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new MonitoredObject();
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new MonitoredObject(val);
+        }
     },
-    ModCollection{
+    ModCollection(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -19,11 +29,18 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                if(!alreadyModified){
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
                     monitoredCollection.illegalMod(IllegalModification.ModCollection);
-                    alreadyModified=true;
+
                 }
             }
         }
@@ -35,8 +52,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModParent{
+    ModParent(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -44,11 +69,18 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                if(!alreadyModified){
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
                     monitoredCollection.illegalMod(IllegalModification.ModParent);
-                    alreadyModified=true;
+
                 }
             }
         }
@@ -60,8 +92,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModRoot{
+    ModRoot(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -69,11 +109,18 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                if(!alreadyModified){
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
                     monitoredCollection.illegalMod(IllegalModification.ModRoot);
-                    alreadyModified=true;
+
                 }
             }
         }
@@ -85,8 +132,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ThrowIOB{
+    ThrowIOB(IndexOutOfBoundsException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -94,9 +149,18 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                throw new IndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    throw new IndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -107,8 +171,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ThrowAIOB{
+    ThrowAIOB(IllegalArgumentException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -116,9 +188,18 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                throw new ArrayIndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    throw new ArrayIndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -129,8 +210,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModCollectionThrowIOB{
+    ModCollectionThrowIOB(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -138,10 +227,19 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                monitoredCollection.illegalMod(IllegalModification.ModCollection);
-                throw new IndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    monitoredCollection.illegalMod(IllegalModification.ModCollection);
+                    throw new IndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -152,8 +250,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModCollectionThrowAIOB{
+    ModCollectionThrowAIOB(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -161,10 +267,19 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                monitoredCollection.illegalMod(IllegalModification.ModCollection);
-                throw new ArrayIndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    monitoredCollection.illegalMod(IllegalModification.ModCollection);
+                    throw new ArrayIndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -175,8 +290,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModParentThrowIOB{
+    ModParentThrowIOB(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -184,10 +307,19 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                monitoredCollection.illegalMod(IllegalModification.ModParent);
-                throw new IndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    monitoredCollection.illegalMod(IllegalModification.ModParent);
+                    throw new IndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -198,8 +330,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModParentThrowAIOB{
+    ModParentThrowAIOB(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -207,10 +347,19 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                monitoredCollection.illegalMod(IllegalModification.ModParent);
-                throw new ArrayIndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    monitoredCollection.illegalMod(IllegalModification.ModParent);
+                    throw new ArrayIndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -221,8 +370,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModRootThrowIOB{
+    ModRootThrowIOB(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -230,10 +387,19 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                monitoredCollection.illegalMod(IllegalModification.ModRoot);
-                throw new IndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    monitoredCollection.illegalMod(IllegalModification.ModRoot);
+                    throw new IndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -244,8 +410,16 @@ public enum MonitoredObjectGen{
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
         }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
+        }
     },
-    ModRootThrowAIOB{
+    ModRootThrowAIOB(ConcurrentModificationException.class){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -253,10 +427,19 @@ public enum MonitoredObjectGen{
             Impl(MonitoredCollection<?> monitoredCollection,int val){
                 super(monitoredCollection,val);
             }
+            Impl(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+                super(monitoredCollection,throwSwitch);
+            }
+            Impl(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+                super(monitoredCollection,val,throwSwitch);
+            }
             @Override
             protected void throwingCall(){
-                monitoredCollection.illegalMod(IllegalModification.ModRoot);
-                throw new ArrayIndexOutOfBoundsException();
+                if(throwSwitch.doThrow){
+                    throwSwitch.doThrow=false;
+                    monitoredCollection.illegalMod(IllegalModification.ModRoot);
+                    throw new ArrayIndexOutOfBoundsException();
+                }
             }
         }
         @Override
@@ -266,20 +449,56 @@ public enum MonitoredObjectGen{
         @Override
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val){
             return new Impl(collection,val);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch){
+            return new Impl(collection,throwSwitch);
+        }
+        @Override
+        public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,ThrowSwitch throwSwitch){
+            return new Impl(collection,val,throwSwitch);
         }
     },;
+    public final Class<? extends Throwable> expectedException;
+    MonitoredObjectGen(Class<? extends Throwable> expectedException){
+        this.expectedException=expectedException;
+    }
     public abstract MonitoredObject getMonitoredObject(MonitoredCollection<?> collection);
     public abstract MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val);
     private static abstract class ModifyingMonitoredObj extends MonitoredObject{
         final MonitoredCollection<?> monitoredCollection;
-        boolean alreadyModified=false;
+        final ThrowSwitch throwSwitch;
         ModifyingMonitoredObj(MonitoredCollection<?> monitoredCollection){
             super();
             this.monitoredCollection=monitoredCollection;
+            this.throwSwitch=new ThrowSwitch(true);
         }
         ModifyingMonitoredObj(MonitoredCollection<?> monitoredCollection,int val){
             super(val);
             this.monitoredCollection=monitoredCollection;
+            this.throwSwitch=new ThrowSwitch(true);
+        }
+        ModifyingMonitoredObj(MonitoredCollection<?> monitoredCollection,ThrowSwitch throwSwitch){
+            super();
+            this.monitoredCollection=monitoredCollection;
+            this.throwSwitch=throwSwitch;
+        }
+        ModifyingMonitoredObj(MonitoredCollection<?> monitoredCollection,int val,ThrowSwitch throwSwitch){
+            super(val);
+            this.monitoredCollection=monitoredCollection;
+            this.throwSwitch=throwSwitch;
         }
     }
+    public static class ThrowSwitch{
+        public boolean doThrow;
+        public ThrowSwitch(){
+            doThrow=false;
+        }
+        public ThrowSwitch(boolean doThrow){
+            this.doThrow=doThrow;
+        }
+    }
+    public abstract MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val,
+            ThrowSwitch throwSwitch);
+    public abstract MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,ThrowSwitch throwSwitch);
 }

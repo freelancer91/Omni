@@ -252,7 +252,7 @@ public enum MonitoredComparatorGen{
                 return;
             }
             }
-            throw DataType.invalidDataType(dataType);
+            throw dataType.invalid();
         }
     },
     NullComparator(true,ComparatorType.NaturalOrder,null){
@@ -572,7 +572,7 @@ public enum MonitoredComparatorGen{
             return;
         }
         }
-        throw DataType.invalidDataType(dataType);
+        throw dataType.invalid();
     }
     void initUnsortedHelper(MonitoredList<?,?> listMonitor,int listSize){
         for(int i=listSize;--i >= 0;){

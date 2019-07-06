@@ -87,7 +87,7 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
     }
     @Override default MonitoredIterator<? extends OmniIterator<?>,SET> getMonitoredIterator(IteratorType itrType){
         if(itrType!=IteratorType.AscendingItr) {
-            throw new UnsupportedOperationException("Unknown itrType "+itrType);
+            throw itrType.invalid();
         }
         return getMonitoredIterator();
     }
@@ -98,11 +98,22 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
     @Override default void modRoot(){
         throw new UnsupportedOperationException();
     }
-    @Override default void verifyToString(String string){
-        SET collection=getCollection();
-        var itr=collection.iterator();
-        DataType dataType=getDataType();
-        dataType.verifyToString(string,itr);
+    @Override
+    default void verifyMASSIVEToString(String string,String testName){
+        var dataType=getDataType();
+        switch(dataType){
+        case INT:
+        case LONG:
+        case FLOAT:
+            dataType.verifyToString(string,getCollection(),testName);
+            return;
+        default:
+        }
+        throw dataType.invalid();
+    }
+    @Override
+    default void verifyToString(String string){
+        getDataType().verifyToString(string,getCollection());
     }
     @Override default void verifyHashCode(int hashCode){
         int expectedHashCode=0;
