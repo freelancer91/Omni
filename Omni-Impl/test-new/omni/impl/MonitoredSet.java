@@ -6,6 +6,42 @@ import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.QueryVal.QueryValModification;
 public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection<SET>{
+    default void verifyAdd(DataType inputType,FunctionCallType functionCallType,final Object inputVal){
+        var collection=getCollection();
+        boolean alreadyContains;
+        switch(inputType){
+        case BOOLEAN:
+            alreadyContains=collection.contains((boolean)inputVal);
+            break;
+        case BYTE:
+            alreadyContains=collection.contains((byte)inputVal);
+            break;
+        case CHAR:
+            alreadyContains=collection.contains((char)inputVal);
+            break;
+        case SHORT:
+            alreadyContains=collection.contains((short)inputVal);
+            break;
+        case INT:
+            alreadyContains=collection.contains((int)inputVal);
+            break;
+        case LONG:
+            alreadyContains=collection.contains((long)inputVal);
+            break;
+        case FLOAT:
+            alreadyContains=collection.contains((float)inputVal);
+            break;
+        case DOUBLE:
+            alreadyContains=collection.contains((double)inputVal);
+            break;
+        case REF:
+            alreadyContains=collection.contains(inputVal);
+            break;
+        default:
+            throw inputType.invalid();
+        }
+        Assertions.assertNotEquals(alreadyContains,this.verifyAdd(inputVal,inputType,functionCallType));
+    }
     void updateAddState(Object inputVal,DataType inputType,boolean result);
     interface MonitoredSetIterator<ITR extends OmniIterator<?>,SET extends OmniSet<?>> extends MonitoredCollection.MonitoredIterator<ITR,SET>{
         @Override default IteratorType getIteratorType(){
@@ -33,21 +69,28 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         void verifyNextResult(DataType outputType,Object result);
         @Override
         default Object verifyNext(DataType outputType){
-            Object result=outputType.callIteratorNext(getIterator());
-            verifyNextResult(outputType,result);
-            updateItrNextState();
-            verifyIteratorState();
-            getMonitoredCollection().verifyCollectionState();
+            final Object result;
+            try{
+                result=outputType.callIteratorNext(getIterator());
+                updateItrNextState();
+                verifyNextResult(outputType,result);
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
 
             return result;
         }
         void updateItrRemoveState();
         @Override
         default void verifyRemove(){
-            getIterator().remove();
-            updateItrRemoveState();
-            verifyIteratorState();
-            getMonitoredCollection().verifyCollectionState();
+            try{
+                getIterator().remove();
+                updateItrRemoveState();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
         }
     }
     void removeFromExpectedState(QueryVal queryVal,QueryValModification modification);
@@ -57,16 +100,21 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         Object inputVal=queryVal.getInputVal(inputType,modification);
         int sizeBefore=collection.size();
         boolean containsBefore=queryCastType.callcontains(collection,inputVal,inputType);
-        boolean result=queryCastType.callremoveVal(collection,inputVal,inputType);
-        boolean containsAfter=queryCastType.callcontains(collection,inputVal,inputType);
-        int sizeAfter=collection.size();
-        if(result) {
-            Assertions.assertNotEquals(containsBefore,containsAfter);
-            Assertions.assertEquals(sizeBefore,sizeAfter+1);
-            removeFromExpectedState(queryVal,modification);
-        }else {
-            Assertions.assertEquals(containsBefore,containsAfter);
-            Assertions.assertEquals(sizeBefore,sizeAfter);
+        final boolean result;
+        try{
+            result=queryCastType.callremoveVal(collection,inputVal,inputType);
+            boolean containsAfter=queryCastType.callcontains(collection,inputVal,inputType);
+            int sizeAfter=collection.size();
+            if(result) {
+                Assertions.assertNotEquals(containsBefore,containsAfter);
+                Assertions.assertEquals(sizeBefore,sizeAfter+1);
+                removeFromExpectedState(queryVal,modification);
+            }else {
+                Assertions.assertEquals(containsBefore,containsAfter);
+                Assertions.assertEquals(sizeBefore,sizeAfter);
+            }
+        }finally{
+            verifyCollectionState();
         }
         return result;
     }
@@ -75,14 +123,19 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         SET collection=getCollection();
         boolean containsBefore=inputType.callcontains(collection,inputVal,functionCallType);
         int sizeBefore=collection.size();
-        boolean result=inputType.callCollectionAdd(inputVal,collection,functionCallType);
+        final boolean result;
+        try{
+            result=inputType.callCollectionAdd(inputVal,collection,functionCallType);
+            updateAddState(inputVal,inputType,result);
+        }finally{
+            verifyCollectionState();
+        }
         int sizeAfter=collection.size();
         boolean containsAfter=inputType.callcontains(collection,inputVal,functionCallType);
         Assertions.assertEquals(!result,containsBefore);
         Assertions.assertTrue(containsAfter);
         Assertions.assertEquals(sizeBefore,result?sizeAfter - 1:sizeAfter);
-        updateAddState(inputVal,inputType,result);
-        verifyCollectionState();
+
         return result;
     }
     @Override default MonitoredIterator<? extends OmniIterator<?>,SET> getMonitoredIterator(IteratorType itrType){

@@ -116,11 +116,10 @@ AbstractSeq<Double>
           break;
         }
         ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
-        dstOffset+=numTail0s;
-        if(numTail0s==64){
-          break;
-        }else if(dstOffset>=dstBound){
+        if((dstOffset+=numTail0s)>=dstBound){
           return;
+        }else if(numTail0s==64){
+          break;
         }
         s+=numTail0s;
         word>>>=numTail0s;

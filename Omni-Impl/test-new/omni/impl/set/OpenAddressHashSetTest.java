@@ -1,6 +1,5 @@
 package omni.impl.set;
-import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.DELETED;
-import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.NULL;
+import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.*;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -16,7 +15,6 @@ import omni.api.OmniSet;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
-import omni.impl.IllegalModification;
 import omni.impl.IteratorRemoveScenario;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredCollection;
@@ -25,7 +23,6 @@ import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredObjectGen;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
-import omni.impl.MonitoredRemoveIfPredicateGen;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
@@ -35,8 +32,920 @@ import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 @Tag(value="NewTest")
 public class OpenAddressHashSetTest{
+    private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
+    private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
+    private static final EnumMap<DataType,EnumSet<SetInitialization>> VALID_INIT_SEQS;
+    static{
+        VALID_INIT_SEQS=new EnumMap<>(DataType.class);
+        final var tmp=EnumSet.of(SetInitialization.Empty,SetInitialization.AddTrue,
+                SetInitialization.AddFalse,SetInitialization.AddTrueAndFalse,
+                SetInitialization.AddPrime,SetInitialization.AddFibSeq,
+                SetInitialization.AddMinByte,SetInitialization.FillWord0,
+                SetInitialization.FillWord1,SetInitialization.FillWord2,
+                SetInitialization.FillWord3,SetInitialization.Add200RemoveThenAdd100More);
+        for(var dataType:StructType.OpenAddressHashSet.validDataTypes){
+            if(dataType == DataType.REF){
+                VALID_INIT_SEQS.put(DataType.REF,EnumSet.of(SetInitialization.Empty,
+                        SetInitialization.AddTrue,SetInitialization.AddFalse,
+                        SetInitialization.AddTrueAndFalse,SetInitialization.AddPrime,
+                        SetInitialization.AddFibSeq,SetInitialization.AddMinByte,
+                        SetInitialization.FillWord0,SetInitialization.FillWord1,
+                        SetInitialization.FillWord2,SetInitialization.FillWord3,
+                        SetInitialization.Add200RemoveThenAdd100More,SetInitialization.AddNull));
+            }else{
+                VALID_INIT_SEQS.put(dataType,tmp);
+            }
+        }
+    }
+    private static final int[] CONSTRUCTOR_INITIAL_CAPACITIES=new int[5 + 29 * 3 + 2];
+    private static final float[] LOAD_FACTORS
+    =new float[]{0.1f,0.25f,0.5f,0.75f,0.9f,0.95f,1.0f,1.1f,2.0f,0.0f,-1f,-.75f,-.5f,Float.NaN};
+    private static final int[] GENERAL_PURPOSE_INITIAL_CAPACITIES
+    =new int[]{0,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192};
+    static{
+        CONSTRUCTOR_INITIAL_CAPACITIES[0]=0;
+        CONSTRUCTOR_INITIAL_CAPACITIES[1]=1;
+        CONSTRUCTOR_INITIAL_CAPACITIES[2]=2;
+        int i=2;
+        for(int pow=2;pow <= 30;++pow){
+            CONSTRUCTOR_INITIAL_CAPACITIES[++i]=(1 << pow) - 1;
+            CONSTRUCTOR_INITIAL_CAPACITIES[++i]=1 << pow;
+            CONSTRUCTOR_INITIAL_CAPACITIES[++i]=(1 << pow) + 1;
+        }
+        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=OmniArray.MAX_ARR_SIZE;
+        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MAX_VALUE;
+        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
+        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
+    }
+    @org.junit.jupiter.api.Test public void testadd_val(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var functionCallType:FunctionCallType.values()){
+                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
+                    for(final float loadFactor:LOAD_FACTORS){
+                        if(loadFactor > 0.f && loadFactor <= 1.0f){
+                            for(final var inputType:collectionType.mayBeAddedTo()){
+                                for(final var checkedType:CheckedType.values()){
+                                    for(final int initialCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                                        for(var objGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
+                                            if(objGen.expectedException == null || checkedType.checked
+                                                    || inputType != DataType.REF){
+                                                TestExecutorService.submitTest(()->{
+                                                    final var monitor=new OpenAddressHashSetMonitor(collectionType,
+                                                            checkedType,initialCapacity,loadFactor);
+                                                    switch(inputType){
+                                                    case BOOLEAN:
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        break;
+                                                    case BYTE:
+                                                        for(int i=Byte.MIN_VALUE;i <= Byte.MAX_VALUE;++i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((byte)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=Byte.MAX_VALUE;i >= Byte.MIN_VALUE;--i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((byte)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case CHAR:
+                                                        for(int i=0;i <= 500;++i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((char)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=500;i >= 0;--i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((char)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case SHORT:
+                                                        for(int i=-250;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((short)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=250;i >= -250;--i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((short)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case INT:
+                                                        for(int i=-250;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=250;i >= -250;--i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case LONG:
+                                                        for(long i=-250;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(long i=250;i >= -250;--i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case FLOAT:{
+                                                        float f=0.0f;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(f,inputType,functionCallType));
+                                                            f=Math.nextAfter(f,Double.POSITIVE_INFINITY);
+                                                        }
+                                                    }{
+                                                        float f=-0.0f;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(f,inputType,functionCallType));
+                                                            f=Math.nextAfter(f,Double.NEGATIVE_INFINITY);
+                                                        }
+                                                    }
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Float.NaN,
+                                                            inputType,functionCallType));
+                                                    monitor.set.clear();
+                                                    monitor.updateCollectionState();
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Float.NaN,
+                                                            inputType,functionCallType));{
+                                                                float f=-0.0f;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(f,inputType,functionCallType));
+                                                                    f=Math.nextAfter(f,Double.NEGATIVE_INFINITY);
+                                                                }
+                                                            }{
+                                                                float f=0.0f;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(f,inputType,functionCallType));
+                                                                    f=Math.nextAfter(f,Double.POSITIVE_INFINITY);
+                                                                }
+                                                            }
+                                                            break;
+                                                    case DOUBLE:{
+                                                        double d=0.0d;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(d,inputType,functionCallType));
+                                                            d=Math.nextAfter(d,Double.POSITIVE_INFINITY);
+                                                        }
+                                                    }{
+                                                        double d=-0.0d;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(d,inputType,functionCallType));
+                                                            d=Math.nextAfter(d,Double.NEGATIVE_INFINITY);
+                                                        }
+                                                    }
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Double.NaN,
+                                                            inputType,functionCallType));
+                                                    monitor.set.clear();
+                                                    monitor.updateCollectionState();
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Double.NaN,
+                                                            inputType,functionCallType));{
+                                                                double d=-0.0d;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(d,inputType,functionCallType));
+                                                                    d=Math.nextAfter(d,Double.NEGATIVE_INFINITY);
+                                                                }
+                                                            }{
+                                                                double d=0.0d;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(d,inputType,functionCallType));
+                                                                    d=Math.nextAfter(d,Double.POSITIVE_INFINITY);
+                                                                }
+                                                            }
+                                                            break;
+                                                    case REF:
+                                                        if(objGen.expectedException == null){
+                                                            for(int i=-250;i <= 250;++i){
+                                                                Assertions.assertNotEquals(false,
+                                                                        monitor.verifyAdd(
+                                                                                objGen.getMonitoredObject(monitor,i),
+                                                                                inputType,functionCallType));
+                                                            }
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(null,inputType,functionCallType));
+                                                            monitor.set.clear();
+                                                            monitor.updateCollectionState();
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(null,inputType,functionCallType));
+                                                            for(int i=250;i >= -250;--i){
+                                                                Assertions.assertNotEquals(false,
+                                                                        monitor.verifyAdd(
+                                                                                objGen.getMonitoredObject(monitor,i),
+                                                                                inputType,functionCallType));
+                                                            }
+                                                        }else{
+                                                            for(int tmp=-500;tmp <= 500;++tmp){
+                                                                final int i=tmp;
+                                                                Assertions.assertThrows(objGen.expectedException,
+                                                                        ()->monitor.verifyAdd(
+                                                                                objGen.getMonitoredObject(monitor,i),
+                                                                                inputType,functionCallType));
+                                                            }
+                                                        }
+                                                        break;
+                                                    default:
+                                                        throw inputType.invalid();
+                                                    }
+                                                });
+                                            }
+                                            if(inputType != DataType.REF){
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testadd_val");
+    }
+    @org.junit.jupiter.api.Test public void testclear_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
+            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+            .verifyClear();
+        };
+        test.runAllTests("OpenAddressHashSetTest.testclear_void");
+    }
+    @org.junit.jupiter.api.Test public void testclone_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
+            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+            .verifyClone();
+        };
+        test.runAllTests("OpenAddressHashSetTest.testclone_void");
+    }
+    @org.junit.jupiter.api.Test public void testConstructor_float(){
+
+        for(final var checkedType:CheckedType.values()){
+            for(final float loadFactor:LOAD_FACTORS){
+                if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                        TestExecutorService.submitTest(()->{
+                            if(loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                                new OpenAddressHashSetMonitor(collectionType,checkedType,loadFactor)
+                                .verifyCollectionState();
+                            }else{
+                                Assertions.assertThrows(IllegalArgumentException.class,
+                                        ()->new OpenAddressHashSetMonitor(collectionType,checkedType,loadFactor));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_float");
+    }
+    @org.junit.jupiter.api.Test public void testConstructor_int(){
+
+        for(final var checkedType:CheckedType.values()){
+            for(final int initialCapacity:CONSTRUCTOR_INITIAL_CAPACITIES){
+                if(checkedType.checked || initialCapacity >= 0){
+                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                        TestExecutorService.submitTest(()->{
+                            if(initialCapacity >= 0){
+                                new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity)
+                                .verifyCollectionState();
+                            }else{
+                                Assertions.assertThrows(IllegalArgumentException.class,
+                                        ()->new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_int");
+    }
+    @org.junit.jupiter.api.Test public void testConstructor_intfloat(){
+
+        for(final var checkedType:CheckedType.values()){
+            for(final int initialCapacity:CONSTRUCTOR_INITIAL_CAPACITIES){
+                if(checkedType.checked || initialCapacity >= 0){
+                    for(final float loadFactor:LOAD_FACTORS){
+                        if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                            for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                                TestExecutorService.submitTest(()->{
+                                    if(initialCapacity >= 0 && loadFactor == loadFactor && loadFactor <= 1.0f
+                                            && loadFactor > 0){
+                                        new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity,
+                                                loadFactor).verifyCollectionState();
+                                    }else{
+                                        Assertions.assertThrows(IllegalArgumentException.class,
+                                                ()->new OpenAddressHashSetMonitor(collectionType,checkedType,
+                                                        initialCapacity,loadFactor));
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_intfloat");
+    }
+    @org.junit.jupiter.api.Test public void testConstructor_void(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var checkedType:CheckedType.values()){
+                TestExecutorService
+                .submitTest(()->new OpenAddressHashSetMonitor(collectionType,checkedType).verifyCollectionState());
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_void");
+    }
+    @org.junit.jupiter.api.Test public void testcontains_val(){
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
+            if(monitoredObjectGen == null){
+                return monitor.verifyContains(queryVal,inputType,castType,modification);
+            }else{
+                return monitor.verifyThrowingContains(monitoredObjectGen);
+            }
+        };
+        test.runAllTests("OpenAddressHashSetTest.testcontains_val");
+    }
+    @org.junit.jupiter.api.Test public void testforEach_Consumer(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var functionCallType:FunctionCallType.values()){
+                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
+                    for(final var functionGen:StructType.OpenAddressHashSet.validMonitoredFunctionGens){
+                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                            final int size
+                            =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
+                            final long randSeedBound=functionGen.randomized && size > 1 && !functionCallType.boxed?100:0;
+                            for(final var checkedType:CheckedType.values()){
+                                if(checkedType.checked || functionGen.expectedException == null || size == 0){
+                                    LongStream.rangeClosed(0,randSeedBound)
+                                    .forEach(randSeed->TestExecutorService.submitTest(()->{
+                                        final var monitor=initSet.initialize(
+                                                new OpenAddressHashSetMonitor(collectionType,checkedType));
+                                        if(functionGen.expectedException == null || monitor.size() == 0){
+                                            monitor.verifyForEach(functionGen,functionCallType,randSeed);
+                                        }else{
+                                            Assertions.assertThrows(functionGen.expectedException,()->monitor
+                                                    .verifyForEach(functionGen,functionCallType,randSeed));
+                                            monitor.verifyCollectionState();
+                                        }
+                                    }));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testforEach_Consumer");
+    }
+    @org.junit.jupiter.api.Test public void testhashCode_void(){
+        for(final var loadFactor:LOAD_FACTORS){
+            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
+                for(final var initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                        for(final var checkedType:CheckedType.values()){
+                            for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                                TestExecutorService
+                                .submitTest(()->initSet.initialize(new OpenAddressHashSetMonitor(collectionType,
+                                        checkedType,initCapacity,loadFactor)).verifyHashCode());
+                            }
+                        }
+                    }
+                    for(var monitoredObjectGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
+                        if(monitoredObjectGen.expectedException != null){
+                            TestExecutorService.submitTest(()->{
+                                var monitor=new OpenAddressHashSetMonitor(DataType.REF,CheckedType.CHECKED,initCapacity,
+                                        loadFactor);
+                                MonitoredObjectGen.ThrowSwitch throwSwitch=new MonitoredObjectGen.ThrowSwitch(false);
+                                @SuppressWarnings("unchecked")
+                                var set=(OmniSet.OfRef<Object>)monitor.set;
+                                for(int i=0;i < 10;++i){
+                                    set.add(monitoredObjectGen.getMonitoredObject(monitor,throwSwitch));
+                                }
+                                monitor.updateCollectionState();
+                                throwSwitch.doThrow=true;
+                                Assertions.assertThrows(monitoredObjectGen.expectedException,()->set.hashCode());
+                                monitor.verifyCollectionState();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testhashCode_void");
+    }
+    @org.junit.jupiter.api.Test public void testisEmpty_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
+            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+            .verifyIsEmpty();
+        };
+        test.runAllTests("OpenAddressHashSetTest.testisEmpty_void");
+    }
+    @org.junit.jupiter.api.Test public void testiterator_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
+            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+            .getMonitoredIterator().verifyIteratorState();
+        };
+        test.runAllTests("OpenAddressHashSetTest.testiterator_void");
+    }
+    @org.junit.jupiter.api.Test public void testItrclone_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->initSet
+                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+                .getMonitoredIterator().verifyClone();
+        test.runAllTests("OpenAddressHashSetTest.testItrclone_void");
+    }
+    @org.junit.jupiter.api.Test public void testItrforEachRemaining_Consumer(){
+        for(final var loadFactor:LOAD_FACTORS){
+            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
+
+                for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                    for(final var functionCallType:FunctionCallType.values()){
+                        if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
+                            for(final var checkedType:CheckedType.values()){
+                                for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                                    int sizeScenario;
+                                    switch(initSet){
+                                    case Empty:
+                                        sizeScenario=0;
+                                        break;
+                                    case AddPrime:
+                                    case AddTrue:
+                                    case AddFalse:
+                                    case AddMinByte:
+                                    case AddNull:
+                                        sizeScenario=1;
+                                        break;
+                                    case AddTrueAndFalse:
+                                    case FillWord0:
+                                    case FillWord1:
+                                    case FillWord2:
+                                    case FillWord3:
+                                        sizeScenario=2;
+                                        break;
+                                    case AddFibSeq:
+                                    case Add200RemoveThenAdd100More:
+                                        sizeScenario=3;
+                                        break;
+                                    default:
+                                        throw initSet.invalid();
+                                    }
+                                    for(final var functionGen:IteratorType.AscendingItr.validMonitoredFunctionGens){
+                                        if(checkedType.checked || functionGen.expectedException == null || sizeScenario == 0){
+                                            for(final var preMod:IteratorType.AscendingItr.validPreMods){
+                                                if(checkedType.checked || preMod.expectedException == null || sizeScenario == 0){
+                                                    int itrScenarioMax=0;
+                                                    if(sizeScenario > 1){
+                                                        if(sizeScenario > 2){
+                                                            itrScenarioMax=3;
+                                                        }else{
+                                                            itrScenarioMax=2;
+                                                        }
+                                                    }
+                                                    IntStream.rangeClosed(0,itrScenarioMax).forEach(itrScenario->{
+                                                        LongStream.rangeClosed(0,preMod.expectedException == null && functionGen.randomized
+                                                                && sizeScenario > 1 && itrScenario == 0?100:0).forEach(randSeed->{
+                                                                    for(final var initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                                                                        TestExecutorService
+                                                                        .submitTest(()->{
+                                                                            final var setMonitor=initSet
+                                                                                    .initialize(
+                                                                                            new OpenAddressHashSetMonitor(
+                                                                                                    collectionType,
+                                                                                                    checkedType,
+                                                                                                    initCapacity,
+                                                                                                    loadFactor));
+                                                                            final var itrMonitor=setMonitor
+                                                                                    .getMonitoredIterator();
+                                                                            switch(itrScenario){
+                                                                            case 1:
+                                                                                itrMonitor.iterateForward();
+                                                                                break;
+                                                                            case 2:
+                                                                                itrMonitor.iterateForward();
+                                                                                itrMonitor.remove();
+                                                                                break;
+                                                                            case 3:
+                                                                                for(int i=0;i < 13 && itrMonitor
+                                                                                        .hasNext();++i){
+                                                                                    itrMonitor.iterateForward();
+                                                                                }
+                                                                                break;
+                                                                            default:
+                                                                            }
+                                                                            final int numLeft=itrMonitor
+                                                                                    .getNumLeft();
+                                                                            itrMonitor.illegalMod(preMod);
+                                                                            final Class<? extends Throwable> expectedException=numLeft == 0
+                                                                                    ?null
+                                                                                            :preMod.expectedException == null
+                                                                                            ?functionGen.expectedException
+                                                                                                    :preMod.expectedException;
+                                                                            if(expectedException == null){
+                                                                                itrMonitor
+                                                                                .verifyForEachRemaining(
+                                                                                        functionGen,
+                                                                                        functionCallType,
+                                                                                        randSeed);
+                                                                            }else{
+                                                                                Assertions.assertThrows(
+                                                                                        expectedException,
+                                                                                        ()->itrMonitor
+                                                                                        .verifyForEachRemaining(
+                                                                                                functionGen,
+                                                                                                functionCallType,
+                                                                                                randSeed));
+                                                                                itrMonitor
+                                                                                .verifyIteratorState();
+                                                                                setMonitor
+                                                                                .verifyCollectionState();
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                });
+
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrforEachRemaining_Consumer");
+    }
+    @org.junit.jupiter.api.Test public void testItrhasNext_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
+            final var setMonitor
+            =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor));
+            final var itrMonitor=setMonitor.getMonitoredIterator();
+            final var setSize=setMonitor.size();
+            for(int i=0;i < setSize;++i){
+                Assertions.assertTrue(itrMonitor.verifyHasNext());
+                itrMonitor.iterateForward();
+            }
+            Assertions.assertFalse(itrMonitor.verifyHasNext());
+        };
+        test.runAllTests("OpenAddressHashSetTest.testItrhasNext_void");
+    }
+    @org.junit.jupiter.api.Test public void testItrnext_void(){
+        for(final var loadFactor:LOAD_FACTORS){
+            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
+
+                for(final var checkedType:CheckedType.values()){
+                    for(final var preMod:IteratorType.AscendingItr.validPreMods){
+                        if(checkedType.checked || preMod.expectedException == null){
+                            for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+
+                                for(final var outputType:collectionType.validOutputTypes()){
+
+                                    for(final var initialCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                                            TestExecutorService.submitTest(()->{
+                                                final var setMonitor=initSet.initialize(new OpenAddressHashSetMonitor(
+                                                        collectionType,checkedType,initialCapacity,loadFactor));
+                                                final var itrMonitor=setMonitor.getMonitoredIterator();
+                                                itrMonitor.illegalMod(preMod);
+                                                if(preMod.expectedException == null){
+                                                    while(itrMonitor.hasNext()){
+                                                        itrMonitor.verifyNext(outputType);
+                                                    }
+                                                    Assertions.assertFalse(itrMonitor.getIterator().hasNext());
+                                                    if(checkedType.checked){
+                                                        Assertions.assertThrows(NoSuchElementException.class,
+                                                                ()->itrMonitor.verifyNext(outputType));
+                                                    }
+                                                }else{
+                                                    Assertions.assertThrows(preMod.expectedException,
+                                                            ()->itrMonitor.verifyNext(outputType));
+                                                }
+                                                itrMonitor.verifyIteratorState();
+                                                setMonitor.verifyCollectionState();
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrnext_void");
+    }
+    @org.junit.jupiter.api.Test public void testItrremove_void(){
+        for(final float loadFactor:LOAD_FACTORS){
+            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
+                for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                    for(final var checkedType:CheckedType.values()){
+                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                            for(final var itrRemoveScenario:IteratorType.AscendingItr.validItrRemoveScenarios){
+                                if((!initSet.isEmpty || itrRemoveScenario == IteratorRemoveScenario.PostInit)
+                                        && (checkedType.checked || itrRemoveScenario.expectedException == null)){
+                                    for(final var preMod:IteratorType.AscendingItr.validPreMods){
+                                        if(checkedType.checked || preMod.expectedException == null){
+                                            final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
+                                            final int setSize=monitor.size();
+                                            int itrOffset,itrBound;
+                                            if(itrRemoveScenario == IteratorRemoveScenario.PostInit){
+                                                itrOffset=itrBound=0;
+                                            }else{
+                                                itrOffset=1;
+                                                itrBound=setSize;
+                                            }
+                                            IntStream.rangeClosed(itrOffset,itrBound).forEach(itrCount->{
+
+                                                for(final int initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                                                    TestExecutorService.submitTest(()->{
+                                                        var setMonitor=initSet.initialize(new OpenAddressHashSetMonitor(
+                                                                collectionType,checkedType,initCapacity,loadFactor));
+                                                        final var itrMonitor=setMonitor.getMonitoredIterator();
+                                                        for(int i=0;i < itrCount;++i){
+                                                            itrMonitor.iterateForward();
+                                                        }
+                                                        if(itrRemoveScenario == IteratorRemoveScenario.PostRemove){
+                                                            itrMonitor.remove();
+                                                        }
+                                                        itrMonitor.illegalMod(preMod);
+                                                        final Class<? extends Throwable> expectedException=itrRemoveScenario.expectedException == null
+                                                                ?preMod.expectedException
+                                                                        :itrRemoveScenario.expectedException;
+                                                        if(expectedException == null){
+                                                            for(;;){
+                                                                itrMonitor.verifyRemove();
+                                                                if(!itrMonitor.hasNext()){
+                                                                    break;
+                                                                }
+                                                                itrMonitor.iterateForward();
+                                                            }
+                                                        }else{
+                                                            Assertions.assertThrows(expectedException,
+                                                                    ()->itrMonitor.verifyRemove());
+                                                            itrMonitor.verifyIteratorState();
+                                                            setMonitor.verifyCollectionState();
+                                                        }
+                                                    });
+                                                }
+
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrremove_void");
+    }
+    @org.junit.jupiter.api.Test public void testMASSIVEtoString(){
+        int numToAdd;
+        var set=new FloatOpenAddressHashSet((numToAdd=DataType.FLOAT.massiveToStringThreshold + 1) + 1);
+        for(int i=0;i <= numToAdd;++i){
+            set.add(Float.intBitsToFloat(i));
+        }
+        DataType.FLOAT.verifyToString(set.toString(),set,
+                "OpenAddressHashSetTest." + DataType.FLOAT + ".testMASSIVEtoString");
+    }
+    @org.junit.jupiter.api.Test public void testReadAndWrite(){
+        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->initSet
+                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)).verifyReadAndWrite(functionGen);
+        test.runAllTests("OpenAddressHashSetTest.testReadAndWrite");
+    }
+    @org.junit.jupiter.api.Test public void testremoveIf_Predicate(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var functionCallType:FunctionCallType.values()){
+                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
+                    for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                        final int setSize
+                        =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
+                        for(final var filterGen:StructType.OpenAddressHashSet.validMonitoredRemoveIfPredicateGens){
+                            final long randSeedBound;
+                            final double[] thresholdArr;
+                            if(filterGen.randomized && setSize > 1 && !functionCallType.boxed){
+                                randSeedBound=100;
+                                thresholdArr=RANDOM_THRESHOLDS;
+                            }else{
+                                randSeedBound=0;
+                                thresholdArr=NON_RANDOM_THRESHOLD;
+                            }
+                            for(final var checkedType:CheckedType.values()){
+                                if(checkedType.checked || filterGen.expectedException == null || setSize == 0){
+                                    LongStream.rangeClosed(0,randSeedBound)
+                                    .forEach(randSeed->DoubleStream.of(thresholdArr).forEach(
+                                            threshold->TestExecutorService.submitTest(()->{
+                                                final var monitor=initSet.initialize(
+                                                        new OpenAddressHashSetMonitor(collectionType,
+                                                                checkedType));
+                                                final var filter=filterGen.getMonitoredRemoveIfPredicate(
+                                                        monitor,threshold,randSeed);
+                                                final int sizeBefore=monitor.size();
+                                                if(filterGen.expectedException == null || sizeBefore == 0){
+                                                    final boolean result=monitor.verifyRemoveIf(filter,
+                                                            functionCallType);
+                                                    if(sizeBefore == 0b00){
+                                                        Assertions.assertFalse(result);
+                                                    }else{
+                                                        switch(filterGen){
+                                                        case Random:
+                                                            Assertions.assertEquals(filter.numRemoved != 0,
+                                                            result);
+                                                            break;
+                                                        case RemoveAll:
+                                                            Assertions.assertTrue(monitor.set.isEmpty());
+                                                            Assertions.assertTrue(result);
+                                                            break;
+                                                        case RemoveFalse:
+                                                            Assertions.assertFalse(monitor.set.contains(false));
+                                                            break;
+                                                        case RemoveNone:
+                                                            Assertions.assertFalse(result);
+                                                            Assertions.assertFalse(monitor.set.isEmpty());
+                                                            break;
+                                                        case RemoveTrue:
+                                                            Assertions.assertFalse(monitor.set.contains(true));
+                                                            break;
+                                                        default:
+                                                            throw filterGen.invalid();
+                                                        }
+                                                    }
+                                                }else{
+                                                    Assertions.assertThrows(filterGen.expectedException,
+                                                            ()->monitor.verifyRemoveIf(filter,
+                                                                    functionCallType));
+                                                    monitor.verifyCollectionState();
+                                                }
+                                            })));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testremoveIf_Predicate");
+    }
+    @org.junit.jupiter.api.Test public void testremoveVal_val(){
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
+            if(monitoredObjectGen == null){
+                return monitor.verifyRemoveVal(queryVal,inputType,castType,modification);
+            }else{
+                return monitor.verifyThrowingRemoveVal(monitoredObjectGen);
+            }
+        };
+        test.runAllTests("OpenAddressHashSetTest.testremoveVal_val");
+    }
+    @org.junit.jupiter.api.Test public void testsetLoadFactor_float(){
+
+        for(final var checkedType:CheckedType.values()){
+
+            for(final float loadFactor:LOAD_FACTORS){
+                if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
+                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                            TestExecutorService
+                            .submitTest(()->initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType))
+                                    .verifySetLoadFactor(loadFactor));
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testsetLoadFactor_float");
+    }
+    @org.junit.jupiter.api.Test public void testsize_void(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
+            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+            .verifySize();
+        };
+        test.runAllTests("OpenAddressHashSetTest.testsize_void");
+    }
+    @org.junit.jupiter.api.Test public void testtoArray_IntFunction(){
+        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
+            final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
+            if(functionGen.expectedException == null){
+                monitor.verifyToArray(functionGen);
+            }else{
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
+                monitor.verifyCollectionState();
+            }
+        };
+        test.runAllTests("OpenAddressHashSetTest.testToArray_IntFunction");
+    }
+    @org.junit.jupiter.api.Test public void testtoArray_ObjectArray(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                final int size=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
+                for(final var checkedType:CheckedType.values()){
+                    for(int arrSize=0,increment=Math.max(1,size / 10),bound=size + increment + 2;arrSize <= bound;
+                            arrSize+=increment){
+                        final Object[] paramArr=new Object[arrSize];
+                        TestExecutorService.submitTest(()->initSet
+                                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)).verifyToArray(paramArr));
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoArray_ObjectArray");
+    }
+    @org.junit.jupiter.api.Test public void testtoArray_void(){
+        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(final var outputType:collectionType.validOutputTypes()){
+                for(final var checkedType:CheckedType.values()){
+                    for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                        TestExecutorService.submitTest(()->{
+                            outputType.verifyToArray(initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)));
+                        });
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoArray_void");
+    }
+    @org.junit.jupiter.api.Test public void testtoString_void(){
+        for(final var loadFactor:LOAD_FACTORS){
+            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
+                for(final var initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+                        for(final var checkedType:CheckedType.values()){
+                            for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                                TestExecutorService
+                                .submitTest(()->initSet.initialize(new OpenAddressHashSetMonitor(collectionType,
+                                        checkedType,initCapacity,loadFactor)).verifyToString());
+                            }
+                        }
+                    }
+                    for(var monitoredObjectGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
+                        if(monitoredObjectGen.expectedException != null){
+                            TestExecutorService.submitTest(()->{
+                                var monitor=new OpenAddressHashSetMonitor(DataType.REF,CheckedType.CHECKED,initCapacity,
+                                        loadFactor);
+                                MonitoredObjectGen.ThrowSwitch throwSwitch=new MonitoredObjectGen.ThrowSwitch(false);
+                                @SuppressWarnings("unchecked")
+                                var set=(OmniSet.OfRef<Object>)monitor.set;
+                                for(int i=0;i < 10;++i){
+                                    set.add(monitoredObjectGen.getMonitoredObject(monitor,throwSwitch));
+                                }
+                                monitor.updateCollectionState();
+                                throwSwitch.doThrow=true;
+                                Assertions.assertThrows(monitoredObjectGen.expectedException,()->set.toString());
+                                monitor.verifyCollectionState();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoString_void");
+    }
+    @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
+        int numTestsRemaining;
+        if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
+            System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
+        }
+        TestExecutorService.reset();
+    }
     private interface BasicTest{
-        default void runAllTests(String testName){
+        void runTest(float loadFactor,int initCapacity,DataType collectionType,CheckedType checkedType,
+                SetInitialization initSet);
+        private void runAllTests(String testName){
             for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
                 for(final var checkedType:CheckedType.values()){
                     for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
@@ -53,11 +962,11 @@ public class OpenAddressHashSetTest{
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(float loadFactor,int initCapacity,DataType collectionType,CheckedType checkedType,
-                SetInitialization initSet);
     }
     private interface MonitoredFunctionGenTest{
-        default void runAllTests(String testName){
+        void runTest(DataType collectionType,MonitoredFunctionGen functionGen,CheckedType checkedType,
+                SetInitialization initSet);
+        private void runAllTests(String testName){
             for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
                 for(final var functionGen:StructType.OpenAddressHashSet.validMonitoredFunctionGens){
                     for(final var checkedType:CheckedType.values()){
@@ -71,360 +980,8 @@ public class OpenAddressHashSetTest{
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(DataType collectionType,MonitoredFunctionGen functionGen,CheckedType checkedType,
-                SetInitialization initSet);
     }
     private static class OpenAddressHashSetMonitor implements MonitoredSet<AbstractOpenAddressHashSet<?>>{
-        private class CheckedItrMonitor extends AbstractItrMonitor{
-            int expectedItrModCount;
-            int expectedItrLastRet;
-            CheckedItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft,int expectedItrModCount){
-                super(itr,expectedOffset,expectedNumLeft);
-                this.expectedItrModCount=expectedItrModCount;
-                expectedItrLastRet=-1;
-            }
-            @Override public void updateIteratorState(){
-                switch(dataType){
-                case FLOAT:
-                    expectedOffset=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case DOUBLE:
-                    expectedOffset=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case REF:
-                    expectedOffset=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }
-            @Override public void updateItrNextState(){
-                expectedItrLastRet=expectedOffset;
-                super.updateItrNextState();
-            }
-            @Override public void updateItrRemoveState(){
-                ++expectedModCount;
-                ++expectedItrModCount;
-                --expectedSize;
-                switch(dataType){
-                case FLOAT:
-                    ((int[])expectedTable)[expectedItrLastRet]=0x7fe00000;
-                    break;
-                case DOUBLE:
-                    ((long[])expectedTable)[expectedItrLastRet]=0x7ffc000000000000L;
-                    break;
-                case REF:
-                    ((Object[])expectedTable)[expectedItrLastRet]=DELETED;
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                expectedItrLastRet=-1;
-            }
-            @Override public void verifyForEachRemaining(MonitoredFunction function){
-                expectedItrLastRet=super.verifyForEachRemainingHelper(function,expectedItrLastRet);
-            }
-            @Override public void verifyIteratorState(Object itr){
-                switch(dataType){
-                case FLOAT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(itr));
-                    Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(itr));
-                    Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(itr));
-                    break;
-                case DOUBLE:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(itr));
-                    Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(itr));
-                    Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(itr));
-                    break;
-                case REF:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(itr));
-                    Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(itr));
-                    Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(itr));
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }
-        }
-        private class UncheckedItrMonitor extends AbstractItrMonitor{
-            UncheckedItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft){
-                super(itr,expectedOffset,expectedNumLeft);
-            }
-            @Override public void updateIteratorState(){
-                switch(dataType){
-                case FLOAT:
-                    expectedOffset=FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                case DOUBLE:
-                    expectedOffset=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                case REF:
-                    expectedOffset=FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }
-            @Override public void updateItrRemoveState(){
-                --expectedSize;
-                switch(dataType){
-                case FLOAT:{
-                    final int[] table=(int[])expectedTable;
-                    for(int offset=expectedOffset;;){
-                        switch(table[++offset]){
-                        default:
-                            table[offset]=0x7fe00000;
-                            return;
-                        case 0:
-                        case 0x7fe00000:
-                        }
-                    }
-                }
-                case DOUBLE:{
-                    final long[] table=(long[])expectedTable;
-                    for(int offset=expectedOffset;;){
-                        long tableVal;
-                        if((tableVal=table[++offset]) != 0 && tableVal != 0x7ffc000000000000L){
-                            table[offset]=0x7ffc000000000000L;
-                            return;
-                        }
-                    }
-                }
-                case REF:{
-                    final Object[] table=(Object[])expectedTable;
-                    for(int offset=expectedOffset;;){
-                        Object tableVal;
-                        if((tableVal=table[++offset]) != null && tableVal != DELETED){
-                            table[offset]=DELETED;
-                            return;
-                        }
-                    }
-                }
-                default:
-                    throw dataType.invalid();
-                }
-            }
-            @Override public void verifyForEachRemaining(MonitoredFunction function){
-                super.verifyForEachRemainingHelper(function,-1);
-            }
-            @Override public void verifyIteratorState(Object itr){
-                switch(dataType){
-                case FLOAT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(itr));
-                    break;
-                case DOUBLE:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(itr));
-                    break;
-                case REF:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(itr));
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }
-        }
-        abstract class AbstractItrMonitor
-        implements MonitoredSet.MonitoredSetIterator<OmniIterator<?>,AbstractOpenAddressHashSet<?>>{
-            final OmniIterator<?> itr;
-            int expectedOffset;
-            int expectedNumLeft;
-            AbstractItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft){
-                this.itr=itr;
-                this.expectedOffset=expectedOffset;
-                this.expectedNumLeft=expectedNumLeft;
-            }
-            @Override public OmniIterator<?> getIterator(){
-                return itr;
-            }
-            @Override public MonitoredCollection<AbstractOpenAddressHashSet<?>> getMonitoredCollection(){
-                return OpenAddressHashSetMonitor.this;
-            }
-            @Override public int getNumLeft(){
-                return expectedNumLeft;
-            }
-            @Override public boolean hasNext(){
-                return expectedOffset != -1;
-            }
-            @Override public void iterateForward(){
-                MonitoredSet.MonitoredSetIterator.super.iterateForward();
-                --expectedNumLeft;
-            }
-            @Override public void modItr(){
-                MonitoredSet.MonitoredSetIterator.super.modItr();
-                --expectedNumLeft;
-            }
-            @Override public void updateItrNextState(){
-                int expectedOffset=this.expectedOffset;
-                switch(dataType){
-                case FLOAT:{
-                    final int[] table=(int[])expectedTable;
-                    setOffset:for(;;){
-                        if(--expectedOffset == -1){
-                            break;
-                        }
-                        switch(table[expectedOffset]){
-                        default:
-                            break setOffset;
-                        case 0x7fe00000:
-                        case 0:
-                        }
-                    }
-                    break;
-                }
-                case DOUBLE:{
-                    final long[] table=(long[])expectedTable;
-                    for(;;){
-                        if(--expectedOffset == -1){
-                            break;
-                        }
-                        long tableVal;
-                        if((tableVal=table[expectedOffset]) != 0 && tableVal != 0x7ffc000000000000L){
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case REF:{
-                    final Object[] table=(Object[])expectedTable;
-                    for(;;){
-                        if(--expectedOffset == -1){
-                            break;
-                        }
-                        Object tableVal;
-                        if((tableVal=table[expectedOffset]) != null && tableVal != DELETED){
-                            break;
-                        }
-                    }
-                    break;
-                }
-                default:
-                    throw dataType.invalid();
-                }
-                this.expectedOffset=expectedOffset;
-                --expectedNumLeft;
-            }
-            @Override public void verifyNextResult(DataType outputType,Object result){
-                Object expectedResult;
-                switch(dataType){
-                case FLOAT:{
-                    int bits;
-                    if((bits=((int[])expectedTable)[expectedOffset]) == 0xffe00000){
-                        bits=0;
-                    }
-                    expectedResult=outputType.convertVal(Float.intBitsToFloat(bits));
-                    break;
-                }
-                case DOUBLE:{
-                    long bits;
-                    if((bits=((long[])expectedTable)[expectedOffset]) == 0xfffc000000000000L){
-                        bits=0;
-                    }
-                    expectedResult=Double.longBitsToDouble(bits);
-                    break;
-                }
-                case REF:{
-                    if((expectedResult=((Object[])expectedTable)[expectedOffset]) == NULL){
-                        expectedResult=null;
-                    }
-                    break;
-                }
-                default:
-                    throw dataType.invalid();
-                }
-                Assertions.assertEquals(expectedResult,result);
-            }
-            private int verifyForEachRemainingHelper(MonitoredFunction function,int expectedLastRet){
-                final var monitoredFunctionItr=function.iterator();
-                int expectedOffset;
-                if((expectedOffset=this.expectedOffset) != -1){
-                    switch(dataType){
-                    case FLOAT:{
-                        final int[] table=(int[])expectedTable;
-                        for(;;--expectedOffset){
-                            int tableVal;
-                            switch(tableVal=table[expectedOffset]){
-                            case 0:
-                            case 0x7fe00000:
-                                continue;
-                            case 0xffe00000:
-                                tableVal=0;
-                            default:
-                                final var v=(Float)monitoredFunctionItr.next();
-                                Assertions.assertEquals(v.floatValue(),Float.intBitsToFloat(tableVal));
-                                expectedLastRet=expectedOffset;
-                                if(--expectedNumLeft != 0){
-                                    continue;
-                                }
-                            }
-                            break;
-                        }
-                        break;
-                    }
-                    case DOUBLE:{
-                        final long[] table=(long[])expectedTable;
-                        for(;;--expectedOffset){
-                            long tableVal;
-                            if((tableVal=table[expectedOffset]) != 0 && tableVal != 0x7ffc000000000000L){
-                                if(tableVal == 0xfffc000000000000L){
-                                    tableVal=0;
-                                }
-                                final var v=(Double)monitoredFunctionItr.next();
-                                Assertions.assertEquals(v.doubleValue(),Double.longBitsToDouble(tableVal));
-                                expectedLastRet=expectedOffset;
-                                if(--expectedNumLeft == 0){
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    case REF:{
-                        final Object[] table=(Object[])expectedTable;
-                        for(;;--expectedOffset){
-                            Object tableVal;
-                            if((tableVal=table[expectedOffset]) != null && tableVal != DELETED){
-                                if(tableVal == NULL){
-                                    tableVal=null;
-                                }
-                                final var v=monitoredFunctionItr.next();
-                                Assertions.assertEquals(v,tableVal);
-                                expectedLastRet=expectedOffset;
-                                if(--expectedNumLeft == 0){
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        throw dataType.invalid();
-                    }
-                }
-                Assertions.assertFalse(monitoredFunctionItr.hasNext());
-                this.expectedOffset=-1;
-                return expectedLastRet;
-            }
-        }
         private static int getTableHash(int bits){
             return bits ^ bits >>> 16;
         }
@@ -684,9 +1241,6 @@ public class OpenAddressHashSetTest{
         @Override public StructType getStructType(){
             return StructType.OpenAddressHashSet;
         }
-        @Override public boolean isEmpty(){
-            return expectedSize == 0;
-        }
         @SuppressWarnings("unchecked") @Override public void modCollection(){
             outer:for(;;){
                 switch(dataType){
@@ -753,54 +1307,6 @@ public class OpenAddressHashSetTest{
                 break;
             }
         updateCollectionState();
-        }
-        @Override public boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
-                QueryValModification modification){
-            Object inputVal=queryVal.getInputVal(inputType,modification);
-            int sizeBefore=set.size();
-            boolean containsBefore=queryCastType.callcontains(set,inputVal,inputType);
-            boolean result=queryCastType.callremoveVal(set,inputVal,inputType);
-            boolean containsAfter=queryCastType.callcontains(set,inputVal,inputType);
-            int sizeAfter=set.size();
-            if(result) {
-                Assertions.assertNotEquals(containsBefore,containsAfter);
-                Assertions.assertEquals(sizeBefore,sizeAfter+1);
-                switch(dataType) {
-                case FLOAT:
-                case DOUBLE:
-                    removeFromExpectedState(queryVal,modification);
-                    break;
-                case REF:
-                    removeFromExpectedState(inputType,queryVal,modification);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }else {
-                Assertions.assertEquals(containsBefore,containsAfter);
-                Assertions.assertEquals(sizeBefore,sizeAfter);
-            }
-            return result;
-        }
-        private void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
-            final Object inputVal=queryVal.getInputVal(inputType,modification);
-            switch(dataType){
-            case FLOAT:{
-                removeVal((float)inputVal);
-                break;
-            }
-            case DOUBLE:{
-                removeVal((double)inputVal);
-                break;
-            }
-            case REF:{
-                removeVal(inputVal);
-                break;
-            }
-            default:
-                throw dataType.invalid();
-            }
-            ++expectedModCount;
         }
         @Override public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification){
             removeFromExpectedState(dataType,queryVal,modification);
@@ -884,6 +1390,35 @@ public class OpenAddressHashSetTest{
                 ++expectedModCount;
             }
         }
+        @Override public void updateClearState() {
+            switch(dataType){
+            case FLOAT:{
+                final var table=(int[])expectedTable;
+                for(int i=table.length;--i >= 0;){
+                    table[i]=0;
+                }
+                break;
+            }
+            case DOUBLE:{
+                final var table=(long[])expectedTable;
+                for(int i=table.length;--i >= 0;){
+                    table[i]=0;
+                }
+                break;
+            }
+            case REF:{
+                final var table=(Object[])expectedTable;
+                for(int i=table.length;--i >= 0;){
+                    table[i]=null;
+                }
+                break;
+            }
+            default:
+                throw dataType.invalid();
+            }
+            expectedSize=0;
+            ++expectedModCount;
+        }
         @Override public void updateCollectionState(){
             AbstractOpenAddressHashSet<?> set;
             expectedSize=(set=this.set).size;
@@ -960,24 +1495,6 @@ public class OpenAddressHashSetTest{
                 throw dataType.invalid();
             }
         }
-        @Override public boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){
-            final boolean containsBefore=inputType.callcontains(set,inputVal,functionCallType);
-            final int sizeBefore=expectedSize;
-            final boolean result=inputType.callCollectionAdd(inputVal,set,functionCallType);
-            final int sizeAfter=set.size();
-            final boolean containsAfter=inputType.callcontains(set,inputVal,functionCallType);
-            Assertions.assertEquals(!result,containsBefore);
-            Assertions.assertTrue(containsAfter);
-            Assertions.assertEquals(sizeBefore,result?sizeAfter - 1:sizeAfter);
-            updateAddState(inputVal,inputType,result);
-            Assertions.assertTrue(inputType.callremoveVal(set,inputVal,functionCallType));
-            updateRemoveState(inputType,inputVal,functionCallType);
-            Assertions.assertTrue(inputType.callCollectionAdd(inputVal,set,functionCallType));
-            Assertions.assertFalse(inputType.callCollectionAdd(inputVal,set,functionCallType));
-            updateAddState(inputVal,inputType,true);
-            verifyCollectionState();
-            return result;
-        }
         @Override public void verifyArrayIsCopy(Object arr){
             switch(dataType){
             case FLOAT:
@@ -993,35 +1510,6 @@ public class OpenAddressHashSetTest{
                 throw dataType.invalid();
             }
         }
-        @Override public void updateClearState() {
-          switch(dataType){
-          case FLOAT:{
-              final var table=(int[])expectedTable;
-              for(int i=table.length;--i >= 0;){
-                  table[i]=0;
-              }
-              break;
-          }
-          case DOUBLE:{
-              final var table=(long[])expectedTable;
-              for(int i=table.length;--i >= 0;){
-                  table[i]=0;
-              }
-              break;
-          }
-          case REF:{
-              final var table=(Object[])expectedTable;
-              for(int i=table.length;--i >= 0;){
-                  table[i]=null;
-              }
-              break;
-          }
-          default:
-              throw dataType.invalid();
-          }
-          expectedSize=0;
-          ++expectedModCount;
-      }
         @Override public void verifyClone(Object clone){
             AbstractOpenAddressHashSet<?> cloneSet;
             Assertions.assertEquals(expectedSize,(cloneSet=(AbstractOpenAddressHashSet<?>)clone).size);
@@ -1377,6 +1865,26 @@ public class OpenAddressHashSetTest{
                 insert(t,insertHere,v);
             }
         }
+        private void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
+            final Object inputVal=queryVal.getInputVal(inputType,modification);
+            switch(dataType){
+            case FLOAT:{
+                removeVal((float)inputVal);
+                break;
+            }
+            case DOUBLE:{
+                removeVal((double)inputVal);
+                break;
+            }
+            case REF:{
+                removeVal(inputVal);
+                break;
+            }
+            default:
+                throw dataType.invalid();
+            }
+            ++expectedModCount;
+        }
         private void removeVal(double v){
             final long[] expectedTable;
             int expectedTableLength;
@@ -1420,80 +1928,6 @@ public class OpenAddressHashSetTest{
                 hash=hash + 1 & expectedTableLength;
             }
             --expectedSize;
-        }
-        private void updateRemoveState(DataType inputType,Object inputVal,FunctionCallType funtionCallType){
-            switch(dataType){
-            case FLOAT:{
-                float v;
-                switch(inputType){
-                case BOOLEAN:
-                    v=(boolean)inputVal?1.0f:0.0f;
-                    break;
-                case BYTE:
-                    v=(byte)inputVal;
-                    break;
-                case CHAR:
-                    v=(char)inputVal;
-                    break;
-                case SHORT:
-                    v=(short)inputVal;
-                    break;
-                case INT:
-                    v=(int)inputVal;
-                    break;
-                case LONG:
-                    v=(long)inputVal;
-                    break;
-                case FLOAT:
-                    v=(float)inputVal;
-                    break;
-                default:
-                    throw inputType.invalid();
-                }
-                removeVal(v);
-                break;
-            }
-            case DOUBLE:{
-                double v;
-                switch(inputType){
-                case BOOLEAN:
-                    v=(boolean)inputVal?1.0d:0.0d;
-                    break;
-                case BYTE:
-                    v=(byte)inputVal;
-                    break;
-                case CHAR:
-                    v=(char)inputVal;
-                    break;
-                case SHORT:
-                    v=(short)inputVal;
-                    break;
-                case INT:
-                    v=(int)inputVal;
-                    break;
-                case LONG:
-                    v=(long)inputVal;
-                    break;
-                case FLOAT:
-                    v=(float)inputVal;
-                    break;
-                case DOUBLE:
-                    v=(double)inputVal;
-                    break;
-                default:
-                    throw inputType.invalid();
-                }
-                removeVal(v);
-                break;
-            }
-            case REF:{
-                removeVal(inputVal);
-                break;
-            }
-            default:
-                throw dataType.invalid();
-            }
-            ++expectedModCount;
         }
         private void verifyStructuralIntegrity(AbstractOpenAddressHashSet<?> set){
             final HashSet<Object> encounteredVals=new HashSet<>(set.size);
@@ -1555,13 +1989,363 @@ public class OpenAddressHashSetTest{
             }
             Assertions.assertEquals(encounteredVals.size(),set.size);
         }
+        abstract class AbstractItrMonitor
+        implements MonitoredSet.MonitoredSetIterator<OmniIterator<?>,AbstractOpenAddressHashSet<?>>{
+            final OmniIterator<?> itr;
+            int expectedOffset;
+            int expectedNumLeft;
+            AbstractItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft){
+                this.itr=itr;
+                this.expectedOffset=expectedOffset;
+                this.expectedNumLeft=expectedNumLeft;
+            }
+            @Override public OmniIterator<?> getIterator(){
+                return itr;
+            }
+            @Override public MonitoredCollection<AbstractOpenAddressHashSet<?>> getMonitoredCollection(){
+                return OpenAddressHashSetMonitor.this;
+            }
+            @Override public int getNumLeft(){
+                return expectedNumLeft;
+            }
+            @Override public boolean hasNext(){
+                return expectedOffset != -1;
+            }
+            @Override public void iterateForward(){
+                MonitoredSet.MonitoredSetIterator.super.iterateForward();
+                --expectedNumLeft;
+            }
+            @Override public void modItr(){
+                MonitoredSet.MonitoredSetIterator.super.modItr();
+                --expectedNumLeft;
+            }
+            @Override public void updateItrNextState(){
+                int expectedOffset=this.expectedOffset;
+                switch(dataType){
+                case FLOAT:{
+                    final int[] table=(int[])expectedTable;
+                    setOffset:for(;;){
+                        if(--expectedOffset == -1){
+                            break;
+                        }
+                        switch(table[expectedOffset]){
+                        default:
+                            break setOffset;
+                        case 0x7fe00000:
+                        case 0:
+                        }
+                    }
+                    break;
+                }
+                case DOUBLE:{
+                    final long[] table=(long[])expectedTable;
+                    for(;;){
+                        if(--expectedOffset == -1){
+                            break;
+                        }
+                        long tableVal;
+                        if((tableVal=table[expectedOffset]) != 0 && tableVal != 0x7ffc000000000000L){
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case REF:{
+                    final Object[] table=(Object[])expectedTable;
+                    for(;;){
+                        if(--expectedOffset == -1){
+                            break;
+                        }
+                        Object tableVal;
+                        if((tableVal=table[expectedOffset]) != null && tableVal != DELETED){
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default:
+                    throw dataType.invalid();
+                }
+                this.expectedOffset=expectedOffset;
+                --expectedNumLeft;
+            }
+            @Override public void verifyNextResult(DataType outputType,Object result){
+                Object expectedResult;
+                switch(dataType){
+                case FLOAT:{
+                    int bits;
+                    if((bits=((int[])expectedTable)[expectedOffset]) == 0xffe00000){
+                        bits=0;
+                    }
+                    expectedResult=outputType.convertVal(Float.intBitsToFloat(bits));
+                    break;
+                }
+                case DOUBLE:{
+                    long bits;
+                    if((bits=((long[])expectedTable)[expectedOffset]) == 0xfffc000000000000L){
+                        bits=0;
+                    }
+                    expectedResult=Double.longBitsToDouble(bits);
+                    break;
+                }
+                case REF:{
+                    if((expectedResult=((Object[])expectedTable)[expectedOffset]) == NULL){
+                        expectedResult=null;
+                    }
+                    break;
+                }
+                default:
+                    throw dataType.invalid();
+                }
+                Assertions.assertEquals(expectedResult,result);
+            }
+            private int verifyForEachRemainingHelper(MonitoredFunction function,int expectedLastRet){
+                final var monitoredFunctionItr=function.iterator();
+                int expectedOffset;
+                if((expectedOffset=this.expectedOffset) != -1){
+                    switch(dataType){
+                    case FLOAT:{
+                        final int[] table=(int[])expectedTable;
+                        for(;;--expectedOffset){
+                            int tableVal;
+                            switch(tableVal=table[expectedOffset]){
+                            case 0:
+                            case 0x7fe00000:
+                                continue;
+                            case 0xffe00000:
+                                tableVal=0;
+                            default:
+                                final var v=(Float)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.floatValue(),Float.intBitsToFloat(tableVal));
+                                expectedLastRet=expectedOffset;
+                                if(--expectedNumLeft != 0){
+                                    continue;
+                                }
+                            }
+                            break;
+                        }
+                        break;
+                    }
+                    case DOUBLE:{
+                        final long[] table=(long[])expectedTable;
+                        for(;;--expectedOffset){
+                            long tableVal;
+                            if((tableVal=table[expectedOffset]) != 0 && tableVal != 0x7ffc000000000000L){
+                                if(tableVal == 0xfffc000000000000L){
+                                    tableVal=0;
+                                }
+                                final var v=(Double)monitoredFunctionItr.next();
+                                Assertions.assertEquals(v.doubleValue(),Double.longBitsToDouble(tableVal));
+                                expectedLastRet=expectedOffset;
+                                if(--expectedNumLeft == 0){
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case REF:{
+                        final Object[] table=(Object[])expectedTable;
+                        for(;;--expectedOffset){
+                            Object tableVal;
+                            if((tableVal=table[expectedOffset]) != null && tableVal != DELETED){
+                                if(tableVal == NULL){
+                                    tableVal=null;
+                                }
+                                final var v=monitoredFunctionItr.next();
+                                Assertions.assertEquals(v,tableVal);
+                                expectedLastRet=expectedOffset;
+                                if(--expectedNumLeft == 0){
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                        throw dataType.invalid();
+                    }
+                }
+                Assertions.assertFalse(monitoredFunctionItr.hasNext());
+                this.expectedOffset=-1;
+                return expectedLastRet;
+            }
+        }
+        private class CheckedItrMonitor extends AbstractItrMonitor{
+            int expectedItrModCount;
+            int expectedItrLastRet;
+            CheckedItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft,int expectedItrModCount){
+                super(itr,expectedOffset,expectedNumLeft);
+                this.expectedItrModCount=expectedItrModCount;
+                expectedItrLastRet=-1;
+            }
+            @Override public void updateIteratorState(){
+                switch(dataType){
+                case FLOAT:
+                    expectedOffset=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(itr);
+                    expectedItrModCount=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(itr);
+                    expectedItrLastRet=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(itr);
+                    break;
+                case DOUBLE:
+                    expectedOffset=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(itr);
+                    expectedItrModCount=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(itr);
+                    expectedItrLastRet=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(itr);
+                    break;
+                case REF:
+                    expectedOffset=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(itr);
+                    expectedItrModCount=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(itr);
+                    expectedItrLastRet=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(itr);
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+            @Override public void updateItrNextState(){
+                expectedItrLastRet=expectedOffset;
+                super.updateItrNextState();
+            }
+            @Override public void updateItrRemoveState(){
+                ++expectedModCount;
+                ++expectedItrModCount;
+                --expectedSize;
+                switch(dataType){
+                case FLOAT:
+                    ((int[])expectedTable)[expectedItrLastRet]=0x7fe00000;
+                    break;
+                case DOUBLE:
+                    ((long[])expectedTable)[expectedItrLastRet]=0x7ffc000000000000L;
+                    break;
+                case REF:
+                    ((Object[])expectedTable)[expectedItrLastRet]=DELETED;
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+                expectedItrLastRet=-1;
+            }
+            @Override public void verifyForEachRemaining(MonitoredFunction function){
+                expectedItrLastRet=super.verifyForEachRemainingHelper(function,expectedItrLastRet);
+            }
+            @Override public void verifyIteratorState(Object itr){
+                switch(dataType){
+                case FLOAT:
+                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertEquals(expectedOffset,
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(itr));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(itr));
+                    Assertions.assertEquals(expectedItrLastRet,
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                    break;
+                case DOUBLE:
+                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertEquals(expectedOffset,
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(itr));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(itr));
+                    Assertions.assertEquals(expectedItrLastRet,
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                    break;
+                case REF:
+                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(itr));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(itr));
+                    Assertions.assertEquals(expectedItrLastRet,
+                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+        }
+        private class UncheckedItrMonitor extends AbstractItrMonitor{
+            UncheckedItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft){
+                super(itr,expectedOffset,expectedNumLeft);
+            }
+            @Override public void updateIteratorState(){
+                switch(dataType){
+                case FLOAT:
+                    expectedOffset=FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(itr);
+                    break;
+                case DOUBLE:
+                    expectedOffset=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(itr);
+                    break;
+                case REF:
+                    expectedOffset=FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(itr);
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+            @Override public void updateItrRemoveState(){
+                --expectedSize;
+                switch(dataType){
+                case FLOAT:{
+                    final int[] table=(int[])expectedTable;
+                    for(int offset=expectedOffset;;){
+                        switch(table[++offset]){
+                        default:
+                            table[offset]=0x7fe00000;
+                            return;
+                        case 0:
+                        case 0x7fe00000:
+                        }
+                    }
+                }
+                case DOUBLE:{
+                    final long[] table=(long[])expectedTable;
+                    for(int offset=expectedOffset;;){
+                        long tableVal;
+                        if((tableVal=table[++offset]) != 0 && tableVal != 0x7ffc000000000000L){
+                            table[offset]=0x7ffc000000000000L;
+                            return;
+                        }
+                    }
+                }
+                case REF:{
+                    final Object[] table=(Object[])expectedTable;
+                    for(int offset=expectedOffset;;){
+                        Object tableVal;
+                        if((tableVal=table[++offset]) != null && tableVal != DELETED){
+                            table[offset]=DELETED;
+                            return;
+                        }
+                    }
+                }
+                default:
+                    throw dataType.invalid();
+                }
+            }
+            @Override public void verifyForEachRemaining(MonitoredFunction function){
+                super.verifyForEachRemainingHelper(function,-1);
+            }
+            @Override public void verifyIteratorState(Object itr){
+                switch(dataType){
+                case FLOAT:
+                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(itr));
+                    break;
+                case DOUBLE:
+                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(itr));
+                    break;
+                case REF:
+                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(itr));
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+        }
     }
     private interface QueryTest{
         static final int[] sizes=new int[]{0,1,2,3,4,5,8,13,16,21,32,34,55,64,89,128,129,144,233,256,257,377,512,610,987};
         static final double[] positions=new double[]{-1,0,0.25,0.5,0.75,1};
         boolean callMethod(OpenAddressHashSetMonitor monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
                 QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen);
-        default void runAllTests(String testName){
+        private void runAllTests(String testName){
             for(final var loadFactor:LOAD_FACTORS){
                 if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
                     for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
@@ -1639,7 +2423,8 @@ public class OpenAddressHashSetTest{
             }
             TestExecutorService.completeAllTests(testName);
         }
-        @SuppressWarnings("unchecked") default void runTest(DataType collectionType,QueryVal queryVal,
+        @SuppressWarnings("unchecked")
+        private void runTest(DataType collectionType,QueryVal queryVal,
                 QueryVal.QueryValModification modification,DataType inputType,QueryCastType castType,CheckedType checkedType,
                 int setSize,float loadFactor,double position,MonitoredObjectGen monitoredObjectGen){
             final var monitor=new OpenAddressHashSetMonitor(collectionType,checkedType,0,loadFactor);
@@ -1679,876 +2464,5 @@ public class OpenAddressHashSetTest{
             final boolean actualResult=callMethod(monitor,queryVal,inputType,castType,modification,monitoredObjectGen);
             Assertions.assertEquals(expectedResult,actualResult);
         }
-    }
-    private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
-    private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
-    private static final EnumMap<DataType,EnumSet<SetInitialization>> VALID_INIT_SEQS;
-    static{
-        VALID_INIT_SEQS=new EnumMap<>(DataType.class);
-        final var tmp=EnumSet.of(SetInitialization.Empty,SetInitialization.AddTrue,
-                SetInitialization.AddFalse,SetInitialization.AddTrueAndFalse,
-                SetInitialization.AddPrime,SetInitialization.AddFibSeq,
-                SetInitialization.AddMinByte,SetInitialization.FillWord0,
-                SetInitialization.FillWord1,SetInitialization.FillWord2,
-                SetInitialization.FillWord3,SetInitialization.Add200RemoveThenAdd100More);
-        for(var dataType:StructType.OpenAddressHashSet.validDataTypes){
-            if(dataType == DataType.REF){
-                VALID_INIT_SEQS.put(DataType.REF,EnumSet.of(SetInitialization.Empty,
-                        SetInitialization.AddTrue,SetInitialization.AddFalse,
-                        SetInitialization.AddTrueAndFalse,SetInitialization.AddPrime,
-                        SetInitialization.AddFibSeq,SetInitialization.AddMinByte,
-                        SetInitialization.FillWord0,SetInitialization.FillWord1,
-                        SetInitialization.FillWord2,SetInitialization.FillWord3,
-                        SetInitialization.Add200RemoveThenAdd100More,SetInitialization.AddNull));
-            }else{
-                VALID_INIT_SEQS.put(dataType,tmp);
-            }
-        }
-    }
-    private static final int[] CONSTRUCTOR_INITIAL_CAPACITIES=new int[5 + 29 * 3 + 2];
-    private static final float[] LOAD_FACTORS
-    =new float[]{0.1f,0.25f,0.5f,0.75f,0.9f,0.95f,1.0f,1.1f,2.0f,0.0f,-1f,-.75f,-.5f,Float.NaN};
-    private static final int[] GENERAL_PURPOSE_INITIAL_CAPACITIES
-    =new int[]{0,1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192};
-    static{
-        CONSTRUCTOR_INITIAL_CAPACITIES[0]=0;
-        CONSTRUCTOR_INITIAL_CAPACITIES[1]=1;
-        CONSTRUCTOR_INITIAL_CAPACITIES[2]=2;
-        int i=2;
-        for(int pow=2;pow <= 30;++pow){
-            CONSTRUCTOR_INITIAL_CAPACITIES[++i]=(1 << pow) - 1;
-            CONSTRUCTOR_INITIAL_CAPACITIES[++i]=1 << pow;
-            CONSTRUCTOR_INITIAL_CAPACITIES[++i]=(1 << pow) + 1;
-        }
-        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=OmniArray.MAX_ARR_SIZE;
-        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MAX_VALUE;
-        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
-        CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
-    }
-    private static void testadd_valHelper(DataType collectionType,DataType inputType,CheckedType checkedType,
-            float loadFactor,int initialCapacity,FunctionCallType functionCallType,
-            MonitoredObjectGen monitoredObjectGen){
-        final var monitor=new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity,loadFactor);
-        switch(inputType){
-        case BOOLEAN:
-            Assertions.assertNotEquals(false,monitor.verifyAdd(false,inputType,functionCallType));
-            Assertions.assertNotEquals(false,monitor.verifyAdd(true,inputType,functionCallType));
-            Assertions.assertNotEquals(true,monitor.verifyAdd(false,inputType,functionCallType));
-            Assertions.assertNotEquals(true,monitor.verifyAdd(true,inputType,functionCallType));
-            monitor.set.clear();
-            monitor.updateCollectionState();
-            Assertions.assertNotEquals(false,monitor.verifyAdd(true,inputType,functionCallType));
-            Assertions.assertNotEquals(false,monitor.verifyAdd(false,inputType,functionCallType));
-            Assertions.assertNotEquals(true,monitor.verifyAdd(true,inputType,functionCallType));
-            Assertions.assertNotEquals(true,monitor.verifyAdd(false,inputType,functionCallType));
-            break;
-        case BYTE:
-            for(int i=Byte.MIN_VALUE;i <= Byte.MAX_VALUE;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd((byte)i,inputType,functionCallType));
-            }
-            monitor.set.clear();
-            monitor.updateCollectionState();
-            for(int i=Byte.MAX_VALUE;i >= Byte.MIN_VALUE;--i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd((byte)i,inputType,functionCallType));
-            }
-            break;
-        case CHAR:
-            for(int i=0;i <= 500;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd((char)i,inputType,functionCallType));
-            }
-            monitor.set.clear();
-            monitor.updateCollectionState();
-            for(int i=500;i >= 0;--i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd((char)i,inputType,functionCallType));
-            }
-            break;
-        case SHORT:
-            for(int i=-250;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd((short)i,inputType,functionCallType));
-            }
-            monitor.set.clear();
-            monitor.updateCollectionState();
-            for(int i=250;i >= -250;--i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd((short)i,inputType,functionCallType));
-            }
-            break;
-        case INT:
-            for(int i=-250;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(i,inputType,functionCallType));
-            }
-            monitor.set.clear();
-            monitor.updateCollectionState();
-            for(int i=250;i >= -250;--i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(i,inputType,functionCallType));
-            }
-            break;
-        case LONG:
-            for(long i=-250;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(i,inputType,functionCallType));
-            }
-            monitor.set.clear();
-            monitor.updateCollectionState();
-            for(long i=250;i >= -250;--i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(i,inputType,functionCallType));
-            }
-            break;
-        case FLOAT:
-        {
-            float f=0.0f;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(f,inputType,functionCallType));
-                f=Math.nextAfter(f,Double.POSITIVE_INFINITY);
-            }
-        }{
-            float f=-0.0f;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(f,inputType,functionCallType));
-                f=Math.nextAfter(f,Double.NEGATIVE_INFINITY);
-            }
-        }
-        Assertions.assertNotEquals(false,monitor.verifyAdd(Float.NaN,inputType,functionCallType));
-        monitor.set.clear();
-        monitor.updateCollectionState();
-        Assertions.assertNotEquals(false,monitor.verifyAdd(Float.NaN,inputType,functionCallType));
-        {
-            float f=-0.0f;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(f,inputType,functionCallType));
-                f=Math.nextAfter(f,Double.NEGATIVE_INFINITY);
-            }
-        }{
-            float f=0.0f;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(f,inputType,functionCallType));
-                f=Math.nextAfter(f,Double.POSITIVE_INFINITY);
-            }
-        }
-        break;
-        case DOUBLE:
-        {
-            double d=0.0d;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(d,inputType,functionCallType));
-                d=Math.nextAfter(d,Double.POSITIVE_INFINITY);
-            }
-        }{
-            double d=-0.0d;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(d,inputType,functionCallType));
-                d=Math.nextAfter(d,Double.NEGATIVE_INFINITY);
-            }
-        }
-        Assertions.assertNotEquals(false,monitor.verifyAdd(Double.NaN,inputType,functionCallType));
-        monitor.set.clear();
-        monitor.updateCollectionState();
-        Assertions.assertNotEquals(false,monitor.verifyAdd(Double.NaN,inputType,functionCallType));
-        {
-            double d=-0.0d;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(d,inputType,functionCallType));
-                d=Math.nextAfter(d,Double.NEGATIVE_INFINITY);
-            }
-        }{
-            double d=0.0d;
-            for(int i=0;i <= 250;++i){
-                Assertions.assertNotEquals(false,monitor.verifyAdd(d,inputType,functionCallType));
-                d=Math.nextAfter(d,Double.POSITIVE_INFINITY);
-            }
-        }
-        break;
-        case REF:
-            if(monitoredObjectGen.expectedException == null){
-                for(int i=-250;i <= 250;++i){
-                    Assertions.assertNotEquals(false,monitor.verifyAdd(monitoredObjectGen.getMonitoredObject(monitor,i),
-                            inputType,functionCallType));
-                }
-                Assertions.assertNotEquals(false,monitor.verifyAdd(null,inputType,functionCallType));
-                monitor.set.clear();
-                monitor.updateCollectionState();
-                Assertions.assertNotEquals(false,monitor.verifyAdd(null,inputType,functionCallType));
-                for(int i=250;i >= -250;--i){
-                    Assertions.assertNotEquals(false,monitor.verifyAdd(monitoredObjectGen.getMonitoredObject(monitor,i),
-                            inputType,functionCallType));
-                }
-            }else{
-                for(int tmp=-500;tmp <= 500;++tmp){
-                    final int i=tmp;
-                    Assertions.assertThrows(monitoredObjectGen.expectedException,()->monitor
-                            .verifyAdd(monitoredObjectGen.getMonitoredObject(monitor,i),inputType,functionCallType));
-                }
-            }
-
-            break;
-        default:
-            throw inputType.invalid();
-        }
-    }
-    private static void testConstructor_floatHelper(float loadFactor,DataType collectionType,CheckedType checkedType){
-        if(loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
-            new OpenAddressHashSetMonitor(collectionType,checkedType,loadFactor).verifyCollectionState();
-        }else{
-            Assertions.assertThrows(IllegalArgumentException.class,
-                    ()->new OpenAddressHashSetMonitor(collectionType,checkedType,loadFactor));
-        }
-    }
-    private static void testConstructor_intfloatHelper(int initialCapacity,float loadFactor,DataType collectionType,
-            CheckedType checkedType){
-        if(initialCapacity >= 0 && loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
-            new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity,loadFactor).verifyCollectionState();
-        }else{
-            Assertions.assertThrows(IllegalArgumentException.class,
-                    ()->new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity,loadFactor));
-        }
-    }
-    private static void testConstructor_intHelper(int initialCapacity,DataType collectionType,CheckedType checkedType){
-        if(initialCapacity >= 0){
-            new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity).verifyCollectionState();
-        }else{
-            Assertions.assertThrows(IllegalArgumentException.class,
-                    ()->new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity));
-        }
-    }
-    private static void testforEach_ConsumerHelper(DataType collectionType,MonitoredFunctionGen functionGen,
-            FunctionCallType functionCallType,long randSeed,CheckedType checkedType,SetInitialization initSet){
-        final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
-        if(functionGen.expectedException == null || monitor.size() == 0){
-            monitor.verifyForEach(functionGen,functionCallType,randSeed);
-        }else{
-            Assertions.assertThrows(functionGen.expectedException,
-                    ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
-            monitor.verifyCollectionState();
-        }
-    }
-    private static void testItrforEachRemaining_ConsumerHelper(float loadFactor,int initCapacity,int itrScenario,
-            IllegalModification preMod,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,long randSeed,
-            DataType collectionType,CheckedType checkedType,SetInitialization initSet){
-        final var setMonitor
-        =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor));
-        final var itrMonitor=setMonitor.getMonitoredIterator();
-        switch(itrScenario){
-        case 1:
-            itrMonitor.iterateForward();
-            break;
-        case 2:
-            itrMonitor.iterateForward();
-            itrMonitor.remove();
-            break;
-        case 3:
-            for(int i=0;i < 13 && itrMonitor.hasNext();++i){
-                itrMonitor.iterateForward();
-            }
-            break;
-        default:
-        }
-        final int numLeft=itrMonitor.getNumLeft();
-        itrMonitor.illegalMod(preMod);
-        final Class<? extends Throwable> expectedException
-        =numLeft == 0?null:preMod.expectedException == null?functionGen.expectedException:preMod.expectedException;
-        if(expectedException == null){
-            itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed);
-        }else{
-            Assertions.assertThrows(expectedException,
-                    ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
-            itrMonitor.verifyIteratorState();
-            setMonitor.verifyCollectionState();
-        }
-    }
-    private static void testItrnext_voidHelper(float loadFactor,int initialCapacity,IllegalModification preMod,
-            DataType outputType,DataType collectionType,CheckedType checkedType,SetInitialization initSet){
-        final var setMonitor
-        =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initialCapacity,loadFactor));
-        final var itrMonitor=setMonitor.getMonitoredIterator();
-        itrMonitor.illegalMod(preMod);
-        if(preMod.expectedException == null){
-            while(itrMonitor.hasNext()){
-                itrMonitor.verifyNext(outputType);
-            }
-            Assertions.assertFalse(itrMonitor.getIterator().hasNext());
-            if(checkedType.checked){
-                Assertions.assertThrows(NoSuchElementException.class,()->itrMonitor.verifyNext(outputType));
-            }
-        }else{
-            Assertions.assertThrows(preMod.expectedException,()->itrMonitor.verifyNext(outputType));
-        }
-        itrMonitor.verifyIteratorState();
-        setMonitor.verifyCollectionState();
-    }
-    private static void testItrremove_voidHelper(OpenAddressHashSetMonitor setMonitor,int itrCount,
-            IteratorRemoveScenario itrRemoveScenario,IllegalModification preMod){
-        final var itrMonitor=setMonitor.getMonitoredIterator();
-        for(int i=0;i < itrCount;++i){
-            itrMonitor.iterateForward();
-        }
-        if(itrRemoveScenario == IteratorRemoveScenario.PostRemove){
-            itrMonitor.remove();
-        }
-        itrMonitor.illegalMod(preMod);
-        final Class<? extends Throwable> expectedException
-        =itrRemoveScenario.expectedException == null?preMod.expectedException:itrRemoveScenario.expectedException;
-        if(expectedException == null){
-            for(;;){
-                itrMonitor.verifyRemove();
-                if(!itrMonitor.hasNext()){
-                    break;
-                }
-                itrMonitor.iterateForward();
-            }
-        }else{
-            Assertions.assertThrows(expectedException,()->itrMonitor.verifyRemove());
-            itrMonitor.verifyIteratorState();
-            setMonitor.verifyCollectionState();
-        }
-    }
-    private static void testremoveIf_PredicateHelper(DataType collectionType,MonitoredRemoveIfPredicateGen filterGen,
-            FunctionCallType functionCallType,long randSeed,double threshold,CheckedType checkedType,
-            SetInitialization initSet){
-        final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
-        final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,randSeed);
-        final int sizeBefore=monitor.size();
-        if(filterGen.expectedException == null || sizeBefore == 0){
-            final boolean result=monitor.verifyRemoveIf(filter,functionCallType);
-            if(sizeBefore == 0b00){
-                Assertions.assertFalse(result);
-            }else{
-                switch(filterGen){
-                case Random:
-                    Assertions.assertEquals(filter.numRemoved != 0,result);
-                    break;
-                case RemoveAll:
-                    Assertions.assertTrue(monitor.set.isEmpty());
-                    Assertions.assertTrue(result);
-                    break;
-                case RemoveFalse:
-                    Assertions.assertFalse(monitor.set.contains(false));
-                    break;
-                case RemoveNone:
-                    Assertions.assertFalse(result);
-                    Assertions.assertFalse(monitor.set.isEmpty());
-                    break;
-                case RemoveTrue:
-                    Assertions.assertFalse(monitor.set.contains(true));
-                    break;
-                default:
-                    throw filterGen.invalid();
-                }
-            }
-        }else{
-            Assertions.assertThrows(filterGen.expectedException,()->monitor.verifyRemoveIf(filter,functionCallType));
-            monitor.verifyCollectionState();
-        }
-    }
-    @org.junit.jupiter.api.Test public void testadd_val(){
-        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var functionCallType:FunctionCallType.values()){
-                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                    for(final float loadFactor:LOAD_FACTORS){
-                        if(loadFactor > 0.f && loadFactor <= 1.0f){
-                            for(final var inputType:collectionType.mayBeAddedTo()){
-                                for(final var checkedType:CheckedType.values()){
-                                    for(final int initialCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
-                                        if(inputType==DataType.REF) {
-                                            for(var objGen:StructType.OpenAddressHashSet.validMonitoredObjectGens) {
-                                                if(objGen.expectedException == null || checkedType.checked){
-                                                    TestExecutorService.submitTest(()->testadd_valHelper(collectionType,
-                                                            inputType,checkedType,loadFactor,initialCapacity,
-                                                            functionCallType,objGen));
-                                                }
-                                            }
-                                        }else {
-                                            TestExecutorService.submitTest(()->testadd_valHelper(collectionType,inputType,checkedType,
-                                                    loadFactor,initialCapacity,functionCallType,null));
-                                        }
-
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testadd_val");
-    }
-    @org.junit.jupiter.api.Test public void testclear_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
-            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
-            .verifyClear();
-        };
-        test.runAllTests("OpenAddressHashSetTest.testclear_void");
-    }
-    @org.junit.jupiter.api.Test public void testclone_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
-            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
-            .verifyClone();
-        };
-        test.runAllTests("OpenAddressHashSetTest.testclone_void");
-    }
-    @org.junit.jupiter.api.Test public void testConstructor_float(){
-
-        for(final var checkedType:CheckedType.values()){
-            for(final float loadFactor:LOAD_FACTORS){
-                if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
-                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                        TestExecutorService.submitTest(()->testConstructor_floatHelper(loadFactor,collectionType,checkedType));
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_float");
-    }
-    @org.junit.jupiter.api.Test public void testConstructor_int(){
-
-        for(final var checkedType:CheckedType.values()){
-            for(final int initialCapacity:CONSTRUCTOR_INITIAL_CAPACITIES){
-                if(checkedType.checked || initialCapacity >= 0){
-                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                        TestExecutorService.submitTest(()->testConstructor_intHelper(initialCapacity,collectionType,checkedType));
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_int");
-    }
-    @org.junit.jupiter.api.Test public void testConstructor_intfloat(){
-
-        for(final var checkedType:CheckedType.values()){
-            for(final int initialCapacity:CONSTRUCTOR_INITIAL_CAPACITIES){
-                if(checkedType.checked || initialCapacity >= 0){
-                    for(final float loadFactor:LOAD_FACTORS){
-                        if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
-                            for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                                TestExecutorService.submitTest(
-                                        ()->testConstructor_intfloatHelper(initialCapacity,loadFactor,collectionType,checkedType));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_intfloat");
-    }
-    @org.junit.jupiter.api.Test public void testConstructor_void(){
-        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var checkedType:CheckedType.values()){
-                TestExecutorService
-                .submitTest(()->new OpenAddressHashSetMonitor(collectionType,checkedType).verifyCollectionState());
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_void");
-    }
-    @org.junit.jupiter.api.Test public void testcontains_val(){
-        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
-            if(monitoredObjectGen == null){
-                return monitor.verifyContains(queryVal,inputType,castType,modification);
-            }else{
-                return monitor.verifyThrowingContains(monitoredObjectGen);
-            }
-        };
-        test.runAllTests("OpenAddressHashSetTest.testcontains_val");
-    }
-    @org.junit.jupiter.api.Test public void testforEach_Consumer(){
-        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var functionCallType:FunctionCallType.values()){
-                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                    for(final var functionGen:StructType.OpenAddressHashSet.validMonitoredFunctionGens){
-                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                            final int size
-                            =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
-                            final long randSeedBound=functionGen.randomized && size > 1 && !functionCallType.boxed?100:0;
-                            for(final var checkedType:CheckedType.values()){
-                                if(checkedType.checked || functionGen.expectedException == null || size == 0){
-                                    LongStream.rangeClosed(0,randSeedBound)
-                                    .forEach(randSeed->TestExecutorService.submitTest(()->testforEach_ConsumerHelper(collectionType,
-                                            functionGen,functionCallType,randSeed,checkedType,initSet)));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testforEach_Consumer");
-    }
-    @org.junit.jupiter.api.Test public void testhashCode_void(){
-        for(final var loadFactor:LOAD_FACTORS){
-            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
-                for(final var initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
-                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                        for(final var checkedType:CheckedType.values()){
-                            for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                                TestExecutorService
-                                .submitTest(()->initSet.initialize(new OpenAddressHashSetMonitor(collectionType,
-                                        checkedType,initCapacity,loadFactor)).verifyHashCode());
-                            }
-                        }
-                    }
-                    for(var monitoredObjectGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
-                        if(monitoredObjectGen.expectedException != null){
-                            TestExecutorService.submitTest(()->{
-                                var monitor=new OpenAddressHashSetMonitor(DataType.REF,CheckedType.CHECKED,initCapacity,
-                                        loadFactor);
-                                MonitoredObjectGen.ThrowSwitch throwSwitch=new MonitoredObjectGen.ThrowSwitch(false);
-                                @SuppressWarnings("unchecked")
-                                var set=(OmniSet.OfRef<Object>)monitor.set;
-                                for(int i=0;i < 10;++i){
-                                    set.add(monitoredObjectGen.getMonitoredObject(monitor,throwSwitch));
-                                }
-                                monitor.updateCollectionState();
-                                throwSwitch.doThrow=true;
-                                Assertions.assertThrows(monitoredObjectGen.expectedException,()->set.hashCode());
-                                monitor.verifyCollectionState();
-                            });
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testhashCode_void");
-    }
-    @org.junit.jupiter.api.Test public void testisEmpty_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
-            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
-            .verifyIsEmpty();
-        };
-        test.runAllTests("OpenAddressHashSetTest.testisEmpty_void");
-    }
-    @org.junit.jupiter.api.Test public void testiterator_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
-            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
-            .getMonitoredIterator().verifyIteratorState();
-        };
-        test.runAllTests("OpenAddressHashSetTest.testiterator_void");
-    }
-    @org.junit.jupiter.api.Test public void testItrclone_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->initSet
-                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
-                .getMonitoredIterator().verifyClone();
-        test.runAllTests("OpenAddressHashSetTest.testItrclone_void");
-    }
-    // @Disabled
-    @org.junit.jupiter.api.Test public void testItrforEachRemaining_Consumer(){
-        for(final var loadFactor:LOAD_FACTORS){
-            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
-
-                for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                    for(final var functionCallType:FunctionCallType.values()){
-                        if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                            for(final var checkedType:CheckedType.values()){
-                                for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                                    int sizeScenario;
-                                    switch(initSet){
-                                    case Empty:
-                                        sizeScenario=0;
-                                        break;
-                                    case AddPrime:
-                                    case AddTrue:
-                                    case AddFalse:
-                                    case AddMinByte:
-                                    case AddNull:
-                                        sizeScenario=1;
-                                        break;
-                                    case AddTrueAndFalse:
-                                    case FillWord0:
-                                    case FillWord1:
-                                    case FillWord2:
-                                    case FillWord3:
-                                        sizeScenario=2;
-                                        break;
-                                    case AddFibSeq:
-                                    case Add200RemoveThenAdd100More:
-                                        sizeScenario=3;
-                                        break;
-                                    default:
-                                        throw initSet.invalid();
-                                    }
-                                    for(final var functionGen:IteratorType.AscendingItr.validMonitoredFunctionGens){
-                                        if(checkedType.checked || functionGen.expectedException == null || sizeScenario == 0){
-                                            for(final var preMod:IteratorType.AscendingItr.validPreMods){
-                                                if(checkedType.checked || preMod.expectedException == null || sizeScenario == 0){
-                                                    int itrScenarioMax=0;
-                                                    if(sizeScenario > 1){
-                                                        if(sizeScenario > 2){
-                                                            itrScenarioMax=3;
-                                                        }else{
-                                                            itrScenarioMax=2;
-                                                        }
-                                                    }
-                                                    IntStream.rangeClosed(0,itrScenarioMax).forEach(itrScenario->{
-                                                        LongStream.rangeClosed(0,preMod.expectedException == null && functionGen.randomized
-                                                                && sizeScenario > 1 && itrScenario == 0?100:0).forEach(randSeed->{
-                                                                    for(final var initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
-                                                                        TestExecutorService
-                                                                        .submitTest(()->testItrforEachRemaining_ConsumerHelper(loadFactor,initCapacity,
-                                                                                itrScenario,preMod,functionGen,functionCallType,randSeed,collectionType,
-                                                                                checkedType,initSet));
-                                                                    }
-
-                                                                });
-
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrforEachRemaining_Consumer");
-    }
-    @org.junit.jupiter.api.Test public void testItrhasNext_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
-            final var setMonitor
-            =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor));
-            final var itrMonitor=setMonitor.getMonitoredIterator();
-            final var setSize=setMonitor.size();
-            for(int i=0;i < setSize;++i){
-                Assertions.assertTrue(itrMonitor.verifyHasNext());
-                itrMonitor.iterateForward();
-            }
-            Assertions.assertFalse(itrMonitor.verifyHasNext());
-        };
-        test.runAllTests("OpenAddressHashSetTest.testItrhasNext_void");
-    }
-    @org.junit.jupiter.api.Test public void testItrnext_void(){
-        for(final var loadFactor:LOAD_FACTORS){
-            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
-
-                for(final var checkedType:CheckedType.values()){
-                    for(final var preMod:IteratorType.AscendingItr.validPreMods){
-                        if(checkedType.checked || preMod.expectedException == null){
-                            for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-
-                                for(final var outputType:collectionType.validOutputTypes()){
-
-                                    for(final var initialCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
-                                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                                            TestExecutorService.submitTest(()->testItrnext_voidHelper(loadFactor,initialCapacity,preMod,
-                                                    outputType,collectionType,checkedType,initSet));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrnext_void");
-    }
-    @org.junit.jupiter.api.Test public void testItrremove_void(){
-        for(final float loadFactor:LOAD_FACTORS){
-            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
-                for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                    for(final var checkedType:CheckedType.values()){
-                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                            for(final var itrRemoveScenario:IteratorType.AscendingItr.validItrRemoveScenarios){
-                                if((!initSet.isEmpty || itrRemoveScenario == IteratorRemoveScenario.PostInit)
-                                        && (checkedType.checked || itrRemoveScenario.expectedException == null)){
-                                    for(final var preMod:IteratorType.AscendingItr.validPreMods){
-                                        if(checkedType.checked || preMod.expectedException == null){
-                                            final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
-                                            final int setSize=monitor.size();
-                                            int itrOffset,itrBound;
-                                            if(itrRemoveScenario == IteratorRemoveScenario.PostInit){
-                                                itrOffset=itrBound=0;
-                                            }else{
-                                                itrOffset=1;
-                                                itrBound=setSize;
-                                            }
-                                            IntStream.rangeClosed(itrOffset,itrBound).forEach(itrCount->{
-
-                                                for(final int initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
-                                                    TestExecutorService.submitTest(()->testItrremove_voidHelper(
-                                                            initSet.initialize(
-                                                                    new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor)),
-                                                            itrCount,itrRemoveScenario,preMod));
-                                                }
-
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrremove_void");
-    }
-    @org.junit.jupiter.api.Test public void testMASSIVEtoString(){
-        int initCapacity;
-        OpenAddressHashSetMonitor monitor;
-        initCapacity=OmniArray.MAX_ARR_SIZE / 17 + 1;
-        monitor=new OpenAddressHashSetMonitor(DataType.FLOAT,CheckedType.UNCHECKED,initCapacity + 1,.75f);
-        final var set=(FloatOpenAddressHashSet)monitor.set;
-        for(int i=0;i <= initCapacity;++i){
-            set.add(Float.intBitsToFloat(i));
-        }
-        monitor.updateCollectionState();
-        monitor.verifyMASSIVEToString("OpenAddressHashSetTest." + DataType.FLOAT + ".testMASSIVEtoString");
-    }
-    @org.junit.jupiter.api.Test public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->initSet
-                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)).verifyReadAndWrite(functionGen);
-        test.runAllTests("OpenAddressHashSetTest.testReadAndWrite");
-    }
-    @org.junit.jupiter.api.Test public void testremoveIf_Predicate(){
-        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var functionCallType:FunctionCallType.values()){
-                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                    for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                        final int setSize
-                        =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
-                        for(final var filterGen:StructType.OpenAddressHashSet.validMonitoredRemoveIfPredicateGens){
-                            final long randSeedBound;
-                            final double[] thresholdArr;
-                            if(filterGen.randomized && setSize > 1 && !functionCallType.boxed){
-                                randSeedBound=100;
-                                thresholdArr=RANDOM_THRESHOLDS;
-                            }else{
-                                randSeedBound=0;
-                                thresholdArr=NON_RANDOM_THRESHOLD;
-                            }
-                            for(final var checkedType:CheckedType.values()){
-                                if(checkedType.checked || filterGen.expectedException == null || setSize == 0){
-                                    LongStream.rangeClosed(0,randSeedBound)
-                                    .forEach(randSeed->DoubleStream.of(thresholdArr).forEach(
-                                            threshold->TestExecutorService.submitTest(()->testremoveIf_PredicateHelper(collectionType,
-                                                    filterGen,functionCallType,randSeed,threshold,checkedType,initSet))));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testremoveIf_Predicate");
-    }
-    @org.junit.jupiter.api.Test public void testremoveVal_val(){
-        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
-            if(monitoredObjectGen == null){
-                return monitor.verifyRemoveVal(queryVal,inputType,castType,modification);
-            }else{
-                return monitor.verifyThrowingRemoveVal(monitoredObjectGen);
-            }
-        };
-        test.runAllTests("OpenAddressHashSetTest.testremoveVal_val");
-    }
-    @org.junit.jupiter.api.Test public void testsetLoadFactor_float(){
-
-        for(final var checkedType:CheckedType.values()){
-
-            for(final float loadFactor:LOAD_FACTORS){
-                if(checkedType.checked || loadFactor == loadFactor && loadFactor <= 1.0f && loadFactor > 0){
-                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                            TestExecutorService
-                            .submitTest(()->initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType))
-                                    .verifySetLoadFactor(loadFactor));
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testsetLoadFactor_float");
-    }
-    @org.junit.jupiter.api.Test public void testsize_void(){
-        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
-            initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
-            .verifySize();
-        };
-        test.runAllTests("OpenAddressHashSetTest.testsize_void");
-    }
-    @org.junit.jupiter.api.Test public void testtoArray_IntFunction(){
-        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
-            final var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
-            if(functionGen.expectedException == null){
-                monitor.verifyToArray(functionGen);
-            }else{
-                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
-                monitor.verifyCollectionState();
-            }
-        };
-        test.runAllTests("OpenAddressHashSetTest.testToArray_IntFunction");
-    }
-    @org.junit.jupiter.api.Test public void testtoArray_ObjectArray(){
-        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                final int size=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
-                for(final var checkedType:CheckedType.values()){
-                    for(int arrSize=0,increment=Math.max(1,size / 10),bound=size + increment + 2;arrSize <= bound;
-                            arrSize+=increment){
-                        final Object[] paramArr=new Object[arrSize];
-                        TestExecutorService.submitTest(()->initSet
-                                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)).verifyToArray(paramArr));
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoArray_ObjectArray");
-    }
-    @org.junit.jupiter.api.Test public void testtoArray_void(){
-        for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var outputType:collectionType.validOutputTypes()){
-                for(final var checkedType:CheckedType.values()){
-                    for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                        TestExecutorService.submitTest(()->{
-                            outputType.verifyToArray(initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)));
-                        });
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoArray_void");
-    }
-    @org.junit.jupiter.api.Test public void testtoString_void(){
-        for(final var loadFactor:LOAD_FACTORS){
-            if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
-                for(final var initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
-                    for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                        for(final var checkedType:CheckedType.values()){
-                            for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                                TestExecutorService
-                                .submitTest(()->initSet.initialize(new OpenAddressHashSetMonitor(collectionType,
-                                        checkedType,initCapacity,loadFactor)).verifyToString());
-                            }
-                        }
-                    }
-                    for(var monitoredObjectGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
-                        if(monitoredObjectGen.expectedException != null){
-                            TestExecutorService.submitTest(()->{
-                                var monitor=new OpenAddressHashSetMonitor(DataType.REF,CheckedType.CHECKED,initCapacity,
-                                        loadFactor);
-                                MonitoredObjectGen.ThrowSwitch throwSwitch=new MonitoredObjectGen.ThrowSwitch(false);
-                                @SuppressWarnings("unchecked")
-                                var set=(OmniSet.OfRef<Object>)monitor.set;
-                                for(int i=0;i < 10;++i){
-                                    set.add(monitoredObjectGen.getMonitoredObject(monitor,throwSwitch));
-                                }
-                                monitor.updateCollectionState();
-                                throwSwitch.doThrow=true;
-                                Assertions.assertThrows(monitoredObjectGen.expectedException,()->set.toString());
-                                monitor.verifyCollectionState();
-                            });
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("OpenAddressHashSetTest.testtoString_void");
-    }
-    @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
-        int numTestsRemaining;
-        if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
-            System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
-        }
-        TestExecutorService.reset();
     }
 }

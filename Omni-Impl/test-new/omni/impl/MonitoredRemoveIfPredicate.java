@@ -64,10 +64,12 @@ DoublePredicate{
     public boolean test(double value){
         ++numCalls;
         if(retainedVals.contains(value)){
+            testImpl(value);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(value)){
+            testImpl(value);
             ++numRemoved;
             return true;
         }
@@ -85,10 +87,12 @@ DoublePredicate{
     public boolean test(float val){
         ++numCalls;
         if(retainedVals.contains(val)){
+            testImpl(val);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(val)){
+            testImpl(val);
             ++numRemoved;
             return true;
         }
@@ -106,10 +110,12 @@ DoublePredicate{
     public boolean test(long value){
         ++numCalls;
         if(retainedVals.contains(value)){
+            testImpl(value);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(value)){
+            testImpl(value);
             ++numRemoved;
             return true;
         }
@@ -127,10 +133,12 @@ DoublePredicate{
     public boolean test(int value){
         ++numCalls;
         if(retainedVals.contains(value)){
+            testImpl(value);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(value)){
+            testImpl(value);
             ++numRemoved;
             return true;
         }
@@ -148,10 +156,12 @@ DoublePredicate{
     public boolean test(short val){
         ++numCalls;
         if(retainedVals.contains(val)){
+            testImpl(val);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(val)){
+            testImpl(val);
             ++numRemoved;
             return true;
         }
@@ -169,10 +179,12 @@ DoublePredicate{
     public boolean test(char val){
         ++numCalls;
         if(retainedVals.contains(val)){
+            testImpl(val);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(val)){
+            testImpl(val);
             ++numRemoved;
             return true;
         }
@@ -190,10 +202,12 @@ DoublePredicate{
     public boolean test(byte val){
         ++numCalls;
         if(retainedVals.contains(val)){
+            testImpl(val);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(val)){
+            testImpl(val);
             ++numRemoved;
             return true;
         }
@@ -211,10 +225,12 @@ DoublePredicate{
     public boolean test(boolean val){
         ++numCalls;
         if(retainedVals.contains(val)){
+            testImpl(val);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(val)){
+            testImpl(val);
             ++numRemoved;
             return true;
         }
@@ -232,10 +248,12 @@ DoublePredicate{
     public boolean test(Object t){
         ++numCalls;
         if(retainedVals.contains(t)){
+            testImpl(t);
             ++numRetained;
             return false;
         }
         if(removedVals.contains(t)){
+            testImpl(t);
             ++numRemoved;
             return true;
         }

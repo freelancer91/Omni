@@ -373,6 +373,14 @@ public enum QueryVal{
     },
     MaxByte{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public double getDoubleValPlusFloatEpsilon(){
             return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
         }
@@ -487,6 +495,14 @@ public enum QueryVal{
         }
     },
     MinByte{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return modification == QueryValModification.None;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isCharValSupported(QueryValModification modification){
             return false;
@@ -603,6 +619,14 @@ public enum QueryVal{
     },
     TwoHundred{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public double getDoubleValPlusFloatEpsilon(){
             return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
         }
@@ -675,6 +699,14 @@ public enum QueryVal{
         }
     },
     MaxChar{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         public double getDoubleValPlusFloatEpsilon(){
             return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
@@ -791,6 +823,14 @@ public enum QueryVal{
     },
     MaxShort{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public double getDoubleValPlusFloatEpsilon(){
             return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
         }
@@ -906,6 +946,14 @@ public enum QueryVal{
     },
     MinShort{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         public double getDoubleValPlusFloatEpsilon(){
             return Math.nextAfter(getFloatVal(),getPlusFloatEpsilonDirection());
         }
@@ -1020,6 +1068,14 @@ public enum QueryVal{
         }
     },
     MaxSafeInt{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isShortValSupported(QueryValModification modification){
             return false;
@@ -1150,6 +1206,14 @@ public enum QueryVal{
     },
     MinSafeInt{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isShortValSupported(QueryValModification modification){
             return false;
         }
@@ -1279,6 +1343,14 @@ public enum QueryVal{
     },
     MaxInt{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isShortValSupported(QueryValModification modification){
             return false;
         }
@@ -1386,6 +1458,14 @@ public enum QueryVal{
         }
     },
     MinInt{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
@@ -1495,6 +1575,14 @@ public enum QueryVal{
     },
     MaxSafeLong{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
         }
@@ -1588,6 +1676,14 @@ public enum QueryVal{
         }
     },
     MinSafeLong{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
@@ -1683,6 +1779,14 @@ public enum QueryVal{
     },
     OneLShift54{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isCharValSupported(QueryValModification modification){
             return false;
         }
@@ -1744,6 +1848,14 @@ public enum QueryVal{
     },
     MaxLong{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
         }
@@ -1792,6 +1904,14 @@ public enum QueryVal{
     },
     MinLong{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
         }
@@ -1839,6 +1959,14 @@ public enum QueryVal{
         }
     },
     MaxFloat{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;
@@ -1925,6 +2053,14 @@ public enum QueryVal{
     },
     MinFloat{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;
         }
@@ -2006,6 +2142,14 @@ public enum QueryVal{
     },
     MaxDouble{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
         }
@@ -2053,6 +2197,14 @@ public enum QueryVal{
         }
     },
     MinDouble{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isFloatValSupported(QueryValModification modification){
             return false;
@@ -2102,6 +2254,14 @@ public enum QueryVal{
     },
     PosInfinity{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;
         }
@@ -2150,6 +2310,14 @@ public enum QueryVal{
     },
     NegInfinity{
         @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;
         }
@@ -2197,6 +2365,14 @@ public enum QueryVal{
         }
     },
     NaN{
+        @Override
+        boolean isByteValSupported(QueryValModification modification){
+            return false;
+        }
+        @Override
+        boolean isBooleanValSupported(QueryValModification modification){
+            return false;
+        }
         @Override
         boolean isLongValSupported(QueryValModification modification){
             return false;

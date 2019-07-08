@@ -35,7 +35,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator();
     StructType getStructType();
     default boolean isEmpty() {
-      return size()==0;
+        return size()==0;
     }
     void modCollection();
     void modParent();
@@ -43,13 +43,16 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     int size();
     void updateClearState();
     default void verifyClear(){
-      var lst=getCollection();
-      lst.clear();
-      int size=size();
-      if(size!=0) {
-        updateClearState();
-      }
-      verifyCollectionState();
+        try{
+            int size=size();
+            getCollection().clear();
+            if(size != 0){
+                updateClearState();
+            }
+        }finally{
+            verifyCollectionState();
+        }
+
     }
     void updateCollectionState();
     void verifyCollectionState();
@@ -59,7 +62,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification);
     default void verifyToString(String string){
-      getDataType().verifyToString(string,getCollection());
+        getDataType().verifyToString(string,getCollection());
     }
     void verifyMASSIVEToString(String string,String testName);
     void verifyHashCode(int hashCode);
@@ -67,27 +70,28 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     void verifyArrayIsCopy(Object arr);
 
     default boolean verifyThrowingContains(MonitoredObjectGen monitoredObjectGen){
-        Object inputVal=monitoredObjectGen.getMonitoredObject(this);
         try{
-            return QueryCastType.ToObject.callcontains(getCollection(),inputVal,DataType.REF);
+            return QueryCastType.ToObject.callcontains(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+                    DataType.REF);
         }finally{
             verifyCollectionState();
         }
     }
     default boolean verifyThrowingRemoveVal(MonitoredObjectGen monitoredObjectGen){
-        Object inputVal=monitoredObjectGen.getMonitoredObject(this);
         try{
-            return QueryCastType.ToObject.callremoveVal(getCollection(),inputVal,DataType.REF);
+            return QueryCastType.ToObject.callremoveVal(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+                    DataType.REF);
         }finally{
             verifyCollectionState();
         }
     }
     default boolean verifyContains(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryValModification modification){
-        Object inputVal=queryVal.getInputVal(inputType,modification);
-        boolean result=queryCastType.callcontains(getCollection(),inputVal,inputType);
-        verifyCollectionState();
-        return result;
+        try{
+            return queryCastType.callcontains(getCollection(),queryVal.getInputVal(inputType,modification),inputType);
+        }finally{
+            verifyCollectionState();
+        }
     }
 
 
@@ -147,10 +151,12 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     }
 
     default Object verifyClone(){
-        final COL collection=getCollection();
-        final Object clone=collection.clone();
-        verifyCollectionState();
-        Assertions.assertNotSame(collection,clone);
+        final Object clone;
+        try{
+            clone=getCollection().clone();
+        }finally{
+            verifyCollectionState();
+        }
         verifyClone(clone);
         return clone;
     }
@@ -160,92 +166,96 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         final COL collection=getCollection();
         final MonitoredFunction monitoredFunction=functionGen.getMonitoredFunction(this,randSeed);
         final DataType dataType=getDataType();
-        switch(dataType){
-        case BOOLEAN:{
-            final var cast=(OmniCollection.OfBoolean)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Boolean>)monitoredFunction);
-            }else{
-                cast.forEach((BooleanConsumer)monitoredFunction);
+        try{
+            switch(dataType){
+            case BOOLEAN:{
+                final var cast=(OmniCollection.OfBoolean)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Boolean>)monitoredFunction);
+                }else{
+                    cast.forEach((BooleanConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case BYTE:{
-            final var cast=(OmniCollection.OfByte)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Byte>)monitoredFunction);
-            }else{
-                cast.forEach((ByteConsumer)monitoredFunction);
+            case BYTE:{
+                final var cast=(OmniCollection.OfByte)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Byte>)monitoredFunction);
+                }else{
+                    cast.forEach((ByteConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case CHAR:{
-            final var cast=(OmniCollection.OfChar)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Character>)monitoredFunction);
-            }else{
-                cast.forEach((CharConsumer)monitoredFunction);
+            case CHAR:{
+                final var cast=(OmniCollection.OfChar)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Character>)monitoredFunction);
+                }else{
+                    cast.forEach((CharConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case DOUBLE:{
-            final var cast=(OmniCollection.OfDouble)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Double>)monitoredFunction);
-            }else{
-                cast.forEach((DoubleConsumer)monitoredFunction);
+            case DOUBLE:{
+                final var cast=(OmniCollection.OfDouble)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Double>)monitoredFunction);
+                }else{
+                    cast.forEach((DoubleConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case FLOAT:{
-            final var cast=(OmniCollection.OfFloat)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Float>)monitoredFunction);
-            }else{
-                cast.forEach((FloatConsumer)monitoredFunction);
+            case FLOAT:{
+                final var cast=(OmniCollection.OfFloat)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Float>)monitoredFunction);
+                }else{
+                    cast.forEach((FloatConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case INT:{
-            final var cast=(OmniCollection.OfInt)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Integer>)monitoredFunction);
-            }else{
-                cast.forEach((IntConsumer)monitoredFunction);
+            case INT:{
+                final var cast=(OmniCollection.OfInt)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Integer>)monitoredFunction);
+                }else{
+                    cast.forEach((IntConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case LONG:{
-            final var cast=(OmniCollection.OfLong)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Long>)monitoredFunction);
-            }else{
-                cast.forEach((LongConsumer)monitoredFunction);
+            case LONG:{
+                final var cast=(OmniCollection.OfLong)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Long>)monitoredFunction);
+                }else{
+                    cast.forEach((LongConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case REF:{
-            final var cast=(OmniCollection.OfRef<?>)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                throw DataType.cannotBeBoxed();
-            }else{
-                cast.forEach(monitoredFunction);
+            case REF:{
+                final var cast=(OmniCollection.OfRef<?>)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    throw DataType.cannotBeBoxed();
+                }else{
+                    cast.forEach(monitoredFunction);
+                }
+                break;
             }
-            break;
-        }
-        case SHORT:{
-            final var cast=(OmniCollection.OfShort)collection;
-            if(functionCallType == FunctionCallType.Boxed){
-                cast.forEach((Consumer<? super Short>)monitoredFunction);
-            }else{
-                cast.forEach((ShortConsumer)monitoredFunction);
+            case SHORT:{
+                final var cast=(OmniCollection.OfShort)collection;
+                if(functionCallType == FunctionCallType.Boxed){
+                    cast.forEach((Consumer<? super Short>)monitoredFunction);
+                }else{
+                    cast.forEach((ShortConsumer)monitoredFunction);
+                }
+                break;
             }
-            break;
+            default:
+                throw dataType.invalid();
+            }
+        }finally{
+            verifyCollectionState();
         }
-        default:
-            throw dataType.invalid();
-        }
-        verifyCollectionState();
+        Assertions.assertEquals(monitoredFunction.size(),size());
         var itr=collection.iterator();
         var funcItr=monitoredFunction.iterator();
         if(dataType == DataType.REF){
@@ -261,39 +271,55 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }
     }
     default boolean verifyIsEmpty(){
-        final COL collection=getCollection();
         final boolean expectedResult=isEmpty();
-        final boolean actualResult=collection.isEmpty();
-        verifyCollectionState();
+        final boolean actualResult;
+        try{
+            actualResult=getCollection().isEmpty();
+        }finally{
+            verifyCollectionState();
+        }
         Assertions.assertEquals(expectedResult,actualResult);
         return actualResult;
     }
     default int verifySize(){
-        final COL collection=getCollection();
         final int expectedSize=size();
-        final int actualSize=collection.size();
-        verifyCollectionState();
+        final int actualSize;
+        try{
+            actualSize=getCollection().size();
+        }finally{
+            verifyCollectionState();
+        }
         Assertions.assertEquals(expectedSize,actualSize);
         return actualSize;
     }
     default String verifyMASSIVEToString(String testName){
-        COL collection=getCollection();
-        String result=collection.toString();
-        verifyCollectionState();
+        final String result;
+        try{
+            result=getCollection().toString();
+        }finally{
+            verifyCollectionState();
+        }
         verifyMASSIVEToString(result,testName);
         return result;
     }
     default String verifyToString() {
-        COL collection=getCollection();
-        String result=collection.toString();
-        verifyCollectionState();
+        final String result;
+        try{
+            result=getCollection().toString();
+        }finally{
+            verifyCollectionState();
+        }
         verifyToString(result);
         return result;
     }
     default int verifyHashCode() {
         COL collection=getCollection();
-        int result=collection.hashCode();
-        verifyCollectionState();
+        final int result;
+        try{
+            result=collection.hashCode();
+        }finally{
+            verifyCollectionState();
+        }
         verifyHashCode(result);
         return result;
     }
@@ -307,26 +333,34 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             return;
         }
         if(monitoredFunctionGen.expectedException == null){
-            try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
-                oos.writeObject(getCollection());
-            }catch(Exception e){
-                Assertions.fail(e);
-            }
             COL readCol=null;
-            try(var ois=monitoredFunctionGen.getMonitoredObjectInputStream(this,new FileInputStream(file));){
-                readCol=(COL)ois.readObject();
+            try{
+                try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
+                    oos.writeObject(getCollection());
+                }catch(Exception e){
+                    Assertions.fail(e);
+                }
+
+                try(var ois=monitoredFunctionGen.getMonitoredObjectInputStream(this,new FileInputStream(file));){
+                    readCol=(COL)ois.readObject();
+                }catch(Exception e){
+                    Assertions.fail(e);
+                    return;
+                }
+            }finally{
                 verifyCollectionState();
-            }catch(Exception e){
-                Assertions.fail(e);
-                return;
             }
             verifyClone(readCol);
         }else{
-            Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
-                try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(this,new FileOutputStream(file));){
-                    writeObjectImpl(moos);
-                }
-            });
+            try{
+                Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
+                    try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(this,new FileOutputStream(file));){
+                        writeObjectImpl(moos);
+                    }
+                });
+            }finally{
+                verifyCollectionState();
+            }
         }
     }
     @SuppressWarnings("unchecked")
@@ -334,102 +368,105 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         COL collection=getCollection();
         DataType dataType=getDataType();
         boolean result;
-        switch(dataType) {
-        case BOOLEAN:
-        {
-            var cast=(OmniCollection.OfBoolean)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Boolean>)filter);
-            }else {
-                result=cast.removeIf((BooleanPredicate)filter);
+        try{
+            switch(dataType) {
+            case BOOLEAN:
+            {
+                var cast=(OmniCollection.OfBoolean)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Boolean>)filter);
+                }else {
+                    result=cast.removeIf((BooleanPredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case BYTE:
-        {
-            var cast=(OmniCollection.OfByte)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Byte>)filter);
-            }else {
-                result=cast.removeIf((BytePredicate)filter);
+            case BYTE:
+            {
+                var cast=(OmniCollection.OfByte)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Byte>)filter);
+                }else {
+                    result=cast.removeIf((BytePredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case CHAR:
-        {
-            var cast=(OmniCollection.OfChar)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Character>)filter);
-            }else {
-                result=cast.removeIf((CharPredicate)filter);
+            case CHAR:
+            {
+                var cast=(OmniCollection.OfChar)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Character>)filter);
+                }else {
+                    result=cast.removeIf((CharPredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case DOUBLE:
-        {
-            var cast=(OmniCollection.OfDouble)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Double>)filter);
-            }else {
-                result=cast.removeIf((DoublePredicate)filter);
+            case DOUBLE:
+            {
+                var cast=(OmniCollection.OfDouble)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Double>)filter);
+                }else {
+                    result=cast.removeIf((DoublePredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case FLOAT:
-        {
-            var cast=(OmniCollection.OfFloat)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Float>)filter);
-            }else {
-                result=cast.removeIf((FloatPredicate)filter);
+            case FLOAT:
+            {
+                var cast=(OmniCollection.OfFloat)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Float>)filter);
+                }else {
+                    result=cast.removeIf((FloatPredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case INT:
-        {
-            var cast=(OmniCollection.OfInt)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Integer>)filter);
-            }else {
-                result=cast.removeIf((IntPredicate)filter);
+            case INT:
+            {
+                var cast=(OmniCollection.OfInt)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Integer>)filter);
+                }else {
+                    result=cast.removeIf((IntPredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case LONG:
-        {
-            var cast=(OmniCollection.OfLong)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Long>)filter);
-            }else {
-                result=cast.removeIf((LongPredicate)filter);
+            case LONG:
+            {
+                var cast=(OmniCollection.OfLong)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Long>)filter);
+                }else {
+                    result=cast.removeIf((LongPredicate)filter);
+                }
+                break;
             }
-            break;
-        }
-        case REF:
-        {
-            var cast=(OmniCollection.OfRef<?>)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                throw DataType.cannotBeBoxed();
-            }else {
-                result=cast.removeIf(filter);
+            case REF:
+            {
+                var cast=(OmniCollection.OfRef<?>)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    throw DataType.cannotBeBoxed();
+                }else {
+                    result=cast.removeIf(filter);
+                }
+                break;
             }
-            break;
-        }
-        case SHORT:
-        {
-            var cast=(OmniCollection.OfShort)collection;
-            if(functionCallType==FunctionCallType.Boxed) {
-                result=cast.removeIf((Predicate<? super Short>)filter);
-            }else {
-                result=cast.removeIf((ShortPredicate)filter);
+            case SHORT:
+            {
+                var cast=(OmniCollection.OfShort)collection;
+                if(functionCallType==FunctionCallType.Boxed) {
+                    result=cast.removeIf((Predicate<? super Short>)filter);
+                }else {
+                    result=cast.removeIf((ShortPredicate)filter);
+                }
+                break;
             }
-            break;
+            default:
+                throw dataType.invalid();
+            }
+            verifyRemoveIf(result,filter);
+        }finally{
+            /// verifyCollectionState();
         }
-        default:
-            throw dataType.invalid();
-        }
-        verifyRemoveIf(result,filter);
-        verifyCollectionState();
         return result;
     }
     default Object verifyToArray(DataType outputType) {
@@ -442,8 +479,12 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         for(int i=0;i<arrLength;++i) {
             arr[i]=(T)Integer.valueOf(i);
         }
-        T[] result=collection.toArray(arr);
-        verifyCollectionState();
+        T[] result;
+        try{
+            result=collection.toArray(arr);
+        }finally{
+            verifyCollectionState();
+        }
         verifyArrayIsCopy(result);
         switch(Integer.signum(size-arrLength)) {
         case -1:
@@ -484,8 +525,8 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             result=collection.toArray(monitoredArrayConstructor);
         }finally {
             Assertions.assertEquals(1,monitoredArrayConstructor.numCalls);
+            verifyCollectionState();
         }
-        verifyCollectionState();
         verifyArrayIsCopy(result);
         Assertions.assertEquals(size,result.length);
         var iterator=collection.iterator();
@@ -519,11 +560,15 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         default boolean verifyHasNext() {
             ITR iterator=getIterator();
             boolean expectedResult=hasNext();
-            boolean actual=iterator.hasNext();
-            Assertions.assertEquals(expectedResult,actual);
-            verifyIteratorState();
-            getMonitoredCollection().verifyCollectionState();
-            return actual;
+            boolean actualResult;
+            try{
+                actualResult=iterator.hasNext();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+            Assertions.assertEquals(expectedResult,actualResult);
+            return actualResult;
         }
         default void illegalMod(IllegalModification modType){
             switch(modType){
@@ -557,9 +602,13 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }
         default Object verifyClone(){
             final ITR itr=getIterator();
-            final Object clone=itr.clone();
-            verifyIteratorState();
-            getMonitoredCollection().verifyCollectionState();
+            final Object clone;
+            try{
+                clone=itr.clone();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
             Assertions.assertNotSame(itr,clone);
             verifyClone(clone);
             return clone;
@@ -570,48 +619,52 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             MonitoredFunction function=functionGen.getMonitoredFunction(this,randSeed);
             MonitoredCollection<?> monitoredCollection=getMonitoredCollection();
             DataType dataType=monitoredCollection.getDataType();
-            if(functionCallType==FunctionCallType.Boxed) {
-                if(dataType==DataType.REF) {
-                    throw DataType.cannotBeBoxed();
+            try{
+                if(functionCallType==FunctionCallType.Boxed) {
+                    if(dataType==DataType.REF) {
+                        throw DataType.cannotBeBoxed();
+                    }
+                    iterator.forEachRemaining((Consumer)function);
+                }else {
+                    switch(dataType) {
+                    case BOOLEAN:
+                        ((OmniIterator.OfBoolean)iterator).forEachRemaining((BooleanConsumer)function);
+                        break;
+                    case BYTE:
+                        ((OmniIterator.OfByte)iterator).forEachRemaining((ByteConsumer)function);
+                        break;
+                    case CHAR:
+                        ((OmniIterator.OfChar)iterator).forEachRemaining((CharConsumer)function);
+                        break;
+                    case DOUBLE:
+                        ((OmniIterator.OfDouble)iterator).forEachRemaining((DoubleConsumer)function);
+                        break;
+                    case FLOAT:
+                        ((OmniIterator.OfFloat)iterator).forEachRemaining((FloatConsumer)function);
+                        break;
+                    case INT:
+                        ((OmniIterator.OfInt)iterator).forEachRemaining((IntConsumer)function);
+                        break;
+                    case LONG:
+                        ((OmniIterator.OfLong)iterator).forEachRemaining((LongConsumer)function);
+                        break;
+                    case REF:
+                        ((OmniIterator.OfRef<?>)iterator).forEachRemaining(function);
+                        break;
+                    case SHORT:
+                        ((OmniIterator.OfShort)iterator).forEachRemaining((ShortConsumer)function);
+                        break;
+                    default:
+                        throw dataType.invalid();
+                    }
                 }
-                iterator.forEachRemaining((Consumer)function);
-            }else {
-                switch(dataType) {
-                case BOOLEAN:
-                    ((OmniIterator.OfBoolean)iterator).forEachRemaining((BooleanConsumer)function);
-                    break;
-                case BYTE:
-                    ((OmniIterator.OfByte)iterator).forEachRemaining((ByteConsumer)function);
-                    break;
-                case CHAR:
-                    ((OmniIterator.OfChar)iterator).forEachRemaining((CharConsumer)function);
-                    break;
-                case DOUBLE:
-                    ((OmniIterator.OfDouble)iterator).forEachRemaining((DoubleConsumer)function);
-                    break;
-                case FLOAT:
-                    ((OmniIterator.OfFloat)iterator).forEachRemaining((FloatConsumer)function);
-                    break;
-                case INT:
-                    ((OmniIterator.OfInt)iterator).forEachRemaining((IntConsumer)function);
-                    break;
-                case LONG:
-                    ((OmniIterator.OfLong)iterator).forEachRemaining((LongConsumer)function);
-                    break;
-                case REF:
-                    ((OmniIterator.OfRef<?>)iterator).forEachRemaining(function);
-                    break;
-                case SHORT:
-                    ((OmniIterator.OfShort)iterator).forEachRemaining((ShortConsumer)function);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
+            }finally{
+                monitoredCollection.verifyCollectionState();
+                verifyIteratorState();
             }
-            monitoredCollection.verifyCollectionState();
             Assertions.assertEquals(numLeft,function.size());
             verifyForEachRemaining(function);
-            verifyIteratorState();
+
         }
     }
 }
