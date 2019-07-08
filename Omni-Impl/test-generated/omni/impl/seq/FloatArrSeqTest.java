@@ -450,6 +450,109 @@ public class FloatArrSeqTest{
     seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(itrScenario.preModScenario);
   }
   @org.junit.jupiter.api.Test
+  public void testItrclone_void(){
+    for(var itrType:new ItrType[]{ItrType.Itr,ItrType.ListItr}){
+      for(var nestedType:NestedType.values()){
+        if(itrType==ItrType.Itr || nestedType!=NestedType.STACK){
+          for(var checkedType:CheckedType.values()){
+            for(var seqLocation:SequenceLocation.values()){
+              if(seqLocation.expectedException==null){
+                for(int tmpSeqSize=0;tmpSeqSize<=10;++tmpSeqSize){
+                  final int seqSize=tmpSeqSize;
+                  TestExecutorService.submitTest(()->{
+                    var seqMonitor=new SeqMonitor(nestedType,checkedType);
+                    for(int i=0;i<seqSize;++i){
+                      seqMonitor.add(i);
+                    }
+                    var itrMonitor=seqMonitor.getItrMonitor(seqLocation,itrType);
+                    var itr=itrMonitor.itr;
+                    var itrClone=itr.clone();
+                    itrMonitor.verifyIteratorState();
+                    seqMonitor.verifyStructuralIntegrity();
+                    switch(itrType){
+                      case Itr:
+                        switch(nestedType){
+                          case STACK:
+                            if(checkedType.checked){
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.lastRet(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.modCount(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedStack.Itr.modCount(itrClone));
+                            }else{
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.UncheckedStack.Itr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedStack.Itr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedStack.Itr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedStack.Itr.cursor(itrClone));
+                            }
+                            break;
+                          case LIST:
+                            if(checkedType.checked){
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.lastRet(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.modCount(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.modCount(itrClone));
+                            }else{
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.UncheckedList.Itr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedList.Itr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedList.Itr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedList.Itr.cursor(itrClone));
+                            }
+                            break;
+                          case SUBLIST:
+                            if(checkedType.checked){
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.lastRet(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.modCount(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.Itr.modCount(itrClone));
+                            }else{
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.Itr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.Itr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.Itr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.Itr.cursor(itrClone));
+                            }
+                            break;
+                          default:
+                            throw new UnsupportedOperationException("Unknown nestedType "+nestedType);
+                        }
+                        break;
+                      case ListItr:
+                        switch(nestedType){
+                          case LIST:
+                            if(checkedType.checked){
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.lastRet(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.modCount(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.modCount(itrClone));
+                            }else{
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.lastRet(itrClone));
+                            }
+                            break;
+                          case SUBLIST:
+                            if(checkedType.checked){
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.ListItr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.ListItr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.ListItr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.ListItr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.ListItr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.CheckedSubList.ListItr.lastRet(itrClone));
+                            }else{
+                              Assertions.assertSame(FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.ListItr.parent(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.ListItr.parent(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.ListItr.cursor(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.ListItr.cursor(itrClone));
+                              Assertions.assertEquals(FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.ListItr.lastRet(itr),FieldAndMethodAccessor.FloatArrSeq.UncheckedSubList.ListItr.lastRet(itrClone));
+                            }
+                            break;
+                          default:
+                            throw new UnsupportedOperationException("Unknown nestedType "+nestedType);
+                        }
+                        break;
+                      default:
+                        throw new UnsupportedOperationException("Unknown itrType "+itrType);
+                    }
+                    seqMonitor.verifyPreAlloc().verifyAscending(seqSize).verifyPostAlloc(PreModScenario.NoMod);
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    TestExecutorService.completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
   public void testItrremove_void(){
     for(var checkedType:CheckedType.values()){
       for(var removeScenario:ItrRemoveScenario.values()){

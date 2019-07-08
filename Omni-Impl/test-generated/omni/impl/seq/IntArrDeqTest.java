@@ -490,6 +490,57 @@ public class IntArrDeqTest{
     seqMonitor.verifyPreAlloc().verifyAscending(seqSize);
   }
   @org.junit.jupiter.api.Test
+  public void testItrclone_void(){
+    for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
+      for(var checkedType:CheckedType.values()){
+        for(var seqLocation:SequenceLocation.values()){
+          if(seqLocation.expectedException==null){
+            for(int tmpSeqSize=0;tmpSeqSize<=10;++tmpSeqSize){
+              final int seqSize=tmpSeqSize;
+              for(int tmpHead=0;tmpHead<tmpSeqSize;++tmpHead){
+                final int head=tmpHead;
+                TestExecutorService.submitTest(()->{
+                  SeqMonitor seqMonitor=new SeqMonitor(checkedType,seqSize,head,seqSize);
+                  initializeAscending(seqMonitor.seq.arr,head,seqSize);
+                  var itrMonitor=seqMonitor.getItrMonitor(seqLocation,itrType);
+                  var itr=itrMonitor.itr;
+                  var itrClone=itr.clone();
+                  itrMonitor.verifyIteratorState();
+                  seqMonitor.verifyStructuralIntegrity();
+                  Assertions.assertEquals(FieldAndMethodAccessor.IntArrDeq.AbstractDeqItr.cursor(itr),FieldAndMethodAccessor.IntArrDeq.AbstractDeqItr.cursor(itrClone));
+                  switch(itrType){
+                    case Itr:
+                      if(checkedType.checked){
+                        Assertions.assertSame(FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.root(itr),FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.root(itrClone));
+                        Assertions.assertEquals(FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.lastRet(itr),FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.lastRet(itrClone));                        
+                        Assertions.assertEquals(FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.modCount(itr),FieldAndMethodAccessor.IntArrDeq.Checked.AscendingItr.modCount(itrClone));                        
+                      }else{
+                        Assertions.assertSame(FieldAndMethodAccessor.IntArrDeq.AscendingItr.root(itr),FieldAndMethodAccessor.IntArrDeq.AscendingItr.root(itrClone));
+                      }
+                      break;
+                    case DescendingItr:
+                      if(checkedType.checked){
+                        Assertions.assertSame(FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.root(itr),FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.root(itrClone));
+                        Assertions.assertEquals(FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.lastRet(itr),FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.lastRet(itrClone));                        
+                        Assertions.assertEquals(FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.modCount(itr),FieldAndMethodAccessor.IntArrDeq.Checked.DescendingItr.modCount(itrClone));                        
+                      }else{
+                        Assertions.assertSame(FieldAndMethodAccessor.IntArrDeq.DescendingItr.root(itr),FieldAndMethodAccessor.IntArrDeq.DescendingItr.root(itrClone));
+                      }
+                      break;
+                    default:
+                      throw new UnsupportedOperationException("Unknown itrType "+itrType);
+                  }
+                  seqMonitor.verifyPreAlloc().verifyAscending(seqSize).verifyPostAlloc(PreModScenario.NoMod);
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    TestExecutorService.completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
   public void testItrremove_void(){
     for(var itrType:new ItrType[]{ItrType.Itr,ItrType.DescendingItr}){
       for(var checkedType:CheckedType.values()){

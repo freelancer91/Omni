@@ -1664,9 +1664,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
     private DescendingItr(CharArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(CharArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -3781,9 +3778,6 @@ public class CharArrDeq implements OmniDeque.OfChar,Externalizable,Cloneable,Ran
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

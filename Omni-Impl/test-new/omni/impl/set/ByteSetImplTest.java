@@ -29,12 +29,12 @@ import omni.impl.StructType;
 import omni.util.TestExecutorService;
 @Tag(value="NewTest")
 public class ByteSetImplTest{
-    private static final EnumSet<SetInitializationSequence> VALID_INIT_SEQS=EnumSet.of(SetInitializationSequence.Empty,
-            SetInitializationSequence.AddTrue,SetInitializationSequence.AddFalse,
-            SetInitializationSequence.AddTrueAndFalse,SetInitializationSequence.AddPrime,
-            SetInitializationSequence.AddFibSeq,SetInitializationSequence.AddMinByte,
-            SetInitializationSequence.FillWord0,SetInitializationSequence.FillWord1,SetInitializationSequence.FillWord2,
-            SetInitializationSequence.FillWord3);
+    private static final EnumSet<SetInitialization> VALID_INIT_SEQS=EnumSet.of(SetInitialization.Empty,
+            SetInitialization.AddTrue,SetInitialization.AddFalse,
+            SetInitialization.AddTrueAndFalse,SetInitialization.AddPrime,
+            SetInitialization.AddFibSeq,SetInitialization.AddMinByte,
+            SetInitialization.FillWord0,SetInitialization.FillWord1,SetInitialization.FillWord2,
+            SetInitialization.FillWord3);
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
     private static int getSize(long...words){
@@ -45,8 +45,8 @@ public class ByteSetImplTest{
         return size;
     }
     private static void testforEach_ConsumerHelper(MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
-            long randSeed,CheckedType checkedType,SetInitializationSequence initSeq){
-        final var monitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+            long randSeed,CheckedType checkedType,SetInitialization initSet){
+        final var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
         if(functionGen.expectedException == null || monitor.size() == 0){
             monitor.verifyForEach(functionGen,functionCallType,randSeed);
         }else{
@@ -57,8 +57,8 @@ public class ByteSetImplTest{
     }
     private static void testItrforEachRemaining_ConsumerHelper(int itrScenario,IllegalModification preMod,
             MonitoredFunctionGen functionGen,FunctionCallType functionCallType,long randSeed,CheckedType checkedType,
-            SetInitializationSequence initSeq){
-        final var setMonitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+            SetInitialization initSet){
+        final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
         final var itrMonitor=setMonitor.getMonitoredIterator();
         switch(itrScenario){
         case 1:
@@ -83,8 +83,8 @@ public class ByteSetImplTest{
         }
     }
     private static void testItrnext_voidHelper(IllegalModification preMod,DataType outputType,CheckedType checkedType,
-            SetInitializationSequence initSeq){
-        final var setMonitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+            SetInitialization initSet){
+        final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
         final var itrMonitor=setMonitor.getMonitoredIterator();
         itrMonitor.illegalMod(preMod);
         if(preMod.expectedException == null){
@@ -102,8 +102,8 @@ public class ByteSetImplTest{
         setMonitor.verifyCollectionState();
     }
     private static void testItrremove_voidHelper(int itrCount,IteratorRemoveScenario itrRemoveScenario,
-            IllegalModification preMod,CheckedType checkedType,SetInitializationSequence initSeq){
-        final var setMonitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+            IllegalModification preMod,CheckedType checkedType,SetInitialization initSet){
+        final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
         final var itrMonitor=setMonitor.getMonitoredIterator();
         for(int i=0;i < itrCount;++i){
             itrMonitor.iterateForward();
@@ -131,8 +131,8 @@ public class ByteSetImplTest{
     }
     private static void testremoveIf_PredicateHelper(MonitoredRemoveIfPredicateGen filterGen,
             FunctionCallType functionCallType,long randSeed,double threshold,CheckedType checkedType,
-            SetInitializationSequence initSeq){
-        final var monitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+            SetInitialization initSet){
+        final var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
         final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,4);
         final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,randSeed);
         final int sizeBefore=monitor.size();
@@ -176,10 +176,10 @@ public class ByteSetImplTest{
             final int min=inputType.getMinInt();
             final int max=inputType.getMaxInt();
             for(final var checkedType:CheckedType.values()){
-                for(final var initSeq:VALID_INIT_SEQS){
+                for(final var initSet:VALID_INIT_SEQS){
                     for(final var functionCallType:FunctionCallType.values()){
                         TestExecutorService.submitTest(()->{
-                            final var monitor=initSeq.initialize(new ByteSetImplMonitor(checkedType,0,0,0,0));
+                            final var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType,0,0,0,0));
                             for(int i=min;i <= max;++i){
                                 Assertions.assertEquals(!monitor.set.contains((byte)DataType.BYTE.convertVal(i)),
                                         monitor.verifyAdd(inputType.convertVal(i),inputType,functionCallType));
@@ -193,13 +193,13 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testclear_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyClear();
         test.runAllTests("ByteSetImplTest.testclear_void");
     }
     @org.junit.jupiter.api.Test
     public void testclone_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyClone();
         test.runAllTests("ByteSetImplTest.testclone_void");
     }
@@ -253,15 +253,15 @@ public class ByteSetImplTest{
     @org.junit.jupiter.api.Test
     public void testforEach_Consumer(){
         for(final var functionGen:StructType.ByteSetImpl.validMonitoredFunctionGens){
-            for(final var initSeq:VALID_INIT_SEQS){
-                final int size=initSeq.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
+            for(final var initSet:VALID_INIT_SEQS){
+                final int size=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
                 for(final var functionCallType:FunctionCallType.values()){
                     final long randSeedBound=functionGen.randomized && size > 1 && !functionCallType.boxed?100:0;
                     for(final var checkedType:CheckedType.values()){
                         if(checkedType.checked || functionGen.expectedException == null || size == 0){
                             LongStream.rangeClosed(0,randSeedBound).forEach(
                                     randSeed->TestExecutorService.submitTest(()->testforEach_ConsumerHelper(functionGen,
-                                            functionCallType,randSeed,checkedType,initSeq)));
+                                            functionCallType,randSeed,checkedType,initSet)));
                         }
                     }
                 }
@@ -271,32 +271,32 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testhashCode_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyHashCode();
         test.runAllTests("ByteSetImplTest.testhashCode_void");
     }
     @org.junit.jupiter.api.Test
     public void testisEmpty_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyIsEmpty();
         test.runAllTests("ByteSetImplTest.testisEmpty_void");
     }
     @org.junit.jupiter.api.Test
     public void testiterator_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .getMonitoredIterator().verifyIteratorState();
         test.runAllTests("ByteSetImplTest.testiterator_void");
     }
     @org.junit.jupiter.api.Test
     public void testItrclone_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("ByteSetImplTest.testItrclone_void");
     }
     @org.junit.jupiter.api.Test
     public void testItrforEachRemaining_Consumer(){
-        for(final var initSeq:VALID_INIT_SEQS){
-            final int size=initSeq.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
+        for(final var initSet:VALID_INIT_SEQS){
+            final int size=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
             for(final var checkedType:CheckedType.values()){
                 for(final var functionGen:IteratorType.AscendingItr.validMonitoredFunctionGens){
                     if(checkedType.checked || functionGen.expectedException == null || size == 0){
@@ -313,7 +313,7 @@ public class ByteSetImplTest{
                                                     TestExecutorService.submitTest(
                                                             ()->testItrforEachRemaining_ConsumerHelper(itrScenario,
                                                                     preMod,functionGen,functionCallType,randSeed,
-                                                                    checkedType,initSeq));
+                                                                    checkedType,initSet));
                                                 }
                                             });
                                 });
@@ -327,8 +327,8 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testItrhasNext_void(){
-        final BasicTest test=(checkedType,initSeq)->{
-            final var setMonitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+        final BasicTest test=(checkedType,initSet)->{
+            final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
             final var itrMonitor=setMonitor.getMonitoredIterator();
             final var setSize=setMonitor.size();
             for(int i=0;i < setSize;++i){
@@ -345,9 +345,9 @@ public class ByteSetImplTest{
             for(final var checkedType:CheckedType.values()){
                 for(final var preMod:IteratorType.AscendingItr.validPreMods){
                     if(checkedType.checked || preMod.expectedException == null){
-                        for(final var initSeq:VALID_INIT_SEQS){
+                        for(final var initSet:VALID_INIT_SEQS){
                             TestExecutorService
-                            .submitTest(()->testItrnext_voidHelper(preMod,outputType,checkedType,initSeq));
+                            .submitTest(()->testItrnext_voidHelper(preMod,outputType,checkedType,initSet));
                         }
                     }
                 }
@@ -357,8 +357,8 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testItrremove_void(){
-        for(final var initSeq:VALID_INIT_SEQS){
-            final int setSize=initSeq.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
+        for(final var initSet:VALID_INIT_SEQS){
+            final int setSize=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
             for(final var checkedType:CheckedType.values()){
                 for(final var itrRemoveScenario:IteratorType.AscendingItr.validItrRemoveScenarios){
                     if((setSize != 0 || itrRemoveScenario == IteratorRemoveScenario.PostInit)
@@ -374,7 +374,7 @@ public class ByteSetImplTest{
                                 }
                                 IntStream.rangeClosed(itrOffset,itrBound).forEach(
                                         itrCount->TestExecutorService.submitTest(()->testItrremove_voidHelper(itrCount,
-                                                itrRemoveScenario,preMod,checkedType,initSeq)));
+                                                itrRemoveScenario,preMod,checkedType,initSet)));
                             }
                         }
                     }
@@ -385,14 +385,14 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSeq)->initSeq
+        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->initSet
                 .initialize(new ByteSetImplMonitor(checkedType)).verifyReadAndWrite(functionGen);
         test.runAllTests("ByteSetImplTest.testReadAndWrite");
     }
     @org.junit.jupiter.api.Test
     public void testremoveIf_Predicate(){
-        for(final var initSeq:VALID_INIT_SEQS){
-            final int setSize=initSeq.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
+        for(final var initSet:VALID_INIT_SEQS){
+            final int setSize=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
             for(final var filterGen:StructType.ByteSetImpl.validMonitoredRemoveIfPredicateGens){
                 for(final var functionCallType:FunctionCallType.values()){
                     final long randSeedBound;
@@ -410,7 +410,7 @@ public class ByteSetImplTest{
                             .forEach(randSeed->DoubleStream.of(thresholdArr)
                                     .forEach(threshold->TestExecutorService
                                             .submitTest(()->testremoveIf_PredicateHelper(filterGen,
-                                                    functionCallType,randSeed,threshold,checkedType,initSeq))));
+                                                    functionCallType,randSeed,threshold,checkedType,initSet))));
                         }
                     }
                 }
@@ -426,14 +426,14 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testsize_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifySize();
         test.runAllTests("ByteSetImplTest.testsize_void");
     }
     @org.junit.jupiter.api.Test
     public void testtoArray_IntFunction(){
-        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSeq)->{
-            final var monitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
+            final var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
             if(functionGen.expectedException == null){
                 monitor.verifyToArray(functionGen);
             }else{
@@ -445,14 +445,14 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testtoArray_ObjectArray(){
-        for(final var initSeq:VALID_INIT_SEQS){
-            final int size=initSeq.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
+        for(final var initSet:VALID_INIT_SEQS){
+            final int size=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
             for(final var checkedType:CheckedType.values()){
                 for(int arrSize=0,increment=Math.max(1,size / 10),bound=size + increment
                         + 2;arrSize <= bound;arrSize+=increment){
                     final Object[] paramArr=new Object[arrSize];
                     TestExecutorService.submitTest(
-                            ()->initSeq.initialize(new ByteSetImplMonitor(checkedType)).verifyToArray(paramArr));
+                            ()->initSet.initialize(new ByteSetImplMonitor(checkedType)).verifyToArray(paramArr));
                 }
             }
         }
@@ -462,9 +462,9 @@ public class ByteSetImplTest{
     public void testtoArray_void(){
         for(final var outputType:DataType.BYTE.validOutputTypes()){
             for(final var checkedType:CheckedType.values()){
-                for(final var initSeq:VALID_INIT_SEQS){
+                for(final var initSet:VALID_INIT_SEQS){
                     TestExecutorService.submitTest(
-                            ()->outputType.verifyToArray(initSeq.initialize(new ByteSetImplMonitor(checkedType))));
+                            ()->outputType.verifyToArray(initSet.initialize(new ByteSetImplMonitor(checkedType))));
                 }
             }
         }
@@ -472,7 +472,7 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testtoString_void(){
-        final BasicTest test=(checkedType,initSeq)->initSeq.initialize(new ByteSetImplMonitor(checkedType))
+        final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyToString();
         test.runAllTests("ByteSetImplTest.testtoString_void");
     }
@@ -487,13 +487,13 @@ public class ByteSetImplTest{
     private interface BasicTest{
         default void runAllTests(String testName){
             for(final var checkedType:CheckedType.values()){
-                for(final var initSeq:VALID_INIT_SEQS){
-                    TestExecutorService.submitTest(()->runTest(checkedType,initSeq));
+                for(final var initSet:VALID_INIT_SEQS){
+                    TestExecutorService.submitTest(()->runTest(checkedType,initSet));
                 }
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(CheckedType checkedType,SetInitializationSequence initSeq);
+        void runTest(CheckedType checkedType,SetInitialization initSet);
     }
     private static class ByteSetImplMonitor implements MonitoredSet<ByteSetImpl>{
         final CheckedType checkedType;
@@ -630,18 +630,14 @@ public class ByteSetImplTest{
         public void verifyArrayIsCopy(Object arr){
             // nothing to do
         }
-        @Override
-        public void verifyClear(){
-            set.clear();
-            if(expectedSize != 0){
-                for(int i=0;i < 4;++i){
-                    expectedWords[i]=0;
-                }
-                expectedSize=0;
-                ++expectedModCount;
-            }
-            verifyCollectionState();
+        @Override public void updateClearState() {
+          for(int i=0;i < 4;++i){
+            expectedWords[i]=0;
+          }
+          expectedSize=0;
+          ++expectedModCount;
         }
+       
         @Override
         public void verifyClone(Object clone){
             ByteSetImpl cast;
@@ -892,15 +888,15 @@ public class ByteSetImplTest{
             for(final var functionGen:StructType.ByteSetImpl.validMonitoredFunctionGens){
                 for(final var checkedType:CheckedType.values()){
                     if(checkedType.checked || functionGen.expectedException == null){
-                        for(final var initSeq:VALID_INIT_SEQS){
-                            TestExecutorService.submitTest(()->runTest(functionGen,checkedType,initSeq));
+                        for(final var initSet:VALID_INIT_SEQS){
+                            TestExecutorService.submitTest(()->runTest(functionGen,checkedType,initSet));
                         }
                     }
                 }
             }
             TestExecutorService.completeAllTests(testName);
         }
-        void runTest(MonitoredFunctionGen functionGen,CheckedType checkedType,SetInitializationSequence initSeq);
+        void runTest(MonitoredFunctionGen functionGen,CheckedType checkedType,SetInitialization initSet);
     }
     private static interface QueryTest{
         boolean callMethod(ByteSetImplMonitor monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
@@ -914,9 +910,9 @@ public class ByteSetImplTest{
                                 final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,castType,
                                         inputType,DataType.BYTE);
                                 for(final var checkedType:CheckedType.values()){
-                                    for(final var initSeq:VALID_INIT_SEQS){
+                                    for(final var initSet:VALID_INIT_SEQS){
                                         TestExecutorService.submitTest(()->runTest(queryCanReturnTrue,queryVal,
-                                                modification,inputType,castType,checkedType,initSeq));
+                                                modification,inputType,castType,checkedType,initSet));
                                     }
                                 }
                             });
@@ -927,9 +923,9 @@ public class ByteSetImplTest{
             TestExecutorService.completeAllTests(testName);
         }
         default void runTest(boolean queryCanReturnTrue,QueryVal queryVal,QueryVal.QueryValModification modification,
-                DataType inputType,QueryCastType castType,CheckedType checkedType,SetInitializationSequence initSeq){
+                DataType inputType,QueryCastType castType,CheckedType checkedType,SetInitialization initSet){
             boolean expectedResult;
-            final var monitor=initSeq.initialize(new ByteSetImplMonitor(checkedType));
+            final var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
             if(queryCanReturnTrue){
                 final byte byteInputVal=queryVal.getByteVal(modification);
                 expectedResult=(monitor.expectedWords[(byteInputVal >> 6) + 2] & 1L << byteInputVal) != 0;

@@ -1995,9 +1995,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
     private DescendingItr(BooleanArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(BooleanArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -2547,9 +2544,6 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

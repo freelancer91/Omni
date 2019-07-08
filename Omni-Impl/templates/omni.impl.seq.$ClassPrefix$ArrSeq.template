@@ -1271,15 +1271,16 @@ public
       this.lastRet=-1;
   #ENDIF
     }
-  
+ #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList,UncheckedList,UncheckedSubList
     private Itr(STRUCTNAME$<E>$ parent,int cursor){
       this.parent=parent;
       this.cursor=cursor;
-    #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList,CheckedStack
+    #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
       this.modCount=parent.modCount;
       this.lastRet=-1;
     #ENDIF
     }
+ #ENDIF
     @Override public Object clone(){
       return new Itr$<E>$(this);
     }

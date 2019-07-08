@@ -2000,9 +2000,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
     private DescendingItr(FloatArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(FloatArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -4117,9 +4114,6 @@ public class FloatArrDeq implements OmniDeque.OfFloat,Externalizable,Cloneable,R
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

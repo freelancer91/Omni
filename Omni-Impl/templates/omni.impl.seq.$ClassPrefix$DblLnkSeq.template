@@ -2372,9 +2372,6 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       private DescendingItr(UncheckedList$<E>$ parent){
         super(parent,parent.tail);
       }
-      private DescendingItr(UncheckedList$<E>$ parent,$DNode$$<E>$ curr){
-        super(parent,curr);
-      }
       @Override public Object clone(){
         return new DescendingItr$<E>$(this);
       }

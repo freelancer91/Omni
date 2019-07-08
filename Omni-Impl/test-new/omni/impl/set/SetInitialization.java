@@ -5,7 +5,7 @@ import java.util.Random;
 import omni.api.OmniSet;
 import omni.impl.DataType;
 import omni.impl.MonitoredSet;
-public enum SetInitializationSequence{
+public enum SetInitialization{
     Empty("Empty",true){
         @Override
         public <SET extends MonitoredSet<?>> SET initialize(SET monitoredSet){
@@ -562,12 +562,12 @@ public enum SetInitializationSequence{
     public final String name;
     public final boolean isEmpty;
     public final EnumSet<DataType> validDataTypes;
-    SetInitializationSequence(String name,boolean isEmpty){
+    SetInitialization(String name,boolean isEmpty){
         this.name=name;
         this.isEmpty=isEmpty;
         this.validDataTypes=initValidDataTypes(this);
     }
-    private static final EnumSet<DataType> initValidDataTypes(SetInitializationSequence initSeq){
+    private static final EnumSet<DataType> initValidDataTypes(SetInitialization initSeq){
         switch(initSeq.name){
         case "Empty":
             return DataType.getDataTypeSet("BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,REF");

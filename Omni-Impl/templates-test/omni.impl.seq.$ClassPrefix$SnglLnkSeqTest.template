@@ -1623,6 +1623,92 @@ public class $ClassPrefix$SnglLnkSeqTest{
     //TODO verify the iterated values
   }
   @org.junit.jupiter.api.Test
+  public void testItrclone_void(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(int numToAdd:Abstract$ClassPrefix$SeqMonitor.FIB_SEQ){
+          for(var seqLocation:SequenceLocation.values()){
+            if(seqLocation.expectedException==null){
+              TestExecutorService.submitTest(()->{
+                var seqMonitor=new SeqMonitor(nestedType,checkedType);
+                for(int i=0;i<numToAdd;++i){
+                  seqMonitor.add(i);
+                }
+                var itrMonitor=seqMonitor.getItrMonitor();
+                switch(seqLocation){
+                  case BEGINNING:
+                    break;
+                  case NEARBEGINNING:
+                    for(int i=0,bound=numToAdd/4;i<bound;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  case MIDDLE:
+                    for(int i=0,bound=numToAdd/2;i<bound;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  case NEAREND:
+                    for(int i=0,bound=(numToAdd/4)*3;i<bound;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  case END:
+                    for(int i=0;i<numToAdd;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  default:
+                    throw new Error("Unknown seqLocation "+seqLocation);
+                }
+                var itr=itrMonitor.itr;
+                var itrClone=itr.clone();
+                itrMonitor.verifyIteratorState();
+                seqMonitor.verifyStructuralIntegrity();
+                switch(nestedType){
+                  case QUEUE:{
+                    if(checkedType.checked){
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.parent(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.curr(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.prev(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.next(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.next(itrClone));
+                      Assertions.assertEquals(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.modCount(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedQueue.Itr.modCount(itrClone));
+                    }else{
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.parent(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.curr(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.prev(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.next(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedQueue.Itr.next(itrClone));
+                    }
+                    break;
+                  }
+                  case STACK:{
+                    if(checkedType.checked){
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.parent(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.curr(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.prev(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.next(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.next(itrClone));
+                      Assertions.assertEquals(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.modCount(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.CheckedStack.Itr.modCount(itrClone));
+                    }else{
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.parent(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.curr(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.prev(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.next(itr),FieldAndMethodAccessor.$ClassPrefix$SnglLnkSeq.UncheckedStack.Itr.next(itrClone));
+                    }
+                    break;
+                  }
+                  default:
+                    throw new UnsupportedOperationException("Unknown nestedType "+nestedType);
+                }
+                seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc(PreModScenario.NoMod);
+              });
+            }
+          }
+        }
+      }
+    }
+    TestExecutorService.completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
   public void testItrremove_void(){
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){

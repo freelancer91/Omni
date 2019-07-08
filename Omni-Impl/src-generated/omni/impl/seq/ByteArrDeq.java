@@ -1729,9 +1729,6 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
     private DescendingItr(ByteArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(ByteArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -3846,9 +3843,6 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

@@ -1119,10 +1119,6 @@ AbstractSeq<E>
         this.parent=parent;
         this.cursor=parent.size;
       }
-      private Itr(UncheckedStack<E> parent,int cursor){
-        this.parent=parent;
-        this.cursor=cursor;
-      }
       @Override public Object clone(){
         return new Itr<E>(this);
       }
@@ -3572,12 +3568,6 @@ AbstractSeq<E>
       private Itr(CheckedStack<E> parent){
         this.parent=parent;
         this.cursor=parent.size;
-        this.modCount=parent.modCount;
-        this.lastRet=-1;
-      }
-      private Itr(CheckedStack<E> parent,int cursor){
-        this.parent=parent;
-        this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }

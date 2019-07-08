@@ -892,9 +892,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
     private DescendingItr($ClassPrefix$ArrDeq$<E>$ root){
       super(root,root.tail);
     }
-    private DescendingItr($ClassPrefix$ArrDeq$<E>$ root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr$<E>$(this);
     }
@@ -3377,9 +3374,6 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       }
       private DescendingItr(Checked$<E>$ root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked$<E>$ root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr$<E>$(this);

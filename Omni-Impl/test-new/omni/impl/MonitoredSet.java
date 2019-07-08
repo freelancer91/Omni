@@ -111,10 +111,6 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         }
         throw dataType.invalid();
     }
-    @Override
-    default void verifyToString(String string){
-        getDataType().verifyToString(string,getCollection());
-    }
     @Override default void verifyHashCode(int hashCode){
         int expectedHashCode=0;
         SET collection=getCollection();

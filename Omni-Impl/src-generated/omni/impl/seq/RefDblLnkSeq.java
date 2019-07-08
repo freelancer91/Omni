@@ -7161,9 +7161,6 @@ AbstractSeq<E>
       private DescendingItr(UncheckedList<E> parent){
         super(parent,parent.tail);
       }
-      private DescendingItr(UncheckedList<E> parent,RefDblLnkNode<E> curr){
-        super(parent,curr);
-      }
       @Override public Object clone(){
         return new DescendingItr<E>(this);
       }

@@ -1966,9 +1966,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
     private DescendingItr(RefArrDeq<E> root){
       super(root,root.tail);
     }
-    private DescendingItr(RefArrDeq<E> root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr<E>(this);
     }
@@ -4249,9 +4246,6 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       }
       private DescendingItr(Checked<E> root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked<E> root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr<E>(this);

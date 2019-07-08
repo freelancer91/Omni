@@ -812,7 +812,7 @@ public class BooleanSetImpl implements OmniSet.OfBoolean,Cloneable,Externalizabl
     }
     @Override public boolean equals(Object val){
         // TODO Auto-generated method stub
-        return super.equals(val);
+        return false;
     }
     @SuppressWarnings("unchecked")
     @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){

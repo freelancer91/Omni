@@ -1454,9 +1454,6 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
     private DescendingItr(LongArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(LongArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -3571,9 +3568,6 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

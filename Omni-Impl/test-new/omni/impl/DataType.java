@@ -18,7 +18,6 @@ import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
-import omni.api.OmniSet;
 import omni.api.OmniStack;
 import omni.function.BooleanComparator;
 import omni.function.BooleanConsumer;
@@ -143,7 +142,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -165,7 +164,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -466,7 +465,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -488,7 +487,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -695,7 +694,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -714,7 +713,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -917,7 +916,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -939,7 +938,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1133,7 +1132,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1155,7 +1154,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1340,7 +1339,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1362,7 +1361,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1558,7 +1557,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1580,7 +1579,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1611,6 +1610,8 @@ public enum DataType{
             Assertions.assertEquals(']',result.charAt(++offset));
             Assertions.assertEquals(offset + 1,result.length());
         }
+
+        
     },
     DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
             double.class,Double[].class,double[].class,"Double","Double",
@@ -1710,7 +1711,7 @@ public enum DataType{
             }
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1732,7 +1733,7 @@ public enum DataType{
             Assertions.assertEquals(offset+1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1928,7 +1929,7 @@ public enum DataType{
             return collection.search(inputVal);
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection){
+        public void verifyToString(String result,OmniCollection<?> collection){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -1949,7 +1950,7 @@ public enum DataType{
             Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
-        public void verifyToString(String result,OmniSet<?> collection,String testName){
+        public void verifyToString(String result,OmniCollection<?> collection,String testName){
             var itr=collection.iterator();
             int offset;
             Assertions.assertEquals('[',result.charAt(offset=0));
@@ -2015,7 +2016,6 @@ public enum DataType{
         public boolean isValidQueryVal(QueryVal queryVal){
             return true;
         }
-
     };
     private static void incrementProgressBar(int nextPercent){
         if(nextPercent % 10 == 0){
@@ -2154,8 +2154,8 @@ public enum DataType{
         }
         throw inputType.invalid();
     }
-    public abstract void verifyToString(String result,OmniSet<?> collection,String testName);
-    public abstract void verifyToString(String result,OmniSet<?> collection);
+    public abstract void verifyToString(String result,OmniCollection<?> collection,String testName);
+    public abstract void verifyToString(String result,OmniCollection<?> collection);
     public abstract boolean callcontains(OmniCollection<?> collection,Object inputVal,
             FunctionCallType functionCallType);
     public abstract boolean callremoveVal(OmniCollection<?> collection,Object inputVal,
@@ -2172,6 +2172,7 @@ public enum DataType{
     public abstract Object callIteratorPrev(OmniListIterator<?> itr);
     public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
             FunctionCallType functionCallType);
+    
     public int getMaxInt(){
         throw new UnsupportedOperationException();
     }

@@ -1734,9 +1734,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
     private DescendingItr(DoubleArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(DoubleArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -3851,9 +3848,6 @@ public class DoubleArrDeq implements OmniDeque.OfDouble,Externalizable,Cloneable
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

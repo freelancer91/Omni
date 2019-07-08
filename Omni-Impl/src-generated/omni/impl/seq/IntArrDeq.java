@@ -1543,9 +1543,6 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
     private DescendingItr(IntArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(IntArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -3660,9 +3657,6 @@ public class IntArrDeq implements OmniDeque.OfInt,Externalizable,Cloneable,Rando
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);

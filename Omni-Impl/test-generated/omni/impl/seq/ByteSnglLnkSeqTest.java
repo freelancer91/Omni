@@ -1160,6 +1160,92 @@ public class ByteSnglLnkSeqTest{
     //TODO verify the iterated values
   }
   @org.junit.jupiter.api.Test
+  public void testItrclone_void(){
+    for(var nestedType:NestedType.values()){
+      for(var checkedType:CheckedType.values()){
+        for(int numToAdd:AbstractByteSeqMonitor.FIB_SEQ){
+          for(var seqLocation:SequenceLocation.values()){
+            if(seqLocation.expectedException==null){
+              TestExecutorService.submitTest(()->{
+                var seqMonitor=new SeqMonitor(nestedType,checkedType);
+                for(int i=0;i<numToAdd;++i){
+                  seqMonitor.add(i);
+                }
+                var itrMonitor=seqMonitor.getItrMonitor();
+                switch(seqLocation){
+                  case BEGINNING:
+                    break;
+                  case NEARBEGINNING:
+                    for(int i=0,bound=numToAdd/4;i<bound;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  case MIDDLE:
+                    for(int i=0,bound=numToAdd/2;i<bound;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  case NEAREND:
+                    for(int i=0,bound=(numToAdd/4)*3;i<bound;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  case END:
+                    for(int i=0;i<numToAdd;++i){
+                      itrMonitor.iterateForward();
+                    }
+                    break;
+                  default:
+                    throw new Error("Unknown seqLocation "+seqLocation);
+                }
+                var itr=itrMonitor.itr;
+                var itrClone=itr.clone();
+                itrMonitor.verifyIteratorState();
+                seqMonitor.verifyStructuralIntegrity();
+                switch(nestedType){
+                  case QUEUE:{
+                    if(checkedType.checked){
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.parent(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.curr(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.prev(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.next(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.next(itrClone));
+                      Assertions.assertEquals(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.modCount(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedQueue.Itr.modCount(itrClone));
+                    }else{
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.parent(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.curr(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.prev(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.next(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedQueue.Itr.next(itrClone));
+                    }
+                    break;
+                  }
+                  case STACK:{
+                    if(checkedType.checked){
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.parent(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.curr(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.prev(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.next(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.next(itrClone));
+                      Assertions.assertEquals(FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.modCount(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.CheckedStack.Itr.modCount(itrClone));
+                    }else{
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.parent(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.parent(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.curr(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.curr(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.prev(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.prev(itrClone));
+                      Assertions.assertSame(FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.next(itr),FieldAndMethodAccessor.ByteSnglLnkSeq.UncheckedStack.Itr.next(itrClone));
+                    }
+                    break;
+                  }
+                  default:
+                    throw new UnsupportedOperationException("Unknown nestedType "+nestedType);
+                }
+                seqMonitor.verifyPreAlloc().verifyNaturalAscending(numToAdd).verifyPostAlloc(PreModScenario.NoMod);
+              });
+            }
+          }
+        }
+      }
+    }
+    TestExecutorService.completeAllTests();
+  }
+  @org.junit.jupiter.api.Test
   public void testItrremove_void(){
     for(var nestedType:NestedType.values()){
       for(var checkedType:CheckedType.values()){

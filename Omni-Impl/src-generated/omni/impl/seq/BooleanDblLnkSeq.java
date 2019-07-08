@@ -6667,9 +6667,6 @@ AbstractSeq<Boolean>
       private DescendingItr(UncheckedList parent){
         super(parent,parent.tail);
       }
-      private DescendingItr(UncheckedList parent,BooleanDblLnkNode curr){
-        super(parent,curr);
-      }
       @Override public Object clone(){
         return new DescendingItr(this);
       }

@@ -34,12 +34,23 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     DataType getDataType();
     MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator();
     StructType getStructType();
-    boolean isEmpty();
+    default boolean isEmpty() {
+      return size()==0;
+    }
     void modCollection();
     void modParent();
     void modRoot();
     int size();
-    void verifyClear();
+    void updateClearState();
+    default void verifyClear(){
+      var lst=getCollection();
+      lst.clear();
+      int size=size();
+      if(size!=0) {
+        updateClearState();
+      }
+      verifyCollectionState();
+    }
     void updateCollectionState();
     void verifyCollectionState();
     void verifyClone(Object clone);
@@ -47,7 +58,9 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType);
     boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification);
-    void verifyToString(String string);
+    default void verifyToString(String string){
+      getDataType().verifyToString(string,getCollection());
+    }
     void verifyMASSIVEToString(String string,String testName);
     void verifyHashCode(int hashCode);
     void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter);
@@ -320,7 +333,6 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     default boolean verifyRemoveIf(MonitoredRemoveIfPredicate filter,FunctionCallType functionCallType){
         COL collection=getCollection();
         DataType dataType=getDataType();
-        // var filter=filterGen.getMonitoredRemoveIfPredicate(this,threshold,randSeed);
         boolean result;
         switch(dataType) {
         case BOOLEAN:

@@ -905,7 +905,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
     }
     @Override public boolean equals(Object val){
       // TODO Auto-generated method stub
-      return super.equals(val);
+      return false;
     }
     @Override public void writeExternal(ObjectOutput out) throws IOException{
       int modCount=this.modCount;

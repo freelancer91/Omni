@@ -1692,9 +1692,6 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
     private DescendingItr(ShortArrDeq root){
       super(root,root.tail);
     }
-    private DescendingItr(ShortArrDeq root,int cursor){
-      super(root,cursor);
-    }
     @Override public Object clone(){
       return new DescendingItr(this);
     }
@@ -3809,9 +3806,6 @@ public class ShortArrDeq implements OmniDeque.OfShort,Externalizable,Cloneable,R
       }
       private DescendingItr(Checked root){
         super(root,root.tail);
-      }
-      private DescendingItr(Checked root,int cursor){
-        super(root,cursor);
       }
       @Override public Object clone(){
         return new DescendingItr(this);
