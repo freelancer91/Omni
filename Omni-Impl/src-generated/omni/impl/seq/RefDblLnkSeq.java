@@ -2524,12 +2524,13 @@ AbstractSeq<E>
       @Override public void forEachRemaining(Consumer<? super E> action){
         int size,numLeft;
         final CheckedSubList<E> parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             RefDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -5785,7 +5786,7 @@ AbstractSeq<E>
         try{
           RefDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
         this.curr=null;
         this.lastRet=parent.head;
@@ -5917,12 +5918,13 @@ AbstractSeq<E>
       @Override public void forEachRemaining(Consumer<? super E> action){
         final int size,numLeft;
         final CheckedList<E> parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             RefDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;

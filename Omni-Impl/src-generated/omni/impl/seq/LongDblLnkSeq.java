@@ -1986,12 +1986,13 @@ AbstractSeq<Long>
       @Override public void forEachRemaining(LongConsumer action){
         int size,numLeft;
         final CheckedSubList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -2001,12 +2002,13 @@ AbstractSeq<Long>
       @Override public void forEachRemaining(Consumer<? super Long> action){
         final int size,numLeft;
         final CheckedSubList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -4598,7 +4600,7 @@ AbstractSeq<Long>
         try{
           LongDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
         this.curr=null;
         this.lastRet=parent.head;
@@ -4736,12 +4738,13 @@ AbstractSeq<Long>
       @Override public void forEachRemaining(LongConsumer action){
         final int size,numLeft;
         final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;
@@ -4751,12 +4754,13 @@ AbstractSeq<Long>
       @Override public void forEachRemaining(Consumer<? super Long> action){
         final int size,numLeft;
         final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             LongDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;

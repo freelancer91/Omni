@@ -473,9 +473,7 @@ public class IntegralOpenAddressHashSetTest{
                                                         for(int i=0;i < itrCount;++i){
                                                             itrMonitor.iterateForward();
                                                         }
-                                                        if(itrRemoveScenario == IteratorRemoveScenario.PostRemove){
-                                                            itrMonitor.remove();
-                                                        }
+                                                        itrRemoveScenario.initialize(itrMonitor);
                                                         itrMonitor.illegalMod(preMod);
                                                         final Class<? extends Throwable> expectedException=itrRemoveScenario.expectedException == null
                                                                 ?preMod.expectedException
@@ -1392,7 +1390,7 @@ public class IntegralOpenAddressHashSetTest{
             }
         }
         @Override
-        public void verifyArrayIsCopy(Object arr){
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
             switch(dataType){
             case CHAR:
                 Assertions.assertNotSame(((CharOpenAddressHashSet)set).table,arr);
@@ -2369,33 +2367,6 @@ public class IntegralOpenAddressHashSetTest{
                 expectedItrLastRet=-1;
             }
             @Override
-            public void updateIteratorState(){
-                switch(dataType){
-                case CHAR:
-                    expectedOffset=FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case SHORT:
-                    expectedOffset=FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case INT:
-                    expectedOffset=FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case LONG:
-                    expectedOffset=FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }
-            @Override
             public void updateItrRemoveState(){
                 ++expectedModCount;
                 ++expectedItrModCount;
@@ -2428,43 +2399,43 @@ public class IntegralOpenAddressHashSetTest{
                 expectedItrLastRet=super.verifyForEachRemainingHelper(function,expectedItrLastRet);
             }
             @Override
-            public void verifyIteratorState(Object itr){
+            public void verifyCloneHelper(Object clone){
                 switch(dataType){
                 case CHAR:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.offset(itr));
+                            FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.CharOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 case SHORT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.offset(itr));
+                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 case INT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.offset(itr));
+                            FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.IntOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 case LONG:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.offset(itr));
+                            FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.LongOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 default:
                     throw dataType.invalid();
@@ -2480,29 +2451,14 @@ public class IntegralOpenAddressHashSetTest{
                 expectedItrLastRet=this.expectedOffset;
                 super.updateItrNextFromWords(expectedOffset);
             }
+            @Override
+            public boolean nextWasJustCalled(){
+                return expectedItrLastRet != -1;
+            }
         }
         class UncheckedItrMonitor extends AbstractItrMonitor{
             UncheckedItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft){
                 super(itr,expectedOffset,expectedNumLeft);
-            }
-            @Override
-            public void updateIteratorState(){
-                switch(dataType){
-                case CHAR:
-                    expectedOffset=FieldAndMethodAccessor.CharOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                case SHORT:
-                    expectedOffset=FieldAndMethodAccessor.ShortOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                case INT:
-                    expectedOffset=FieldAndMethodAccessor.IntOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                case LONG:
-                    expectedOffset=FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.offset(itr);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
             }
             @Override
             public void updateItrRemoveState(){
@@ -2602,30 +2558,114 @@ public class IntegralOpenAddressHashSetTest{
                 super.verifyForEachRemainingHelper(function,-1);
             }
             @Override
-            public void verifyIteratorState(Object itr){
+            public void verifyCloneHelper(Object clone){
                 switch(dataType){
                 case CHAR:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.CharOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.CharOpenAddressHashSet.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.CharOpenAddressHashSet.Itr.offset(itr));
+                            FieldAndMethodAccessor.CharOpenAddressHashSet.Itr.offset(clone));
                     break;
                 case SHORT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.ShortOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.ShortOpenAddressHashSet.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Itr.offset(itr));
+                            FieldAndMethodAccessor.ShortOpenAddressHashSet.Itr.offset(clone));
                     break;
                 case INT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.IntOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.IntOpenAddressHashSet.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.IntOpenAddressHashSet.Itr.offset(itr));
+                            FieldAndMethodAccessor.IntOpenAddressHashSet.Itr.offset(clone));
                     break;
                 case LONG:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.offset(itr));
+                            FieldAndMethodAccessor.LongOpenAddressHashSet.Itr.offset(clone));
                     break;
                 default:
                     throw dataType.invalid();
+                }
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                int expectedOffset;
+                int bitIndex;
+                switch(bitIndex=(expectedOffset=this.expectedOffset) - 1 >> 6){
+                default:
+                    if(expectedTableLength != 0){
+                        if(expectedOffset == -1){
+                            expectedOffset=expectedTableLength;
+                        }else{
+                            expectedOffset-=256;
+                        }
+                        switch(dataType){
+                        case CHAR:{
+                            final char[] table=(char[])expectedTable;
+                            for(;;){
+                                if((table[--expectedOffset] & -2) != 0){
+                                    return true;
+                                }
+                                if(expectedOffset == 0){
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case SHORT:{
+                            final short[] table=(short[])expectedTable;
+                            for(;;){
+                                if((table[--expectedOffset] & -2) != 0){
+                                    return true;
+                                }
+                                if(expectedOffset == 0){
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case INT:{
+                            final int[] table=(int[])expectedTable;
+                            for(;;){
+                                if((table[--expectedOffset] & -2) != 0){
+                                    return true;
+                                }
+                                if(expectedOffset == 0){
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case LONG:{
+                            final long[] table=(long[])expectedTable;
+                            for(;;){
+                                if((table[--expectedOffset] & -2) != 0){
+                                    return true;
+                                }
+                                if(expectedOffset == 0){
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        default:
+                            throw dataType.invalid();
+                        }
+                    }else{
+                        expectedOffset=0;
+                    }
+                    bitIndex=3;
+                case 3:
+                case 2:
+                case 1:
+                case 0:
+                    for(;;){
+                        if((expectedOffset=Long
+                                .numberOfLeadingZeros(expectedWords[bitIndex] & -1L >>> -expectedOffset)) != 64){
+                            return true;
+                        }
+                        expectedOffset=0;
+                        if(--bitIndex < 0){
+                            return false;
+                        }
+                    }
                 }
             }
         }

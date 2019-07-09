@@ -1,4 +1,5 @@
 package omni.impl.seq;
+import java.util.NoSuchElementException;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
@@ -6,10 +7,14 @@ import org.junit.jupiter.api.Test;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
+import omni.api.OmniListIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
 import omni.impl.IteratorType;
+import omni.impl.MonitoredCollection;
+import omni.impl.MonitoredFunction;
+import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredList;
 import omni.impl.MonitoredObjectGen;
 import omni.impl.QueryCastType;
@@ -22,24 +27,24 @@ public class ArrListTest{
     private static final double[] POSITIONS=new double[]{-1,0,0.5,1.0};
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
-    private static final int[] FIB_SEQ=new int[]{0,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,
-            17711,28657,46368,75025,121393,196418,317811,514229,832040,1346269,2178309,3524578,5702887,9227465,14930352,
-            24157817,39088169,63245986,102334155,165580141,267914296,433494437,701408733,1134903170,1836311903};
+    private static final int[] FIB_SEQ=new int[]{0,1,2,3,5,8,13,21,34,55,89};
+    private static final int[] EXTENDED_FIB_SEQ=new int[]{0,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,
+            6765,10946};
     @Test
     public void testadd_intval(){
-        for(var collectionType:DataType.values()){
-            for(var inputType:collectionType.mayBeAddedTo()){
-                for(var functionCallType:FunctionCallType.values()){
+        for(final var collectionType:DataType.values()){
+            for(final var inputType:collectionType.mayBeAddedTo()){
+                for(final var functionCallType:FunctionCallType.values()){
                     if(inputType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                        for(var initCap:INIT_CAPACITIES){
-                            for(var checkedType:CheckedType.values()){
-                                for(var position:POSITIONS){
+                        for(final var initCap:INIT_CAPACITIES){
+                            for(final var checkedType:CheckedType.values()){
+                                for(final var position:POSITIONS){
                                     if(position >= 0 || checkedType.checked){
                                         TestExecutorService.submitTest(()->{
-                                            var monitor=new ArrListMonitor(checkedType,collectionType,initCap);
+                                            final var monitor=new ArrListMonitor(checkedType,collectionType,initCap);
                                             if(position < 0){
                                                 for(int i=0;i < 1000;++i){
-                                                    Object inputVal=inputType.convertValUnchecked(i);
+                                                    final Object inputVal=inputType.convertValUnchecked(i);
                                                     final int finalI=i;
                                                     Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
                                                             .verifyAdd(-1,inputVal,inputType,functionCallType));
@@ -65,16 +70,17 @@ public class ArrListTest{
         }
         TestExecutorService.completeAllTests("ArrListTest.testadd_intval");
     }
-    @Test public void testadd_val() {
-        for(var collectionType:DataType.values()) {
-            for(var inputType:collectionType.mayBeAddedTo()) {
-                for(var functionCallType:FunctionCallType.values()) {
-                    if(inputType!=DataType.REF || functionCallType!=FunctionCallType.Boxed) {
-                        for(var initCap:INIT_CAPACITIES) {
-                            for(var checkedType:CheckedType.values()) {
+    @Test
+    public void testadd_val(){
+        for(final var collectionType:DataType.values()){
+            for(final var inputType:collectionType.mayBeAddedTo()){
+                for(final var functionCallType:FunctionCallType.values()){
+                    if(inputType != DataType.REF || functionCallType != FunctionCallType.Boxed){
+                        for(final var initCap:INIT_CAPACITIES){
+                            for(final var checkedType:CheckedType.values()){
                                 TestExecutorService.submitTest(()->{
-                                    var monitor=new ArrListMonitor(checkedType,collectionType,initCap);
-                                    for(int i=0;i<1000;++i) {
+                                    final var monitor=new ArrListMonitor(checkedType,collectionType,initCap);
+                                    for(int i=0;i < 1000;++i){
                                         monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
                                     }
                                 });
@@ -86,15 +92,18 @@ public class ArrListTest{
         }
         TestExecutorService.completeAllTests("ArrListTest.testadd_val");
     }
-    @Test public void testclear_void(){
-        BasicTest test=(monitor)->monitor.verifyClear();
+    @Test
+    public void testclear_void(){
+        final BasicTest test=(monitor)->monitor.verifyClear();
         test.runAllTests("ArrListTest.testclear_void");
     }
-    @Test public void testclone_void(){
-        BasicTest test=(monitor)->monitor.verifyClone();
+    @Test
+    public void testclone_void(){
+        final BasicTest test=(monitor)->monitor.verifyClone();
         test.runAllTests("ArrListTest.testclone_void");
     }
-    @Test public void testConstructor_int(){
+    @Test
+    public void testConstructor_int(){
         for(final var dataType:DataType.values()){
             for(final var checkedType:CheckedType.values()){
                 for(final var initCap:INIT_CAPACITIES){
@@ -149,7 +158,8 @@ public class ArrListTest{
         }
         TestExecutorService.completeAllTests("ArrListTest.testConstructor_int");
     }
-    @Test public void testConstructor_void(){
+    @Test
+    public void testConstructor_void(){
         for(final var dataType:DataType.values()){
             for(final var checkedType:CheckedType.values()){
                 TestExecutorService.submitTest(()->new ArrListMonitor(checkedType,dataType).verifyCollectionState());
@@ -159,7 +169,7 @@ public class ArrListTest{
     }
     @Test
     public void testcontains_val(){
-        QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
             if(monitoredObjectGen == null){
                 Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
             }else{
@@ -170,21 +180,20 @@ public class ArrListTest{
     }
     @Test
     public void testforEach_Consumer(){
-        for(var functionGen:StructType.ArrList.validMonitoredFunctionGens){
-            for(var checkedType:CheckedType.values()){
-                for(var size:FIB_SEQ){
-                    if(size > 1000){
-                        break;
-                    }
+        for(final var functionGen:StructType.ArrList.validMonitoredFunctionGens){
+            for(final var checkedType:CheckedType.values()){
+                for(final var size:FIB_SEQ){
                     if(size == 0 || checkedType.checked || functionGen.expectedException == null){
-                        for(var functionCallType:FunctionCallType.values()){
-                            long randSeedBound=functionGen.randomized && !functionCallType.boxed && size > 0?100:0;
+                        for(final var functionCallType:FunctionCallType.values()){
+                            final long randSeedBound=functionGen.randomized && !functionCallType.boxed && size > 0?100
+                                    :0;
                             LongStream.rangeClosed(0,randSeedBound).forEach(randSeed->{
-                                for(var collectionType:DataType.values()){
+                                for(final var collectionType:DataType.values()){
                                     if(collectionType != DataType.REF || !functionCallType.boxed){
                                         TestExecutorService.submitTest(()->{
-                                            var monitor=SequenceInitialization.Ascending
-                                                    .initialize(new ArrListMonitor(checkedType,collectionType),size,0);
+                                            final var monitor=SequenceInitialization.Ascending
+                                                    .initialize(new ArrListMonitor(checkedType,collectionType,size),
+                                                            size,0);
                                             if(functionGen.expectedException == null || size == 0){
                                                 monitor.verifyForEach(functionGen,functionCallType,randSeed);
                                             }else{
@@ -204,16 +213,13 @@ public class ArrListTest{
     }
     @Test
     public void testget_int(){
-        for(var collectionType:DataType.values()){
-            for(var checkedType:CheckedType.values()){
-                for(int size:FIB_SEQ){
-                    if(size > 100){
-                        break;
-                    }
+        for(final var collectionType:DataType.values()){
+            for(final var checkedType:CheckedType.values()){
+                for(final int size:FIB_SEQ){
                     TestExecutorService.submitTest(()->{
-                        var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType),size,0);
-                        for(var outputType:collectionType.validOutputTypes()){
+                        final var monitor=SequenceInitialization.Ascending
+                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
+                        for(final var outputType:collectionType.validOutputTypes()){
                             if(checkedType.checked){
                                 Assertions.assertThrows(IndexOutOfBoundsException.class,
                                         ()->monitor.verifyGet(-1,outputType));
@@ -231,29 +237,12 @@ public class ArrListTest{
         TestExecutorService.completeAllTests("ArrListTest.testget_int");
     }
     @Test
-    public void testindexOf_val(){
-        QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
-            if(monitoredObjectGen == null){
-                int expectedIndex;
-                if(position >= 0){
-                    expectedIndex=(int)Math.round(position * seqSize);
-                }else{
-                    expectedIndex=-1;
-                }
-                Assertions.assertEquals(expectedIndex,monitor.verifyIndexOf(queryVal,inputType,castType,modification));
-            }else{
-                monitor.verifyThrowingIndexOf(monitoredObjectGen);
-            }
-        };
-        test.runAllTests("ArrListTest.testindexOf_val");
-    }
-    @Test
     public void testhashCode_void(){
-        ToStringAndHashCodeTest test=(size,collectionType,checkedType,initVal,objGen)->{
+        final ToStringAndHashCodeTest test=(size,collectionType,checkedType,initVal,objGen)->{
             if(collectionType == DataType.REF){
-                var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
-                var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                        new ArrListMonitor(checkedType,collectionType),size,initVal,objGen,throwSwitch);
+                final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
+                        new ArrListMonitor(checkedType,collectionType,size),size,initVal,objGen,throwSwitch);
                 if(objGen.expectedException == null || size == 0){
                     monitor.verifyHashCode();
                 }else{
@@ -273,37 +262,323 @@ public class ArrListTest{
         };
         test.runAllTests("ArrListTest.testtoString_void");
     }
-    @Test public void testisEmpty_void(){
-        BasicTest test=(monitor)->monitor.verifyIsEmpty();
+    @Test
+    public void testindexOf_val(){
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
+            if(monitoredObjectGen == null){
+                int expectedIndex;
+                if(position >= 0){
+                    expectedIndex=(int)Math.round(position * seqSize);
+                }else{
+                    expectedIndex=-1;
+                }
+                Assertions.assertEquals(expectedIndex,monitor.verifyIndexOf(queryVal,inputType,castType,modification));
+            }else{
+                monitor.verifyThrowingIndexOf(monitoredObjectGen);
+            }
+        };
+        test.runAllTests("ArrListTest.testindexOf_val");
+    }
+    @Test
+    public void testisEmpty_void(){
+        final BasicTest test=(monitor)->monitor.verifyIsEmpty();
         test.runAllTests("ArrListTest.testisEmpty_void");
     }
     @Test
     public void testiterator_void(){
-        // TODO
+        for(var collectionType:DataType.values()){
+            for(var itrType:StructType.ArrList.validItrTypes){
+                for(var checkedType:CheckedType.values()){
+                    for(var size:FIB_SEQ){
+                        TestExecutorService.submitTest(()->SequenceInitialization.Ascending
+                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0)
+                                .getMonitoredIterator(itrType).verifyIteratorState());
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testiterator_void");
     }
     @Test
     public void testItrclone_void(){
-        // TODO
+        for(var collectionType:DataType.values()){
+            for(var itrType:StructType.ArrList.validItrTypes){
+                for(var checkedType:CheckedType.values()){
+                    for(var size:FIB_SEQ){
+                        int prevIndex=-1;
+                        for(var position:POSITIONS){
+                            int index;
+                            if(position >= 0 && (index=(int)(position * size)) != prevIndex){
+                                prevIndex=index;
+                                TestExecutorService.submitTest(()->{
+                                    var seqMonitor=SequenceInitialization.Ascending
+                                            .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
+                                    var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
+                                    itrMonitor.verifyClone();
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testItrclone_void");
     }
     @Test
     public void testItrforEachRemaining_Consumer(){
-        // TODO
+        for(var collectionType:DataType.values()){
+            for(var functionCallType:FunctionCallType.values()){
+                if(collectionType != DataType.REF || !functionCallType.boxed){
+                    for(var size:FIB_SEQ){
+                        int prevNumToIterate=-1;
+                        for(var position:POSITIONS){
+                            int numToIterate;
+                            if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
+                                prevNumToIterate=numToIterate;
+                                int numLeft=size - numToIterate;
+                                for(var itrType:StructType.ArrList.validItrTypes){
+                                    for(var functionGen:itrType.validMonitoredFunctionGens){
+                                        for(var checkedType:CheckedType.values()){
+                                            for(var illegalMod:itrType.validPreMods){
+                                                if(checkedType.checked || illegalMod.expectedException == null
+                                                        && (size == 0 || functionGen.expectedException == null)){
+                                                    long randSeedBound=!functionCallType.boxed && numLeft > 1
+                                                            && functionGen.randomized?100:0;
+                                                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                                        final long randSeed=tmpRandSeed;
+                                                        TestExecutorService.submitTest(()->{
+                                                            var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                                    new ArrListMonitor(checkedType,collectionType,size),
+                                                                    size,0);
+                                                            var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,
+                                                                    itrType);
+                                                            itrMonitor.illegalMod(illegalMod);
+                                                            if(illegalMod.expectedException == null || numLeft == 0){
+                                                                if(functionGen.expectedException == null
+                                                                        || numLeft == 0){
+                                                                    itrMonitor.verifyForEachRemaining(functionGen,
+                                                                            functionCallType,randSeed);
+                                                                }else{
+                                                                    Assertions.assertThrows(
+                                                                            functionGen.expectedException,
+                                                                            ()->itrMonitor.verifyForEachRemaining(
+                                                                                    functionGen,functionCallType,
+                                                                                    randSeed));
+                                                                }
+                                                            }else{
+                                                                Assertions
+                                                                .assertThrows(illegalMod.expectedException,
+                                                                        ()->itrMonitor.verifyForEachRemaining(
+                                                                                functionGen,functionCallType,
+                                                                                randSeed));
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testItrforEachRemaining_Consumer");
     }
     @Test
     public void testItrhasNext_void(){
-        // TODO
+        for(var collectionType:DataType.values()){
+            for(var itrType:StructType.ArrList.validItrTypes){
+                double[] positionArr;
+                if(itrType.iteratorInterface == OmniListIterator.class){
+                    positionArr=POSITIONS;
+                }else{
+                    positionArr=new double[]{0};
+                }
+                for(var checkedType:CheckedType.values()){
+                    for(var size:FIB_SEQ){
+                        if(checkedType.checked || size > 0){
+                            int prevIndex=-1;
+                            for(var position:positionArr){
+                                int index;
+                                if(position >= 0 && (index=(int)(position * size)) != prevIndex){
+                                    prevIndex=index;
+                                    if(checkedType.checked || index < size){
+                                        TestExecutorService.submitTest(()->{
+                                            var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                    new ArrListMonitor(checkedType,collectionType,size),size,0);
+                                            var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
+                                            while(itrMonitor.verifyHasNext()){
+                                                itrMonitor.iterateForward();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testItrnext_void");
     }
     @Test
     public void testItrnext_void(){
-        // TODO
+        for(var collectionType:DataType.values()){
+            for(var outputType:collectionType.validOutputTypes()){
+                for(var itrType:StructType.ArrList.validItrTypes){
+                    double[] positionArr;
+                    if(itrType.iteratorInterface == OmniListIterator.class){
+                        positionArr=POSITIONS;
+                    }else{
+                        positionArr=new double[]{0};
+                    }
+                    for(var illegalMod:itrType.validPreMods){
+                        for(var checkedType:CheckedType.values()){
+                            if(illegalMod.expectedException == null || checkedType.checked){
+                                for(var size:FIB_SEQ){
+                                    if(checkedType.checked || size > 0){
+                                        int prevIndex=-1;
+                                        for(var position:positionArr){
+                                            int index;
+                                            if(position >= 0 && (index=(int)(position * size)) != prevIndex){
+                                                prevIndex=index;
+                                                if(checkedType.checked || index < size){
+                                                    TestExecutorService.submitTest(()->{
+                                                        var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                                new ArrListMonitor(checkedType,collectionType,size),
+                                                                size,0);
+                                                        var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
+                                                        itrMonitor.illegalMod(illegalMod);
+                                                        if(illegalMod.expectedException == null){
+                                                            while(itrMonitor.hasNext()){
+                                                                itrMonitor.verifyNext(outputType);
+                                                            }
+                                                            if(checkedType.checked){
+                                                                Assertions.assertThrows(NoSuchElementException.class,
+                                                                        ()->itrMonitor.verifyNext(outputType));
+                                                            }
+                                                        }else{
+                                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                                    ()->itrMonitor.verifyNext(outputType));
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testItrnext_void");
     }
     @Test
     public void testItrremove_void(){
-        // TODO
+        for(var itrType:StructType.ArrList.validItrTypes){
+            for(var illegalMod:itrType.validPreMods){
+                for(var checkedType:CheckedType.values()){
+                    if(illegalMod.expectedException == null || checkedType.checked){
+                        for(var removeScenario:itrType.validItrRemoveScenarios){
+                            if(checkedType.checked || removeScenario.expectedException == null){
+                                for(var collectionType:DataType.values()){
+                                    for(var size:FIB_SEQ){
+                                        int prevNumToIterate=-1;
+                                        positionLoop:for(var position:POSITIONS){
+                                            final int numToIterate;
+                                            if(position >= 0
+                                                    && (numToIterate=(int)(size * position)) != prevNumToIterate){
+                                                prevNumToIterate=numToIterate;
+                                                switch(removeScenario){
+                                                case PostInit:
+                                                    if(numToIterate != 0){
+                                                        break positionLoop;
+                                                    }
+                                                    break;
+                                                case PostNext:
+                                                    if(itrType.iteratorInterface != OmniListIterator.class
+                                                    && (size == 0 || numToIterate == size)){
+                                                        continue;
+                                                    }
+                                                case PostAdd:
+                                                case PostPrev:
+                                                    break;
+                                                case PostRemove:
+                                                    if(size == 0
+                                                    && itrType.iteratorInterface != OmniListIterator.class){
+                                                        continue;
+                                                    }
+                                                    break;
+                                                default:
+                                                    throw removeScenario.invalid();
+                                                }
+                                                // TestExecutorService.submitTest(()->{
+                                                var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                        new ArrListMonitor(checkedType,collectionType,size),size,0);
+                                                var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,
+                                                        itrType);
+                                                removeScenario.initialize(itrMonitor);
+                                                itrMonitor.illegalMod(illegalMod);
+                                                if(removeScenario.expectedException == null){
+                                                    if(illegalMod.expectedException == null){
+                                                        itrMonitor.verifyRemove();
+                                                        switch(removeScenario){
+                                                        case PostNext:{
+                                                            while(itrMonitor.hasNext()){
+                                                                itrMonitor.iterateForward();
+                                                                itrMonitor.verifyRemove();
+                                                            }
+                                                            if(!(itrMonitor instanceof MonitoredList.MonitoredListIterator<?,?>)){
+                                                                Assertions.assertEquals(numToIterate < 2,
+                                                                        seqMonitor.isEmpty());
+                                                                break;
+                                                            }
+                                                        }
+                                                        case PostPrev:{
+                                                            var cast=(MonitoredList.MonitoredListIterator<?,?>)itrMonitor;
+                                                            while(cast.hasPrevious()){
+                                                                cast.iterateReverse();
+                                                                cast.verifyRemove();
+                                                            }
+                                                            while(cast.hasNext()){
+                                                                cast.iterateForward();
+                                                                cast.verifyRemove();
+                                                            }
+                                                            Assertions.assertTrue(seqMonitor.isEmpty());
+                                                            break;
+                                                        }
+                                                        default:
+                                                            throw removeScenario.invalid();
+                                                        }
+                                                    }else{
+                                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                                ()->itrMonitor.verifyRemove());
+                                                    }
+                                                }else{
+                                                    Assertions.assertThrows(removeScenario.expectedException,
+                                                            ()->itrMonitor.verifyRemove());
+                                                }
+                                                // });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testItrremove_void");
     }
     @Test
     public void testlastIndexOf_val(){
-        QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
             if(monitoredObjectGen == null){
                 int expectedIndex;
                 if(position >= 0){
@@ -321,7 +596,7 @@ public class ArrListTest{
     }
     @Test
     public void testMASSIVEtoString(){
-        for(var collectionType:DataType.values()){
+        for(final var collectionType:DataType.values()){
             int seqSize;
             if((seqSize=collectionType.massiveToStringThreshold + 1) == 0){
                 continue;
@@ -365,18 +640,15 @@ public class ArrListTest{
     }
     @Test
     public void testput_intval(){
-        for(var collectionType:DataType.values()){
-            for(var checkedType:CheckedType.values()){
-                for(int size:FIB_SEQ){
-                    if(size > 100){
-                        break;
-                    }
-                    for(var inputType:collectionType.mayBeAddedTo()){
-                        for(var functionCallType:FunctionCallType.values()){
+        for(final var collectionType:DataType.values()){
+            for(final var checkedType:CheckedType.values()){
+                for(final int size:FIB_SEQ){
+                    for(final var inputType:collectionType.mayBeAddedTo()){
+                        for(final var functionCallType:FunctionCallType.values()){
                             if(inputType != DataType.REF || !functionCallType.boxed){
                                 TestExecutorService.submitTest(()->{
-                                    var monitor=SequenceInitialization.Ascending
-                                            .initialize(new ArrListMonitor(checkedType,collectionType),size,0);
+                                    final var monitor=SequenceInitialization.Ascending
+                                            .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
                                     if(checkedType.checked){
                                         Assertions.assertThrows(IndexOutOfBoundsException.class,
                                                 ()->monitor.verifyPut(-1,inputType.convertValUnchecked(0),inputType,
@@ -400,20 +672,18 @@ public class ArrListTest{
     }
     @Test
     public void testReadAndWrite(){
-        // TODO
+        final MonitoredFunctionGenTest test=(monitor,functionGen)->monitor.verifyReadAndWrite(functionGen);
+        test.runAllTests("ArrListTest.testReadAndWrite");
     }
     @Test
     public void testremoveIf_Predicate(){
-        for(var filterGen:StructType.ArrList.validMonitoredRemoveIfPredicateGens){
-            for(int size:FIB_SEQ){
-                if(size > 1000){
-                    break;
-                }
-                for(var checkedType:CheckedType.values()){
+        for(final var filterGen:StructType.ArrList.validMonitoredRemoveIfPredicateGens){
+            for(final int size:EXTENDED_FIB_SEQ){
+                for(final var checkedType:CheckedType.values()){
                     if(size == 0 || checkedType.checked || filterGen.expectedException == null){
-                        for(var collectionType:DataType.values()){
-                            int initValBound=collectionType == DataType.BOOLEAN?1:0;
-                            for(var functionCallType:FunctionCallType.values()){
+                        for(final var collectionType:DataType.values()){
+                            final int initValBound=collectionType == DataType.BOOLEAN?1:0;
+                            for(final var functionCallType:FunctionCallType.values()){
                                 if(collectionType != DataType.REF || !functionCallType.boxed){
                                     long randSeedBound;
                                     double[] thresholdArr;
@@ -428,22 +698,16 @@ public class ArrListTest{
                                         final long randSeed=tmpRandSeed;
                                         for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
                                             final int initVal=tmpInitVal;
-                                            for(var threshold:thresholdArr){
+                                            for(final var threshold:thresholdArr){
                                                 TestExecutorService.submitTest(()->{
-                                                    var monitor=SequenceInitialization.Ascending.initialize(
-                                                            new ArrListMonitor(checkedType,collectionType),size,
+                                                    final var monitor=SequenceInitialization.Ascending.initialize(
+                                                            new ArrListMonitor(checkedType,collectionType,size),size,
                                                             initVal);
-                                                    var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
+                                                    final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
                                                             threshold,randSeed);
                                                     if(filterGen.expectedException == null || size == 0){
                                                         monitor.verifyRemoveIf(filter,functionCallType);
                                                     }else{
-                                                        if(size == 377 && collectionType == DataType.BYTE
-                                                                && functionCallType == FunctionCallType.Boxed
-                                                                && randSeed == 0 && threshold == 0.5
-                                                                && filterGen == omni.impl.MonitoredRemoveIfPredicateGen.Throw){
-                                                            System.out.println("here");
-                                                        }
                                                         Assertions.assertThrows(filterGen.expectedException,
                                                                 ()->monitor.verifyRemoveIf(filter,functionCallType));
                                                     }
@@ -452,7 +716,6 @@ public class ArrListTest{
                                         }
                                     }
                                 }
-
                             }
                         }
                     }
@@ -463,7 +726,7 @@ public class ArrListTest{
     }
     @Test
     public void testremoveVal_val(){
-        QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
+        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
             if(monitoredObjectGen == null){
                 Assertions.assertEquals(position >= 0,
                         monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
@@ -475,17 +738,14 @@ public class ArrListTest{
     }
     @Test
     public void testset_intval(){
-        for(var collectionType:DataType.values()){
-            for(var checkedType:CheckedType.values()){
-                for(int size:FIB_SEQ){
-                    if(size > 100){
-                        break;
-                    }
-                    for(var functionCallType:FunctionCallType.values()){
+        for(final var collectionType:DataType.values()){
+            for(final var checkedType:CheckedType.values()){
+                for(final int size:FIB_SEQ){
+                    for(final var functionCallType:FunctionCallType.values()){
                         if(collectionType != DataType.REF || !functionCallType.boxed){
                             TestExecutorService.submitTest(()->{
-                                var monitor=SequenceInitialization.Ascending
-                                        .initialize(new ArrListMonitor(checkedType,collectionType),size,0);
+                                final var monitor=SequenceInitialization.Ascending
+                                        .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
                                 if(checkedType.checked){
                                     Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(-1,
                                             collectionType.convertValUnchecked(0),functionCallType));
@@ -504,30 +764,48 @@ public class ArrListTest{
         }
         TestExecutorService.completeAllTests("ArrListTest.testset_intval");
     }
-    @Test public void testsize_void() {
-        BasicTest test=(monitor)->monitor.verifySize();
+    @Test
+    public void testsize_void(){
+        final BasicTest test=(monitor)->monitor.verifySize();
         test.runAllTests("ArrListTest.testsize_void");
     }
     @Test
     public void testtoArray_IntFunction(){
-        // TODO
+        final MonitoredFunctionGenTest test=(monitor,functionGen)->{
+            if(functionGen.expectedException == null){
+                monitor.verifyToArray(functionGen);
+            }else{
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
+            }
+        };
+        test.runAllTests("ArrListTest.testtoArray_IntFunction");
     }
     @Test
     public void testtoArray_ObjectArray(){
-        // TODO
+        for(int tmpSize=0;tmpSize <= 15;tmpSize+=5){
+            final int size=tmpSize;
+            for(int tmpArrSize=0,tmpArrSizeBound=tmpSize + 5;tmpArrSize <= tmpArrSizeBound;++tmpArrSize){
+                final int arrSize=tmpArrSize;
+                for(final var collectionType:DataType.values()){
+                    for(final var checkedType:CheckedType.values()){
+                        TestExecutorService.submitTest(()->SequenceInitialization.Ascending
+                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0)
+                                .verifyToArray(new Object[arrSize]));
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testtoArray_ObjectArray");
     }
     @Test
     public void testtoArray_void(){
-        for(var collectionType:DataType.values()){
-            for(var checkedType:CheckedType.values()){
-                for(int size:FIB_SEQ){
-                    if(size > 100){
-                        break;
-                    }
+        for(final var collectionType:DataType.values()){
+            for(final var checkedType:CheckedType.values()){
+                for(final int size:FIB_SEQ){
                     TestExecutorService.submitTest(()->{
-                        var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType),size,0);
-                        for(var outputType:collectionType.validOutputTypes()){
+                        final var monitor=SequenceInitialization.Ascending
+                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
+                        for(final var outputType:collectionType.validOutputTypes()){
                             outputType.verifyToArray(monitor);
                         }
                     });
@@ -538,11 +816,11 @@ public class ArrListTest{
     }
     @Test
     public void testtoString_void(){
-        ToStringAndHashCodeTest test=(size,collectionType,checkedType,initVal,objGen)->{
+        final ToStringAndHashCodeTest test=(size,collectionType,checkedType,initVal,objGen)->{
             if(collectionType == DataType.REF && objGen.expectedException != null && size != 0){
-                var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
-                var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                        new ArrListMonitor(checkedType,collectionType),size,initVal,objGen,throwSwitch);
+                final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
+                        new ArrListMonitor(checkedType,collectionType,size),size,initVal,objGen,throwSwitch);
                 Assertions.assertThrows(objGen.expectedException,()->{
                     try{
                         monitor.seq.toString();
@@ -567,61 +845,16 @@ public class ArrListTest{
         TestExecutorService.reset();
     }
     private static class ArrListMonitor extends AbstractArrSeqMonitor<OmniList<?>>
-    implements MonitoredList<OmniIterator<?>,OmniList<?>>{
+    implements
+    MonitoredList<OmniIterator<?>,OmniListIterator<?>,OmniList<?>>{
         public ArrListMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
         public ArrListMonitor(CheckedType checkedType,DataType dataType,int initCap){
             super(checkedType,dataType,initCap);
         }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,OmniList<?>> getMonitoredIterator(){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override public MonitoredIterator<? extends OmniIterator<?>,OmniList<?>>
-        getMonitoredIterator(IteratorType itrType){
-            // TODO Auto-generated method stub
-            return null;
-        }
-        @Override public StructType getStructType(){
-            return StructType.ArrList;
-        }
-        @Override public void modCollection(){
-            switch(dataType){
-            case BOOLEAN:
-                ++((BooleanArrSeq.CheckedList)seq).modCount;
-                break;
-            case BYTE:
-                ++((ByteArrSeq.CheckedList)seq).modCount;
-                break;
-            case CHAR:
-                ++((CharArrSeq.CheckedList)seq).modCount;
-                break;
-            case DOUBLE:
-                ++((DoubleArrSeq.CheckedList)seq).modCount;
-                break;
-            case FLOAT:
-                ++((FloatArrSeq.CheckedList)seq).modCount;
-                break;
-            case INT:
-                ++((IntArrSeq.CheckedList)seq).modCount;
-                break;
-            case LONG:
-                ++((LongArrSeq.CheckedList)seq).modCount;
-                break;
-            case REF:
-                ++((RefArrSeq.CheckedList<?>)seq).modCount;
-                break;
-            case SHORT:
-                ++((ShortArrSeq.CheckedList)seq).modCount;
-                break;
-            default:
-                throw dataType.invalid();
-            }
-            ++expectedModCount;
-        }
-        @Override public void updateRemoveValState(Object inputVal,DataType inputType){
-            final int expectedSize=this.expectedSize;
+        @Override
+        public int findRemoveValIndex(Object inputVal,DataType inputType){
             switch(dataType){
             case BOOLEAN:{
                 boolean inputCast;
@@ -656,11 +889,9 @@ public class ArrListTest{
                 final var expectedArr=(boolean[])this.expectedArr;
                 for(int i=0;;++i){
                     if(expectedArr[i] == inputCast){
-                        System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                        break;
+                        return i;
                     }
                 }
-                break;
             }
             case BYTE:{
                 byte inputCast;
@@ -695,11 +926,9 @@ public class ArrListTest{
                 final var expectedArr=(byte[])this.expectedArr;
                 for(int i=0;;++i){
                     if(expectedArr[i] == inputCast){
-                        System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                        break;
+                        return i;
                     }
                 }
-                break;
             }
             case CHAR:{
                 char inputCast;
@@ -734,11 +963,9 @@ public class ArrListTest{
                 final var expectedArr=(char[])this.expectedArr;
                 for(int i=0;;++i){
                     if(expectedArr[i] == inputCast){
-                        System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                        break;
+                        return i;
                     }
                 }
-                break;
             }
             case SHORT:{
                 short inputCast;
@@ -773,11 +1000,9 @@ public class ArrListTest{
                 final var expectedArr=(short[])this.expectedArr;
                 for(int i=0;;++i){
                     if(expectedArr[i] == inputCast){
-                        System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                        break;
+                        return i;
                     }
                 }
-                break;
             }
             case INT:{
                 int inputCast;
@@ -812,11 +1037,9 @@ public class ArrListTest{
                 final var expectedArr=(int[])this.expectedArr;
                 for(int i=0;;++i){
                     if(expectedArr[i] == inputCast){
-                        System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                        break;
+                        return i;
                     }
                 }
-                break;
             }
             case LONG:{
                 long inputCast;
@@ -851,11 +1074,9 @@ public class ArrListTest{
                 final var expectedArr=(long[])this.expectedArr;
                 for(int i=0;;++i){
                     if(expectedArr[i] == inputCast){
-                        System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                        break;
+                        return i;
                     }
                 }
-                break;
             }
             case FLOAT:{
                 float inputCast;
@@ -891,20 +1112,17 @@ public class ArrListTest{
                 if(inputCast == inputCast){
                     for(int i=0;;++i){
                         if(expectedArr[i] == inputCast){
-                            System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                            break;
+                            return i;
                         }
                     }
                 }else{
                     for(int i=0;;++i){
                         float v;
                         if((v=expectedArr[i]) != v){
-                            System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                            break;
+                            return i;
                         }
                     }
                 }
-                break;
             }
             case DOUBLE:{
                 double inputCast;
@@ -940,232 +1158,133 @@ public class ArrListTest{
                 if(inputCast == inputCast){
                     for(int i=0;;++i){
                         if(expectedArr[i] == inputCast){
-                            System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                            break;
+                            return i;
                         }
                     }
                 }else{
                     for(int i=0;;++i){
                         double v;
                         if((v=expectedArr[i]) != v){
-                            System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                            break;
+                            return i;
                         }
                     }
                 }
-                break;
             }
             case REF:{
                 final var expectedArr=(Object[])this.expectedArr;
                 if(inputVal == null){
                     for(int i=0;;++i){
                         if(expectedArr[i] == null){
-                            System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                            break;
+                            return i;
                         }
                     }
                 }else{
                     for(int i=0;;++i){
                         if(inputVal.equals(expectedArr[i])){
-                            System.arraycopy(expectedArr,i + 1,expectedArr,i,expectedSize - i - 1);
-                            break;
+                            return i;
                         }
                     }
                 }
-                expectedArr[expectedSize]=null;
-                break;
             }
             default:
                 throw dataType.invalid();
             }
-            --this.expectedSize;
-            ++expectedModCount;
         }
         @Override
-        public void verifyGetResult(int index,Object result,DataType outputType){
-            switch(outputType){
-            case BOOLEAN:
-                Assertions.assertEquals(((boolean[])expectedArr)[index],(boolean)result);
-                break;
-            case BYTE:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(byte)1:(byte)0,(byte)result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],(byte)result);
-                    break;
-                default:
-                    throw dataType.invalid();
+        public MonitoredIterator<? extends OmniIterator<?>,OmniList<?>> getMonitoredIterator(){
+            var itr=seq.iterator();
+            if(checkedType.checked){
+                return new CheckedItrMonitor(itr,0,expectedModCount);
+            }
+            return new UncheckedItrMonitor(itr,0);
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OmniList<?>> getMonitoredIterator(int index,
+                IteratorType itrType){
+            switch(itrType){
+            case AscendingItr:
+                var itr=getMonitoredIterator();
+                while(--index >= 0 && itr.hasNext()){
+                    itr.iterateForward();
                 }
-                break;
-            case CHAR:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(char)1:(char)0,(char)result);
-                    break;
-                case CHAR:
-                    Assertions.assertEquals(((char[])expectedArr)[index],(char)result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
-            case SHORT:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(short)1:(short)0,(short)result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],(short)result);
-                    break;
-                case SHORT:
-                    Assertions.assertEquals(((short[])expectedArr)[index],(short)result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
-            case INT:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(int)1:(int)0,(int)result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],(int)result);
-                    break;
-                case CHAR:
-                    Assertions.assertEquals(((char[])expectedArr)[index],(int)result);
-                    break;
-                case SHORT:
-                    Assertions.assertEquals(((short[])expectedArr)[index],(int)result);
-                    break;
-                case INT:
-                    Assertions.assertEquals(((int[])expectedArr)[index],(int)result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
-            case LONG:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(long)1:(long)0,(long)result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],(long)result);
-                    break;
-                case CHAR:
-                    Assertions.assertEquals(((char[])expectedArr)[index],(long)result);
-                    break;
-                case SHORT:
-                    Assertions.assertEquals(((short[])expectedArr)[index],(long)result);
-                    break;
-                case INT:
-                    Assertions.assertEquals(((int[])expectedArr)[index],(long)result);
-                    break;
-                case LONG:
-                    Assertions.assertEquals(((long[])expectedArr)[index],(long)result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
-            case FLOAT:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(float)1:(float)0,(float)result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],(float)result);
-                    break;
-                case CHAR:
-                    Assertions.assertEquals(((char[])expectedArr)[index],(float)result);
-                    break;
-                case SHORT:
-                    Assertions.assertEquals(((short[])expectedArr)[index],(float)result);
-                    break;
-                case INT:
-                    Assertions.assertEquals(((int[])expectedArr)[index],(float)result);
-                    break;
-                case LONG:
-                    Assertions.assertEquals(((long[])expectedArr)[index],(float)result);
-                    break;
-                case FLOAT:
-                    Assertions.assertEquals(((float[])expectedArr)[index],(float)result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
-            case DOUBLE:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index]?(double)1:(double)0,(double)result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],(double)result);
-                    break;
-                case CHAR:
-                    Assertions.assertEquals(((char[])expectedArr)[index],(double)result);
-                    break;
-                case SHORT:
-                    Assertions.assertEquals(((short[])expectedArr)[index],(double)result);
-                    break;
-                case INT:
-                    Assertions.assertEquals(((int[])expectedArr)[index],(double)result);
-                    break;
-                case LONG:
-                    Assertions.assertEquals(((long[])expectedArr)[index],(double)result);
-                    break;
-                case FLOAT:
-                    Assertions.assertEquals(((float[])expectedArr)[index],(double)result);
-                    break;
-                case DOUBLE:
-                    Assertions.assertEquals(((double[])expectedArr)[index],(double)result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
-            case REF:
-                switch(dataType){
-                case BOOLEAN:
-                    Assertions.assertEquals(((boolean[])expectedArr)[index],result);
-                    break;
-                case BYTE:
-                    Assertions.assertEquals(((byte[])expectedArr)[index],result);
-                    break;
-                case CHAR:
-                    Assertions.assertEquals(((char[])expectedArr)[index],result);
-                    break;
-                case SHORT:
-                    Assertions.assertEquals(((short[])expectedArr)[index],result);
-                    break;
-                case INT:
-                    Assertions.assertEquals(((int[])expectedArr)[index],result);
-                    break;
-                case LONG:
-                    Assertions.assertEquals(((long[])expectedArr)[index],result);
-                    break;
-                case FLOAT:
-                    Assertions.assertEquals(((float[])expectedArr)[index],result);
-                    break;
-                case DOUBLE:
-                    Assertions.assertEquals(((double[])expectedArr)[index],result);
-                    break;
-                case REF:
-                    Assertions.assertSame(((Object[])expectedArr)[index],result);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-                break;
+                return itr;
+            case BidirectionalItr:{
+                return getMonitoredListIterator(index);
+            }
+            default:
+                throw itrType.invalid();
             }
         }
         @Override
+        public MonitoredIterator<? extends OmniIterator<?>,OmniList<?>> getMonitoredIterator(IteratorType itrType){
+            switch(itrType){
+            case AscendingItr:
+                return getMonitoredIterator();
+            case BidirectionalItr:{
+                return getMonitoredListIterator();
+            }
+            default:
+                throw itrType.invalid();
+            }
+        }
+        @Override
+        public MonitoredListIterator<? extends OmniListIterator<?>,OmniList<?>> getMonitoredListIterator(){
+            var itr=seq.listIterator();
+            if(checkedType.checked){
+                return new CheckedListItrMonitor(itr,0,expectedModCount);
+            }
+            return new UncheckedListItrMonitor(itr,0);
+        }
+        @Override
+        public MonitoredListIterator<? extends OmniListIterator<?>,OmniList<?>> getMonitoredListIterator(int index){
+            var itr=seq.listIterator(index);
+            if(checkedType.checked){
+                return new CheckedListItrMonitor(itr,index,expectedModCount);
+            }
+            return new UncheckedListItrMonitor(itr,index);
+        }
+        @Override
+        public StructType getStructType(){
+            return StructType.ArrList;
+        }
+        @Override
+        public void modCollection(){
+            switch(dataType){
+            case BOOLEAN:
+                ++((BooleanArrSeq.CheckedList)seq).modCount;
+                break;
+            case BYTE:
+                ++((ByteArrSeq.CheckedList)seq).modCount;
+                break;
+            case CHAR:
+                ++((CharArrSeq.CheckedList)seq).modCount;
+                break;
+            case DOUBLE:
+                ++((DoubleArrSeq.CheckedList)seq).modCount;
+                break;
+            case FLOAT:
+                ++((FloatArrSeq.CheckedList)seq).modCount;
+                break;
+            case INT:
+                ++((IntArrSeq.CheckedList)seq).modCount;
+                break;
+            case LONG:
+                ++((LongArrSeq.CheckedList)seq).modCount;
+                break;
+            case REF:
+                ++((RefArrSeq.CheckedList<?>)seq).modCount;
+                break;
+            case SHORT:
+                ++((ShortArrSeq.CheckedList)seq).modCount;
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            ++expectedModCount;
+        }
+        @Override
         public void verifyPutResult(int index,Object input,DataType inputType){
-            Object expectedVal=dataType.convertValUnchecked(inputType,input);
+            final Object expectedVal=dataType.convertValUnchecked(inputType,input);
             switch(dataType){
             case BOOLEAN:
                 Assertions.assertEquals((boolean)expectedVal,((OmniList.OfBoolean)seq).getBoolean(index));
@@ -1207,7 +1326,8 @@ public class ArrListTest{
                 throw dataType.invalid();
             }
         }
-        @Override OmniList<?> initSeq(){
+        @Override
+        OmniList<?> initSeq(){
             switch(dataType){
             case BOOLEAN:
                 if(checkedType.checked){
@@ -1267,7 +1387,8 @@ public class ArrListTest{
                 throw dataType.invalid();
             }
         }
-        @Override OmniList<?> initSeq(int initCap){
+        @Override
+        OmniList<?> initSeq(int initCap){
             switch(dataType){
             case BOOLEAN:
                 if(checkedType.checked){
@@ -1327,7 +1448,8 @@ public class ArrListTest{
                 throw dataType.invalid();
             }
         }
-        @Override void updateModCount(){
+        @Override
+        void updateModCount(){
             switch(dataType){
             case BOOLEAN:
                 expectedModCount=((BooleanArrSeq.CheckedList)seq).modCount;
@@ -1360,7 +1482,8 @@ public class ArrListTest{
                 throw dataType.invalid();
             }
         }
-        @Override void verifyCloneTypeAndModCount(Object clone){
+        @Override
+        void verifyCloneTypeAndModCount(Object clone){
             switch(dataType){
             case BOOLEAN:{
                 if(checkedType.checked){
@@ -1447,7 +1570,8 @@ public class ArrListTest{
                 throw dataType.invalid();
             }
         }
-        @Override void verifyModCount(){
+        @Override
+        void verifyModCount(){
             int actualModCount;
             switch(dataType){
             case BOOLEAN:
@@ -1482,78 +1606,636 @@ public class ArrListTest{
             }
             Assertions.assertEquals(expectedModCount,actualModCount);
         }
-    }
-    private static interface ToStringAndHashCodeTest{
-        void callMethod(int size,DataType collectionType,CheckedType checkedType,int initVal,MonitoredObjectGen objGen);
-        private void runAllTests(String testName){
-            for(int size:FIB_SEQ){
-                if(size > 100){
+        private abstract class AbstractItrMonitor<ITR extends OmniIterator<?>>
+        implements
+        MonitoredIterator<ITR,OmniList<?>>{
+            final ITR itr;
+            int expectedCursor;
+            AbstractItrMonitor(ITR itr,int expectedCursor){
+                this.itr=itr;
+                this.expectedCursor=expectedCursor;
+            }
+            @Override
+            public ITR getIterator(){
+                return this.itr;
+            }
+            @Override
+            public IteratorType getIteratorType(){
+                return IteratorType.AscendingItr;
+            }
+            @Override
+            public MonitoredCollection<OmniList<?>> getMonitoredCollection(){
+                return ArrListMonitor.this;
+            }
+            @Override
+            public int getNumLeft(){
+                return expectedSize - expectedCursor;
+            }
+            @Override
+            public boolean hasNext(){
+                return expectedCursor < expectedSize;
+            }
+            @Override
+            public void verifyNextResult(DataType outputType,Object result){
+                verifyGetResult(expectedCursor - 1,result,outputType);
+            }
+            int verifyForEachRemainingHelper(MonitoredFunction function,int expectedLastRet){
+                int expectedCursor=this.expectedCursor;
+                final int expectedSize=ArrListMonitor.this.expectedSize;
+                final var functionItr=function.iterator();
+                switch(dataType){
+                case BOOLEAN:{
+                    final var expectedArr=(boolean[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(boolean)functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
                     break;
                 }
-                for(var collectionType:DataType.values()){
-                    final int initValBound;
-                    if(collectionType == DataType.BOOLEAN){
-                        initValBound=1;
-                    }else{
-                        initValBound=0;
+                case BYTE:{
+                    final var expectedArr=(byte[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(byte)functionItr.next());
+                        expectedLastRet=expectedCursor++;
                     }
-                    for(var checkedType:CheckedType.values()){
-                        if(collectionType == DataType.REF || !checkedType.checked){
-                            IntStream.rangeClosed(0,initValBound).forEach(initVal->{
-                                for(var objGen:StructType.ArrList.validMonitoredObjectGens){
-                                    if(checkedType.checked || objGen.expectedException == null){
-                                        TestExecutorService.submitTest(
-                                                ()->callMethod(size,collectionType,checkedType,initVal,objGen));
-                                    }
-                                    if(collectionType != DataType.REF){
-                                        break;
-                                    }
-                                }
-                            });
-                        }
+                    break;
+                }
+                case CHAR:{
+                    final var expectedArr=(char[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(char)functionItr.next());
+                        expectedLastRet=expectedCursor++;
                     }
+                    break;
+                }
+                case SHORT:{
+                    final var expectedArr=(short[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(short)functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
+                    break;
+                }
+                case INT:{
+                    final var expectedArr=(int[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(int)functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
+                    break;
+                }
+                case LONG:{
+                    final var expectedArr=(long[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(long)functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
+                    break;
+                }
+                case FLOAT:{
+                    final var expectedArr=(float[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(float)functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
+                    break;
+                }
+                case DOUBLE:{
+                    final var expectedArr=(double[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertEquals(expectedArr[expectedCursor],(double)functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
+                    break;
+                }
+                case REF:{
+                    final var expectedArr=(Object[])ArrListMonitor.this.expectedArr;
+                    while(expectedCursor < expectedSize){
+                        Assertions.assertSame(expectedArr[expectedCursor],functionItr.next());
+                        expectedLastRet=expectedCursor++;
+                    }
+                    break;
+                }
+                default:
+                    throw dataType.invalid();
+                }
+                this.expectedCursor=expectedCursor;
+                return expectedLastRet;
+            }
+        }
+        private abstract class AbstractListItrMonitor extends AbstractItrMonitor<OmniListIterator<?>>
+        implements
+        MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
+            int expectedLastRet;
+            AbstractListItrMonitor(OmniListIterator<?> itr,int expectedCursor){
+                super(itr,expectedCursor);
+                expectedLastRet=-1;
+            }
+            @Override
+            public boolean hasPrevious(){
+                return expectedCursor > 0;
+            }
+            @Override
+            public int nextIndex(){
+                return expectedCursor;
+            }
+            @Override
+            public int previousIndex(){
+                return expectedCursor - 1;
+            }
+            @Override
+            public void updateItrNextState(){
+                expectedLastRet=expectedCursor++;
+            }
+            @Override
+            public void updateItrPreviousState(){
+                expectedLastRet=--expectedCursor;
+            }
+            @Override
+            public void verifyForEachRemaining(MonitoredFunction function){
+                expectedLastRet=super.verifyForEachRemainingHelper(function,expectedLastRet);
+            }
+            @Override
+            public void verifyPreviousResult(DataType outputType,Object result){
+                verifyGetResult(expectedLastRet,result,outputType);
+            }
+        }
+        private class CheckedItrMonitor extends AbstractItrMonitor<OmniIterator<?>>{
+            int expectedItrModCount;
+            int expectedLastRet;
+            CheckedItrMonitor(OmniIterator<?> itr,int expectedCursor,int expectedItrModCount){
+                super(itr,expectedCursor);
+                expectedLastRet=-1;
+                this.expectedItrModCount=expectedItrModCount;
+            }
+            @Override
+            public void updateItrNextState(){
+                expectedLastRet=expectedCursor++;
+            }
+            @Override
+            public void updateItrRemoveState(){
+                updateRemoveIndexState(expectedCursor=expectedLastRet);
+                ++expectedItrModCount;
+                expectedLastRet=-1;
+            }
+            @Override
+            public void verifyCloneHelper(Object clone){
+                switch(dataType){
+                case BOOLEAN:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.BooleanArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.BooleanArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.BooleanArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case BYTE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ByteArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.ByteArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.ByteArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case CHAR:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.CharArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.CharArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.CharArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case DOUBLE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.DoubleArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.DoubleArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.DoubleArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case FLOAT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.FloatArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case INT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.IntArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.IntArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.IntArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case LONG:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.LongArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.LongArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.LongArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case REF:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.RefArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.RefArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.RefArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                case SHORT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrSeq.CheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ShortArrSeq.CheckedList.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.ShortArrSeq.CheckedList.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.ShortArrSeq.CheckedList.Itr.lastRet(clone));
+                    break;
+                default:
+                    throw dataType.invalid();
                 }
             }
-            TestExecutorService.completeAllTests(testName);
+            @Override
+            public void verifyForEachRemaining(MonitoredFunction function){
+                expectedLastRet=super.verifyForEachRemainingHelper(function,expectedLastRet);
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return expectedLastRet != -1;
+            }
+        }
+        private class CheckedListItrMonitor extends AbstractListItrMonitor{
+            int expectedItrModCount;
+            CheckedListItrMonitor(OmniListIterator<?> itr,int expectedCursor,int expectedItrModCount){
+                super(itr,expectedCursor);
+                this.expectedItrModCount=expectedItrModCount;
+            }
+            @Override
+            public void updateItrAddState(Object input,DataType inputType){
+                ArrListMonitor.this.updateAddState(expectedCursor++,input,inputType);
+                ++expectedItrModCount;
+                expectedLastRet=-1;
+            }
+            @Override
+            public void updateItrRemoveState(){
+                updateRemoveIndexState(expectedCursor=expectedLastRet);
+                ++expectedItrModCount;
+                expectedLastRet=-1;
+            }
+            @Override
+            public void verifyCloneHelper(Object clone){
+                switch(dataType){
+                case BOOLEAN:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.BooleanArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.BooleanArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.BooleanArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case BYTE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ByteArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.ByteArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.ByteArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case CHAR:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.CharArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.CharArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.CharArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case DOUBLE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.DoubleArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.DoubleArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.DoubleArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case FLOAT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.FloatArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case INT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.IntArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.IntArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.IntArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case LONG:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.LongArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.LongArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.LongArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case REF:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.RefArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.RefArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.RefArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                case SHORT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrSeq.CheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ShortArrSeq.CheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.ShortArrSeq.CheckedList.ListItr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.ShortArrSeq.CheckedList.ListItr.lastRet(clone));
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+            @Override
+            public boolean previousWasJustCalled(){
+                return expectedLastRet == expectedCursor;
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return expectedLastRet != -1 && expectedLastRet == expectedCursor - 1;
+            }
+        }
+        private class UncheckedItrMonitor extends AbstractItrMonitor<OmniIterator<?>>{
+            int lastRetState=-1;
+            UncheckedItrMonitor(OmniIterator<?> itr,int expectedCursor){
+                super(itr,expectedCursor);
+            }
+            @Override
+            public void updateItrNextState(){
+                lastRetState=expectedCursor++;
+            }
+            @Override
+            public void updateItrRemoveState(){
+                updateRemoveIndexState(--expectedCursor);
+                lastRetState=-1;
+            }
+            @Override
+            public void verifyCloneHelper(Object clone){
+                switch(dataType){
+                case BOOLEAN:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case BYTE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ByteArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case CHAR:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.CharArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case DOUBLE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.DoubleArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case FLOAT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.FloatArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case INT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.IntArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case LONG:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.LongArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case REF:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.RefArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                case SHORT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrSeq.UncheckedList.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ShortArrSeq.UncheckedList.Itr.cursor(clone));
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+            @Override
+            public void verifyForEachRemaining(MonitoredFunction function){
+                lastRetState=super.verifyForEachRemainingHelper(function,lastRetState);
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return lastRetState != -1;
+            }
+        }
+        private class UncheckedListItrMonitor extends AbstractListItrMonitor{
+            int lastRetState=-1;
+            UncheckedListItrMonitor(OmniListIterator<?> itr,int expectedCursor){
+                super(itr,expectedCursor);
+            }
+            @Override
+            public void updateItrAddState(Object input,DataType inputType){
+                ArrListMonitor.this.updateAddState(expectedCursor++,input,inputType);
+                lastRetState=-1;
+            }
+            @Override
+            public void updateItrRemoveState(){
+                updateRemoveIndexState(expectedCursor=expectedLastRet);
+                lastRetState=-1;
+            }
+            @Override
+            public void verifyCloneHelper(Object clone){
+                switch(dataType){
+                case BOOLEAN:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.BooleanArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case BYTE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ByteArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ByteArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.ByteArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case CHAR:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.CharArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.CharArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.CharArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case DOUBLE:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.DoubleArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.DoubleArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.DoubleArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case FLOAT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.FloatArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case INT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.IntArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.IntArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.IntArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case LONG:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.LongArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.LongArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.LongArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case REF:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.RefArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.RefArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.RefArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                case SHORT:
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.ShortArrSeq.UncheckedList.ListItr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.ShortArrSeq.UncheckedList.ListItr.cursor(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.ShortArrSeq.UncheckedList.ListItr.lastRet(clone));
+                    break;
+                default:
+                    throw dataType.invalid();
+                }
+            }
+            @Override
+            public void updateItrNextState(){
+                expectedLastRet=expectedCursor++;
+                lastRetState=0;
+            }
+            @Override
+            public void updateItrPreviousState(){
+                expectedLastRet=--expectedCursor;
+                lastRetState=1;
+            }
+            @Override
+            public void verifyForEachRemaining(MonitoredFunction function){
+                int expectedLastRet=this.expectedLastRet;
+                int newLastRet=super.verifyForEachRemainingHelper(function,expectedLastRet);
+                if(expectedLastRet != newLastRet){
+                    this.lastRetState=0;
+                    this.expectedLastRet=newLastRet;
+                }
+
+            }
+            @Override
+            public boolean previousWasJustCalled(){
+                return lastRetState == 1;
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return lastRetState == 0;
+            }
         }
     }
     private static interface BasicTest{
-        default void runAllTests(String testName) {
-            for(int seqSize:FIB_SEQ) {
-                if(seqSize>100) {
-                    break;
-                }
-                for(var dataType:DataType.values()) {
-                    for(var checkedType:CheckedType.values()) {
-                        for(var initCap:INIT_CAPACITIES) {
-                            TestExecutorService.submitTest(()->runTest(SequenceInitialization.Ascending.initialize(new ArrListMonitor(checkedType,dataType,initCap),seqSize,0)));
+        default void runAllTests(String testName){
+            for(final int seqSize:FIB_SEQ){
+                for(final var dataType:DataType.values()){
+                    for(final var checkedType:CheckedType.values()){
+                        for(final var initCap:INIT_CAPACITIES){
+                            TestExecutorService.submitTest(()->runTest(SequenceInitialization.Ascending
+                                    .initialize(new ArrListMonitor(checkedType,dataType,initCap),seqSize,0)));
                         }
                     }
                 }
             }
             TestExecutorService.completeAllTests("ArrListTest.testsize_void");
         }
-
         void runTest(ArrListMonitor monitor);
+    }
+    private static interface MonitoredFunctionGenTest{
+        void runTest(ArrListMonitor monitor,MonitoredFunctionGen functionGen);
+        private void runAllTests(String testName){
+            for(final var size:FIB_SEQ){
+                for(final var functionGen:StructType.ArrList.validMonitoredFunctionGens){
+                    for(final var checkedType:CheckedType.values()){
+                        if(checkedType.checked || functionGen.expectedException == null){
+                            for(final var collectionType:DataType.values()){
+                                final int initValCap=collectionType == DataType.BOOLEAN && size != 0?1:0;
+                                IntStream.rangeClosed(0,initValCap).forEach(initVal->{
+                                    for(final var initCap:INIT_CAPACITIES){
+                                        TestExecutorService.submitTest(()->runTest(SequenceInitialization.Ascending
+                                                .initialize(new ArrListMonitor(checkedType,collectionType,initCap),size,
+                                                        initVal),
+                                                functionGen));
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests("ArrListTest.testReadAndWrite");
+        }
     }
     private static interface QueryTest{
         void callAndVerifyResult(ArrListMonitor monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
                 QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,double position,
                 int seqSize);
         private void runAllTests(String testName){
-            for(var collectionType:DataType.values()){
-                for(var queryVal:QueryVal.values()){
+            for(final var collectionType:DataType.values()){
+                for(final var queryVal:QueryVal.values()){
                     if(collectionType.isValidQueryVal(queryVal)){
                         queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
                             castTypesToInputTypes.forEach((castType,inputTypes)->{
                                 inputTypes.forEach(inputType->{
                                     if(queryVal == QueryVal.NonNull){
-                                        for(var monitoredObjectGen:StructType.ArrList.validMonitoredObjectGens){
+                                        for(final var monitoredObjectGen:StructType.ArrList.validMonitoredObjectGens){
                                             if(monitoredObjectGen.expectedException != null){
-                                                for(var size:FIB_SEQ){
-                                                    if(size > 1000){
-                                                        break;
-                                                    }
+                                                for(final var size:FIB_SEQ){
                                                     if(size > 0){
                                                         TestExecutorService.submitTest(()->Assertions.assertThrows(
                                                                 monitoredObjectGen.expectedException,
@@ -1567,11 +2249,8 @@ public class ArrListTest{
                                     }else{
                                         final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,
                                                 castType,inputType,collectionType);
-                                        for(var size:FIB_SEQ){
-                                            if(size > 1000){
-                                                break;
-                                            }
-                                            for(var position:POSITIONS){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var position:POSITIONS){
                                                 if(position >= 0){
                                                     if(!queryCanReturnTrue){
                                                         continue;
@@ -1599,7 +2278,7 @@ public class ArrListTest{
                                                         continue;
                                                     }
                                                 }
-                                                for(var checkedType:CheckedType.values()){
+                                                for(final var checkedType:CheckedType.values()){
                                                     TestExecutorService.submitTest(
                                                             ()->runTest(collectionType,queryVal,modification,inputType,
                                                                     castType,checkedType,size,position,null));
@@ -1619,7 +2298,7 @@ public class ArrListTest{
         private void runTest(DataType collectionType,QueryVal queryVal,QueryVal.QueryValModification modification,
                 DataType inputType,QueryCastType castType,CheckedType checkedType,int seqSize,double position,
                 MonitoredObjectGen monitoredObjectGen){
-            var monitor=new ArrListMonitor(checkedType,collectionType);
+            final var monitor=new ArrListMonitor(checkedType,collectionType,seqSize);
             if(position < 0){
                 switch(collectionType){
                 case BOOLEAN:
@@ -1688,6 +2367,37 @@ public class ArrListTest{
             }
             monitor.updateCollectionState();
             callAndVerifyResult(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize);
+        }
+    }
+    private static interface ToStringAndHashCodeTest{
+        void callMethod(int size,DataType collectionType,CheckedType checkedType,int initVal,MonitoredObjectGen objGen);
+        private void runAllTests(String testName){
+            for(final int size:FIB_SEQ){
+                for(final var collectionType:DataType.values()){
+                    final int initValBound;
+                    if(collectionType == DataType.BOOLEAN){
+                        initValBound=1;
+                    }else{
+                        initValBound=0;
+                    }
+                    for(final var checkedType:CheckedType.values()){
+                        if(collectionType == DataType.REF || !checkedType.checked){
+                            IntStream.rangeClosed(0,initValBound).forEach(initVal->{
+                                for(final var objGen:StructType.ArrList.validMonitoredObjectGens){
+                                    if(checkedType.checked || objGen.expectedException == null){
+                                        TestExecutorService.submitTest(
+                                                ()->callMethod(size,collectionType,checkedType,initVal,objGen));
+                                    }
+                                    if(collectionType != DataType.REF){
+                                        break;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
         }
     }
 }

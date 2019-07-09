@@ -699,9 +699,7 @@ public class OpenAddressHashSetTest{
                                                         for(int i=0;i < itrCount;++i){
                                                             itrMonitor.iterateForward();
                                                         }
-                                                        if(itrRemoveScenario == IteratorRemoveScenario.PostRemove){
-                                                            itrMonitor.remove();
-                                                        }
+                                                        itrRemoveScenario.initialize(itrMonitor);
                                                         itrMonitor.illegalMod(preMod);
                                                         final Class<? extends Throwable> expectedException=itrRemoveScenario.expectedException == null
                                                                 ?preMod.expectedException
@@ -1495,7 +1493,8 @@ public class OpenAddressHashSetTest{
                 throw dataType.invalid();
             }
         }
-        @Override public void verifyArrayIsCopy(Object arr){
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
             switch(dataType){
             case FLOAT:
                 Assertions.assertNotSame(((FloatOpenAddressHashSet)set).table,arr);
@@ -2179,27 +2178,6 @@ public class OpenAddressHashSetTest{
                 this.expectedItrModCount=expectedItrModCount;
                 expectedItrLastRet=-1;
             }
-            @Override public void updateIteratorState(){
-                switch(dataType){
-                case FLOAT:
-                    expectedOffset=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case DOUBLE:
-                    expectedOffset=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                case REF:
-                    expectedOffset=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(itr);
-                    expectedItrModCount=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(itr);
-                    expectedItrLastRet=FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(itr);
-                    break;
-                default:
-                    throw dataType.invalid();
-                }
-            }
             @Override public void updateItrNextState(){
                 expectedItrLastRet=expectedOffset;
                 super.updateItrNextState();
@@ -2226,57 +2204,97 @@ public class OpenAddressHashSetTest{
             @Override public void verifyForEachRemaining(MonitoredFunction function){
                 expectedItrLastRet=super.verifyForEachRemainingHelper(function,expectedItrLastRet);
             }
-            @Override public void verifyIteratorState(Object itr){
+            @Override
+            public void verifyCloneHelper(Object clone){
                 switch(dataType){
                 case FLOAT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(itr));
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 case DOUBLE:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.root(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.root(clone));
                     Assertions.assertEquals(expectedOffset,
-                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(itr));
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 case REF:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.root(clone));
+                    Assertions.assertEquals(expectedOffset,
+                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.offset(clone));
                     Assertions.assertEquals(expectedItrModCount,
-                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(itr));
+                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.modCount(clone));
                     Assertions.assertEquals(expectedItrLastRet,
-                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(itr));
+                            FieldAndMethodAccessor.RefOpenAddressHashSet.Checked.Itr.lastRet(clone));
                     break;
                 default:
                     throw dataType.invalid();
                 }
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return expectedItrLastRet != -1;
             }
         }
         private class UncheckedItrMonitor extends AbstractItrMonitor{
             UncheckedItrMonitor(OmniIterator<?> itr,int expectedOffset,int expectedNumLeft){
                 super(itr,expectedOffset,expectedNumLeft);
             }
-            @Override public void updateIteratorState(){
+            @Override
+            public boolean nextWasJustCalled(){
                 switch(dataType){
-                case FLOAT:
-                    expectedOffset=FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(itr);
+                case FLOAT:{
+                    final int[] table=(int[])expectedTable;
+                    for(int offset=expectedOffset;;){
+                        switch(table[++offset]){
+                        default:
+                            return true;
+                        case 0:
+                        case 0x7fe00000:
+                        }
+                        if(offset == table.length - 1){
+                            break;
+                        }
+                    }
                     break;
-                case DOUBLE:
-                    expectedOffset=FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(itr);
+                }
+                case DOUBLE:{
+                    final long[] table=(long[])expectedTable;
+                    for(int offset=expectedOffset;;){
+                        long tableVal;
+                        if((tableVal=table[++offset]) != 0 && tableVal != 0x7ffc000000000000L){
+                            return true;
+                        }
+                        if(offset == table.length - 1){
+                            break;
+                        }
+                    }
                     break;
-                case REF:
-                    expectedOffset=FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(itr);
+                }
+                case REF:{
+                    final Object[] table=(Object[])expectedTable;
+                    for(int offset=expectedOffset;;){
+                        Object tableVal;
+                        if((tableVal=table[++offset]) != null && tableVal != DELETED){
+                            return true;
+                        }
+                        if(offset == table.length - 1){
+                            break;
+                        }
+                    }
                     break;
+                }
                 default:
                     throw dataType.invalid();
                 }
+                return false;
             }
             @Override public void updateItrRemoveState(){
                 --expectedSize;
@@ -2320,19 +2338,23 @@ public class OpenAddressHashSetTest{
             @Override public void verifyForEachRemaining(MonitoredFunction function){
                 super.verifyForEachRemainingHelper(function,-1);
             }
-            @Override public void verifyIteratorState(Object itr){
+            @Override
+            public void verifyCloneHelper(Object clone){
                 switch(dataType){
                 case FLOAT:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.root(clone));
+                    Assertions.assertEquals(expectedOffset,
+                            FieldAndMethodAccessor.FloatOpenAddressHashSet.Itr.offset(clone));
                     break;
                 case DOUBLE:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.root(clone));
+                    Assertions.assertEquals(expectedOffset,
+                            FieldAndMethodAccessor.DoubleOpenAddressHashSet.Itr.offset(clone));
                     break;
                 case REF:
-                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.root(itr));
-                    Assertions.assertEquals(expectedOffset,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(itr));
+                    Assertions.assertSame(set,FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.root(clone));
+                    Assertions.assertEquals(expectedOffset,
+                            FieldAndMethodAccessor.RefOpenAddressHashSet.Itr.offset(clone));
                     break;
                 default:
                     throw dataType.invalid();

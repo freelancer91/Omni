@@ -98,6 +98,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.BooleanInput<?>)itr).add((Boolean)inputVal);
+            }else{
+                ((OmniListIterator.BooleanInput<?>)itr).add((boolean)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Boolean)inputVal);
@@ -347,7 +355,7 @@ public enum DataType{
             throw super.cannotBeConverted(val,DOUBLE);
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.OfBoolean)monitoredList.getCollection()).getBoolean(index);
         }
         @Override
@@ -484,6 +492,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.ByteInput<?>)itr).add((Byte)inputVal);
+            }else{
+                ((OmniListIterator.ByteInput<?>)itr).add((byte)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Byte)inputVal);
@@ -612,7 +628,7 @@ public enum DataType{
             return Byte.MIN_VALUE;
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.ByteOutput<?>)monitoredList.getCollection()).getByte(index);
         }
         @Override
@@ -746,6 +762,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.CharInput<?>)itr).add((Character)inputVal);
+            }else{
+                ((OmniListIterator.CharInput<?>)itr).add((char)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Character)inputVal);
@@ -871,7 +895,7 @@ public enum DataType{
             return 0;
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.CharOutput<?>)monitoredList.getCollection()).getChar(index);
         }
         @Override
@@ -1005,6 +1029,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.ShortInput<?>)itr).add((Short)inputVal);
+            }else{
+                ((OmniListIterator.ShortInput<?>)itr).add((short)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Short)inputVal);
@@ -1133,7 +1165,7 @@ public enum DataType{
             return Short.MIN_VALUE;
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.ShortOutput<?>)monitoredList.getCollection()).getShort(index);
         }
         @Override
@@ -1251,6 +1283,14 @@ public enum DataType{
                 ((OmniList.IntInput<?>)collection).add(index,(Integer)inputVal);
             }else{
                 ((OmniList.IntInput<?>)collection).add(index,(int)inputVal);
+            }
+        }
+        @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.IntInput<?>)itr).add((Integer)inputVal);
+            }else{
+                ((OmniListIterator.IntInput<?>)itr).add((int)inputVal);
             }
         }
         @Override
@@ -1382,7 +1422,7 @@ public enum DataType{
             return Integer.MIN_VALUE;
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.IntOutput<?>)monitoredList.getCollection()).getInt(index);
         }
         @Override
@@ -1491,6 +1531,14 @@ public enum DataType{
                 ((OmniList.LongInput<?>)collection).add(index,(Long)inputVal);
             }else{
                 ((OmniList.LongInput<?>)collection).add(index,(long)inputVal);
+            }
+        }
+        @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.LongInput<?>)itr).add((Long)inputVal);
+            }else{
+                ((OmniListIterator.LongInput<?>)itr).add((long)inputVal);
             }
         }
         @Override
@@ -1622,7 +1670,7 @@ public enum DataType{
             return Long.MIN_VALUE;
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.LongOutput<?>)monitoredList.getCollection()).getLong(index);
         }
         @Override
@@ -1772,6 +1820,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.FloatInput<?>)itr).add((Float)inputVal);
+            }else{
+                ((OmniListIterator.FloatInput<?>)itr).add((float)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Float)inputVal);
@@ -1884,7 +1940,7 @@ public enum DataType{
             Assertions.assertEquals(offset + 1,result.length());
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.FloatOutput<?>)monitoredList.getCollection()).getFloat(index);
         }
         @Override
@@ -1956,6 +2012,14 @@ public enum DataType{
                 ((OmniList.OfDouble)collection).add(index,(Double)inputVal);
             }else{
                 ((OmniList.OfDouble)collection).add(index,(double)inputVal);
+            }
+        }
+        @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.OfDouble)itr).add((Double)inputVal);
+            }else{
+                ((OmniListIterator.OfDouble)itr).add((double)inputVal);
             }
         }
         @Override
@@ -2110,7 +2174,7 @@ public enum DataType{
             return val;
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.DoubleOutput<?>)monitoredList.getCollection()).getDouble(index);
         }
         @Override
@@ -2133,6 +2197,7 @@ public enum DataType{
         public void verifyMASSIVEToString(String result,int seqSize,String testName){
             throw new UnsupportedOperationException();
         }
+
     },
     REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
             RefDblLnkNode.class,
@@ -2201,26 +2266,34 @@ public enum DataType{
         @Override public Object callIteratorPrev(OmniListIterator<?> itr){
             return itr.previous();
         }
-        @SuppressWarnings({"unchecked","rawtypes"})
+        @SuppressWarnings({"unchecked"})
         @Override
         public boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
                 FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 throw cannotBeBoxed();
             }
-            return ((OmniCollection.OfRef)collection).add(inputVal);
+            return ((OmniCollection.OfRef<Object>)collection).add(inputVal);
         }
-        @SuppressWarnings({"unchecked","rawtypes"})
+        @SuppressWarnings({"unchecked"})
         @Override
         public void callListAdd(int index,Object inputVal,OmniList<?> collection,
                 FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 throw cannotBeBoxed();
             }
-            ((OmniList.OfRef)collection).add(index,inputVal);
+            ((OmniList.OfRef<Object>)collection).add(index,inputVal);
+        }
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                throw cannotBeBoxed();
+            }
+            ((OmniListIterator.OfRef<Object>)itr).add(inputVal);
         }
         @Override
-        public Object callListGet(int index,MonitoredList<?,?> monitoredList){
+        public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             var dataType=monitoredList.getDataType();
             var list=monitoredList.getCollection();
             switch(dataType){
@@ -2405,6 +2478,7 @@ public enum DataType{
         public void verifyMASSIVEToString(String result,int seqSize,String testName){
             throw new UnsupportedOperationException();
         }
+
     };
     private static void incrementProgressBar(int nextPercent){
         if(nextPercent % 10 == 0){
@@ -2604,11 +2678,12 @@ public enum DataType{
     public abstract Object verifyToArray(MonitoredCollection<?> collection);
     public abstract Object callIteratorNext(OmniIterator<?> itr);
     public abstract Object callIteratorPrev(OmniListIterator<?> itr);
+    public abstract void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType);
     public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
             FunctionCallType functionCallType);
     public abstract void callListAdd(int index,Object inputVal,OmniList<?> collection,
             FunctionCallType functionCallType);
-    public abstract Object callListGet(int index,MonitoredList<?,?> monitoredList);
+    public abstract Object callListGet(int index,MonitoredList<?,?,?> monitoredList);
     public abstract void callListPut(int index,Object inputVal,OmniList<?> collection,
             FunctionCallType functionCallType);
     public abstract Object callListSet(int index,Object inputVal,OmniList<?> collection,

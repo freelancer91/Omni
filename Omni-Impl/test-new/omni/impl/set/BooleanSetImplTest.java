@@ -209,7 +209,8 @@ public class BooleanSetImplTest{
             expectedState=set.state;
         }
 
-        @Override public void verifyArrayIsCopy(Object arr){
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
             //nothing to do
         }
 
@@ -232,6 +233,17 @@ public class BooleanSetImplTest{
         }
 
         class UncheckedMonitoredItr extends AbstractMonitoredItr{
+            @Override
+            public boolean nextWasJustCalled(){
+                switch(expectedItrState){
+                case 0b00:
+                    return expectedState != 0b00;
+                case 0b10:
+                    return expectedState == 0b11;
+                default:
+                    return false;
+                }
+            }
 
             @Override public boolean hasNext(){
                 return expectedItrState!=0b00;
@@ -262,9 +274,7 @@ public class BooleanSetImplTest{
                 expectedItrState=0b00;
             }
 
-            @Override public void updateIteratorState(){
-                expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr);
-            }
+
             @Override
             public void updateItrRemoveState(){
                 if(expectedItrState == 0b00){
@@ -279,9 +289,9 @@ public class BooleanSetImplTest{
             }
 
             @Override
-            public void verifyIteratorState(Object itr){
-                Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Itr.root(itr));
-                Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(itr));
+            public void verifyCloneHelper(Object clone){
+                Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Itr.root(clone));
+                Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Itr.itrState(clone));
             }
 
 
@@ -300,9 +310,11 @@ public class BooleanSetImplTest{
             }
 
 
+
         }
 
         class CheckedMonitoredItr extends AbstractMonitoredItr{
+
 
             @Override public boolean hasNext(){
                 switch(expectedItrState){
@@ -377,10 +389,20 @@ public class BooleanSetImplTest{
                 }
             }
 
-            @Override public void updateIteratorState(){
-                expectedItrState=FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr);
-            }
 
+            @Override
+            public boolean nextWasJustCalled(){
+                switch(expectedItrState){
+                case 0b0101:
+                case 0b0111:
+                case 0b1010:
+                case 0b1110:
+                case 0b1111:
+                    return true;
+                default:
+                    return false;
+                }
+            }
             @Override
             public void updateItrRemoveState(){
                 switch(expectedItrState){
@@ -407,9 +429,10 @@ public class BooleanSetImplTest{
             }
 
             @Override
-            public void verifyIteratorState(Object itr){
-                Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.root(itr));
-                Assertions.assertEquals(expectedItrState,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(itr));
+            public void verifyCloneHelper(Object clone){
+                Assertions.assertSame(set,FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.root(clone));
+                Assertions.assertEquals(expectedItrState,
+                        FieldAndMethodAccessor.BooleanSetImpl.Checked.Itr.itrState(clone));
             }
 
 
@@ -433,6 +456,7 @@ public class BooleanSetImplTest{
                     break;
                 }
             }
+
 
 
         }
@@ -593,56 +617,56 @@ public class BooleanSetImplTest{
                                             && itrScenario == 0?100:0)
                                     .forEach(randSeed->{
                                         for(final var functionCallType:FunctionCallType.values()){
-                                                    TestExecutorService.submitTest(()->{
-                                                        final var setMonitor=initSet
-                                                                .initialize(new BooleanSetImplMonitor(checkedType));
-                                                        final var itrMonitor=setMonitor.getMonitoredIterator();
-                                                        int adjustedState;
-                                                        switch(itrScenario){
-                                                        case 1:
-                                                            itrMonitor.iterateForward();
-                                                            adjustedState=0b10;
-                                                            break;
-                                                        case 2:
-                                                            itrMonitor.iterateForward();
-                                                            itrMonitor.remove();
-                                                            adjustedState=0b10;
-                                                            break;
-                                                        default:
-                                                            switch(initSet){
-                                                            case AddFalse:
-                                                                adjustedState=0b01;
-                                                                break;
-                                                            case AddTrue:
-                                                                adjustedState=0b10;
-                                                                break;
-                                                            case AddTrueAndFalse:
-                                                                adjustedState=0b11;
-                                                                break;
-                                                            case Empty:
-                                                                adjustedState=0b00;
-                                                                break;
-                                                            default:
-                                                                throw initSet.invalid();
-                                                            }
-                                                        }
-                                                        itrMonitor.illegalMod(preMod);
-                                                        final Class<? extends Throwable> expectedException=adjustedState == 0b00
-                                                                ?null
+                                            TestExecutorService.submitTest(()->{
+                                                final var setMonitor=initSet
+                                                        .initialize(new BooleanSetImplMonitor(checkedType));
+                                                final var itrMonitor=setMonitor.getMonitoredIterator();
+                                                int adjustedState;
+                                                switch(itrScenario){
+                                                case 1:
+                                                    itrMonitor.iterateForward();
+                                                    adjustedState=0b10;
+                                                    break;
+                                                case 2:
+                                                    itrMonitor.iterateForward();
+                                                    itrMonitor.remove();
+                                                    adjustedState=0b10;
+                                                    break;
+                                                default:
+                                                    switch(initSet){
+                                                    case AddFalse:
+                                                        adjustedState=0b01;
+                                                        break;
+                                                    case AddTrue:
+                                                        adjustedState=0b10;
+                                                        break;
+                                                    case AddTrueAndFalse:
+                                                        adjustedState=0b11;
+                                                        break;
+                                                    case Empty:
+                                                        adjustedState=0b00;
+                                                        break;
+                                                    default:
+                                                        throw initSet.invalid();
+                                                    }
+                                                }
+                                                itrMonitor.illegalMod(preMod);
+                                                final Class<? extends Throwable> expectedException=adjustedState == 0b00
+                                                        ?null
                                                                 :preMod.expectedException == null
-                                                                        ?functionGen.expectedException
+                                                                ?functionGen.expectedException
                                                                         :preMod.expectedException;
-                                                        if(expectedException == null){
-                                                            itrMonitor.verifyForEachRemaining(functionGen,
-                                                                    functionCallType,randSeed);
-                                                        }else{
-                                                            Assertions.assertThrows(expectedException,
-                                                                    ()->itrMonitor.verifyForEachRemaining(functionGen,
-                                                                            functionCallType,randSeed));
-                                                            itrMonitor.verifyIteratorState();
-                                                            setMonitor.verifyCollectionState();
-                                                        }
-                                                    });
+                                                if(expectedException == null){
+                                                    itrMonitor.verifyForEachRemaining(functionGen,
+                                                            functionCallType,randSeed);
+                                                }else{
+                                                    Assertions.assertThrows(expectedException,
+                                                            ()->itrMonitor.verifyForEachRemaining(functionGen,
+                                                                    functionCallType,randSeed));
+                                                    itrMonitor.verifyIteratorState();
+                                                    setMonitor.verifyCollectionState();
+                                                }
+                                            });
                                         }
                                     });
                                 });
@@ -676,26 +700,26 @@ public class BooleanSetImplTest{
                     if(checkedType.checked || preMod.expectedException == null){
                         for(var initSet:VALID_INIT_SEQS){
                             TestExecutorService
-                                    .submitTest(()->{
-                                        final var setMonitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
-                                        final var itrMonitor=setMonitor.getMonitoredIterator();
-                                        itrMonitor.illegalMod(preMod);
-                                        if(preMod.expectedException == null){
-                                            while(itrMonitor.hasNext()){
-                                                itrMonitor.verifyNext(outputType);
-                                            }
-                                            Assertions.assertFalse(itrMonitor.getIterator().hasNext());
-                                            if(checkedType.checked){
-                                                Assertions.assertThrows(NoSuchElementException.class,
-                                                        ()->itrMonitor.verifyNext(outputType));
-                                            }
-                                        }else{
-                                            Assertions.assertThrows(preMod.expectedException,
-                                                    ()->itrMonitor.verifyNext(outputType));
-                                        }
-                                        itrMonitor.verifyIteratorState();
-                                        setMonitor.verifyCollectionState();
-                                    });
+                            .submitTest(()->{
+                                final var setMonitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+                                final var itrMonitor=setMonitor.getMonitoredIterator();
+                                itrMonitor.illegalMod(preMod);
+                                if(preMod.expectedException == null){
+                                    while(itrMonitor.hasNext()){
+                                        itrMonitor.verifyNext(outputType);
+                                    }
+                                    Assertions.assertFalse(itrMonitor.getIterator().hasNext());
+                                    if(checkedType.checked){
+                                        Assertions.assertThrows(NoSuchElementException.class,
+                                                ()->itrMonitor.verifyNext(outputType));
+                                    }
+                                }else{
+                                    Assertions.assertThrows(preMod.expectedException,
+                                            ()->itrMonitor.verifyNext(outputType));
+                                }
+                                itrMonitor.verifyIteratorState();
+                                setMonitor.verifyCollectionState();
+                            });
                         }
                     }
                 }
@@ -742,13 +766,11 @@ public class BooleanSetImplTest{
                                             for(int i=0;i < itrCount;++i){
                                                 itrMonitor.iterateForward();
                                             }
-                                            if(itrRemoveScenario == IteratorRemoveScenario.PostRemove){
-                                                itrMonitor.remove();
-                                            }
+                                            itrRemoveScenario.initialize(itrMonitor);
                                             itrMonitor.illegalMod(preMod);
                                             final Class<? extends Throwable> expectedException=itrRemoveScenario.expectedException == null
                                                     ?preMod.expectedException
-                                                    :itrRemoveScenario.expectedException;
+                                                            :itrRemoveScenario.expectedException;
                                             if(expectedException == null){
                                                 for(;;){
                                                     itrMonitor.verifyRemove();

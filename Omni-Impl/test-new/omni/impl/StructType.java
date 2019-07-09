@@ -13,6 +13,7 @@ public enum StructType{
     public final EnumSet<MonitoredRemoveIfPredicateGen> validMonitoredRemoveIfPredicateGens;
     public final EnumSet<IllegalModification> validPreMods;
     public final EnumSet<MonitoredObjectGen> validMonitoredObjectGens;
+    public final EnumSet<IteratorType> validItrTypes;
     StructType(String name){
         this.name=name;
         this.validDataTypes=initValidDataTypes(this);
@@ -21,6 +22,28 @@ public enum StructType{
         this.validMonitoredRemoveIfPredicateGens=initValidMonitoredRemoveIfPredicateGens(this);
         this.validPreMods=initValidPreMods(this);
         this.validMonitoredObjectGens=initValidMonitoredObjectGens(this);
+        this.validItrTypes=initValidItrTypes(this);
+    }
+    private static EnumSet<IteratorType> initValidItrTypes(StructType structType){
+        switch(structType.name){
+        case "BooleanSetImpl":
+        case "ByteSetImpl":
+        case "IntegralOpenAddressHashSet":
+        case "OpenAddressHashSet":
+        case "ArrStack":
+        case "SnglLnkQueue":
+        case "SnglLnkStack":
+            return EnumSet.of(IteratorType.AscendingItr);
+        case "ArrDeq":
+            return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr);
+        case "ArrList":
+        case "DblLnkList":
+            return EnumSet.of(IteratorType.AscendingItr,IteratorType.BidirectionalItr);
+        case "ArrSubList":
+        case "DblLnkSubList":
+            return EnumSet.of(IteratorType.SubAscendingItr,IteratorType.SubBidirectionalItr);
+        }
+        throw structType.invalid();
     }
     private static EnumSet<MonitoredObjectGen> initValidMonitoredObjectGens(StructType structType){
         switch(structType.name){

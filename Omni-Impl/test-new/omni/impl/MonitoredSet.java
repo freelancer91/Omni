@@ -47,51 +47,7 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         @Override default IteratorType getIteratorType(){
             return IteratorType.AscendingItr;
         }
-        void verifyIteratorState(Object itr);
-        @Override
-        default void verifyIteratorState(){
-            verifyIteratorState(getIterator());
-        }
-        @Override
-        default void verifyClone(Object clone){
-            Assertions.assertNotSame(clone,getIterator());
-            verifyIteratorState(clone);
-        }
-        @Override default void modItr(){
-            if(!hasNext()) {
-                throw new UnsupportedOperationException("Cannot modify an iterator in a depleted state");
-            }
-            ITR itr=getIterator();
-            itr.next();
-            updateIteratorState();
-        }
-        void updateItrNextState();
-        void verifyNextResult(DataType outputType,Object result);
-        @Override
-        default Object verifyNext(DataType outputType){
-            final Object result;
-            try{
-                result=outputType.callIteratorNext(getIterator());
-                updateItrNextState();
-                verifyNextResult(outputType,result);
-            }finally{
-                verifyIteratorState();
-                getMonitoredCollection().verifyCollectionState();
-            }
 
-            return result;
-        }
-        void updateItrRemoveState();
-        @Override
-        default void verifyRemove(){
-            try{
-                getIterator().remove();
-                updateItrRemoveState();
-            }finally{
-                verifyIteratorState();
-                getMonitoredCollection().verifyCollectionState();
-            }
-        }
     }
     void removeFromExpectedState(QueryVal queryVal,QueryValModification modification);
     @Override default boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,

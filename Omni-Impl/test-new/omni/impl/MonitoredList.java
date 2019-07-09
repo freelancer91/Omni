@@ -1,9 +1,13 @@
 package omni.impl;
 
+import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
+import omni.api.OmniListIterator;
 import omni.impl.QueryVal.QueryValModification;
-public interface MonitoredList<ITR extends OmniIterator<?>,LST extends OmniList<?>>extends MonitoredSequence<LST>{
+public interface MonitoredList<ITR extends OmniIterator<?>,LSTITR extends OmniListIterator<?>,LST extends OmniList<?>>
+extends
+MonitoredSequence<LST>{
     default void verifyAdd(int index,Object inputVal,DataType inputType,FunctionCallType functionCallType){
         var collection=getCollection();
         try{
@@ -83,6 +87,102 @@ public interface MonitoredList<ITR extends OmniIterator<?>,LST extends OmniList<
             verifyCollectionState();
         }
     }
+    interface MonitoredListIterator<LSTITR extends OmniListIterator<?>,LST extends OmniList<?>>
+    extends
+    MonitoredIterator<LSTITR,LST>{
+        default void add(Object input,DataType inputType){
+            inputType.callIteratorAdd(input,getIterator(),FunctionCallType.Unboxed);
+            updateItrAddState(input,inputType);
+        }
+        boolean previousWasJustCalled();
+        @Override
+        default void modItr(){
+            if(hasNext()){
+                iterateForward();
+            }else if(hasPrevious()){
+                iterateReverse();
+            }else{
+                throw new UnsupportedOperationException("Cannot modify an iterator in a depleted state");
+            }
+        }
+        default Object verifyPrevious(DataType outputType){
+            final Object result;
+            try{
+                result=outputType.callIteratorPrev(getIterator());
+                updateItrPreviousState();
+                verifyPreviousResult(outputType,result);
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+            return result;
+        }
+        void updateItrPreviousState();
+        void verifyPreviousResult(DataType outputType,Object result);
+        boolean hasPrevious();
+        default void iterateReverse(){
+            LSTITR iterator=getIterator();
+            iterator.previous();
+            updateItrPreviousState();
+        }
+        default boolean verifyHasPrevious(){
+            LSTITR iterator=getIterator();
+            boolean expectedResult=hasPrevious();
+            boolean actualResult;
+            try{
+                actualResult=iterator.hasPrevious();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+            Assertions.assertEquals(expectedResult,actualResult);
+            return actualResult;
+        }
+        int nextIndex();
+        int previousIndex();
+        void updateItrAddState(Object input,DataType inputType);
+        default void verifyAdd(Object input,DataType inputType,FunctionCallType functionCallType){
+            var itr=getIterator();
+            try{
+                inputType.callIteratorAdd(input,itr,functionCallType);
+                updateItrAddState(input,inputType);
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+        }
+        default int verifyNextIndex(){
+            int expected=nextIndex();
+            int actual;
+            try{
+                actual=getIterator().nextIndex();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+            Assertions.assertEquals(expected,actual);
+            return actual;
+        }
+        default int verifyPreviousIndex(){
+            int expected=previousIndex();
+            int actual;
+            try{
+                actual=getIterator().previousIndex();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+            Assertions.assertEquals(expected,actual);
+            return actual;
+        }
+    }
+    @Override
+    MonitoredIterator<? extends ITR,LST> getMonitoredIterator();
+    @Override
+    MonitoredIterator<? extends ITR,LST> getMonitoredIterator(IteratorType itrType);
+    MonitoredIterator<? extends ITR,LST> getMonitoredIterator(int index,IteratorType itrType);
+    MonitoredListIterator<? extends LSTITR,LST> getMonitoredListIterator();
+    MonitoredListIterator<? extends LSTITR,LST> getMonitoredListIterator(int index);
     //    interface MonitoredListIterator<ITR extends OmniListIterator<?>,LST extends OmniList<?>>extends MonitoredIterator<ITR,LST>{
     //        @Override
     //        MonitoredList<ITR,LST> getMonitoredCollection();

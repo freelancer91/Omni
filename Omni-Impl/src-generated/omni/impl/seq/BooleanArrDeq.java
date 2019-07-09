@@ -2520,19 +2520,20 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         }
         throw new IllegalStateException();
       }
-      @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
+      @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
         int modCount=this.modCount;
         final Checked root;
         int tail=(root=this.root).tail;
         try{
           final var arr=root.arr;
-          if(cursor>tail){
+          int cursor;
+          if((cursor=expectedCursor)>tail){
             OmniArray.OfBoolean.ascendingForEach(arr,cursor,arr.length-1,action);
             cursor=0;
           }
           OmniArray.OfBoolean.ascendingForEach(arr,cursor,tail,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
         }
         this.lastRet=tail;
         this.cursor=-1;
@@ -2647,19 +2648,20 @@ public class BooleanArrDeq implements OmniDeque.OfBoolean,Externalizable,Cloneab
         }
         throw new IllegalStateException();
       }
-      @Override void uncheckedForEachRemaining(int cursor,BooleanConsumer action){
+      @Override void uncheckedForEachRemaining(final int expectedCursor,BooleanConsumer action){
         int modCount=this.modCount;
         final Checked root;
         int head=(root=this.root).head;
         try{
           final var arr=root.arr;
-          if(cursor<head){
+          int cursor;
+          if((cursor=expectedCursor)<head){
             OmniArray.OfBoolean.descendingForEach(arr,0,cursor,action);
             cursor=arr.length-1;
           }
           OmniArray.OfBoolean.descendingForEach(arr,head,cursor,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
         }
         this.lastRet=head;
         this.cursor=-1;

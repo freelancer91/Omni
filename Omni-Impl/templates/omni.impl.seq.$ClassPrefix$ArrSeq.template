@@ -1358,7 +1358,7 @@ public
     #MACRO IteratorRemoveImpl<ListItr>()
     #MACRO IteratorForEachImpl<ListItr>($TypeNameModifier$Consumer$<? super E>$,action)
       #IFNOT OfRef
-    #MACRO IteratorForEachImpl<Itr>(Consumer<? super $BoxedType$>,action::accept)
+    #MACRO IteratorForEachImpl<ListItr>(Consumer<? super $BoxedType$>,action::accept)
       #ENDIF
     #ENDIF
     #MACRO SuppressUnchecked()
@@ -3359,33 +3359,35 @@ ERROR unknown struct STRUCTNAME for ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(
 #MACRODEF IteratorForEachImpl<ITRTYPE>(CONSUMER,ACTION)
 @Override public void forEachRemaining(CONSUMER action){
 #IFSWITCH STRUCTNAME==CheckedSubList
-  int cursor;
+  final int cursor;
   final int bound;
   final STRUCTNAME$<E>$ parent;
   if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
     final int modCount=this.modCount;
     final var root=parent.root;
+    final int lastRet;
     try{
-      OmniArray.Of$ClassPrefix$.ascendingForEach(root.arr,cursor,cursor=bound-1,ACTION);
+      OmniArray.Of$ClassPrefix$.ascendingForEach(root.arr,cursor,lastRet=bound-1,ACTION);
     }finally{
-      CheckedCollection.checkModCount(modCount,root.modCount);
+      CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
     }
     this.cursor=bound;
-    this.lastRet=cursor;
+    this.lastRet=lastRet;
   }
 #ELSEIFSWITCH STRUCTNAME==CheckedList
-  int cursor;
+  final int cursor;
   final int bound;
   final STRUCTNAME$<E>$ parent;
   if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
     final int modCount=this.modCount;
+    final int lastRet;
     try{
-      OmniArray.Of$ClassPrefix$.ascendingForEach(parent.arr,cursor,cursor=bound-1,ACTION);
+      OmniArray.Of$ClassPrefix$.ascendingForEach(parent.arr,cursor,lastRet=bound-1,ACTION);
     }finally{
-      CheckedCollection.checkModCount(modCount,parent.modCount);
+      CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
     }
     this.cursor=bound;
-    this.lastRet=cursor;
+    this.lastRet=lastRet;
   }
 #ELSEIFSWITCH STRUCTNAME==CheckedStack
   final int cursor;
@@ -3395,7 +3397,7 @@ ERROR unknown struct STRUCTNAME for ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(
     try{
       OmniArray.Of$ClassPrefix$.descendingForEach(parent.arr,0,cursor-1,ACTION);
     }finally{
-      CheckedCollection.checkModCount(modCount,parent.modCount);
+      CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
     }
     this.cursor=0;
     this.lastRet=0;

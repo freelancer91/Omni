@@ -902,17 +902,18 @@ AbstractSeq<Byte>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(ByteSnglLnkNode next,ByteConsumer action){
+      @Override void uncheckedForEachRemaining(final ByteSnglLnkNode expectedNext,ByteConsumer action){
         final int modCount=this.modCount;
-        ByteSnglLnkNode prev,curr;
+        ByteSnglLnkNode prev,curr,next;
         try{
           curr=this.curr;
+          next=expectedNext;
           do{
             action.accept(next.val);
             prev=curr;
           }while((next=(curr=next).next)!=null);
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,this.parent.modCount,expectedNext,this.next);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1635,13 +1636,13 @@ AbstractSeq<Byte>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(ByteSnglLnkNode next,ByteConsumer action){
+      @Override void uncheckedForEachRemaining(final ByteSnglLnkNode expectedNext,ByteConsumer action){
         final int modCount=this.modCount;
-        ByteSnglLnkNode prev,curr;
+        ByteSnglLnkNode prev,curr,next;
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next){
+          for(curr=this.curr,next=expectedNext;;next=curr.next){
             action.accept(next.val);
             prev=curr;
             if((curr=next)==tail){
@@ -1649,7 +1650,7 @@ AbstractSeq<Byte>
             }
           }
         }finally{
-          CheckedCollection.checkModCount(modCount,parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount,expectedNext,this.next);
         }
         this.prev=prev;
         this.curr=curr;

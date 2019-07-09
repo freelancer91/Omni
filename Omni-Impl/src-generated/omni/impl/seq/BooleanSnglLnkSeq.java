@@ -944,17 +944,18 @@ AbstractSeq<Boolean>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(BooleanSnglLnkNode next,BooleanConsumer action){
+      @Override void uncheckedForEachRemaining(final BooleanSnglLnkNode expectedNext,BooleanConsumer action){
         final int modCount=this.modCount;
-        BooleanSnglLnkNode prev,curr;
+        BooleanSnglLnkNode prev,curr,next;
         try{
           curr=this.curr;
+          next=expectedNext;
           do{
             action.accept(next.val);
             prev=curr;
           }while((next=(curr=next).next)!=null);
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,this.parent.modCount,expectedNext,this.next);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1749,13 +1750,13 @@ AbstractSeq<Boolean>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(BooleanSnglLnkNode next,BooleanConsumer action){
+      @Override void uncheckedForEachRemaining(final BooleanSnglLnkNode expectedNext,BooleanConsumer action){
         final int modCount=this.modCount;
-        BooleanSnglLnkNode prev,curr;
+        BooleanSnglLnkNode prev,curr,next;
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next){
+          for(curr=this.curr,next=expectedNext;;next=curr.next){
             action.accept(next.val);
             prev=curr;
             if((curr=next)==tail){
@@ -1763,7 +1764,7 @@ AbstractSeq<Boolean>
             }
           }
         }finally{
-          CheckedCollection.checkModCount(modCount,parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount,expectedNext,this.next);
         }
         this.prev=prev;
         this.curr=curr;

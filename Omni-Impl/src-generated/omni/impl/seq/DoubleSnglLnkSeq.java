@@ -794,17 +794,18 @@ AbstractSeq<Double>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(DoubleSnglLnkNode next,DoubleConsumer action){
+      @Override void uncheckedForEachRemaining(final DoubleSnglLnkNode expectedNext,DoubleConsumer action){
         final int modCount=this.modCount;
-        DoubleSnglLnkNode prev,curr;
+        DoubleSnglLnkNode prev,curr,next;
         try{
           curr=this.curr;
+          next=expectedNext;
           do{
             action.accept(next.val);
             prev=curr;
           }while((next=(curr=next).next)!=null);
         }finally{
-          CheckedCollection.checkModCount(modCount,this.parent.modCount);
+          CheckedCollection.checkModCount(modCount,this.parent.modCount,expectedNext,this.next);
         }
         this.prev=prev;
         this.curr=curr;
@@ -1488,13 +1489,13 @@ AbstractSeq<Double>
         }
         throw new NoSuchElementException();
       }
-      @Override void uncheckedForEachRemaining(DoubleSnglLnkNode next,DoubleConsumer action){
+      @Override void uncheckedForEachRemaining(final DoubleSnglLnkNode expectedNext,DoubleConsumer action){
         final int modCount=this.modCount;
-        DoubleSnglLnkNode prev,curr;
+        DoubleSnglLnkNode prev,curr,next;
         final CheckedQueue parent;
         final var tail=(parent=this.parent).tail;
         try{
-          for(curr=this.curr;;next=curr.next){
+          for(curr=this.curr,next=expectedNext;;next=curr.next){
             action.accept(next.val);
             prev=curr;
             if((curr=next)==tail){
@@ -1502,7 +1503,7 @@ AbstractSeq<Double>
             }
           }
         }finally{
-          CheckedCollection.checkModCount(modCount,parent.modCount);
+          CheckedCollection.checkModCount(modCount,parent.modCount,expectedNext,this.next);
         }
         this.prev=prev;
         this.curr=curr;

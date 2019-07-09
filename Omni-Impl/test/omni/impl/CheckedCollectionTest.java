@@ -158,6 +158,53 @@ public class CheckedCollectionTest{
         });
     }
     @Test
+    public void testCheckModCountintintObjectObject(){
+        Object o1=new Object();
+        Object o2=new Object();
+        Assertions.assertDoesNotThrow(()->{
+            CheckedCollection.checkModCount(1,1,o1,o1);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,2,o1,o1);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,1,o1,o2);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,2,o1,o2);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(2,1,o1,o2);
+        });
+    }
+    @Test
+    public void testCheckModCountintintintint(){
+        Assertions.assertDoesNotThrow(()->{
+            CheckedCollection.checkModCount(1,1,2,2);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,2,3,3);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,1,2,3);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,2,3,4);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,2,1,2);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(2,1,2,1);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(1,2,2,1);
+        });
+        Assertions.assertThrows(ConcurrentModificationException.class,()->{
+            CheckedCollection.checkModCount(2,1,1,2);
+        });
+    }
+    @Test
     public void testCheckModCountintintRuntimeException(){
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
             throw CheckedCollection.checkModCount(1,1,new IndexOutOfBoundsException());
@@ -176,22 +223,22 @@ public class CheckedCollectionTest{
         });
     }
     private static class ModCountCheckerTester{
-      int modCount;
-      ModCountCheckerTester(int modCount){
-          this.modCount=modCount;
-      }
-      public CheckedCollection.AbstractModCountChecker getModCountChecker(int expected){
-          return new CheckedCollection.AbstractModCountChecker(expected){
-              @Override
-              protected int getActualModCount(){
-                  return modCount;
-              }
-          };
-      }
-  }
+        int modCount;
+        ModCountCheckerTester(int modCount){
+            this.modCount=modCount;
+        }
+        public CheckedCollection.AbstractModCountChecker getModCountChecker(int expected){
+            return new CheckedCollection.AbstractModCountChecker(expected){
+                @Override
+                protected int getActualModCount(){
+                    return modCount;
+                }
+            };
+        }
+    }
     @Test
     public void testAbstractModCountChecker(){
-        
+
         ModCountCheckerTester testClass=new ModCountCheckerTester(1);
         CheckedCollection.AbstractModCountChecker modCountChecker=testClass.getModCountChecker(testClass.modCount);
         Assertions.assertDoesNotThrow(modCountChecker::checkModCount);

@@ -1689,10 +1689,12 @@ AbstractSeq<Float>
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        final int cursor,bound;
+        int cursor;
+        final int bound;
         final UncheckedList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
-          OmniArray.OfFloat.ascendingForEach(parent.arr,cursor,bound-1,action::accept);
+          OmniArray.OfFloat.ascendingForEach(parent.arr,cursor,cursor=bound-1,action::accept);
+          this.lastRet=cursor;
           this.cursor=bound;
         }
       }
@@ -2891,10 +2893,12 @@ AbstractSeq<Float>
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        final int cursor,bound;
+        int cursor;
+        final int bound;
         final UncheckedSubList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
-          OmniArray.OfFloat.ascendingForEach(parent.root.arr,cursor,bound-1,action::accept);
+          OmniArray.OfFloat.ascendingForEach(parent.root.arr,cursor,cursor=bound-1,action::accept);
+          this.lastRet=cursor;
           this.cursor=bound;
         }
       }
@@ -3303,7 +3307,7 @@ AbstractSeq<Float>
           try{
             OmniArray.OfFloat.descendingForEach(parent.arr,0,cursor-1,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=0;
           this.lastRet=0;
@@ -3317,7 +3321,7 @@ AbstractSeq<Float>
           try{
             OmniArray.OfFloat.descendingForEach(parent.arr,0,cursor-1,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=0;
           this.lastRet=0;
@@ -3572,33 +3576,35 @@ AbstractSeq<Float>
         throw new IllegalStateException();
       }
       @Override public void forEachRemaining(FloatConsumer action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           final int modCount=this.modCount;
+          final int lastRet;
           try{
-            OmniArray.OfFloat.ascendingForEach(parent.arr,cursor,cursor=bound-1,action);
+            OmniArray.OfFloat.ascendingForEach(parent.arr,cursor,lastRet=bound-1,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           final int modCount=this.modCount;
+          final int lastRet;
           try{
-            OmniArray.OfFloat.ascendingForEach(parent.arr,cursor,cursor=bound-1,action::accept);
+            OmniArray.OfFloat.ascendingForEach(parent.arr,cursor,lastRet=bound-1,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
     }
@@ -5064,35 +5070,37 @@ AbstractSeq<Float>
         throw new IllegalStateException();
       }
       @Override public void forEachRemaining(FloatConsumer action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedSubList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           final int modCount=this.modCount;
           final var root=parent.root;
+          final int lastRet;
           try{
-            OmniArray.OfFloat.ascendingForEach(root.arr,cursor,cursor=bound-1,action);
+            OmniArray.OfFloat.ascendingForEach(root.arr,cursor,lastRet=bound-1,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Float> action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedSubList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           final int modCount=this.modCount;
           final var root=parent.root;
+          final int lastRet;
           try{
-            OmniArray.OfFloat.ascendingForEach(root.arr,cursor,cursor=bound-1,action::accept);
+            OmniArray.OfFloat.ascendingForEach(root.arr,cursor,lastRet=bound-1,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
     }

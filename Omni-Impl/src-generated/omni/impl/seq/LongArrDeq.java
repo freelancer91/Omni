@@ -3544,19 +3544,20 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         }
         throw new IllegalStateException();
       }
-      @Override void uncheckedForEachRemaining(int cursor,LongConsumer action){
+      @Override void uncheckedForEachRemaining(final int expectedCursor,LongConsumer action){
         int modCount=this.modCount;
         final Checked root;
         int tail=(root=this.root).tail;
         try{
           final var arr=root.arr;
-          if(cursor>tail){
+          int cursor;
+          if((cursor=expectedCursor)>tail){
             OmniArray.OfLong.ascendingForEach(arr,cursor,arr.length-1,action);
             cursor=0;
           }
           OmniArray.OfLong.ascendingForEach(arr,cursor,tail,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
         }
         this.lastRet=tail;
         this.cursor=-1;
@@ -3671,19 +3672,20 @@ public class LongArrDeq implements OmniDeque.OfLong,Externalizable,Cloneable,Ran
         }
         throw new IllegalStateException();
       }
-      @Override void uncheckedForEachRemaining(int cursor,LongConsumer action){
+      @Override void uncheckedForEachRemaining(final int expectedCursor,LongConsumer action){
         int modCount=this.modCount;
         final Checked root;
         int head=(root=this.root).head;
         try{
           final var arr=root.arr;
-          if(cursor<head){
+          int cursor;
+          if((cursor=expectedCursor)<head){
             OmniArray.OfLong.descendingForEach(arr,0,cursor,action);
             cursor=arr.length-1;
           }
           OmniArray.OfLong.descendingForEach(arr,head,cursor,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          CheckedCollection.checkModCount(modCount,root.modCount,expectedCursor,this.cursor);
         }
         this.lastRet=head;
         this.cursor=-1;

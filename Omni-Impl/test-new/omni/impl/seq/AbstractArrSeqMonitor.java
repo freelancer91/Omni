@@ -391,6 +391,23 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
             throw dataType.invalid();
         }
     }
+    @Override
+    public void verifyReadAndWriteClone(SEQ readCol){
+        verifyCloneTypeAndModCount(readCol);
+        Assertions.assertNotSame(readCol,seq);
+        int size;
+        Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)readCol).size);
+        var origArr=((RefArrSeq<?>)seq).arr;
+        var cloneArr=((RefArrSeq<?>)readCol).arr;
+        if(origArr == OmniArray.OfRef.DEFAULT_ARR){
+            Assertions.assertSame(origArr,cloneArr);
+        }else{
+            Assertions.assertNotSame(origArr,cloneArr);
+            while(size != 0){
+                Assertions.assertEquals(origArr[--size],cloneArr[size]);
+            }
+        }
+    }
     @Override public void verifyClone(Object clone){
         verifyCloneTypeAndModCount(clone);
         Assertions.assertNotSame(clone,seq);
@@ -785,9 +802,10 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
             }
         }
     }
-    @Override public void verifyArrayIsCopy(Object arr){
+    @Override
+    public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
         if(expectedArr != null){
-            if(expectedCapacity == 0){
+            if(expectedCapacity == 0 && emptyArrayMayBeSame){
                 outer:for(;;){
                     switch(dataType){
                     case BOOLEAN:
@@ -846,6 +864,202 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
     }
     @Override public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
         ((Externalizable)seq).writeExternal(oos);
+    }
+    public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
+        switch(outputType){
+        case BOOLEAN:
+            Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor],(boolean)output);
+            break;
+        case BYTE:{
+            var v=(byte)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?(byte)1:(byte)0,v);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case CHAR:{
+            var v=(char)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?(char)1:(char)0,v);
+                break;
+            case CHAR:
+                Assertions.assertEquals(((char[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case SHORT:{
+            var v=(short)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?(short)1:(short)0,v);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],v);
+                break;
+            case SHORT:
+                Assertions.assertEquals(((short[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case INT:{
+            var v=(int)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?1:0,v);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],v);
+                break;
+            case CHAR:
+                Assertions.assertEquals(((char[])expectedArr)[expectedCursor],v);
+                break;
+            case SHORT:
+                Assertions.assertEquals(((short[])expectedArr)[expectedCursor],v);
+                break;
+            case INT:
+                Assertions.assertEquals(((int[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case LONG:{
+            var v=(long)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?1L:0L,v);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],v);
+                break;
+            case CHAR:
+                Assertions.assertEquals(((char[])expectedArr)[expectedCursor],v);
+                break;
+            case SHORT:
+                Assertions.assertEquals(((short[])expectedArr)[expectedCursor],v);
+                break;
+            case INT:
+                Assertions.assertEquals(((int[])expectedArr)[expectedCursor],v);
+                break;
+            case LONG:
+                Assertions.assertEquals(((long[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case FLOAT:{
+            var v=(float)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?1F:0F,v);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],v);
+                break;
+            case CHAR:
+                Assertions.assertEquals(((char[])expectedArr)[expectedCursor],v);
+                break;
+            case SHORT:
+                Assertions.assertEquals(((short[])expectedArr)[expectedCursor],v);
+                break;
+            case INT:
+                Assertions.assertEquals(((int[])expectedArr)[expectedCursor],v);
+                break;
+            case LONG:
+                Assertions.assertEquals(((long[])expectedArr)[expectedCursor],v);
+                break;
+            case FLOAT:
+                Assertions.assertEquals(((float[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case DOUBLE:{
+            var v=(double)output;
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor]?1D:0D,v);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],v);
+                break;
+            case CHAR:
+                Assertions.assertEquals(((char[])expectedArr)[expectedCursor],v);
+                break;
+            case SHORT:
+                Assertions.assertEquals(((short[])expectedArr)[expectedCursor],v);
+                break;
+            case INT:
+                Assertions.assertEquals(((int[])expectedArr)[expectedCursor],v);
+                break;
+            case LONG:
+                Assertions.assertEquals(((long[])expectedArr)[expectedCursor],v);
+                break;
+            case FLOAT:
+                Assertions.assertEquals(((float[])expectedArr)[expectedCursor],v);
+                break;
+            case DOUBLE:
+                Assertions.assertEquals(((double[])expectedArr)[expectedCursor],v);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        case REF:{
+            switch(dataType){
+            case BOOLEAN:
+                Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor],output);
+                break;
+            case BYTE:
+                Assertions.assertEquals(((byte[])expectedArr)[expectedCursor],output);
+                break;
+            case CHAR:
+                Assertions.assertEquals(((char[])expectedArr)[expectedCursor],output);
+                break;
+            case SHORT:
+                Assertions.assertEquals(((short[])expectedArr)[expectedCursor],output);
+                break;
+            case INT:
+                Assertions.assertEquals(((int[])expectedArr)[expectedCursor],output);
+                break;
+            case LONG:
+                Assertions.assertEquals(((long[])expectedArr)[expectedCursor],output);
+                break;
+            case FLOAT:
+                Assertions.assertEquals(((float[])expectedArr)[expectedCursor],output);
+                break;
+            case DOUBLE:
+                Assertions.assertEquals(((double[])expectedArr)[expectedCursor],output);
+                break;
+            case REF:
+                Assertions.assertSame(((Object[])expectedArr)[expectedCursor],output);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            break;
+        }
+        }
     }
     public void updateAddState(int index,Object inputVal,DataType inputType){
         switch(dataType){
@@ -1173,7 +1387,19 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
     public void updateAddState(Object inputVal,DataType inputType){
         updateAddState(expectedSize,inputVal,inputType);
     }
-
+    abstract int findRemoveValIndex(Object inputVal,DataType inputType);
+    @Override
+    public void updateRemoveValState(Object inputVal,DataType inputType){
+        int index=findRemoveValIndex(inputVal,inputType);
+        updateRemoveIndexState(index);
+    }
+    public void updateRemoveIndexState(int index){
+        System.arraycopy(expectedArr,index + 1,expectedArr,index,(--expectedSize) - index);
+        if(dataType == DataType.REF){
+            ((Object[])expectedArr)[expectedSize]=null;
+        }
+        ++expectedModCount;
+    }
     abstract void updateModCount();
     abstract void verifyModCount();
     abstract void verifyCloneTypeAndModCount(Object clone);

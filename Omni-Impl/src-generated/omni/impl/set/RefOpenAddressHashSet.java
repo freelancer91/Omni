@@ -1220,9 +1220,7 @@ private boolean addToTable(Object val,int hash){
                 }
               }
           }finally{
-              if(modCount!=root.modCount || expectedOffset!=this.offset){
-                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
-              }
+              CheckedCollection.checkModCount(modCount,root.modCount,expectedOffset,this.offset);
           }
           this.offset=-1;
           this.lastRet=lastRet;

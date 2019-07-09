@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.ConcurrentModificationException;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.function.CharConsumer;
@@ -1846,9 +1845,7 @@ private boolean addToTable(char val){
                   }
               }
           }finally{
-              if(modCount!=root.modCount || expectedOffset!=this.offset){
-                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
-              }
+              CheckedCollection.checkModCount(modCount,root.modCount,expectedOffset,this.offset);
           }
           this.offset=-1;
           this.lastRet=lastRet+256;
@@ -1889,9 +1886,7 @@ private boolean addToTable(char val){
                   }
               }
           }finally{
-              if(modCount!=root.modCount || expectedOffset!=this.offset){
-                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},offset{expected="+expectedOffset+";actual="+this.offset+"}");
-              }
+              CheckedCollection.checkModCount(modCount,root.modCount,expectedOffset,this.offset);
           }
           this.lastRet=lastRet;
           this.offset=-1;

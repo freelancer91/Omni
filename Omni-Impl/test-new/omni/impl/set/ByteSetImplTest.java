@@ -207,9 +207,9 @@ public class ByteSetImplTest{
                                                         itrMonitor.illegalMod(preMod);
                                                         final Class<? extends Throwable> expectedException=numLeft == 0
                                                                 ?null
-                                                                :preMod.expectedException == null
+                                                                        :preMod.expectedException == null
                                                                         ?functionGen.expectedException
-                                                                        :preMod.expectedException;
+                                                                                :preMod.expectedException;
                                                         if(expectedException == null){
                                                             itrMonitor.verifyForEachRemaining(functionGen,
                                                                     functionCallType,randSeed);
@@ -254,26 +254,26 @@ public class ByteSetImplTest{
                     if(checkedType.checked || preMod.expectedException == null){
                         for(final var initSet:VALID_INIT_SEQS){
                             TestExecutorService
-                                    .submitTest(()->{
-                                        final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
-                                        final var itrMonitor=setMonitor.getMonitoredIterator();
-                                        itrMonitor.illegalMod(preMod);
-                                        if(preMod.expectedException == null){
-                                            while(itrMonitor.hasNext()){
-                                                itrMonitor.verifyNext(outputType);
-                                            }
-                                            Assertions.assertFalse(itrMonitor.getIterator().hasNext());
-                                            if(checkedType.checked){
-                                                Assertions.assertThrows(NoSuchElementException.class,
-                                                        ()->itrMonitor.verifyNext(outputType));
-                                            }
-                                        }else{
-                                            Assertions.assertThrows(preMod.expectedException,
-                                                    ()->itrMonitor.verifyNext(outputType));
-                                        }
-                                        itrMonitor.verifyIteratorState();
-                                        setMonitor.verifyCollectionState();
-                                    });
+                            .submitTest(()->{
+                                final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
+                                final var itrMonitor=setMonitor.getMonitoredIterator();
+                                itrMonitor.illegalMod(preMod);
+                                if(preMod.expectedException == null){
+                                    while(itrMonitor.hasNext()){
+                                        itrMonitor.verifyNext(outputType);
+                                    }
+                                    Assertions.assertFalse(itrMonitor.getIterator().hasNext());
+                                    if(checkedType.checked){
+                                        Assertions.assertThrows(NoSuchElementException.class,
+                                                ()->itrMonitor.verifyNext(outputType));
+                                    }
+                                }else{
+                                    Assertions.assertThrows(preMod.expectedException,
+                                            ()->itrMonitor.verifyNext(outputType));
+                                }
+                                itrMonitor.verifyIteratorState();
+                                setMonitor.verifyCollectionState();
+                            });
                         }
                     }
                 }
@@ -306,13 +306,11 @@ public class ByteSetImplTest{
                                             for(int i=0;i < itrCount;++i){
                                                 itrMonitor.iterateForward();
                                             }
-                                            if(itrRemoveScenario == IteratorRemoveScenario.PostRemove){
-                                                itrMonitor.remove();
-                                            }
+                                            itrRemoveScenario.initialize(itrMonitor);
                                             itrMonitor.illegalMod(preMod);
                                             final Class<? extends Throwable> expectedException=itrRemoveScenario.expectedException == null
                                                     ?preMod.expectedException
-                                                    :itrRemoveScenario.expectedException;
+                                                            :itrRemoveScenario.expectedException;
                                             if(expectedException == null){
                                                 for(;;){
                                                     itrMonitor.verifyRemove();
@@ -362,54 +360,54 @@ public class ByteSetImplTest{
                             LongStream.rangeClosed(0,randSeedBound)
                             .forEach(randSeed->DoubleStream.of(thresholdArr)
                                     .forEach(threshold->TestExecutorService
-                                                    .submitTest(()->{
-                                                        final var monitor=initSet
-                                                                .initialize(new ByteSetImplMonitor(checkedType));
-                                                        final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,
-                                                                4);
-                                                        final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                                monitor,threshold,randSeed);
-                                                        final int sizeBefore=monitor.size();
-                                                        if(filterGen.expectedException == null || sizeBefore == 0){
-                                                            final boolean result=monitor.verifyRemoveIf(filter,
-                                                                    functionCallType);
-                                                            if(sizeBefore == 0b00){
-                                                                Assertions.assertFalse(result);
-                                                            }else{
-                                                                switch(filterGen){
-                                                                case Random:
-                                                                    Assertions.assertEquals(filter.numRemoved != 0,
-                                                                            result);
-                                                                    break;
-                                                                case RemoveAll:
-                                                                    Assertions.assertTrue(monitor.set.isEmpty());
-                                                                    Assertions.assertTrue(result);
-                                                                    break;
-                                                                case RemoveFalse:
-                                                                    Assertions.assertFalse(monitor.set.contains(false));
-                                                                    Assertions.assertEquals(
-                                                                            (expectedWords[2] & 0b01) != 0,result);
-                                                                    break;
-                                                                case RemoveNone:
-                                                                    Assertions.assertFalse(result);
-                                                                    Assertions.assertFalse(monitor.set.isEmpty());
-                                                                    break;
-                                                                case RemoveTrue:
-                                                                    Assertions.assertFalse(monitor.set.contains(true));
-                                                                    Assertions.assertEquals(
-                                                                            (expectedWords[2] & 0b10) != 0,result);
-                                                                    break;
-                                                                default:
-                                                                    throw filterGen.invalid();
-                                                                }
-                                                            }
-                                                        }else{
-                                                            Assertions.assertThrows(filterGen.expectedException,
-                                                                    ()->monitor.verifyRemoveIf(filter,
-                                                                            functionCallType));
-                                                            monitor.verifyCollectionState();
+                                            .submitTest(()->{
+                                                final var monitor=initSet
+                                                        .initialize(new ByteSetImplMonitor(checkedType));
+                                                final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,
+                                                        4);
+                                                final var filter=filterGen.getMonitoredRemoveIfPredicate(
+                                                        monitor,threshold,randSeed);
+                                                final int sizeBefore=monitor.size();
+                                                if(filterGen.expectedException == null || sizeBefore == 0){
+                                                    final boolean result=monitor.verifyRemoveIf(filter,
+                                                            functionCallType);
+                                                    if(sizeBefore == 0b00){
+                                                        Assertions.assertFalse(result);
+                                                    }else{
+                                                        switch(filterGen){
+                                                        case Random:
+                                                            Assertions.assertEquals(filter.numRemoved != 0,
+                                                            result);
+                                                            break;
+                                                        case RemoveAll:
+                                                            Assertions.assertTrue(monitor.set.isEmpty());
+                                                            Assertions.assertTrue(result);
+                                                            break;
+                                                        case RemoveFalse:
+                                                            Assertions.assertFalse(monitor.set.contains(false));
+                                                            Assertions.assertEquals(
+                                                                    (expectedWords[2] & 0b01) != 0,result);
+                                                            break;
+                                                        case RemoveNone:
+                                                            Assertions.assertFalse(result);
+                                                            Assertions.assertFalse(monitor.set.isEmpty());
+                                                            break;
+                                                        case RemoveTrue:
+                                                            Assertions.assertFalse(monitor.set.contains(true));
+                                                            Assertions.assertEquals(
+                                                                    (expectedWords[2] & 0b10) != 0,result);
+                                                            break;
+                                                        default:
+                                                            throw filterGen.invalid();
                                                         }
-                                                    })));
+                                                    }
+                                                }else{
+                                                    Assertions.assertThrows(filterGen.expectedException,
+                                                            ()->monitor.verifyRemoveIf(filter,
+                                                                    functionCallType));
+                                                    monitor.verifyCollectionState();
+                                                }
+                                            })));
                         }
                     }
                 }
@@ -622,7 +620,7 @@ public class ByteSetImplTest{
             expectedSize=getExpectedSize();
         }
         @Override
-        public void verifyArrayIsCopy(Object arr){
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
             // nothing to do
         }
         @Override public void updateClearState() {
@@ -754,16 +752,11 @@ public class ByteSetImplTest{
         class CheckedMonitoredItr extends AbstractMonitoredItr{
             int expectedItrModCount;
             int expectedItrLastRet;
+
             CheckedMonitoredItr(OmniIterator.OfByte itr,int expectedValOffset,int expectedItrModCount){
                 super(itr,expectedValOffset);
                 this.expectedItrModCount=expectedItrModCount;
                 expectedItrLastRet=-129;
-            }
-            @Override
-            public void updateIteratorState(){
-                expectedValOffset=FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.valOffset(itr);
-                expectedItrModCount=FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.modCount(itr);
-                expectedItrLastRet=FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.lastRet(itr);
             }
             @Override
             public void updateItrNextState(){
@@ -783,6 +776,7 @@ public class ByteSetImplTest{
                 final var monitoredFunctionItr=function.iterator();
                 int expectedValOffset;
                 if((expectedValOffset=this.expectedValOffset) < 128){
+                    var expectedWords=ByteSetImplMonitor.this.expectedWords;
                     int expectedLastRet;
                     outer:for(;;){
                         final var v=(Byte)monitoredFunctionItr.next();
@@ -806,7 +800,7 @@ public class ByteSetImplTest{
                 }
             }
             @Override
-            public void verifyIteratorState(Object clone){
+            public void verifyCloneHelper(Object clone){
                 Assertions.assertEquals(expectedValOffset,
                         FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.valOffset(clone));
                 Assertions.assertEquals(expectedItrLastRet,
@@ -815,48 +809,43 @@ public class ByteSetImplTest{
                         FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.modCount(clone));
                 Assertions.assertSame(set,FieldAndMethodAccessor.ByteSetImpl.Checked.Itr.root(clone));
             }
+            @Override
+            public boolean nextWasJustCalled(){
+                return expectedItrLastRet != -129;
+            }
         }
         class UncheckedMonitoredItr extends AbstractMonitoredItr{
             UncheckedMonitoredItr(OmniIterator.OfByte itr,int expectedValOffset){
                 super(itr,expectedValOffset);
             }
             @Override
-            public void updateIteratorState(){
-                expectedValOffset=FieldAndMethodAccessor.ByteSetImpl.Itr.valOffset(itr);
+            public void updateItrRemoveState(){
+                for(int valOffset=this.expectedValOffset,wordOffset=(valOffset - 1 >> 6) + 2;;--wordOffset,valOffset=0){
+                    long word;
+                    if((valOffset=Long
+                            .numberOfLeadingZeros((word=expectedWords[wordOffset]) & -1L >>> -valOffset)) != 64){
+                        expectedWords[wordOffset]=word & ~(Long.MIN_VALUE >>> valOffset);
+                        return;
+                    }
+                }
             }
             @Override
-            public void updateItrRemoveState(){
-                long word;
-                int valOffset;
-                switch((valOffset=expectedValOffset) - 1 >> 6){
-                case 1:
-                    if((valOffset=Long.numberOfLeadingZeros((word=expectedWords[3]) & -1L >>> -valOffset)) != 64){
-                        expectedWords[3]=word & ~(Long.MIN_VALUE >>> valOffset);
-                        return;
+            public boolean nextWasJustCalled(){
+                var expectedWords=ByteSetImplMonitor.this.expectedWords;
+                for(int valOffset=this.expectedValOffset,wordOffset=(valOffset - 1 >> 6)
+                        + 2;wordOffset >= 0;--wordOffset,valOffset=0){
+                    if((valOffset=Long.numberOfLeadingZeros(expectedWords[wordOffset] & -1L >>> -valOffset)) != 64){
+                        return true;
                     }
-                    valOffset=0;
-                case 0:
-                    if((valOffset=Long.numberOfLeadingZeros((word=expectedWords[2]) & -1L >>> -valOffset)) != 64){
-                        expectedWords[2]=word & ~(Long.MIN_VALUE >>> valOffset);
-                        return;
-                    }
-                    valOffset=0;
-                case -1:
-                    if((valOffset=Long.numberOfLeadingZeros((word=expectedWords[1]) & -1L >>> -valOffset)) != 64){
-                        expectedWords[1]=word & ~(Long.MIN_VALUE >>> valOffset);
-                        return;
-                    }
-                    valOffset=0;
-                default:
-                    expectedWords[0]=(word=expectedWords[0])
-                    & ~(Long.MIN_VALUE >>> Long.numberOfLeadingZeros(word & -1L >>> -valOffset));
                 }
+                return false;
             }
             @Override
             public void verifyForEachRemaining(MonitoredFunction function){
                 final var monitoredFunctionItr=function.iterator();
                 int expectedValOffset;
                 if((expectedValOffset=this.expectedValOffset) < 128){
+                    var expectedWords=ByteSetImplMonitor.this.expectedWords;
                     outer:for(;;){
                         final var v=(Byte)monitoredFunctionItr.next();
                         Assertions.assertEquals(v.byteValue(),expectedValOffset);
@@ -867,14 +856,14 @@ public class ByteSetImplTest{
                         }
                         break;
                     }
-                this.expectedValOffset=128;
+                    this.expectedValOffset=128;
                 }
                 Assertions.assertFalse(monitoredFunctionItr.hasNext());
             }
             @Override
-            public void verifyIteratorState(Object itr){
-                Assertions.assertEquals(expectedValOffset,FieldAndMethodAccessor.ByteSetImpl.Itr.valOffset(itr));
-                Assertions.assertSame(set,FieldAndMethodAccessor.ByteSetImpl.Itr.root(itr));
+            public void verifyCloneHelper(Object clone){
+                Assertions.assertEquals(expectedValOffset,FieldAndMethodAccessor.ByteSetImpl.Itr.valOffset(clone));
+                Assertions.assertSame(set,FieldAndMethodAccessor.ByteSetImpl.Itr.root(clone));
             }
         }
     }

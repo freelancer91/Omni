@@ -67,7 +67,10 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     void verifyMASSIVEToString(String string,String testName);
     void verifyHashCode(int hashCode);
     void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter);
-    void verifyArrayIsCopy(Object arr);
+    default void verifyArrayIsCopy(Object arr){
+        verifyArrayIsCopy(arr,true);
+    }
+    void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame);
 
     default boolean verifyThrowingContains(MonitoredObjectGen monitoredObjectGen){
         try{
@@ -324,6 +327,9 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         return result;
     }
     void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException;
+    default void verifyReadAndWriteClone(COL readCol){
+        verifyClone(readCol);
+    }
     @SuppressWarnings("unchecked") default void verifyReadAndWrite(MonitoredFunctionGen monitoredFunctionGen) {
         final File file;
         try{
@@ -350,7 +356,11 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             }finally{
                 verifyCollectionState();
             }
-            verifyClone(readCol);
+            if(getDataType() == DataType.REF){
+                verifyReadAndWriteClone(readCol);
+            }else{
+                verifyClone(readCol);
+            }
         }else{
             try{
                 Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
@@ -485,7 +495,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }finally{
             verifyCollectionState();
         }
-        verifyArrayIsCopy(result);
+        verifyArrayIsCopy(result,false);
         switch(Integer.signum(size-arrLength)) {
         case -1:
             Assertions.assertNull(result[size]);
@@ -527,7 +537,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             Assertions.assertEquals(1,monitoredArrayConstructor.numCalls);
             verifyCollectionState();
         }
-        verifyArrayIsCopy(result);
+        verifyArrayIsCopy(result,false);
         Assertions.assertEquals(size,result.length);
         var iterator=collection.iterator();
         if(getDataType()==DataType.REF) {
@@ -543,20 +553,53 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         return result;
     }
     interface MonitoredIterator<ITR extends OmniIterator<?>,COL extends OmniCollection<?>>{
+        boolean nextWasJustCalled();
+        default void modItr(){
+            if(!hasNext()){
+                throw new UnsupportedOperationException("Cannot modify an iterator in a depleted state");
+            }
+            iterateForward();
+        }
+        void updateItrNextState();
+        void verifyNextResult(DataType outputType,Object result);
+        default Object verifyNext(DataType outputType){
+            final Object result;
+            try{
+                result=outputType.callIteratorNext(getIterator());
+                updateItrNextState();
+                verifyNextResult(outputType,result);
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
 
+            return result;
+        }
+        void updateItrRemoveState();
+        default void verifyRemove(){
+            try{
+                getIterator().remove();
+                updateItrRemoveState();
+            }finally{
+                verifyIteratorState();
+                getMonitoredCollection().verifyCollectionState();
+            }
+        }
         ITR getIterator();
         IteratorType getIteratorType();
         MonitoredCollection<COL> getMonitoredCollection();
         boolean hasNext();
         int getNumLeft();
         void verifyForEachRemaining(MonitoredFunction function);
-        void updateIteratorState();
-        void modItr();
-        void verifyRemove();
-        void verifyClone(Object clone);
-
-        void verifyIteratorState();
-        Object verifyNext(DataType outputType);
+        // void updateIteratorState();
+        abstract void verifyCloneHelper(Object clone);
+        default void verifyClone(Object clone){
+            Assertions.assertNotSame(getIterator(),clone);
+            verifyCloneHelper(clone);
+        }
+        default void verifyIteratorState(){
+            verifyCloneHelper(getIterator());
+        }
         default boolean verifyHasNext() {
             ITR iterator=getIterator();
             boolean expectedResult=hasNext();
@@ -591,14 +634,12 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         default void iterateForward() {
             ITR iterator=getIterator();
             iterator.next();
-            updateIteratorState();
+            updateItrNextState();
         }
         default void remove() {
             ITR iterator=getIterator();
-            MonitoredCollection<COL> collection=getMonitoredCollection();
             iterator.remove();
-            collection.updateCollectionState();
-            updateIteratorState();
+            updateItrRemoveState();
         }
         default Object verifyClone(){
             final ITR itr=getIterator();
@@ -658,12 +699,13 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
                         throw dataType.invalid();
                     }
                 }
+                Assertions.assertEquals(numLeft,function.size());
+                verifyForEachRemaining(function);
             }finally{
                 monitoredCollection.verifyCollectionState();
                 verifyIteratorState();
             }
-            Assertions.assertEquals(numLeft,function.size());
-            verifyForEachRemaining(function);
+
 
         }
     }

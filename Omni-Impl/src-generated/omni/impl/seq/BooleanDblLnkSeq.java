@@ -2232,12 +2232,13 @@ AbstractSeq<Boolean>
       @Override public void forEachRemaining(BooleanConsumer action){
         int size,numLeft;
         final CheckedSubList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             BooleanDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -2247,12 +2248,13 @@ AbstractSeq<Boolean>
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
         final int size,numLeft;
         final CheckedSubList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             BooleanDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -5146,7 +5148,7 @@ AbstractSeq<Boolean>
         try{
           BooleanDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
         this.curr=null;
         this.lastRet=parent.head;
@@ -5284,12 +5286,13 @@ AbstractSeq<Boolean>
       @Override public void forEachRemaining(BooleanConsumer action){
         final int size,numLeft;
         final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             BooleanDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;
@@ -5299,12 +5302,13 @@ AbstractSeq<Boolean>
       @Override public void forEachRemaining(Consumer<? super Boolean> action){
         final int size,numLeft;
         final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             BooleanDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;

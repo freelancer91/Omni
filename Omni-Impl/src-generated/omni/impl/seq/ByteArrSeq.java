@@ -1528,10 +1528,12 @@ AbstractSeq<Byte>
         }
       }
       @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int cursor,bound;
+        int cursor;
+        final int bound;
         final UncheckedList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
-          OmniArray.OfByte.ascendingForEach(parent.arr,cursor,bound-1,action::accept);
+          OmniArray.OfByte.ascendingForEach(parent.arr,cursor,cursor=bound-1,action::accept);
+          this.lastRet=cursor;
           this.cursor=bound;
         }
       }
@@ -2529,10 +2531,12 @@ AbstractSeq<Byte>
         }
       }
       @Override public void forEachRemaining(Consumer<? super Byte> action){
-        final int cursor,bound;
+        int cursor;
+        final int bound;
         final UncheckedSubList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
-          OmniArray.OfByte.ascendingForEach(parent.root.arr,cursor,bound-1,action::accept);
+          OmniArray.OfByte.ascendingForEach(parent.root.arr,cursor,cursor=bound-1,action::accept);
+          this.lastRet=cursor;
           this.cursor=bound;
         }
       }
@@ -2943,7 +2947,7 @@ AbstractSeq<Byte>
           try{
             OmniArray.OfByte.descendingForEach(parent.arr,0,cursor-1,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=0;
           this.lastRet=0;
@@ -2957,7 +2961,7 @@ AbstractSeq<Byte>
           try{
             OmniArray.OfByte.descendingForEach(parent.arr,0,cursor-1,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=0;
           this.lastRet=0;
@@ -3218,33 +3222,35 @@ AbstractSeq<Byte>
         throw new IllegalStateException();
       }
       @Override public void forEachRemaining(ByteConsumer action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           final int modCount=this.modCount;
+          final int lastRet;
           try{
-            OmniArray.OfByte.ascendingForEach(parent.arr,cursor,cursor=bound-1,action);
+            OmniArray.OfByte.ascendingForEach(parent.arr,cursor,lastRet=bound-1,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Byte> action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).size)){
           final int modCount=this.modCount;
+          final int lastRet;
           try{
-            OmniArray.OfByte.ascendingForEach(parent.arr,cursor,cursor=bound-1,action::accept);
+            OmniArray.OfByte.ascendingForEach(parent.arr,cursor,lastRet=bound-1,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
     }
@@ -4489,35 +4495,37 @@ AbstractSeq<Byte>
         throw new IllegalStateException();
       }
       @Override public void forEachRemaining(ByteConsumer action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedSubList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           final int modCount=this.modCount;
           final var root=parent.root;
+          final int lastRet;
           try{
-            OmniArray.OfByte.ascendingForEach(root.arr,cursor,cursor=bound-1,action);
+            OmniArray.OfByte.ascendingForEach(root.arr,cursor,lastRet=bound-1,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
       @Override public void forEachRemaining(Consumer<? super Byte> action){
-        int cursor;
+        final int cursor;
         final int bound;
         final CheckedSubList parent;
         if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size)){
           final int modCount=this.modCount;
           final var root=parent.root;
+          final int lastRet;
           try{
-            OmniArray.OfByte.ascendingForEach(root.arr,cursor,cursor=bound-1,action::accept);
+            OmniArray.OfByte.ascendingForEach(root.arr,cursor,lastRet=bound-1,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkModCount(modCount,root.modCount,cursor,this.cursor);
           }
           this.cursor=bound;
-          this.lastRet=cursor;
+          this.lastRet=lastRet;
         }
       }
     }

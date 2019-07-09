@@ -3,7 +3,6 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -1254,9 +1253,7 @@ public class ByteSetImpl implements OmniSet.OfByte,Cloneable,Externalizable{
                   lastRet=forEachRemainingHelper(root.word3,valOffset,lastRet,action);
               }
           }finally{
-              if(modCount!=root.modCount || expectedValOffset!=this.valOffset){
-                throw new ConcurrentModificationException("modCount{expected="+modCount+",actual="+root.modCount+"},valOffset{expected="+expectedValOffset+";actual="+this.valOffset+"}");
-              }
+              CheckedCollection.checkModCount(modCount,root.modCount,expectedValOffset,this.valOffset);
           }
           this.valOffset=128;
           this.lastRet=lastRet;

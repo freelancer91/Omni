@@ -4,6 +4,20 @@ public interface CheckedCollection{
     static void checkLo(int index) throws IndexOutOfBoundsException{
         if(index<0){ throw new IndexOutOfBoundsException(index); }
     }
+    static void checkModCount(int expectedModCount,int actualModCount,int expectedCursor,int actualCursor)
+            throws ConcurrentModificationException{
+        if(expectedCursor != actualCursor){
+            throw new ConcurrentModificationException(
+                    "Expected cursor = " + expectedCursor + "; Actual cursor = " + actualCursor);
+        }
+        checkModCount(expectedModCount,actualModCount);
+    }
+    static void checkModCount(int expectedModCount,int actualModCount,Object expectedNode,Object actualNode){
+        if(expectedModCount != actualModCount || expectedNode != actualNode){
+            throw new ConcurrentModificationException("modCount{expected=" + expectedModCount + ",actual="
+                    + actualModCount + "};node{expected=" + expectedNode + ",actual=" + actualNode + '}');
+        }
+    }
     static void checkModCount(int expectedModCount,int actualModCount) throws ConcurrentModificationException{
         if(actualModCount==expectedModCount){ return; }
         throw new ConcurrentModificationException(getCMEMessage(expectedModCount,actualModCount));
@@ -42,6 +56,7 @@ public interface CheckedCollection{
     private static String getCMEMessage(int expectedModCount,int actualModCount){
         return "Expected modCount = "+expectedModCount+"; Actual modCount = "+actualModCount;
     }
+
     static abstract class AbstractModCountChecker{
         private transient final int expectedModCount;
         public AbstractModCountChecker(int expectedModCount){

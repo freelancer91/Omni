@@ -2027,12 +2027,13 @@ AbstractSeq<Integer>
       @Override public void forEachRemaining(IntConsumer action){
         int size,numLeft;
         final CheckedSubList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             IntDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -2042,12 +2043,13 @@ AbstractSeq<Integer>
       @Override public void forEachRemaining(Consumer<? super Integer> action){
         final int size,numLeft;
         final CheckedSubList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)>0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))>0){
           final int modCount=this.modCount;
           try{
             IntDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.root.modCount);
+            CheckedCollection.checkModCount(modCount,parent.root.modCount,currIndex,this.currIndex);
           }
           this.lastRet=parent.tail;
           this.curr=null;
@@ -4707,7 +4709,7 @@ AbstractSeq<Integer>
         try{
           IntDblLnkNode.uncheckedForEachDescending(this.curr,currIndex,action);
         }finally{
-          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount);
+          CheckedCollection.checkModCount(modCount,(parent=this.parent).modCount,currIndex,this.currIndex);
         }
         this.curr=null;
         this.lastRet=parent.head;
@@ -4845,12 +4847,13 @@ AbstractSeq<Integer>
       @Override public void forEachRemaining(IntConsumer action){
         final int size,numLeft;
         final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             IntDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;
@@ -4860,12 +4863,13 @@ AbstractSeq<Integer>
       @Override public void forEachRemaining(Consumer<? super Integer> action){
         final int size,numLeft;
         final CheckedList parent;
-        if((numLeft=(size=(parent=this.parent).size)-this.currIndex)!=0){
+        final int currIndex;
+        if((numLeft=(size=(parent=this.parent).size)-(currIndex=this.currIndex))!=0){
           final int modCount=this.modCount;
           try{
             IntDblLnkNode.uncheckedForEachAscending(this.curr,numLeft,action::accept);
           }finally{
-            CheckedCollection.checkModCount(modCount,parent.modCount);
+            CheckedCollection.checkModCount(modCount,parent.modCount,currIndex,this.currIndex);
           }
           this.curr=null;
           this.lastRet=parent.tail;
