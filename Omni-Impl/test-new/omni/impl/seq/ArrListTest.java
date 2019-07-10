@@ -11,6 +11,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
+import omni.impl.IllegalModification;
 import omni.impl.IteratorType;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredFunction;
@@ -391,29 +392,128 @@ public class ArrListTest{
     public void testItrhasNext_void(){
         for(var collectionType:DataType.values()){
             for(var itrType:StructType.ArrList.validItrTypes){
-                double[] positionArr;
-                if(itrType.iteratorInterface == OmniListIterator.class){
-                    positionArr=POSITIONS;
-                }else{
-                    positionArr=new double[]{0};
-                }
                 for(var checkedType:CheckedType.values()){
                     for(var size:FIB_SEQ){
-                        if(checkedType.checked || size > 0){
-                            int prevIndex=-1;
-                            for(var position:positionArr){
-                                int index;
-                                if(position >= 0 && (index=(int)(position * size)) != prevIndex){
-                                    prevIndex=index;
-                                    if(checkedType.checked || index < size){
-                                        TestExecutorService.submitTest(()->{
-                                            var seqMonitor=SequenceInitialization.Ascending.initialize(
-                                                    new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                            var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
-                                            while(itrMonitor.verifyHasNext()){
-                                                itrMonitor.iterateForward();
-                                            }
-                                        });
+                        
+                          
+                              TestExecutorService.submitTest(()->{
+                                  var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                          new ArrListMonitor(checkedType,collectionType,size),size,0);
+                                  var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                                  while(itrMonitor.verifyHasNext()){
+                                      itrMonitor.iterateForward();
+                                  }
+                              });
+                          
+                        
+                    }
+                }
+            }
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testItrhasNext_void");
+    }
+    @Test
+    public void testListItrhasPrevious_void(){
+        for(var collectionType:DataType.values()){
+            
+          for(var checkedType:CheckedType.values()){
+              for(var size:FIB_SEQ){
+                  
+                    
+                TestExecutorService.submitTest(()->{
+                    var seqMonitor=SequenceInitialization.Ascending.initialize(
+                            new ArrListMonitor(checkedType,collectionType,size),size,0);
+                    var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                    while(itrMonitor.verifyHasPrevious()){
+                        itrMonitor.iterateReverse();
+                    }
+                });
+                    
+                  
+              }
+          }
+            
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testListItrhasPrevious_void");
+    }
+    @Test
+    public void testListItrpreviousIndex_void(){
+        for(var collectionType:DataType.values()){
+          
+        for(var checkedType:CheckedType.values()){
+            for(var size:FIB_SEQ){
+                
+                  
+              TestExecutorService.submitTest(()->{
+                  var seqMonitor=SequenceInitialization.Ascending.initialize(
+                          new ArrListMonitor(checkedType,collectionType,size),size,0);
+                  var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                  while(itrMonitor.verifyPreviousIndex()>0){
+                      itrMonitor.iterateReverse();
+                  }
+              });
+                  
+                
+            }
+        }
+          
+      }
+        TestExecutorService.completeAllTests("ArrListTest.testListItrhasPrevious_void");
+    }
+    @Test
+    public void testListItrnextIndex_void(){
+        for(var collectionType:DataType.values()){
+            
+          for(var checkedType:CheckedType.values()){
+              for(var size:FIB_SEQ){
+                  
+                    
+                TestExecutorService.submitTest(()->{
+                    var seqMonitor=SequenceInitialization.Ascending.initialize(
+                            new ArrListMonitor(checkedType,collectionType,size),size,0);
+                    var itrMonitor=seqMonitor.getMonitoredListIterator();
+                    while(itrMonitor.verifyNextIndex()<size){
+                        itrMonitor.iterateForward();
+                    }
+                });
+                    
+                  
+              }
+          }
+            
+        }
+        TestExecutorService.completeAllTests("ArrListTest.testListItrnextIndex_void");
+    }
+    @Test
+    public void testItrnext_void(){
+        for(var collectionType:DataType.values()){
+            for(var outputType:collectionType.validOutputTypes()){
+                for(var itrType:StructType.ArrList.validItrTypes){
+                    for(var illegalMod:itrType.validPreMods){
+                        for(var checkedType:CheckedType.values()){
+                            if(illegalMod.expectedException == null || checkedType.checked){
+                                for(var size:FIB_SEQ){
+                                    if(checkedType.checked || size > 0){
+                                        
+                                      TestExecutorService.submitTest(()->{
+                                          var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                  new ArrListMonitor(checkedType,collectionType,size),
+                                                  size,0);
+                                          var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                                          itrMonitor.illegalMod(illegalMod);
+                                          if(illegalMod.expectedException == null){
+                                              while(itrMonitor.hasNext()){
+                                                  itrMonitor.verifyNext(outputType);
+                                              }
+                                              if(checkedType.checked){
+                                                  Assertions.assertThrows(NoSuchElementException.class,
+                                                          ()->itrMonitor.verifyNext(outputType));
+                                              }
+                                          }else{
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->itrMonitor.verifyNext(outputType));
+                                          }
+                                      });
                                     }
                                 }
                             }
@@ -425,59 +525,94 @@ public class ArrListTest{
         TestExecutorService.completeAllTests("ArrListTest.testItrnext_void");
     }
     @Test
-    public void testItrnext_void(){
+    public void testListItrprevious_void(){
         for(var collectionType:DataType.values()){
             for(var outputType:collectionType.validOutputTypes()){
-                for(var itrType:StructType.ArrList.validItrTypes){
-                    double[] positionArr;
-                    if(itrType.iteratorInterface == OmniListIterator.class){
-                        positionArr=POSITIONS;
-                    }else{
-                        positionArr=new double[]{0};
-                    }
-                    for(var illegalMod:itrType.validPreMods){
+                    for(var illegalMod:IteratorType.BidirectionalItr.validPreMods){
                         for(var checkedType:CheckedType.values()){
                             if(illegalMod.expectedException == null || checkedType.checked){
                                 for(var size:FIB_SEQ){
                                     if(checkedType.checked || size > 0){
-                                        int prevIndex=-1;
-                                        for(var position:positionArr){
-                                            int index;
-                                            if(position >= 0 && (index=(int)(position * size)) != prevIndex){
-                                                prevIndex=index;
-                                                if(checkedType.checked || index < size){
-                                                    TestExecutorService.submitTest(()->{
-                                                        var seqMonitor=SequenceInitialization.Ascending.initialize(
-                                                                new ArrListMonitor(checkedType,collectionType,size),
-                                                                size,0);
-                                                        var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
-                                                        itrMonitor.illegalMod(illegalMod);
-                                                        if(illegalMod.expectedException == null){
-                                                            while(itrMonitor.hasNext()){
-                                                                itrMonitor.verifyNext(outputType);
-                                                            }
-                                                            if(checkedType.checked){
-                                                                Assertions.assertThrows(NoSuchElementException.class,
-                                                                        ()->itrMonitor.verifyNext(outputType));
-                                                            }
-                                                        }else{
-                                                            Assertions.assertThrows(illegalMod.expectedException,
-                                                                    ()->itrMonitor.verifyNext(outputType));
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        }
+                                      TestExecutorService.submitTest(()->{
+                                          var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                  new ArrListMonitor(checkedType,collectionType,size),
+                                                  size,0);
+                                          var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                                          itrMonitor.illegalMod(illegalMod);
+                                          if(illegalMod.expectedException == null){
+                                              while(itrMonitor.hasPrevious()){
+                                                  itrMonitor.verifyPrevious(outputType);
+                                              }
+                                              if(checkedType.checked){
+                                                  Assertions.assertThrows(NoSuchElementException.class,
+                                                          ()->itrMonitor.verifyPrevious(outputType));
+                                              }
+                                          }else{
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->itrMonitor.verifyPrevious(outputType));
+                                          }
+                                      });
+                                                
                                     }
                                 }
                             }
                         }
-                    }
                 }
             }
         }
-        TestExecutorService.completeAllTests("ArrListTest.testItrnext_void");
+        TestExecutorService.completeAllTests("ArrListTest.testListItrprevious_void");
     }
+    
+    @Test
+    public void testListItrset_val() {
+      //TODO
+    }
+    @Test
+    public void testlistIterator_void() {
+      //TODO
+    }
+    @Test
+    public void testlistIterator_int() {
+      //TODO
+    }
+    @Test
+    public void testremoveAt_int() {
+      //TODO
+    }
+    @Test
+    public void testreplaceAll_UnaryOperator() {
+      //TODO
+    }
+    @Test
+    public void testsort_Comparator() {
+      //TODO
+    }
+    @Test
+    public void teststableAscendingSort_void() {
+      //TODO
+    }
+    @Test
+    public void teststableDescendingSort_void() {
+      //TODO
+    }
+    @Test
+    public void testunstableAscendingSort_void() {
+      //TODO
+    }
+    @Test
+    public void testunstableDescendingSort_void() {
+      //TODO
+    }
+    @Test
+    public void testunstableSort_Comparator() {
+      //TODO
+    }
+    @Test
+    public void testsubList_intint() {
+      //TODO
+    }
+    
+    
     @Test
     public void testItrremove_void(){
         for(var itrType:StructType.ArrList.validItrTypes){
@@ -517,7 +652,7 @@ public class ArrListTest{
                                                 default:
                                                     throw removeScenario.invalid();
                                                 }
-                                                // TestExecutorService.submitTest(()->{
+                                              TestExecutorService.submitTest(()->{
                                                 var seqMonitor=SequenceInitialization.Ascending.initialize(
                                                         new ArrListMonitor(checkedType,collectionType,size),size,0);
                                                 var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,
@@ -563,7 +698,7 @@ public class ArrListTest{
                                                     Assertions.assertThrows(removeScenario.expectedException,
                                                             ()->itrMonitor.verifyRemove());
                                                 }
-                                                // });
+                                                });
                                             }
                                         }
                                     }
@@ -575,6 +710,61 @@ public class ArrListTest{
             }
         }
         TestExecutorService.completeAllTests("ArrListTest.testItrremove_void");
+    }
+    @Test
+    public void testListItradd_val() {
+
+            for(var checkedType:CheckedType.values()){
+                  for(var collectionType:DataType.values()){
+                    for(var inputType:collectionType.mayBeAddedTo()) {
+                      for(var functionCallType:FunctionCallType.values()) {
+                        if(inputType!=DataType.REF || !functionCallType.boxed) {
+                          for(var initCapacity:INIT_CAPACITIES) {
+                            for(var position:POSITIONS){
+                              if(position>=0) {
+                                TestExecutorService.submitTest(()->{
+                                  var seqMonitor=new ArrListMonitor(checkedType,collectionType,initCapacity);
+                                  var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                  for(int i=0;;) {
+                                    itrMonitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+                                    if(++i==1000) {
+                                      break;
+                                    }
+                                    double dI=(double)i;
+                                    double currPosition;
+                                    while((currPosition=(double)itrMonitor.nextIndex()/dI)<position && itrMonitor.hasNext()) {
+                                      itrMonitor.iterateForward();
+                                    }
+                                    while(currPosition>position && itrMonitor.hasPrevious()) {
+                                      itrMonitor.iterateReverse();
+                                      currPosition=(double)itrMonitor.nextIndex()/dI;
+                                    }
+                                  }
+                                  if(checkedType.checked) {
+                                    itrMonitor.illegalMod(IllegalModification.ModCollection);
+                                    Assertions.assertThrows(IllegalModification.ModCollection.expectedException,()->itrMonitor.verifyAdd(inputType.convertValUnchecked(1000),inputType,functionCallType));
+                                  }
+                                  
+                                });
+                              }
+                            }
+                          }
+                            
+                        
+                        }
+                      }
+                      
+                    }
+                      
+                  }
+                        
+                    
+                }
+            
+        
+      
+      TestExecutorService.completeAllTests("ArrListTest.testListItradd_val");
+  
     }
     @Test
     public void testlastIndexOf_val(){
@@ -1758,6 +1948,10 @@ public class ArrListTest{
             @Override
             public void verifyPreviousResult(DataType outputType,Object result){
                 verifyGetResult(expectedLastRet,result,outputType);
+            }
+            @Override
+            public void updateItrSetState(Object input,DataType inputType){
+              ArrListMonitor.this.verifyPutResult(expectedLastRet,input,inputType);
             }
         }
         private class CheckedItrMonitor extends AbstractItrMonitor<OmniIterator<?>>{

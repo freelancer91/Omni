@@ -140,7 +140,18 @@ MonitoredSequence<LST>{
         }
         int nextIndex();
         int previousIndex();
+        void updateItrSetState(Object input,DataType inputType);
         void updateItrAddState(Object input,DataType inputType);
+        default void verifySet(Object input,DataType inputType,FunctionCallType functionCallType) {
+          var itr=getIterator();
+          try{
+              inputType.callIteratorSet(input,itr,functionCallType);
+              updateItrSetState(input,inputType);
+          }finally{
+              verifyIteratorState();
+              getMonitoredCollection().verifyCollectionState();
+          }
+        }
         default void verifyAdd(Object input,DataType inputType,FunctionCallType functionCallType){
             var itr=getIterator();
             try{

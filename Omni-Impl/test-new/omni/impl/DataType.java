@@ -106,6 +106,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.BooleanInput<?>)itr).set((Boolean)inputVal);
+            }else{
+                ((OmniListIterator.BooleanInput<?>)itr).set((boolean)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Boolean)inputVal);
@@ -500,6 +508,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.ByteInput<?>)itr).set((Byte)inputVal);
+            }else{
+                ((OmniListIterator.ByteInput<?>)itr).set((byte)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Byte)inputVal);
@@ -770,6 +786,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.CharInput<?>)itr).set((Character)inputVal);
+            }else{
+                ((OmniListIterator.CharInput<?>)itr).set((char)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Character)inputVal);
@@ -1037,6 +1061,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.ShortInput<?>)itr).set((Short)inputVal);
+            }else{
+                ((OmniListIterator.ShortInput<?>)itr).set((short)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Short)inputVal);
@@ -1294,6 +1326,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.IntInput<?>)itr).set((Integer)inputVal);
+            }else{
+                ((OmniListIterator.IntInput<?>)itr).set((int)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Integer)inputVal);
@@ -1539,6 +1579,14 @@ public enum DataType{
                 ((OmniListIterator.LongInput<?>)itr).add((Long)inputVal);
             }else{
                 ((OmniListIterator.LongInput<?>)itr).add((long)inputVal);
+            }
+        }
+        @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.LongInput<?>)itr).set((Long)inputVal);
+            }else{
+                ((OmniListIterator.LongInput<?>)itr).set((long)inputVal);
             }
         }
         @Override
@@ -1828,6 +1876,14 @@ public enum DataType{
             }
         }
         @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.FloatInput<?>)itr).set((Float)inputVal);
+            }else{
+                ((OmniListIterator.FloatInput<?>)itr).set((float)inputVal);
+            }
+        }
+        @Override
         public boolean callcontains(OmniCollection<?> collection,Object inputVal,FunctionCallType functionCallType){
             if(functionCallType.boxed){
                 return collection.contains((Float)inputVal);
@@ -2020,6 +2076,14 @@ public enum DataType{
                 ((OmniListIterator.OfDouble)itr).add((Double)inputVal);
             }else{
                 ((OmniListIterator.OfDouble)itr).add((double)inputVal);
+            }
+        }
+        @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniListIterator.OfDouble)itr).set((Double)inputVal);
+            }else{
+                ((OmniListIterator.OfDouble)itr).set((double)inputVal);
             }
         }
         @Override
@@ -2291,6 +2355,14 @@ public enum DataType{
                 throw cannotBeBoxed();
             }
             ((OmniListIterator.OfRef<Object>)itr).add(inputVal);
+        }
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                throw cannotBeBoxed();
+            }
+            ((OmniListIterator.OfRef<Object>)itr).set(inputVal);
         }
         @Override
         public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
@@ -2678,6 +2750,8 @@ public enum DataType{
     public abstract Object verifyToArray(MonitoredCollection<?> collection);
     public abstract Object callIteratorNext(OmniIterator<?> itr);
     public abstract Object callIteratorPrev(OmniListIterator<?> itr);
+    public abstract void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType);
+
     public abstract void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType);
     public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
             FunctionCallType functionCallType);
