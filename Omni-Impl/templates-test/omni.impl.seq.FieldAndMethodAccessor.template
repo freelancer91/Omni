@@ -75,6 +75,15 @@ final class FieldAndMethodAccessor{
       throw new RuntimeException(e);
     }
   }
+  static int incrementIntValue(Field field,Object obj){
+    try{
+      int v;
+      field.setInt(obj,v=field.getInt(obj)+1);
+      return v;
+    }catch(IllegalArgumentException | IllegalAccessException e){
+      throw new RuntimeException(e);
+    }
+  }
   static Field prepareFieldForClass(Class<?> clazz,String fieldName){
     try{
       Field field=clazz.getDeclaredField(fieldName);
@@ -678,10 +687,6 @@ static interface CLASSPREFIXArrSeq{
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
     }
-    //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-    //  ((Externalizable)obj).readExternal(oos);
-    //  return obj;
-    //}
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXArrSeqTYPEPARAMETER)obj).size;
     }
@@ -715,10 +720,6 @@ static interface CLASSPREFIXArrSeq{
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
     }
-    //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-    //  ((Externalizable)obj).readExternal(oos);
-    //  return obj;
-    //}
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXArrSeqTYPEPARAMETER)obj).size;
     }
@@ -765,10 +766,6 @@ static interface CLASSPREFIXArrSeq{
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
     }
-    //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-    //  ((Externalizable)obj).readExternal(oos);
-    //  return obj;
-    //}
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXArrSeqTYPEPARAMETER)obj).size;
     }
@@ -790,10 +787,6 @@ static interface CLASSPREFIXArrSeq{
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       ((Externalizable)obj).writeExternal(oos);
     }
-    //public static Object readObject(Object obj,ObjectInputStream oos) throws IOException,ClassNotFoundException{
-    //  ((Externalizable)obj).readExternal(oos);
-    //  return obj;
-    //}
     public static int size(Object obj){
       return ((omni.impl.seq.CLASSPREFIXArrSeqTYPEPARAMETER)obj).size;
     }
@@ -829,15 +822,15 @@ static interface CLASSPREFIXArrSeq{
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
     }
-    //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-    //  return readObjectHelper(obj,ois,readResolveMethod);
-    //}
     static final Field modCountField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
     static final Field rootField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","root");
     static final Field parentField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
     static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.CLASSPREFIXArrSeq"+DOLLARSIGN+"CheckedSubList","rootOffset");
     static int modCount(Object obj){
       return getIntValue(modCountField,obj);
+    }
+    static int incrementModCount(Object obj){
+      return incrementIntValue(modCountField,obj);
     }
     static omni.impl.seq.CLASSPREFIXArrSeq.CheckedListTYPEPARAMETER root(Object obj){
       return (omni.impl.seq.CLASSPREFIXArrSeq.CheckedListTYPEPARAMETER)getValue(rootField,obj);

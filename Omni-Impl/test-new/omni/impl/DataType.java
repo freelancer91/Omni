@@ -1,5 +1,6 @@
 package omni.impl;
 
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.function.DoubleConsumer;
@@ -382,8 +383,23 @@ public enum DataType{
                 return ((OmniList.OfBoolean)collection).set(index,(boolean)inputVal);
             }
         }
-
-
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.OfBoolean)monitoredList.getCollection()).removeBooleanAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfBoolean)collection).sort((Comparator<? super Boolean>)sorter);
+            }else{
+                ((OmniList.OfBoolean)collection).sort((BooleanComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            throw new UnsupportedOperationException();
+        }
     },
     BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
             Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
@@ -663,7 +679,23 @@ public enum DataType{
                 return ((OmniList.OfByte)collection).set(index,(byte)inputVal);
             }
         }
-
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.ByteOutput<?>)monitoredList.getCollection()).removeByteAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfByte)collection).sort((Comparator<? super Byte>)sorter);
+            }else{
+                ((OmniList.OfByte)collection).sort((ByteComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfByte)collection).unstableSort(sorter);
+        }
     },
     CHAR("CHAR","BOOLEAN,CHAR","CHAR,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Character.class,char.class,
             Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
@@ -942,6 +974,23 @@ public enum DataType{
         public void verifyMASSIVEToString(String result,int seqSize,String testName){
             throw new UnsupportedOperationException();
         }
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.CharOutput<?>)monitoredList.getCollection()).removeCharAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfChar)collection).sort((Comparator<? super Character>)sorter);
+            }else{
+                ((OmniList.OfChar)collection).sort((CharComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfChar)collection).unstableSort(sorter);
+        }
     },
     SHORT("SHORT","BOOLEAN,BYTE,SHORT","SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Short.class,short.class,
             Short[].class,short[].class,"Short","Short",ShortPredicate.class,ShortConsumer.class,ShortComparator.class,
@@ -1216,7 +1265,23 @@ public enum DataType{
                 return ((OmniList.OfShort)collection).set(index,(short)inputVal);
             }
         }
-
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.ShortOutput<?>)monitoredList.getCollection()).removeShortAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfShort)collection).sort((Comparator<? super Short>)sorter);
+            }else{
+                ((OmniList.OfShort)collection).sort((ShortComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfShort)collection).unstableSort(sorter);
+        }
     },
     INT("INT","BOOLEAN,BYTE,CHAR,SHORT,INT","INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Integer.class,int.class,
             Integer[].class,int[].class,"Int","Int",IntPredicate.class,
@@ -1481,6 +1546,23 @@ public enum DataType{
                 return ((OmniList.OfInt)collection).set(index,(int)inputVal);
             }
         }
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.IntOutput<?>)monitoredList.getCollection()).removeIntAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfInt)collection).sort((Comparator<? super Integer>)sorter);
+            }else{
+                ((OmniList.OfInt)collection).sort((IntBinaryOperator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfInt)collection).unstableSort(sorter);
+        }
     },
     LONG("LONG","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG","LONG,FLOAT,DOUBLE,REF",true,false,true,Long.class,long.class,
             Long[].class,long[].class,"Long","Long",LongPredicate.class,
@@ -1737,7 +1819,23 @@ public enum DataType{
                 return ((OmniList.OfLong)collection).set(index,(long)inputVal);
             }
         }
-
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.LongOutput<?>)monitoredList.getCollection()).removeLongAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfLong)collection).sort((Comparator<? super Long>)sorter);
+            }else{
+                ((OmniList.OfLong)collection).sort((LongComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfLong)collection).unstableSort(sorter);
+        }
     },
     FLOAT("FLOAT","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT","FLOAT,DOUBLE,REF",false,true,true,Float.class,float.class,
             Float[].class,float[].class,"Float","Float",FloatPredicate.class,
@@ -2015,8 +2113,23 @@ public enum DataType{
                 return ((OmniList.OfFloat)collection).set(index,(float)inputVal);
             }
         }
-
-
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.FloatOutput<?>)monitoredList.getCollection()).removeFloatAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfFloat)collection).sort((Comparator<? super Float>)sorter);
+            }else{
+                ((OmniList.OfFloat)collection).sort((FloatComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfFloat)collection).unstableSort(sorter);
+        }
     },
     DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
             double.class,Double[].class,double[].class,"Double","Double",
@@ -2261,7 +2374,23 @@ public enum DataType{
         public void verifyMASSIVEToString(String result,int seqSize,String testName){
             throw new UnsupportedOperationException();
         }
-
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            return ((OmniList.DoubleOutput<?>)monitoredList.getCollection()).removeDoubleAt(index);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                ((OmniList.OfDouble)collection).sort((Comparator<? super Double>)sorter);
+            }else{
+                ((OmniList.OfDouble)collection).sort((DoubleComparator)sorter);
+            }
+        }
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfDouble)collection).unstableSort(sorter);
+        }
     },
     REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
             RefDblLnkNode.class,
@@ -2550,6 +2679,56 @@ public enum DataType{
         public void verifyMASSIVEToString(String result,int seqSize,String testName){
             throw new UnsupportedOperationException();
         }
+        @Override
+        public Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList){
+            var dataType=monitoredList.getDataType();
+            Object result;
+            switch(dataType){
+            case BOOLEAN:
+                result=((OmniList.OfBoolean)monitoredList.getCollection()).remove(index);
+                break;
+            case BYTE:
+                result=((OmniList.OfByte)monitoredList.getCollection()).remove(index);
+                break;
+            case CHAR:
+                result=((OmniList.OfChar)monitoredList.getCollection()).remove(index);
+                break;
+            case DOUBLE:
+                result=((OmniList.OfDouble)monitoredList.getCollection()).remove(index);
+                break;
+            case FLOAT:
+                result=((OmniList.OfFloat)monitoredList.getCollection()).remove(index);
+                break;
+            case INT:
+                result=((OmniList.OfInt)monitoredList.getCollection()).remove(index);
+                break;
+            case LONG:
+                result=((OmniList.OfLong)monitoredList.getCollection()).remove(index);
+                break;
+            case REF:
+                result=((OmniList.OfRef<?>)monitoredList.getCollection()).remove(index);
+                break;
+            case SHORT:
+                result=((OmniList.OfShort)monitoredList.getCollection()).remove(index);
+                break;
+            default:
+                throw dataType.invalid();
+            }
+            return result;
+        }
+        @Override
+        @SuppressWarnings("unchecked")
+        public void callListSort(MonitoredComparator sorter,OmniList<?> collection,FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                throw DataType.cannotBeBoxed();
+            }
+            ((OmniList.OfRef<Object>)collection).sort(sorter);
+        }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
+            ((OmniList.OfRef<Object>)collection).unstableSort(sorter);
+        }
 
     };
     private static void incrementProgressBar(int nextPercent){
@@ -2751,7 +2930,7 @@ public enum DataType{
     public abstract Object callIteratorNext(OmniIterator<?> itr);
     public abstract Object callIteratorPrev(OmniListIterator<?> itr);
     public abstract void callIteratorSet(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType);
-
+    public abstract Object callListRemoveAt(int index,MonitoredList<?,?,?> monitoredList);
     public abstract void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType);
     public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
             FunctionCallType functionCallType);
@@ -2762,6 +2941,9 @@ public enum DataType{
             FunctionCallType functionCallType);
     public abstract Object callListSet(int index,Object inputVal,OmniList<?> collection,
             FunctionCallType functionCallType);
+    public abstract void callListSort(MonitoredComparator sorter,OmniList<?> collection,
+            FunctionCallType functionCallType);
+    public abstract void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection);
     public int getMaxInt(){
         throw new UnsupportedOperationException();
     }

@@ -10,6 +10,7 @@ public enum StructType{
     public final EnumSet<DataType> validDataTypes;
     public final EnumSet<QueryMethod> validQueryMethods;
     public final EnumSet<MonitoredFunctionGen> validMonitoredFunctionGens;
+    public final EnumSet<MonitoredComparatorGen> validComparatorGens;
     public final EnumSet<MonitoredRemoveIfPredicateGen> validMonitoredRemoveIfPredicateGens;
     public final EnumSet<IllegalModification> validPreMods;
     public final EnumSet<MonitoredObjectGen> validMonitoredObjectGens;
@@ -23,6 +24,35 @@ public enum StructType{
         this.validPreMods=initValidPreMods(this);
         this.validMonitoredObjectGens=initValidMonitoredObjectGens(this);
         this.validItrTypes=initValidItrTypes(this);
+        this.validComparatorGens=initValidComparatorGens(this);
+    }
+    private static EnumSet<MonitoredComparatorGen> initValidComparatorGens(StructType structType){
+        switch(structType.name){
+        case "BooleanSetImpl":
+        case "ByteSetImpl":
+        case "IntegralOpenAddressHashSet":
+        case "OpenAddressHashSet":
+        case "ArrStack":
+        case "SnglLnkQueue":
+        case "SnglLnkStack":
+        case "ArrDeq":
+            return EnumSet.noneOf(MonitoredComparatorGen.class);
+        case "ArrList":
+        case "DblLnkList":
+            return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,
+                    MonitoredComparatorGen.ModCollectionDescending,MonitoredComparatorGen.ModCollectionThrowAIOB,
+                    MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.NoThrowAscending,
+                    MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,
+                    MonitoredComparatorGen.NullComparatorModCollection,
+                    MonitoredComparatorGen.NullComparatorModCollectionThrowAIOB,
+                    MonitoredComparatorGen.NullComparatorModCollectionThrowIOB,
+                    MonitoredComparatorGen.NullComparatorThrowAIOB,MonitoredComparatorGen.NullComparatorThrowIOB,
+                    MonitoredComparatorGen.ThrowAIOB,MonitoredComparatorGen.ThrowIOB);
+        case "ArrSubList":
+        case "DblLnkSubList":
+            return EnumSet.allOf(MonitoredComparatorGen.class);
+        }
+        throw structType.invalid();
     }
     private static EnumSet<IteratorType> initValidItrTypes(StructType structType){
         switch(structType.name){

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 
 public enum MonitoredComparatorGen{
-    NullComparatorThrowAIOB(false,ComparatorType.NaturalOrder,IllegalArgumentException.class){
+    NullComparatorThrowAIOB(false,ComparatorType.NaturalOrder,IllegalArgumentException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -18,7 +18,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorThrowIOB(false,ComparatorType.NaturalOrder,IndexOutOfBoundsException.class){
+    NullComparatorThrowIOB(false,ComparatorType.NaturalOrder,IndexOutOfBoundsException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -31,7 +31,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModCollection(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class){
+    NullComparatorModCollection(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -44,7 +44,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModParent(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class){
+    NullComparatorModParent(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -57,7 +57,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModRoot(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class){
+    NullComparatorModRoot(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -70,7 +70,8 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModCollectionThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    NullComparatorModCollectionThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,
+            true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -83,7 +84,8 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModCollectionThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    NullComparatorModCollectionThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,
+            true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -96,7 +98,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModParentThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    NullComparatorModParentThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -109,7 +111,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModParentThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    NullComparatorModParentThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -122,7 +124,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModRootThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    NullComparatorModRootThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -135,7 +137,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModRootThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    NullComparatorModRootThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -148,13 +150,13 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NoThrowAscending(true,ComparatorType.Ascending,null){
+    NoThrowAscending(true,ComparatorType.Ascending,null,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator();
         }
     },
-    NoThrowDescending(true,ComparatorType.Descending,null){
+    NoThrowDescending(true,ComparatorType.Descending,null,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -181,6 +183,87 @@ public enum MonitoredComparatorGen{
         }
         @SuppressWarnings({"unchecked","rawtypes"})
         @Override
+        void assertReverseSorted(MonitoredList<?,?,?> listMonitor){
+            var uncastItr=listMonitor.getMonitoredIterator().getIterator();
+            if(!uncastItr.hasNext()){
+                return;
+            }
+            var dataType=listMonitor.getDataType();
+            switch(dataType){
+            case BOOLEAN:{
+                var itr=(OmniIterator.OfBoolean)uncastItr;
+                for(boolean next,prev=itr.nextBoolean();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Boolean.compare(prev,next=itr.nextBoolean()) <= 0);
+                }
+                break;
+            }
+            case BYTE:{
+                var itr=(OmniIterator.OfByte)uncastItr;
+                for(byte next,prev=itr.nextByte();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Byte.compare(prev,next=itr.nextByte()) <= 0);
+                }
+                break;
+            }
+            case CHAR:{
+                var itr=(OmniIterator.OfChar)uncastItr;
+                for(char next,prev=itr.nextChar();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Character.compare(prev,next=itr.nextChar()) <= 0);
+                }
+                break;
+            }
+            case DOUBLE:{
+                var itr=(OmniIterator.OfDouble)uncastItr;
+                for(double next,prev=itr.nextDouble();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Double.compare(prev,next=itr.nextDouble()) <= 0);
+                }
+                break;
+            }
+            case FLOAT:{
+                var itr=(OmniIterator.OfFloat)uncastItr;
+                for(float next,prev=itr.nextFloat();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Float.compare(prev,next=itr.nextFloat()) <= 0);
+                }
+                break;
+            }
+            case INT:{
+                var itr=(OmniIterator.OfInt)uncastItr;
+                for(int next,prev=itr.nextInt();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Integer.compare(prev,next=itr.nextInt()) <= 0);
+                }
+                break;
+            }
+            case LONG:{
+                var itr=(OmniIterator.OfLong)uncastItr;
+                for(long next,prev=itr.nextLong();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Long.compare(prev,next=itr.nextLong()) <= 0);
+                }
+                break;
+            }
+            case REF:{
+                var itr=(OmniIterator.OfRef)uncastItr;
+                for(Comparable next,prev=(Comparable)itr.next();itr.hasNext();prev=next){
+                    Assertions.assertTrue(prev.compareTo(next=(Comparable)itr.next()) <= 0);
+                }
+                break;
+            }
+            case SHORT:{
+                var itr=(OmniIterator.OfShort)uncastItr;
+                for(short next,prev=itr.nextShort();itr.hasNext();prev=next){
+                    Assertions.assertTrue(Short.compare(prev,next=itr.nextShort()) <= 0);
+                }
+                break;
+            }
+            default:
+                throw dataType.invalid();
+            }
+            if(listMonitor.size() > 1){
+                listMonitor.incrementModCount();
+                listMonitor.copyListContents();
+            }
+
+        }
+        @SuppressWarnings({"unchecked","rawtypes"})
+        @Override
         void assertSorted(MonitoredList<?,?,?> listMonitor){
             var uncastItr=listMonitor.getMonitoredIterator().getIterator();
             if(!uncastItr.hasNext()){
@@ -193,69 +276,75 @@ public enum MonitoredComparatorGen{
                 for(boolean next,prev=itr.nextBoolean();itr.hasNext();prev=next){
                     Assertions.assertTrue(Boolean.compare(prev,next=itr.nextBoolean()) >= 0);
                 }
-                return;
+                break;
             }
             case BYTE:{
                 var itr=(OmniIterator.OfByte)uncastItr;
                 for(byte next,prev=itr.nextByte();itr.hasNext();prev=next){
                     Assertions.assertTrue(Byte.compare(prev,next=itr.nextByte()) >= 0);
                 }
-                return;
+                break;
             }
             case CHAR:{
                 var itr=(OmniIterator.OfChar)uncastItr;
                 for(char next,prev=itr.nextChar();itr.hasNext();prev=next){
                     Assertions.assertTrue(Character.compare(prev,next=itr.nextChar()) >= 0);
                 }
-                return;
+                break;
             }
             case DOUBLE:{
                 var itr=(OmniIterator.OfDouble)uncastItr;
                 for(double next,prev=itr.nextDouble();itr.hasNext();prev=next){
                     Assertions.assertTrue(Double.compare(prev,next=itr.nextDouble()) >= 0);
                 }
-                return;
+                break;
             }
             case FLOAT:{
                 var itr=(OmniIterator.OfFloat)uncastItr;
                 for(float next,prev=itr.nextFloat();itr.hasNext();prev=next){
                     Assertions.assertTrue(Float.compare(prev,next=itr.nextFloat()) >= 0);
                 }
-                return;
+                break;
             }
             case INT:{
                 var itr=(OmniIterator.OfInt)uncastItr;
                 for(int next,prev=itr.nextInt();itr.hasNext();prev=next){
                     Assertions.assertTrue(Integer.compare(prev,next=itr.nextInt()) >= 0);
                 }
-                return;
+                break;
             }
             case LONG:{
                 var itr=(OmniIterator.OfLong)uncastItr;
                 for(long next,prev=itr.nextLong();itr.hasNext();prev=next){
                     Assertions.assertTrue(Long.compare(prev,next=itr.nextLong()) >= 0);
                 }
-                return;
+                break;
             }
             case REF:{
                 var itr=(OmniIterator.OfRef)uncastItr;
                 for(Comparable next,prev=(Comparable)itr.next();itr.hasNext();prev=next){
                     Assertions.assertTrue(prev.compareTo(next=(Comparable)itr.next()) >= 0);
                 }
-                return;
+                break;
             }
             case SHORT:{
                 var itr=(OmniIterator.OfShort)uncastItr;
                 for(short next,prev=itr.nextShort();itr.hasNext();prev=next){
                     Assertions.assertTrue(Short.compare(prev,next=itr.nextShort()) >= 0);
                 }
-                return;
+                break;
             }
+            default:
+                throw dataType.invalid();
             }
-            throw dataType.invalid();
+            if(listMonitor.size() > 1){
+                listMonitor.incrementModCount();
+                listMonitor.copyListContents();
+            }
+
         }
     },
-    NullComparator(true,ComparatorType.NaturalOrder,null){
+    NullComparator(true,ComparatorType.NaturalOrder,null,true){
         @Override
         void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
             if(listMonitor.getDataType() == DataType.REF){
@@ -267,7 +356,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ThrowAIOB(true,ComparatorType.ImmediatelyThrows,IllegalArgumentException.class){
+    ThrowAIOB(true,ComparatorType.ImmediatelyThrows,IllegalArgumentException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -278,7 +367,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ThrowIOB(true,ComparatorType.ImmediatelyThrows,IndexOutOfBoundsException.class){
+    ThrowIOB(true,ComparatorType.ImmediatelyThrows,IndexOutOfBoundsException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -289,7 +378,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModCollectionAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class){
+    ModCollectionAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -300,7 +389,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModCollectionDescending(true,ComparatorType.Descending,ConcurrentModificationException.class){
+    ModCollectionDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -330,7 +419,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ModParentAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class){
+    ModParentAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -341,7 +430,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModParentDescending(true,ComparatorType.Descending,ConcurrentModificationException.class){
+    ModParentDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -371,7 +460,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ModRootAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class){
+    ModRootAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -382,7 +471,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModRootDescending(true,ComparatorType.Descending,ConcurrentModificationException.class){
+    ModRootDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -412,7 +501,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ModCollectionThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    ModCollectionThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -424,7 +513,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModCollectionThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    ModCollectionThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -436,7 +525,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModParentThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    ModParentThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -448,7 +537,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModParentThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    ModParentThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -460,7 +549,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModRootThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    ModRootThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -472,7 +561,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModRootThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class){
+    ModRootThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
             return new MonitoredComparator(){
@@ -488,17 +577,97 @@ public enum MonitoredComparatorGen{
     public final boolean validWithPrimitive;
     public final ComparatorType comparatorType;
     public final Class<? extends Throwable> expectedException;
+    public final boolean validWithNoComparator;
     MonitoredComparatorGen(boolean validWithPrimitive,ComparatorType comparatorType,
-            Class<? extends Throwable> expectedException){
+            Class<? extends Throwable> expectedException,boolean validWithNoComparator){
         this.validWithPrimitive=validWithPrimitive;
         this.comparatorType=comparatorType;
         this.expectedException=expectedException;
+        this.validWithNoComparator=validWithNoComparator;
     }
     public enum ComparatorType{
         Ascending,Descending,NaturalOrder,ImmediatelyThrows;
     }
     public MonitoredComparator getMonitoredComparator(MonitoredList<?,?,?> listMonitor){
-        throw new UnsupportedOperationException();
+        return null;
+    }
+    void assertReverseSorted(MonitoredList<?,?,?> listMonitor){
+        var uncastItr=listMonitor.getMonitoredIterator().getIterator();
+        if(!uncastItr.hasNext()){
+            return;
+        }
+        var dataType=listMonitor.getDataType();
+        switch(dataType){
+        case BOOLEAN:{
+            var itr=(OmniIterator.OfBoolean)uncastItr;
+            for(boolean next,prev=itr.nextBoolean();itr.hasNext();prev=next){
+                Assertions.assertTrue(Boolean.compare(prev,next=itr.nextBoolean()) >= 0);
+            }
+            break;
+        }
+        case BYTE:{
+            var itr=(OmniIterator.OfByte)uncastItr;
+            for(byte next,prev=itr.nextByte();itr.hasNext();prev=next){
+                Assertions.assertTrue(Byte.compare(prev,next=itr.nextByte()) >= 0);
+            }
+            break;
+        }
+        case CHAR:{
+            var itr=(OmniIterator.OfChar)uncastItr;
+            for(char next,prev=itr.nextChar();itr.hasNext();prev=next){
+                Assertions.assertTrue(Character.compare(prev,next=itr.nextChar()) >= 0);
+            }
+            break;
+        }
+        case DOUBLE:{
+            var itr=(OmniIterator.OfDouble)uncastItr;
+            for(double next,prev=itr.nextDouble();itr.hasNext();prev=next){
+                Assertions.assertTrue(Double.compare(prev,next=itr.nextDouble()) >= 0);
+            }
+            break;
+        }
+        case FLOAT:{
+            var itr=(OmniIterator.OfFloat)uncastItr;
+            for(float next,prev=itr.nextFloat();itr.hasNext();prev=next){
+                Assertions.assertTrue(Float.compare(prev,next=itr.nextFloat()) >= 0);
+            }
+            break;
+        }
+        case INT:{
+            var itr=(OmniIterator.OfInt)uncastItr;
+            for(int next,prev=itr.nextInt();itr.hasNext();prev=next){
+                Assertions.assertTrue(Integer.compare(prev,next=itr.nextInt()) >= 0);
+            }
+            break;
+        }
+        case LONG:{
+            var itr=(OmniIterator.OfLong)uncastItr;
+            for(long next,prev=itr.nextLong();itr.hasNext();prev=next){
+                Assertions.assertTrue(Long.compare(prev,next=itr.nextLong()) >= 0);
+            }
+            break;
+        }
+        case REF:{
+            var itr=(OmniIterator.OfRef)uncastItr;
+            for(Comparable next,prev=(Comparable)itr.next();itr.hasNext();prev=next){
+                Assertions.assertTrue(prev.compareTo(next=(Comparable)itr.next()) >= 0);
+            }
+            break;
+        }
+        case SHORT:{
+            var itr=(OmniIterator.OfShort)uncastItr;
+            for(short next,prev=itr.nextShort();itr.hasNext();prev=next){
+                Assertions.assertTrue(Short.compare(prev,next=itr.nextShort()) >= 0);
+            }
+            break;
+        }
+        default:
+            throw dataType.invalid();
+        }
+        if(listMonitor.size() > 1){
+            listMonitor.incrementModCount();
+            listMonitor.copyListContents();
+        }
     }
     @SuppressWarnings({"unchecked","rawtypes"})
     void assertSorted(MonitoredList<?,?,?> listMonitor){
@@ -513,66 +682,72 @@ public enum MonitoredComparatorGen{
             for(boolean next,prev=itr.nextBoolean();itr.hasNext();prev=next){
                 Assertions.assertTrue(Boolean.compare(prev,next=itr.nextBoolean()) <= 0);
             }
-            return;
+            break;
         }
         case BYTE:{
             var itr=(OmniIterator.OfByte)uncastItr;
             for(byte next,prev=itr.nextByte();itr.hasNext();prev=next){
                 Assertions.assertTrue(Byte.compare(prev,next=itr.nextByte()) <= 0);
             }
-            return;
+            break;
         }
         case CHAR:{
             var itr=(OmniIterator.OfChar)uncastItr;
             for(char next,prev=itr.nextChar();itr.hasNext();prev=next){
                 Assertions.assertTrue(Character.compare(prev,next=itr.nextChar()) <= 0);
             }
-            return;
+            break;
         }
         case DOUBLE:{
             var itr=(OmniIterator.OfDouble)uncastItr;
             for(double next,prev=itr.nextDouble();itr.hasNext();prev=next){
                 Assertions.assertTrue(Double.compare(prev,next=itr.nextDouble()) <= 0);
             }
-            return;
+            break;
         }
         case FLOAT:{
             var itr=(OmniIterator.OfFloat)uncastItr;
             for(float next,prev=itr.nextFloat();itr.hasNext();prev=next){
                 Assertions.assertTrue(Float.compare(prev,next=itr.nextFloat()) <= 0);
             }
-            return;
+            break;
         }
         case INT:{
             var itr=(OmniIterator.OfInt)uncastItr;
             for(int next,prev=itr.nextInt();itr.hasNext();prev=next){
                 Assertions.assertTrue(Integer.compare(prev,next=itr.nextInt()) <= 0);
             }
-            return;
+            break;
         }
         case LONG:{
             var itr=(OmniIterator.OfLong)uncastItr;
             for(long next,prev=itr.nextLong();itr.hasNext();prev=next){
                 Assertions.assertTrue(Long.compare(prev,next=itr.nextLong()) <= 0);
             }
-            return;
+            break;
         }
         case REF:{
             var itr=(OmniIterator.OfRef)uncastItr;
             for(Comparable next,prev=(Comparable)itr.next();itr.hasNext();prev=next){
                 Assertions.assertTrue(prev.compareTo(next=(Comparable)itr.next()) <= 0);
             }
-            return;
+            break;
         }
         case SHORT:{
             var itr=(OmniIterator.OfShort)uncastItr;
             for(short next,prev=itr.nextShort();itr.hasNext();prev=next){
                 Assertions.assertTrue(Short.compare(prev,next=itr.nextShort()) <= 0);
             }
-            return;
+            break;
         }
+        default:
+            throw dataType.invalid();
         }
-        throw dataType.invalid();
+        if(listMonitor.size() > 1){
+            listMonitor.incrementModCount();
+            listMonitor.copyListContents();
+        }
+
     }
     void initUnsortedHelper(MonitoredList<?,?,?> listMonitor,int listSize){
         for(int i=listSize;--i >= 0;){
@@ -581,10 +756,14 @@ public enum MonitoredComparatorGen{
     }
 
     public void initUnsorted(MonitoredList<?,?,?> listMonitor,int listSize){
-        if(listSize <= 1){
-            throw new UnsupportedOperationException("List size must be > 1");
+        if(listSize != 0){
+            if(listSize > 1){
+                initUnsortedHelper(listMonitor,listSize);
+            }else{
+                listMonitor.add(0);
+            }
         }
-        initUnsortedHelper(listMonitor,listSize);
+
     }
 
 }

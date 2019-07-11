@@ -44,10 +44,10 @@ DoubleUnaryOperator{
      *
      */
     private static final long serialVersionUID=1L;
-    
+
     public abstract MonitoredFunctionGen getMonitoredFunctionGen();
-    
-    
+
+
     protected abstract void throwingCall();
     @Override
     public void accept(Object t){
@@ -96,8 +96,25 @@ DoubleUnaryOperator{
     }
     @Override
     public Object apply(Object t){
-        accept(t);
-        return String.valueOf(t);
+        if(t instanceof Boolean){
+            return test((boolean)t);
+        }else if(t instanceof Byte){
+            return applyAsByte((byte)t);
+        }else if(t instanceof Character){
+            return applyAsChar((char)t);
+        }else if(t instanceof Short){
+            return applyAsShort((short)t);
+        }else if(t instanceof Integer){
+            return applyAsInt((int)t);
+        }else if(t instanceof Long){
+            return applyAsLong((long)t);
+        }else if(t instanceof Float){
+            return applyAsFloat((float)t);
+        }else if(t instanceof Double){
+            return applyAsDouble((double)t);
+        }else{
+            throw new UnsupportedOperationException("the value t=" + t + " is of an unknown type");
+        }
     }
     @Override
     public double applyAsDouble(double operand){

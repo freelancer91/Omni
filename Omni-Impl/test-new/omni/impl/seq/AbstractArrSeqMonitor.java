@@ -2,6 +2,7 @@ package omni.impl.seq;
 
 import java.io.Externalizable;
 import java.io.IOException;
+import java.util.function.IntBinaryOperator;
 import org.junit.jupiter.api.Assertions;
 import omni.api.OmniCollection;
 import omni.impl.CheckedType;
@@ -61,11 +62,7 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
             }
         }
     }
-    @Override public void updateCollectionState(){
-        this.expectedSize=((AbstractSeq<?>)seq).size;
-        if(checkedType.checked) {
-            updateModCount();
-        }
+    public void copyListContents(){
         switch(dataType) {
         case BOOLEAN:{
             var castSeq=(BooleanArrSeq)seq;
@@ -251,7 +248,18 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
             throw dataType.invalid();
         }
     }
-    @Override public void verifyCollectionState(){
+    public void incrementModCount(){
+        ++expectedModCount;
+    }
+    @Override
+    public void updateCollectionState(){
+        this.expectedSize=((AbstractSeq<?>)seq).size;
+        if(checkedType.checked){
+            updateModCount();
+        }
+        copyListContents();
+    }
+    public void verifyCollectionState(boolean refIsSame){
         int expectedSize;
         Assertions.assertEquals(expectedSize=this.expectedSize,((AbstractSeq<?>)seq).size);
         if(checkedType.checked) {
@@ -364,6 +372,15 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
             }else {
                 var expectedArr=(Object[])this.expectedArr;
                 int i=0;
+                if(refIsSame){
+                    while(i != expectedSize){
+                        Assertions.assertSame(expectedArr[i],actualArr[i++]);
+                    }
+                }else{
+                    while(i != expectedSize){
+                        Assertions.assertEquals(expectedArr[i],actualArr[i++]);
+                    }
+                }
                 while(i!=expectedSize) {
                     Assertions.assertSame(expectedArr[i],actualArr[i++]);
                 }
@@ -390,6 +407,10 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
         default:
             throw dataType.invalid();
         }
+    }
+    @Override
+    public void verifyCollectionState(){
+        verifyCollectionState(true);
     }
     @Override
     public void verifyReadAndWriteClone(SEQ readCol){
@@ -535,265 +556,223 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
             throw dataType.invalid();
         }
     }
+
     @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
-        if(dataType==DataType.BOOLEAN) {
-            if(result) {
+        Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
+        Assertions.assertNotEquals(result,filter.numRemoved == 0);
+        final int expectedSize=this.expectedSize;
+        if(result){
+            int numRemoved;
+            if(dataType == DataType.BOOLEAN){
                 var expectedArr=(boolean[])this.expectedArr;
-                ++expectedModCount;
                 if(filter.removedVals.contains(Boolean.TRUE)) {
                     if(filter.removedVals.contains(Boolean.FALSE)) {
                         Assertions.assertTrue(filter.retainedVals.isEmpty());
                         Assertions.assertEquals(0,filter.numRetained);
-                        int expectedSize;
-                        boolean firstVal=expectedArr[expectedSize=this.expectedSize-1];
-                        for(;;) {
-                            if(expectedArr[--expectedSize]^firstVal) {
-                                //we are expecting this condition to be met before expectedSize==-1. Otherwise, something is wrong.
-                                break;
-                            }
+                        int i=expectedSize - 1;
+                        boolean firstVal=expectedArr[i];
+                        while(expectedArr[--i] == firstVal){
+                            // we are expecting this condition to be met before i==-1. Otherwise, something
+                            // is wrong.
                         }
-                        this.expectedSize=0;
+                        numRemoved=expectedSize;
                     }else {
+                        numRemoved=1;
                         int i=0;
-                        for(int expectedSize=this.expectedSize;;++i) {
+                        for(;;++i){
                             if(expectedArr[i]) {
                                 for(int j=i+1;j<expectedSize;++j) {
                                     if(!expectedArr[j]) {
                                         expectedArr[i++]=false;
+                                    }else{
+                                        ++numRemoved;
                                     }
+
                                 }
                                 break;
                             }
                         }
-                        this.expectedSize=i;
                     }
                 }else {
+                    numRemoved=1;
                     int i=0;
-                    for(int expectedSize=this.expectedSize;;++i) {
+                    for(;;++i){
                         if(!expectedArr[i]) {
                             for(int j=i+1;j<expectedSize;++j) {
                                 if(expectedArr[j]) {
                                     expectedArr[i++]=true;
+                                }else{
+                                    ++numRemoved;
                                 }
+
                             }
                             break;
                         }
                     }
-                    this.expectedSize=i;
                 }
             }else {
-                var expectedArr=((BooleanArrSeq)seq).arr;
-                Assertions.assertTrue(filter.removedVals.isEmpty());
-                if(filter.retainedVals.contains(Boolean.TRUE)) {
-                    if(filter.retainedVals.contains(Boolean.FALSE)) {
-                        int expectedSize;
-                        boolean firstVal=expectedArr[expectedSize=this.expectedSize-1];
-                        for(;;) {
-                            if(expectedArr[--expectedSize]^firstVal) {
-                                //we are expecting this condition to be met before expectedSize==-1. Otherwise, something is wrong.
-                                break;
-                            }
-                        }
-                    }else {
-                        for(int i=this.expectedSize;--i>=0;) {
-                            Assertions.assertTrue(expectedArr[i]);
-                        }
-                    }
-                }else {
-                    if(filter.retainedVals.contains(Boolean.FALSE)) {
-                        for(int i=this.expectedSize;--i>=0;) {
-                            Assertions.assertFalse(expectedArr[i]);
-                        }
-                    }else {
-                        Assertions.assertEquals(0,expectedSize);
-                    }
-                }
-            }
-        }else {
-            Assertions.assertEquals(expectedSize,filter.numCalls);
-            if(result) {
-                int i=0;
+                Assertions.assertEquals(expectedSize,filter.numCalls);
+                IntBinaryOperator remover;
                 switch(dataType) {
                 case BYTE:{
-                    var arr=(byte[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
+                    var castArr=(byte[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
                         }
-                    }
+                        return dstIndex;
+                    };
                     break;
                 }
                 case CHAR:{
-                    var arr=(char[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
+                    var castArr=(char[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
                         }
-                    }
-                    break;
-                }
-                case DOUBLE:{
-                    var arr=(double[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
-                        }
-                    }
-                    break;
-                }
-                case FLOAT:{
-                    var arr=(float[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
-                        }
-                    }
-                    break;
-                }
-                case INT:{
-                    var arr=(int[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
-                        }
-                    }
-                    break;
-                }
-                case LONG:{
-                    var arr=(long[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
-                        }
-                    }
-                    break;
-                }
-                case REF:{
-                    var arr=(Object[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
-                        }
-                    }
-                    for(int expectedCapacity=this.expectedCapacity,j=i;++j<expectedCapacity;) {
-                        arr[j]=null;
-                    }
+                        return dstIndex;
+                    };
                     break;
                 }
                 case SHORT:{
-                    var arr=(short[])expectedArr;
-                    for(int bound=this.expectedSize;;++i) {
-                        var val=arr[i];
-                        if(filter.removedVals.contains(val)) {
-                            Assertions.assertFalse(filter.retainedVals.contains(val));
-                            for(int j=i+1;j<bound;++j) {
-                                if(filter.retainedVals.contains(val=arr[j])) {
-                                    arr[i++]=val;
-                                    Assertions.assertFalse(filter.removedVals.contains(val));
-                                }else {
-                                    Assertions.assertTrue(filter.removedVals.contains(val));
-                                }
-                            }
-                            break;
-                        }else {
-                            Assertions.assertTrue(filter.retainedVals.contains(val));
+                    var castArr=(short[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
                         }
-                    }
+                        return dstIndex;
+                    };
+                    break;
+                }
+                case INT:{
+                    var castArr=(int[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
+                        }
+                        return dstIndex;
+                    };
+                    break;
+                }
+                case LONG:{
+                    var castArr=(long[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
+                        }
+                        return dstIndex;
+                    };
+                    break;
+                }
+                case FLOAT:{
+                    var castArr=(float[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
+                        }
+                        return dstIndex;
+                    };
+                    break;
+                }
+                case DOUBLE:{
+                    var castArr=(double[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
+                        }
+                        return dstIndex;
+                    };
+                    break;
+                }
+                case REF:{
+                    var castArr=(Object[])expectedArr;
+                    remover=(srcIndex,dstIndex)->{
+                        var val=castArr[srcIndex];
+                        boolean removedContains=filter.removedVals.contains(val);
+                        boolean retainedContains=filter.retainedVals.contains(val);
+                        Assertions.assertNotEquals(removedContains,retainedContains);
+                        if(retainedContains){
+                            castArr[dstIndex++]=val;
+                        }
+                        return dstIndex;
+                    };
                     break;
                 }
                 default:
                     throw dataType.invalid();
                 }
-                Assertions.assertEquals(filter.numRemoved,expectedSize-i);
-                Assertions.assertEquals(filter.numRetained,i);
-                this.expectedSize=i;
+                int dstOffset=0;
+                for(int srcOffset=0;srcOffset < expectedSize;++srcOffset){
+                    dstOffset=remover.applyAsInt(srcOffset,dstOffset);
+                }
+                numRemoved=expectedSize - dstOffset;
+                Assertions.assertEquals(filter.numRemoved,numRemoved);
+                Assertions.assertEquals(filter.numRetained,dstOffset);
+                if(dataType == DataType.REF){
+                    var expectedArr=(Object[])this.expectedArr;
+                    while(dstOffset != expectedSize){
+                        expectedArr[dstOffset]=null;
+                        ++dstOffset;
+                    }
+                }
+            }
+            ++expectedModCount;
+            this.expectedSize-=numRemoved;
+        }else{
+            if(dataType == DataType.BOOLEAN){
+                var expectedArr=((BooleanArrSeq)seq).arr;
+                if(filter.retainedVals.contains(Boolean.TRUE)){
+                    if(filter.retainedVals.contains(Boolean.FALSE)){
+                        int i=expectedSize - 1;
+                        boolean firstVal=expectedArr[i];
+                        while(expectedArr[--i] == firstVal){
+                            // we are expecting this condition to be met before expectedSize==-1. Otherwise,
+                            // something is wrong.
+                        }
+                    }else{
+                        for(int i=expectedSize;--i >= 0;){
+                            Assertions.assertTrue(expectedArr[i]);
+                        }
+                    }
+                }else{
+                    if(filter.retainedVals.contains(Boolean.FALSE)){
+                        for(int i=expectedSize;--i >= 0;){
+                            Assertions.assertFalse(expectedArr[i]);
+                        }
+                    }else{
+                        Assertions.assertEquals(0,expectedSize);
+                    }
+                }
             }else {
-                Assertions.assertTrue(filter.removedVals.isEmpty());
-                Assertions.assertEquals(0,filter.numRemoved);
+                Assertions.assertEquals(expectedSize,filter.numCalls);
                 Assertions.assertEquals(expectedSize,filter.numRetained);
                 var itr=seq.iterator();
                 while(itr.hasNext()) {
@@ -801,6 +780,7 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
                 }
             }
         }
+
     }
     @Override
     public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
@@ -1387,10 +1367,10 @@ public abstract class AbstractArrSeqMonitor<SEQ extends OmniCollection<?>> imple
     public void updateAddState(Object inputVal,DataType inputType){
         updateAddState(expectedSize,inputVal,inputType);
     }
-    abstract int findRemoveValIndex(Object inputVal,DataType inputType);
+    abstract int findRemoveValIndex(Object inputVal,DataType inputType,int fromIndex,int toIndex);
     @Override
     public void updateRemoveValState(Object inputVal,DataType inputType){
-        int index=findRemoveValIndex(inputVal,inputType);
+        int index=findRemoveValIndex(inputVal,inputType,0,expectedSize);
         updateRemoveIndexState(index);
     }
     public void updateRemoveIndexState(int index){

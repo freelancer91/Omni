@@ -475,7 +475,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             }
             verifyRemoveIf(result,filter);
         }finally{
-            /// verifyCollectionState();
+            verifyCollectionState();
         }
         return result;
     }
