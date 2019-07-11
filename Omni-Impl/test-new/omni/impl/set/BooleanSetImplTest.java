@@ -796,9 +796,15 @@ public class BooleanSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(functionGen,checkedType,
-                initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType)).verifyReadAndWrite(functionGen);
-                test.runAllTests("BooleanSetImplTest.testReadAndWrite");
+        MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
+            var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+            if(functionGen.expectedException==null) {
+                Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
+            }else {
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+            }
+        };
+        test.runAllTests("BooleanSetImplTest.testReadAndWrite");
     }
     @org.junit.jupiter.api.Test
     public void testremoveIf_Predicate(){

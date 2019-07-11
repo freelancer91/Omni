@@ -117,6 +117,8 @@ AbstractSeq<$BoxedType$>
       OmniArray.Of$ClassPrefix$.readArray(arr=new $ArrayType$[size],0,size-1,in);
 #ENDIF
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
     }
   }
 #IFNOT OfBoolean
@@ -745,6 +747,8 @@ public
         OmniArray.Of$ClassPrefix$.readArray(arr=new $ArrayType$[size],0,size-1,ois);
 #ENDIF
         this.arr=arr;
+      }else{
+        this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
       }
     }
     private void writeObject(ObjectOutputStream oos) throws IOException{

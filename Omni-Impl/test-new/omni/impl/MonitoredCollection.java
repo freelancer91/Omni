@@ -1,10 +1,9 @@
 package omni.impl;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
+import java.io.OutputStream;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
@@ -330,48 +329,33 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     default void verifyReadAndWriteClone(COL readCol){
         verifyClone(readCol);
     }
-    @SuppressWarnings("unchecked") default void verifyReadAndWrite(MonitoredFunctionGen monitoredFunctionGen) {
-        final File file;
+    @SuppressWarnings("unchecked") default void verifyReadAndWrite(MonitoredFunctionGen monitoredFunctionGen) throws ClassNotFoundException, IOException { 
+        COL readCol=null;
         try{
-            file=Files.createTempFile(null,null).toFile();
-        }catch(Exception e){
-            Assertions.fail(e);
-            return;
-        }
-        if(monitoredFunctionGen.expectedException == null){
-            COL readCol=null;
-            try{
-                try(var oos=new ObjectOutputStream(new FileOutputStream(file));){
+            
+            if(monitoredFunctionGen.expectedException==null) {
+                var baos=new ByteArrayOutputStream();
+                try(var oos=new ObjectOutputStream(baos);){
                     oos.writeObject(getCollection());
-                }catch(Exception e){
-                    Assertions.fail(e);
                 }
-
-                try(var ois=monitoredFunctionGen.getMonitoredObjectInputStream(this,new FileInputStream(file));){
+                try(var ois=monitoredFunctionGen.getMonitoredObjectInputStream(this,new ByteArrayInputStream(baos.toByteArray()));){
                     readCol=(COL)ois.readObject();
-                }catch(Exception e){
-                    Assertions.fail(e);
-                    return;
                 }
-            }finally{
-                verifyCollectionState();
+            }else {
+                try(var oos=monitoredFunctionGen.getMonitoredObjectOutputStream(this,OutputStream.nullOutputStream())){
+                    writeObjectImpl(oos);
+                }
             }
-            if(getDataType() == DataType.REF){
-                verifyReadAndWriteClone(readCol);
-            }else{
-                verifyClone(readCol);
-            }
-        }else{
-            try{
-                Assertions.assertThrows(monitoredFunctionGen.expectedException,()->{
-                    try(var moos=monitoredFunctionGen.getMonitoredObjectOutputStream(this,new FileOutputStream(file));){
-                        writeObjectImpl(moos);
-                    }
-                });
-            }finally{
-                verifyCollectionState();
-            }
+            
+        }finally{
+            verifyCollectionState();
         }
+        if(getDataType() == DataType.REF){
+            verifyReadAndWriteClone(readCol);
+        }else{
+            verifyClone(readCol);
+        }
+        
     }
     @SuppressWarnings("unchecked")
     default boolean verifyRemoveIf(MonitoredRemoveIfPredicate filter,FunctionCallType functionCallType){

@@ -71,6 +71,8 @@ AbstractSeq<Short>
       short[] arr;
       OmniArray.OfShort.readArray(arr=new short[size],0,size-1,in);
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.OfShort.DEFAULT_ARR;
     }
   }
   static  long markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter){
@@ -1738,6 +1740,8 @@ AbstractSeq<Short>
           short[] arr;
           OmniArray.OfShort.readArray(arr=new short[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfShort.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3559,6 +3563,8 @@ AbstractSeq<Short>
           short[] arr;
           OmniArray.OfShort.readArray(arr=new short[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfShort.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

@@ -71,6 +71,8 @@ AbstractSeq<Byte>
       byte[] arr;
       in.readFully(arr=new byte[size],0,size);
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.OfByte.DEFAULT_ARR;
     }
   }
   static  long markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter){
@@ -1742,6 +1744,8 @@ AbstractSeq<Byte>
           byte[] arr;
           ois.readFully(arr=new byte[size]);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfByte.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3556,6 +3560,8 @@ AbstractSeq<Byte>
           byte[] arr;
           ois.readFully(arr=new byte[size]);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfByte.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

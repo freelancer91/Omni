@@ -70,6 +70,8 @@ AbstractSeq<Double>
       double[] arr;
       OmniArray.OfDouble.readArray(arr=new double[size],0,size-1,in);
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.OfDouble.DEFAULT_ARR;
     }
   }
   static  long markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter){
@@ -1608,6 +1610,8 @@ AbstractSeq<Double>
           double[] arr;
           OmniArray.OfDouble.readArray(arr=new double[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfDouble.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3409,6 +3413,8 @@ AbstractSeq<Double>
           double[] arr;
           OmniArray.OfDouble.readArray(arr=new double[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfDouble.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

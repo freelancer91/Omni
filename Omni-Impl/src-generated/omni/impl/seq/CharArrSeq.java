@@ -70,6 +70,8 @@ AbstractSeq<Character>
       char[] arr;
       OmniArray.OfChar.readArray(arr=new char[size],0,size-1,in);
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.OfChar.DEFAULT_ARR;
     }
   }
   static  long markSurvivors(char[] arr,int srcOffset,int srcBound,CharPredicate filter){
@@ -1721,6 +1723,8 @@ AbstractSeq<Character>
           char[] arr;
           OmniArray.OfChar.readArray(arr=new char[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfChar.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3537,6 +3541,8 @@ AbstractSeq<Character>
           char[] arr;
           OmniArray.OfChar.readArray(arr=new char[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfChar.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

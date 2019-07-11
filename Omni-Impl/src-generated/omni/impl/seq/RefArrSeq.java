@@ -66,6 +66,8 @@ AbstractSeq<E>
       Object[] arr;
       OmniArray.OfRef.readArray(arr=new Object[size],0,size-1,in);
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.OfRef.DEFAULT_ARR;
     }
   }
   @SuppressWarnings("unchecked")
@@ -2002,6 +2004,8 @@ AbstractSeq<E>
           Object[] arr;
           OmniArray.OfRef.readArray(arr=new Object[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfRef.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -4281,6 +4285,8 @@ AbstractSeq<E>
           Object[] arr;
           OmniArray.OfRef.readArray(arr=new Object[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfRef.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

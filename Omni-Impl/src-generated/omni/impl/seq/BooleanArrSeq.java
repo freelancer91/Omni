@@ -70,6 +70,8 @@ AbstractSeq<Boolean>
       boolean[] arr;
       OmniArray.OfBoolean.readArray(arr=new boolean[size],0,size-1,in);
       this.arr=arr;
+    }else{
+      this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
     }
   }
   @Override public void clear(){
@@ -1874,6 +1876,8 @@ AbstractSeq<Boolean>
           boolean[] arr;
           OmniArray.OfBoolean.readArray(arr=new boolean[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{
@@ -3823,6 +3827,8 @@ AbstractSeq<Boolean>
           boolean[] arr;
           OmniArray.OfBoolean.readArray(arr=new boolean[size],0,size-1,ois);
           this.arr=arr;
+        }else{
+          this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
         }
       }
       private void writeObject(ObjectOutputStream oos) throws IOException{

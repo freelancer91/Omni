@@ -743,8 +743,14 @@ public class OpenAddressHashSetTest{
                 "OpenAddressHashSetTest." + DataType.FLOAT + ".testMASSIVEtoString");
     }
     @org.junit.jupiter.api.Test public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->initSet
-                .initialize(new OpenAddressHashSetMonitor(collectionType,checkedType)).verifyReadAndWrite(functionGen);
+        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
+            var monitor=initSet.initialize(new OpenAddressHashSetMonitor(collectionType,checkedType));
+            if(functionGen.expectedException==null) {
+                Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
+            }else {
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+            }   
+        };
         test.runAllTests("OpenAddressHashSetTest.testReadAndWrite");
     }
     @org.junit.jupiter.api.Test public void testremoveIf_Predicate(){

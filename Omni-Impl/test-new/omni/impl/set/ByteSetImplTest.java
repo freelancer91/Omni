@@ -336,8 +336,14 @@ public class ByteSetImplTest{
     }
     @org.junit.jupiter.api.Test
     public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->initSet
-                .initialize(new ByteSetImplMonitor(checkedType)).verifyReadAndWrite(functionGen);
+        final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
+            var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
+            if(functionGen.expectedException==null) {
+                Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
+            }else {
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+            }
+        };
         test.runAllTests("ByteSetImplTest.testReadAndWrite");
     }
     @org.junit.jupiter.api.Test

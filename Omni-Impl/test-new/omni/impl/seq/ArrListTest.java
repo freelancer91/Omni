@@ -1,19 +1,19 @@
 package omni.impl.seq;
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
+import java.util.EnumSet;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
+import omni.api.OmniStack;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
 import omni.impl.FunctionCallType;
@@ -28,6 +28,7 @@ import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
+import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
@@ -39,36 +40,142 @@ public class ArrListTest{
     private static final int[] FIB_SEQ=new int[]{0,1,2,3,5,8,13,21,34,55,89};
     private static final int[] EXTENDED_FIB_SEQ=new int[]{0,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,
             6765,10946};
+    private static final int[] SUB_LIST_BUFFERS=new int[]{0,5};
+    private static final EnumSet<StructType> VALID_STRUCT_TYPES=EnumSet.of(StructType.ArrList,StructType.ArrSubList);
+    private static MonitoredList<?,?,?> getMonitoredList(DataType collectionType,CheckedType checkedType,
+            StructType structType,int initCapacity,int rootPreAlloc,int parentPreAlloc,int rootPostAlloc,
+            int parentPostAlloc){
+        var root=new ArrListMonitor(checkedType,collectionType,initCapacity);
+        if(structType == StructType.ArrList){
+            return root;
+        }else{
+            root=SequenceInitialization.Ascending.initialize(
+                    SequenceInitialization.Ascending.initialize(root,rootPreAlloc,Integer.MIN_VALUE),rootPostAlloc,
+                    Integer.MAX_VALUE - rootPostAlloc);
+            final var parent=SequenceInitialization.Ascending.initialize(
+                    SequenceInitialization.Ascending.initialize(root.getMonitoredSubList(rootPreAlloc,rootPreAlloc),
+                            parentPreAlloc,Integer.MIN_VALUE + rootPreAlloc),
+                    parentPostAlloc,Integer.MAX_VALUE - rootPostAlloc - parentPostAlloc);
+            return parent.getMonitoredSubList(parentPreAlloc,parentPreAlloc);
+        }
+    }
     @Test
     public void testadd_intval(){
-        for(final var collectionType:DataType.values()){
-            for(final var inputType:collectionType.mayBeAddedTo()){
-                for(final var functionCallType:FunctionCallType.values()){
-                    if(inputType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                        for(final var initCap:INIT_CAPACITIES){
-                            for(final var checkedType:CheckedType.values()){
-                                for(final var position:POSITIONS){
-                                    if(position >= 0 || checkedType.checked){
-                                        TestExecutorService.submitTest(()->{
-                                            final var monitor=new ArrListMonitor(checkedType,collectionType,initCap);
-                                            if(position < 0){
-                                                for(int i=0;i < 1000;++i){
-                                                    final Object inputVal=inputType.convertValUnchecked(i);
-                                                    final int finalI=i;
-                                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
-                                                            .verifyAdd(-1,inputVal,inputType,functionCallType));
-                                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
-                                                            .verifyAdd(finalI + 1,inputVal,inputType,functionCallType));
-                                                    monitor.add(i);
-                                                }
-                                            }else{
-                                                for(int i=0;i < 1000;++i){
-                                                    monitor.verifyAdd((int)(i * position),
-                                                            inputType.convertValUnchecked(i),inputType,
-                                                            functionCallType);
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final var inputType:collectionType.mayBeAddedTo()){
+                                                for(final var functionCallType:FunctionCallType.values()){
+                                                    if(inputType != DataType.REF
+                                                            || functionCallType != FunctionCallType.Boxed){
+                                                        for(final var initCap:INIT_CAPACITIES){
+                                                            for(final var position:POSITIONS){
+                                                                if(position >= 0 || checkedType.checked){
+                                                                    TestExecutorService.submitTest(()->{
+                                                                        if(illegalMod.expectedException == null){
+                                                                            final var monitor=getMonitoredList(
+                                                                                    collectionType,checkedType,
+                                                                                    structType,initCap,rootPreAlloc,
+                                                                                    parentPreAlloc,rootPostAlloc,
+                                                                                    parentPostAlloc);
+                                                                            if(position < 0){
+                                                                                for(int i=0;i < 1000;++i){
+                                                                                    final Object inputVal=inputType
+                                                                                            .convertValUnchecked(i);
+                                                                                    final int finalI=i;
+                                                                                    Assertions.assertThrows(
+                                                                                            IndexOutOfBoundsException.class,
+                                                                                            ()->monitor.verifyAdd(-1,
+                                                                                                    inputVal,inputType,
+                                                                                                    functionCallType));
+                                                                                    Assertions.assertThrows(
+                                                                                            IndexOutOfBoundsException.class,
+                                                                                            ()->monitor.verifyAdd(
+                                                                                                    finalI + 1,inputVal,
+                                                                                                    inputType,
+                                                                                                    functionCallType));
+                                                                                    monitor.add(i);
+                                                                                }
+                                                                            }else{
+                                                                                for(int i=0;i < 1000;++i){
+                                                                                    monitor.verifyAdd(
+                                                                                            (int)(i * position),
+                                                                                            inputType
+                                                                                                    .convertValUnchecked(
+                                                                                                            i),
+                                                                                            inputType,functionCallType);
+                                                                                }
+                                                                            }
+                                                                        }else{
+                                                                            {
+                                                                                final var monitor=SequenceInitialization.Ascending
+                                                                                        .initialize(getMonitoredList(
+                                                                                                collectionType,
+                                                                                                checkedType,structType,
+                                                                                                initCap,rootPreAlloc,
+                                                                                                parentPreAlloc,
+                                                                                                rootPostAlloc,
+                                                                                                parentPostAlloc),10,0);
+                                                                                monitor.illegalMod(illegalMod);
+                                                                                final Object inputVal=inputType
+                                                                                        .convertValUnchecked(0);
+                                                                                Assertions.assertThrows(
+                                                                                        illegalMod.expectedException,
+                                                                                        ()->monitor.verifyAdd(-1,
+                                                                                                inputVal,inputType,
+                                                                                                functionCallType));
+                                                                                Assertions.assertThrows(
+                                                                                        illegalMod.expectedException,
+                                                                                        ()->monitor.verifyAdd(1,
+                                                                                                inputVal,inputType,
+                                                                                                functionCallType));
+                                                                                Assertions.assertThrows(
+                                                                                        illegalMod.expectedException,
+                                                                                        ()->monitor.verifyAdd(0,
+                                                                                                inputVal,inputType,
+                                                                                                functionCallType));
+                                                                            }
+                                                                            {
+                                                                                final var monitor=getMonitoredList(
+                                                                                        collectionType,checkedType,
+                                                                                        structType,initCap,rootPreAlloc,
+                                                                                        parentPreAlloc,rootPostAlloc,
+                                                                                        parentPostAlloc);
+                                                                                monitor.illegalMod(illegalMod);
+                                                                                final Object inputVal=inputType
+                                                                                        .convertValUnchecked(0);
+                                                                                Assertions.assertThrows(
+                                                                                        illegalMod.expectedException,
+                                                                                        ()->monitor.verifyAdd(-1,
+                                                                                                inputVal,inputType,
+                                                                                                functionCallType));
+                                                                                Assertions.assertThrows(
+                                                                                        illegalMod.expectedException,
+                                                                                        ()->monitor.verifyAdd(1,
+                                                                                                inputVal,inputType,
+                                                                                                functionCallType));
+                                                                                Assertions.assertThrows(
+                                                                                        illegalMod.expectedException,
+                                                                                        ()->monitor.verifyAdd(0,
+                                                                                                inputVal,inputType,
+                                                                                                functionCallType));
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
-                                        });
+                                        }
                                     }
                                 }
                             }
@@ -81,18 +188,70 @@ public class ArrListTest{
     }
     @Test
     public void testadd_val(){
-        for(final var collectionType:DataType.values()){
-            for(final var inputType:collectionType.mayBeAddedTo()){
-                for(final var functionCallType:FunctionCallType.values()){
-                    if(inputType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                        for(final var initCap:INIT_CAPACITIES){
-                            for(final var checkedType:CheckedType.values()){
-                                TestExecutorService.submitTest(()->{
-                                    final var monitor=new ArrListMonitor(checkedType,collectionType,initCap);
-                                    for(int i=0;i < 1000;++i){
-                                        monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final var inputType:collectionType.mayBeAddedTo()){
+                                                for(final var functionCallType:FunctionCallType.values()){
+                                                    if(inputType != DataType.REF
+                                                            || functionCallType != FunctionCallType.Boxed){
+                                                        for(final var initCap:INIT_CAPACITIES){
+                                                            TestExecutorService.submitTest(()->{
+                                                                if(illegalMod.expectedException == null){
+                                                                    final var monitor=getMonitoredList(collectionType,
+                                                                            checkedType,structType,initCap,rootPreAlloc,
+                                                                            parentPreAlloc,rootPostAlloc,
+                                                                            parentPostAlloc);
+                                                                    for(int i=0;i < 1000;++i){
+                                                                        monitor.verifyAdd(
+                                                                                inputType.convertValUnchecked(i),
+                                                                                inputType,functionCallType);
+                                                                    }
+                                                                }else{
+                                                                    {
+                                                                        final var monitor=getMonitoredList(
+                                                                                collectionType,checkedType,structType,
+                                                                                initCap,rootPreAlloc,parentPreAlloc,
+                                                                                rootPostAlloc,parentPostAlloc);
+                                                                        monitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(
+                                                                                illegalMod.expectedException,
+                                                                                ()->monitor.verifyAdd(
+                                                                                        inputType
+                                                                                                .convertValUnchecked(0),
+                                                                                        inputType,functionCallType));
+                                                                    }
+                                                                    {
+                                                                        final var monitor=SequenceInitialization.Ascending
+                                                                                .initialize(getMonitoredList(
+                                                                                        collectionType,checkedType,
+                                                                                        structType,initCap,rootPreAlloc,
+                                                                                        parentPreAlloc,rootPostAlloc,
+                                                                                        parentPostAlloc),10,0);
+                                                                        monitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(
+                                                                                illegalMod.expectedException,
+                                                                                ()->monitor.verifyAdd(
+                                                                                        inputType
+                                                                                                .convertValUnchecked(0),
+                                                                                        inputType,functionCallType));
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
-                                });
+                                }
                             }
                         }
                     }
@@ -103,12 +262,12 @@ public class ArrListTest{
     }
     @Test
     public void testclear_void(){
-        final BasicTest test=(monitor)->monitor.verifyClear();
+        final BasicTest test=MonitoredList::verifyClear;
         test.runAllTests("ArrListTest.testclear_void");
     }
     @Test
     public void testclone_void(){
-        final BasicTest test=(monitor)->monitor.verifyClone();
+        final BasicTest test=MonitoredList::verifyClone;
         test.runAllTests("ArrListTest.testclone_void");
     }
     @Test
@@ -189,56 +348,66 @@ public class ArrListTest{
     }
     @Test
     public void testforEach_Consumer(){
-        for(final var functionGen:StructType.ArrList.validMonitoredFunctionGens){
-            for(final var checkedType:CheckedType.values()){
-                for(final var size:FIB_SEQ){
-                    if(size == 0 || checkedType.checked || functionGen.expectedException == null){
-                        for(final var functionCallType:FunctionCallType.values()){
-                            final long randSeedBound=functionGen.randomized && !functionCallType.boxed && size > 0?100
-                                    :0;
-                            LongStream.rangeClosed(0,randSeedBound).forEach(randSeed->{
-                                for(final var collectionType:DataType.values()){
-                                    if(collectionType != DataType.REF || !functionCallType.boxed){
-                                        TestExecutorService.submitTest(()->{
-                                            final var monitor=SequenceInitialization.Ascending.initialize(
-                                                    new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                            if(functionGen.expectedException == null || size == 0){
-                                                monitor.verifyForEach(functionGen,functionCallType,randSeed);
-                                            }else{
-                                                Assertions.assertThrows(functionGen.expectedException,()->monitor
-                                                        .verifyForEach(functionGen,functionCallType,randSeed));
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    }
+        final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+            if(illegalMod.expectedException == null){
+                if(functionGen.expectedException == null || monitor.isEmpty()){
+                    monitor.verifyForEach(functionGen,functionCallType,randSeed);
+                }else{
+                    Assertions.assertThrows(functionGen.expectedException,
+                            ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
                 }
+            }else{
+                monitor.illegalMod(illegalMod);
+                Assertions.assertThrows(illegalMod.expectedException,
+                        ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
             }
-        }
-        TestExecutorService.completeAllTests("ArrListTest.testforEach_Consumer");
+        };
+        test.runAllTests("ArrListTest.testforEach_Consumer",100,EnumSet.allOf(FunctionCallType.class));
     }
     @Test
     public void testget_int(){
-        for(final var collectionType:DataType.values()){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final int size:FIB_SEQ){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        for(final var outputType:collectionType.validOutputTypes()){
-                            if(checkedType.checked){
-                                Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                        ()->monitor.verifyGet(-1,outputType));
-                                Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                        ()->monitor.verifyGet(size,outputType));
-                            }
-                            for(int index=0;index < size;++index){
-                                monitor.verifyGet(index,outputType);
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final int size:FIB_SEQ){
+                                               
+                                                TestExecutorService.submitTest(()->{
+                                                    var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                    monitor.illegalMod(illegalMod);
+                                                    if(illegalMod.expectedException==null) {
+                                                        for(var outputType:collectionType.validOutputTypes()) {
+                                                            if(checkedType.checked) {
+                                                                Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifyGet(-1,outputType));
+                                                                Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifyGet(size,outputType));
+                                                            }
+                                                            for(int index=0;index<size;++index) {
+                                                                monitor.verifyGet(index,outputType);
+                                                            }
+                                                        }
+                                                    }else {
+                                                        for(var outputType:collectionType.validOutputTypes()) {
+                                                            for(int tmpIndex=-1;tmpIndex<=size;++tmpIndex) {
+                                                                final int index=tmpIndex;
+                                                                Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyGet(index,outputType));
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                                
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    });
+                    }
                 }
             }
         }
@@ -246,30 +415,32 @@ public class ArrListTest{
     }
     @Test
     public void testhashCode_void(){
-        final ToStringAndHashCodeTest test=(size,collectionType,checkedType,initVal,objGen)->{
-            if(collectionType == DataType.REF){
+        final ToStringAndHashCodeTest test=(monitor,size,initVal,objGen,illegalMod)->{
+            if(monitor.getDataType()==DataType.REF && objGen.expectedException!=null && size!=0) {
                 final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
-                final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                        new ArrListMonitor(checkedType,collectionType,size),size,initVal,objGen,throwSwitch);
-                if(objGen.expectedException == null || size == 0){
-                    monitor.verifyHashCode();
-                }else{
-                    Assertions.assertThrows(objGen.expectedException,()->{
-                        try{
-                            monitor.seq.hashCode();
-                        }finally{
-                            throwSwitch.doThrow=false;
-                            monitor.verifyCollectionState();
-                        }
-                    });
+                SequenceInitialization.Ascending.initializeWithMonitoredObj(monitor,size,initVal,objGen,throwSwitch);
+                monitor.illegalMod(illegalMod);
+                Class<? extends Throwable> expectedException=illegalMod.expectedException==null?objGen.expectedException:illegalMod.expectedException;
+                Assertions.assertThrows(expectedException,()->{
+                   try {
+                       monitor.getCollection().hashCode();
+                   }finally {
+                       throwSwitch.doThrow=false;
+                       monitor.verifyCollectionState();
+                   }
+                });
+            }else {
+                SequenceInitialization.Ascending.initialize(monitor,size,initVal);
+                if(illegalMod.expectedException==null) {
+                   monitor.verifyHashCode();
+                }else {
+                    monitor.illegalMod(illegalMod);
+                    Assertions.assertThrows(illegalMod.expectedException,monitor::verifyHashCode);
                 }
-            }else{
-                SequenceInitialization.Ascending.initialize(new ArrListMonitor(checkedType,collectionType),size,initVal)
-                .verifyHashCode();
             }
-        };
-        test.runAllTests("ArrListTest.testtoString_void");
-    }
+          };
+          test.runAllTests("ArrListTest.testhashCode_void");
+      }
     @Test
     public void testindexOf_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
@@ -289,21 +460,43 @@ public class ArrListTest{
     }
     @Test
     public void testisEmpty_void(){
-        final BasicTest test=(monitor)->monitor.verifyIsEmpty();
+        final BasicTest test=MonitoredList::verifyIsEmpty;
         test.runAllTests("ArrListTest.testisEmpty_void");
     }
     @Test
     public void testiterator_void(){
-        for(final var collectionType:DataType.values()){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final var size:FIB_SEQ){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        final var itrMonitor=monitor.getMonitoredIterator();
-                        monitor.verifyCollectionState();
-                        itrMonitor.verifyIteratorState();
-                    });
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final var size:FIB_SEQ){
+                                                TestExecutorService.submitTest(()->{
+                                                  final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                  try{
+                                                      if(illegalMod.expectedException==null) {
+                                                          monitor.getMonitoredIterator().verifyIteratorState();
+                                                          
+                                                      }else {
+                                                          monitor.illegalMod(illegalMod);
+                                                          Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredIterator);
+                                                      }
+                                                  }finally {
+                                                      monitor.verifyCollectionState();
+                                                  }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -311,78 +504,100 @@ public class ArrListTest{
     }
     @Test
     public void testItrclone_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var itrType:StructType.ArrList.validItrTypes){
-                for(final var checkedType:CheckedType.values()){
-                    for(final var size:FIB_SEQ){
-                        int prevIndex=-1;
-                        for(final var position:POSITIONS){
-                            int index;
-                            if(position >= 0 && (index=(int)(position * size)) != prevIndex){
-                                prevIndex=index;
-                                TestExecutorService.submitTest(()->{
-                                    final var seqMonitor=SequenceInitialization.Ascending
-                                            .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                    final var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
-                                    itrMonitor.verifyClone();
-                                });
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){   
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(var itrType:structType.validItrTypes) {
+                                        for(var size:FIB_SEQ) {
+                                            int prevIndex=-1;
+                                            for(var position:POSITIONS) {
+                                                int index;
+                                                if(position >= 0 && (index=(int)(position * size)) != prevIndex){
+                                                    prevIndex=index;
+                                                    TestExecutorService.submitTest(()->{
+                                                        final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                        final var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
+                                                        itrMonitor.verifyClone();
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                    
+                
             }
         }
         TestExecutorService.completeAllTests("ArrListTest.testItrclone_void");
     }
     @Test
     public void testItrforEachRemaining_Consumer(){
-        for(final var collectionType:DataType.values()){
-            for(final var functionCallType:FunctionCallType.values()){
-                if(collectionType != DataType.REF || !functionCallType.boxed){
-                    for(final var size:FIB_SEQ){
-                        int prevNumToIterate=-1;
-                        for(final var position:POSITIONS){
-                            int numToIterate;
-                            if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
-                                prevNumToIterate=numToIterate;
-                                final int numLeft=size - numToIterate;
-                                for(final var itrType:StructType.ArrList.validItrTypes){
-                                    for(final var functionGen:itrType.validMonitoredFunctionGens){
-                                        for(final var checkedType:CheckedType.values()){
-                                            for(final var illegalMod:itrType.validPreMods){
-                                                if(checkedType.checked || illegalMod.expectedException == null
-                                                        && (size == 0 || functionGen.expectedException == null)){
-                                                    final long randSeedBound=!functionCallType.boxed && numLeft > 1
-                                                            && functionGen.randomized?100:0;
-                                                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                                                        final long randSeed=tmpRandSeed;
-                                                        TestExecutorService.submitTest(()->{
-                                                            final var seqMonitor=SequenceInitialization.Ascending
-                                                                    .initialize(new ArrListMonitor(checkedType,
-                                                                            collectionType,size),size,0);
-                                                            final var itrMonitor=seqMonitor
-                                                                    .getMonitoredIterator(numToIterate,itrType);
-                                                            itrMonitor.illegalMod(illegalMod);
-                                                            if(illegalMod.expectedException == null || numLeft == 0){
-                                                                if(functionGen.expectedException == null
-                                                                        || numLeft == 0){
-                                                                    itrMonitor.verifyForEachRemaining(functionGen,
-                                                                            functionCallType,randSeed);
-                                                                }else{
-                                                                    Assertions.assertThrows(
-                                                                            functionGen.expectedException,
-                                                                            ()->itrMonitor.verifyForEachRemaining(
-                                                                                    functionGen,functionCallType,
-                                                                                    randSeed));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    for(final var rootPreAlloc:buffers){
+                        for(final var parentPreAlloc:buffers){
+                            for(final var rootPostAlloc:buffers){
+                                for(final var parentPostAlloc:buffers){
+                                    for(final var collectionType:DataType.values()){
+                                        for(final var functionCallType:FunctionCallType.values()){
+                                            if(collectionType != DataType.REF || !functionCallType.boxed){
+                                                for(final var size:FIB_SEQ){
+                                                    int prevNumToIterate=-1;
+                                                    for(final var position:POSITIONS){
+                                                        int numToIterate;
+                                                        if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
+                                                            prevNumToIterate=numToIterate;
+                                                            final int numLeft=size - numToIterate;
+                                                            for(final var itrType:structType.validItrTypes){
+                                                                for(final var functionGen:itrType.validMonitoredFunctionGens){
+                                                                    if(checkedType.checked || illegalMod.expectedException == null
+                                                                            && (size == 0 || functionGen.expectedException == null)){
+                                                                        final long randSeedBound=!functionCallType.boxed && numLeft > 1
+                                                                                && functionGen.randomized?100:0;
+                                                                        for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                                                            final long randSeed=tmpRandSeed;
+                                                                            TestExecutorService.submitTest(()->{
+                                                                                final var seqMonitor=SequenceInitialization.Ascending
+                                                                                        .initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                                                final var itrMonitor=seqMonitor
+                                                                                        .getMonitoredIterator(numToIterate,itrType);
+                                                                                itrMonitor.illegalMod(illegalMod);
+                                                                                if(illegalMod.expectedException == null || numLeft == 0){
+                                                                                    if(functionGen.expectedException == null
+                                                                                            || numLeft == 0){
+                                                                                        itrMonitor.verifyForEachRemaining(functionGen,
+                                                                                                functionCallType,randSeed);
+                                                                                    }else{
+                                                                                        Assertions.assertThrows(
+                                                                                                functionGen.expectedException,
+                                                                                                ()->itrMonitor.verifyForEachRemaining(
+                                                                                                        functionGen,functionCallType,
+                                                                                                        randSeed));
+                                                                                    }
+                                                                                }else{
+                                                                                    Assertions
+                                                                                            .assertThrows(illegalMod.expectedException,
+                                                                                                    ()->itrMonitor.verifyForEachRemaining(
+                                                                                                            functionGen,functionCallType,
+                                                                                                            randSeed));
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    } 
                                                                 }
-                                                            }else{
-                                                                Assertions
-                                                                .assertThrows(illegalMod.expectedException,
-                                                                        ()->itrMonitor.verifyForEachRemaining(
-                                                                                functionGen,functionCallType,
-                                                                                randSeed));
                                                             }
-                                                        });
+                                                        }
                                                     }
                                                 }
                                             }
@@ -399,52 +614,74 @@ public class ArrListTest{
     }
     @Test
     public void testItrhasNext_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var itrType:StructType.ArrList.validItrTypes){
-                for(final var checkedType:CheckedType.values()){
-                    for(final var size:FIB_SEQ){
-                        TestExecutorService.submitTest(()->{
-                            final var seqMonitor=SequenceInitialization.Ascending
-                                    .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                            final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
-                            while(itrMonitor.verifyHasNext()){
-                                itrMonitor.iterateForward();
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){   
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(final var itrType:structType.validItrTypes){
+                                        for(final var size:FIB_SEQ){
+                                            TestExecutorService.submitTest(()->{
+                                                final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                                                while(itrMonitor.verifyHasNext()){
+                                                    itrMonitor.iterateForward();
+                                                }
+                                            });
+                                        }
+                                        
+                                    }
+                                }
                             }
-                        });
+                        }
                     }
                 }
             }
-        }
+        } 
         TestExecutorService.completeAllTests("ArrListTest.testItrhasNext_void");
     }
     @Test
     public void testItrnext_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var outputType:collectionType.validOutputTypes()){
-                for(final var itrType:StructType.ArrList.validItrTypes){
-                    for(final var illegalMod:itrType.validPreMods){
-                        for(final var checkedType:CheckedType.values()){
-                            if(illegalMod.expectedException == null || checkedType.checked){
-                                for(final var size:FIB_SEQ){
-                                    if(checkedType.checked || size > 0){
-                                        TestExecutorService.submitTest(()->{
-                                            final var seqMonitor=SequenceInitialization.Ascending.initialize(
-                                                    new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                            final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
-                                            itrMonitor.illegalMod(illegalMod);
-                                            if(illegalMod.expectedException == null){
-                                                while(itrMonitor.hasNext()){
-                                                    itrMonitor.verifyNext(outputType);
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(final var outputType:collectionType.validOutputTypes()){
+                                        for(final var itrType:structType.validItrTypes){
+                                            for(final var illegalMod:itrType.validPreMods){
+                                                if(illegalMod.expectedException == null || checkedType.checked){
+                                                    for(final var size:FIB_SEQ){
+                                                        if(checkedType.checked || size > 0){
+                                                            TestExecutorService.submitTest(()->{
+                                                                final var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                                        getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                                final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                                                                itrMonitor.illegalMod(illegalMod);
+                                                                if(illegalMod.expectedException == null){
+                                                                    while(itrMonitor.hasNext()){
+                                                                        itrMonitor.verifyNext(outputType);
+                                                                    }
+                                                                    if(checkedType.checked){
+                                                                        Assertions.assertThrows(NoSuchElementException.class,
+                                                                                ()->itrMonitor.verifyNext(outputType));
+                                                                    }
+                                                                }else{
+                                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                                            ()->itrMonitor.verifyNext(outputType));
+                                                                }
+                                                            });
+                                                        }
+                                                    }
                                                 }
-                                                if(checkedType.checked){
-                                                    Assertions.assertThrows(NoSuchElementException.class,
-                                                            ()->itrMonitor.verifyNext(outputType));
-                                                }
-                                            }else{
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->itrMonitor.verifyNext(outputType));
                                             }
-                                        });
+                                        }
                                     }
                                 }
                             }
@@ -457,90 +694,103 @@ public class ArrListTest{
     }
     @Test
     public void testItrremove_void(){
-        for(final var itrType:StructType.ArrList.validItrTypes){
-            for(final var illegalMod:itrType.validPreMods){
-                for(final var checkedType:CheckedType.values()){
-                    if(illegalMod.expectedException == null || checkedType.checked){
-                        for(final var removeScenario:itrType.validItrRemoveScenarios){
-                            if(checkedType.checked || removeScenario.expectedException == null){
-                                for(final var collectionType:DataType.values()){
-                                    for(final var size:FIB_SEQ){
-                                        int prevNumToIterate=-1;
-                                        positionLoop:for(final var position:POSITIONS){
-                                            final int numToIterate;
-                                            if(position >= 0
-                                                    && (numToIterate=(int)(size * position)) != prevNumToIterate){
-                                                prevNumToIterate=numToIterate;
-                                                switch(removeScenario){
-                                                case PostInit:
-                                                    if(numToIterate != 0){
-                                                        break positionLoop;
-                                                    }
-                                                    break;
-                                                case PostNext:
-                                                    if(itrType.iteratorInterface != OmniListIterator.class
-                                                    && (size == 0 || numToIterate == size)){
-                                                        continue;
-                                                    }
-                                                case PostAdd:
-                                                case PostPrev:
-                                                    break;
-                                                case PostRemove:
-                                                    if(size == 0
-                                                    && itrType.iteratorInterface != OmniListIterator.class){
-                                                        continue;
-                                                    }
-                                                    break;
-                                                default:
-                                                    throw removeScenario.invalid();
-                                                }
-                                                TestExecutorService.submitTest(()->{
-                                                    final var seqMonitor=SequenceInitialization.Ascending.initialize(
-                                                            new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                                    final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,
-                                                            itrType);
-                                                    removeScenario.initialize(itrMonitor);
-                                                    itrMonitor.illegalMod(illegalMod);
-                                                    if(removeScenario.expectedException == null){
-                                                        if(illegalMod.expectedException == null){
-                                                            itrMonitor.verifyRemove();
-                                                            switch(removeScenario){
-                                                            case PostNext:{
-                                                                while(itrMonitor.hasNext()){
-                                                                    itrMonitor.iterateForward();
-                                                                    itrMonitor.verifyRemove();
-                                                                }
-                                                                if(!(itrMonitor instanceof MonitoredList.MonitoredListIterator<?,?>)){
-                                                                    Assertions.assertEquals(numToIterate < 2,
-                                                                            seqMonitor.isEmpty());
-                                                                    break;
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var itrType:structType.validItrTypes){
+                                            if(illegalMod.expectedException == null || checkedType.checked){
+                                                for(final var removeScenario:itrType.validItrRemoveScenarios){
+                                                    if(checkedType.checked || removeScenario.expectedException == null){
+                                                        for(final var collectionType:DataType.values()){
+                                                            for(final var size:FIB_SEQ){
+                                                                int prevNumToIterate=-1;
+                                                                positionLoop:for(final var position:POSITIONS){
+                                                                    final int numToIterate;
+                                                                    if(position >= 0
+                                                                            && (numToIterate=(int)(size * position)) != prevNumToIterate){
+                                                                        prevNumToIterate=numToIterate;
+                                                                        switch(removeScenario){
+                                                                        case PostInit:
+                                                                            if(numToIterate != 0){
+                                                                                break positionLoop;
+                                                                            }
+                                                                            break;
+                                                                        case PostNext:
+                                                                            if(itrType.iteratorInterface != OmniListIterator.class
+                                                                                    && (size == 0 || numToIterate == size)){
+                                                                                continue;
+                                                                            }
+                                                                        case PostAdd:
+                                                                        case PostPrev:
+                                                                            break;
+                                                                        case PostRemove:
+                                                                            if(size == 0
+                                                                                    && itrType.iteratorInterface != OmniListIterator.class){
+                                                                                continue;
+                                                                            }
+                                                                            break;
+                                                                        default:
+                                                                            throw removeScenario.invalid();
+                                                                        }
+                                                                        TestExecutorService.submitTest(()->{
+                                                                            final var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                                                    getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                                            final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,
+                                                                                    itrType);
+                                                                            removeScenario.initialize(itrMonitor);
+                                                                            itrMonitor.illegalMod(illegalMod);
+                                                                            if(removeScenario.expectedException == null){
+                                                                                if(illegalMod.expectedException == null){
+                                                                                    itrMonitor.verifyRemove();
+                                                                                    switch(removeScenario){
+                                                                                    case PostNext:{
+                                                                                        while(itrMonitor.hasNext()){
+                                                                                            itrMonitor.iterateForward();
+                                                                                            itrMonitor.verifyRemove();
+                                                                                        }
+                                                                                        if(!(itrMonitor instanceof MonitoredList.MonitoredListIterator<?,?>)){
+                                                                                            Assertions.assertEquals(numToIterate < 2,
+                                                                                                    seqMonitor.isEmpty());
+                                                                                            break;
+                                                                                        }
+                                                                                    }
+                                                                                    case PostPrev:{
+                                                                                        final var cast=(MonitoredList.MonitoredListIterator<?,?>)itrMonitor;
+                                                                                        while(cast.hasPrevious()){
+                                                                                            cast.iterateReverse();
+                                                                                            cast.verifyRemove();
+                                                                                        }
+                                                                                        while(cast.hasNext()){
+                                                                                            cast.iterateForward();
+                                                                                            cast.verifyRemove();
+                                                                                        }
+                                                                                        Assertions.assertTrue(seqMonitor.isEmpty());
+                                                                                        break;
+                                                                                    }
+                                                                                    default:
+                                                                                        throw removeScenario.invalid();
+                                                                                    }
+                                                                                }else{
+                                                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                                                            ()->itrMonitor.verifyRemove());
+                                                                                }
+                                                                            }else{
+                                                                                Assertions.assertThrows(removeScenario.expectedException,
+                                                                                        ()->itrMonitor.verifyRemove());
+                                                                            }
+                                                                        });
+                                                                    }
                                                                 }
                                                             }
-                                                            case PostPrev:{
-                                                                final var cast=(MonitoredList.MonitoredListIterator<?,?>)itrMonitor;
-                                                                while(cast.hasPrevious()){
-                                                                    cast.iterateReverse();
-                                                                    cast.verifyRemove();
-                                                                }
-                                                                while(cast.hasNext()){
-                                                                    cast.iterateForward();
-                                                                    cast.verifyRemove();
-                                                                }
-                                                                Assertions.assertTrue(seqMonitor.isEmpty());
-                                                                break;
-                                                            }
-                                                            default:
-                                                                throw removeScenario.invalid();
-                                                            }
-                                                        }else{
-                                                            Assertions.assertThrows(illegalMod.expectedException,
-                                                                    ()->itrMonitor.verifyRemove());
                                                         }
-                                                    }else{
-                                                        Assertions.assertThrows(removeScenario.expectedException,
-                                                                ()->itrMonitor.verifyRemove());
                                                     }
-                                                });
+                                                }
                                             }
                                         }
                                     }
@@ -551,6 +801,9 @@ public class ArrListTest{
                 }
             }
         }
+        
+        
+        
         TestExecutorService.completeAllTests("ArrListTest.testItrremove_void");
     }
     @Test
@@ -573,49 +826,105 @@ public class ArrListTest{
     }
     @Test
     public void testlistIterator_int(){
-        for(final int size:FIB_SEQ){
-            final int inc=Math.max(1,size / 10);
-            for(int tmpIndex=-inc,bound=size + inc;tmpIndex <= bound;tmpIndex+=inc){
-                final int index=tmpIndex;
-                for(final var checkedType:CheckedType.values()){
-                    if(checkedType.checked || index >= 0 && index <= size){
-                        for(final var collectionType:DataType.values()){
-                            TestExecutorService.submitTest(()->{
-                                final var monitor=SequenceInitialization.Ascending
-                                        .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                if(index >= 0 && index <= size){
-                                    final var itrMonitor=monitor.getMonitoredListIterator(index);
-                                    monitor.verifyCollectionState();
-                                    itrMonitor.verifyIteratorState();
-                                }else{
-                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
-                                        try{
-                                            monitor.getMonitoredListIterator(index);
-                                        }finally{
-                                            monitor.verifyCollectionState();
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final int size:FIB_SEQ){
+                                            final int inc=Math.max(1,size / 10);
+                                            for(int tmpIndex=-inc,bound=size + inc;tmpIndex <= bound;tmpIndex+=inc){
+                                                final int index=tmpIndex;
+                                                
+                                                if(checkedType.checked || index >= 0 && index <= size){
+                                                    for(final var collectionType:DataType.values()){
+                                                        TestExecutorService.submitTest(()->{
+                                                            final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                            
+                                                            
+                                                            
+                                                            if(illegalMod.expectedException==null) {
+                                                                if(index >= 0 && index <= size){
+                                                                    final var itrMonitor=monitor.getMonitoredListIterator(index);
+                                                                    monitor.verifyCollectionState();
+                                                                    itrMonitor.verifyIteratorState();
+                                                                }else{
+                                                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+                                                                        try{
+                                                                            monitor.getMonitoredListIterator(index);
+                                                                        }finally{
+                                                                            monitor.verifyCollectionState();
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }else {
+                                                                monitor.illegalMod(illegalMod);
+                                                                Assertions.assertThrows(illegalMod.expectedException,()->{
+                                                                    try{
+                                                                        monitor.getMonitoredListIterator(index);
+                                                                    }finally{
+                                                                        monitor.verifyCollectionState();
+                                                                    }
+                                                                });
+                                                            }
+                                                            
+                                                        });
+                                                    }
+                                                }
+                                                
+                                            }
                                         }
-                                    });
+                                    }
                                 }
-                            });
+                            }
                         }
                     }
                 }
             }
         }
+        
+        
+        
         TestExecutorService.completeAllTests("ArrListTest.testlistIterator_int");
     }
     @Test
     public void testlistIterator_void(){
-        for(final int size:FIB_SEQ){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final var collectionType:DataType.values()){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        final var itrMonitor=monitor.getMonitoredListIterator();
-                        monitor.verifyCollectionState();
-                        itrMonitor.verifyIteratorState();
-                    });
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final var size:FIB_SEQ){
+                                                TestExecutorService.submitTest(()->{
+                                                  final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                  try{
+                                                      if(illegalMod.expectedException==null) {
+                                                          monitor.getMonitoredListIterator().verifyIteratorState();
+                                                          
+                                                      }else {
+                                                          monitor.illegalMod(illegalMod);
+                                                          Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredListIterator);
+                                                      }
+                                                  }finally {
+                                                      monitor.verifyCollectionState();
+                                                  }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -623,43 +932,58 @@ public class ArrListTest{
     }
     @Test
     public void testListItradd_val(){
-        for(final var checkedType:CheckedType.values()){
-            for(final var collectionType:DataType.values()){
-                for(final var inputType:collectionType.mayBeAddedTo()){
-                    for(final var functionCallType:FunctionCallType.values()){
-                        if(inputType != DataType.REF || !functionCallType.boxed){
-                            for(final var initCapacity:INIT_CAPACITIES){
-                                for(final var position:POSITIONS){
-                                    if(position >= 0){
-                                        TestExecutorService.submitTest(()->{
-                                            final var seqMonitor=new ArrListMonitor(checkedType,collectionType,
-                                                    initCapacity);
-                                            final var itrMonitor=seqMonitor.getMonitoredListIterator();
-                                            for(int i=0;;){
-                                                itrMonitor.verifyAdd(inputType.convertValUnchecked(i),inputType,
-                                                        functionCallType);
-                                                if(++i == 1000){
-                                                    break;
-                                                }
-                                                final double dI=i;
-                                                double currPosition;
-                                                while((currPosition=itrMonitor.nextIndex() / dI) < position
-                                                        && itrMonitor.hasNext()){
-                                                    itrMonitor.iterateForward();
-                                                }
-                                                while(currPosition > position && itrMonitor.hasPrevious()){
-                                                    itrMonitor.iterateReverse();
-                                                    currPosition=itrMonitor.nextIndex() / dI;
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final var inputType:collectionType.mayBeAddedTo()){
+                                                for(final var functionCallType:FunctionCallType.values()){
+                                                    if(inputType != DataType.REF || !functionCallType.boxed){
+                                                        for(final var initCapacity:INIT_CAPACITIES){
+                                                            for(final var position:POSITIONS){
+                                                                if(position >= 0){
+                                                                    TestExecutorService.submitTest(()->{
+                                                                        final var seqMonitor=getMonitoredList(collectionType,checkedType,structType,initCapacity,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                        final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                                                        for(int i=0;;){
+                                                                            itrMonitor.verifyAdd(inputType.convertValUnchecked(i),inputType,
+                                                                                    functionCallType);
+                                                                            if(++i == 1000){
+                                                                                break;
+                                                                            }
+                                                                            final double dI=i;
+                                                                            double currPosition;
+                                                                            while((currPosition=itrMonitor.nextIndex() / dI) < position
+                                                                                    && itrMonitor.hasNext()){
+                                                                                itrMonitor.iterateForward();
+                                                                            }
+                                                                            while(currPosition > position && itrMonitor.hasPrevious()){
+                                                                                itrMonitor.iterateReverse();
+                                                                                currPosition=itrMonitor.nextIndex() / dI;
+                                                                            }
+                                                                        }
+                                                                        if(illegalMod.expectedException!=null) {
+                                                                            itrMonitor.illegalMod(illegalMod);
+                                                                            Assertions.assertThrows(illegalMod.expectedException,()->itrMonitor.verifyAdd(inputType.convertValUnchecked(1000),inputType,functionCallType));
+                                                                            //for good measure, do it again with an empty list
+                                                                            final var itrMonitor2=getMonitoredList(collectionType,checkedType,structType,initCapacity,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc).getMonitoredListIterator();
+                                                                            itrMonitor2.illegalMod(illegalMod);
+                                                                            Assertions.assertThrows(illegalMod.expectedException,()->itrMonitor2.verifyAdd(inputType.convertValUnchecked(1000),inputType,functionCallType));
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
-                                            if(checkedType.checked){
-                                                itrMonitor.illegalMod(IllegalModification.ModCollection);
-                                                Assertions.assertThrows(
-                                                        IllegalModification.ModCollection.expectedException,
-                                                        ()->itrMonitor.verifyAdd(inputType.convertValUnchecked(1000),
-                                                                inputType,functionCallType));
-                                            }
-                                        });
+                                        }
                                     }
                                 }
                             }
@@ -672,17 +996,27 @@ public class ArrListTest{
     }
     @Test
     public void testListItrhasPrevious_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var checkedType:CheckedType.values()){
-                for(final var size:FIB_SEQ){
-                    TestExecutorService.submitTest(()->{
-                        final var seqMonitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
-                        while(itrMonitor.verifyHasPrevious()){
-                            itrMonitor.iterateReverse();
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){   
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(final var size:FIB_SEQ){
+                                        TestExecutorService.submitTest(()->{
+                                            final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                            final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                                            while(itrMonitor.verifyHasPrevious()){
+                                                itrMonitor.iterateReverse();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
                         }
-                    });
+                    }
                 }
             }
         }
@@ -690,17 +1024,27 @@ public class ArrListTest{
     }
     @Test
     public void testListItrnextIndex_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var checkedType:CheckedType.values()){
-                for(final var size:FIB_SEQ){
-                    TestExecutorService.submitTest(()->{
-                        final var seqMonitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        final var itrMonitor=seqMonitor.getMonitoredListIterator();
-                        while(itrMonitor.verifyNextIndex() < size){
-                            itrMonitor.iterateForward();
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){   
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(final var size:FIB_SEQ){
+                                        TestExecutorService.submitTest(()->{
+                                            final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                            final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                            while(itrMonitor.verifyNextIndex() < size){
+                                                itrMonitor.iterateForward();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
                         }
-                    });
+                    }
                 }
             }
         }
@@ -708,31 +1052,43 @@ public class ArrListTest{
     }
     @Test
     public void testListItrprevious_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var outputType:collectionType.validOutputTypes()){
-                for(final var illegalMod:IteratorType.BidirectionalItr.validPreMods){
-                    for(final var checkedType:CheckedType.values()){
-                        if(illegalMod.expectedException == null || checkedType.checked){
-                            for(final var size:FIB_SEQ){
-                                if(checkedType.checked || size > 0){
-                                    TestExecutorService.submitTest(()->{
-                                        final var seqMonitor=SequenceInitialization.Ascending
-                                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                        final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
-                                        itrMonitor.illegalMod(illegalMod);
-                                        if(illegalMod.expectedException == null){
-                                            while(itrMonitor.hasPrevious()){
-                                                itrMonitor.verifyPrevious(outputType);
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            final var itrType=structType==StructType.ArrList?IteratorType.BidirectionalItr:IteratorType.SubBidirectionalItr;
+            for(final var checkedType:CheckedType.values()){
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(final var outputType:collectionType.validOutputTypes()){
+                                        for(final var illegalMod:itrType.validPreMods){
+                                            if(illegalMod.expectedException == null || checkedType.checked){
+                                                for(final var size:FIB_SEQ){
+                                                    if(checkedType.checked || size > 0){
+                                                        TestExecutorService.submitTest(()->{
+                                                            final var seqMonitor=SequenceInitialization.Ascending.initialize(
+                                                                    getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                            final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                                                            itrMonitor.illegalMod(illegalMod);
+                                                            if(illegalMod.expectedException == null){
+                                                                while(itrMonitor.hasPrevious()){
+                                                                    itrMonitor.verifyPrevious(outputType);
+                                                                }
+                                                                if(checkedType.checked){
+                                                                    Assertions.assertThrows(NoSuchElementException.class,
+                                                                            ()->itrMonitor.verifyPrevious(outputType));
+                                                                }
+                                                            }else{
+                                                                Assertions.assertThrows(illegalMod.expectedException,
+                                                                        ()->itrMonitor.verifyPrevious(outputType));
+                                                            }
+                                                        });
+                                                    }
+                                                }
                                             }
-                                            if(checkedType.checked){
-                                                Assertions.assertThrows(NoSuchElementException.class,
-                                                        ()->itrMonitor.verifyPrevious(outputType));
-                                            }
-                                        }else{
-                                            Assertions.assertThrows(illegalMod.expectedException,
-                                                    ()->itrMonitor.verifyPrevious(outputType));
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -744,17 +1100,27 @@ public class ArrListTest{
     }
     @Test
     public void testListItrpreviousIndex_void(){
-        for(final var collectionType:DataType.values()){
-            for(final var checkedType:CheckedType.values()){
-                for(final var size:FIB_SEQ){
-                    TestExecutorService.submitTest(()->{
-                        final var seqMonitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
-                        while(itrMonitor.verifyPreviousIndex() > 0){
-                            itrMonitor.iterateReverse();
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){   
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var collectionType:DataType.values()){
+                                    for(final var size:FIB_SEQ){
+                                        TestExecutorService.submitTest(()->{
+                                            final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                            final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                                            while(itrMonitor.verifyPreviousIndex() > 0){
+                                                itrMonitor.iterateReverse();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
                         }
-                    });
+                    }
                 }
             }
         }
@@ -762,45 +1128,57 @@ public class ArrListTest{
     }
     @Test
     public void testListItrset_val(){
-        for(final var illegalMod:IteratorType.BidirectionalItr.validPreMods){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            final var itrType=structType==StructType.ArrList?IteratorType.BidirectionalItr:IteratorType.SubBidirectionalItr;
             for(final var checkedType:CheckedType.values()){
-                if(illegalMod.expectedException == null || checkedType.checked){
-                    for(final var removeScenario:IteratorType.BidirectionalItr.validItrRemoveScenarios){
-                        if(checkedType.checked || removeScenario.expectedException == null){
-                            for(final var collectionType:DataType.values()){
-                                for(var inputType:collectionType.mayBeAddedTo()){
-                                    for(var functionCallType:FunctionCallType.values()){
-                                        if(inputType != DataType.REF || !functionCallType.boxed){
-                                            for(final var size:FIB_SEQ){
-                                                TestExecutorService.submitTest(()->{
-                                                    final var seqMonitor=SequenceInitialization.Ascending.initialize(
-                                                            new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                                    final var itrMonitor=seqMonitor.getMonitoredListIterator();
-                                                    removeScenario.initialize(itrMonitor);
-                                                    itrMonitor.illegalMod(illegalMod);
-                                                    if(removeScenario.expectedException == null){
-                                                        if(illegalMod.expectedException == null){
-                                                            int i=1;
-                                                            itrMonitor.verifySet(inputType.convertValUnchecked(i),
-                                                                    inputType,functionCallType);
-                                                            while(itrMonitor.hasNext()){
-                                                                itrMonitor.iterateForward();
-                                                                itrMonitor.verifySet(inputType.convertValUnchecked(++i),
-                                                                        inputType,functionCallType);
+                for(final var rootPreAlloc:buffers){
+                    for(final var parentPreAlloc:buffers){
+                        for(final var rootPostAlloc:buffers){
+                            for(final var parentPostAlloc:buffers){
+                                for(final var illegalMod:itrType.validPreMods){
+                                    if(illegalMod.expectedException == null || checkedType.checked){
+                                        for(final var removeScenario:itrType.validItrRemoveScenarios){
+                                            if(checkedType.checked || removeScenario.expectedException == null){
+                                                for(final var collectionType:DataType.values()){
+                                                    for(final var inputType:collectionType.mayBeAddedTo()){
+                                                        for(final var functionCallType:FunctionCallType.values()){
+                                                            if(inputType != DataType.REF || !functionCallType.boxed){
+                                                                for(final var size:FIB_SEQ){
+                                                                    TestExecutorService.submitTest(()->{
+                                                                        final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+
+                                                                        final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                                                        removeScenario.initialize(itrMonitor);
+                                                                        itrMonitor.illegalMod(illegalMod);
+                                                                        if(removeScenario.expectedException == null){
+                                                                            if(illegalMod.expectedException == null){
+                                                                                int i=1;
+                                                                                itrMonitor.verifySet(inputType.convertValUnchecked(i),
+                                                                                        inputType,functionCallType);
+                                                                                while(itrMonitor.hasNext()){
+                                                                                    itrMonitor.iterateForward();
+                                                                                    itrMonitor.verifySet(inputType.convertValUnchecked(++i),
+                                                                                            inputType,functionCallType);
+                                                                                }
+                                                                            }else{
+                                                                                Assertions.assertThrows(illegalMod.expectedException,
+                                                                                        ()->itrMonitor.verifySet(
+                                                                                                inputType.convertValUnchecked(1),inputType,
+                                                                                                functionCallType));
+                                                                            }
+                                                                        }else{
+                                                                            Assertions.assertThrows(removeScenario.expectedException,
+                                                                                    ()->itrMonitor.verifySet(
+                                                                                            inputType.convertValUnchecked(1),inputType,
+                                                                                            functionCallType));
+                                                                        }
+                                                                    });
+                                                                }
                                                             }
-                                                        }else{
-                                                            Assertions.assertThrows(illegalMod.expectedException,
-                                                                    ()->itrMonitor.verifySet(
-                                                                            inputType.convertValUnchecked(1),inputType,
-                                                                            functionCallType));
                                                         }
-                                                    }else{
-                                                        Assertions.assertThrows(removeScenario.expectedException,
-                                                                ()->itrMonitor.verifySet(
-                                                                        inputType.convertValUnchecked(1),inputType,
-                                                                        functionCallType));
                                                     }
-                                                });
+                                                }
                                             }
                                         }
                                     }
@@ -820,182 +1198,104 @@ public class ArrListTest{
             if((seqSize=collectionType.massiveToStringThreshold + 1) == 0){
                 continue;
             }
-            OmniList<?> seq;
+            OmniList<?> list;
+            OmniStack<?> stack;
             switch(collectionType){
             case BOOLEAN:{
                 boolean[] arr;
-                seq=new BooleanArrSeq.UncheckedList(seqSize,arr=new boolean[seqSize]);
+                list=new BooleanArrSeq.UncheckedList(seqSize,arr=new boolean[seqSize]);
+                stack=new BooleanArrSeq.UncheckedStack(seqSize,arr);
                 for(int i=0;i < seqSize;++i){
                     arr[i]=true;
                 }
                 break;
             }
             case BYTE:{
-                seq=new ByteArrSeq.UncheckedList(seqSize,new byte[seqSize]);
+                byte[] arr;
+                list=new ByteArrSeq.UncheckedList(seqSize,arr=new byte[seqSize]);
+                stack=new ByteArrSeq.UncheckedStack(seqSize,arr);
                 break;
             }
             case SHORT:{
-                seq=new ShortArrSeq.UncheckedList(seqSize,new short[seqSize]);
+                short[] arr;
+                list=new ShortArrSeq.UncheckedList(seqSize,arr=new short[seqSize]);
+                stack=new ShortArrSeq.UncheckedStack(seqSize,arr);
                 break;
             }
             case INT:{
-                seq=new IntArrSeq.UncheckedList(seqSize,new int[seqSize]);
+                int[] arr;
+                list=new IntArrSeq.UncheckedList(seqSize,arr=new int[seqSize]);
+                stack=new IntArrSeq.UncheckedStack(seqSize,arr);
                 break;
             }
             case LONG:{
-                seq=new LongArrSeq.UncheckedList(seqSize,new long[seqSize]);
+                long[] arr;
+                list=new LongArrSeq.UncheckedList(seqSize,arr=new long[seqSize]);
+                stack=new LongArrSeq.UncheckedStack(seqSize,arr);
                 break;
             }
             case FLOAT:{
-                seq=new FloatArrSeq.UncheckedList(seqSize,new float[seqSize]);
+                float[] arr;
+                list=new FloatArrSeq.UncheckedList(seqSize,arr=new float[seqSize]);
+                stack=new FloatArrSeq.UncheckedStack(seqSize,arr);
                 break;
             }
             default:
                 throw collectionType.invalid();
             }
-            collectionType.verifyMASSIVEToString(seq.toString(),seqSize,
-                    "ArrListTest." + collectionType + ".testMASSIVEtoString");
+            collectionType.verifyMASSIVEToString(list.toString(),seqSize,"ArrListTest.ArrList." + collectionType + ".testMASSIVEtoString");
+            collectionType.verifyMASSIVEToString(stack.toString(),seqSize,"ArrListTest.ArrStack." + collectionType + ".testMASSIVEtoString");
+            collectionType.verifyMASSIVEToString(list.subList(0,seqSize).toString(),seqSize,"ArrListTest.SubList." + collectionType + ".testMASSIVEtoString");
         }
     }
     @Test
     public void testput_intval(){
-        for(final var collectionType:DataType.values()){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final int size:FIB_SEQ){
-                    for(final var inputType:collectionType.mayBeAddedTo()){
-                        for(final var functionCallType:FunctionCallType.values()){
-                            if(inputType != DataType.REF || !functionCallType.boxed){
-                                TestExecutorService.submitTest(()->{
-                                    final var monitor=SequenceInitialization.Ascending
-                                            .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                    if(checkedType.checked){
-                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                ()->monitor.verifyPut(-1,inputType.convertValUnchecked(0),inputType,
-                                                        functionCallType));
-                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                ()->monitor.verifyPut(size,inputType.convertValUnchecked(size + 1),
-                                                        inputType,functionCallType));
-                                    }
-                                    for(int index=0;index < size;++index){
-                                        monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),inputType,
-                                                functionCallType);
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("ArrListTest.testput_intval");
-    }
-    @Test
-    public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(monitor,functionGen)->monitor.verifyReadAndWrite(functionGen);
-        test.runAllTests("ArrListTest.testReadAndWrite");
-    }
-    @Test
-    public void testremoveAt_int(){
-        for(final var position:new int[]{-1,0,1,2,3}){
-            for(final var checkedType:CheckedType.values()){
-                if(checkedType.checked || position >= 0 && position <= 2){
-                    for(final var size:FIB_SEQ){
-                        switch(position){
-                        case 0:
-                            if(size < 1){
-                                continue;
-                            }
-                            break;
-                        case 1:
-                            if(size < 3){
-                                continue;
-                            }
-                            break;
-                        case 2:
-                            if(size < 2){
-                                continue;
-                            }
-                        default:
-                        }
-                        for(final var collectionType:DataType.values()){
-                            for(final var outputType:collectionType.validOutputTypes()){
-                                TestExecutorService.submitTest(()->{
-                                    final var monitor=SequenceInitialization.Ascending
-                                            .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                    switch(position){
-                                    case -1:
-                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                ()->monitor.verifyRemoveAt(-1,outputType));
-                                        break;
-                                    case 3:
-                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                ()->monitor.verifyRemoveAt(size,outputType));
-                                        break;
-                                    case 0:
-                                        for(int i=0;i < size;++i){
-                                            monitor.verifyRemoveAt(0,outputType);
-                                        }
-                                        break;
-                                    case 1:{
-                                        for(int i=0;i < size;++i){
-                                            monitor.verifyRemoveAt((size - i) / 2,outputType);
-                                        }
-                                        break;
-                                    }
-                                    case 2:
-                                        for(int i=0;i < size;++i){
-                                            monitor.verifyRemoveAt(size - i - 1,outputType);
-                                        }
-                                        break;
-                                    default:
-                                        throw new UnsupportedOperationException("Unknown position " + position);
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        TestExecutorService.completeAllTests("ArrListTest.testremoveAt_int");
-    }
-    @Test
-    public void testremoveIf_Predicate(){
-        for(final var filterGen:StructType.ArrList.validMonitoredRemoveIfPredicateGens){
-            for(final int size:EXTENDED_FIB_SEQ){
-                for(final var checkedType:CheckedType.values()){
-                    if(size == 0 || checkedType.checked || filterGen.expectedException == null){
-                        for(final var collectionType:DataType.values()){
-                            final int initValBound=collectionType == DataType.BOOLEAN?1:0;
-                            for(final var functionCallType:FunctionCallType.values()){
-                                if(collectionType != DataType.REF || !functionCallType.boxed){
-                                    long randSeedBound;
-                                    double[] thresholdArr;
-                                    if(filterGen.randomized && size > 0 && !functionCallType.boxed){
-                                        randSeedBound=100;
-                                        thresholdArr=RANDOM_THRESHOLDS;
-                                    }else{
-                                        randSeedBound=0;
-                                        thresholdArr=NON_RANDOM_THRESHOLD;
-                                    }
-                                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                                        final long randSeed=tmpRandSeed;
-                                        for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-                                            final int initVal=tmpInitVal;
-                                            for(final var threshold:thresholdArr){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            for(final int size:FIB_SEQ){
                                                 TestExecutorService.submitTest(()->{
-                                                    final var monitor=SequenceInitialization.Ascending.initialize(
-                                                            new ArrListMonitor(checkedType,collectionType,size),size,
-                                                            initVal);
-                                                    final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
-                                                            threshold,randSeed);
-                                                    if(filterGen.expectedException == null || size == 0){
-                                                        monitor.verifyRemoveIf(filter,functionCallType);
-                                                    }else{
-                                                        Assertions.assertThrows(filterGen.expectedException,
-                                                                ()->monitor.verifyRemoveIf(filter,functionCallType));
+                                                    var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                    monitor.illegalMod(illegalMod);
+                                                    if(illegalMod.expectedException==null) {
+                                                        for(final var inputType:collectionType.mayBeAddedTo()){
+                                                            for(final var functionCallType:FunctionCallType.values()){
+                                                                if(inputType != DataType.REF || !functionCallType.boxed){
+                                                                    if(checkedType.checked) {
+                                                                      Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                                              ()->monitor.verifyPut(-1,inputType.convertValUnchecked(0),inputType,
+                                                                              functionCallType));
+                                                                      Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                                              ()->monitor.verifyPut(size,inputType.convertValUnchecked(size + 1),
+                                                                                      inputType,functionCallType));
+                                                                    }
+                                                                    for(int index=0;index < size;++index){
+                                                                          monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),inputType,
+                                                                                  functionCallType);
+                                                                      }
+                                                                }
+                                                            }
+                                                        }
+                                                    }else {
+                                                        for(final var inputType:collectionType.mayBeAddedTo()){
+                                                            for(final var functionCallType:FunctionCallType.values()){
+                                                                if(inputType != DataType.REF || !functionCallType.boxed){
+                                                                    for(int tmpIndex=-1;tmpIndex<=size;++tmpIndex) {
+                                                                        final int index=tmpIndex;
+                                                                        Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),inputType,functionCallType));
+                                                                    }
+                                                                }
+                                                            }
+                                                        }  
                                                     }
-                                                });
+                                                });  
                                             }
                                         }
                                     }
@@ -1006,47 +1306,104 @@ public class ArrListTest{
                 }
             }
         }
-        TestExecutorService.completeAllTests("ArrListTest.testremoveIf_Predicate");
+        
+        TestExecutorService.completeAllTests("ArrListTest.testput_intval");
     }
     @Test
-    public void testremoveVal_val(){
-        final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize)->{
-            if(monitoredObjectGen == null){
-                Assertions.assertEquals(position >= 0,
-                        monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
+    public void testReadAndWrite(){
+        final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+            if(illegalMod.expectedException == null){
+                if(functionGen.expectedException == null){
+                    Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
+                }else{
+                    Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+                }
             }else{
-                monitor.verifyThrowingRemoveVal(monitoredObjectGen);
+                monitor.illegalMod(illegalMod);
+                Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyReadAndWrite(functionGen));
             }
         };
-        test.runAllTests("ArrListTest.testremoveVal_val");
+        test.runAllTests("ArrListTest.testReadAndWrite",0,EnumSet.of(FunctionCallType.Unboxed));
     }
     @Test
-    public void testreplaceAll_UnaryOperator(){
-        for(final var functionGen:StructType.ArrList.validMonitoredFunctionGens){
+    public void testremoveAt_int(){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final var size:FIB_SEQ){
-                    if(size == 0 || checkedType.checked || functionGen.expectedException == null){
-                        for(final var functionCallType:FunctionCallType.values()){
-                            for(final var collectionType:DataType.values()){
-                                if(collectionType != DataType.REF || !functionCallType.boxed){
-                                    final int initValBound=collectionType == DataType.BOOLEAN && size > 0?1:0;
-                                    final long randSeedBound=size > 1 && functionGen.randomized
-                                            && !functionCallType.boxed?100:0;
-                                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                                        final long randSeed=tmpRandSeed;
-                                        for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-                                            final int initVal=tmpInitVal;
-                                            TestExecutorService.submitTest(()->{
-                                                final var monitor=SequenceInitialization.Ascending.initialize(
-                                                        new ArrListMonitor(checkedType,collectionType,size),size,
-                                                        initVal);
-                                                if(functionGen.expectedException == null || size == 0){
-                                                    monitor.verifyReplaceAll(functionGen,functionCallType,randSeed);
-                                                }else{
-                                                    Assertions.assertThrows(functionGen.expectedException,()->monitor
-                                                            .verifyReplaceAll(functionGen,functionCallType,randSeed));
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var position:illegalMod.expectedException==null?new int[]{-1,0,1,2,3}:new int[] {-1}){
+                                            
+                                            if(checkedType.checked || position >= 0 && position <= 2){
+                                                for(final var size:FIB_SEQ){
+                                                    switch(position){
+                                                    case 0:
+                                                        if(size < 1){
+                                                            continue;
+                                                        }
+                                                        break;
+                                                    case 1:
+                                                        if(size < 3){
+                                                            continue;
+                                                        }
+                                                        break;
+                                                    case 2:
+                                                        if(size < 2){
+                                                            continue;
+                                                        }
+                                                    default:
+                                                    }
+                                                    for(final var collectionType:DataType.values()){
+                                                        for(final var outputType:collectionType.validOutputTypes()){
+                                                            TestExecutorService.submitTest(()->{
+                                                                var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                               
+                                                                if(illegalMod.expectedException==null) {
+                                                                    switch(position){
+                                                                    case -1:
+                                                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                                                ()->monitor.verifyRemoveAt(-1,outputType));
+                                                                        break;
+                                                                    case 3:
+                                                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                                                ()->monitor.verifyRemoveAt(size,outputType));
+                                                                        break;
+                                                                    case 0:
+                                                                        for(int i=0;i < size;++i){
+                                                                            monitor.verifyRemoveAt(0,outputType);
+                                                                        }
+                                                                        break;
+                                                                    case 1:{
+                                                                        for(int i=0;i < size;++i){
+                                                                            monitor.verifyRemoveAt((size - i) / 2,outputType);
+                                                                        }
+                                                                        break;
+                                                                    }
+                                                                    case 2:
+                                                                        for(int i=0;i < size;++i){
+                                                                            monitor.verifyRemoveAt(size - i - 1,outputType);
+                                                                        }
+                                                                        break;
+                                                                    default:
+                                                                        throw new UnsupportedOperationException("Unknown position " + position);
+                                                                    }
+                                                                }else {
+                                                                    monitor.illegalMod(illegalMod);
+                                                                    for(int tmpIndex=-1;tmpIndex<=size;++tmpIndex) {
+                                                                        final int index=tmpIndex;
+                                                                        Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyRemoveAt(index,outputType));
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
                                                 }
-                                            });
+                                            }
+                                            
                                         }
                                     }
                                 }
@@ -1056,60 +1413,235 @@ public class ArrListTest{
                 }
             }
         }
-        TestExecutorService.completeAllTests("ArrListTest.testreplaceAll_UnaryOperator");
+        
+        
+        
+        
+        
+        TestExecutorService.completeAllTests("ArrListTest.testremoveAt_int");
     }
     @Test
-    public void testset_intval(){
-        for(final var collectionType:DataType.values()){
+    public void testremoveIf_Predicate(){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final int size:FIB_SEQ){
-                    for(final var functionCallType:FunctionCallType.values()){
-                        if(collectionType != DataType.REF || !functionCallType.boxed){
-                            TestExecutorService.submitTest(()->{
-                                final var monitor=SequenceInitialization.Ascending
-                                        .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                if(checkedType.checked){
-                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(-1,
-                                            collectionType.convertValUnchecked(0),functionCallType));
-                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(size,
-                                            collectionType.convertValUnchecked(size + 1),functionCallType));
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var filterGen:structType.validMonitoredRemoveIfPredicateGens){
+                                            for(final int size:EXTENDED_FIB_SEQ){
+                                                
+                                                if(size == 0 || checkedType.checked || filterGen.expectedException == null){
+                                                    for(final var collectionType:DataType.values()){
+                                                        final int initValBound=collectionType == DataType.BOOLEAN?1:0;
+                                                        for(final var functionCallType:FunctionCallType.values()){
+                                                            if(collectionType != DataType.REF || !functionCallType.boxed){
+                                                                long randSeedBound;
+                                                                double[] thresholdArr;
+                                                                if(filterGen.randomized && size > 0 && !functionCallType.boxed){
+                                                                    randSeedBound=100;
+                                                                    thresholdArr=RANDOM_THRESHOLDS;
+                                                                }else{
+                                                                    randSeedBound=0;
+                                                                    thresholdArr=NON_RANDOM_THRESHOLD;
+                                                                }
+                                                                for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                                                    final long randSeed=tmpRandSeed;
+                                                                    for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
+                                                                        final int initVal=tmpInitVal;
+                                                                        for(final var threshold:thresholdArr){
+                                                                            TestExecutorService.submitTest(()->{
+                                                                                var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,initVal);
+
+                                                                                final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
+                                                                                        threshold,randSeed);
+                                                                                if(illegalMod.expectedException==null) {
+                                                                                    if(filterGen.expectedException == null || size == 0){
+                                                                                        monitor.verifyRemoveIf(filter,functionCallType);
+                                                                                    }else{
+                                                                                        Assertions.assertThrows(filterGen.expectedException,
+                                                                                                ()->monitor.verifyRemoveIf(filter,functionCallType));
+                                                                                    }
+                                                                                }else {
+                                                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                                                            ()->monitor.verifyRemoveIf(filter,functionCallType));
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                                for(int index=0;index < size;++index){
-                                    monitor.verifySet(index,collectionType.convertValUnchecked(index + 1),
-                                            functionCallType);
-                                }
-                            });
+                            }
                         }
                     }
                 }
             }
         }
+        
+        
+        
+        TestExecutorService.completeAllTests("ArrListTest.testremoveIf_Predicate");
+    }
+    @Test
+    public void testremoveVal_val(){
+        final QueryTest test=new QueryTest(){
+            @Override
+            public void callAndVerifyResult(MonitoredList<?,?,?> monitor,QueryVal queryVal,DataType inputType,
+                    QueryCastType castType,QueryValModification modification,MonitoredObjectGen monitoredObjectGen,
+                    double position,int seqSize){
+                if(monitoredObjectGen == null){
+                    Assertions.assertEquals(position >= 0,
+                            monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
+                }else{
+                    monitor.verifyThrowingRemoveVal(monitoredObjectGen);
+                }
+            }
+            @Override
+            public boolean cmeFilter(IllegalModification illegalMod,DataType inputType,DataType collectionType,
+                    QueryVal queryVal,QueryVal.QueryValModification modification,QueryCastType castType){
+                return illegalMod.expectedException == null || collectionType != DataType.REF
+                        && queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
+            }
+        };
+        test.runAllTests("ArrListTest.testremoveVal_val");
+    }
+    @Test
+    public void testreplaceAll_UnaryOperator(){
+        final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+            if(illegalMod.expectedException == null){
+                if(functionGen.expectedException == null || monitor.isEmpty()){
+                    monitor.verifyReplaceAll(functionGen,functionCallType,randSeed);
+                }else{
+                    Assertions.assertThrows(functionGen.expectedException,
+                            ()->monitor.verifyReplaceAll(functionGen,functionCallType,randSeed));
+                }
+            }else{
+                monitor.illegalMod(illegalMod);
+                Assertions.assertThrows(illegalMod.expectedException,
+                        ()->monitor.verifyReplaceAll(functionGen,functionCallType,randSeed));
+            }
+        };
+        test.runAllTests("ArrListTest.testreplaceAll_UnaryOperator",100,EnumSet.allOf(FunctionCallType.class));
+    }
+    @Test
+    public void testset_intval(){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            
+                                            for(final int size:FIB_SEQ){
+                                                
+                                                        TestExecutorService.submitTest(()->{
+                                                            var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                            if(illegalMod.expectedException==null) {
+                                                                for(final var functionCallType:FunctionCallType.values()){
+                                                                    if(collectionType != DataType.REF || !functionCallType.boxed){
+                                                                        if(checkedType.checked){
+                                                                            Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(-1,
+                                                                                    collectionType.convertValUnchecked(0),functionCallType));
+                                                                            Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(size,
+                                                                                    collectionType.convertValUnchecked(size + 1),functionCallType));
+                                                                        }
+                                                                        for(int index=0;index < size;++index){
+                                                                            monitor.verifySet(index,collectionType.convertValUnchecked(index + 1),
+                                                                                    functionCallType);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }else {
+                                                                monitor.illegalMod(illegalMod);
+                                                                for(final var functionCallType:FunctionCallType.values()){
+                                                                    if(collectionType != DataType.REF || !functionCallType.boxed){
+                                                                        for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                                                            final int index=tmpIndex;
+                                                                            Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifySet(index,collectionType.convertValUnchecked(index + 1),
+                                                                                    functionCallType));
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            
+                                                        });
+                                           
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
         TestExecutorService.completeAllTests("ArrListTest.testset_intval");
     }
     @Test
     public void testsize_void(){
-        final BasicTest test=(monitor)->monitor.verifySize();
+        final BasicTest test=MonitoredList::verifySize;
         test.runAllTests("ArrListTest.testsize_void");
     }
     @Test
     public void testsort_Comparator(){
-        for(final var size:FIB_SEQ){
-            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
-                for(final var checkedType:CheckedType.values()){
-                    if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                        for(final var functionCallType:FunctionCallType.values()){
-                            for(final var collectionType:DataType.values()){
-                                if(collectionType != DataType.REF && comparatorGen.validWithPrimitive
-                                        || collectionType == DataType.REF && !functionCallType.boxed){
-                                    TestExecutorService.submitTest(()->{
-                                        final var monitor=new ArrListMonitor(checkedType,collectionType,size);
-                                        if(size < 2 || comparatorGen.expectedException == null){
-                                            monitor.verifyStableSort(size,comparatorGen,functionCallType);
-                                        }else{
-                                            Assertions.assertThrows(comparatorGen.expectedException,
-                                                    ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var comparatorGen:structType.validComparatorGens){
+                                                if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
+                                                    for(final var functionCallType:FunctionCallType.values()){
+                                                        for(final var collectionType:DataType.values()){
+                                                            if(collectionType != DataType.REF && comparatorGen.validWithPrimitive
+                                                                    || collectionType == DataType.REF && !functionCallType.boxed){
+                                                                TestExecutorService.submitTest(()->{
+                                                                    var monitor=getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                    if(illegalMod.expectedException==null) {
+                                                                      if(size < 2 || comparatorGen.expectedException == null){
+                                                                          monitor.verifyStableSort(size,comparatorGen,functionCallType);
+                                                                      }else{
+                                                                          Assertions.assertThrows(comparatorGen.expectedException,
+                                                                                  ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
+                                                                      }
+                                                                    }else {
+                                                                        monitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                                                ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
+                                            }
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -1121,22 +1653,45 @@ public class ArrListTest{
     }
     @Test
     public void teststableAscendingSort_void(){
-        for(final var size:FIB_SEQ){
-            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
-                if(comparatorGen.validWithNoComparator){
-                    for(final var checkedType:CheckedType.values()){
-                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                            for(final var collectionType:DataType.values()){
-                                if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
-                                    TestExecutorService.submitTest(()->{
-                                        final var monitor=new ArrListMonitor(checkedType,collectionType,size);
-                                        if(size < 2 || comparatorGen.expectedException == null){
-                                            monitor.verifyAscendingStableSort(size,comparatorGen);
-                                        }else{
-                                            Assertions.assertThrows(comparatorGen.expectedException,
-                                                    ()->monitor.verifyAscendingStableSort(size,comparatorGen));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
+                                                if(comparatorGen.validWithNoComparator){
+                                                    
+                                                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
+                                                            for(final var collectionType:DataType.values()){
+                                                                if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
+                                                                    TestExecutorService.submitTest(()->{
+                                                                        var monitor=getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                        if(illegalMod.expectedException==null) {
+                                                                          if(size < 2 || comparatorGen.expectedException == null){
+                                                                              monitor.verifyAscendingStableSort(size,comparatorGen);
+                                                                          }else{
+                                                                              Assertions.assertThrows(comparatorGen.expectedException,
+                                                                                      ()->monitor.verifyAscendingStableSort(size,comparatorGen));
+                                                                          }
+                                                                        }else {
+                                                                            monitor.illegalMod(illegalMod);
+                                                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                                                    ()->monitor.verifyAscendingStableSort(size,comparatorGen));
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    
+                                                }
+                                            }
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -1144,26 +1699,52 @@ public class ArrListTest{
                 }
             }
         }
+        
+        
+       
         TestExecutorService.completeAllTests("ArrListTest.teststableAscendingSort_void");
     }
     @Test
     public void teststableDescendingSort_void(){
-        for(final var size:FIB_SEQ){
-            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
-                if(comparatorGen.validWithNoComparator){
-                    for(final var checkedType:CheckedType.values()){
-                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                            for(final var collectionType:DataType.values()){
-                                if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
-                                    TestExecutorService.submitTest(()->{
-                                        final var monitor=new ArrListMonitor(checkedType,collectionType,size);
-                                        if(size < 2 || comparatorGen.expectedException == null){
-                                            monitor.verifyDescendingStableSort(size,comparatorGen);
-                                        }else{
-                                            Assertions.assertThrows(comparatorGen.expectedException,
-                                                    ()->monitor.verifyDescendingStableSort(size,comparatorGen));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
+                                                if(comparatorGen.validWithNoComparator){
+                                                    
+                                                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
+                                                            for(final var collectionType:DataType.values()){
+                                                                if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
+                                                                    TestExecutorService.submitTest(()->{
+                                                                        var monitor=getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                        if(illegalMod.expectedException==null) {
+                                                                          if(size < 2 || comparatorGen.expectedException == null){
+                                                                              monitor.verifyDescendingStableSort(size,comparatorGen);
+                                                                          }else{
+                                                                              Assertions.assertThrows(comparatorGen.expectedException,
+                                                                                      ()->monitor.verifyDescendingStableSort(size,comparatorGen));
+                                                                          }
+                                                                        }else {
+                                                                            monitor.illegalMod(illegalMod);
+                                                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                                                    ()->monitor.verifyDescendingStableSort(size,comparatorGen));
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    
+                                                }
+                                            }
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -1175,26 +1756,63 @@ public class ArrListTest{
     }
     @Test
     public void testsubList_intint(){
-        for(final int size:FIB_SEQ){
-            final int inc=Math.max(1,size / 10);
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(int tmpFromIndex=-inc,fromBound=size + 2 * inc;tmpFromIndex <= fromBound;tmpFromIndex+=inc){
-                    if(checkedType.checked || tmpFromIndex >= 0 && tmpFromIndex <= size){
-                        final int fromIndex=tmpFromIndex;
-                        for(int tmpToIndex=-(2 * inc),toBound=size + inc;tmpToIndex < toBound;tmpToIndex+=inc){
-                            if(checkedType.checked || tmpToIndex >= fromIndex && tmpToIndex <= size){
-                                final int toIndex=tmpToIndex;
-                                for(final var collectionType:DataType.values()){
-                                    TestExecutorService.submitTest(()->{
-                                        final var rootMonitor=SequenceInitialization.Ascending
-                                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                                        if(fromIndex >= 0 && toIndex >= fromIndex && toIndex <= size){
-                                            rootMonitor.getMonitoredSubList(fromIndex,toIndex).verifyCollectionState();
-                                        }else{
-                                            Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                    ()->rootMonitor.getMonitoredSubList(fromIndex,toIndex));
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final int size:FIB_SEQ){
+                                            final int inc=Math.max(1,size / 10);
+                                            
+                                            for(int tmpFromIndex=-inc,fromBound=size + 2 * inc;tmpFromIndex <= fromBound;tmpFromIndex+=inc){
+                                                if(checkedType.checked || tmpFromIndex >= 0 && tmpFromIndex <= size){
+                                                    final int fromIndex=tmpFromIndex;
+                                                    for(int tmpToIndex=-(2 * inc),toBound=size + inc;tmpToIndex < toBound;tmpToIndex+=inc){
+                                                        if(checkedType.checked || tmpToIndex >= fromIndex && tmpToIndex <= size){
+                                                            final int toIndex=tmpToIndex;
+                                                            for(final var collectionType:DataType.values()){
+                                                                TestExecutorService.submitTest(()->{
+                                                                    final var rootMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                                    if(illegalMod.expectedException==null) {
+                                                                        if(fromIndex >= 0 && toIndex >= fromIndex && toIndex <= size){
+                                                                            rootMonitor.getMonitoredSubList(fromIndex,toIndex).verifyCollectionState();
+                                                                        }else{
+                                                                            Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+                                                                                try{
+                                                                                    rootMonitor.getMonitoredSubList(fromIndex,toIndex);
+                                                                                }finally {
+                                                                                    rootMonitor.verifyCollectionState();
+                                                                                }
+                                                                                
+                                                                            });
+                                                                                    
+                                                                        }
+                                                                    }else {
+                                                                        rootMonitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                                                ()->{
+                                                                                    try{
+                                                                                        rootMonitor.getMonitoredSubList(fromIndex,toIndex);
+                                                                                    }finally {
+                                                                                        rootMonitor.verifyCollectionState();
+                                                                                    }
+                                                                                    
+                                                                                });
+                                                                    }
+                                                                    
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -1202,91 +1820,181 @@ public class ArrListTest{
                 }
             }
         }
+        
+        
+       
         TestExecutorService.completeAllTests("ArrListTest.testsubList_intint");
     }
     @Test
     public void testtoArray_IntFunction(){
-        final MonitoredFunctionGenTest test=(monitor,functionGen)->{
-            if(functionGen.expectedException == null){
-                monitor.verifyToArray(functionGen);
+        final MonitoredFunctionTest test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+            if(illegalMod.expectedException == null){
+                if(functionGen.expectedException == null){
+                    monitor.verifyToArray(functionGen);
+                }else{
+                    Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
+                }
             }else{
-                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
+                monitor.illegalMod(illegalMod);
+                Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyToArray(functionGen));
             }
         };
-        test.runAllTests("ArrListTest.testtoArray_IntFunction");
+        test.runAllTests("ArrListTest.testtoArray_IntFunction",0,EnumSet.of(FunctionCallType.Unboxed));
     }
     @Test
     public void testtoArray_ObjectArray(){
-        for(int tmpSize=0;tmpSize <= 15;tmpSize+=5){
-            final int size=tmpSize;
-            for(int tmpArrSize=0,tmpArrSizeBound=tmpSize + 5;tmpArrSize <= tmpArrSizeBound;++tmpArrSize){
-                final int arrSize=tmpArrSize;
-                for(final var collectionType:DataType.values()){
-                    for(final var checkedType:CheckedType.values()){
-                        TestExecutorService.submitTest(()->SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0)
-                                .verifyToArray(new Object[arrSize]));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(int tmpSize=0;tmpSize <= 15;tmpSize+=5){
+                                            final int size=tmpSize;
+                                            for(int tmpArrSize=0,tmpArrSizeBound=tmpSize + 5;tmpArrSize <= tmpArrSizeBound;++tmpArrSize){
+                                                final int arrSize=tmpArrSize;
+                                                for(final var collectionType:DataType.values()){
+                                                    
+                                                        TestExecutorService.submitTest(()->{
+                                                            var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                            if(illegalMod.expectedException==null) {
+                                                                monitor.verifyToArray(new Object[arrSize]);
+                                                            }else {
+                                                                monitor.illegalMod(illegalMod);
+                                                                Assertions.assertThrows(illegalMod.expectedException,()-> monitor.verifyToArray(new Object[arrSize]));
+                                                            }
+                                                            
+                                                        });
+                                                    
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+        
         TestExecutorService.completeAllTests("ArrListTest.testtoArray_ObjectArray");
     }
     @Test
     public void testtoArray_void(){
-        for(final var collectionType:DataType.values()){
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
             for(final var checkedType:CheckedType.values()){
-                for(final int size:FIB_SEQ){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending
-                                .initialize(new ArrListMonitor(checkedType,collectionType,size),size,0);
-                        for(final var outputType:collectionType.validOutputTypes()){
-                            outputType.verifyToArray(monitor);
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var collectionType:DataType.values()){
+                                            
+                                            for(final int size:FIB_SEQ){
+                                                TestExecutorService.submitTest(()->{
+                                                    var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,0);
+                                                    if(illegalMod.expectedException==null) {
+                                                        for(final var outputType:collectionType.validOutputTypes()){
+                                                            outputType.verifyToArray(monitor);
+                                                        }
+                                                    }else {
+                                                        monitor.illegalMod(illegalMod);
+                                                        for(var outputType:collectionType.validOutputTypes()) {
+                                                            Assertions.assertThrows(illegalMod.expectedException,()->outputType.verifyToArray(monitor));
+                                                        }
+                                                    }
+                                                    
+                                                });
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    });
+                    }
                 }
             }
         }
+        
         TestExecutorService.completeAllTests("ArrListTest.testget_int");
     }
     @Test
     public void testtoString_void(){
-        final ToStringAndHashCodeTest test=(size,collectionType,checkedType,initVal,objGen)->{
-            if(collectionType == DataType.REF && objGen.expectedException != null && size != 0){
-                final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
-                final var monitor=SequenceInitialization.Ascending.initializeWithMonitoredObj(
-                        new ArrListMonitor(checkedType,collectionType,size),size,initVal,objGen,throwSwitch);
-                Assertions.assertThrows(objGen.expectedException,()->{
-                    try{
-                        monitor.seq.toString();
-                    }finally{
-                        throwSwitch.doThrow=false;
-                        monitor.verifyCollectionState();
-                    }
-                });
-            }else{
-                SequenceInitialization.Ascending.initialize(new ArrListMonitor(checkedType,collectionType),size,initVal)
-                .verifyToString();
-            }
+        final ToStringAndHashCodeTest test=(monitor,size,initVal,objGen,illegalMod)->{
+          if(monitor.getDataType()==DataType.REF && objGen.expectedException!=null && size!=0) {
+              final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+              SequenceInitialization.Ascending.initializeWithMonitoredObj(monitor,size,initVal,objGen,throwSwitch);
+              monitor.illegalMod(illegalMod);
+              Class<? extends Throwable> expectedException=illegalMod.expectedException==null?objGen.expectedException:illegalMod.expectedException;
+              Assertions.assertThrows(expectedException,()->{
+                 try {
+                     monitor.getCollection().toString();
+                 }finally {
+                     throwSwitch.doThrow=false;
+                     monitor.verifyCollectionState();
+                 }
+              });
+          }else {
+              SequenceInitialization.Ascending.initialize(monitor,size,initVal);
+              Runnable method=()->monitor.verifyToString();
+              if(illegalMod.expectedException==null) {
+                 Assertions.assertDoesNotThrow(method::run);
+              }else {
+                  monitor.illegalMod(illegalMod);
+                  Assertions.assertThrows(illegalMod.expectedException,method::run);
+              }
+          }
         };
         test.runAllTests("ArrListTest.testtoString_void");
     }
     @Test
     public void testunstableAscendingSort_void(){
-        for(final var size:FIB_SEQ){
-            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
-                if(comparatorGen.validWithNoComparator){
-                    for(final var checkedType:CheckedType.values()){
-                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                            TestExecutorService.submitTest(()->{
-                                final var monitor=new ArrListMonitor(checkedType,DataType.REF,size);
-                                if(size < 2 || comparatorGen.expectedException == null){
-                                    monitor.verifyAscendingUnstableSort(size,comparatorGen);
-                                }else{
-                                    Assertions.assertThrows(comparatorGen.expectedException,
-                                            ()->monitor.verifyAscendingUnstableSort(size,comparatorGen));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
+                                                if(comparatorGen.validWithNoComparator){
+                                                    
+                                                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
+                                                                TestExecutorService.submitTest(()->{
+                                                                    var monitor=getMonitoredList(DataType.REF,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                    if(illegalMod.expectedException==null) {
+                                                                      if(size < 2 || comparatorGen.expectedException == null){
+                                                                          monitor.verifyAscendingUnstableSort(size,comparatorGen);
+                                                                      }else{
+                                                                          Assertions.assertThrows(comparatorGen.expectedException,
+                                                                                  ()->monitor.verifyAscendingUnstableSort(size,comparatorGen));
+                                                                      }
+                                                                    }else {
+                                                                        monitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                                                ()->monitor.verifyAscendingUnstableSort(size,comparatorGen));
+                                                                    }
+                                                                });
+                                                                
+                                                            
+                                                        }
+                                                    
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                            });
+                            }
                         }
                     }
                 }
@@ -1296,20 +2004,45 @@ public class ArrListTest{
     }
     @Test
     public void testunstableDescendingSort_void(){
-        for(final var size:FIB_SEQ){
-            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
-                if(comparatorGen.validWithNoComparator){
-                    for(final var checkedType:CheckedType.values()){
-                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                            TestExecutorService.submitTest(()->{
-                                final var monitor=new ArrListMonitor(checkedType,DataType.REF,size);
-                                if(size < 2 || comparatorGen.expectedException == null){
-                                    monitor.verifyDescendingUnstableSort(size,comparatorGen);
-                                }else{
-                                    Assertions.assertThrows(comparatorGen.expectedException,
-                                            ()->monitor.verifyDescendingUnstableSort(size,comparatorGen));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
+                                                if(comparatorGen.validWithNoComparator){
+                                                    
+                                                        if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
+                                                                TestExecutorService.submitTest(()->{
+                                                                    var monitor=getMonitoredList(DataType.REF,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                    if(illegalMod.expectedException==null) {
+                                                                      if(size < 2 || comparatorGen.expectedException == null){
+                                                                          monitor.verifyDescendingUnstableSort(size,comparatorGen);
+                                                                      }else{
+                                                                          Assertions.assertThrows(comparatorGen.expectedException,
+                                                                                  ()->monitor.verifyDescendingUnstableSort(size,comparatorGen));
+                                                                      }
+                                                                    }else {
+                                                                        monitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                                                ()->monitor.verifyDescendingUnstableSort(size,comparatorGen));
+                                                                    }
+                                                                });
+                                                                
+                                                            
+                                                        }
+                                                    
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                            });
+                            }
                         }
                     }
                 }
@@ -1319,22 +2052,45 @@ public class ArrListTest{
     }
     @Test
     public void testunstableSort_Comparator(){
-        for(final var size:FIB_SEQ){
-            for(final var comparatorGen:StructType.ArrList.validComparatorGens){
-                for(final var checkedType:CheckedType.values()){
-                    if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                        for(final var collectionType:DataType.values()){
-                            if(collectionType == DataType.REF
-                                    || comparatorGen.validWithPrimitive && collectionType != DataType.BOOLEAN){
-                                TestExecutorService.submitTest(()->{
-                                    final var monitor=new ArrListMonitor(checkedType,collectionType,size);
-                                    if(size < 2 || comparatorGen.expectedException == null){
-                                        monitor.verifyUnstableSort(size,comparatorGen);
-                                    }else{
-                                        Assertions.assertThrows(comparatorGen.expectedException,
-                                                ()->monitor.verifyUnstableSort(size,comparatorGen));
+        for(final var structType:VALID_STRUCT_TYPES){
+            final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+            for(final var checkedType:CheckedType.values()){
+                for(final var illegalMod:structType.validPreMods){
+                    if(checkedType.checked || illegalMod.expectedException == null){
+                        for(final var rootPreAlloc:buffers){
+                            for(final var parentPreAlloc:buffers){
+                                for(final var rootPostAlloc:buffers){
+                                    for(final var parentPostAlloc:buffers){
+                                        for(final var size:FIB_SEQ){
+                                            for(final var comparatorGen:structType.validComparatorGens){
+                                                if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
+                                                        for(final var collectionType:DataType.values()){
+                                                            if(collectionType == DataType.REF
+                                                                    || comparatorGen.validWithPrimitive && collectionType != DataType.BOOLEAN){
+                                                                TestExecutorService.submitTest(()->{
+                                                                    var monitor=getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc);
+                                                                    if(illegalMod.expectedException==null) {
+                                                                      if(size < 2 || comparatorGen.expectedException == null){
+                                                                          monitor.verifyUnstableSort(size,comparatorGen);
+                                                                      }else{
+                                                                          Assertions.assertThrows(comparatorGen.expectedException,
+                                                                                  ()->monitor.verifyUnstableSort(size,comparatorGen));
+                                                                      }
+                                                                    }else {
+                                                                        monitor.illegalMod(illegalMod);
+                                                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                                                ()->monitor.verifyUnstableSort(size,comparatorGen));
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    
+                                                }
+                                                
+                                            }
+                                        }
                                     }
-                                });
+                                }
                             }
                         }
                     }
@@ -1351,9 +2107,9 @@ public class ArrListTest{
         }
         TestExecutorService.reset();
     }
-    private static class ArrListMonitor extends AbstractArrSeqMonitor<OmniList<?>>
-    implements
-    MonitoredList<OmniIterator<?>,OmniListIterator<?>,OmniList<?>>{
+    static class ArrListMonitor extends AbstractArrSeqMonitor<OmniList<?>>
+            implements
+            MonitoredList<OmniIterator<?>,OmniListIterator<?>,OmniList<?>>{
         public ArrListMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
@@ -2207,12 +2963,6 @@ public class ArrListTest{
             final ArrListMonitor expectedRoot;
             final ArrSubListMonitor expectedParent;
             final OmniList<?> seq;
-            private OmniList<?> getParentSeq(){
-                if(expectedParent == null){
-                    return null;
-                }
-                return expectedParent.seq;
-            }
             int expectedRootOffset;
             int expectedSize;
             int expectedModCount;
@@ -2384,47 +3134,47 @@ public class ArrListTest{
                     case BOOLEAN:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case BYTE:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.ByteArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case CHAR:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.CharArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case DOUBLE:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.DoubleArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case FLOAT:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.FloatArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case INT:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.IntArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case LONG:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.LongArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case REF:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.RefArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     case SHORT:
                         subListUpdater=subListUpdater.andThen(
                                 subListMonitor->subListMonitor.expectedModCount=FieldAndMethodAccessor.ShortArrSeq.CheckedSubList
-                                .modCount(subListMonitor.seq));
+                                        .modCount(subListMonitor.seq));
                         break;
                     default:
                         throw dataType.invalid();
@@ -2655,7 +3405,7 @@ public class ArrListTest{
                                     FieldAndMethodAccessor.BooleanArrSeq.UncheckedSubList.root(subListMonitor.seq));
                             Assertions.assertEquals(subListMonitor.expectedRootOffset,
                                     FieldAndMethodAccessor.BooleanArrSeq.UncheckedSubList
-                                    .rootOffset(subListMonitor.seq));
+                                            .rootOffset(subListMonitor.seq));
                         });
                     }
                     break;
@@ -2725,7 +3475,7 @@ public class ArrListTest{
                                     FieldAndMethodAccessor.DoubleArrSeq.UncheckedSubList.root(subListMonitor.seq));
                             Assertions.assertEquals(subListMonitor.expectedRootOffset,
                                     FieldAndMethodAccessor.DoubleArrSeq.UncheckedSubList
-                                    .rootOffset(subListMonitor.seq));
+                                            .rootOffset(subListMonitor.seq));
                         });
                     }
                     break;
@@ -2895,7 +3645,6 @@ public class ArrListTest{
                                             }else{
                                                 ++numRemoved;
                                             }
-
                                         }
                                         break;
                                     }
@@ -2912,7 +3661,6 @@ public class ArrListTest{
                                         }else{
                                             ++numRemoved;
                                         }
-
                                     }
                                     break;
                                 }
@@ -3061,23 +3809,23 @@ public class ArrListTest{
                     ++expectedRoot.expectedModCount;
                 }else{
                     if(dataType == DataType.BOOLEAN){
-                        final var expectedArr=((BooleanArrSeq)seq).arr;
+                        final var expectedArr=((BooleanArrSeq)expectedRoot.seq).arr;
                         if(filter.retainedVals.contains(Boolean.TRUE)){
                             if(filter.retainedVals.contains(Boolean.FALSE)){
-                                int i=expectedSize - 1;
+                                int i=expectedRootOffset+expectedSize - 1;
                                 final boolean firstVal=expectedArr[i];
                                 while(expectedArr[--i] == firstVal){
                                     // we are expecting this condition to be met before expectedSize==-1. Otherwise,
                                     // something is wrong.
                                 }
                             }else{
-                                for(int i=expectedSize;--i >= 0;){
+                                for(int i=expectedRootOffset+expectedSize;--i >= expectedRootOffset;){
                                     Assertions.assertTrue(expectedArr[i]);
                                 }
                             }
                         }else{
                             if(filter.retainedVals.contains(Boolean.FALSE)){
-                                for(int i=expectedSize;--i >= 0;){
+                                for(int i=expectedRootOffset+expectedSize;--i >= expectedRootOffset;){
                                     Assertions.assertFalse(expectedArr[i]);
                                 }
                             }else{
@@ -3198,9 +3946,15 @@ public class ArrListTest{
                     throw dataType.invalid();
                 }
             }
+            private OmniList<?> getParentSeq(){
+                if(expectedParent == null){
+                    return null;
+                }
+                return expectedParent.seq;
+            }
             private abstract class AbstractItrMonitor<ITR extends OmniIterator<?>>
-            implements
-            MonitoredIterator<ITR,OmniList<?>>{
+                    implements
+                    MonitoredIterator<ITR,OmniList<?>>{
                 final ITR itr;
                 int expectedCursor;
                 AbstractItrMonitor(ITR itr,int expectedCursor){
@@ -3322,7 +4076,7 @@ public class ArrListTest{
                 }
                 @Override
                 public void updateItrNextState(){
-                    expectedLastRet=++expectedCursor;
+                    expectedLastRet=expectedCursor++;
                 }
                 @Override
                 public void updateItrRemoveState(){
@@ -3427,8 +4181,8 @@ public class ArrListTest{
                 }
             }
             private class CheckedListIteratorMonitor extends CheckedIteratorMonitor<OmniListIterator<?>>
-            implements
-            MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
+                    implements
+                    MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
                 CheckedListIteratorMonitor(OmniListIterator<?> itr,int expectedCursor){
                     super(itr,expectedCursor);
                 }
@@ -3644,8 +4398,8 @@ public class ArrListTest{
                 }
             }
             private class UncheckedListIteratorMonitor extends AbstractItrMonitor<OmniListIterator<?>>
-            implements
-            MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
+                    implements
+                    MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
                 int expectedLastRet;
                 int lastRetState=-1;
                 UncheckedListIteratorMonitor(OmniListIterator<?> itr,int expectedCursor){
@@ -3682,7 +4436,7 @@ public class ArrListTest{
                 }
                 @Override
                 public void updateItrRemoveState(){
-                    expectedRoot.updateRemoveIndexState(expectedLastRet);
+                    expectedRoot.updateRemoveIndexState(expectedCursor=expectedLastRet);
                     bubbleUpModifySize(-1);
                     lastRetState=-1;
                 }
@@ -3780,10 +4534,31 @@ public class ArrListTest{
                     }
                 }
             }
+            @Override
+            public void verifyReadAndWriteClone(OmniList<?> clone){
+                expectedRoot.verifyCloneTypeAndModCount(clone);
+                Assertions.assertNotSame(clone,expectedRoot.seq);
+                int size;
+                Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);                
+                final var origArr=((RefArrSeq<?>)expectedRoot.seq).arr;
+                final var cloneArr=((RefArrSeq<?>)clone).arr;
+                if(origArr == OmniArray.OfRef.DEFAULT_ARR){
+                    Assertions.assertSame(origArr,cloneArr);
+                }else{
+                    Assertions.assertNotSame(origArr,cloneArr);
+                    if(size == 0){
+                        Assertions.assertSame(cloneArr,OmniArray.OfRef.DEFAULT_ARR);
+                    }else{
+                        do{
+                            Assertions.assertEquals(origArr[expectedRootOffset + --size],cloneArr[size]);
+                        }while(size != 0);
+                    }
+                }
+            }
         }
         private abstract class AbstractItrMonitor<ITR extends OmniIterator<?>>
-        implements
-        MonitoredIterator<ITR,OmniList<?>>{
+                implements
+                MonitoredIterator<ITR,OmniList<?>>{
             final ITR itr;
             int expectedCursor;
             AbstractItrMonitor(ITR itr,int expectedCursor){
@@ -3877,8 +4652,8 @@ public class ArrListTest{
             }
         }
         private abstract class AbstractListItrMonitor extends AbstractItrMonitor<OmniListIterator<?>>
-        implements
-        MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
+                implements
+                MonitoredListIterator<OmniListIterator<?>,OmniList<?>>{
             int expectedLastRet;
             AbstractListItrMonitor(OmniListIterator<?> itr,int expectedCursor){
                 super(itr,expectedCursor);
@@ -4338,6 +5113,44 @@ public class ArrListTest{
     }
     private static interface BasicTest{
         default void runAllTests(String testName){
+            for(final var structType:VALID_STRUCT_TYPES){
+                final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+                for(final var checkedType:CheckedType.values()){
+                    for(final var illegalMod:structType.validPreMods){
+                        if(checkedType.checked || illegalMod.expectedException == null){
+                            for(final var rootPreAlloc:buffers){
+                                for(final var parentPreAlloc:buffers){
+                                    for(final var rootPostAlloc:buffers){
+                                        for(final var parentPostAlloc:buffers){
+                                            for(final int seqSize:FIB_SEQ){
+                                                for(final var collectionType:DataType.values()){
+                                                    for(final var initCap:INIT_CAPACITIES){
+                                                        TestExecutorService.submitTest(()->{
+                                                            final var monitor=SequenceInitialization.Ascending
+                                                                    .initialize(getMonitoredList(collectionType,
+                                                                            checkedType,structType,initCap,rootPreAlloc,
+                                                                            parentPreAlloc,rootPostAlloc,
+                                                                            parentPostAlloc),seqSize,0);
+                                                            monitor.illegalMod(illegalMod);
+                                                            if(illegalMod.expectedException == null){
+                                                                runTest(monitor);
+                                                            }else{
+                                                                Assertions.assertThrows(illegalMod.expectedException,
+                                                                        ()->runTest(monitor));
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
             for(final int seqSize:FIB_SEQ){
                 for(final var dataType:DataType.values()){
                     for(final var checkedType:CheckedType.values()){
@@ -4350,101 +5163,353 @@ public class ArrListTest{
             }
             TestExecutorService.completeAllTests("ArrListTest.testsize_void");
         }
-        void runTest(ArrListMonitor monitor);
+        void runTest(MonitoredList<?,?,?> monitor);
     }
-    private static interface MonitoredFunctionGenTest{
-        void runTest(ArrListMonitor monitor,MonitoredFunctionGen functionGen);
-        private void runAllTests(String testName){
-            for(final var size:FIB_SEQ){
-                for(final var functionGen:StructType.ArrList.validMonitoredFunctionGens){
-                    for(final var checkedType:CheckedType.values()){
-                        if(checkedType.checked || functionGen.expectedException == null){
-                            for(final var collectionType:DataType.values()){
-                                final int initValCap=collectionType == DataType.BOOLEAN && size != 0?1:0;
-                                IntStream.rangeClosed(0,initValCap).forEach(initVal->{
-                                    for(final var initCap:INIT_CAPACITIES){
-                                        TestExecutorService.submitTest(()->runTest(SequenceInitialization.Ascending
-                                                .initialize(new ArrListMonitor(checkedType,collectionType,initCap),size,
-                                                        initVal),
-                                                functionGen));
+    private static interface MonitoredFunctionTest{
+        void runTest(MonitoredList<?,?,?> monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
+                IllegalModification illegalMod,long randSeed);
+        private void runAllTests(String testName,long maxRand,EnumSet<FunctionCallType> functionCallTypes){
+            for(final var structType:VALID_STRUCT_TYPES){
+                final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+                for(final var checkedType:CheckedType.values()){
+                    for(final var illegalMod:structType.validPreMods){
+                        if(checkedType.checked || illegalMod.expectedException == null){
+                            for(final var functionGen:structType.validMonitoredFunctionGens){
+                                if(checkedType.checked || functionGen.expectedException == null){
+                                    for(final var rootPreAlloc:buffers){
+                                        for(final var parentPreAlloc:buffers){
+                                            for(final var rootPostAlloc:buffers){
+                                                for(final var parentPostAlloc:buffers){
+                                                    for(final var collectionType:DataType.values()){
+                                                        for(final var size:FIB_SEQ){
+                                                            for(final var functionCallType:functionCallTypes){
+                                                                if(!functionCallType.boxed || collectionType!=DataType.REF) {
+                                                                    final long randSeedBound=size > 1
+                                                                            && functionGen.randomized
+                                                                            && !functionCallType.boxed?maxRand:0;
+                                                                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                                                        final long randSeed=tmpRandSeed;
+                                                                        final int initValCap=collectionType == DataType.BOOLEAN
+                                                                                && size != 0?1:0;
+                                                                        for(int tmpInitVal=0;tmpInitVal <= initValCap;++tmpInitVal){
+                                                                            final int initVal=tmpInitVal;
+                                                                            for(final var initCap:INIT_CAPACITIES){
+                                                                                TestExecutorService.submitTest(()->
+                                                                                runTest(
+                                                                                        SequenceInitialization.Ascending
+                                                                                                .initialize(
+                                                                                                        getMonitoredList(
+                                                                                                                collectionType,
+                                                                                                                checkedType,
+                                                                                                                structType,
+                                                                                                                initCap,
+                                                                                                                rootPreAlloc,
+                                                                                                                parentPreAlloc,
+                                                                                                                rootPostAlloc,
+                                                                                                                parentPostAlloc),
+                                                                                                        size,initVal),
+                                                                                        functionGen,functionCallType,
+                                                                                        illegalMod,randSeed)
+                                                                                )
+                                                                                ;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
-                                });
+                                }
                             }
                         }
                     }
                 }
             }
-            TestExecutorService.completeAllTests("ArrListTest.testReadAndWrite");
+            TestExecutorService.completeAllTests(testName);
         }
     }
     private static interface QueryTest{
-        void callAndVerifyResult(ArrListMonitor monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
-                QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,double position,
-                int seqSize);
+        void callAndVerifyResult(MonitoredList<?,?,?> monitor,QueryVal queryVal,DataType inputType,
+                QueryCastType castType,QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,
+                double position,int seqSize);
+        default boolean cmeFilter(IllegalModification illegalMod,DataType inputType,DataType collectionType,
+                QueryVal queryVal,QueryVal.QueryValModification modification,QueryCastType castType){
+            if(illegalMod.expectedException != null){
+                switch(collectionType){
+                case BOOLEAN:
+                    return queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
+                case BYTE:
+                    switch(queryVal){
+                    default:
+                        if(castType != QueryCastType.ToObject){
+                            switch(inputType){
+                            case CHAR:
+                            case SHORT:
+                            case INT:
+                                return true;
+                            default:
+                            }
+                        }
+                        break;
+                    case Null:
+                        return castType != QueryCastType.ToObject;
+                    case MaxByte:
+                    case MinByte:
+                        switch(modification){
+                        case Plus1:
+                            if(castType != QueryCastType.ToObject){
+                                switch(inputType){
+                                case CHAR:
+                                case SHORT:
+                                case INT:
+                                    return true;
+                                default:
+                                }
+                            }
+                        default:
+                        }
+                    case MaxBoolean:
+                    case Neg0:
+                    case Pos0:
+                    }
+                    return false;
+                case CHAR:
+                    switch(queryVal){
+                    default:
+                        if(castType != QueryCastType.ToObject){
+                            switch(inputType){
+                            case BYTE:
+                            case SHORT:
+                            case INT:
+                                return true;
+                            default:
+                            }
+                        }
+                        break;
+                    case Null:
+                        return castType != QueryCastType.ToObject;
+                    case MaxChar:
+                    case Pos0:
+                        switch(modification){
+                        case Plus1:
+                            if(castType != QueryCastType.ToObject){
+                                switch(inputType){
+                                case BYTE:
+                                case SHORT:
+                                case INT:
+                                    return true;
+                                default:
+                                }
+                            }
+                        default:
+                        }
+                    case MaxBoolean:
+                    case Neg0:
+                    case MaxByte:
+                    case TwoHundred:
+                    case MaxShort:
+                    }
+                    return false;
+                case SHORT:
+                    switch(queryVal){
+                    default:
+                        if(castType != QueryCastType.ToObject){
+                            switch(inputType){
+                            case CHAR:
+                            case INT:
+                                return true;
+                            default:
+                            }
+                        }
+                        break;
+                    case Null:
+                        return castType != QueryCastType.ToObject;
+                    case MaxShort:
+                    case MinShort:
+                        switch(modification){
+                        case Plus1:
+                            if(castType != QueryCastType.ToObject){
+                                switch(inputType){
+                                case CHAR:
+                                case INT:
+                                    return true;
+                                default:
+                                }
+                            }
+                        default:
+                        }
+                    case MaxBoolean:
+                    case Neg0:
+                    case Pos0:
+                    case MaxByte:
+                    case MinByte:
+                    case TwoHundred:
+                    }
+                case REF:
+                    return false;
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                    return queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
+                default:
+                    throw collectionType.invalid();
+                }
+            }
+            return true;
+        }
         private void runAllTests(String testName){
-            for(final var collectionType:DataType.values()){
-                for(final var queryVal:QueryVal.values()){
-                    if(collectionType.isValidQueryVal(queryVal)){
-                        queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
-                            castTypesToInputTypes.forEach((castType,inputTypes)->{
-                                inputTypes.forEach(inputType->{
-                                    if(queryVal == QueryVal.NonNull){
-                                        for(final var monitoredObjectGen:StructType.ArrList.validMonitoredObjectGens){
-                                            if(monitoredObjectGen.expectedException != null){
-                                                for(final var size:FIB_SEQ){
-                                                    if(size > 0){
-                                                        TestExecutorService.submitTest(()->Assertions.assertThrows(
-                                                                monitoredObjectGen.expectedException,
-                                                                ()->runTest(collectionType,queryVal,modification,
-                                                                        inputType,castType,CheckedType.CHECKED,size,-1,
-                                                                        monitoredObjectGen)));
+            for(final var structType:VALID_STRUCT_TYPES){
+                final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
+                for(final var checkedType:CheckedType.values()){
+                    for(final var illegalMod:structType.validPreMods){
+                        if(checkedType.checked || illegalMod.expectedException == null){
+                            for(final var rootPreAlloc:buffers){
+                                for(final var parentPreAlloc:buffers){
+                                    for(final var rootPostAlloc:buffers){
+                                        for(final var parentPostAlloc:buffers){
+                                            for(final var collectionType:DataType.values()){
+                                                for(final var queryVal:QueryVal.values()){
+                                                    if(collectionType.isValidQueryVal(queryVal)){
+                                                        queryVal.validQueryCombos
+                                                                .forEach((modification,castTypesToInputTypes)->{
+                                                                    castTypesToInputTypes
+                                                                            .forEach((castType,inputTypes)->{
+                                                                                inputTypes.forEach(inputType->{
+                                                                                    if(queryVal == QueryVal.NonNull){
+                                                                                        for(final var monitoredObjectGen:StructType.ArrList.validMonitoredObjectGens){
+                                                                                            if(monitoredObjectGen.expectedException != null){
+                                                                                                for(final var size:FIB_SEQ){
+                                                                                                    if(size > 0){
+                                                                                                        final Class<? extends Throwable> expectedException=illegalMod.expectedException == null
+                                                                                                                ?monitoredObjectGen.expectedException
+                                                                                                                :illegalMod.expectedException;
+                                                                                                        TestExecutorService
+                                                                                                                .submitTest(
+                                                                                                                        ()->Assertions
+                                                                                                                                .assertThrows(
+                                                                                                                                        expectedException,
+                                                                                                                                        ()->runTest(
+                                                                                                                                                collectionType,
+                                                                                                                                                queryVal,
+                                                                                                                                                modification,
+                                                                                                                                                inputType,
+                                                                                                                                                castType,
+                                                                                                                                                CheckedType.CHECKED,
+                                                                                                                                                size,
+                                                                                                                                                -1,
+                                                                                                                                                monitoredObjectGen,
+                                                                                                                                                illegalMod,
+                                                                                                                                                structType,
+                                                                                                                                                rootPreAlloc,
+                                                                                                                                                parentPreAlloc,
+                                                                                                                                                rootPostAlloc,
+                                                                                                                                                parentPostAlloc)));
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }else{
+                                                                                        final boolean queryCanReturnTrue=queryVal
+                                                                                                .queryCanReturnTrue(
+                                                                                                        modification,
+                                                                                                        castType,
+                                                                                                        inputType,
+                                                                                                        collectionType);
+                                                                                        for(final var size:FIB_SEQ){
+                                                                                            for(final var position:POSITIONS){
+                                                                                                if(position >= 0){
+                                                                                                    if(!queryCanReturnTrue){
+                                                                                                        continue;
+                                                                                                    }
+                                                                                                    switch(size){
+                                                                                                    case 3:
+                                                                                                        if(position == 0.5d){
+                                                                                                            break;
+                                                                                                        }
+                                                                                                    case 2:
+                                                                                                        if(position == 1.0d){
+                                                                                                            break;
+                                                                                                        }
+                                                                                                    case 1:
+                                                                                                        if(position == 0.0d){
+                                                                                                            break;
+                                                                                                        }
+                                                                                                    case 0:
+                                                                                                        continue;
+                                                                                                    case 4:
+                                                                                                        if(position != 0.5d){
+                                                                                                            break;
+                                                                                                        }
+                                                                                                    default:
+                                                                                                        continue;
+                                                                                                    }
+                                                                                                }
+                                                                                                TestExecutorService
+                                                                                                        .submitTest(
+                                                                                                                ()->{
+                                                                                                                    if(cmeFilter(
+                                                                                                                            illegalMod,
+                                                                                                                            inputType,
+                                                                                                                            collectionType,
+                                                                                                                            queryVal,
+                                                                                                                            modification,
+                                                                                                                            castType)){
+                                                                                                                        runTest(collectionType,
+                                                                                                                                queryVal,
+                                                                                                                                modification,
+                                                                                                                                inputType,
+                                                                                                                                castType,
+                                                                                                                                checkedType,
+                                                                                                                                size,
+                                                                                                                                position,
+                                                                                                                                null,
+                                                                                                                                illegalMod,
+                                                                                                                                structType,
+                                                                                                                                rootPreAlloc,
+                                                                                                                                parentPreAlloc,
+                                                                                                                                rootPostAlloc,
+                                                                                                                                parentPostAlloc);
+                                                                                                                    }else{
+                                                                                                                        Assertions
+                                                                                                                                .assertThrows(
+                                                                                                                                        illegalMod.expectedException,
+                                                                                                                                        ()->runTest(
+                                                                                                                                                collectionType,
+                                                                                                                                                queryVal,
+                                                                                                                                                modification,
+                                                                                                                                                inputType,
+                                                                                                                                                castType,
+                                                                                                                                                checkedType,
+                                                                                                                                                size,
+                                                                                                                                                position,
+                                                                                                                                                null,
+                                                                                                                                                illegalMod,
+                                                                                                                                                structType,
+                                                                                                                                                rootPreAlloc,
+                                                                                                                                                parentPreAlloc,
+                                                                                                                                                rootPostAlloc,
+                                                                                                                                                parentPostAlloc));
+                                                                                                                    }
+                                                                                                                });
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                            });
+                                                                });
                                                     }
-                                                }
-                                            }
-                                        }
-                                    }else{
-                                        final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,
-                                                castType,inputType,collectionType);
-                                        for(final var size:FIB_SEQ){
-                                            for(final var position:POSITIONS){
-                                                if(position >= 0){
-                                                    if(!queryCanReturnTrue){
-                                                        continue;
-                                                    }
-                                                    switch(size){
-                                                    case 3:
-                                                        if(position == 0.5d){
-                                                            break;
-                                                        }
-                                                    case 2:
-                                                        if(position == 1.0d){
-                                                            break;
-                                                        }
-                                                    case 1:
-                                                        if(position == 0.0d){
-                                                            break;
-                                                        }
-                                                    case 0:
-                                                        continue;
-                                                    case 4:
-                                                        if(position != 0.5d){
-                                                            break;
-                                                        }
-                                                    default:
-                                                        continue;
-                                                    }
-                                                }
-                                                for(final var checkedType:CheckedType.values()){
-                                                    TestExecutorService.submitTest(
-                                                            ()->runTest(collectionType,queryVal,modification,inputType,
-                                                                    castType,checkedType,size,position,null));
                                                 }
                                             }
                                         }
                                     }
-                                });
-                            });
-                        });
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -4453,36 +5518,42 @@ public class ArrListTest{
         @SuppressWarnings("unchecked")
         private void runTest(DataType collectionType,QueryVal queryVal,QueryVal.QueryValModification modification,
                 DataType inputType,QueryCastType castType,CheckedType checkedType,int seqSize,double position,
-                MonitoredObjectGen monitoredObjectGen){
-            final var monitor=new ArrListMonitor(checkedType,collectionType,seqSize);
+                MonitoredObjectGen monitoredObjectGen,IllegalModification illegalMod,StructType structType,
+                int rootPreAlloc,int parentPreAlloc,int rootPostAlloc,int parentPostAlloc){
+            final var monitor=getMonitoredList(collectionType,checkedType,structType,
+                    seqSize + rootPreAlloc + rootPostAlloc + parentPreAlloc + parentPostAlloc,rootPreAlloc,
+                    parentPreAlloc,rootPostAlloc,parentPostAlloc);
             if(position < 0){
                 switch(collectionType){
                 case BOOLEAN:
-                    queryVal.initDoesNotContain((OmniCollection.OfBoolean)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfBoolean)monitor.getCollection(),seqSize,0,
+                            modification);
                     break;
                 case BYTE:
-                    queryVal.initDoesNotContain((OmniCollection.OfByte)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfByte)monitor.getCollection(),seqSize,0,modification);
                     break;
                 case CHAR:
-                    queryVal.initDoesNotContain((OmniCollection.OfChar)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfChar)monitor.getCollection(),seqSize,0,modification);
                     break;
                 case DOUBLE:
-                    queryVal.initDoesNotContain((OmniCollection.OfDouble)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfDouble)monitor.getCollection(),seqSize,0,
+                            modification);
                     break;
                 case FLOAT:
-                    queryVal.initDoesNotContain((OmniCollection.OfFloat)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfFloat)monitor.getCollection(),seqSize,0,modification);
                     break;
                 case INT:
-                    queryVal.initDoesNotContain((OmniCollection.OfInt)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfInt)monitor.getCollection(),seqSize,0,modification);
                     break;
                 case LONG:
-                    queryVal.initDoesNotContain((OmniCollection.OfLong)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfLong)monitor.getCollection(),seqSize,0,modification);
                     break;
                 case REF:
-                    queryVal.initDoesNotContain((OmniCollection.OfRef<Object>)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfRef<Object>)monitor.getCollection(),seqSize,0,
+                            modification);
                     break;
                 case SHORT:
-                    queryVal.initDoesNotContain((OmniCollection.OfShort)monitor.seq,seqSize,0,modification);
+                    queryVal.initDoesNotContain((OmniCollection.OfShort)monitor.getCollection(),seqSize,0,modification);
                     break;
                 default:
                     throw collectionType.invalid();
@@ -4490,65 +5561,94 @@ public class ArrListTest{
             }else{
                 switch(collectionType){
                 case BOOLEAN:
-                    queryVal.initContains((OmniCollection.OfBoolean)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfBoolean)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case BYTE:
-                    queryVal.initContains((OmniCollection.OfByte)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfByte)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case CHAR:
-                    queryVal.initContains((OmniCollection.OfChar)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfChar)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case DOUBLE:
-                    queryVal.initContains((OmniCollection.OfDouble)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfDouble)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case FLOAT:
-                    queryVal.initContains((OmniCollection.OfFloat)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfFloat)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case INT:
-                    queryVal.initContains((OmniCollection.OfInt)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfInt)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case LONG:
-                    queryVal.initContains((OmniCollection.OfLong)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfLong)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 case REF:
-                    queryVal.initContains((OmniCollection.OfRef<Object>)monitor.seq,seqSize,0,position,modification,
-                            inputType);
+                    queryVal.initContains((OmniCollection.OfRef<Object>)monitor.getCollection(),seqSize,0,position,
+                            modification,inputType);
                     break;
                 case SHORT:
-                    queryVal.initContains((OmniCollection.OfShort)monitor.seq,seqSize,0,position,modification);
+                    queryVal.initContains((OmniCollection.OfShort)monitor.getCollection(),seqSize,0,position,
+                            modification);
                     break;
                 default:
                     throw collectionType.invalid();
                 }
             }
             monitor.updateCollectionState();
+            monitor.illegalMod(illegalMod);
             callAndVerifyResult(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,seqSize);
         }
     }
     private static interface ToStringAndHashCodeTest{
-        void callMethod(int size,DataType collectionType,CheckedType checkedType,int initVal,MonitoredObjectGen objGen);
+        void runTest(MonitoredList<?,?,?> monitor,int size,int initVal,MonitoredObjectGen objGen,IllegalModification illegalMod);
         private void runAllTests(String testName){
-            for(final int size:FIB_SEQ){
+            for(final var structType:VALID_STRUCT_TYPES){
+                final var buffers=structType == StructType.ArrSubList?SUB_LIST_BUFFERS:new int[]{0};
                 for(final var collectionType:DataType.values()){
-                    final int initValBound;
-                    if(collectionType == DataType.BOOLEAN){
-                        initValBound=1;
-                    }else{
-                        initValBound=0;
-                    }
-                    for(final var checkedType:CheckedType.values()){
-                        if(collectionType == DataType.REF || !checkedType.checked){
-                            IntStream.rangeClosed(0,initValBound).forEach(initVal->{
-                                for(final var objGen:StructType.ArrList.validMonitoredObjectGens){
-                                    if(checkedType.checked || objGen.expectedException == null){
-                                        TestExecutorService.submitTest(
-                                                ()->callMethod(size,collectionType,checkedType,initVal,objGen));
-                                    }
-                                    if(collectionType != DataType.REF){
-                                        break;
+                    final int initValBound=collectionType==DataType.BOOLEAN?1:0;
+                    for(int tmpInitVal=0;tmpInitVal<=initValBound;++tmpInitVal) {
+                        final int initVal=tmpInitVal;
+                        for(final var checkedType:CheckedType.values()){
+                            for(final var illegalMod:structType.validPreMods){
+                                if(checkedType.checked || illegalMod.expectedException == null){
+                                
+                                    for(final var rootPreAlloc:buffers){
+                                        for(final var parentPreAlloc:buffers){
+                                            for(final var rootPostAlloc:buffers){
+                                                for(final var parentPostAlloc:buffers){
+                                                
+                                                    
+                                                    for(final int size:FIB_SEQ){
+                                                        
+                                                        if(collectionType==DataType.REF || !checkedType.checked) {
+                                                            for(var objGen:structType.validMonitoredObjectGens) {
+                                                                if(checkedType.checked || objGen.expectedException==null) {
+                                                                    TestExecutorService.submitTest(()->
+                                                                      runTest(getMonitoredList(collectionType,checkedType,structType,size+rootPreAlloc+parentPreAlloc+rootPostAlloc+parentPostAlloc,rootPreAlloc,parentPreAlloc,rootPostAlloc,parentPostAlloc),size,initVal,objGen,illegalMod)
+                                                                    );
+                                                                    
+                                                                    
+                                                                    
+                                                                }
+                                                                if(collectionType!=DataType.REF) {
+                                                                    break;
+                                                                }
+                                                            }
+                                                            
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            });
+                            }
                         }
                     }
                 }

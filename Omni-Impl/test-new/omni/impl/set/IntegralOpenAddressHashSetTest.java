@@ -546,9 +546,14 @@ public class IntegralOpenAddressHashSetTest{
     }
     @org.junit.jupiter.api.Test
     public void testReadAndWrite(){
-        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->initSet
-                .initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType))
-                .verifyReadAndWrite(functionGen);
+        final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
+            var monitor=initSet.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
+            if(functionGen.expectedException==null) {
+                Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
+            }else {
+                Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyReadAndWrite(functionGen));
+            }   
+        };
         test.runAllTests("IntegralOpenAddressHashSetTest.testReadAndWrite");
     }
     @org.junit.jupiter.api.Test
