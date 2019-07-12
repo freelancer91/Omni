@@ -6,7 +6,7 @@ import omni.impl.MonitoredSequence;
 
 public enum SequenceInitialization{
     Ascending{
-        @Override public <SEQ extends MonitoredSequence<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal){
+        @Override public <SEQ extends MonitoredSequence<?,?>> SEQ initialize(SEQ seq,int numToAdd,int initVal){
             var dataType=seq.getDataType();
             switch(dataType) {
             case BOOLEAN:{
@@ -97,7 +97,7 @@ public enum SequenceInitialization{
             return seq;
         }
         @Override
-        public <SEQ extends MonitoredSequence<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,
+        public <SEQ extends MonitoredSequence<?,?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,
                 MonitoredObjectGen objGen,MonitoredObjectGen.ThrowSwitch throwSwitch){
             @SuppressWarnings("unchecked")
             var collection=(OmniCollection.OfRef<Object>)seq.getCollection();
@@ -115,7 +115,7 @@ public enum SequenceInitialization{
 
     };
 
-    public abstract <SEQ extends MonitoredSequence<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal);
-    public abstract <SEQ extends MonitoredSequence<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,
+    public abstract <SEQ extends MonitoredSequence<?,?>> SEQ initialize(SEQ seq,int numToAdd,int initVal);
+    public abstract <SEQ extends MonitoredSequence<?,?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,
             MonitoredObjectGen objGen,MonitoredObjectGen.ThrowSwitch throwSwitch);
 }

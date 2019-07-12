@@ -42,6 +42,7 @@ import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import omni.function.ShortUnaryOperator;
 import omni.util.OmniArray;
+import omni.util.PeekAndPollIfc;
 import omni.util.TestExecutorService;
 import omni.util.ToStringUtil;
 import omni.util.TypeUtil;
@@ -51,6 +52,19 @@ public enum DataType{
             BooleanPredicate.class,BooleanConsumer.class,BooleanComparator.class,BooleanPredicate.class,Boolean.FALSE,
             BooleanDblLnkNode.class,BooleanSnglLnkNode.class,"removeBooleanAt",boolean.class,"test","compare",
             boolean.class,"booleanElement",OmniArray.MAX_ARR_SIZE / 7){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.OfBoolean)monitoredStack.getCollection()).popBoolean();
+        }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.BooleanInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Boolean)inputVal);
+        }else {
+            cast.push((boolean)inputVal);
+        }
+      }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.OfBoolean)collection.getCollection();
             boolean[] result;
@@ -400,12 +414,37 @@ public enum DataType{
         public void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection){
             throw new UnsupportedOperationException();
         }
+        @Override public Object callPeek(PeekAndPollIfc<?> collection){
+          return ((PeekAndPollIfc.BooleanOutput<?>)collection).peekBoolean();
+        }
+        @Override public Object callPoll(PeekAndPollIfc<?> collection){
+          return ((PeekAndPollIfc.BooleanOutput<?>)collection).pollBoolean();
+        }
     },
     BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
             Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
             ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,ByteDblLnkNode.class,
             ByteSnglLnkNode.class,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement",
             OmniArray.MAX_ARR_SIZE / 6){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.ByteOutput<?>)monitoredStack.getCollection()).popByte();
+        }
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.ByteOutput<?>)collection).peekByte();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.ByteOutput<?>)collection).pollByte();
+      }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.ByteInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Byte)inputVal);
+        }else {
+            cast.push((byte)inputVal);
+        }
+      }
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToByte(val);
@@ -701,6 +740,25 @@ public enum DataType{
             Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
             CharUnaryOperator.class,Character.MIN_VALUE,CharDblLnkNode.class,CharSnglLnkNode.class,"removeCharAt",
             int.class,"applyAsChar","compare",char.class,"charElement",-1){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.CharOutput<?>)monitoredStack.getCollection()).popChar();
+        }
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.CharOutput<?>)collection).peekChar();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.CharOutput<?>)collection).pollChar();
+      }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.CharInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Character)inputVal);
+        }else {
+            cast.push((char)inputVal);
+        }
+      }
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToChar(val);
@@ -996,6 +1054,26 @@ public enum DataType{
             Short[].class,short[].class,"Short","Short",ShortPredicate.class,ShortConsumer.class,ShortComparator.class,
             ShortUnaryOperator.class,Short.MIN_VALUE,ShortDblLnkNode.class,ShortSnglLnkNode.class,"removeShortAt",
             int.class,"applyAsShort","compare",short.class,"shortElement",OmniArray.MAX_ARR_SIZE / 8){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.ShortOutput<?>)monitoredStack.getCollection()).popShort();
+        }
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+       
+        return ((PeekAndPollIfc.ShortOutput<?>)collection).peekShort();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.ShortOutput<?>)collection).pollShort();
+      }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.ShortInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Short)inputVal);
+        }else {
+            cast.push((short)inputVal);
+        }
+      }
         @Override
         public Object convertVal(boolean val){
             return (short)TypeUtil.castToByte(val);
@@ -1288,6 +1366,25 @@ public enum DataType{
             IntConsumer.class,IntBinaryOperator.class,IntUnaryOperator.class,Integer.MIN_VALUE,IntDblLnkNode.class,
             IntSnglLnkNode.class,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement",
             OmniArray.MAX_ARR_SIZE / 13){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.IntOutput<?>)monitoredStack.getCollection()).popInt();
+        }
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.IntOutput<?>)collection).peekInt();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.IntOutput<?>)collection).pollInt();
+      }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.IntInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Integer)inputVal);
+        }else {
+            cast.push((int)inputVal);
+        }
+      }
         @Override
         public Object convertVal(boolean val){
             return (int)TypeUtil.castToByte(val);
@@ -1569,6 +1666,25 @@ public enum DataType{
             LongConsumer.class,LongComparator.class,LongUnaryOperator.class,Long.MIN_VALUE,LongDblLnkNode.class,
             LongSnglLnkNode.class,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement",
             OmniArray.MAX_ARR_SIZE / 22){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.LongOutput<?>)monitoredStack.getCollection()).popLong();
+        }
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.LongOutput<?>)collection).peekLong();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.LongOutput<?>)collection).pollLong();
+      }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.LongInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Long)inputVal);
+        }else {
+            cast.push((long)inputVal);
+        }
+      }
         @Override
         public Object convertVal(boolean val){
             return TypeUtil.castToLong(val);
@@ -1842,6 +1958,25 @@ public enum DataType{
             FloatConsumer.class,FloatComparator.class,FloatUnaryOperator.class,Float.NaN,FloatDblLnkNode.class,
             FloatSnglLnkNode.class,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement",
             OmniArray.MAX_ARR_SIZE / 17){
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        return ((OmniStack.FloatOutput<?>)monitoredStack.getCollection()).popFloat();
+        }
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.FloatOutput<?>)collection).peekFloat();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.FloatOutput<?>)collection).pollFloat();
+      }
+      @Override
+      public void callStackPush(Object inputVal,OmniStack<?> collection,
+              FunctionCallType functionCallType){
+        var cast=(OmniStack.FloatInput<?>)collection;
+        if(functionCallType.boxed){
+            cast.push((Float)inputVal);
+        }else {
+            cast.push((float)inputVal);
+        }
+      }
         @Override
         public void verifyMASSIVEToString(String result,int seqSize,String testName){
             int offset;
@@ -2136,7 +2271,12 @@ public enum DataType{
             DoublePredicate.class,DoubleConsumer.class,DoubleComparator.class,DoubleUnaryOperator.class,Double.NaN,
             DoubleDblLnkNode.class,DoubleSnglLnkNode.class,"removeDoubleAt",long.class,"applyAsDouble","compare",
             double.class,"doubleElement",-1){
-
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.DoubleOutput<?>)collection).peekDouble();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return ((PeekAndPollIfc.DoubleOutput<?>)collection).pollDouble();
+      }
         @Override public Object verifyToArray(MonitoredCollection<?> collection){
             var cast=(OmniCollection.DoubleOutput<?>)collection.getCollection();
             double[] result;
@@ -2173,6 +2313,16 @@ public enum DataType{
                 result=cast.add((double)inputVal);
             }
             return result;
+        }
+        @Override
+        public void callStackPush(Object inputVal,OmniStack<?> collection,
+                FunctionCallType functionCallType){
+          var cast=(OmniStack.OfDouble)collection;
+          if(functionCallType.boxed){
+              cast.push((Double)inputVal);
+          }else {
+              cast.push((double)inputVal);
+          }
         }
         @Override
         public void callListAdd(int index,Object inputVal,OmniList<?> collection,
@@ -2354,6 +2504,9 @@ public enum DataType{
         public Object callListGet(int index,MonitoredList<?,?,?> monitoredList){
             return ((OmniList.DoubleOutput<?>)monitoredList.getCollection()).getDouble(index);
         }
+        @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+          return ((OmniStack.DoubleOutput<?>)monitoredStack.getCollection()).popDouble();
+          }
         @Override
         public void callListPut(int index,Object inputVal,OmniList<?> collection,FunctionCallType functionCallType){
             if(functionCallType.boxed){
@@ -2395,6 +2548,38 @@ public enum DataType{
     REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
             RefDblLnkNode.class,
             RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element",-1){
+      @Override public Object callPeek(PeekAndPollIfc<?> collection){
+        return collection.peek();
+      }
+      @Override public Object callPoll(PeekAndPollIfc<?> collection){
+        return collection.poll();
+      }
+      @Override public Object callStackPop(MonitoredStack<?> monitoredStack) {
+        var dataType=monitoredStack.getDataType();
+        var stack=monitoredStack.getCollection();
+        switch(dataType){
+        case BOOLEAN:
+            return ((OmniStack.OfBoolean)stack).pop();
+        case BYTE:
+            return ((OmniStack.OfByte)stack).pop();
+        case CHAR:
+            return ((OmniStack.OfChar)stack).pop();
+        case DOUBLE:
+            return ((OmniStack.OfDouble)stack).pop();
+        case FLOAT:
+            return ((OmniStack.OfFloat)stack).pop();
+        case INT:
+            return ((OmniStack.OfInt)stack).pop();
+        case LONG:
+            return ((OmniStack.OfLong)stack).pop();
+        case REF:
+            return ((OmniStack.OfRef<?>)stack).pop();
+        case SHORT:
+            return ((OmniStack.OfShort)stack).pop();
+        default:
+            throw dataType.invalid();
+        }
+    }
         @Override public Object verifyToArray(MonitoredCollection<?> monitoredCollection){
             var collection=monitoredCollection.getCollection();
             Object[] result;
@@ -2467,6 +2652,15 @@ public enum DataType{
                 throw cannotBeBoxed();
             }
             return ((OmniCollection.OfRef<Object>)collection).add(inputVal);
+        }
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public void callStackPush(Object inputVal,OmniStack<?> collection,
+                FunctionCallType functionCallType){
+            if(functionCallType.boxed){
+                throw cannotBeBoxed();
+            }
+            ((OmniStack.OfRef<Object>)collection).push(inputVal);
         }
         @SuppressWarnings({"unchecked"})
         @Override
@@ -2934,6 +3128,7 @@ public enum DataType{
     public abstract void callIteratorAdd(Object inputVal,OmniListIterator<?> itr,FunctionCallType functionCallType);
     public abstract boolean callCollectionAdd(Object inputVal,OmniCollection<?> collection,
             FunctionCallType functionCallType);
+    public abstract void callStackPush(Object inputVal,OmniStack<?> collection,FunctionCallType functionCallType);
     public abstract void callListAdd(int index,Object inputVal,OmniList<?> collection,
             FunctionCallType functionCallType);
     public abstract Object callListGet(int index,MonitoredList<?,?,?> monitoredList);
@@ -2944,6 +3139,9 @@ public enum DataType{
     public abstract void callListSort(MonitoredComparator sorter,OmniList<?> collection,
             FunctionCallType functionCallType);
     public abstract void callListUnstableSort(MonitoredComparator sorter,OmniList<?> collection);
+    public abstract Object callPeek(PeekAndPollIfc<?> collection);
+    public abstract Object callPoll(PeekAndPollIfc<?> collection);
+    public abstract Object callStackPop(MonitoredStack<?> collection);
     public int getMaxInt(){
         throw new UnsupportedOperationException();
     }

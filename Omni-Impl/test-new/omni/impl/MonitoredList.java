@@ -16,12 +16,11 @@ import omni.function.ShortUnaryOperator;
 import omni.impl.QueryVal.QueryValModification;
 public interface MonitoredList<ITR extends OmniIterator<?>,LSTITR extends OmniListIterator<?>,LST extends OmniList<?>>
 extends
-MonitoredSequence<LST>{
-    void updateRemoveIndexState(int index);
+MonitoredSequence<ITR,LST>{
     default Object verifyRemoveAt(int index,DataType outputType){
         Object result;
         Object expected=null;
-        if(index >= 0 || index <= size()){
+        if(index >= 0 || index < size()){
             expected=outputType.callListGet(index,this);
         }
         try{
@@ -85,12 +84,12 @@ MonitoredSequence<LST>{
         }
     }
     void verifyPutResult(int index,Object input,DataType inputType);
-    void verifyGetResult(int index,Object result,DataType outputType);
+    
     default Object verifySet(int index,Object inputVal,FunctionCallType functionCallType){
         Object result;
         Object expected=null;
         var dataType=getDataType();
-        if(index >= 0 || index <= size()){
+        if(index >= 0 || index < size()){
             expected=dataType.callListGet(index,this);
         }
         try{
@@ -224,11 +223,7 @@ MonitoredSequence<LST>{
             return actual;
         }
     }
-    @Override
-    MonitoredIterator<? extends ITR,LST> getMonitoredIterator();
-    @Override
-    MonitoredIterator<? extends ITR,LST> getMonitoredIterator(IteratorType itrType);
-    MonitoredIterator<? extends ITR,LST> getMonitoredIterator(int index,IteratorType itrType);
+    
     MonitoredListIterator<? extends LSTITR,LST> getMonitoredListIterator();
     MonitoredListIterator<? extends LSTITR,LST> getMonitoredListIterator(int index);
     void updateReplaceAllState(MonitoredFunction function);
