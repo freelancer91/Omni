@@ -3,6 +3,7 @@ import java.util.ListIterator;
 import omni.util.TypeUtil;
 public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterator<E>
 {
+  //TODO add the rest of the methods
   //@Override
   //public abstract boolean hasPrevious();
   //@Override

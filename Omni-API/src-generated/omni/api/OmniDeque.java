@@ -1,9 +1,23 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>
+public interface OmniDeque<E> extends OmniCollection<E>,OmniQueue<E>,OmniStack<E>,PeekAndPollIfc<E>
 {
-  OmniIterator<E> descendingIterator();
+  //TODO add the rest of the methods
+  //public abstract void addFirst(E val);
+  //public abstract void addLast(E val);
+  //public abstract boolean offerFirst(E val);
+  //public abstract boolean offerLast(E val);
+  public abstract E peekFirst();
+  public abstract E peekLast();
+  public abstract E pollFirst();
+  public abstract E pollLast();
+  public abstract E getFirst();
+  public abstract E getLast();
+  public abstract E removeFirst();
+  public abstract E removeLast();
+  //public abstract Object clone();
+  public abstract OmniIterator<E> descendingIterator();
   public default boolean removeFirstOccurrence(boolean val)
   {
     return removeVal(val);

@@ -549,7 +549,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         default Object verifyNext(DataType outputType){
             final Object result;
             try{
-                result=outputType.callIteratorNext(getIterator());
+                result=outputType.callNext(getIterator());
                 updateItrNextState();
                 verifyNextResult(outputType,result);
             }finally{

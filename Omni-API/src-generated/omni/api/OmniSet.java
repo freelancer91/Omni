@@ -25,6 +25,7 @@ public abstract interface OmniSet<E> extends OmniCollection<E>
     public abstract interface OfDouble extends OmniCollection<Double>,OmniCollection.OfPrimitive<Double>,OmniCollection.OfDouble,OmniSet<Double>
   ,FloatInput<Double>,DoubleOutput<Double>
     {}
+  //public abstract Object clone();
   public abstract interface DoubleOutput<E> extends OmniSet<E>,OmniCollection.DoubleOutput<E>{
   }
   public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>{

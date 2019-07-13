@@ -13,6 +13,8 @@ import omni.function.ShortConsumer;
 import omni.util.TypeUtil;
 public interface OmniIterator<E> extends Iterator<E>
 {
+  //TODO add the rest of the methods
+  //public abstract E next();
   //@Override
   //public abstract boolean hasNext();
   public abstract Object clone();

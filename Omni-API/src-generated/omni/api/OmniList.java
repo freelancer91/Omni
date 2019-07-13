@@ -20,9 +20,9 @@ import omni.function.ShortUnaryOperator;
 import omni.util.TypeUtil;
 public abstract interface OmniList<E> extends OmniCollection<E>
 {
-  OmniListIterator<E> listIterator();
-  OmniListIterator<E> listIterator(int index);
-  OmniList<E> subList(int fromIndex,int toIndex);
+  public abstract OmniListIterator<E> listIterator();
+  public abstract OmniListIterator<E> listIterator(int index);
+  public abstract OmniList<E> subList(int fromIndex,int toIndex);
   public abstract int indexOf(Object val);
   public abstract int indexOf(boolean val);
   public abstract int indexOf(byte val);
@@ -59,6 +59,13 @@ public abstract interface OmniList<E> extends OmniCollection<E>
   public abstract int lastIndexOf(Double val);
   public abstract void stableAscendingSort();
   public abstract void stableDescendingSort();
+  //TODO add the rest of the methods
+  public abstract E get(int index);
+  public abstract E remove(int index);
+  //public abstract E set(int index,E val);
+  //public abstract boolean add(int index,E val);
+  //public abstract void put(int index,E val);
+  //public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniList<E>,OmniCollection.OfPrimitive<E>
   {
      public abstract void add(int index,boolean val);

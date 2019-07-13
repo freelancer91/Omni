@@ -87,11 +87,11 @@ public class TestExecutorService {
             reset();
         }
     }
-    private static void finishWritingProgressBar(int nextPercent,int totalNumTests){
+    private static void finishWritingProgressBar(int nextPercent){
         while(nextPercent <= 100){
             nextPercent=incrementProgressBar(nextPercent);
         }
-        System.out.println(" Finished " + totalNumTests + " tests!");
+        System.out.println(" Finished!");
     }
     private static int incrementProgressBar(int nextPercent){
         if(nextPercent % 10 == 0){
@@ -102,18 +102,18 @@ public class TestExecutorService {
         return nextPercent + 1;
     }
     public static void completeAllTests(String testName) {
-        System.out.print("Running test "+testName+" 0%");
+        final int tnt;
+        System.out.print("Running "+(tnt=totalNumTasks.get())+" "+testName+" tests 0%");
         try {
-            final int tnt;
             int nextPercent;
-            int threshold=(int)Math.ceil((nextPercent=1)/100.0*(tnt=totalNumTasks.get()));
+            int threshold=(int)Math.ceil((nextPercent=1)/100.0*tnt);
             final var tct=totalCompletedTasks;
             Object m=monitor;
             for(var tq=testQueue;;){
                 final var myTask=tq.poll();
                 int currCompleted;
                 if((currCompleted=tct.get())==tnt) {
-                    finishWritingProgressBar(nextPercent,tnt);
+                    finishWritingProgressBar(nextPercent);
                     return;
                 }
                 while(currCompleted>=threshold) {
@@ -126,7 +126,7 @@ public class TestExecutorService {
                     //wait for the other threads to finish
                     for(;;) {
                         if((currCompleted=tct.get())==tnt) {
-                            finishWritingProgressBar(nextPercent,tnt);
+                            finishWritingProgressBar(nextPercent);
                             return;
                         }else{
                             while(currCompleted >= threshold){

@@ -21,6 +21,8 @@ import omni.function.ShortPredicate;
 //TODO integration into Java Collection library
 public abstract interface OmniCollection<E> extends Cloneable
 {
+  //TODO add the rest of the methods
+  //public abstract boolean add(E val);
   public abstract OmniIterator<E> iterator();
   public abstract void clear();
   public abstract boolean contains(Object val);

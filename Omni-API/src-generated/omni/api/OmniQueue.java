@@ -1,8 +1,11 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public abstract interface OmniQueue<E> extends OmniCollection<E>
+public abstract interface OmniQueue<E> extends OmniCollection<E>,PeekAndPollIfc<E>
 {
+  //TODO add the rest of the methods
+  public abstract E element();
+  public abstract E remove();
   public abstract interface OfBoolean extends OfPrimitive<Boolean>,OmniCollection<Boolean>,OmniQueue<Boolean>,OmniCollection.OfPrimitive<Boolean>,OmniCollection.OfBoolean,PeekAndPollIfc.BooleanOutput<Boolean>
   ,BooleanInput<Boolean>,ByteOutput<Boolean>,CharOutput<Boolean>
   {
@@ -521,6 +524,7 @@ public abstract interface OmniQueue<E> extends OmniCollection<E>
       return offer((double)val.floatValue());
     }
   }
+  //public abstract Object clone();
   public abstract interface OfPrimitive<E> extends OmniQueue<E>,OmniCollection.OfPrimitive<E>
   {
     public abstract boolean offer(boolean val);

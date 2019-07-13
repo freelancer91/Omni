@@ -7,17 +7,17 @@ import omni.api.OmniIterator;
 import omni.impl.QueryVal.QueryValModification;
 import omni.util.TestExecutorService;
 
-public interface MonitoredSequence<ITR extends OmniIterator<?>,SEQ extends OmniCollection<?>> extends MonitoredCollection<SEQ>{
+public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends MonitoredCollection<SEQ>{
 
 
 
   void updateRemoveIndexState(int index);
-    MonitoredIterator<? extends ITR,SEQ> getMonitoredIterator(int index,IteratorType itrType);
+    MonitoredIterator<? extends OmniIterator<?>,SEQ> getMonitoredIterator(int index,IteratorType itrType);
     void verifyGetResult(int index,Object result,DataType outputType);
     void updateAddState(Object inputVal,DataType inputType);
     @Override default boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){
         var collection=getCollection();
-        Assertions.assertTrue(inputType.callCollectionAdd(inputVal,collection,functionCallType));
+        Assertions.assertTrue(inputType.callAdd(inputVal,collection,functionCallType));
         updateAddState(inputVal,inputType);
         verifyCollectionState();
         return true;

@@ -1,8 +1,10 @@
 package omni.api;
 import omni.util.PeekAndPollIfc;
 import omni.util.TypeUtil;
-public abstract interface OmniStack<E> extends OmniCollection<E>
+public abstract interface OmniStack<E> extends OmniCollection<E>,PeekAndPollIfc<E>
 {
+    public abstract E pop();
+    //public abstract Object clone();
     public abstract int search(Object val);
     public abstract int search(boolean val);
     public abstract int search(byte val);

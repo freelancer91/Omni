@@ -81,7 +81,7 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         int sizeBefore=collection.size();
         final boolean result;
         try{
-            result=inputType.callCollectionAdd(inputVal,collection,functionCallType);
+            result=inputType.callAdd(inputVal,collection,functionCallType);
             updateAddState(inputVal,inputType,result);
         }finally{
             verifyCollectionState();

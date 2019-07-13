@@ -5,7 +5,6 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Assertions;
-import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
 import omni.function.BooleanPredicate;
@@ -14,17 +13,18 @@ import omni.function.CharUnaryOperator;
 import omni.function.FloatUnaryOperator;
 import omni.function.ShortUnaryOperator;
 import omni.impl.QueryVal.QueryValModification;
-public interface MonitoredList<ITR extends OmniIterator<?>,LSTITR extends OmniListIterator<?>,LST extends OmniList<?>>
+public interface MonitoredList<LST extends OmniList<?>>
 extends
-MonitoredSequence<ITR,LST>{
+MonitoredSequence<LST>{
     default Object verifyRemoveAt(int index,DataType outputType){
         Object result;
         Object expected=null;
+        var collection=getCollection();
         if(index >= 0 || index < size()){
-            expected=outputType.callListGet(index,this);
+            expected=outputType.callGet(index,collection);
         }
         try{
-            result=outputType.callListRemoveAt(index,this);
+            result=outputType.callRemoveAt(index,collection);
             updateRemoveIndexState(index);
         }finally{
             verifyCollectionState();
@@ -39,7 +39,7 @@ MonitoredSequence<ITR,LST>{
     default void verifyAdd(int index,Object inputVal,DataType inputType,FunctionCallType functionCallType){
         var collection=getCollection();
         try{
-            inputType.callListAdd(index,inputVal,collection,functionCallType);
+            inputType.callAdd(index,inputVal,collection,functionCallType);
             updateAddState(index,inputVal,inputType);
         }finally{
             verifyCollectionState();
@@ -90,10 +90,10 @@ MonitoredSequence<ITR,LST>{
         Object expected=null;
         var dataType=getDataType();
         if(index >= 0 || index < size()){
-            expected=dataType.callListGet(index,this);
+            expected=dataType.callGet(index,getCollection());
         }
         try{
-            result=dataType.callListSet(index,inputVal,getCollection(),functionCallType);
+            result=dataType.callSet(index,inputVal,getCollection(),functionCallType);
             verifyPutResult(index,inputVal,dataType);
         }finally{
             verifyCollectionState();
@@ -108,7 +108,7 @@ MonitoredSequence<ITR,LST>{
     default Object verifyGet(int index,DataType outputType) {
         Object result;
         try {
-            result=outputType.callListGet(index,this);
+            result=outputType.callGet(index,getCollection());
         }finally{
             verifyCollectionState();
         }
@@ -117,7 +117,7 @@ MonitoredSequence<ITR,LST>{
     }
     default void verifyPut(int index,Object inputVal,DataType inputType,FunctionCallType functionCallType){
         try{
-            inputType.callListPut(index,inputVal,getCollection(),functionCallType);
+            inputType.callPut(index,inputVal,getCollection(),functionCallType);
             verifyPutResult(index,inputVal,inputType);
         }finally{
             verifyCollectionState();
@@ -127,7 +127,7 @@ MonitoredSequence<ITR,LST>{
     extends
     MonitoredIterator<LSTITR,LST>{
         default void add(Object input,DataType inputType){
-            inputType.callIteratorAdd(input,getIterator(),FunctionCallType.Unboxed);
+            inputType.callAdd(input,getIterator(),FunctionCallType.Unboxed);
             updateItrAddState(input,inputType);
         }
         boolean previousWasJustCalled();
@@ -144,7 +144,7 @@ MonitoredSequence<ITR,LST>{
         default Object verifyPrevious(DataType outputType){
             final Object result;
             try{
-                result=outputType.callIteratorPrev(getIterator());
+                result=outputType.callPrevious(getIterator());
                 updateItrPreviousState();
                 verifyPreviousResult(outputType,result);
             }finally{
@@ -181,7 +181,7 @@ MonitoredSequence<ITR,LST>{
         default void verifySet(Object input,DataType inputType,FunctionCallType functionCallType) {
             var itr=getIterator();
             try{
-                inputType.callIteratorSet(input,itr,functionCallType);
+                inputType.callSet(input,itr,functionCallType);
                 updateItrSetState(input,inputType);
             }finally{
                 verifyIteratorState();
@@ -191,7 +191,7 @@ MonitoredSequence<ITR,LST>{
         default void verifyAdd(Object input,DataType inputType,FunctionCallType functionCallType){
             var itr=getIterator();
             try{
-                inputType.callIteratorAdd(input,itr,functionCallType);
+                inputType.callAdd(input,itr,functionCallType);
                 updateItrAddState(input,inputType);
             }finally{
                 verifyIteratorState();
@@ -224,8 +224,8 @@ MonitoredSequence<ITR,LST>{
         }
     }
     
-    MonitoredListIterator<? extends LSTITR,LST> getMonitoredListIterator();
-    MonitoredListIterator<? extends LSTITR,LST> getMonitoredListIterator(int index);
+    MonitoredListIterator<? extends OmniListIterator<?>,LST> getMonitoredListIterator();
+    MonitoredListIterator<? extends OmniListIterator<?>,LST> getMonitoredListIterator(int index);
     void updateReplaceAllState(MonitoredFunction function);
     void verifyCollectionState(boolean refIsSame);
     @Override
@@ -396,13 +396,13 @@ MonitoredSequence<ITR,LST>{
     void incrementModCount();
     default void verifyStableSort(int size,MonitoredComparatorGen comparatorGen,FunctionCallType functionCallType){
         comparatorGen.initUnsorted(this,size);
-        getDataType().callListSort(comparatorGen.getMonitoredComparator(this),getCollection(),functionCallType);
+        getDataType().callStableSort(comparatorGen.getMonitoredComparator(this),getCollection(),functionCallType);
         comparatorGen.assertSorted(this);
         verifyCollectionState();
     }
     default void verifyUnstableSort(int size,MonitoredComparatorGen comparatorGen){
         comparatorGen.initUnsorted(this,size);
-        getDataType().callListUnstableSort(comparatorGen.getMonitoredComparator(this),getCollection());
+        getDataType().callUnstableSort(comparatorGen.getMonitoredComparator(this),getCollection());
         comparatorGen.assertSorted(this);
         verifyCollectionState();
     }
@@ -432,5 +432,5 @@ MonitoredSequence<ITR,LST>{
         comparatorGen.assertReverseSorted(this);
         verifyCollectionState();
     }
-    MonitoredList<?,?,?> getMonitoredSubList(int fromIndex,int toIndex);
+    MonitoredList<?> getMonitoredSubList(int fromIndex,int toIndex);
 }

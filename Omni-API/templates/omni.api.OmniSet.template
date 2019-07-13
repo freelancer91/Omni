@@ -10,7 +10,7 @@ public abstract interface OmniSet<E> extends OmniCollection<E>
   #MACRO PrimitiveSubInterface<long,Long,Long>()
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
-  
+  //public abstract Object clone();
   public abstract interface DoubleOutput<E> extends OmniSet<E>,OmniCollection.DoubleOutput<E>{
   }
   public abstract interface FloatOutput<E> extends DoubleOutput<E>,OmniCollection.FloatOutput<E>{
