@@ -2466,7 +2466,6 @@ private static $<E>$ int collapseBodyHelper($DNode$$<E>$ newHead,$DNode$$<E>$ ne
       }
       void uncheckedForEachRemaining($DNode$$<E>$ curr,$TypeNameModifier$Consumer$<? super E>$ action){
         $DNode$.uncheckedForEachAscending(curr,action);
-        this.curr=null;
       }
       @Override public void forEachRemaining($TypeNameModifier$Consumer$<? super E>$ action){
         final $DNode$$<E>$ curr;

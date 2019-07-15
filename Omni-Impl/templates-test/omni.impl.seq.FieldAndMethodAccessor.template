@@ -458,6 +458,9 @@ static interface CLASSPREFIXDblLnkSeq{
     static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.CLASSPREFIXDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
     static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.CLASSPREFIXDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
     static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.CLASSPREFIXDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+    static int incrementModCount(Object obj){
+      return incrementIntValue(modCountField,obj);
+    }
     public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
       writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
     }

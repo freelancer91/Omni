@@ -444,6 +444,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -1185,6 +1188,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -1926,6 +1932,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -2667,6 +2676,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -3408,6 +3420,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -4149,6 +4164,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -4890,6 +4908,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -5631,6 +5652,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
@@ -6372,6 +6396,9 @@ final class FieldAndMethodAccessor{
       static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
       static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
       static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
