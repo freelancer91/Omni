@@ -3700,6 +3700,8 @@ public enum DataType{
     public final Class<?> comparableType;
     public final String elementMethodName;
     public final int massiveToStringThreshold;
+    public final EnumSet<FunctionCallType> validFunctionCalls;
+    
     DataType(String name,String mayBeAddedTo,String validOutputTypes,boolean isIntegral,boolean isFloatingPoint,
             boolean isSigned,Class<?> boxedClass,Class<?> primitiveClass,
             Class<?> boxedArrayClass,Class<?> primitiveArrayClass,String classPrefix,String typeNameModifier,
@@ -3733,6 +3735,11 @@ public enum DataType{
         this.comparableType=comparableType;
         this.elementMethodName=elementMethodName;
         this.massiveToStringThreshold=massiveToStringThreshold;
+        if("REF".equals(name)) {
+            this.validFunctionCalls=EnumSet.of(FunctionCallType.Unboxed);
+        }else {
+            this.validFunctionCalls=EnumSet.allOf(FunctionCallType.class);
+        }
     }
     public boolean isValidQueryVal(QueryVal queryVal){
         return queryVal != QueryVal.NonNull;

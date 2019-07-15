@@ -6,6 +6,72 @@ import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.QueryVal.QueryValModification;
 public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection<SET>{
+    @Override
+    @SuppressWarnings("unchecked") default boolean add(int val) {
+        SET collection=getCollection();
+        DataType dataType=getDataType();
+        Object inputVal;
+        boolean result;
+        switch(dataType) {
+        case BOOLEAN:{
+            boolean v;
+            result=((OmniSet.OfBoolean)collection).add(v=(val&1)!=0);
+            inputVal=v;
+            break;
+        }
+        case BYTE:{
+            byte v;
+            result=((OmniSet.OfByte)collection).add(v=(byte)val);
+            inputVal=v;
+            break;
+        }
+        case CHAR:{
+            char v;
+            result=((OmniSet.OfChar)collection).add(v=(char)val);
+            inputVal=v;
+            break;
+        }
+        case SHORT:{
+            short v;
+            result=((OmniSet.OfShort)collection).add(v=(short)val);
+            inputVal=v;
+            break;
+        }
+        case INT:{
+            int v;
+            result=((OmniSet.OfInt)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case LONG:{
+            long v;
+            result=((OmniSet.OfLong)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case FLOAT:{
+            float v;
+            result=((OmniSet.OfFloat)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case DOUBLE:{
+            double v;
+            result=((OmniSet.OfDouble)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case REF:{
+            result=((OmniSet.OfRef<Object>)collection).add(inputVal=val);
+            break;
+        }
+        default:
+            throw dataType.invalid();
+        }
+        updateAddState(inputVal,dataType,result);
+        return result;
+    }
+    
     default void verifyAdd(DataType inputType,FunctionCallType functionCallType,final Object inputVal){
         var collection=getCollection();
         boolean alreadyContains;

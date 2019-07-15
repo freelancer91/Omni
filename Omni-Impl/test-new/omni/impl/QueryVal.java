@@ -1,8 +1,6 @@
 package omni.impl;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import omni.api.OmniCollection;
@@ -2435,9 +2433,9 @@ public enum QueryVal{
         return new UnsupportedOperationException("Unknown combo queryVal=" + queryVal + "; inputType=" + inputType
                 + "; modification=" + modification + "; castType=" + castType);
     }
-    public final Map<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> validQueryCombos;
+    public final EnumMap<QueryVal.QueryValModification,EnumMap<QueryCastType,Set<DataType>>> validQueryCombos;
     QueryVal(){
-        EnumMap<QueryVal.QueryValModification,Map<QueryCastType,Set<DataType>>> tmpValidCombos=new EnumMap<>(
+        EnumMap<QueryVal.QueryValModification,EnumMap<QueryCastType,Set<DataType>>> tmpValidCombos=new EnumMap<>(
                 QueryVal.QueryValModification.class);
         for(var modification:QueryValModification.values()){
             for(var castType:QueryCastType.values()){
@@ -2465,10 +2463,7 @@ public enum QueryVal{
                 return EnumSet.copyOf(dataTypeSet);
             });
         });
-        tmpValidCombos.replaceAll((modification,mapped)->{
-            return Collections.unmodifiableMap(mapped);
-        });
-        this.validQueryCombos=Collections.unmodifiableMap(tmpValidCombos);
+        this.validQueryCombos=tmpValidCombos;
     }
     public abstract boolean queryCanReturnTrue(QueryValModification modification,QueryCastType castType,
             DataType inputType,

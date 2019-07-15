@@ -8,7 +8,71 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.util.TestExecutorService;
 
 public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends MonitoredCollection<SEQ>{
-
+    @Override
+    @SuppressWarnings("unchecked")
+    default boolean add(int val) {
+        SEQ collection=getCollection();
+        DataType dataType=getDataType();
+        Object inputVal;
+        switch(dataType) {
+        case BOOLEAN:{
+            boolean v;
+            ((OmniCollection.OfBoolean)collection).add(v=(val&1)!=0);
+            inputVal=v;
+            break;
+        }
+        case BYTE:{
+            byte v;
+            ((OmniCollection.OfByte)collection).add(v=(byte)val);
+            inputVal=v;
+            break;
+        }
+        case CHAR:{
+            char v;
+            ((OmniCollection.OfChar)collection).add(v=(char)val);
+            inputVal=v;
+            break;
+        }
+        case SHORT:{
+            short v;
+            ((OmniCollection.OfShort)collection).add(v=(short)val);
+            inputVal=v;
+            break;
+        }
+        case INT:{
+            int v;
+            ((OmniCollection.OfInt)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case LONG:{
+            long v;
+            ((OmniCollection.OfLong)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case FLOAT:{
+            float v;
+            ((OmniCollection.OfFloat)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case DOUBLE:{
+            double v;
+            ((OmniCollection.OfDouble)collection).add(v=val);
+            inputVal=v;
+            break;
+        }
+        case REF:{
+            ((OmniCollection.OfRef<Object>)collection).add(inputVal=val);
+            break;
+        }
+        default:
+            throw dataType.invalid();
+        }
+        updateAddState(inputVal,dataType);
+        return true;
+    }
 
 
   void updateRemoveIndexState(int index);

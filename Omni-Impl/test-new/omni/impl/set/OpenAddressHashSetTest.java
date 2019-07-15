@@ -79,6 +79,220 @@ public class OpenAddressHashSetTest{
     }
     @org.junit.jupiter.api.Test public void testadd_val(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
+            for(var inputType:collectionType.mayBeAddedTo()) {
+                for(var functionCallType:inputType.validFunctionCalls) {
+                    for(final float loadFactor:LOAD_FACTORS){
+                        if(loadFactor > 0.f && loadFactor <= 1.0f){
+                            
+                                for(final var checkedType:CheckedType.values()){
+                                    for(final int initialCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
+                                        for(var objGen:StructType.OpenAddressHashSet.validMonitoredObjectGens){
+                                            if(objGen.expectedException == null || checkedType.checked
+                                                    || inputType != DataType.REF){
+                                                TestExecutorService.submitTest(()->{
+                                                    final var monitor=new OpenAddressHashSetMonitor(collectionType,
+                                                            checkedType,initialCapacity,loadFactor);
+                                                    switch(inputType){
+                                                    case BOOLEAN:
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(false,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(true,inputType,functionCallType));
+                                                        Assertions.assertNotEquals(true,
+                                                                monitor.verifyAdd(false,inputType,functionCallType));
+                                                        break;
+                                                    case BYTE:
+                                                        for(int i=Byte.MIN_VALUE;i <= Byte.MAX_VALUE;++i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((byte)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=Byte.MAX_VALUE;i >= Byte.MIN_VALUE;--i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((byte)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case CHAR:
+                                                        for(int i=0;i <= 500;++i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((char)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=500;i >= 0;--i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((char)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case SHORT:
+                                                        for(int i=-250;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((short)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=250;i >= -250;--i){
+                                                            Assertions.assertNotEquals(false,monitor.verifyAdd((short)i,
+                                                                    inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case INT:
+                                                        for(int i=-250;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(int i=250;i >= -250;--i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case LONG:
+                                                        for(long i=-250;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        monitor.set.clear();
+                                                        monitor.updateCollectionState();
+                                                        for(long i=250;i >= -250;--i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(i,inputType,functionCallType));
+                                                        }
+                                                        break;
+                                                    case FLOAT:{
+                                                        float f=0.0f;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(f,inputType,functionCallType));
+                                                            f=Math.nextAfter(f,Double.POSITIVE_INFINITY);
+                                                        }
+                                                    }{
+                                                        float f=-0.0f;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(f,inputType,functionCallType));
+                                                            f=Math.nextAfter(f,Double.NEGATIVE_INFINITY);
+                                                        }
+                                                    }
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Float.NaN,
+                                                            inputType,functionCallType));
+                                                    monitor.set.clear();
+                                                    monitor.updateCollectionState();
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Float.NaN,
+                                                            inputType,functionCallType));{
+                                                                float f=-0.0f;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(f,inputType,functionCallType));
+                                                                    f=Math.nextAfter(f,Double.NEGATIVE_INFINITY);
+                                                                }
+                                                            }{
+                                                                float f=0.0f;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(f,inputType,functionCallType));
+                                                                    f=Math.nextAfter(f,Double.POSITIVE_INFINITY);
+                                                                }
+                                                            }
+                                                            break;
+                                                    case DOUBLE:{
+                                                        double d=0.0d;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(d,inputType,functionCallType));
+                                                            d=Math.nextAfter(d,Double.POSITIVE_INFINITY);
+                                                        }
+                                                    }{
+                                                        double d=-0.0d;
+                                                        for(int i=0;i <= 250;++i){
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(d,inputType,functionCallType));
+                                                            d=Math.nextAfter(d,Double.NEGATIVE_INFINITY);
+                                                        }
+                                                    }
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Double.NaN,
+                                                            inputType,functionCallType));
+                                                    monitor.set.clear();
+                                                    monitor.updateCollectionState();
+                                                    Assertions.assertNotEquals(false,monitor.verifyAdd(Double.NaN,
+                                                            inputType,functionCallType));{
+                                                                double d=-0.0d;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(d,inputType,functionCallType));
+                                                                    d=Math.nextAfter(d,Double.NEGATIVE_INFINITY);
+                                                                }
+                                                            }{
+                                                                double d=0.0d;
+                                                                for(int i=0;i <= 250;++i){
+                                                                    Assertions.assertNotEquals(false,
+                                                                            monitor.verifyAdd(d,inputType,functionCallType));
+                                                                    d=Math.nextAfter(d,Double.POSITIVE_INFINITY);
+                                                                }
+                                                            }
+                                                            break;
+                                                    case REF:
+                                                        if(objGen.expectedException == null){
+                                                            for(int i=-250;i <= 250;++i){
+                                                                Assertions.assertNotEquals(false,
+                                                                        monitor.verifyAdd(
+                                                                                objGen.getMonitoredObject(monitor,i),
+                                                                                inputType,functionCallType));
+                                                            }
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(null,inputType,functionCallType));
+                                                            monitor.set.clear();
+                                                            monitor.updateCollectionState();
+                                                            Assertions.assertNotEquals(false,
+                                                                    monitor.verifyAdd(null,inputType,functionCallType));
+                                                            for(int i=250;i >= -250;--i){
+                                                                Assertions.assertNotEquals(false,
+                                                                        monitor.verifyAdd(
+                                                                                objGen.getMonitoredObject(monitor,i),
+                                                                                inputType,functionCallType));
+                                                            }
+                                                        }else{
+                                                            for(int tmp=-500;tmp <= 500;++tmp){
+                                                                final int i=tmp;
+                                                                Assertions.assertThrows(objGen.expectedException,
+                                                                        ()->monitor.verifyAdd(
+                                                                                objGen.getMonitoredObject(monitor,i),
+                                                                                inputType,functionCallType));
+                                                            }
+                                                        }
+                                                        break;
+                                                    default:
+                                                        throw inputType.invalid();
+                                                    }
+                                                });
+                                            }
+                                            if(inputType != DataType.REF){
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                }
+                            
+                        }
+                    }
+                }
+            }
+            
             for(final var functionCallType:FunctionCallType.values()){
                 if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
                     for(final float loadFactor:LOAD_FACTORS){
@@ -399,32 +613,32 @@ public class OpenAddressHashSetTest{
     }
     @org.junit.jupiter.api.Test public void testforEach_Consumer(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var functionCallType:FunctionCallType.values()){
-                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                    for(final var functionGen:StructType.OpenAddressHashSet.validMonitoredFunctionGens){
-                        for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                            final int size
-                            =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
-                            final long randSeedBound=functionGen.randomized && size > 1 && !functionCallType.boxed?100:0;
-                            for(final var checkedType:CheckedType.values()){
-                                if(checkedType.checked || functionGen.expectedException == null || size == 0){
-                                    LongStream.rangeClosed(0,randSeedBound)
-                                    .forEach(randSeed->TestExecutorService.submitTest(()->{
-                                        final var monitor=initSet.initialize(
-                                                new OpenAddressHashSetMonitor(collectionType,checkedType));
-                                        if(functionGen.expectedException == null || monitor.size() == 0){
-                                            monitor.verifyForEach(functionGen,functionCallType,randSeed);
-                                        }else{
-                                            Assertions.assertThrows(functionGen.expectedException,()->monitor
-                                                    .verifyForEach(functionGen,functionCallType,randSeed));
-                                            monitor.verifyCollectionState();
-                                        }
-                                    }));
-                                }
+            for(final var functionCallType:collectionType.validFunctionCalls){
+                
+                for(final var functionGen:StructType.OpenAddressHashSet.validMonitoredFunctionGens){
+                    for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                        final int size
+                        =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
+                        final long randSeedBound=functionGen.randomized && size > 1 && !functionCallType.boxed?100:0;
+                        for(final var checkedType:CheckedType.values()){
+                            if(checkedType.checked || functionGen.expectedException == null || size == 0){
+                                LongStream.rangeClosed(0,randSeedBound)
+                                .forEach(randSeed->TestExecutorService.submitTest(()->{
+                                    final var monitor=initSet.initialize(
+                                            new OpenAddressHashSetMonitor(collectionType,checkedType));
+                                    if(functionGen.expectedException == null || monitor.size() == 0){
+                                        monitor.verifyForEach(functionGen,functionCallType,randSeed);
+                                    }else{
+                                        Assertions.assertThrows(functionGen.expectedException,()->monitor
+                                                .verifyForEach(functionGen,functionCallType,randSeed));
+                                        monitor.verifyCollectionState();
+                                    }
+                                }));
                             }
                         }
                     }
                 }
+                
             }
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testforEach_Consumer");
@@ -490,8 +704,8 @@ public class OpenAddressHashSetTest{
             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
 
                 for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-                    for(final var functionCallType:FunctionCallType.values()){
-                        if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
+                    for(final var functionCallType:collectionType.validFunctionCalls){
+                        
                             for(final var checkedType:CheckedType.values()){
                                 for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
                                     int sizeScenario;
@@ -602,7 +816,7 @@ public class OpenAddressHashSetTest{
                                     }
                                 }
                             }
-                        }
+                        
                     }
 
                 }
@@ -755,73 +969,72 @@ public class OpenAddressHashSetTest{
     }
     @org.junit.jupiter.api.Test public void testremoveIf_Predicate(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
-            for(final var functionCallType:FunctionCallType.values()){
-                if(collectionType != DataType.REF || functionCallType != FunctionCallType.Boxed){
-                    for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
-                        final int setSize
-                        =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
-                        for(final var filterGen:StructType.OpenAddressHashSet.validMonitoredRemoveIfPredicateGens){
-                            final long randSeedBound;
-                            final double[] thresholdArr;
-                            if(filterGen.randomized && setSize > 1 && !functionCallType.boxed){
-                                randSeedBound=100;
-                                thresholdArr=RANDOM_THRESHOLDS;
-                            }else{
-                                randSeedBound=0;
-                                thresholdArr=NON_RANDOM_THRESHOLD;
-                            }
-                            for(final var checkedType:CheckedType.values()){
-                                if(checkedType.checked || filterGen.expectedException == null || setSize == 0){
-                                    LongStream.rangeClosed(0,randSeedBound)
-                                    .forEach(randSeed->DoubleStream.of(thresholdArr).forEach(
-                                            threshold->TestExecutorService.submitTest(()->{
-                                                final var monitor=initSet.initialize(
-                                                        new OpenAddressHashSetMonitor(collectionType,
-                                                                checkedType));
-                                                final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                        monitor,threshold,randSeed);
-                                                final int sizeBefore=monitor.size();
-                                                if(filterGen.expectedException == null || sizeBefore == 0){
-                                                    final boolean result=monitor.verifyRemoveIf(filter,
-                                                            functionCallType);
-                                                    if(sizeBefore == 0b00){
-                                                        Assertions.assertFalse(result);
-                                                    }else{
-                                                        switch(filterGen){
-                                                        case Random:
-                                                            Assertions.assertEquals(filter.numRemoved != 0,
-                                                            result);
-                                                            break;
-                                                        case RemoveAll:
-                                                            Assertions.assertTrue(monitor.set.isEmpty());
-                                                            Assertions.assertTrue(result);
-                                                            break;
-                                                        case RemoveFalse:
-                                                            Assertions.assertFalse(monitor.set.contains(false));
-                                                            break;
-                                                        case RemoveNone:
-                                                            Assertions.assertFalse(result);
-                                                            Assertions.assertFalse(monitor.set.isEmpty());
-                                                            break;
-                                                        case RemoveTrue:
-                                                            Assertions.assertFalse(monitor.set.contains(true));
-                                                            break;
-                                                        default:
-                                                            throw filterGen.invalid();
-                                                        }
-                                                    }
+            for(final var functionCallType:collectionType.validFunctionCalls){
+                for(final var initSet:VALID_INIT_SEQS.get(collectionType)){
+                    final int setSize
+                    =initSet.initialize(new OpenAddressHashSetMonitor(collectionType,CheckedType.UNCHECKED)).size();
+                    for(final var filterGen:StructType.OpenAddressHashSet.validMonitoredRemoveIfPredicateGens){
+                        final long randSeedBound;
+                        final double[] thresholdArr;
+                        if(filterGen.randomized && setSize > 1 && !functionCallType.boxed){
+                            randSeedBound=100;
+                            thresholdArr=RANDOM_THRESHOLDS;
+                        }else{
+                            randSeedBound=0;
+                            thresholdArr=NON_RANDOM_THRESHOLD;
+                        }
+                        for(final var checkedType:CheckedType.values()){
+                            if(checkedType.checked || filterGen.expectedException == null || setSize == 0){
+                                LongStream.rangeClosed(0,randSeedBound)
+                                .forEach(randSeed->DoubleStream.of(thresholdArr).forEach(
+                                        threshold->TestExecutorService.submitTest(()->{
+                                            final var monitor=initSet.initialize(
+                                                    new OpenAddressHashSetMonitor(collectionType,
+                                                            checkedType));
+                                            final var filter=filterGen.getMonitoredRemoveIfPredicate(
+                                                    monitor,threshold,randSeed);
+                                            final int sizeBefore=monitor.size();
+                                            if(filterGen.expectedException == null || sizeBefore == 0){
+                                                final boolean result=monitor.verifyRemoveIf(filter,
+                                                        functionCallType);
+                                                if(sizeBefore == 0b00){
+                                                    Assertions.assertFalse(result);
                                                 }else{
-                                                    Assertions.assertThrows(filterGen.expectedException,
-                                                            ()->monitor.verifyRemoveIf(filter,
-                                                                    functionCallType));
-                                                    monitor.verifyCollectionState();
+                                                    switch(filterGen){
+                                                    case Random:
+                                                        Assertions.assertEquals(filter.numRemoved != 0,
+                                                        result);
+                                                        break;
+                                                    case RemoveAll:
+                                                        Assertions.assertTrue(monitor.set.isEmpty());
+                                                        Assertions.assertTrue(result);
+                                                        break;
+                                                    case RemoveFalse:
+                                                        Assertions.assertFalse(monitor.set.contains(false));
+                                                        break;
+                                                    case RemoveNone:
+                                                        Assertions.assertFalse(result);
+                                                        Assertions.assertFalse(monitor.set.isEmpty());
+                                                        break;
+                                                    case RemoveTrue:
+                                                        Assertions.assertFalse(monitor.set.contains(true));
+                                                        break;
+                                                    default:
+                                                        throw filterGen.invalid();
+                                                    }
                                                 }
-                                            })));
-                                }
+                                            }else{
+                                                Assertions.assertThrows(filterGen.expectedException,
+                                                        ()->monitor.verifyRemoveIf(filter,
+                                                                functionCallType));
+                                                monitor.verifyCollectionState();
+                                            }
+                                        })));
                             }
                         }
                     }
                 }
+                
             }
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testremoveIf_Predicate");

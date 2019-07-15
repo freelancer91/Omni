@@ -97,43 +97,8 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     }
 
 
-    @SuppressWarnings("unchecked") default boolean add(int val) {
-        COL collection=getCollection();
-        DataType dataType=getDataType();
-        boolean result;
-        switch(dataType) {
-        case BOOLEAN:
-            result=((OmniCollection.BooleanInput<?>)collection).add((val&1)!=0);
-            break;
-        case BYTE:
-            result=((OmniCollection.ByteInput<?>)collection).add((byte)val);
-            break;
-        case CHAR:
-            result=((OmniCollection.CharInput<?>)collection).add((char)val);
-            break;
-        case SHORT:
-            result=((OmniCollection.ShortInput<?>)collection).add((short)val);
-            break;
-        case INT:
-        case LONG:
-        case FLOAT:
-        case DOUBLE:
-            result=((OmniCollection.IntInput<?>)collection).add(val);
-            break;
-        case REF:
-            result=((OmniCollection.OfRef<Object>)collection).add(val);
-            break;
-        default:
-            throw dataType.invalid();
-        }
-        updateCollectionState();
-        return result;
-    }
-    default boolean add(MonitoredObject monitoredObject) {
-        @SuppressWarnings("unchecked") boolean result=((OmniCollection.OfRef<Object> )getCollection()).add(monitoredObject);
-        updateCollectionState();
-        return result;
-    }
+    boolean add(int val);
+    
     default void illegalMod(IllegalModification modType){
         switch(modType){
         case ModCollection:

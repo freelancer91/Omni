@@ -5,6 +5,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Assertions;
+import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
 import omni.function.BooleanPredicate;
@@ -104,6 +105,12 @@ MonitoredSequence<LST>{
             Assertions.assertEquals(expected,result);
         }
         return result;
+    }
+    @SuppressWarnings("unchecked")
+    default boolean add(MonitoredObject monitoredObject) {
+        ((OmniCollection.OfRef<Object> )getCollection()).add(monitoredObject);
+        updateAddState(monitoredObject,DataType.REF);
+        return true;
     }
     default Object verifyGet(int index,DataType outputType) {
         Object result;

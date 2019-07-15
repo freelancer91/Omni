@@ -2,10 +2,13 @@ package omni.impl.seq;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import omni.api.OmniCollection;
 import omni.api.OmniDeque;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
@@ -18,23 +21,468 @@ import omni.impl.DataType;
 import omni.impl.DoubleDblLnkNode;
 import omni.impl.FloatDblLnkNode;
 import omni.impl.FunctionCallType;
+import omni.impl.IllegalModification;
 import omni.impl.IntDblLnkNode;
 import omni.impl.IteratorType;
 import omni.impl.LongDblLnkNode;
 import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredDeque;
 import omni.impl.MonitoredFunction;
+import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredList;
+import omni.impl.MonitoredObjectGen;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
+import omni.impl.MonitoredSequence;
+import omni.impl.MonitoredStack;
+import omni.impl.QueryCastType;
+import omni.impl.QueryVal;
+import omni.impl.QueryVal.QueryValModification;
 import omni.impl.RefDblLnkNode;
 import omni.impl.ShortDblLnkNode;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 public class DblLnkSeqTest{
-  private static final EnumSet<StructType> ALL_STRUCTS=EnumSet.of(StructType.DblLnkList);
-  
+    private static interface BasicTest{
+        void runTest(MonitoredSequence<?> monitor);
+        private void runAllTests(String testName){
+            for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+                for(final var illegalMod:initParams.validPreMods){
+                    for(final int size:SIZES){
+                            TestExecutorService.submitTest(()->{
+                                final var monitor=SequenceInitialization.Ascending
+                                        .initialize(getMonitoredList(initParams,size),size,0);
+                                if(illegalMod.expectedException == null){
+                                    runTest(monitor);
+                                }else{
+                                    monitor.illegalMod(illegalMod);
+                                    Assertions.assertThrows(illegalMod.expectedException,()->runTest(monitor));
+                                }
+                            });
+                        
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
+        }
+    }
+    private static interface MonitoredFunctionTest<MONITOR extends MonitoredSequence<?>>{
+        void runTest(MONITOR monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
+                IllegalModification illegalMod,long randSeed);
+        @SuppressWarnings("unchecked")
+        private void runAllTests(String testName,long maxRand,EnumSet<FunctionCallType> functionCallTypes){
+            for(final var initParams:ALL_STRUCT_INIT_PARAMS) {
+                for(final var functionGen:initParams.structType.validMonitoredFunctionGens){
+                    if(initParams.checkedType.checked || functionGen.expectedException == null){
+                        for(final var size:SIZES){
+                            final int initValBound=initParams.collectionType == DataType.BOOLEAN && size != 0?1:0;
+                            for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                                for(final var illegalMod:initParams.validPreMods){
+                                    final long randSeedBound=size > 1 && functionGen.randomized
+                                            && !functionCallType.boxed && illegalMod.expectedException == null?maxRand
+                                                    :0;
+                                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                        final long randSeed=tmpRandSeed;
+                                        for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
+                                            final int initVal=tmpInitVal;
+                                                TestExecutorService.submitTest(()->runTest(
+                                                        (MONITOR)SequenceInitialization.Ascending.initialize(
+                                                                getMonitoredList(initParams,size),size,initVal),
+                                                        functionGen,functionCallType,illegalMod,randSeed));
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
+        }
+    }
+    private static interface QueryTest<MONITOR extends MonitoredSequence<?>>{
+        void callAndVerifyResult(MONITOR monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
+                QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,double position,
+                int seqSize);
+        default boolean cmeFilter(IllegalModification illegalMod,DataType inputType,DataType collectionType,
+                QueryVal queryVal,QueryVal.QueryValModification modification,QueryCastType castType){
+            if(illegalMod.expectedException != null){
+                switch(collectionType){
+                case BOOLEAN:
+                    return queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
+                case BYTE:
+                    switch(queryVal){
+                    default:
+                        if(castType != QueryCastType.ToObject){
+                            switch(inputType){
+                            case CHAR:
+                            case SHORT:
+                            case INT:
+                                return true;
+                            default:
+                            }
+                        }
+                        break;
+                    case Null:
+                        return castType != QueryCastType.ToObject;
+                    case MaxByte:
+                    case MinByte:
+                        switch(modification){
+                        case Plus1:
+                            if(castType != QueryCastType.ToObject){
+                                switch(inputType){
+                                case CHAR:
+                                case SHORT:
+                                case INT:
+                                    return true;
+                                default:
+                                }
+                            }
+                        default:
+                        }
+                    case MaxBoolean:
+                    case Neg0:
+                    case Pos0:
+                    }
+                    return false;
+                case CHAR:
+                    switch(queryVal){
+                    default:
+                        if(castType != QueryCastType.ToObject){
+                            switch(inputType){
+                            case BYTE:
+                            case SHORT:
+                            case INT:
+                                return true;
+                            default:
+                            }
+                        }
+                        break;
+                    case Null:
+                        return castType != QueryCastType.ToObject;
+                    case MaxChar:
+                    case Pos0:
+                        switch(modification){
+                        case Plus1:
+                            if(castType != QueryCastType.ToObject){
+                                switch(inputType){
+                                case BYTE:
+                                case SHORT:
+                                case INT:
+                                    return true;
+                                default:
+                                }
+                            }
+                        default:
+                        }
+                    case MaxBoolean:
+                    case Neg0:
+                    case MaxByte:
+                    case TwoHundred:
+                    case MaxShort:
+                    }
+                    return false;
+                case SHORT:
+                    switch(queryVal){
+                    default:
+                        if(castType != QueryCastType.ToObject){
+                            switch(inputType){
+                            case CHAR:
+                            case INT:
+                                return true;
+                            default:
+                            }
+                        }
+                        break;
+                    case Null:
+                        return castType != QueryCastType.ToObject;
+                    case MaxShort:
+                    case MinShort:
+                        switch(modification){
+                        case Plus1:
+                            if(castType != QueryCastType.ToObject){
+                                switch(inputType){
+                                case CHAR:
+                                case INT:
+                                    return true;
+                                default:
+                                }
+                            }
+                        default:
+                        }
+                    case MaxBoolean:
+                    case Neg0:
+                    case Pos0:
+                    case MaxByte:
+                    case MinByte:
+                    case TwoHundred:
+                    }
+                case REF:
+                    return false;
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                    return queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
+                default:
+                    throw collectionType.invalid();
+                }
+            }
+            return true;
+        }
+        private void runAllTests(String testName,int structSwitch){
+            SequenceInitParams[] initParamArray;
+           // switch(structSwitch){
+           // case 0:
+           //     initParamArray=LIST_STRUCT_INIT_PARAMS;
+           //     break;
+           // case 1:
+           //     initParamArray=STACK_STRUCT_INIT_PARAMS;
+           //     break;
+            //default:
+                initParamArray=ALL_STRUCT_INIT_PARAMS;
+           // }
+            for(final var initParams:initParamArray){
+                for(final var queryVal:QueryVal.values()){
+                    if(initParams.collectionType.isValidQueryVal(queryVal)){
+                        queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
+                            castTypesToInputTypes.forEach((castType,inputTypes)->{
+                                inputTypes.forEach(inputType->{
+                                    if(queryVal == QueryVal.NonNull){
+                                        for(final var monitoredObjectGen:initParams.structType.validMonitoredObjectGens){
+                                            if(monitoredObjectGen.expectedException != null
+                                                    && initParams.checkedType.checked){
+                                                for(final var size:SIZES){
+                                                    if(size > 0){
+                                                        for(final var illegalMod:initParams.validPreMods){
+                                                            final Class<? extends Throwable> expectedException=illegalMod.expectedException == null
+                                                                    ?monitoredObjectGen.expectedException
+                                                                    :illegalMod.expectedException;
+                                                            TestExecutorService.submitTest(
+                                                                    ()->Assertions.assertThrows(expectedException,
+                                                                            ()->runTest(initParams,illegalMod,queryVal,
+                                                                                    modification,castType,inputType,
+                                                                                    monitoredObjectGen,size,-1)));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }else{
+                                        final boolean queryCanReturnTrue=queryVal.queryCanReturnTrue(modification,
+                                                castType,inputType,initParams.collectionType);
+                                        for(final var size:SIZES){
+                                            for(final var position:POSITIONS){
+                                                if(position >= 0){
+                                                    if(!queryCanReturnTrue){
+                                                        continue;
+                                                    }
+                                                    switch(size){
+                                                    case 3:
+                                                        if(position == 0.5d){
+                                                            break;
+                                                        }
+                                                    case 2:
+                                                        if(position == 1.0d){
+                                                            break;
+                                                        }
+                                                    case 1:
+                                                        if(position == 0.0d){
+                                                            break;
+                                                        }
+                                                    case 0:
+                                                        continue;
+                                                    case 4:
+                                                        if(position != 0.5d){
+                                                            break;
+                                                        }
+                                                    default:
+                                                        continue;
+                                                    }
+                                                }
+                                                for(final var illegalMod:initParams.validPreMods){
+                                                    TestExecutorService.submitTest(()->{
+                                                        if(cmeFilter(illegalMod,inputType,initParams.collectionType,
+                                                                queryVal,modification,castType)){
+                                                            runTest(initParams,illegalMod,queryVal,modification,
+                                                                    castType,inputType,null,size,position);
+                                                        }else{
+                                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                                    ()->runTest(initParams,illegalMod,queryVal,
+                                                                            modification,castType,inputType,null,size,
+                                                                            position));
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
+        }
+        @SuppressWarnings("unchecked")
+        private void runTest(SequenceInitParams initParams,IllegalModification illegalMod,QueryVal queryVal,
+                QueryVal.QueryValModification modification,QueryCastType castType,DataType inputType,
+                MonitoredObjectGen monitoredObjectGen,int seqSize,double position){
+            final var monitor=getMonitoredList(initParams,seqSize);
+            if(position < 0){
+                switch(initParams.collectionType){
+                case BOOLEAN:
+                    queryVal.initDoesNotContain((OmniCollection.OfBoolean)monitor.getCollection(),seqSize,0,
+                            modification);
+                    break;
+                case BYTE:
+                    queryVal.initDoesNotContain((OmniCollection.OfByte)monitor.getCollection(),seqSize,0,modification);
+                    break;
+                case CHAR:
+                    queryVal.initDoesNotContain((OmniCollection.OfChar)monitor.getCollection(),seqSize,0,modification);
+                    break;
+                case DOUBLE:
+                    queryVal.initDoesNotContain((OmniCollection.OfDouble)monitor.getCollection(),seqSize,0,
+                            modification);
+                    break;
+                case FLOAT:
+                    queryVal.initDoesNotContain((OmniCollection.OfFloat)monitor.getCollection(),seqSize,0,modification);
+                    break;
+                case INT:
+                    queryVal.initDoesNotContain((OmniCollection.OfInt)monitor.getCollection(),seqSize,0,modification);
+                    break;
+                case LONG:
+                    queryVal.initDoesNotContain((OmniCollection.OfLong)monitor.getCollection(),seqSize,0,modification);
+                    break;
+                case REF:
+                    queryVal.initDoesNotContain((OmniCollection.OfRef<Object>)monitor.getCollection(),seqSize,0,
+                            modification);
+                    break;
+                case SHORT:
+                    queryVal.initDoesNotContain((OmniCollection.OfShort)monitor.getCollection(),seqSize,0,modification);
+                    break;
+                default:
+                    throw initParams.collectionType.invalid();
+                }
+            }else{
+                switch(initParams.collectionType){
+                case BOOLEAN:
+                    queryVal.initContains((OmniCollection.OfBoolean)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case BYTE:
+                    queryVal.initContains((OmniCollection.OfByte)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case CHAR:
+                    queryVal.initContains((OmniCollection.OfChar)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case DOUBLE:
+                    queryVal.initContains((OmniCollection.OfDouble)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case FLOAT:
+                    queryVal.initContains((OmniCollection.OfFloat)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case INT:
+                    queryVal.initContains((OmniCollection.OfInt)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case LONG:
+                    queryVal.initContains((OmniCollection.OfLong)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                case REF:
+                    queryVal.initContains((OmniCollection.OfRef<Object>)monitor.getCollection(),seqSize,0,position,
+                            modification,inputType);
+                    break;
+                case SHORT:
+                    queryVal.initContains((OmniCollection.OfShort)monitor.getCollection(),seqSize,0,position,
+                            modification);
+                    break;
+                default:
+                    throw initParams.collectionType.invalid();
+                }
+            }
+            monitor.updateCollectionState();
+            monitor.illegalMod(illegalMod);
+            callAndVerifyResult((MONITOR)monitor,queryVal,inputType,castType,modification,monitoredObjectGen,position,
+                    seqSize);
+        }
+    }
+    private static interface ToStringAndHashCodeTest{
+        void callRaw(OmniCollection<?> seq);
+        void callVerify(MonitoredSequence<?> monitor);
+        private void runAllTests(String testName){
+            for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+                if(initParams.collectionType == DataType.REF){
+                    for(final var objGen:initParams.structType.validMonitoredObjectGens){
+                        if(objGen.expectedException == null || initParams.checkedType.checked){
+                            for(final var size:SIZES){
+                                for(final var illegalMod:initParams.validPreMods){
+                                    TestExecutorService.submitTest(()->{
+                                        if(size == 0 || objGen.expectedException == null){
+                                            final var monitor=SequenceInitialization.Ascending
+                                                    .initialize(getMonitoredList(initParams,size),size,0);
+                                            if(illegalMod.expectedException == null){
+                                                callVerify(monitor);
+                                            }else{
+                                                monitor.illegalMod(illegalMod);
+                                                Assertions.assertThrows(illegalMod.expectedException,
+                                                        ()->callVerify(monitor));
+                                            }
+                                        }else{
+                                            final var throwSwitch=new MonitoredObjectGen.ThrowSwitch();
+                                            final var monitor=SequenceInitialization.Ascending
+                                                    .initializeWithMonitoredObj(getMonitoredList(initParams,size),
+                                                            size,0,objGen,throwSwitch);
+                                            monitor.illegalMod(illegalMod);
+                                            final Class<? extends Throwable> expectedException=illegalMod.expectedException == null
+                                                    ?objGen.expectedException
+                                                    :illegalMod.expectedException;
+                                            Assertions.assertThrows(expectedException,()->{
+                                                try{
+                                                    callRaw(monitor.getCollection());
+                                                }finally{
+                                                    throwSwitch.doThrow=false;
+                                                    monitor.verifyCollectionState();
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    final int initValBound=initParams.collectionType == DataType.BOOLEAN?1:0;
+                    for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
+                        final int initVal=tmpInitVal;
+                        for(final var size:SIZES){
+                            for(final var illegalMod:initParams.validPreMods){
+                                TestExecutorService.submitTest(()->{
+                                    final var monitor=SequenceInitialization.Ascending
+                                            .initialize(getMonitoredList(initParams,size),size,initVal);
+                                    if(illegalMod.expectedException == null){
+                                        callVerify(monitor);
+                                    }else{
+                                        monitor.illegalMod(illegalMod);
+                                        Assertions.assertThrows(illegalMod.expectedException,()->callVerify(monitor));
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            TestExecutorService.completeAllTests(testName);
+        }
+    }
   
   private static class DblLnkSeqMonitor<LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
       extends AbstractSequenceMonitor<LSTDEQ> implements MonitoredDeque<LSTDEQ>,MonitoredList<LSTDEQ>{
@@ -42,18 +490,46 @@ public class DblLnkSeqTest{
       final DblLnkSeqMonitor<LSTDEQ,E> expectedRoot;
       final SubListMonitor<SUBLIST,LSTDEQ,E> expectedParent;
       final SUBLIST seq;
+      final int expectedParentOffset;
+      final int expectedRootOffset;
+      Object expectedHead;
+      Object expectedTail;
+      
       int expectedSize;
       int expectedModCount;
+      
+      
       //TODO add the other fields
       
       
-      SubListMonitor(DblLnkSeqMonitor<LSTDEQ,E> expectedRoot,int fromIndex,int toIndex){
-        //TODO
-        throw new UnsupportedOperationException();
+      @SuppressWarnings("unchecked")
+    SubListMonitor(DblLnkSeqMonitor<LSTDEQ,E> expectedRoot,int fromIndex,int toIndex){
+          this.expectedRoot=expectedRoot;
+          this.expectedParent=null;
+          this.seq=(SUBLIST)expectedRoot.seq.subList(fromIndex,toIndex);
+          this.expectedSize=toIndex-fromIndex;
+          this.expectedModCount=expectedRoot.expectedModCount;
+          this.expectedRootOffset=fromIndex;
+          this.expectedParentOffset=fromIndex;
+          
+          if(expectedSize!=0) {
+             expectedTail=expectedRoot.getNodeIterateDown(expectedRoot.seq,expectedRoot.expectedSize-toIndex);
+             expectedHead=expectedRoot.getNodeIterateUp(fromIndex,expectedRoot.seq);
+          }
       }
-      SubListMonitor(SubListMonitor<SUBLIST,LSTDEQ,E> expectedRoot,int fromIndex,int toIndex){
-        //TODO
-        throw new UnsupportedOperationException();
+      @SuppressWarnings("unchecked")
+    SubListMonitor(SubListMonitor<SUBLIST,LSTDEQ,E> expectedParent,int fromIndex,int toIndex){
+          this.expectedRoot=expectedParent.expectedRoot;
+          this.expectedParent=expectedParent;
+          this.seq=(SUBLIST)expectedParent.seq.subList(fromIndex,toIndex);
+          this.expectedSize=toIndex-fromIndex;
+          this.expectedModCount=expectedParent.expectedModCount;
+          this.expectedRootOffset=expectedParent.expectedRootOffset+fromIndex;
+          this.expectedParentOffset=fromIndex;
+          if(expectedSize!=0) {
+              expectedTail=expectedRoot.getNodeIterateDown(expectedParent.seq,expectedParent.expectedSize-toIndex);
+              expectedHead=expectedRoot.getNodeIterateUp(fromIndex,expectedParent.seq);
+           }
       }
       
       @Override public void updateRemoveIndexState(int index){
@@ -161,9 +637,84 @@ public class DblLnkSeqTest{
         
       }
 
-      @Override public void updateCollectionState(){
-        // TODO Auto-generated method stub
-        
+      @SuppressWarnings("unchecked")
+    @Override public void updateCollectionState(){
+        Consumer<SubListMonitor<SUBLIST,LSTDEQ,E>> updater=subListMonitor->subListMonitor.expectedSize=((AbstractSeq<E>)subListMonitor.seq).size;
+        if(expectedRoot.checkedType.checked) {
+            var dataType=expectedRoot.dataType;
+            switch(dataType) {
+            case BOOLEAN:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.BooleanDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((BooleanDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((BooleanDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case BYTE:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.ByteDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((ByteDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((ByteDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case CHAR:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.CharDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((CharDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((CharDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case DOUBLE:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.DoubleDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((DoubleDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((DoubleDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case FLOAT:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.FloatDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((FloatDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((FloatDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case INT:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.IntDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((IntDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((IntDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case LONG:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.LongDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((LongDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((LongDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            case REF:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.RefDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((RefDblLnkSeq<E>)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((RefDblLnkSeq<E>)subListMonitor.seq).tail;
+                });
+                break;
+            case SHORT:
+                updater=updater.andThen(subListMonitor->{
+                    subListMonitor.expectedModCount=FieldAndMethodAccessor.ShortDblLnkSeq.CheckedSubList.modCount(subListMonitor.seq);
+                    subListMonitor.expectedHead=((ShortDblLnkSeq)subListMonitor.seq).head;
+                    subListMonitor.expectedTail=((ShortDblLnkSeq)subListMonitor.seq).tail;
+                });
+                break;
+            default:
+                throw dataType.invalid();
+            }
+        }
+        var curr=this;
+        do {
+            updater.accept(curr);
+        }while((curr=curr.expectedParent)!=null);
+        expectedRoot.updateCollectionState();
       }
 
       @Override public void verifyClone(Object clone){
@@ -212,8 +763,77 @@ public class DblLnkSeqTest{
       }
 
       @Override public void verifyCollectionState(boolean refIsSame){
-        // TODO Auto-generated method stub
-        
+        var dataType=expectedRoot.dataType;
+        int rootOffset=this.expectedRootOffset;
+        int rootBound=rootOffset+this.expectedSize;
+        boolean checked=expectedRoot.checkedType.checked;
+        switch(dataType) {
+        case BOOLEAN:{
+            var root=(BooleanDblLnkSeq)expectedRoot.seq;
+            var curr=(BooleanDblLnkSeq)seq;
+            var expectedArr=(boolean[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case BYTE:{
+            var root=(ByteDblLnkSeq)expectedRoot.seq;
+            var curr=(ByteDblLnkSeq)seq;
+            var expectedArr=(byte[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case CHAR:{
+            var root=(CharDblLnkSeq)expectedRoot.seq;
+            var curr=(CharDblLnkSeq)seq;
+            var expectedArr=(char[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case DOUBLE:{
+            var root=(DoubleDblLnkSeq)expectedRoot.seq;
+            var curr=(DoubleDblLnkSeq)seq;
+            var expectedArr=(double[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case FLOAT:{
+            var root=(FloatDblLnkSeq)expectedRoot.seq;
+            var curr=(FloatDblLnkSeq)seq;
+            var expectedArr=(float[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case INT:{
+            var root=(IntDblLnkSeq)expectedRoot.seq;
+            var curr=(IntDblLnkSeq)seq;
+            var expectedArr=(int[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case LONG:{
+            var root=(LongDblLnkSeq)expectedRoot.seq;
+            var curr=(LongDblLnkSeq)seq;
+            var expectedArr=(long[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case REF:{
+            var root=(RefDblLnkSeq<E>)expectedRoot.seq;
+            var curr=(RefDblLnkSeq<E>)seq;
+            var expectedArr=(Object[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        case SHORT:{
+            var root=(ShortDblLnkSeq)expectedRoot.seq;
+            var curr=(ShortDblLnkSeq)seq;
+            var expectedArr=(short[])expectedRoot.expectedArr;
+            //TODO
+            break;
+        }
+        default:
+            throw dataType.invalid();
+        }
       }
 
       @Override public void copyListContents(){
@@ -330,13 +950,28 @@ public class DblLnkSeqTest{
       }
     }
     private Object getNode(int index,AbstractSeq<E> seq,int expectedSize) {
-      int tailDist;
-      if((tailDist=expectedSize-index)<=index) {
-        return getNodeIterateDown(seq,tailDist);
+      if((expectedSize-=index)<=index) {
+        return getNodeIterateDown(seq,expectedSize);
       }else {
         return getNodeIterateUp(index,seq);
       }
     }
+    private Object getItrNode(int index,AbstractSeq<E> seq,int expectedSize) {
+        if((expectedSize-=index)<=index){
+            //the node is closer to the tail
+            switch(expectedSize){
+            case 0:
+              return null;
+            case 1:
+              return tail(seq);
+            default:
+              return getNodeIterateDown(seq,expectedSize);
+            }
+          }else{
+            //the node is closer to the head
+            return getNodeIterateUp(index,seq);
+          }
+        }
     private Object getNodeIterateUp(int index,AbstractSeq<E> seq){
       switch(dataType) {
       case BOOLEAN:{
@@ -681,7 +1316,7 @@ public class DblLnkSeqTest{
         this.lastRetIndex=-1;
       }
       @Override public boolean nextWasJustCalled(){
-        return lastRetIndex!=0 && lastRetIndex<expectedCurrIndex;
+        return lastRetIndex!=-1 && lastRetIndex<expectedCurrIndex;
       }
       @Override public void updateItrNextState(){
         expectedLastRet=expectedCurr;
@@ -992,7 +1627,7 @@ public class DblLnkSeqTest{
         super(seq.listIterator(),0,head(seq));
       }
       ListItrMonitor(int index){
-        super(seq.listIterator(index),index,getNode(index,seq,expectedSize));
+        super(seq.listIterator(index),index,getItrNode(index,seq,expectedSize));
       }
       @Override public IteratorType getIteratorType(){
         return IteratorType.BidirectionalItr;
@@ -1459,7 +2094,11 @@ public class DblLnkSeqTest{
       switch(dataType){
       case BOOLEAN:{
         final var cast=(BooleanDblLnkSeq)seq;
-        final var expectedArr=(boolean[])this.expectedArr;
+        var expectedArr=(boolean[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new boolean[this.expectedCapacity=expectedArr==OmniArray.OfBoolean.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1472,7 +2111,11 @@ public class DblLnkSeqTest{
       }
       case BYTE:{
         final var cast=(ByteDblLnkSeq)seq;
-        final var expectedArr=(byte[])this.expectedArr;
+        var expectedArr=(byte[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new byte[this.expectedCapacity=expectedArr==OmniArray.OfByte.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1485,7 +2128,11 @@ public class DblLnkSeqTest{
       }
       case CHAR:{
         final var cast=(CharDblLnkSeq)seq;
-        final var expectedArr=(char[])this.expectedArr;
+        var expectedArr=(char[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new char[this.expectedCapacity=expectedArr==OmniArray.OfChar.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1498,7 +2145,11 @@ public class DblLnkSeqTest{
       }
       case DOUBLE:{
         final var cast=(DoubleDblLnkSeq)seq;
-        final var expectedArr=(double[])this.expectedArr;
+        var expectedArr=(double[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new double[this.expectedCapacity=expectedArr==OmniArray.OfDouble.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1511,7 +2162,11 @@ public class DblLnkSeqTest{
       }
       case FLOAT:{
         final var cast=(FloatDblLnkSeq)seq;
-        final var expectedArr=(float[])this.expectedArr;
+        var expectedArr=(float[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new float[this.expectedCapacity=expectedArr==OmniArray.OfFloat.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1524,7 +2179,11 @@ public class DblLnkSeqTest{
       }
       case INT:{
         final var cast=(IntDblLnkSeq)seq;
-        final var expectedArr=(int[])this.expectedArr;
+        var expectedArr=(int[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new int[this.expectedCapacity=expectedArr==OmniArray.OfInt.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1537,7 +2196,11 @@ public class DblLnkSeqTest{
       }
       case LONG:{
         final var cast=(LongDblLnkSeq)seq;
-        final var expectedArr=(long[])this.expectedArr;
+        var expectedArr=(long[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new long[this.expectedCapacity=expectedArr==OmniArray.OfLong.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1550,7 +2213,11 @@ public class DblLnkSeqTest{
       }
       case REF:{
         @SuppressWarnings("unchecked") final var cast=(RefDblLnkSeq<E>)seq;
-        final var expectedArr=(Object[])this.expectedArr;
+        var expectedArr=(Object[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new Object[this.expectedCapacity=expectedArr==OmniArray.OfRef.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -1566,7 +2233,11 @@ public class DblLnkSeqTest{
       }
       case SHORT:{
         final var cast=(ShortDblLnkSeq)seq;
-        final var expectedArr=(short[])this.expectedArr;
+        var expectedArr=(short[])this.expectedArr;
+        int expectedCapacity;
+        if((expectedCapacity=this.expectedCapacity)<expectedSize) {
+            this.expectedArr=expectedArr=new short[this.expectedCapacity=expectedArr==OmniArray.OfShort.DEFAULT_ARR && expectedSize<=OmniArray.DEFAULT_ARR_SEQ_CAP?OmniArray.DEFAULT_ARR_SEQ_CAP:OmniArray.growBy50Pct(expectedCapacity,expectedSize)];
+        }
         var currNode=cast.tail;
         for(int i=expectedSize;;){
           if(currNode == null){
@@ -2129,7 +2800,7 @@ public class DblLnkSeqTest{
           var prevNode=headNode.prev;
           Assertions.assertNull(prevNode);
           for(int i=0;i < expectedSize;++i){
-            Assertions.assertEquals(headNode.val,(long)expectedArr[i]);
+            Assertions.assertEquals(headNode.val,expectedArr[i]);
             Assertions.assertSame(prevNode,headNode.prev);
             prevNode=headNode;
             headNode=headNode.next;
@@ -2299,32 +2970,26 @@ public class DblLnkSeqTest{
       }
     }
   }
-  private static class SequenceInitParams{
-    final DataType collectionType;
-    final StructType structType;
-    final CheckedType checkedType;
-    final int[] preAllocs;
-    final int[] postAllocs;
-    public SequenceInitParams(StructType structType,DataType collectionType,CheckedType checkedType,
-        int[] preAllocs,int[] postAllocs){
-      super();
-      this.collectionType=collectionType;
-      this.structType=structType;
-      this.checkedType=checkedType;
-      this.preAllocs=preAllocs;
-      this.postAllocs=postAllocs;
-    }
-    
-  }
-  
-  private static final SequenceInitParams[] INIT_PARAMS;
+  private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
+  private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
+  private static final int[] NON_THROWING_REMOVE_AT_POSITIONS=new int[]{-1,0,1,2,3};
+  private static final int[] THROWING_REMOVE_AT_POSITIONS=new int[]{-1};
+  private static final double[] POSITIONS=new double[]{-1,0,0.5,1.0};
+  private static final SequenceInitParams[] ALL_STRUCT_INIT_PARAMS;
+  private static final SequenceInitParams[] ROOT_STRUCT_INIT_PARAMS;
+  private static final int[] SHORT_SIZES=new int[]{0,100};
+  private static final int[] SIZES=new int[]{0,1,2,3,4,5,10,20,30,40,50,60,70,80,90,100};
   static {
-    Stream.Builder<SequenceInitParams> builder=Stream.builder();
+    Stream.Builder<SequenceInitParams> allStructBuilder=Stream.builder();
+    Stream.Builder<SequenceInitParams> rootStructBuilder=Stream.builder();
     for(var checkedType:CheckedType.values()) {
       for(var collectionType:DataType.values()) {
-        builder.accept(new SequenceInitParams(StructType.DblLnkList,collectionType,checkedType,OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR));
+          var rootParams=new SequenceInitParams(StructType.DblLnkList,collectionType,checkedType,OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR);
+          allStructBuilder.accept(rootParams);
+          rootStructBuilder.accept(rootParams);
       }
     }
+    ROOT_STRUCT_INIT_PARAMS=rootStructBuilder.build().toArray(SequenceInitParams[]::new);
 //    for(int pre0=0;pre0<=4;pre0+=2) {
 //      for(int pre1=0;pre1<=4;pre1+=2) {
 //        for(int pre2=0;pre2<=4;pre2+=2) {
@@ -2335,7 +3000,7 @@ public class DblLnkSeqTest{
 //                final var postAllocs=new int[] {post0,post1,post2};
 //                for(var checkedType:CheckedType.values()) {
 //                  for(var collectionType:DataType.values()) {
-//                    builder.accept(new SequenceInitParams(StructType.DblLnkSubList,collectionType,checkedType,preAllocs,postAllocs));
+//                    allStructBuilder.accept(new SequenceInitParams(StructType.DblLnkSubList,collectionType,checkedType,preAllocs,postAllocs));
 //                  }
 //                }
 //              }
@@ -2344,10 +3009,10 @@ public class DblLnkSeqTest{
 //        }
 //      }
 //    }
-    INIT_PARAMS=builder.build().toArray(SequenceInitParams[]::new);
+    ALL_STRUCT_INIT_PARAMS=allStructBuilder.build().toArray(SequenceInitParams[]::new);
   }
   
-  private MonitoredList<?> getMonitoredList(SequenceInitParams initParams,int initialCapacity){
+  private static MonitoredList<?> getMonitoredList(SequenceInitParams initParams,int initialCapacity){
     var rootMonitor=new DblLnkSeqMonitor<>(initParams,getInitCapacity(initialCapacity,initParams.preAllocs,initParams.postAllocs));
     if(initParams.structType==StructType.DblLnkSubList) {
       //TODO
@@ -2364,7 +3029,202 @@ public class DblLnkSeqTest{
     }
     return initCapacity;
   }
-
+  @org.junit.jupiter.api.AfterEach
+  public void verifyAllExecuted(){
+      int numTestsRemaining;
+      if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
+          System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
+      }
+      TestExecutorService.reset();
+  }
+  @Test
+  public void testcontains_val(){
+      final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+              position,seqSize)->{
+          if(monitoredObjectGen == null){
+              Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
+          }else{
+              monitor.verifyThrowingContains(monitoredObjectGen);
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testcontains_val",2);
+  }
+  @Test
+  public void testforEach_Consumer(){
+      final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
+              randSeed)->{
+          if(illegalMod.expectedException == null){
+              if(functionGen.expectedException == null || monitor.isEmpty()){
+                  monitor.verifyForEach(functionGen,functionCallType,randSeed);
+              }else{
+                  Assertions.assertThrows(functionGen.expectedException,
+                          ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+              }
+          }else{
+              monitor.illegalMod(illegalMod);
+              Assertions.assertThrows(illegalMod.expectedException,
+                      ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testforEach_Consumer",100,EnumSet.allOf(FunctionCallType.class));
+  }
+  @Test
+  public void testlastIndexOf_val(){
+      final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+              position,seqSize)->{
+          if(monitoredObjectGen == null){
+              int expectedIndex;
+              if(position >= 0){
+                  expectedIndex=(int)Math.round(position * seqSize);
+              }else{
+                  expectedIndex=-1;
+              }
+              Assertions.assertEquals(expectedIndex,
+                      monitor.verifyLastIndexOf(queryVal,inputType,castType,modification));
+          }else{
+              monitor.verifyThrowingLastIndexOf(monitoredObjectGen);
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testlastIndexOf_val",0);
+  }
+  @Test
+  public void testremoveVal_val(){
+      final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
+          @Override
+          public void callAndVerifyResult(MonitoredSequence<?> monitor,QueryVal queryVal,DataType inputType,
+                  QueryCastType castType,QueryValModification modification,MonitoredObjectGen monitoredObjectGen,
+                  double position,int seqSize){
+              if(monitoredObjectGen == null){
+                  Assertions.assertEquals(position >= 0,
+                          monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
+              }else{
+                  monitor.verifyThrowingRemoveVal(monitoredObjectGen);
+              }
+          }
+          @Override
+          public boolean cmeFilter(IllegalModification illegalMod,DataType inputType,DataType collectionType,
+                  QueryVal queryVal,QueryVal.QueryValModification modification,QueryCastType castType){
+              return illegalMod.expectedException == null || collectionType != DataType.REF
+                      && queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testremoveVal_val",2);
+  }
+  @Test
+  public void testreplaceAll_UnaryOperator(){
+      final MonitoredFunctionTest<MonitoredList<?>> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+          if(illegalMod.expectedException == null){
+              if(functionGen.expectedException == null || monitor.isEmpty()){
+                  monitor.verifyReplaceAll(functionGen,functionCallType,randSeed);
+              }else{
+                  Assertions.assertThrows(functionGen.expectedException,
+                          ()->monitor.verifyReplaceAll(functionGen,functionCallType,randSeed));
+              }
+          }else{
+              monitor.illegalMod(illegalMod);
+              Assertions.assertThrows(illegalMod.expectedException,
+                      ()->monitor.verifyReplaceAll(functionGen,functionCallType,randSeed));
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testreplaceAll_UnaryOperator",100,EnumSet.allOf(FunctionCallType.class));
+  }
+  @Tag("Search")
+  @Test
+  public void testsearch_val(){
+      final QueryTest<MonitoredStack<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+              position,seqSize)->{
+          if(monitoredObjectGen == null){
+              int expectedIndex;
+              if(position >= 0){
+                  expectedIndex=1+(int)Math.round(position * seqSize);
+              }else{
+                  expectedIndex=-1;
+              }
+              Assertions.assertEquals(expectedIndex,monitor.verifySearch(queryVal,inputType,castType,modification));
+          }else{
+              monitor.verifyThrowingSearch(monitoredObjectGen);
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testsearch",1);
+  }
+  @Test
+  public void testindexOf_val(){
+      final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+              position,seqSize)->{
+          if(monitoredObjectGen == null){
+              int expectedIndex;
+              if(position >= 0){
+                  expectedIndex=(int)Math.round(position * seqSize);
+              }else{
+                  expectedIndex=-1;
+              }
+              Assertions.assertEquals(expectedIndex,monitor.verifyIndexOf(queryVal,inputType,castType,modification));
+          }else{
+              monitor.verifyThrowingIndexOf(monitoredObjectGen);
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testindexOf_val",0);
+  }
+  @Test
+  public void testtoArray_IntFunction(){
+      final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
+              randSeed)->{
+          if(illegalMod.expectedException == null){
+              if(functionGen.expectedException == null){
+                  monitor.verifyToArray(functionGen);
+              }else{
+                  Assertions.assertThrows(functionGen.expectedException,()->monitor.verifyToArray(functionGen));
+              }
+          }else{
+              monitor.illegalMod(illegalMod);
+              Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyToArray(functionGen));
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testtoArray_IntFunction",0,EnumSet.of(FunctionCallType.Unboxed));
+  }
+  @Test
+  public void testisEmpty_void(){
+      final BasicTest test=MonitoredSequence::verifyIsEmpty;
+      test.runAllTests("DblLnkSeqTest.testisEmpty_void");
+  }
+  @Test
+  public void testtoString_void(){
+      final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
+          @Override
+          public void callRaw(OmniCollection<?> seq){
+              seq.toString();
+          }
+          @Override
+          public void callVerify(MonitoredSequence<?> monitor){
+              monitor.verifyToString();
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testtoString_void");
+  }
+  @Test
+  public void testclear_void(){
+      final BasicTest test=MonitoredSequence::verifyClear;
+      test.runAllTests("DblLnkSeqTest.testclear_void");
+  }
+  @Test
+  public void testclone_void(){
+      final BasicTest test=MonitoredSequence::verifyClone;
+      test.runAllTests("DblLnkSeqTest.testclone_void");
+  }
+  @Test
+  public void testhashCode_void(){
+      final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
+          @Override
+          public void callRaw(OmniCollection<?> seq){
+              seq.hashCode();
+          }
+          @Override
+          public void callVerify(MonitoredSequence<?> monitor){
+              monitor.verifyHashCode();
+          }
+      };
+      test.runAllTests("DblLnkSeqTest.testhashCode_void");
+  }
   @Test
   public void testConstructor_void() {
     for(var checkedType:CheckedType.values()) {
@@ -2376,39 +3236,1086 @@ public class DblLnkSeqTest{
   }
   @Test
   public void testadd_val() {
-    for(var initParams:INIT_PARAMS) {
-      for(var illegalMod:initParams.structType.validPreMods) {
-        if(initParams.checkedType.checked || illegalMod.expectedException==null) {
-          for(var functionCallType:FunctionCallType.values()) {
-            for(var inputType:initParams.collectionType.mayBeAddedTo()) {
-              if(!functionCallType.boxed || inputType!=DataType.REF) {
-                if(illegalMod.expectedException==null) {
-                  TestExecutorService.submitTest(()->{
-                    var monitor=getMonitoredList(initParams,100);
-                    for(int i=0;i<100;++i) {
-                      monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+    for(var initParams:ALL_STRUCT_INIT_PARAMS) {
+      for(var illegalMod:initParams.validPreMods) {
+          for(var inputType:initParams.collectionType.mayBeAddedTo()) {
+              for(var functionCallType:inputType.validFunctionCalls) {
+                  if(illegalMod.expectedException==null) {
+                      TestExecutorService.submitTest(()->{
+                        var monitor=getMonitoredList(initParams,100);
+                        for(int i=0;i<100;++i) {
+                          monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+                        }
+                      });
+                    }else {
+                      for(int tmpInitSize=0;tmpInitSize<100;++tmpInitSize) {
+                        final int initSize=tmpInitSize;
+                        TestExecutorService.submitTest(()->{
+                            var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,initSize),initSize,0,0);
+                            monitor.illegalMod(illegalMod);
+                            Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyAdd(inputType.convertValUnchecked(initSize),inputType,functionCallType));
+                        });
+                      }
                     }
-                  });
-                }else {
-                  for(int tmpInitSize=0;tmpInitSize<100;++tmpInitSize) {
-                    final int initSize=tmpInitSize;
-                    TestExecutorService.submitTest(()->{
-                        var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,initSize),initSize,0,0);
-                        monitor.illegalMod(illegalMod);
-                        Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyAdd(inputType.convertValUnchecked(initSize),inputType,functionCallType));
-                    });
                   }
-                }
-              }
-            }
           }
-        }
+        
       }
     }
     TestExecutorService.completeAllTests("DblLnkSeqTest.testadd_val");
   }
   @Test
   public void testadd_intval() {
-    //TODO
+      for(var initParams:ALL_STRUCT_INIT_PARAMS) {
+          for(final var position:POSITIONS){
+              if(position >= 0 || initParams.checkedType.checked){
+                  for(final var illegalMod:initParams.validPreMods){
+                      for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                          for(final var functionCallType:inputType.validFunctionCalls){
+                              
+                                  TestExecutorService.submitTest(()->{
+                                      if(illegalMod.expectedException == null){
+                                          final var monitor=getMonitoredList(initParams,100);
+                                          if(position < 0){
+                                              for(int i=0;i < 100;++i){
+                                                  final Object inputVal=inputType.convertValUnchecked(i);
+                                                  final int finalI=i;
+                                                  Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
+                                                          .verifyAdd(-1,inputVal,inputType,functionCallType));
+                                                  Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
+                                                          .verifyAdd(finalI + 1,inputVal,inputType,functionCallType));
+                                                  monitor.add(i);
+                                              }
+                                          }else{
+                                              for(int i=0;i < 100;++i){
+                                                  monitor.verifyAdd((int)(i * position),
+                                                          inputType.convertValUnchecked(i),inputType,
+                                                          functionCallType);
+                                              }
+                                          }
+                                      }else{
+                                          {
+                                              final var monitor=SequenceInitialization.Ascending
+                                                      .initialize(getMonitoredList(initParams,10),10,0);
+                                              monitor.illegalMod(illegalMod);
+                                              final Object inputVal=inputType.convertValUnchecked(0);
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
+                                          }
+                                          {
+                                              final var monitor=getMonitoredList(initParams,0);
+                                              monitor.illegalMod(illegalMod);
+                                              final Object inputVal=inputType.convertValUnchecked(0);
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
+                                          }
+                                      }
+                                  });
+                              
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testadd_intval");
+  }
+  @Test
+  public void testget_int(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final var size:SHORT_SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                              size,0);
+                      monitor.illegalMod(illegalMod);
+                      if(illegalMod.expectedException == null){
+                          for(final var outputType:initParams.collectionType.validOutputTypes()){
+                              if(initParams.checkedType.checked){
+                                  Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                          ()->monitor.verifyGet(-1,outputType));
+                                  Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                          ()->monitor.verifyGet(size,outputType));
+                              }
+                              for(int index=0;index < size;++index){
+                                  monitor.verifyGet(index,outputType);
+                              }
+                          }
+                      }else{
+                          for(final var outputType:initParams.collectionType.validOutputTypes()){
+                              for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                  final int index=tmpIndex;
+                                  Assertions.assertThrows(illegalMod.expectedException,
+                                          ()->monitor.verifyGet(index,outputType));
+                              }
+                          }
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testget_int");
+  }
+  @Test
+  public void testiterator_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final var size:SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var monitor=SequenceInitialization.Ascending
+                              .initialize(getMonitoredList(initParams,size),size,0);
+                      try{
+                          if(illegalMod.expectedException == null){
+                              monitor.getMonitoredIterator().verifyIteratorState();
+                          }else{
+                              monitor.illegalMod(illegalMod);
+                              Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredIterator);
+                          }
+                      }finally{
+                          monitor.verifyCollectionState();
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testiterator_void");
+  }
+  @Tag("ForEachRemaining")
+  @Test
+  public void testItrforEachRemaining_Consumer(){
+      for(final int size:SIZES){
+          int prevNumToIterate=-1;
+          for(final var position:POSITIONS){
+              int numToIterate;
+              if(position >= 0 && (numToIterate=(int)(position * size)) != prevNumToIterate){
+                  prevNumToIterate=numToIterate;
+                  final int numLeft=size - numToIterate;
+                  for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+                      for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                          for(final var itrType:initParams.structType.validItrTypes){
+                              for(final var illegalMod:itrType.validPreMods){
+                                  if(illegalMod.expectedException == null || initParams.checkedType.checked){
+                                      for(final var functionGen:itrType.validMonitoredFunctionGens){
+                                          if(initParams.checkedType.checked || size == 0
+                                                  || functionGen.expectedException == null){
+                                              final long randSeedBound=!functionCallType.boxed && numLeft > 1
+                                                      && functionGen.randomized&&illegalMod.expectedException==null?100:0;
+                                              for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                                  final long randSeed=tmpRandSeed;
+                                                  TestExecutorService.submitTest(()->{
+                                                      final var seqMonitor=SequenceInitialization.Ascending
+                                                              .initialize(getMonitoredList(initParams,size),size,
+                                                                      0);
+                                                      final var itrMonitor=seqMonitor
+                                                              .getMonitoredIterator(numToIterate,itrType);
+                                                      itrMonitor.illegalMod(illegalMod);
+                                                      if(illegalMod.expectedException == null || numLeft == 0){
+                                                          if(functionGen.expectedException == null || numLeft == 0){
+                                                              itrMonitor.verifyForEachRemaining(functionGen,
+                                                                      functionCallType,randSeed);
+                                                          }else{
+                                                              Assertions
+                                                                      .assertThrows(functionGen.expectedException,
+                                                                              ()->itrMonitor.verifyForEachRemaining(
+                                                                                      functionGen,functionCallType,
+                                                                                      randSeed));
+                                                          }
+                                                      }else{
+                                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                                  ()->itrMonitor.verifyForEachRemaining(functionGen,
+                                                                          functionCallType,randSeed));
+                                                      }
+                                                  });
+                                              }
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testItrforEachRemaining_Consumer");
+  }
+  @Test
+  public void testItrhasNext_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var itrType:initParams.structType.validItrTypes){
+              for(final int size:SHORT_SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var seqMonitor=SequenceInitialization.Ascending
+                              .initialize(getMonitoredList(initParams,size),size,0);
+                      final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                      while(itrMonitor.verifyHasNext()){
+                          itrMonitor.iterateForward();
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testItrhasNext_void");
+  }
+  @Test
+  public void testItrnext_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var itrType:initParams.structType.validItrTypes){
+              for(final var illegalMod:itrType.validPreMods){
+                  if(illegalMod.expectedException == null || initParams.checkedType.checked){
+                      for(final var outputType:initParams.collectionType.validOutputTypes()){
+                          for(final var size:SHORT_SIZES){
+                              if(size > 0 || initParams.checkedType.checked){
+                                  TestExecutorService.submitTest(()->{
+                                      final var seqMonitor=SequenceInitialization.Ascending
+                                              .initialize(getMonitoredList(initParams,size),size,0);
+                                      final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
+                                      if(illegalMod.expectedException == null){
+                                          while(itrMonitor.hasNext()){
+                                              itrMonitor.verifyNext(outputType);
+                                          }
+                                          if(initParams.checkedType.checked){
+                                              Assertions.assertThrows(NoSuchElementException.class,
+                                                      ()->itrMonitor.verifyNext(outputType));
+                                          }
+                                      }else{
+                                          itrMonitor.illegalMod(illegalMod);
+                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                  ()->itrMonitor.verifyNext(outputType));
+                                      }
+                                  });
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testItrnext_void");
+  }
+  @Test
+  public void testlistIterator_int(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var size:SIZES){
+              final int inc=Math.max(1,size / 10);
+              if(initParams.checkedType.checked || size > 0){
+                  for(final var illegalMod:initParams.validPreMods){
+                      TestExecutorService.submitTest(()->{
+                          final var monitor=SequenceInitialization.Ascending
+                                  .initialize(getMonitoredList(initParams,size),size,0);
+                          if(illegalMod.expectedException == null){
+                              for(int index=-inc,bound=size + inc;index <= bound;index+=inc){
+                                  if(index < 0 || index > size){
+                                      if(initParams.checkedType.checked){
+                                          final int finalIndex=index;
+                                          Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+                                              try{
+                                                  monitor.getMonitoredListIterator(finalIndex);
+                                              }finally{
+                                                  monitor.verifyCollectionState();
+                                              }
+                                          });
+                                      }
+                                  }else{
+                                      final var itrMonitor=monitor.getMonitoredListIterator(index);
+                                      monitor.verifyCollectionState();
+                                      itrMonitor.verifyIteratorState();
+                                  }
+                              }
+                          }
+                      });
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testlistIterator_int");
+  }
+  @Test
+  public void testlistIterator_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final var size:SHORT_SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                              size,0);
+                      try{
+                          if(illegalMod.expectedException == null){
+                              monitor.getMonitoredListIterator().verifyIteratorState();
+                          }else{
+                              monitor.illegalMod(illegalMod);
+                              Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredListIterator);
+                          }
+                      }finally{
+                          monitor.verifyCollectionState();
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testlistIterator_void");
+  }
+  @Test
+  public void testListItrhasPrevious_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var size:SHORT_SIZES){
+              TestExecutorService.submitTest(()->{
+                  final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                          size,0);
+                  final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                  while(itrMonitor.verifyHasPrevious()){
+                      itrMonitor.iterateReverse();
+                  }
+              });
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrhasPrevious_void");
+  }
+  @Test
+  public void testListItrnextIndex_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var size:SHORT_SIZES){
+              TestExecutorService.submitTest(()->{
+                  final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                          size,0);
+                  final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                  while(itrMonitor.verifyNextIndex() < size){
+                      itrMonitor.iterateForward();
+                  }
+              });
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrnextIndex_void");
+  }
+  @Test
+  public void testListItrprevious_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var size:SHORT_SIZES){
+              if(size > 0 || initParams.checkedType.checked){
+                  final var itrType=initParams.structType == StructType.DblLnkList?IteratorType.BidirectionalItr
+                          :IteratorType.SubBidirectionalItr;
+                  for(final var illegalMod:itrType.validPreMods){
+                      if(illegalMod.expectedException == null || initParams.checkedType.checked){
+                          for(final var outputType:initParams.collectionType.validOutputTypes()){
+                              TestExecutorService.submitTest(()->{
+                                  final var seqMonitor=SequenceInitialization.Ascending
+                                          .initialize(getMonitoredList(initParams,size),size,0);
+                                  final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                                  itrMonitor.illegalMod(illegalMod);
+                                  if(illegalMod.expectedException == null){
+                                      while(itrMonitor.hasPrevious()){
+                                          itrMonitor.verifyPrevious(outputType);
+                                      }
+                                      if(initParams.checkedType.checked){
+                                          Assertions.assertThrows(NoSuchElementException.class,
+                                                  ()->itrMonitor.verifyPrevious(outputType));
+                                      }
+                                  }else{
+                                      Assertions.assertThrows(illegalMod.expectedException,
+                                              ()->itrMonitor.verifyPrevious(outputType));
+                                  }
+                              });
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrprevious_void");
+  }
+  @Test
+  public void testListItrpreviousIndex_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var size:SHORT_SIZES){
+              TestExecutorService.submitTest(()->{
+                  final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                          size,0);
+                  final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
+                  while(itrMonitor.verifyPreviousIndex() > 0){
+                      itrMonitor.iterateReverse();
+                  }
+              });
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrhasPrevious_void");
+  }
+  @Test
+  public void testListItrset_val(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          final var itrType=initParams.structType == StructType.DblLnkList?IteratorType.BidirectionalItr
+                  :IteratorType.SubBidirectionalItr;
+          for(final var illegalMod:itrType.validPreMods){
+              if(illegalMod.expectedException == null || initParams.checkedType.checked){
+                  for(final var removeScenario:itrType.validItrRemoveScenarios){
+                      if(removeScenario.expectedException == null || initParams.checkedType.checked){
+                          for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                              for(final var functionCallType:inputType.validFunctionCalls){
+                                  for(final int size:SHORT_SIZES){
+                                      TestExecutorService.submitTest(()->{
+                                          final var seqMonitor=SequenceInitialization.Ascending
+                                                  .initialize(getMonitoredList(initParams,size),size,0);
+                                          final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                          removeScenario.initialize(itrMonitor);
+                                          itrMonitor.illegalMod(illegalMod);
+                                          if(removeScenario.expectedException == null){
+                                              if(illegalMod.expectedException == null){
+                                                  int i=1;
+                                                  {
+                                                      final int finalI=i;
+                                                  itrMonitor.verifySet(inputType.convertValUnchecked(finalI),inputType,
+                                                          functionCallType);
+                                                  }
+                                                  while(itrMonitor.hasNext()){
+                                                      itrMonitor.iterateForward();
+                                                      final int finalI=++i;
+                                                      itrMonitor.verifySet(inputType.convertValUnchecked(finalI),
+                                                              inputType,functionCallType);
+                                                  }
+                                              }else{
+                                                  Assertions.assertThrows(illegalMod.expectedException,
+                                                          ()->itrMonitor.verifySet(inputType.convertValUnchecked(1),
+                                                                  inputType,functionCallType));
+                                              }
+                                          }else{
+                                              Assertions.assertThrows(removeScenario.expectedException,
+                                                      ()->itrMonitor.verifySet(inputType.convertValUnchecked(1),
+                                                              inputType,functionCallType));
+                                          }
+                                      });
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrset_val");
+  }
+  @Test
+  public void testListItradd_val(){
+      for(final var position:POSITIONS){
+          if(position >= 0){
+              for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+                  final var itrType=initParams.structType == StructType.DblLnkList?IteratorType.BidirectionalItr
+                          :IteratorType.SubBidirectionalItr;
+                  for(final var illegalMod:itrType.validPreMods){
+                      if(illegalMod.expectedException == null || initParams.checkedType.checked){
+                          for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                              for(final var functionCallType:inputType.validFunctionCalls){
+                                      TestExecutorService.submitTest(()->{
+                                          final var seqMonitor=getMonitoredList(initParams,100);
+                                          final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                          for(int i=0;;){
+                                              itrMonitor.verifyAdd(inputType.convertValUnchecked(i),inputType,
+                                                      functionCallType);
+                                              if(++i == 100){
+                                                  break;
+                                              }
+                                              final double dI=i;
+                                              double currPosition;
+                                              while((currPosition=itrMonitor.nextIndex() / dI) < position
+                                                      && itrMonitor.hasNext()){
+                                                  itrMonitor.iterateForward();
+                                              }
+                                              while(currPosition > position && itrMonitor.hasPrevious()){
+                                                  itrMonitor.iterateReverse();
+                                                  currPosition=itrMonitor.nextIndex() / dI;
+                                              }
+                                          }
+                                          if(illegalMod.expectedException != null){
+                                              itrMonitor.illegalMod(illegalMod);
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->itrMonitor.verifyAdd(inputType.convertValUnchecked(100),
+                                                              inputType,functionCallType));
+                                              // for good measure, do it again with an
+                                              // empty list
+                                              final var itrMonitor2=getMonitoredList(initParams,100)
+                                                      .getMonitoredListIterator();
+                                              itrMonitor2.illegalMod(illegalMod);
+                                              Assertions.assertThrows(illegalMod.expectedException,
+                                                      ()->itrMonitor2.verifyAdd(inputType.convertValUnchecked(100),
+                                                              inputType,functionCallType));
+                                          }
+                                      });
+                                  
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testListItradd_val");
+  }
+  @Test
+  public void testItrremove_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var itrType:initParams.structType.validItrTypes){
+              for(final var illegalMod:itrType.validPreMods){
+                  if(illegalMod.expectedException == null || initParams.checkedType.checked){
+                      for(final var removeScenario:itrType.validItrRemoveScenarios){
+                          if(removeScenario.expectedException == null || initParams.checkedType.checked){
+                              for(final var size:SIZES){
+                                  int prevNumToIterate=-1;
+                                  positionLoop:for(final var position:POSITIONS){
+                                      final int numToIterate;
+                                      if(position >= 0 && (numToIterate=(int)(size * position)) != prevNumToIterate){
+                                          prevNumToIterate=numToIterate;
+                                          switch(removeScenario){
+                                          case PostInit:
+                                              if(numToIterate != 0){
+                                                  break positionLoop;
+                                              }
+                                              break;
+                                          case PostNext:
+                                              if(itrType.iteratorInterface != OmniListIterator.class
+                                                      && (size == 0 || numToIterate == size)){
+                                                  continue;
+                                              }
+                                          case PostAdd:
+                                          case PostPrev:
+                                              break;
+                                          case PostRemove:
+                                              if(size == 0 && itrType.iteratorInterface != OmniListIterator.class){
+                                                  continue;
+                                              }
+                                              break;
+                                          default:
+                                              throw removeScenario.invalid();
+                                          }
+                                          TestExecutorService.submitTest(()->{
+                                              final var seqMonitor=SequenceInitialization.Ascending
+                                                      .initialize(getMonitoredList(initParams,size),size,0);
+                                              final var itrMonitor=seqMonitor.getMonitoredIterator(numToIterate,
+                                                      itrType);
+                                              removeScenario.initialize(itrMonitor);
+                                              itrMonitor.illegalMod(illegalMod);
+                                              if(removeScenario.expectedException == null){
+                                                  if(illegalMod.expectedException == null){
+                                                      itrMonitor.verifyRemove();
+                                                      switch(removeScenario){
+                                                      case PostNext:{
+                                                          while(itrMonitor.hasNext()){
+                                                              itrMonitor.iterateForward();
+                                                              itrMonitor.verifyRemove();
+                                                          }
+                                                          if(!(itrMonitor instanceof MonitoredList.MonitoredListIterator<?,?>)){
+                                                              Assertions.assertEquals(numToIterate < 2,
+                                                                      seqMonitor.isEmpty());
+                                                              break;
+                                                          }
+                                                      }
+                                                      case PostPrev:{
+                                                          final var cast=(MonitoredList.MonitoredListIterator<?,?>)itrMonitor;
+                                                          while(cast.hasPrevious()){
+                                                              cast.iterateReverse();
+                                                              cast.verifyRemove();
+                                                          }
+                                                          while(cast.hasNext()){
+                                                              cast.iterateForward();
+                                                              cast.verifyRemove();
+                                                          }
+                                                          Assertions.assertTrue(seqMonitor.isEmpty());
+                                                          break;
+                                                      }
+                                                      default:
+                                                          throw removeScenario.invalid();
+                                                      }
+                                                  }else{
+                                                      Assertions.assertThrows(illegalMod.expectedException,
+                                                              ()->itrMonitor.verifyRemove());
+                                                  }
+                                              }else{
+                                                  Assertions.assertThrows(removeScenario.expectedException,
+                                                          ()->itrMonitor.verifyRemove());
+                                              }
+                                          });
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testItrremove_void");
+  }
+  @Test
+  public void testput_intval(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final var size:SHORT_SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                              size,0);
+                      if(illegalMod.expectedException == null){
+                          for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                              for(final var functionCallType:inputType.validFunctionCalls){
+                                  if(initParams.checkedType.checked){
+                                      Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                              ()->monitor.verifyPut(-1,inputType.convertValUnchecked(0),inputType,
+                                                      functionCallType));
+                                      Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                              ()->monitor.verifyPut(size,inputType.convertValUnchecked(size + 1),
+                                                      inputType,functionCallType));
+                                  }
+                                  for(int index=0;index < size;++index){
+                                      monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),inputType,
+                                              functionCallType);
+                                  }
+                              }
+                          }
+                      }else{
+                          monitor.illegalMod(illegalMod);
+                          for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                              for(final var functionCallType:inputType.validFunctionCalls){
+                                  for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                      final int index=tmpIndex;
+                                      Assertions.assertThrows(illegalMod.expectedException,
+                                              ()->monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),
+                                                      inputType,functionCallType));
+                                  }
+                              }
+                          }
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testput_intval");
+  }
+  @Test
+  public void testremoveIf_Predicate(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
+              final int sizeBound=initParams.collectionType == DataType.BOOLEAN?10:100;
+              final int sizeInc=Math.max(1,sizeBound / 10);
+              for(int tmpSize=0;tmpSize <= sizeBound;tmpSize+=sizeInc){
+                  final int size;
+                  if((size=tmpSize) == 0 || initParams.checkedType.checked || filterGen.expectedException == null){
+                      final int initValBound;
+                      final int periodBound;
+                      if(initParams.collectionType == DataType.BOOLEAN){
+                          initValBound=size == 0?0:1;
+                          periodBound=Math.max(0,size - 1);
+                      }else{
+                          initValBound=0;
+                          periodBound=0;
+                      }
+                      for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                          for(final var illegalMod:initParams.validPreMods){
+                              long randSeedBound;
+                              double[] thresholdArr;
+                              if(filterGen.randomized && size > 0 && !functionCallType.boxed && illegalMod.expectedException==null){
+                                  randSeedBound=100;
+                                  thresholdArr=RANDOM_THRESHOLDS;
+                              }else{
+                                  randSeedBound=0;
+                                  thresholdArr=NON_RANDOM_THRESHOLD;
+                              }
+                          
+                              for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
+                                  final long randSeed=tmpRandSeed;
+                                  for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
+                                      final int initVal=tmpInitVal;
+                                      for(int tmpPeriod=0;tmpPeriod <= periodBound;++tmpPeriod){
+                                          final int period=tmpPeriod;
+                                          for(final var threshold:thresholdArr){
+                                              TestExecutorService.submitTest(()->{
+                                                  final var monitor=SequenceInitialization.Ascending.initialize(
+                                                          getMonitoredList(initParams,size),size,initVal,period);
+                                                  final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
+                                                          threshold,randSeed);
+                                                  if(illegalMod.expectedException == null){
+                                                      if(filterGen.expectedException == null || size == 0){
+                                                          monitor.verifyRemoveIf(filter,functionCallType);
+                                                      }else{
+                                                          Assertions.assertThrows(filterGen.expectedException,
+                                                                  ()->monitor.verifyRemoveIf(filter,
+                                                                          functionCallType));
+                                                      }
+                                                  }else{
+                                                      monitor.illegalMod(illegalMod);
+                                                      Assertions.assertThrows(illegalMod.expectedException,
+                                                              ()->monitor.verifyRemoveIf(filter,functionCallType));
+                                                  }
+                                              });
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testremoveIf_Predicate");
+  }
+  @Test
+  public void testset_intval(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final int size:SHORT_SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                              size,0);
+                      if(illegalMod.expectedException == null){
+                          for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                              if(initParams.checkedType.checked){
+                                  Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(-1,
+                                          initParams.collectionType.convertValUnchecked(0),functionCallType));
+                                  Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor.verifySet(size,
+                                          initParams.collectionType.convertValUnchecked(size + 1),functionCallType));
+                              }
+                              for(int index=0;index < size;++index){
+                                  monitor.verifySet(index,initParams.collectionType.convertValUnchecked(index + 1),
+                                          functionCallType);
+                              }
+                          }
+                      }else{
+                          monitor.illegalMod(illegalMod);
+                          for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                              for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                  final int index=tmpIndex;
+                                  Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifySet(index,
+                                          initParams.collectionType.convertValUnchecked(index + 1),functionCallType));
+                              }
+                          }
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testset_intval");
+  }
+  @Test
+  public void testsort_Comparator(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var comparatorGen:initParams.structType.validComparatorGens){
+              if(initParams.collectionType == DataType.REF || comparatorGen.validWithPrimitive){
+                  for(final var size:SIZES){
+                      if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
+                          for(final var functionCallType:initParams.collectionType.validFunctionCalls){
+                              for(final var illegalMod:initParams.validPreMods){
+                                  TestExecutorService.submitTest(()->{
+                                      final var monitor=getMonitoredList(initParams,size);
+                                      if(illegalMod.expectedException == null){
+                                          if(size < 2 || comparatorGen.expectedException == null){
+                                              monitor.verifyStableSort(size,comparatorGen,functionCallType);
+                                          }else{
+                                              Assertions.assertThrows(comparatorGen.expectedException,()->monitor
+                                                      .verifyStableSort(size,comparatorGen,functionCallType));
+                                          }
+                                      }else{
+                                          monitor.illegalMod(illegalMod);
+                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                  ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
+                                      }
+                                  });
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testsort_Comparator");
+  }
+  @Test
+  public void teststableAscendingSort_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var comparatorGen:initParams.structType.validComparatorGens){
+              if(comparatorGen.validWithNoComparator
+                      && (comparatorGen.validWithPrimitive || initParams.collectionType == DataType.REF)){
+                  for(final var size:SIZES){
+                      if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
+                          for(final var illegalMod:initParams.validPreMods){
+                              TestExecutorService.submitTest(()->{
+                                  final var monitor=getMonitoredList(initParams,size);
+                                  if(illegalMod.expectedException == null){
+                                      if(size < 2 || comparatorGen.expectedException == null){
+                                          monitor.verifyAscendingStableSort(size,comparatorGen);
+                                      }else{
+                                          Assertions.assertThrows(comparatorGen.expectedException,
+                                                  ()->monitor.verifyAscendingStableSort(size,comparatorGen));
+                                      }
+                                  }else{
+                                      monitor.illegalMod(illegalMod);
+                                      Assertions.assertThrows(illegalMod.expectedException,
+                                              ()->monitor.verifyAscendingStableSort(size,comparatorGen));
+                                  }
+                              });
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.teststableAscendingSort_void");
+  }
+  @Test
+  public void teststableDescendingSort_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var comparatorGen:initParams.structType.validComparatorGens){
+              if(comparatorGen.validWithNoComparator
+                      && (comparatorGen.validWithPrimitive || initParams.collectionType == DataType.REF)){
+                  for(final var size:SIZES){
+                      if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
+                          for(final var illegalMod:initParams.validPreMods){
+                              TestExecutorService.submitTest(()->{
+                                  final var monitor=getMonitoredList(initParams,size);
+                                  if(illegalMod.expectedException == null){
+                                      if(size < 2 || comparatorGen.expectedException == null){
+                                          monitor.verifyDescendingStableSort(size,comparatorGen);
+                                      }else{
+                                          Assertions.assertThrows(comparatorGen.expectedException,
+                                                  ()->monitor.verifyDescendingStableSort(size,comparatorGen));
+                                      }
+                                  }else{
+                                      monitor.illegalMod(illegalMod);
+                                      Assertions.assertThrows(illegalMod.expectedException,
+                                              ()->monitor.verifyDescendingStableSort(size,comparatorGen));
+                                  }
+                              });
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.teststableDescendingSort_void");
+  }
+  @Test
+  public void testtoArray_ObjectArray(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final int size:SIZES){
+                  for(int tmpArrSize=0,tmpArrSizeBound=size + 5;tmpArrSize <= tmpArrSizeBound;++tmpArrSize){
+                      final int arrSize=tmpArrSize;
+                      TestExecutorService.submitTest(()->{
+                          final var monitor=SequenceInitialization.Ascending
+                                  .initialize(getMonitoredList(initParams,size),size,0);
+                          if(illegalMod.expectedException == null){
+                              monitor.verifyToArray(new Object[arrSize]);
+                          }else{
+                              monitor.illegalMod(illegalMod);
+                              Assertions.assertThrows(illegalMod.expectedException,
+                                      ()->monitor.verifyToArray(new Object[arrSize]));
+                          }
+                      });
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testtoArray_ObjectArray");
+  }
+  @Test
+  public void testtoArray_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final int size:SIZES){
+                  TestExecutorService.submitTest(()->{
+                      final var monitor=SequenceInitialization.Ascending
+                              .initialize(getMonitoredList(initParams,size),size,0);
+                      if(illegalMod.expectedException == null){
+                          for(final var outputType:initParams.collectionType.validOutputTypes()){
+                              outputType.verifyToArray(monitor);
+                          }
+                      }else{
+                          monitor.illegalMod(illegalMod);
+                          for(final var outputType:initParams.collectionType.validOutputTypes()){
+                              Assertions.assertThrows(illegalMod.expectedException,
+                                      ()->outputType.verifyToArray(monitor));
+                          }
+                      }
+                  });
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testget_int");
+  }
+  @Test
+  public void testunstableAscendingSort_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          if(initParams.collectionType == DataType.REF){
+              for(final var comparatorGen:initParams.structType.validComparatorGens){
+                  if(comparatorGen.validWithNoComparator){
+                      for(final var size:SIZES){
+                          if(size < 2 || initParams.checkedType.checked || comparatorGen.expectedException == null){
+                              for(final var illegalMod:initParams.validPreMods){
+                                  TestExecutorService.submitTest(()->{
+                                      final var monitor=getMonitoredList(initParams,size);
+                                      if(illegalMod.expectedException == null){
+                                          if(size < 2 || comparatorGen.expectedException == null){
+                                              monitor.verifyAscendingUnstableSort(size,comparatorGen);
+                                          }else{
+                                              Assertions.assertThrows(comparatorGen.expectedException,
+                                                      ()->monitor.verifyAscendingUnstableSort(size,comparatorGen));
+                                          }
+                                      }else{
+                                          monitor.illegalMod(illegalMod);
+                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                  ()->monitor.verifyAscendingUnstableSort(size,comparatorGen));
+                                      }
+                                  });
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableAscendingSort_void");
+  }
+  @Test
+  public void testunstableDescendingSort_void(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          if(initParams.collectionType == DataType.REF){
+              for(final var comparatorGen:initParams.structType.validComparatorGens){
+                  if(comparatorGen.validWithNoComparator){
+                      for(final var size:SIZES){
+                          if(size < 2 || initParams.checkedType.checked || comparatorGen.expectedException == null){
+                              for(final var illegalMod:initParams.validPreMods){
+                                  TestExecutorService.submitTest(()->{
+                                      final var monitor=getMonitoredList(initParams,size);
+                                      if(illegalMod.expectedException == null){
+                                          if(size < 2 || comparatorGen.expectedException == null){
+                                              monitor.verifyDescendingUnstableSort(size,comparatorGen);
+                                          }else{
+                                              Assertions.assertThrows(comparatorGen.expectedException,
+                                                      ()->monitor.verifyDescendingUnstableSort(size,comparatorGen));
+                                          }
+                                      }else{
+                                          monitor.illegalMod(illegalMod);
+                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                  ()->monitor.verifyDescendingUnstableSort(size,comparatorGen));
+                                      }
+                                  });
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableDescendingSort_void");
+  }
+  @Test
+  public void testunstableSort_Comparator(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          if(initParams.collectionType != DataType.BOOLEAN){
+              for(final var comparatorGen:initParams.structType.validComparatorGens){
+                  if(initParams.collectionType == DataType.REF || comparatorGen.validWithPrimitive){
+                      for(final var size:SIZES){
+                          if(size < 2 || initParams.checkedType.checked || comparatorGen.expectedException == null){
+                              for(final var illegalMod:initParams.validPreMods){
+                                  TestExecutorService.submitTest(()->{
+                                      final var monitor=getMonitoredList(initParams,size);
+                                      if(illegalMod.expectedException == null){
+                                          if(size < 2 || comparatorGen.expectedException == null){
+                                              monitor.verifyUnstableSort(size,comparatorGen);
+                                          }else{
+                                              Assertions.assertThrows(comparatorGen.expectedException,
+                                                      ()->monitor.verifyUnstableSort(size,comparatorGen));
+                                          }
+                                      }else{
+                                          monitor.illegalMod(illegalMod);
+                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                  ()->monitor.verifyUnstableSort(size,comparatorGen));
+                                      }
+                                  });
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableSort_Comparator");
+  }
+  @Test
+  public void testremoveAt_int(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          for(final var illegalMod:initParams.validPreMods){
+              for(final var position:illegalMod.expectedException == null?NON_THROWING_REMOVE_AT_POSITIONS
+                      :THROWING_REMOVE_AT_POSITIONS){
+                  if(initParams.checkedType.checked || position >= 0 && position <= 2){
+                      for(final int size:SIZES){
+                          switch(position){
+                          case 0:
+                              if(size < 1){
+                                  continue;
+                              }
+                              break;
+                          case 1:
+                              if(size < 3){
+                                  continue;
+                              }
+                              break;
+                          case 2:
+                              if(size < 2){
+                                  continue;
+                              }
+                          default:
+                          }
+                          for(final var outputType:initParams.collectionType.validOutputTypes()){
+                              TestExecutorService.submitTest(()->{
+                                  final var monitor=SequenceInitialization.Ascending
+                                          .initialize(getMonitoredList(initParams,size),size,0);
+                                  if(illegalMod.expectedException == null){
+                                      switch(position){
+                                      case -1:
+                                          Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                  ()->monitor.verifyRemoveAt(-1,outputType));
+                                          break;
+                                      case 3:
+                                          Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                  ()->monitor.verifyRemoveAt(size,outputType));
+                                          break;
+                                      case 0:
+                                          for(int i=0;i < size;++i){
+                                              monitor.verifyRemoveAt(0,outputType);
+                                          }
+                                          break;
+                                      case 1:{
+                                          for(int i=0;i < size;++i){
+                                              monitor.verifyRemoveAt((size - i) / 2,outputType);
+                                          }
+                                          break;
+                                      }
+                                      case 2:
+                                          for(int i=0;i < size;++i){
+                                              monitor.verifyRemoveAt(size - i - 1,outputType);
+                                          }
+                                          break;
+                                      default:
+                                          throw new UnsupportedOperationException("Unknown position " + position);
+                                      }
+                                  }else{
+                                      monitor.illegalMod(illegalMod);
+                                      for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                          final int index=tmpIndex;
+                                          Assertions.assertThrows(illegalMod.expectedException,
+                                                  ()->monitor.verifyRemoveAt(index,outputType));
+                                      }
+                                  }
+                              });
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      TestExecutorService.completeAllTests("DblLnkSeqTest.testremoveAt_int");
   }
 }
