@@ -488,7 +488,8 @@ public class ArrSeqTest{
                                             if(initParams.checkedType.checked || size == 0
                                                     || functionGen.expectedException == null){
                                                 final long randSeedBound=!functionCallType.boxed && numLeft > 1
-                                                        && functionGen.randomized&&illegalMod.expectedException==null?100:0;
+                                                        && functionGen.randomized
+                                                        && illegalMod.expectedException == null?100:0;
                                                 for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
                                                     final long randSeed=tmpRandSeed;
                                                     TestExecutorService.submitTest(()->{
@@ -1260,14 +1261,14 @@ public class ArrSeqTest{
                             for(final var illegalMod:initParams.validPreMods){
                                 long randSeedBound;
                                 double[] thresholdArr;
-                                if(filterGen.randomized && size > 0 && !functionCallType.boxed && illegalMod.expectedException==null){
+                                if(filterGen.randomized && size > 0 && !functionCallType.boxed
+                                        && illegalMod.expectedException == null){
                                     randSeedBound=100;
                                     thresholdArr=RANDOM_THRESHOLDS;
                                 }else{
                                     randSeedBound=0;
                                     thresholdArr=NON_RANDOM_THRESHOLD;
                                 }
-                            
                                 for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
                                     final long randSeed=tmpRandSeed;
                                     for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
@@ -2308,8 +2309,6 @@ public class ArrSeqTest{
         abstract SEQ initSeq();
         @Override
         abstract SEQ initSeq(int initCap);
-        @Override
-        abstract void updateModCount();
         abstract void verifyCloneTypeAndModCount(Object clone);
         abstract void verifyModCount();
     }

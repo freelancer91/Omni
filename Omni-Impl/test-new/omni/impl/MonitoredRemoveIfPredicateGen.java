@@ -4,6 +4,90 @@ import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 public enum MonitoredRemoveIfPredicateGen{
+    RemoveFirst(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                    return numCalls==1;
+                }
+            };
+        }
+        
+    },
+    RemoveSecond(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                    return numCalls==2;
+                }
+            };
+        }
+        
+    },
+    RemoveFirstAndSecond(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                    return numCalls<3;
+                }
+            };
+        }
+        
+    },
+    RemoveAllButFirst(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                    return numCalls>1;
+                }
+            };
+        }
+        
+    },
+    RemoveAllButSecond(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                    return numCalls!=2;
+                }
+            };
+        }
+        
+    },
+    RemoveAllButFirstAndSecond(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                    return numCalls>2;
+                }
+            };
+        }
+        
+    },
     Random(null,true){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,

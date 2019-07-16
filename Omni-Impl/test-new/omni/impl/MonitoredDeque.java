@@ -18,6 +18,22 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
     
     }
     void updateRemoveLastOccurrenceState(Object inputVal,DataType inputType);
+    default boolean verifyThrowingRemoveFirstOccurrence(MonitoredObjectGen monitoredObjectGen){
+        try{
+            return QueryCastType.ToObject.callremoveFirstOccurrence(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+                    DataType.REF);
+        }finally{
+            verifyCollectionState();
+        }
+    }
+    default boolean verifyThrowingRemoveLastOccurrence(MonitoredObjectGen monitoredObjectGen){
+        try{
+            return QueryCastType.ToObject.callremoveLastOccurrence(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+                    DataType.REF);
+        }finally{
+            verifyCollectionState();
+        }
+    }
     default boolean verifyRemoveLastOccurrence(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification) {
         var collection=getCollection();
@@ -276,7 +292,68 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         return result;
     }
-
+    default void addFirst(int val) {
+        DEQ collection=getCollection();
+        DataType dataType=getDataType();
+        Object inputVal;
+        switch(dataType) {
+        case BOOLEAN:{
+            boolean v;
+            ((OmniDeque.OfBoolean)collection).addFirst(v=(val&1)!=0);
+            inputVal=v;
+            break;
+        }
+        case BYTE:{
+            byte v;
+            ((OmniDeque.OfByte)collection).addFirst(v=(byte)val);
+            inputVal=v;
+            break;
+        }
+        case CHAR:{
+            char v;
+            ((OmniDeque.OfChar)collection).addFirst(v=(char)val);
+            inputVal=v;
+            break;
+        }
+        case SHORT:{
+            short v;
+            ((OmniDeque.OfShort)collection).addFirst(v=(short)val);
+            inputVal=v;
+            break;
+        }
+        case INT:{
+            int v;
+            ((OmniDeque.OfInt)collection).addFirst(v=val);
+            inputVal=v;
+            break;
+        }
+        case LONG:{
+            long v;
+            ((OmniDeque.OfLong)collection).addFirst(v=val);
+            inputVal=v;
+            break;
+        }
+        case FLOAT:{
+            float v;
+            ((OmniDeque.OfFloat)collection).addFirst(v=val);
+            inputVal=v;
+            break;
+        }
+        case DOUBLE:{
+            double v;
+            ((OmniDeque.OfDouble)collection).addFirst(v=val);
+            inputVal=v;
+            break;
+        }
+        case REF:{
+            ((OmniDeque.OfRef<Object>)collection).addFirst(inputVal=val);
+            break;
+        }
+        default:
+            throw dataType.invalid();
+        }
+        updateAddFirstState(inputVal,dataType);
+    }
     @Override
     default Object verifyRemove(DataType outputType){
         Object result;
