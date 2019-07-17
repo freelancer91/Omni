@@ -292,6 +292,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         return result;
     }
+    @SuppressWarnings("unchecked")
     default void addFirst(int val) {
         DEQ collection=getCollection();
         DataType dataType=getDataType();

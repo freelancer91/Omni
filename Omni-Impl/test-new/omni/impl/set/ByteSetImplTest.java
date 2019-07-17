@@ -19,6 +19,7 @@ import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
+import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
@@ -354,7 +355,7 @@ public class ByteSetImplTest{
                 for(final var functionCallType:FunctionCallType.values()){
                     final long randSeedBound;
                     final double[] thresholdArr;
-                    if(filterGen.randomized && setSize > 1 && !functionCallType.boxed){
+                    if(filterGen.predicateGenCallType==PredicateGenCallType.Randomized && setSize > 1 && !functionCallType.boxed){
                         randSeedBound=100;
                         thresholdArr=RANDOM_THRESHOLDS;
                     }else{

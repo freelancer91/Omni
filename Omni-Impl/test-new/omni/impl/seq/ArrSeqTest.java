@@ -29,6 +29,7 @@ import omni.impl.MonitoredList;
 import omni.impl.MonitoredObjectGen;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
+import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
 import omni.impl.MonitoredSequence;
 import omni.impl.MonitoredStack;
 import omni.impl.QueryCastType;
@@ -1261,7 +1262,7 @@ public class ArrSeqTest{
                             for(final var illegalMod:initParams.validPreMods){
                                 long randSeedBound;
                                 double[] thresholdArr;
-                                if(filterGen.randomized && size > 0 && !functionCallType.boxed
+                                if(filterGen.predicateGenCallType==PredicateGenCallType.Randomized && size > 0 && !functionCallType.boxed
                                         && illegalMod.expectedException == null){
                                     randSeedBound=100;
                                     thresholdArr=RANDOM_THRESHOLDS;

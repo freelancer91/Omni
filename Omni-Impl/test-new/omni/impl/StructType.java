@@ -67,11 +67,12 @@ public enum StructType{
         case "ArrDeq":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr);
         case "ArrList":
-        case "DblLnkList":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.BidirectionalItr);
         case "ArrSubList":
         case "DblLnkSubList":
             return EnumSet.of(IteratorType.SubAscendingItr,IteratorType.SubBidirectionalItr);
+        case "DblLnkList":
+            return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr,IteratorType.BidirectionalItr);
         }
         throw structType.invalid();
     }
@@ -104,7 +105,6 @@ public enum StructType{
         case "ArrDeq":
         case "ArrList":
         case "ArrStack":
-        case "DblLnkList":
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
         case "OpenAddressHashSet":
@@ -121,8 +121,13 @@ public enum StructType{
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection,
                     MonitoredRemoveIfPredicateGen.ModParent,MonitoredRemoveIfPredicateGen.ModRoot,
                     MonitoredRemoveIfPredicateGen.ThrowModParent,MonitoredRemoveIfPredicateGen.ThrowModRoot);
+        case "DblLnkList":
+            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveSpecificIndices,MonitoredRemoveIfPredicateGen.ModCollection,
+                    MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
+                    MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
+                    MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection);
         case "DblLnkSubList":
-            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveAllButFirst,MonitoredRemoveIfPredicateGen.RemoveAllButFirstAndSecond,MonitoredRemoveIfPredicateGen.RemoveAllButSecond,MonitoredRemoveIfPredicateGen.RemoveFirst,MonitoredRemoveIfPredicateGen.RemoveFirstAndSecond,MonitoredRemoveIfPredicateGen.RemoveSecond,MonitoredRemoveIfPredicateGen.ModCollection,
+            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveSpecificIndices,MonitoredRemoveIfPredicateGen.ModCollection,
                     MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection,

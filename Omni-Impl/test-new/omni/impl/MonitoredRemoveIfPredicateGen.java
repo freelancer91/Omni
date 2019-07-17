@@ -4,91 +4,34 @@ import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 public enum MonitoredRemoveIfPredicateGen{
-    RemoveFirst(null,false){
+    RemoveSpecificIndices(null,PredicateGenCallType.IndexSpecific){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return new MonitoredRemoveIfPredicate(){
+                @Override
+                protected boolean testImpl(){
+                   int numCalls=this.numCalls-1;
+                   if(numCalls>64) {
+                       return compliment;
+                   }
+                   return (1L<<numCalls&removeIndicesBitSet)!=0!=compliment;
+                }
+            };
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            throw new UnsupportedOperationException();
+        }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
-            return new MonitoredRemoveIfPredicate(){
-                @Override
-                protected boolean testImpl(){
-                    return numCalls==1;
-                }
-            };
-        }
-        
+            throw new UnsupportedOperationException();
+            }
     },
-    RemoveSecond(null,false){
-
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            return new MonitoredRemoveIfPredicate(){
-                @Override
-                protected boolean testImpl(){
-                    return numCalls==2;
-                }
-            };
-        }
-        
-    },
-    RemoveFirstAndSecond(null,false){
-
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            return new MonitoredRemoveIfPredicate(){
-                @Override
-                protected boolean testImpl(){
-                    return numCalls<3;
-                }
-            };
-        }
-        
-    },
-    RemoveAllButFirst(null,false){
-
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            return new MonitoredRemoveIfPredicate(){
-                @Override
-                protected boolean testImpl(){
-                    return numCalls>1;
-                }
-            };
-        }
-        
-    },
-    RemoveAllButSecond(null,false){
-
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            return new MonitoredRemoveIfPredicate(){
-                @Override
-                protected boolean testImpl(){
-                    return numCalls!=2;
-                }
-            };
-        }
-        
-    },
-    RemoveAllButFirstAndSecond(null,false){
-
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            return new MonitoredRemoveIfPredicate(){
-                @Override
-                protected boolean testImpl(){
-                    return numCalls>2;
-                }
-            };
-        }
-        
-    },
-    Random(null,true){
+    Random(null,PredicateGenCallType.Randomized){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -100,11 +43,25 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
-    },
-    RemoveTrue(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        }
+
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
+                boolean compliment,long removeIndicesBitSet){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+        
+    },
+    RemoveTrue(null,PredicateGenCallType.NonRandomized){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             return new MonitoredRemoveIfPredicate(){
                 @Override
                 protected boolean testImpl(double val){
@@ -155,11 +112,23 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
-    },
-    RemoveFalse(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection);
+        }
+
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+
+    },
+    RemoveFalse(null,PredicateGenCallType.NonRandomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             return new MonitoredRemoveIfPredicate(){
 
                 @Override
@@ -211,11 +180,24 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
-    },
-    RemoveAll(null,false){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+        
+        
+    },
+    RemoveAll(null,PredicateGenCallType.NonRandomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             return new MonitoredRemoveIfPredicate(){
                 @Override
                 protected boolean testImpl(){
@@ -223,11 +205,21 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
-    },
-    RemoveNone(null,false){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+    },
+    RemoveNone(null,PredicateGenCallType.NonRandomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             return new MonitoredRemoveIfPredicate(){
                 @Override
                 protected boolean testImpl(){
@@ -235,8 +227,19 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,long randSeed){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
     },
-    Throw(IndexOutOfBoundsException.class,true){
+    Throw(IndexOutOfBoundsException.class,PredicateGenCallType.Randomized){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -272,8 +275,23 @@ public enum MonitoredRemoveIfPredicateGen{
 
             };
         }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            }
+        
+        
     },
-    ModCollection(ConcurrentModificationException.class,true){
+    ModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -311,8 +329,32 @@ public enum MonitoredRemoveIfPredicateGen{
 
             };
         }
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            }
     },
-    ModParent(ConcurrentModificationException.class,true){
+    ModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -351,7 +393,21 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ModRoot(ConcurrentModificationException.class,true){
+    ModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -390,7 +446,21 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModCollection(ConcurrentModificationException.class,true){
+    ThrowModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -428,7 +498,21 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModParent(ConcurrentModificationException.class,true){
+    ThrowModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -466,7 +550,21 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModRoot(ConcurrentModificationException.class,true){
+    ThrowModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+
+            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+        
+        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,long randSeed){
@@ -508,11 +606,20 @@ public enum MonitoredRemoveIfPredicateGen{
         return new UnsupportedOperationException("Invalid MonitoredRemoveIfPredicateGen " + this);
     }
     public final Class<? extends Throwable> expectedException;
-    public final boolean randomized;
-    MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,boolean randomized){
+    public final PredicateGenCallType predicateGenCallType;
+    MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,PredicateGenCallType predicateGenCallType){
         this.expectedException=expectedException;
-        this.randomized=randomized;
+        this.predicateGenCallType=predicateGenCallType;
     }
+    public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection);
+    public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,boolean compliment,long removeIndicesBitSet);
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
             double threshold,long randSeed);
+    
+    public static enum PredicateGenCallType{
+        Randomized,
+        NonRandomized,
+        IndexSpecific;
+    }
+    
 }

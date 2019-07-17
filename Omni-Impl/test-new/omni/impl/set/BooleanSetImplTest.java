@@ -17,6 +17,7 @@ import omni.impl.MonitoredFunction;
 import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
+import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
 import omni.impl.MonitoredSet;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
@@ -811,7 +812,7 @@ public class BooleanSetImplTest{
         for(final var filterGen:StructType.BooleanSetImpl.validMonitoredRemoveIfPredicateGens){
             for(final var initSet:VALID_INIT_SEQS){
                 for(final var functionCallType:FunctionCallType.values()){
-                    final long randSeedBound=filterGen.randomized
+                    final long randSeedBound=filterGen.predicateGenCallType==PredicateGenCallType.Randomized
                             && initSet == SetInitialization.AddTrueAndFalse && !functionCallType.boxed?100:0;
                     for(final var checkedType:CheckedType.values()){
                         if(checkedType.checked || filterGen.expectedException == null || initSet.isEmpty){
