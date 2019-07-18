@@ -1,32 +1,32 @@
 package omni.impl.seq;
-import omni.util.DoubleSortUtil;
-import omni.api.OmniList;
-import omni.impl.DoubleDblLnkNode;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
-import java.util.function.UnaryOperator;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import omni.api.OmniDeque;
+import omni.api.OmniIterator;
+import omni.api.OmniList;
+import omni.api.OmniListIterator;
+import omni.function.DoubleComparator;
+import omni.impl.AbstractDoubleItr;
+import omni.impl.CheckedCollection;
+import omni.impl.DoubleDblLnkNode;
+import omni.util.DoubleSortUtil;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
-import omni.impl.AbstractDoubleItr;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import java.util.Comparator;
-import omni.function.DoubleComparator;
-import omni.api.OmniIterator;
-import omni.api.OmniListIterator;
-import omni.api.OmniDeque;
-import java.io.Externalizable;
-import java.io.Serializable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectInput;
-import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.ConcurrentModificationException;
-import omni.impl.CheckedCollection;
 public abstract class DoubleDblLnkSeq extends 
 AbstractSeq<Double>
  implements
@@ -973,7 +973,7 @@ AbstractSeq<Double>
     }
     private void peelTail(DoubleDblLnkNode tail){
       DoubleDblLnkNode after,before;
-      (before=tail.prev).next=(after=tail.next);
+      (before=tail.prev).next=after=tail.next;
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1049,7 +1049,7 @@ AbstractSeq<Double>
     }
     private void peelHead(DoubleDblLnkNode head){
       DoubleDblLnkNode after,before;
-      (after=head.next).prev=(before=head.prev);
+      (after=head.next).prev=before=head.prev;
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1446,7 +1446,7 @@ AbstractSeq<Double>
       }
       UncheckedList root;
       int size;
-      (root=this.root).size-=(size=this.size);
+      (root=this.root).size-=size=this.size;
       clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(DoubleDblLnkNode head,DoubleDblLnkNode tail,DoublePredicate filter
@@ -1876,7 +1876,7 @@ AbstractSeq<Double>
     }
     boolean uncheckedremoveVal0(DoubleDblLnkNode head
     ){
-      if(0==(head.val)){
+      if(0==head.val){
         --root.size;
         if(--this.size==0){
           removeLastNode(head);
@@ -1887,7 +1887,7 @@ AbstractSeq<Double>
       }else{
         for(final var tail=this.tail;tail!=head;){
           DoubleDblLnkNode prev;
-          if(0==((head=(prev=head).next).val)){
+          if(0==(head=(prev=head).next).val){
             --root.size;
             --this.size;
             if(head==tail){
@@ -2011,7 +2011,7 @@ AbstractSeq<Double>
       final CheckedList root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       {
-        if(0==(head.val)){
+        if(0==head.val){
           root.modCount=++modCount;
           this.modCount=modCount;
           --root.size;
@@ -2024,7 +2024,7 @@ AbstractSeq<Double>
         }
         for(final var tail=this.tail;head!=tail;){
           DoubleDblLnkNode prev;
-          if(0==((head=(prev=head).next).val)){
+          if(0==(head=(prev=head).next).val){
             root.modCount=++modCount;
             this.modCount=modCount;
             --root.size;
@@ -2905,7 +2905,7 @@ AbstractSeq<Double>
         this.size=size=ois.readInt();
         if(size!=0){
           DoubleDblLnkNode curr;
-          for(this.head=curr=new DoubleDblLnkNode((double)ois.readDouble());--size!=0;curr=curr.next=new DoubleDblLnkNode(curr,(double)ois.readDouble())){}
+          for(this.head=curr=new DoubleDblLnkNode(ois.readDouble());--size!=0;curr=curr.next=new DoubleDblLnkNode(curr,ois.readDouble())){}
           this.tail=curr;
         }
       }
@@ -2953,6 +2953,8 @@ AbstractSeq<Double>
           return curr;
         }
         if((marker<<=1)==0){
+            System.out.println("double");
+
            word=survivorSet[++wordOffset];
            marker=1L;
         }
@@ -3060,7 +3062,7 @@ AbstractSeq<Double>
     }
     private void peelTail(DoubleDblLnkNode tail){
       DoubleDblLnkNode after,before;
-      (before=tail.prev).next=(after=tail.next);
+      (before=tail.prev).next=after=tail.next;
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3142,7 +3144,7 @@ AbstractSeq<Double>
     }
     private void peelHead(DoubleDblLnkNode head){
       DoubleDblLnkNode after,before;
-      (after=head.next).prev=(before=head.prev);
+      (after=head.next).prev=before=head.prev;
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3576,7 +3578,7 @@ AbstractSeq<Double>
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
             if((newHead=pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft))!=null){
               newHead.next=newTail;
               newTail.prev=newHead;
@@ -4482,7 +4484,7 @@ AbstractSeq<Double>
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -4589,6 +4591,7 @@ AbstractSeq<Double>
       }
       return new CheckedSubList(this,fromIndex);
     } 
+    @Override
     boolean uncheckedremoveLastOccurrenceBits(DoubleDblLnkNode tail
     ,long bits
     ){
@@ -4622,10 +4625,11 @@ AbstractSeq<Double>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveLastOccurrence0(DoubleDblLnkNode tail
     ){
       {
-        if(0==(tail.val)){
+        if(0==tail.val){
           this.modCount=modCount+1;
           if((tail=tail.prev)==null){
             this.head=null;
@@ -4638,7 +4642,7 @@ AbstractSeq<Double>
           return true;
         }
         for(DoubleDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(0==(tail.val)){
+          if(0==tail.val){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
               this.head=next;
@@ -4654,6 +4658,7 @@ AbstractSeq<Double>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveLastOccurrenceNaN(DoubleDblLnkNode tail
     ){
       {
@@ -4686,6 +4691,7 @@ AbstractSeq<Double>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveValBits(DoubleDblLnkNode head
     ,long bits
     ){
@@ -4718,10 +4724,11 @@ AbstractSeq<Double>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveVal0(DoubleDblLnkNode head
     ){
       {
-        if(0==(head.val)){
+        if(0==head.val){
           ++this.modCount;
           if(--size==0){
             this.head=null;
@@ -4733,7 +4740,7 @@ AbstractSeq<Double>
           return true;
         }
         for(DoubleDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(0==(head.val)){
+          if(0==head.val){
             ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
@@ -4749,6 +4756,7 @@ AbstractSeq<Double>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveValNaN(DoubleDblLnkNode head
     ){
       {
@@ -4784,7 +4792,7 @@ AbstractSeq<Double>
       DoubleDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4800,7 +4808,7 @@ AbstractSeq<Double>
       DoubleDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4816,7 +4824,7 @@ AbstractSeq<Double>
       DoubleDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4832,7 +4840,7 @@ AbstractSeq<Double>
       DoubleDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5242,7 +5250,7 @@ AbstractSeq<Double>
       this.size=size=in.readInt();
       if(size!=0){
         DoubleDblLnkNode curr;
-        for(this.head=curr=new DoubleDblLnkNode((double)in.readDouble());--size!=0;curr=curr.next=new DoubleDblLnkNode(curr,(double)in.readDouble())){}
+        for(this.head=curr=new DoubleDblLnkNode(in.readDouble());--size!=0;curr=curr.next=new DoubleDblLnkNode(curr,in.readDouble())){}
         this.tail=curr;
       }
     }
@@ -5429,7 +5437,7 @@ AbstractSeq<Double>
     boolean uncheckedremoveVal0(DoubleDblLnkNode head
     ){
       {
-        if(0==(head.val)){
+        if(0==head.val){
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -5440,7 +5448,7 @@ AbstractSeq<Double>
           return true;
         }
         for(DoubleDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(0==(head.val)){
+          if(0==head.val){
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -5516,11 +5524,11 @@ AbstractSeq<Double>
       return tail.val;
     }
     @Override public boolean offerFirst(double val){
-      push((double)val);
+      push(val);
       return true;
     }
     @Override public boolean offerLast(double val){
-      addLast((double)val);
+      addLast(val);
       return true;
     }
     @Override public boolean removeFirstOccurrence(Object val){
@@ -5530,7 +5538,7 @@ AbstractSeq<Double>
       return head.val;
     }
     @Override public boolean offer(double val){
-      addLast((double)val);
+      addLast(val);
       return true;
     }
     @Override public int search(boolean val){
@@ -5839,7 +5847,7 @@ AbstractSeq<Double>
     boolean uncheckedremoveLastOccurrence0(DoubleDblLnkNode tail
     ){
       {
-        if(0==(tail.val)){
+        if(0==tail.val){
           if((tail=tail.prev)==null){
             this.head=null;
             this.tail=null;
@@ -5851,7 +5859,7 @@ AbstractSeq<Double>
           return true;
         }
         for(DoubleDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(0==(tail.val)){
+          if(0==tail.val){
             if((tail=tail.prev)==null){
               this.head=next;
               next.prev=null;
@@ -5947,7 +5955,7 @@ AbstractSeq<Double>
     @Override public double pollDouble(){
       DoubleDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5962,7 +5970,7 @@ AbstractSeq<Double>
     @Override public double pollLastDouble(){
       DoubleDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5977,7 +5985,7 @@ AbstractSeq<Double>
     @Override public Double poll(){
       DoubleDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5992,7 +6000,7 @@ AbstractSeq<Double>
     @Override public Double pollLast(){
       DoubleDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6007,28 +6015,28 @@ AbstractSeq<Double>
     @Override public double peekDouble(){
       final DoubleDblLnkNode head;
       if((head=this.head)!=null){
-        return (head.val);
+        return head.val;
       }
       return Double.NaN;
     }
     @Override public double peekLastDouble(){
       final DoubleDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (tail.val);
+        return tail.val;
       }
       return Double.NaN;
     }
     @Override public Double peek(){
       final DoubleDblLnkNode head;
       if((head=this.head)!=null){
-        return (head.val);
+        return head.val;
       }
       return null;
     }
     @Override public Double peekLast(){
       final DoubleDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (tail.val);
+        return tail.val;
       }
       return null;
     }

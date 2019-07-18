@@ -3,7 +3,7 @@ package omni.impl;
 import java.util.ConcurrentModificationException;
 
 public enum MonitoredObjectGen{
-    NoThrow(null){
+    NoThrow(null,0){
         @Override
         public MonitoredObject getMonitoredObject(MonitoredCollection<?> collection){
             return new MonitoredObject();
@@ -21,7 +21,7 @@ public enum MonitoredObjectGen{
             return new MonitoredObject(val);
         }
     },
-    ModCollection(ConcurrentModificationException.class){
+    ModCollection(ConcurrentModificationException.class,0){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -61,7 +61,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModParent(ConcurrentModificationException.class){
+    ModParent(ConcurrentModificationException.class,2){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -101,7 +101,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModRoot(ConcurrentModificationException.class){
+    ModRoot(ConcurrentModificationException.class,1){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -141,7 +141,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ThrowIOB(IndexOutOfBoundsException.class){
+    ThrowIOB(IndexOutOfBoundsException.class,0){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -180,7 +180,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ThrowAIOB(IllegalArgumentException.class){
+    ThrowAIOB(IllegalArgumentException.class,0){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -219,7 +219,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModCollectionThrowIOB(ConcurrentModificationException.class){
+    ModCollectionThrowIOB(ConcurrentModificationException.class,0){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -259,7 +259,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModCollectionThrowAIOB(ConcurrentModificationException.class){
+    ModCollectionThrowAIOB(ConcurrentModificationException.class,0){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -299,7 +299,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModParentThrowIOB(ConcurrentModificationException.class){
+    ModParentThrowIOB(ConcurrentModificationException.class,2){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -339,7 +339,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModParentThrowAIOB(ConcurrentModificationException.class){
+    ModParentThrowAIOB(ConcurrentModificationException.class,2){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -379,7 +379,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModRootThrowIOB(ConcurrentModificationException.class){
+    ModRootThrowIOB(ConcurrentModificationException.class,1){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -419,7 +419,7 @@ public enum MonitoredObjectGen{
             return new Impl(collection,val,throwSwitch);
         }
     },
-    ModRootThrowAIOB(ConcurrentModificationException.class){
+    ModRootThrowAIOB(ConcurrentModificationException.class,1){
         class Impl extends ModifyingMonitoredObj{
             Impl(MonitoredCollection<?> monitoredCollection){
                 super(monitoredCollection);
@@ -460,8 +460,10 @@ public enum MonitoredObjectGen{
         }
     },;
     public final Class<? extends Throwable> expectedException;
-    MonitoredObjectGen(Class<? extends Throwable> expectedException){
+    public final int minDepth;
+    MonitoredObjectGen(Class<? extends Throwable> expectedException,int minDepth){
         this.expectedException=expectedException;
+        this.minDepth=minDepth;
     }
     public abstract MonitoredObject getMonitoredObject(MonitoredCollection<?> collection);
     public abstract MonitoredObject getMonitoredObject(MonitoredCollection<?> collection,int val);

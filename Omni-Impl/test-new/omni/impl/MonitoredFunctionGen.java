@@ -7,7 +7,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 public enum MonitoredFunctionGen{
-    NoThrow(null,false){
+    NoThrow(null,false,0){
         class Impl extends MonitoredFunction {
             private static final long serialVersionUID=1L;
 
@@ -57,7 +57,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ModCollection(ConcurrentModificationException.class,true){
+    ModCollection(ConcurrentModificationException.class,true,0){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -131,7 +131,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ModParent(ConcurrentModificationException.class,true){
+    ModParent(ConcurrentModificationException.class,true,2){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -205,7 +205,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ModRoot(ConcurrentModificationException.class,true){
+    ModRoot(ConcurrentModificationException.class,true,1){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -281,7 +281,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ThrowIOB(IndexOutOfBoundsException.class,true){
+    ThrowIOB(IndexOutOfBoundsException.class,true,0){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -357,7 +357,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ThrowIOBModCollection(ConcurrentModificationException.class,true){
+    ThrowIOBModCollection(ConcurrentModificationException.class,true,0){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -438,7 +438,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ThrowIOBModParent(ConcurrentModificationException.class,true){
+    ThrowIOBModParent(ConcurrentModificationException.class,true,2){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -519,7 +519,7 @@ public enum MonitoredFunctionGen{
             };
         }
     },
-    ThrowIOBModRoot(ConcurrentModificationException.class,true){
+    ThrowIOBModRoot(ConcurrentModificationException.class,true,1){
         abstract class Impl extends AbstractRandomizedImpl{
             Impl(long randSeed,MonitoredCollection.MonitoredIterator<?,?> monitoredIterator){
                 super(randSeed,monitoredIterator);
@@ -601,7 +601,7 @@ public enum MonitoredFunctionGen{
         }
 
     },
-    ModItr(ConcurrentModificationException.class,true){
+    ModItr(ConcurrentModificationException.class,true,0){
         @Override
         public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
                 long randSeed){
@@ -638,7 +638,7 @@ public enum MonitoredFunctionGen{
         }
 
     },
-    ThrowIOBModItr(ConcurrentModificationException.class,true){
+    ThrowIOBModItr(ConcurrentModificationException.class,true,0){
         @Override
         public MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,
                 long randSeed){
@@ -677,9 +677,11 @@ public enum MonitoredFunctionGen{
     };
     public final Class<? extends Throwable> expectedException;
     public final boolean randomized;
-    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean randomized){
+    public final int minDepth;
+    MonitoredFunctionGen(Class<? extends Throwable> expectedException,boolean randomized,int minDepth){
         this.expectedException=expectedException;
         this.randomized=randomized;
+        this.minDepth=minDepth;
     }
 
     public abstract MonitoredFunction getMonitoredFunction(MonitoredCollection.MonitoredIterator<?,?> iteratorMonitor,

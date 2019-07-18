@@ -440,7 +440,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode head;
       if((head=this.head) != null){
         ++modCount;
-        final var ret=(double)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -456,7 +456,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode head;
       if((head=this.head) != null){
         ++modCount;
-        final var ret=(float)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -472,7 +472,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode head;
       if((head=this.head) != null){
         ++modCount;
-        final var ret=(int)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -520,7 +520,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
         ++modCount;
-        final var ret=(double)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -536,7 +536,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
         ++modCount;
-        final var ret=(float)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -552,7 +552,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
         ++modCount;
-        final var ret=(int)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -568,7 +568,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
         ++modCount;
-        final var ret=(long)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -584,7 +584,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       CharDblLnkNode head;
       if((head=this.head) != null){
         ++modCount;
-        final var ret=(long)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -1355,7 +1355,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       return new BidirectionalItr(this,((CharDblLnkSeq)this).getItrNode(index,size),index);
     }
     @Override public boolean offer(char val){
-      addLast((char)val);
+      addLast(val);
       return true;
     }
     @Override public boolean offer(Character val){
@@ -1363,7 +1363,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       return true;
     }
     @Override public boolean offerFirst(char val){
-      push((char)val);
+      push(val);
       return true;
     }
     @Override public boolean offerFirst(Character val){
@@ -1371,7 +1371,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       return true;
     }
     @Override public boolean offerLast(char val){
-      addLast((char)val);
+      addLast(val);
       return true;
     }
     @Override public boolean offerLast(Character val){
@@ -1390,7 +1390,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     }
     @Override public double peekDouble(){
       final CharDblLnkNode head;
-      if((head=this.head) != null){ return (double)head.val; }
+      if((head=this.head) != null){ return head.val; }
       return Double.NaN;
     }
     @Override public Character peekFirst(){
@@ -1398,12 +1398,12 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     }
     @Override public float peekFloat(){
       final CharDblLnkNode head;
-      if((head=this.head) != null){ return (float)head.val; }
+      if((head=this.head) != null){ return head.val; }
       return Float.NaN;
     }
     @Override public int peekInt(){
       final CharDblLnkNode head;
-      if((head=this.head) != null){ return (int)head.val; }
+      if((head=this.head) != null){ return head.val; }
       return Integer.MIN_VALUE;
     }
     @Override public Character peekLast(){
@@ -1418,27 +1418,27 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     }
     @Override public double peekLastDouble(){
       final CharDblLnkNode tail;
-      if((tail=this.tail) != null){ return (double)tail.val; }
+      if((tail=this.tail) != null){ return tail.val; }
       return Double.NaN;
     }
     @Override public float peekLastFloat(){
       final CharDblLnkNode tail;
-      if((tail=this.tail) != null){ return (float)tail.val; }
+      if((tail=this.tail) != null){ return tail.val; }
       return Float.NaN;
     }
     @Override public int peekLastInt(){
       final CharDblLnkNode tail;
-      if((tail=this.tail) != null){ return (int)tail.val; }
+      if((tail=this.tail) != null){ return tail.val; }
       return Integer.MIN_VALUE;
     }
     @Override public long peekLastLong(){
       final CharDblLnkNode tail;
-      if((tail=this.tail) != null){ return (long)tail.val; }
+      if((tail=this.tail) != null){ return tail.val; }
       return Long.MIN_VALUE;
     }
     @Override public long peekLong(){
       final CharDblLnkNode head;
-      if((head=this.head) != null){ return (long)head.val; }
+      if((head=this.head) != null){ return head.val; }
       return Long.MIN_VALUE;
     }
     @Override public Character poll(){
@@ -1474,7 +1474,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public double pollDouble(){
       CharDblLnkNode head;
       if((head=this.head) != null){
-        final var ret=(double)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -1492,7 +1492,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public float pollFloat(){
       CharDblLnkNode head;
       if((head=this.head) != null){
-        final var ret=(float)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -1507,7 +1507,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public int pollInt(){
       CharDblLnkNode head;
       if((head=this.head) != null){
-        final var ret=(int)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -1552,7 +1552,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public double pollLastDouble(){
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
-        final var ret=(double)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -1567,7 +1567,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public float pollLastFloat(){
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
-        final var ret=(float)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -1582,7 +1582,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public int pollLastInt(){
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
-        final var ret=(int)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -1597,7 +1597,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public long pollLastLong(){
       CharDblLnkNode tail;
       if((tail=this.tail) != null){
-        final var ret=(long)tail.val;
+        final var ret=tail.val;
         if(--size == 0){
           head=null;
           this.tail=null;
@@ -1612,7 +1612,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
     @Override public long pollLong(){
       CharDblLnkNode head;
       if((head=this.head) != null){
-        final var ret=(long)head.val;
+        final var ret=head.val;
         if(--size == 0){
           this.head=null;
           tail=null;
@@ -1659,8 +1659,8 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
       this.size=size=in.readInt();
       if(size != 0){
         CharDblLnkNode curr;
-        for(head=curr=new CharDblLnkNode((char)in.readChar());--size != 0;
-            curr=curr.next=new CharDblLnkNode(curr,(char)in.readChar())){}
+        for(head=curr=new CharDblLnkNode(in.readChar());--size != 0;
+            curr=curr.next=new CharDblLnkNode(curr,in.readChar())){}
         tail=curr;
       }
     }
@@ -2461,8 +2461,8 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
         this.size=size=ois.readInt();
         if(size != 0){
           CharDblLnkNode curr;
-          for(head=curr=new CharDblLnkNode((char)ois.readChar());--size != 0;
-              curr=curr.next=new CharDblLnkNode(curr,(char)ois.readChar())){}
+          for(head=curr=new CharDblLnkNode(ois.readChar());--size != 0;
+              curr=curr.next=new CharDblLnkNode(curr,ois.readChar())){}
           tail=curr;
         }
       }
@@ -2558,6 +2558,7 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
         }
         if(--numSurvivors == 0){ return curr; }
         if((marker<<=1) == 0){
+            System.out.println("char");
           word=survivorSet[++wordOffset];
           marker=1L;
         }

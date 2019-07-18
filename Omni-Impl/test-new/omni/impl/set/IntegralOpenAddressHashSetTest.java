@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -584,7 +585,7 @@ public class IntegralOpenAddressHashSetTest{
                                                                     checkedType));
                                                     final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,4);
                                                     final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
-                                                            threshold,randSeed);
+                                                            threshold,new Random(randSeed));
                                                     final int sizeBefore=monitor.size();
                                                     if(filterGen.expectedException == null || sizeBefore == 0){
                                                         final boolean result=monitor.verifyRemoveIf(filter,

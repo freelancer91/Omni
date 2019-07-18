@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -993,7 +994,7 @@ public class OpenAddressHashSetTest{
                                                     new OpenAddressHashSetMonitor(collectionType,
                                                             checkedType));
                                             final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                    monitor,threshold,randSeed);
+                                                    monitor,threshold,new Random(randSeed));
                                             final int sizeBefore=monitor.size();
                                             if(filterGen.expectedException == null || sizeBefore == 0){
                                                 final boolean result=monitor.verifyRemoveIf(filter,

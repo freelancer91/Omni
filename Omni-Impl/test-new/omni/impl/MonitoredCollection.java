@@ -63,7 +63,6 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     default void verifyToString(String string){
         getDataType().verifyToString(string,getCollection());
     }
-    void verifyMASSIVEToString(String string,String testName);
     void verifyHashCode(int hashCode);
     void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter);
     default void verifyArrayIsCopy(Object arr){
@@ -258,16 +257,6 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
         }
         Assertions.assertEquals(expectedSize,actualSize);
         return actualSize;
-    }
-    default String verifyMASSIVEToString(String testName){
-        final String result;
-        try{
-            result=getCollection().toString();
-        }finally{
-            verifyCollectionState();
-        }
-        verifyMASSIVEToString(result,testName);
-        return result;
     }
     default String verifyToString() {
         final String result;

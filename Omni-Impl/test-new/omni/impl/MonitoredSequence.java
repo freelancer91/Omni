@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.impl.QueryVal.QueryValModification;
-import omni.util.TestExecutorService;
 
 public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends MonitoredCollection<SEQ>{
     @Override
@@ -99,105 +98,6 @@ public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends Monito
         return result;
     }
 
-    @Override default void verifyMASSIVEToString(String string,String testName){
-        Assertions.assertEquals('[',string.charAt(0));
-        int stringSize;
-        Assertions.assertEquals(']',string.charAt(stringSize=string.length()-1));
-        if(stringSize>1) {
-            int numBatches=TestExecutorService.numWorkers;
-            DataType dataType;
-            switch(dataType=getDataType()) {
-            case BOOLEAN:{
-                Assertions.assertEquals('t',1);
-                Assertions.assertEquals('r',2);
-                Assertions.assertEquals('u',3);
-                Assertions.assertEquals('e',4);
-                int batchSize=(int)Math.ceil((double)(stringSize-6)/(double)numBatches);
-                int batchOffset=5;
-                for(;;) {
-                    final int finalBatchOffset;
-                    if((finalBatchOffset=batchOffset)==stringSize) {
-                        break;
-                    }
-                    if(( batchOffset+=batchSize)>=stringSize) {
-                        batchOffset=stringSize;
-                    }
-                    final int batchBound=batchOffset;
-                    TestExecutorService.submitTest(()->{
-                        int i=finalBatchOffset;
-                        do {
-                            Assertions.assertEquals(',',string.charAt(i));
-                            Assertions.assertEquals(' ',string.charAt(++i));
-                            Assertions.assertEquals('t',string.charAt(++i));
-                            Assertions.assertEquals('r',string.charAt(++i));
-                            Assertions.assertEquals('u',string.charAt(++i));
-                            Assertions.assertEquals('e',string.charAt(++i));
-                        }while(++i!=batchBound);
-                    });
-                }
-                break;
-            }
-            case BYTE:
-            case SHORT:
-            case INT:
-            case LONG:{
-                Assertions.assertEquals('0',1);
-                int batchSize=(int)Math.ceil((double)(stringSize-3)/(double)numBatches);
-                int batchOffset=2;
-                for(;;) {
-                    final int finalBatchOffset;
-                    if((finalBatchOffset=batchOffset)==stringSize) {
-                        break;
-                    }
-                    if((batchOffset+=batchSize)>=stringSize) {
-                        batchOffset=stringSize;
-                    }
-                    final int batchBound=batchOffset;
-                    TestExecutorService.submitTest(()->{
-                        int i=finalBatchOffset;
-                        do {
-                            Assertions.assertEquals(',',string.charAt(i));
-                            Assertions.assertEquals(' ',string.charAt(++i));
-                            Assertions.assertEquals('0',string.charAt(++i));
-                        }while(++i!=batchBound);
-                    });
-                }
-                break;
-            }
-            case FLOAT:{
-                Assertions.assertEquals('0',1);
-                Assertions.assertEquals('.',2);
-                Assertions.assertEquals('0',3);
-                int batchSize=(int)Math.ceil((double)(stringSize-5)/(double)numBatches);
-                int batchOffset=4;
-                for(;;) {
-                    final int finalBatchOffset;
-                    if((finalBatchOffset=batchOffset)==stringSize) {
-                        break;
-                    }
-                    if((batchOffset+=batchSize)>=stringSize) {
-                        batchOffset=stringSize;
-                    }
-                    final int batchBound=batchOffset;
-                    TestExecutorService.submitTest(()->{
-                        int i=finalBatchOffset;
-                        do {
-                            Assertions.assertEquals(',',string.charAt(i));
-                            Assertions.assertEquals(' ',string.charAt(++i));
-                            Assertions.assertEquals('0',string.charAt(++i));
-                            Assertions.assertEquals('.',string.charAt(++i));
-                            Assertions.assertEquals('0',string.charAt(++i));
-                        }while(++i!=batchBound);
-                    });
-                }
-                break;
-            }
-            default:
-                throw dataType.invalid();
-            }
-            TestExecutorService.completeAllTests(testName);
-        }
-    }
 
     @Override default void verifyHashCode(int hashCode){
         var dataType=getDataType();

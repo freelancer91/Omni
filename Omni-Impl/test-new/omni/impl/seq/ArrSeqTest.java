@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
@@ -138,59 +139,62 @@ public class ArrSeqTest{
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
             for(final var position:POSITIONS){
                 if(position >= 0 || initParams.checkedType.checked){
-                    for(final var illegalMod:initParams.validPreMods){
-                        for(final var inputType:initParams.collectionType.mayBeAddedTo()){
-                            for(final var functionCallType:inputType.validFunctionCalls){
-                                for(final var initCap:INIT_CAPACITIES){
-                                    TestExecutorService.submitTest(()->{
-                                        if(illegalMod.expectedException == null){
-                                            final var monitor=getMonitoredList(initParams,initCap);
-                                            if(position < 0){
-                                                for(int i=0;i < 100;++i){
-                                                    final Object inputVal=inputType.convertValUnchecked(i);
-                                                    final int finalI=i;
-                                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
-                                                            .verifyAdd(-1,inputVal,inputType,functionCallType));
-                                                    Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
-                                                            .verifyAdd(finalI + 1,inputVal,inputType,functionCallType));
-                                                    monitor.add(i);
+                    for(final var illegalMod:initParams.structType.validPreMods){
+                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                            for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                                for(final var functionCallType:inputType.validFunctionCalls){
+                                    for(final var initCap:INIT_CAPACITIES){
+                                        TestExecutorService.submitTest(()->{
+                                            if(illegalMod.expectedException == null){
+                                                final var monitor=getMonitoredList(initParams,initCap);
+                                                if(position < 0){
+                                                    for(int i=0;i < 100;++i){
+                                                        final Object inputVal=inputType.convertValUnchecked(i);
+                                                        final int finalI=i;
+                                                        Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
+                                                                .verifyAdd(-1,inputVal,inputType,functionCallType));
+                                                        Assertions.assertThrows(IndexOutOfBoundsException.class,()->monitor
+                                                                .verifyAdd(finalI + 1,inputVal,inputType,functionCallType));
+                                                        monitor.add(i);
+                                                    }
+                                                }else{
+                                                    for(int i=0;i < 100;++i){
+                                                        monitor.verifyAdd((int)(i * position),
+                                                                inputType.convertValUnchecked(i),inputType,
+                                                                functionCallType);
+                                                    }
                                                 }
                                             }else{
-                                                for(int i=0;i < 100;++i){
-                                                    monitor.verifyAdd((int)(i * position),
-                                                            inputType.convertValUnchecked(i),inputType,
-                                                            functionCallType);
+                                                {
+                                                    final var monitor=SequenceInitialization.Ascending
+                                                            .initialize(getMonitoredList(initParams,initCap),10,0);
+                                                    monitor.illegalMod(illegalMod);
+                                                    final Object inputVal=inputType.convertValUnchecked(0);
+                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                            ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
+                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                            ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
+                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                            ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
+                                                }
+                                                {
+                                                    final var monitor=getMonitoredList(initParams,initCap);
+                                                    monitor.illegalMod(illegalMod);
+                                                    final Object inputVal=inputType.convertValUnchecked(0);
+                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                            ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
+                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                            ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
+                                                    Assertions.assertThrows(illegalMod.expectedException,
+                                                            ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
                                                 }
                                             }
-                                        }else{
-                                            {
-                                                final var monitor=SequenceInitialization.Ascending
-                                                        .initialize(getMonitoredList(initParams,initCap),10,0);
-                                                monitor.illegalMod(illegalMod);
-                                                final Object inputVal=inputType.convertValUnchecked(0);
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
-                                            }
-                                            {
-                                                final var monitor=getMonitoredList(initParams,initCap);
-                                                monitor.illegalMod(illegalMod);
-                                                final Object inputVal=inputType.convertValUnchecked(0);
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
-                                                Assertions.assertThrows(illegalMod.expectedException,
-                                                        ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
-                                            }
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
                             }
                         }
+                        
                     }
                 }
             }
@@ -200,37 +204,40 @@ public class ArrSeqTest{
     @Test
     public void testadd_val(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
-                for(final var inputType:initParams.collectionType.mayBeAddedTo()){
-                    for(final var functionCallType:inputType.validFunctionCalls){
-                        for(final var initCap:INIT_CAPACITIES){
-                            TestExecutorService.submitTest(()->{
-                                if(illegalMod.expectedException == null){
-                                    final var monitor=getMonitoredList(initParams,initCap);
-                                    for(int i=0;i < 100;++i){
-                                        monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                    for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                        for(final var functionCallType:inputType.validFunctionCalls){
+                            for(final var initCap:INIT_CAPACITIES){
+                                TestExecutorService.submitTest(()->{
+                                    if(illegalMod.expectedException == null){
+                                        final var monitor=getMonitoredList(initParams,initCap);
+                                        for(int i=0;i < 100;++i){
+                                            monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+                                        }
+                                    }else{
+                                        {
+                                            final var monitor=getMonitoredSequence(initParams,initCap);
+                                            monitor.illegalMod(illegalMod);
+                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                    ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,
+                                                            functionCallType));
+                                        }
+                                        {
+                                            final var monitor=SequenceInitialization.Ascending
+                                                    .initialize(getMonitoredSequence(initParams,initCap),10,0);
+                                            monitor.illegalMod(illegalMod);
+                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                    ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,
+                                                            functionCallType));
+                                        }
                                     }
-                                }else{
-                                    {
-                                        final var monitor=getMonitoredSequence(initParams,initCap);
-                                        monitor.illegalMod(illegalMod);
-                                        Assertions.assertThrows(illegalMod.expectedException,
-                                                ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,
-                                                        functionCallType));
-                                    }
-                                    {
-                                        final var monitor=SequenceInitialization.Ascending
-                                                .initialize(getMonitoredSequence(initParams,initCap),10,0);
-                                        monitor.illegalMod(illegalMod);
-                                        Assertions.assertThrows(illegalMod.expectedException,
-                                                ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,
-                                                        functionCallType));
-                                    }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                 }
+                
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testadd_val");
@@ -353,35 +360,38 @@ public class ArrSeqTest{
     @Test
     public void testget_int(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
-                for(final var size:SHORT_SIZES){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
-                                size,0);
-                        monitor.illegalMod(illegalMod);
-                        if(illegalMod.expectedException == null){
-                            for(final var outputType:initParams.collectionType.validOutputTypes()){
-                                if(initParams.checkedType.checked){
-                                    Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                            ()->monitor.verifyGet(-1,outputType));
-                                    Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                            ()->monitor.verifyGet(size,outputType));
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                    for(final var size:SHORT_SIZES){
+                        TestExecutorService.submitTest(()->{
+                            final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                                    size,0);
+                            monitor.illegalMod(illegalMod);
+                            if(illegalMod.expectedException == null){
+                                for(final var outputType:initParams.collectionType.validOutputTypes()){
+                                    if(initParams.checkedType.checked){
+                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                ()->monitor.verifyGet(-1,outputType));
+                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                ()->monitor.verifyGet(size,outputType));
+                                    }
+                                    for(int index=0;index < size;++index){
+                                        monitor.verifyGet(index,outputType);
+                                    }
                                 }
-                                for(int index=0;index < size;++index){
-                                    monitor.verifyGet(index,outputType);
+                            }else{
+                                for(final var outputType:initParams.collectionType.validOutputTypes()){
+                                    for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                        final int index=tmpIndex;
+                                        Assertions.assertThrows(illegalMod.expectedException,
+                                                ()->monitor.verifyGet(index,outputType));
+                                    }
                                 }
                             }
-                        }else{
-                            for(final var outputType:initParams.collectionType.validOutputTypes()){
-                                for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
-                                    final int index=tmpIndex;
-                                    Assertions.assertThrows(illegalMod.expectedException,
-                                            ()->monitor.verifyGet(index,outputType));
-                                }
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
+                
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testget_int");
@@ -426,23 +436,26 @@ public class ArrSeqTest{
     @Test
     public void testiterator_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
-                for(final var size:SIZES){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending
-                                .initialize(getMonitoredSequence(initParams,size),size,0);
-                        try{
-                            if(illegalMod.expectedException == null){
-                                monitor.getMonitoredIterator().verifyIteratorState();
-                            }else{
-                                monitor.illegalMod(illegalMod);
-                                Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredIterator);
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                    for(final var size:SIZES){
+                        TestExecutorService.submitTest(()->{
+                            final var monitor=SequenceInitialization.Ascending
+                                    .initialize(getMonitoredSequence(initParams,size),size,0);
+                            try{
+                                if(illegalMod.expectedException == null){
+                                    monitor.getMonitoredIterator().verifyIteratorState();
+                                }else{
+                                    monitor.illegalMod(illegalMod);
+                                    Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredIterator);
+                                }
+                            }finally{
+                                monitor.verifyCollectionState();
                             }
-                        }finally{
-                            monitor.verifyCollectionState();
-                        }
-                    });
+                        });
+                    }
                 }
+                
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testiterator_void");
@@ -703,31 +716,34 @@ public class ArrSeqTest{
             for(final var size:SIZES){
                 final int inc=Math.max(1,size / 10);
                 if(initParams.checkedType.checked || size > 0){
-                    for(final var illegalMod:initParams.validPreMods){
-                        TestExecutorService.submitTest(()->{
-                            final var monitor=SequenceInitialization.Ascending
-                                    .initialize(getMonitoredList(initParams,size),size,0);
-                            if(illegalMod.expectedException == null){
-                                for(int index=-inc,bound=size + inc;index <= bound;index+=inc){
-                                    if(index < 0 || index > size){
-                                        if(initParams.checkedType.checked){
-                                            final int finalIndex=index;
-                                            Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
-                                                try{
-                                                    monitor.getMonitoredListIterator(finalIndex);
-                                                }finally{
-                                                    monitor.verifyCollectionState();
-                                                }
-                                            });
+                    for(final var illegalMod:initParams.structType.validPreMods){
+                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                            TestExecutorService.submitTest(()->{
+                                final var monitor=SequenceInitialization.Ascending
+                                        .initialize(getMonitoredList(initParams,size),size,0);
+                                if(illegalMod.expectedException == null){
+                                    for(int index=-inc,bound=size + inc;index <= bound;index+=inc){
+                                        if(index < 0 || index > size){
+                                            if(initParams.checkedType.checked){
+                                                final int finalIndex=index;
+                                                Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+                                                    try{
+                                                        monitor.getMonitoredListIterator(finalIndex);
+                                                    }finally{
+                                                        monitor.verifyCollectionState();
+                                                    }
+                                                });
+                                            }
+                                        }else{
+                                            final var itrMonitor=monitor.getMonitoredListIterator(index);
+                                            monitor.verifyCollectionState();
+                                            itrMonitor.verifyIteratorState();
                                         }
-                                    }else{
-                                        final var itrMonitor=monitor.getMonitoredListIterator(index);
-                                        monitor.verifyCollectionState();
-                                        itrMonitor.verifyIteratorState();
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
+                        
                     }
                 }
             }
@@ -737,22 +753,24 @@ public class ArrSeqTest{
     @Test
     public void testlistIterator_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
-                for(final var size:SHORT_SIZES){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
-                                size,0);
-                        try{
-                            if(illegalMod.expectedException == null){
-                                monitor.getMonitoredListIterator().verifyIteratorState();
-                            }else{
-                                monitor.illegalMod(illegalMod);
-                                Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredListIterator);
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                    for(final var size:SHORT_SIZES){
+                        TestExecutorService.submitTest(()->{
+                            final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                                    size,0);
+                            try{
+                                if(illegalMod.expectedException == null){
+                                    monitor.getMonitoredListIterator().verifyIteratorState();
+                                }else{
+                                    monitor.illegalMod(illegalMod);
+                                    Assertions.assertThrows(illegalMod.expectedException,monitor::getMonitoredListIterator);
+                                }
+                            }finally{
+                                monitor.verifyCollectionState();
                             }
-                        }finally{
-                            monitor.verifyCollectionState();
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }
@@ -1107,42 +1125,44 @@ public class ArrSeqTest{
     @Test
     public void testput_intval(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
-                for(final var size:SHORT_SIZES){
-                    TestExecutorService.submitTest(()->{
-                        final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
-                                size,0);
-                        if(illegalMod.expectedException == null){
-                            for(final var inputType:initParams.collectionType.mayBeAddedTo()){
-                                for(final var functionCallType:inputType.validFunctionCalls){
-                                    if(initParams.checkedType.checked){
-                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                ()->monitor.verifyPut(-1,inputType.convertValUnchecked(0),inputType,
-                                                        functionCallType));
-                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                                ()->monitor.verifyPut(size,inputType.convertValUnchecked(size + 1),
-                                                        inputType,functionCallType));
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                    for(final var size:SHORT_SIZES){
+                        TestExecutorService.submitTest(()->{
+                            final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
+                                    size,0);
+                            if(illegalMod.expectedException == null){
+                                for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                                    for(final var functionCallType:inputType.validFunctionCalls){
+                                        if(initParams.checkedType.checked){
+                                            Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                    ()->monitor.verifyPut(-1,inputType.convertValUnchecked(0),inputType,
+                                                            functionCallType));
+                                            Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                                    ()->monitor.verifyPut(size,inputType.convertValUnchecked(size + 1),
+                                                            inputType,functionCallType));
+                                        }
+                                        for(int index=0;index < size;++index){
+                                            monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),inputType,
+                                                    functionCallType);
+                                        }
                                     }
-                                    for(int index=0;index < size;++index){
-                                        monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),inputType,
-                                                functionCallType);
+                                }
+                            }else{
+                                monitor.illegalMod(illegalMod);
+                                for(final var inputType:initParams.collectionType.mayBeAddedTo()){
+                                    for(final var functionCallType:inputType.validFunctionCalls){
+                                        for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
+                                            final int index=tmpIndex;
+                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                    ()->monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),
+                                                            inputType,functionCallType));
+                                        }
                                     }
                                 }
                             }
-                        }else{
-                            monitor.illegalMod(illegalMod);
-                            for(final var inputType:initParams.collectionType.mayBeAddedTo()){
-                                for(final var functionCallType:inputType.validFunctionCalls){
-                                    for(int tmpIndex=-1;tmpIndex <= size;++tmpIndex){
-                                        final int index=tmpIndex;
-                                        Assertions.assertThrows(illegalMod.expectedException,
-                                                ()->monitor.verifyPut(index,inputType.convertValUnchecked(index + 1),
-                                                        inputType,functionCallType));
-                                    }
-                                }
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }
@@ -1168,7 +1188,8 @@ public class ArrSeqTest{
     @Test
     public void testremoveAt_int(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                 for(final var position:illegalMod.expectedException == null?NON_THROWING_REMOVE_AT_POSITIONS
                         :THROWING_REMOVE_AT_POSITIONS){
                     if(initParams.checkedType.checked || position >= 0 && position <= 2){
@@ -1236,6 +1257,7 @@ public class ArrSeqTest{
                         }
                     }
                 }
+                }
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveAt_int");
@@ -1259,7 +1281,8 @@ public class ArrSeqTest{
                             periodBound=0;
                         }
                         for(final var functionCallType:initParams.collectionType.validFunctionCalls){
-                            for(final var illegalMod:initParams.validPreMods){
+                            for(final var illegalMod:initParams.structType.validPreMods){
+                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                 long randSeedBound;
                                 double[] thresholdArr;
                                 if(filterGen.predicateGenCallType==PredicateGenCallType.Randomized && size > 0 && !functionCallType.boxed
@@ -1278,10 +1301,11 @@ public class ArrSeqTest{
                                             final int period=tmpPeriod;
                                             for(final var threshold:thresholdArr){
                                                 TestExecutorService.submitTest(()->{
+                                                    
                                                     final var monitor=SequenceInitialization.Ascending.initialize(
                                                             getMonitoredSequence(initParams,size),size,initVal,period);
                                                     final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,
-                                                            threshold,randSeed);
+                                                            threshold,new Random(randSeed));
                                                     if(illegalMod.expectedException == null){
                                                         if(filterGen.expectedException == null || size == 0){
                                                             monitor.verifyRemoveIf(filter,functionCallType);
@@ -1300,6 +1324,7 @@ public class ArrSeqTest{
                                         }
                                     }
                                 }
+                            }
                             }
                         }
                     }
@@ -1373,7 +1398,8 @@ public class ArrSeqTest{
     @Test
     public void testset_intval(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                 for(final int size:SHORT_SIZES){
                     TestExecutorService.submitTest(()->{
                         final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),
@@ -1403,6 +1429,7 @@ public class ArrSeqTest{
                         }
                     });
                 }
+                }
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testset_intval");
@@ -1420,7 +1447,8 @@ public class ArrSeqTest{
                     for(final var size:SIZES){
                         if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
                             for(final var functionCallType:initParams.collectionType.validFunctionCalls){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,size);
                                         if(illegalMod.expectedException == null){
@@ -1436,6 +1464,7 @@ public class ArrSeqTest{
                                                     ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
                                         }
                                     });
+                                    }
                                 }
                             }
                         }
@@ -1453,7 +1482,8 @@ public class ArrSeqTest{
                         && (comparatorGen.validWithPrimitive || initParams.collectionType == DataType.REF)){
                     for(final var size:SIZES){
                         if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
-                            for(final var illegalMod:initParams.validPreMods){
+                            for(final var illegalMod:initParams.structType.validPreMods){
+                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                 TestExecutorService.submitTest(()->{
                                     final var monitor=getMonitoredList(initParams,size);
                                     if(illegalMod.expectedException == null){
@@ -1469,6 +1499,7 @@ public class ArrSeqTest{
                                                 ()->monitor.verifyAscendingStableSort(size,comparatorGen));
                                     }
                                 });
+                                }
                             }
                         }
                     }
@@ -1485,7 +1516,8 @@ public class ArrSeqTest{
                         && (comparatorGen.validWithPrimitive || initParams.collectionType == DataType.REF)){
                     for(final var size:SIZES){
                         if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
-                            for(final var illegalMod:initParams.validPreMods){
+                            for(final var illegalMod:initParams.structType.validPreMods){
+                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                 TestExecutorService.submitTest(()->{
                                     final var monitor=getMonitoredList(initParams,size);
                                     if(illegalMod.expectedException == null){
@@ -1501,6 +1533,7 @@ public class ArrSeqTest{
                                                 ()->monitor.verifyDescendingStableSort(size,comparatorGen));
                                     }
                                 });
+                                }
                             }
                         }
                     }
@@ -1520,7 +1553,8 @@ public class ArrSeqTest{
                         for(int tmpToIndex=-(2 * inc),toBound=size + inc;tmpToIndex < toBound;tmpToIndex+=inc){
                             if(initParams.checkedType.checked || tmpToIndex >= fromIndex && tmpToIndex <= size){
                                 final int toIndex=tmpToIndex;
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var rootMonitor=SequenceInitialization.Ascending
                                                 .initialize(getMonitoredList(initParams,size),size,0);
@@ -1548,6 +1582,7 @@ public class ArrSeqTest{
                                             });
                                         }
                                     });
+                                    }
                                 }
                             }
                         }
@@ -1577,7 +1612,8 @@ public class ArrSeqTest{
     @Test
     public void testtoArray_ObjectArray(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                 for(final int size:SIZES){
                     for(int tmpArrSize=0,tmpArrSizeBound=size + 5;tmpArrSize <= tmpArrSizeBound;++tmpArrSize){
                         final int arrSize=tmpArrSize;
@@ -1594,6 +1630,7 @@ public class ArrSeqTest{
                         });
                     }
                 }
+                }
             }
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testtoArray_ObjectArray");
@@ -1601,7 +1638,8 @@ public class ArrSeqTest{
     @Test
     public void testtoArray_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-            for(final var illegalMod:initParams.validPreMods){
+            for(final var illegalMod:initParams.structType.validPreMods){
+                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                 for(final int size:SIZES){
                     TestExecutorService.submitTest(()->{
                         final var monitor=SequenceInitialization.Ascending
@@ -1618,6 +1656,7 @@ public class ArrSeqTest{
                             }
                         }
                     });
+                }
                 }
             }
         }
@@ -1645,7 +1684,8 @@ public class ArrSeqTest{
                     if(comparatorGen.validWithNoComparator){
                         for(final var size:SIZES){
                             if(size < 2 || initParams.checkedType.checked || comparatorGen.expectedException == null){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,size);
                                         if(illegalMod.expectedException == null){
@@ -1661,6 +1701,7 @@ public class ArrSeqTest{
                                                     ()->monitor.verifyAscendingUnstableSort(size,comparatorGen));
                                         }
                                     });
+                                }
                                 }
                             }
                         }
@@ -1678,7 +1719,8 @@ public class ArrSeqTest{
                     if(comparatorGen.validWithNoComparator){
                         for(final var size:SIZES){
                             if(size < 2 || initParams.checkedType.checked || comparatorGen.expectedException == null){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,size);
                                         if(illegalMod.expectedException == null){
@@ -1694,6 +1736,7 @@ public class ArrSeqTest{
                                                     ()->monitor.verifyDescendingUnstableSort(size,comparatorGen));
                                         }
                                     });
+                                }
                                 }
                             }
                         }
@@ -1711,7 +1754,8 @@ public class ArrSeqTest{
                     if(initParams.collectionType == DataType.REF || comparatorGen.validWithPrimitive){
                         for(final var size:SIZES){
                             if(size < 2 || initParams.checkedType.checked || comparatorGen.expectedException == null){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,size);
                                         if(illegalMod.expectedException == null){
@@ -1727,6 +1771,7 @@ public class ArrSeqTest{
                                                     ()->monitor.verifyUnstableSort(size,comparatorGen));
                                         }
                                     });
+                                }
                                 }
                             }
                         }
@@ -5724,7 +5769,8 @@ public class ArrSeqTest{
         void runTest(MonitoredSequence<?> monitor);
         private void runAllTests(String testName){
             for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-                for(final var illegalMod:initParams.validPreMods){
+                for(final var illegalMod:initParams.structType.validPreMods){
+                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                     for(final int size:SIZES){
                         for(final int initCap:INIT_CAPACITIES){
                             TestExecutorService.submitTest(()->{
@@ -5739,6 +5785,7 @@ public class ArrSeqTest{
                             });
                         }
                     }
+                }
                 }
             }
             TestExecutorService.completeAllTests(testName);
@@ -5756,7 +5803,8 @@ public class ArrSeqTest{
                         for(final var size:SIZES){
                             final int initValBound=initParams.collectionType == DataType.BOOLEAN && size != 0?1:0;
                             for(final var functionCallType:initParams.collectionType.validFunctionCalls){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     final long randSeedBound=size > 1 && functionGen.randomized
                                             && !functionCallType.boxed && illegalMod.expectedException == null?maxRand
                                                     :0;
@@ -5772,6 +5820,7 @@ public class ArrSeqTest{
                                             }
                                         }
                                     }
+                                }
                                 }
                             }
                         }
@@ -5935,7 +5984,8 @@ public class ArrSeqTest{
                                                     && initParams.checkedType.checked){
                                                 for(final var size:SIZES){
                                                     if(size > 0){
-                                                        for(final var illegalMod:initParams.validPreMods){
+                                                        for(final var illegalMod:initParams.structType.validPreMods){
+                                                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                                             final Class<? extends Throwable> expectedException=illegalMod.expectedException == null
                                                                     ?monitoredObjectGen.expectedException
                                                                     :illegalMod.expectedException;
@@ -5944,6 +5994,7 @@ public class ArrSeqTest{
                                                                             ()->runTest(initParams,illegalMod,queryVal,
                                                                                     modification,castType,inputType,
                                                                                     monitoredObjectGen,size,-1)));
+                                                        }
                                                         }
                                                     }
                                                 }
@@ -5981,7 +6032,8 @@ public class ArrSeqTest{
                                                         continue;
                                                     }
                                                 }
-                                                for(final var illegalMod:initParams.validPreMods){
+                                                for(final var illegalMod:initParams.structType.validPreMods){
+                                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                                     TestExecutorService.submitTest(()->{
                                                         if(cmeFilter(illegalMod,inputType,initParams.collectionType,
                                                                 queryVal,modification,castType)){
@@ -5994,6 +6046,7 @@ public class ArrSeqTest{
                                                                             position));
                                                         }
                                                     });
+                                                }
                                                 }
                                             }
                                         }
@@ -6103,7 +6156,8 @@ public class ArrSeqTest{
                     for(final var objGen:initParams.structType.validMonitoredObjectGens){
                         if(objGen.expectedException == null || initParams.checkedType.checked){
                             for(final var size:SIZES){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         if(size == 0 || objGen.expectedException == null){
                                             final var monitor=SequenceInitialization.Ascending
@@ -6135,6 +6189,7 @@ public class ArrSeqTest{
                                         }
                                     });
                                 }
+                                }
                             }
                         }
                     }
@@ -6143,7 +6198,8 @@ public class ArrSeqTest{
                     for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
                         final int initVal=tmpInitVal;
                         for(final var size:SIZES){
-                            for(final var illegalMod:initParams.validPreMods){
+                            for(final var illegalMod:initParams.structType.validPreMods){
+                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                 TestExecutorService.submitTest(()->{
                                     final var monitor=SequenceInitialization.Ascending
                                             .initialize(getMonitoredSequence(initParams,size),size,initVal);
@@ -6154,6 +6210,7 @@ public class ArrSeqTest{
                                         Assertions.assertThrows(illegalMod.expectedException,()->callVerify(monitor));
                                     }
                                 });
+                            }
                             }
                         }
                     }

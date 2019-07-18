@@ -1,33 +1,33 @@
 package omni.impl.seq;
-import omni.util.LongSortUtil;
-import omni.api.OmniList;
-import omni.impl.LongDblLnkNode;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
-import java.util.function.UnaryOperator;
 import java.util.function.LongUnaryOperator;
-import omni.util.OmniArray;
-import omni.util.TypeUtil;
-import omni.impl.AbstractLongItr;
 import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import java.util.Comparator;
-import omni.function.LongComparator;
-import omni.api.OmniIterator;
-import omni.api.OmniListIterator;
+import java.util.function.UnaryOperator;
 import omni.api.OmniDeque;
-import java.io.Externalizable;
-import java.io.Serializable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectInput;
-import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.ConcurrentModificationException;
+import omni.api.OmniIterator;
+import omni.api.OmniList;
+import omni.api.OmniListIterator;
+import omni.function.LongComparator;
+import omni.impl.AbstractLongItr;
 import omni.impl.CheckedCollection;
+import omni.impl.LongDblLnkNode;
+import omni.util.LongSortUtil;
+import omni.util.OmniArray;
 import omni.util.ToStringUtil;
+import omni.util.TypeUtil;
 public abstract class LongDblLnkSeq extends 
 AbstractSeq<Long>
  implements
@@ -307,7 +307,7 @@ AbstractSeq<Long>
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
-      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
+      if((size=this.size)<=OmniArray.MAX_ARR_SIZE/22){(buffer=new byte[size*22])
         [size=LongDblLnkNode.uncheckedToString(head,tail,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
@@ -346,7 +346,7 @@ AbstractSeq<Long>
         final LongDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          return LongDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -358,7 +358,7 @@ AbstractSeq<Long>
         final LongDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          return LongDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -437,7 +437,7 @@ AbstractSeq<Long>
         final LongDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          return LongDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -449,7 +449,7 @@ AbstractSeq<Long>
         final LongDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+          return LongDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -473,7 +473,7 @@ AbstractSeq<Long>
         final LongDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return LongDblLnkNode.uncheckedindexOf(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -485,7 +485,7 @@ AbstractSeq<Long>
         final LongDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return LongDblLnkNode.uncheckedindexOf(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -576,7 +576,7 @@ AbstractSeq<Long>
         final LongDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -588,7 +588,7 @@ AbstractSeq<Long>
         final LongDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return LongDblLnkNode.uncheckedlastIndexOf(size,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -927,7 +927,7 @@ AbstractSeq<Long>
     }
     private void peelTail(LongDblLnkNode tail){
       LongDblLnkNode after,before;
-      (before=tail.prev).next=(after=tail.next);
+      (before=tail.prev).next=after=tail.next;
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1003,7 +1003,7 @@ AbstractSeq<Long>
     }
     private void peelHead(LongDblLnkNode head){
       LongDblLnkNode after,before;
-      (after=head.next).prev=(before=head.prev);
+      (after=head.next).prev=before=head.prev;
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1400,7 +1400,7 @@ AbstractSeq<Long>
       }
       UncheckedList root;
       int size;
-      (root=this.root).size-=(size=this.size);
+      (root=this.root).size-=size=this.size;
       clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(LongDblLnkNode head,LongDblLnkNode tail,LongPredicate filter
@@ -1680,7 +1680,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1692,7 +1692,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1771,7 +1771,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1783,7 +1783,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1792,7 +1792,7 @@ AbstractSeq<Long>
     boolean uncheckedremoveVal(LongDblLnkNode head
     ,long val
     ){
-      if(val==(head.val)){
+      if(val==head.val){
         --root.size;
         if(--this.size==0){
           removeLastNode(head);
@@ -1803,7 +1803,7 @@ AbstractSeq<Long>
       }else{
         for(final var tail=this.tail;tail!=head;){
           LongDblLnkNode prev;
-          if(val==((head=(prev=head).next).val)){
+          if(val==(head=(prev=head).next).val){
             --root.size;
             --this.size;
             if(head==tail){
@@ -1861,7 +1861,7 @@ AbstractSeq<Long>
       final CheckedList root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       {
-        if(val==(head.val)){
+        if(val==head.val){
           root.modCount=++modCount;
           this.modCount=modCount;
           --root.size;
@@ -1874,7 +1874,7 @@ AbstractSeq<Long>
         }
         for(final var tail=this.tail;head!=tail;){
           LongDblLnkNode prev;
-          if(val==((head=(prev=head).next).val)){
+          if(val==(head=(prev=head).next).val){
             root.modCount=++modCount;
             this.modCount=modCount;
             --root.size;
@@ -2148,7 +2148,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2161,7 +2161,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2244,7 +2244,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2257,7 +2257,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2284,7 +2284,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return LongDblLnkNode.uncheckedindexOf(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2297,7 +2297,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return LongDblLnkNode.uncheckedindexOf(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2393,7 +2393,7 @@ AbstractSeq<Long>
           final LongDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2406,7 +2406,7 @@ AbstractSeq<Long>
           final LongDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return LongDblLnkNode.uncheckedlastIndexOf(size,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2502,7 +2502,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+            return LongDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2515,7 +2515,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+            return LongDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2598,7 +2598,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+            return LongDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2611,7 +2611,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedcontains(head,tail,(val));
+            return LongDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2638,7 +2638,7 @@ AbstractSeq<Long>
         this.size=size=ois.readInt();
         if(size!=0){
           LongDblLnkNode curr;
-          for(this.head=curr=new LongDblLnkNode((long)ois.readLong());--size!=0;curr=curr.next=new LongDblLnkNode(curr,(long)ois.readLong())){}
+          for(this.head=curr=new LongDblLnkNode(ois.readLong());--size!=0;curr=curr.next=new LongDblLnkNode(curr,ois.readLong())){}
           this.tail=curr;
         }
       }
@@ -2686,6 +2686,7 @@ AbstractSeq<Long>
           return curr;
         }
         if((marker<<=1)==0){
+            System.out.println("long");
            word=survivorSet[++wordOffset];
            marker=1L;
         }
@@ -2793,7 +2794,7 @@ AbstractSeq<Long>
     }
     private void peelTail(LongDblLnkNode tail){
       LongDblLnkNode after,before;
-      (before=tail.prev).next=(after=tail.next);
+      (before=tail.prev).next=after=tail.next;
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -2875,7 +2876,7 @@ AbstractSeq<Long>
     }
     private void peelHead(LongDblLnkNode head){
       LongDblLnkNode after,before;
-      (after=head.next).prev=(before=head.prev);
+      (after=head.next).prev=before=head.prev;
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3309,7 +3310,7 @@ AbstractSeq<Long>
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
             if((newHead=pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft))!=null){
               newHead.next=newTail;
               newTail.prev=newHead;
@@ -4223,7 +4224,7 @@ AbstractSeq<Long>
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -4330,11 +4331,12 @@ AbstractSeq<Long>
       }
       return new CheckedSubList(this,fromIndex);
     } 
+    @Override
     boolean uncheckedremoveLastOccurrence(LongDblLnkNode tail
     ,long val
     ){
       {
-        if(val==(tail.val)){
+        if(val==tail.val){
           this.modCount=modCount+1;
           if((tail=tail.prev)==null){
             this.head=null;
@@ -4347,7 +4349,7 @@ AbstractSeq<Long>
           return true;
         }
         for(LongDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(val==(tail.val)){
+          if(val==tail.val){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
               this.head=next;
@@ -4363,11 +4365,12 @@ AbstractSeq<Long>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveVal(LongDblLnkNode head
     ,long val
     ){
       {
-        if(val==(head.val)){
+        if(val==head.val){
           ++this.modCount;
           if(--size==0){
             this.head=null;
@@ -4379,7 +4382,7 @@ AbstractSeq<Long>
           return true;
         }
         for(LongDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(val==(head.val)){
+          if(val==head.val){
             ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
@@ -4399,7 +4402,7 @@ AbstractSeq<Long>
       LongDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4415,7 +4418,7 @@ AbstractSeq<Long>
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4431,7 +4434,7 @@ AbstractSeq<Long>
       LongDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4447,7 +4450,7 @@ AbstractSeq<Long>
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4463,7 +4466,7 @@ AbstractSeq<Long>
       LongDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(double)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4479,7 +4482,7 @@ AbstractSeq<Long>
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(double)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4495,7 +4498,7 @@ AbstractSeq<Long>
       LongDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(float)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4511,7 +4514,7 @@ AbstractSeq<Long>
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(float)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4921,7 +4924,7 @@ AbstractSeq<Long>
       this.size=size=in.readInt();
       if(size!=0){
         LongDblLnkNode curr;
-        for(this.head=curr=new LongDblLnkNode((long)in.readLong());--size!=0;curr=curr.next=new LongDblLnkNode(curr,(long)in.readLong())){}
+        for(this.head=curr=new LongDblLnkNode(in.readLong());--size!=0;curr=curr.next=new LongDblLnkNode(curr,in.readLong())){}
         this.tail=curr;
       }
     }
@@ -4957,7 +4960,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -4969,7 +4972,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5048,7 +5051,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5060,7 +5063,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5070,7 +5073,7 @@ AbstractSeq<Long>
     ,long val
     ){
       {
-        if(val==(head.val)){
+        if(val==head.val){
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -5081,7 +5084,7 @@ AbstractSeq<Long>
           return true;
         }
         for(LongDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(val==(head.val)){
+          if(val==head.val){
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -5128,11 +5131,11 @@ AbstractSeq<Long>
       return tail.val;
     }
     @Override public boolean offerFirst(long val){
-      push((long)val);
+      push(val);
       return true;
     }
     @Override public boolean offerLast(long val){
-      addLast((long)val);
+      addLast(val);
       return true;
     }
     @Override public boolean removeFirstOccurrence(Object val){
@@ -5142,7 +5145,7 @@ AbstractSeq<Long>
       return head.val;
     }
     @Override public boolean offer(long val){
-      addLast((long)val);
+      addLast(val);
       return true;
     }
     @Override public int search(boolean val){
@@ -5163,7 +5166,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedsearch(head,(val));
+            return LongDblLnkNode.uncheckedsearch(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5175,7 +5178,7 @@ AbstractSeq<Long>
           final LongDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return LongDblLnkNode.uncheckedsearch(head,(val));
+            return LongDblLnkNode.uncheckedsearch(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5266,7 +5269,7 @@ AbstractSeq<Long>
           final LongDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return uncheckedremoveLastOccurrence(tail,(val));
+            return uncheckedremoveLastOccurrence(tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5278,7 +5281,7 @@ AbstractSeq<Long>
           final LongDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return uncheckedremoveLastOccurrence(tail,(val));
+            return uncheckedremoveLastOccurrence(tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5355,7 +5358,7 @@ AbstractSeq<Long>
     ,long val
     ){
       {
-        if(val==(tail.val)){
+        if(val==tail.val){
           if((tail=tail.prev)==null){
             this.head=null;
             this.tail=null;
@@ -5367,7 +5370,7 @@ AbstractSeq<Long>
           return true;
         }
         for(LongDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(val==(tail.val)){
+          if(val==tail.val){
             if((tail=tail.prev)==null){
               this.head=next;
               next.prev=null;
@@ -5433,7 +5436,7 @@ AbstractSeq<Long>
     @Override public long pollLong(){
       LongDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5448,7 +5451,7 @@ AbstractSeq<Long>
     @Override public long pollLastLong(){
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5463,7 +5466,7 @@ AbstractSeq<Long>
     @Override public Long poll(){
       LongDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5478,7 +5481,7 @@ AbstractSeq<Long>
     @Override public Long pollLast(){
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5493,7 +5496,7 @@ AbstractSeq<Long>
     @Override public double pollDouble(){
       LongDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(double)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5508,7 +5511,7 @@ AbstractSeq<Long>
     @Override public double pollLastDouble(){
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(double)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5523,7 +5526,7 @@ AbstractSeq<Long>
     @Override public float pollFloat(){
       LongDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(float)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5538,7 +5541,7 @@ AbstractSeq<Long>
     @Override public float pollLastFloat(){
       LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(float)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5553,56 +5556,56 @@ AbstractSeq<Long>
     @Override public long peekLong(){
       final LongDblLnkNode head;
       if((head=this.head)!=null){
-        return (head.val);
+        return head.val;
       }
       return Long.MIN_VALUE;
     }
     @Override public long peekLastLong(){
       final LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (tail.val);
+        return tail.val;
       }
       return Long.MIN_VALUE;
     }
     @Override public Long peek(){
       final LongDblLnkNode head;
       if((head=this.head)!=null){
-        return (head.val);
+        return head.val;
       }
       return null;
     }
     @Override public Long peekLast(){
       final LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (tail.val);
+        return tail.val;
       }
       return null;
     }
     @Override public double peekDouble(){
       final LongDblLnkNode head;
       if((head=this.head)!=null){
-        return (double)(head.val);
+        return head.val;
       }
       return Double.NaN;
     }
     @Override public double peekLastDouble(){
       final LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (double)(tail.val);
+        return tail.val;
       }
       return Double.NaN;
     }
     @Override public float peekFloat(){
       final LongDblLnkNode head;
       if((head=this.head)!=null){
-        return (float)(head.val);
+        return head.val;
       }
       return Float.NaN;
     }
     @Override public float peekLastFloat(){
       final LongDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (float)(tail.val);
+        return tail.val;
       }
       return Float.NaN;
     }

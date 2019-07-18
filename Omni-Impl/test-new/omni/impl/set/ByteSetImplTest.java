@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -373,7 +374,7 @@ public class ByteSetImplTest{
                                                 final long[] expectedWords=Arrays.copyOf(monitor.expectedWords,
                                                         4);
                                                 final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                        monitor,threshold,randSeed);
+                                                        monitor,threshold,new Random(randSeed));
                                                 final int sizeBefore=monitor.size();
                                                 if(filterGen.expectedException == null || sizeBefore == 0){
                                                     final boolean result=monitor.verifyRemoveIf(filter,

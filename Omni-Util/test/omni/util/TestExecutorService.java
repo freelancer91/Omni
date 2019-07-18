@@ -10,7 +10,39 @@ public class TestExecutorService {
     private static final LinkedBlockingQueue<Runnable> testQueue;
     private static final AtomicInteger totalNumTasks;
     private static final AtomicInteger totalCompletedTasks;
-    public static final int numWorkers=Runtime.getRuntime().availableProcessors();
+    private static int numWorkers=Runtime.getRuntime().availableProcessors();
+    private static Thread[] workers;
+    public static void setNumWorkers(int numWorkers) {
+        if(numWorkers<1) {
+            numWorkers=1;
+        }else {
+            final int maxNumThreads;
+            if(numWorkers>(maxNumThreads=Runtime.getRuntime().availableProcessors())) {
+                numWorkers=maxNumThreads;
+            }
+        }
+        final int oldNumWorkers;
+        if(numWorkers!=(oldNumWorkers=TestExecutorService.numWorkers)) {
+            reset();
+            for(int i=0;i<oldNumWorkers;++i) {
+                try {
+                    workers[i].interrupt();
+                }catch(Throwable t) {
+                    //swallow
+                }
+            }
+            TestExecutorService.numWorkers=numWorkers;
+            workers=new Thread[numWorkers];
+            for(int i=0;i<numWorkers;++i) {
+                Thread worker;
+                workers[i]=worker=new Thread(TestExecutorService::worker);
+                worker.start();
+            }
+        }
+    }
+    public static int getNumWorkers() {
+       return numWorkers; 
+    }
 
     static {
         testQueue=new LinkedBlockingQueue<>();
@@ -18,8 +50,6 @@ public class TestExecutorService {
         totalCompletedTasks=new AtomicInteger(0);
         int nw;
         if((nw=numWorkers)>1) {
-            Thread[] workers;
-
             workers=new Thread[nw];
             for(int i=0;i<nw;++i) {
                 Thread worker;
@@ -28,6 +58,16 @@ public class TestExecutorService {
             }
         }
 
+    }
+    private static final class ThreadInterruptedException extends RuntimeException{
+        /**
+         * 
+         */
+        private static final long serialVersionUID=7205328610671140969L;
+
+        ThreadInterruptedException(Throwable t){
+            super(t);
+        }
     }
 
     private static void worker() {
@@ -43,7 +83,8 @@ public class TestExecutorService {
                 }
             }
         }catch(InterruptedException t) {
-            throw new Error(t);
+            //swallow
+            //throw new ThreadInterruptedException(t);
         }
     }
     public static void submitTest(Runnable test) {

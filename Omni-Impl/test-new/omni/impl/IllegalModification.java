@@ -3,19 +3,21 @@ package omni.impl;
 import java.util.ConcurrentModificationException;
 import java.util.Set;
 public enum IllegalModification{
-    NoMod(null){
+    NoMod(null,0){
     },
-    ModCollection(ConcurrentModificationException.class){
+    ModCollection(ConcurrentModificationException.class,0){
     },
-    ModParent(ConcurrentModificationException.class){
+    ModParent(ConcurrentModificationException.class,2){
     },
-    ModRoot(ConcurrentModificationException.class){
+    ModRoot(ConcurrentModificationException.class,1){
     },
-    ModItr(ConcurrentModificationException.class){
+    ModItr(ConcurrentModificationException.class,0){
     };
     public final Class<? extends Throwable> expectedException;
-    IllegalModification(Class<? extends Throwable> expectedException){
+    public final int minDepth;
+    IllegalModification(Class<? extends Throwable> expectedException,int minDepth){
         this.expectedException=expectedException;
+        this.minDepth=minDepth;
     }
     public final UnsupportedOperationException invalid(){
         return new UnsupportedOperationException("Invalid IllegalModification " + this);

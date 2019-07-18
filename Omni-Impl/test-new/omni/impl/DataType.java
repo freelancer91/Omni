@@ -302,7 +302,7 @@ public enum DataType{
             Assertions.assertEquals('u',result.charAt(++offset));
             Assertions.assertEquals('e',result.charAt(++offset));
             ++offset;
-            int numBatches=TestExecutorService.numWorkers;
+            int numBatches=TestExecutorService.getNumWorkers();
             int batchSize=(seqSize - 1) / numBatches * 6;
             for(int batchCount=0;batchCount < numBatches;++batchCount){
                 final int batchOffset=offset;
@@ -2585,7 +2585,7 @@ public enum DataType{
             Assertions.assertEquals('.',result.charAt(++offset));
             Assertions.assertEquals('0',result.charAt(++offset));
             ++offset;
-            int numBatches=TestExecutorService.numWorkers;
+            int numBatches=TestExecutorService.getNumWorkers();
             int batchSize=(seqSize - 1) / numBatches * 5;
             for(int batchCount=0;batchCount < numBatches;++batchCount){
                 final int batchOffset=offset;
@@ -3829,7 +3829,7 @@ public enum DataType{
         Assertions.assertEquals('[',result.charAt(offset=0));
         Assertions.assertEquals('0',result.charAt(++offset));
         ++offset;
-        int numBatches=TestExecutorService.numWorkers;
+        int numBatches=TestExecutorService.getNumWorkers();
         int batchSize=(seqSize - 1) / numBatches * 3;
         for(int batchCount=0;batchCount < numBatches;++batchCount){
             final int batchOffset=offset;

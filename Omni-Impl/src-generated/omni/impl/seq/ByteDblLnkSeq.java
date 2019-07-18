@@ -1,33 +1,33 @@
 package omni.impl.seq;
-import omni.util.ByteSortUtil;
-import omni.api.OmniList;
-import omni.impl.ByteDblLnkNode;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
+import omni.api.OmniDeque;
+import omni.api.OmniIterator;
+import omni.api.OmniList;
+import omni.api.OmniListIterator;
+import omni.function.ByteComparator;
 import omni.function.ByteConsumer;
 import omni.function.BytePredicate;
-import java.util.function.UnaryOperator;
 import omni.function.ByteUnaryOperator;
-import omni.util.OmniArray;
-import omni.util.TypeUtil;
 import omni.impl.AbstractByteItr;
-import java.util.function.Predicate;
-import java.util.function.IntFunction;
-import java.util.Comparator;
-import omni.function.ByteComparator;
-import omni.api.OmniIterator;
-import omni.api.OmniListIterator;
-import omni.api.OmniDeque;
-import java.io.Externalizable;
-import java.io.Serializable;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectInput;
-import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.ConcurrentModificationException;
+import omni.impl.ByteDblLnkNode;
 import omni.impl.CheckedCollection;
+import omni.util.ByteSortUtil;
+import omni.util.OmniArray;
 import omni.util.ToStringUtil;
+import omni.util.TypeUtil;
 public abstract class ByteDblLnkSeq extends 
 AbstractSeq<Byte>
  implements
@@ -334,7 +334,7 @@ AbstractSeq<Byte>
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
-      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+      if((size=this.size)<=OmniArray.MAX_ARR_SIZE/6){(buffer=new byte[size*6])
         [size=ByteDblLnkNode.uncheckedToString(head,tail,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
@@ -374,7 +374,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+          return ByteDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -479,7 +479,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+          return ByteDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -492,7 +492,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+          return ByteDblLnkNode.uncheckedcontains(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -517,7 +517,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return ByteDblLnkNode.uncheckedindexOf(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -622,7 +622,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return ByteDblLnkNode.uncheckedindexOf(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -635,7 +635,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode head;
         if((head=this.head)!=null)
         {
-          return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+          return ByteDblLnkNode.uncheckedindexOf(head,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -660,7 +660,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -765,7 +765,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -778,7 +778,7 @@ AbstractSeq<Byte>
         final ByteDblLnkNode tail;
         if((tail=this.tail)!=null)
         {
-          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+          return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,val);
         } //end size check
       } //end checked sublist try modcount
     }//end val check
@@ -1050,7 +1050,7 @@ AbstractSeq<Byte>
     }
     private void peelTail(ByteDblLnkNode tail){
       ByteDblLnkNode after,before;
-      (before=tail.prev).next=(after=tail.next);
+      (before=tail.prev).next=after=tail.next;
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1126,7 +1126,7 @@ AbstractSeq<Byte>
     }
     private void peelHead(ByteDblLnkNode head){
       ByteDblLnkNode after,before;
-      (after=head.next).prev=(before=head.prev);
+      (after=head.next).prev=before=head.prev;
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1523,7 +1523,7 @@ AbstractSeq<Byte>
       }
       UncheckedList root;
       int size;
-      (root=this.root).size-=(size=this.size);
+      (root=this.root).size-=size=this.size;
       clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(ByteDblLnkNode head,ByteDblLnkNode tail,BytePredicate filter
@@ -1804,7 +1804,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1909,7 +1909,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1922,7 +1922,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -1931,7 +1931,7 @@ AbstractSeq<Byte>
     boolean uncheckedremoveVal(ByteDblLnkNode head
     ,int val
     ){
-      if(val==(head.val)){
+      if(val==head.val){
         --root.size;
         if(--this.size==0){
           removeLastNode(head);
@@ -1942,7 +1942,7 @@ AbstractSeq<Byte>
       }else{
         for(final var tail=this.tail;tail!=head;){
           ByteDblLnkNode prev;
-          if(val==((head=(prev=head).next).val)){
+          if(val==(head=(prev=head).next).val){
             --root.size;
             --this.size;
             if(head==tail){
@@ -2000,7 +2000,7 @@ AbstractSeq<Byte>
       final CheckedList root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       {
-        if(val==(head.val)){
+        if(val==head.val){
           root.modCount=++modCount;
           this.modCount=modCount;
           --root.size;
@@ -2013,7 +2013,7 @@ AbstractSeq<Byte>
         }
         for(final var tail=this.tail;head!=tail;){
           ByteDblLnkNode prev;
-          if(val==((head=(prev=head).next).val)){
+          if(val==(head=(prev=head).next).val){
             root.modCount=++modCount;
             this.modCount=modCount;
             --root.size;
@@ -2288,7 +2288,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2398,7 +2398,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2412,7 +2412,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2440,7 +2440,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return ByteDblLnkNode.uncheckedindexOf(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2550,7 +2550,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return ByteDblLnkNode.uncheckedindexOf(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2564,7 +2564,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedindexOf(head,tail,(val));
+            return ByteDblLnkNode.uncheckedindexOf(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2591,7 +2591,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2701,7 +2701,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2715,7 +2715,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,(val));
+            return ByteDblLnkNode.uncheckedlastIndexOf(size,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2742,7 +2742,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+            return ByteDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2852,7 +2852,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+            return ByteDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2866,7 +2866,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedcontains(head,tail,(val));
+            return ByteDblLnkNode.uncheckedcontains(head,tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -2893,7 +2893,7 @@ AbstractSeq<Byte>
         this.size=size=ois.readInt();
         if(size!=0){
           ByteDblLnkNode curr;
-          for(this.head=curr=new ByteDblLnkNode((byte)ois.readByte());--size!=0;curr=curr.next=new ByteDblLnkNode(curr,(byte)ois.readByte())){}
+          for(this.head=curr=new ByteDblLnkNode(ois.readByte());--size!=0;curr=curr.next=new ByteDblLnkNode(curr,ois.readByte())){}
           this.tail=curr;
         }
       }
@@ -2941,6 +2941,7 @@ AbstractSeq<Byte>
           return curr;
         }
         if((marker<<=1)==0){
+            //System.out.println("byte");
            word=survivorSet[++wordOffset];
            marker=1L;
         }
@@ -3048,7 +3049,7 @@ AbstractSeq<Byte>
     }
     private void peelTail(ByteDblLnkNode tail){
       ByteDblLnkNode after,before;
-      (before=tail.prev).next=(after=tail.next);
+      (before=tail.prev).next=after=tail.next;
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3130,7 +3131,7 @@ AbstractSeq<Byte>
     }
     private void peelHead(ByteDblLnkNode head){
       ByteDblLnkNode after,before;
-      (after=head.next).prev=(before=head.prev);
+      (after=head.next).prev=before=head.prev;
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3564,7 +3565,7 @@ AbstractSeq<Byte>
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
             if((newHead=pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft))!=null){
               newHead.next=newTail;
               newTail.prev=newHead;
@@ -4490,7 +4491,7 @@ AbstractSeq<Byte>
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
+          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -4597,11 +4598,12 @@ AbstractSeq<Byte>
       }
       return new CheckedSubList(this,fromIndex);
     } 
+    @Override
     boolean uncheckedremoveLastOccurrence(ByteDblLnkNode tail
     ,int val
     ){
       {
-        if(val==(tail.val)){
+        if(val==tail.val){
           this.modCount=modCount+1;
           if((tail=tail.prev)==null){
             this.head=null;
@@ -4614,7 +4616,7 @@ AbstractSeq<Byte>
           return true;
         }
         for(ByteDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(val==(tail.val)){
+          if(val==tail.val){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
               this.head=next;
@@ -4630,11 +4632,12 @@ AbstractSeq<Byte>
       }
       return false;
     }
+    @Override
     boolean uncheckedremoveVal(ByteDblLnkNode head
     ,int val
     ){
       {
-        if(val==(head.val)){
+        if(val==head.val){
           ++this.modCount;
           if(--size==0){
             this.head=null;
@@ -4646,7 +4649,7 @@ AbstractSeq<Byte>
           return true;
         }
         for(ByteDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(val==(head.val)){
+          if(val==head.val){
             ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
@@ -4666,7 +4669,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4682,7 +4685,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4698,7 +4701,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4714,7 +4717,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4730,7 +4733,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(double)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4746,7 +4749,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(double)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4762,7 +4765,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(float)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4778,7 +4781,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(float)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4794,7 +4797,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(long)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4810,7 +4813,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(long)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4826,7 +4829,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(int)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4842,7 +4845,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(int)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4858,7 +4861,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=(short)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -4874,7 +4877,7 @@ AbstractSeq<Byte>
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=(short)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5284,7 +5287,7 @@ AbstractSeq<Byte>
       this.size=size=in.readInt();
       if(size!=0){
         ByteDblLnkNode curr;
-        for(this.head=curr=new ByteDblLnkNode((byte)in.readByte());--size!=0;curr=curr.next=new ByteDblLnkNode(curr,(byte)in.readByte())){}
+        for(this.head=curr=new ByteDblLnkNode(in.readByte());--size!=0;curr=curr.next=new ByteDblLnkNode(curr,in.readByte())){}
         this.tail=curr;
       }
     }
@@ -5321,7 +5324,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5426,7 +5429,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5439,7 +5442,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return uncheckedremoveVal(head,(val));
+            return uncheckedremoveVal(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5449,7 +5452,7 @@ AbstractSeq<Byte>
     ,int val
     ){
       {
-        if(val==(head.val)){
+        if(val==head.val){
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -5460,7 +5463,7 @@ AbstractSeq<Byte>
           return true;
         }
         for(ByteDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(val==(head.val)){
+          if(val==head.val){
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -5507,11 +5510,11 @@ AbstractSeq<Byte>
       return tail.val;
     }
     @Override public boolean offerFirst(byte val){
-      push((byte)val);
+      push(val);
       return true;
     }
     @Override public boolean offerLast(byte val){
-      addLast((byte)val);
+      addLast(val);
       return true;
     }
     @Override public boolean removeFirstOccurrence(Object val){
@@ -5521,7 +5524,7 @@ AbstractSeq<Byte>
       return head.val;
     }
     @Override public boolean offer(byte val){
-      addLast((byte)val);
+      addLast(val);
       return true;
     }
     @Override public int search(boolean val){
@@ -5543,7 +5546,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,(val));
+            return ByteDblLnkNode.uncheckedsearch(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5648,7 +5651,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,(val));
+            return ByteDblLnkNode.uncheckedsearch(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5661,7 +5664,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode head;
           if((head=this.head)!=null)
           {
-            return ByteDblLnkNode.uncheckedsearch(head,(val));
+            return ByteDblLnkNode.uncheckedsearch(head,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5686,7 +5689,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return uncheckedremoveLastOccurrence(tail,(val));
+            return uncheckedremoveLastOccurrence(tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5791,7 +5794,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return uncheckedremoveLastOccurrence(tail,(val));
+            return uncheckedremoveLastOccurrence(tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5804,7 +5807,7 @@ AbstractSeq<Byte>
           final ByteDblLnkNode tail;
           if((tail=this.tail)!=null)
           {
-            return uncheckedremoveLastOccurrence(tail,(val));
+            return uncheckedremoveLastOccurrence(tail,val);
           } //end size check
         } //end checked sublist try modcount
       }//end val check
@@ -5814,7 +5817,7 @@ AbstractSeq<Byte>
     ,int val
     ){
       {
-        if(val==(tail.val)){
+        if(val==tail.val){
           if((tail=tail.prev)==null){
             this.head=null;
             this.tail=null;
@@ -5826,7 +5829,7 @@ AbstractSeq<Byte>
           return true;
         }
         for(ByteDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(val==(tail.val)){
+          if(val==tail.val){
             if((tail=tail.prev)==null){
               this.head=next;
               next.prev=null;
@@ -5892,7 +5895,7 @@ AbstractSeq<Byte>
     @Override public byte pollByte(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5907,7 +5910,7 @@ AbstractSeq<Byte>
     @Override public byte pollLastByte(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5922,7 +5925,7 @@ AbstractSeq<Byte>
     @Override public Byte poll(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5937,7 +5940,7 @@ AbstractSeq<Byte>
     @Override public Byte pollLast(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5952,7 +5955,7 @@ AbstractSeq<Byte>
     @Override public double pollDouble(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(double)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5967,7 +5970,7 @@ AbstractSeq<Byte>
     @Override public double pollLastDouble(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(double)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5982,7 +5985,7 @@ AbstractSeq<Byte>
     @Override public float pollFloat(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(float)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5997,7 +6000,7 @@ AbstractSeq<Byte>
     @Override public float pollLastFloat(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(float)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6012,7 +6015,7 @@ AbstractSeq<Byte>
     @Override public long pollLong(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(long)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6027,7 +6030,7 @@ AbstractSeq<Byte>
     @Override public long pollLastLong(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(long)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6042,7 +6045,7 @@ AbstractSeq<Byte>
     @Override public int pollInt(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(int)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6057,7 +6060,7 @@ AbstractSeq<Byte>
     @Override public int pollLastInt(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(int)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6072,7 +6075,7 @@ AbstractSeq<Byte>
     @Override public short pollShort(){
       ByteDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=(short)(head.val);
+        final var ret=head.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6087,7 +6090,7 @@ AbstractSeq<Byte>
     @Override public short pollLastShort(){
       ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=(short)(tail.val);
+        final var ret=tail.val;
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6102,98 +6105,98 @@ AbstractSeq<Byte>
     @Override public byte peekByte(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (head.val);
+        return head.val;
       }
       return Byte.MIN_VALUE;
     }
     @Override public byte peekLastByte(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (tail.val);
+        return tail.val;
       }
       return Byte.MIN_VALUE;
     }
     @Override public Byte peek(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (head.val);
+        return head.val;
       }
       return null;
     }
     @Override public Byte peekLast(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (tail.val);
+        return tail.val;
       }
       return null;
     }
     @Override public double peekDouble(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (double)(head.val);
+        return head.val;
       }
       return Double.NaN;
     }
     @Override public double peekLastDouble(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (double)(tail.val);
+        return tail.val;
       }
       return Double.NaN;
     }
     @Override public float peekFloat(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (float)(head.val);
+        return head.val;
       }
       return Float.NaN;
     }
     @Override public float peekLastFloat(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (float)(tail.val);
+        return tail.val;
       }
       return Float.NaN;
     }
     @Override public long peekLong(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (long)(head.val);
+        return head.val;
       }
       return Long.MIN_VALUE;
     }
     @Override public long peekLastLong(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (long)(tail.val);
+        return tail.val;
       }
       return Long.MIN_VALUE;
     }
     @Override public int peekInt(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (int)(head.val);
+        return head.val;
       }
       return Integer.MIN_VALUE;
     }
     @Override public int peekLastInt(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (int)(tail.val);
+        return tail.val;
       }
       return Integer.MIN_VALUE;
     }
     @Override public short peekShort(){
       final ByteDblLnkNode head;
       if((head=this.head)!=null){
-        return (short)(head.val);
+        return head.val;
       }
       return Short.MIN_VALUE;
     }
     @Override public short peekLastShort(){
       final ByteDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return (short)(tail.val);
+        return tail.val;
       }
       return Short.MIN_VALUE;
     }

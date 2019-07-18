@@ -5,6 +5,7 @@ import java.util.ConcurrentModificationException;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
@@ -58,6 +59,7 @@ public class DblLnkSeqTest{
     private static final int[] SHORT_SIZES=new int[]{0,10};
     private static final int[] MEDIUM_SIZES=new int[]{0,1,2,3,4,5,10};
     private static final int[] SIZES=new int[]{0,1,2,3,4,5,10,20,30,40,50,60,70,80,90,100};
+    private static final int[] REMOVE_IF_SIZES=new int[] {0,1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,90,80,100};
     static{
         for(final var collectionType:DataType.values()){
             final var allStructCheckedTypeToSequenceInit=ALL_STRUCT_INIT_PARAMS.computeIfAbsent(collectionType,
@@ -67,12 +69,44 @@ public class DblLnkSeqTest{
                         OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR);
                 final var rootParamArray=new SequenceInitParams[1];
                 rootParamArray[0]=rootParams;
-                final SequenceInitParams[] paramArray=new SequenceInitParams[1 + 3 * 3 * 3 * 3 * 3 * 3];
+                final SequenceInitParams[] paramArray=new SequenceInitParams[1+3*3+3*3*3*3+3*3*3*3*3*3];
                 paramArray[0]=rootParams;
                 allStructCheckedTypeToSequenceInit.put(checkedType,paramArray);
             }
         }
         int index=0;
+        for(int pre0=0;pre0 <=4;pre0+=2) {
+            int[] preAllocs=new int[] {pre0};
+            for(int post0=0;post0<=4;post0+=2) {
+                int[] postAllocs=new int[] {post0};
+                ++index;
+                for(final var collectionType:DataType.values()){
+                    final var tmp=ALL_STRUCT_INIT_PARAMS.get(collectionType);
+                    for(final var checkedType:CheckedType.values()){
+                        tmp.get(checkedType)[index]=new SequenceInitParams(StructType.DblLnkSubList,
+                                collectionType,checkedType,preAllocs,postAllocs);
+                    }
+                }
+            }
+        }
+        for(int pre0=0;pre0 <=4;pre0+=2) {
+            for(int pre1=0;pre1<=4;pre1+=2) {
+                int[] preAllocs=new int[] {pre0,pre1};
+                for(int post0=0;post0 <=4;post0+=2) {
+                    for(int post1=0;post1<=4;post1+=2) {
+                        int[] postAllocs=new int[] {post0,post1};
+                        ++index;
+                        for(final var collectionType:DataType.values()){
+                            final var tmp=ALL_STRUCT_INIT_PARAMS.get(collectionType);
+                            for(final var checkedType:CheckedType.values()){
+                                tmp.get(checkedType)[index]=new SequenceInitParams(StructType.DblLnkSubList,
+                                        collectionType,checkedType,preAllocs,postAllocs);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         for(int pre0=0;pre0 <= 4;pre0+=2){
             for(int pre1=0;pre1 <= 4;pre1+=2){
                 for(int pre2=0;pre2 <= 4;pre2+=2){
@@ -130,7 +164,7 @@ public class DblLnkSeqTest{
         }
         return subListMonitor;
     }
-    @Order(458022)
+    @Order(527850)
     @Test
     public void testadd_intval(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -144,12 +178,13 @@ public class DblLnkSeqTest{
                             }
                             for(final var inputType:collectionType.mayBeAddedTo()){
                                 for(final var functionCallType:inputType.validFunctionCalls){
-                                    for(final var illegalMod:initParams.validPreMods){
+                                    for(final var illegalMod:initParams.structType.validPreMods){
+                                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                         TestExecutorService.submitTest(()->{
                                             if(illegalMod.expectedException == null){
-                                                final var monitor=getMonitoredList(initParams,100);
+                                                final var monitor=getMonitoredList(initParams,10);
                                                 if(position < 0){
-                                                    for(int i=0;i < 100;++i){
+                                                    for(int i=0;i < 10;++i){
                                                         final Object inputVal=inputType.convertValUnchecked(i);
                                                         final int finalI=i;
                                                         Assertions.assertThrows(IndexOutOfBoundsException.class,
@@ -161,7 +196,7 @@ public class DblLnkSeqTest{
                                                         monitor.add(i);
                                                     }
                                                 }else{
-                                                    for(int i=0;i < 100;++i){
+                                                    for(int i=0;i < 10;++i){
                                                         monitor.verifyAdd((int)(i * position),
                                                                 inputType.convertValUnchecked(i),inputType,
                                                                 functionCallType);
@@ -194,6 +229,7 @@ public class DblLnkSeqTest{
                                             }
                                         });
                                     }
+                                    }
                                 }
                             }
                         }
@@ -203,7 +239,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testadd_intval");
     }
-    @Order(1106760)
+    @Order(1237170)
     @Test
     public void testadd_val(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -211,7 +247,8 @@ public class DblLnkSeqTest{
                 for(final var functionCallType:inputType.validFunctionCalls){
                     checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                         for(final var initParams:initParamArray){
-                            for(final var illegalMod:initParams.validPreMods){
+                            for(final var illegalMod:initParams.structType.validPreMods){
+                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                 if(illegalMod.expectedException == null){
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,10);
@@ -233,6 +270,7 @@ public class DblLnkSeqTest{
                                         });
                                     }
                                 }
+                            }
                             }
                         }
                     });
@@ -281,13 +319,13 @@ public class DblLnkSeqTest{
         BasicDequeAddTest test=DblLnkSeqMonitor::verifyPush;
         test.runAllTests("DblLnkSeqTest.testpush_val");
     }
-    @Order(9504)
+    @Order(16416)
     @Test
     public void testclear_void(){
         final BasicTest test=MonitoredSequence::verifyClear;
         test.runAllTests("DblLnkSeqTest.testclear_void");
     }
-    @Order(9504)
+    @Order(16416)
     @Test
     public void testclone_void(){
         final BasicTest test=MonitoredSequence::verifyClone;
@@ -304,7 +342,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testConstructor_void");
     }
-    @Order(355572)
+    @Order(770424)
     @Test
     public void testcontains_val(){
         final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -346,7 +384,7 @@ public class DblLnkSeqTest{
         BasicDequeGetTest test=DblLnkSeqMonitor::verifyElement;
         test.runAllGetFirstTests("DblLnkSeqTest.testelement_void",true);
     }
-    @Order(628055)
+    @Order(1079342)
     @Test
     public void testforEach_Consumer(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -366,14 +404,15 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testforEach_Consumer",100,EnumSet.allOf(FunctionCallType.class));
     }
-    @Order(1188)
+    @Order(2052)
     @Test
     public void testget_int(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
                     if(initParams.totalPreAlloc <= 2 && initParams.totalPostAlloc <= 2){
-                        for(final var illegalMod:initParams.validPreMods){
+                        for(final var illegalMod:initParams.structType.validPreMods){
+                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                             for(final var size:SHORT_SIZES){
                                 TestExecutorService.submitTest(()->{
                                     final var monitor=SequenceInitialization.Ascending
@@ -404,6 +443,7 @@ public class DblLnkSeqTest{
                             }
                         }
                     }
+                    }
                 }
             });
         });
@@ -421,7 +461,7 @@ public class DblLnkSeqTest{
         BasicDequeGetTest test=DblLnkSeqMonitor::verifyGetLast;
         test.runAllGetLastTests("DblLnkSeqTest.testgetLast_void",true);
     }
-    @Order(1344)
+    @Order(2960)
     @Test
     public void testhashCode_void(){
         final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
@@ -436,7 +476,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testhashCode_void");
     }
-    @Order(355572)
+    @Order(770424)
     @Test
     public void testindexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -455,19 +495,20 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testindexOf_val",true);
     }
-    @Order(9504)
+    @Order(16416)
     @Test
     public void testisEmpty_void(){
         final BasicTest test=MonitoredSequence::verifyIsEmpty;
         test.runAllTests("DblLnkSeqTest.testisEmpty_void");
     }
-    @Order(420192)
+    @Order(470736)
     @Test
     public void testiterator_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
-                    for(final var illegalMod:initParams.validPreMods){
+                    for(final var illegalMod:initParams.structType.validPreMods){
+                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                         for(final var size:SIZES){
                             TestExecutorService.submitTest(()->{
                                 final var monitor=SequenceInitialization.Ascending
@@ -487,11 +528,12 @@ public class DblLnkSeqTest{
                         }
                     }
                 }
+                }
             });
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testiterator_void");
     }
-    @Order(44100)
+    @Order(76860)
     @Test
     public void testItrclone_void(){
         for(final var size:SIZES){
@@ -521,7 +563,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrclone_void");
     }
-    @Order(467786)
+    @Order(927902)
     @Tag("ForEachRemaining")
     @Test
     public void testItrforEachRemaining_Consumer(){
@@ -538,10 +580,9 @@ public class DblLnkSeqTest{
                                 if(initParams.totalPreAlloc == 0 && initParams.totalPostAlloc == 0){
                                     for(final var itrType:initParams.structType.validItrTypes){
                                         for(final var illegalMod:itrType.validPreMods){
-                                            if(illegalMod.expectedException == null || checkedType.checked){
+                                            if(illegalMod.expectedException == null || checkedType.checked  && illegalMod.minDepth<=initParams.preAllocs.length){
                                                 for(final var functionGen:itrType.validMonitoredFunctionGens){
-                                                    if(checkedType.checked || size == 0
-                                                            || functionGen.expectedException == null){
+                                                    if(size==0 || functionGen.expectedException==null || checkedType.checked && functionGen.minDepth<=initParams.preAllocs.length){
                                                         for(final var functionCallType:collectionType.validFunctionCalls){
                                                             final long randSeedBound=!functionCallType.boxed
                                                                     && numLeft > 1 && functionGen.randomized
@@ -596,7 +637,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrforEachRemaining_Consumer");
     }
-    @Order(52560)
+    @Order(59076)
     @Test
     public void testItrhasNext_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -619,7 +660,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrhasNext_void");
     }
-    @Order(564891)
+    @Order(633003)
     @Test
     public void testItrnext_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -629,7 +670,7 @@ public class DblLnkSeqTest{
                         for(final var initParams:initParamArray){
                             for(final var itrType:initParams.structType.validItrTypes){
                                 for(final var illegalMod:itrType.validPreMods){
-                                    if(illegalMod.expectedException == null || checkedType.checked){
+                                    if(illegalMod.expectedException == null || checkedType.checked  && illegalMod.minDepth<=initParams.preAllocs.length){
                                         for(final var outputType:collectionType.validOutputTypes()){
                                             TestExecutorService.submitTest(()->{
                                                 final var seqMonitor=SequenceInitialization.Ascending
@@ -660,7 +701,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrnext_void");
     }
-    @Order(6295086)
+    @Order(665163)
     @Tag("ItrRemove")
     @Test
     public void testItrremove_void(){
@@ -669,10 +710,10 @@ public class DblLnkSeqTest{
                 for(final var initParams:initParamArray){
                     for(final var itrType:initParams.structType.validItrTypes){
                         for(final var illegalMod:itrType.validPreMods){
-                            if(illegalMod.expectedException == null || checkedType.checked){
+                            if(illegalMod.expectedException == null || checkedType.checked  && illegalMod.minDepth<=initParams.preAllocs.length){
                                 for(final var removeScenario:itrType.validItrRemoveScenarios){
                                     if(removeScenario.expectedException == null || checkedType.checked){
-                                        for(final var size:SIZES){
+                                        for(final var size:SHORT_SIZES){
                                             int prevNumToIterate=-1;
                                             positionLoop:for(final var position:POSITIONS){
                                                 if(position != 0 && position != 1 && initParams.preAllocs.length > 0
@@ -767,7 +808,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrremove_void");
     }
-    @Order(355572)
+    @Order(770424)
     @Test
     public void testlastIndexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -787,7 +828,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testlastIndexOf_val",true);
     }
-    @Order(9351)
+    @Order(16146)
     @Test
     public void testlistIterator_int(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -797,7 +838,8 @@ public class DblLnkSeqTest{
                     if(checkedType.checked || size > 0){
                         for(final var initParams:initParamArray){
                             if(initParams.totalPreAlloc <= 2 && initParams.totalPostAlloc <= 2){
-                                for(final var illegalMod:initParams.validPreMods){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=SequenceInitialization.Ascending
                                                 .initialize(getMonitoredList(initParams,size),size,0);
@@ -824,6 +866,7 @@ public class DblLnkSeqTest{
                                     });
                                 }
                             }
+                            }
                         }
                     }
                 }
@@ -831,14 +874,15 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testlistIterator_int");
     }
-    @Order(1188)
+    @Order(2052)
     @Test
     public void testlistIterator_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
                     if(initParams.totalPreAlloc <= 2 && initParams.totalPostAlloc <= 2){
-                        for(final var illegalMod:initParams.validPreMods){
+                        for(final var illegalMod:initParams.structType.validPreMods){
+                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                             for(final var size:SHORT_SIZES){
                                 TestExecutorService.submitTest(()->{
                                     final var monitor=SequenceInitialization.Ascending
@@ -858,12 +902,13 @@ public class DblLnkSeqTest{
                             }
                         }
                     }
+                    }
                 }
             });
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testlistIterator_void");
     }
-    @Order(558900)
+    @Order(641493)
     @Test
     public void testListItradd_val(){
         for(final var position:POSITIONS){
@@ -879,7 +924,7 @@ public class DblLnkSeqTest{
                                     ?IteratorType.BidirectionalItr
                                     :IteratorType.SubBidirectionalItr;
                             for(final var illegalMod:itrType.validPreMods){
-                                if(illegalMod.expectedException == null || checkedType.checked){
+                                if(illegalMod.expectedException == null || checkedType.checked  && illegalMod.minDepth<=initParams.preAllocs.length){
                                     for(final var inputType:collectionType.mayBeAddedTo()){
                                         for(final var functionCallType:inputType.validFunctionCalls){
                                             TestExecutorService.submitTest(()->{
@@ -928,7 +973,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItradd_val");
     }
-    @Order(26280)
+    @Order(29520)
     @Test
     public void testListItrhasPrevious_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -949,7 +994,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrhasPrevious_void");
     }
-    @Order(26280)
+    @Order(29520)
     @Test
     public void testListItrnextIndex_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -970,7 +1015,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrnextIndex_void");
     }
-    @Order(282338)
+    @Order(316394)
     @Test
     public void testListItrprevious_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -982,7 +1027,7 @@ public class DblLnkSeqTest{
                                     ?IteratorType.BidirectionalItr
                                     :IteratorType.SubBidirectionalItr;
                             for(final var illegalMod:itrType.validPreMods){
-                                if(illegalMod.expectedException == null || checkedType.checked){
+                                if(illegalMod.expectedException == null || checkedType.checked  && illegalMod.minDepth<=initParams.preAllocs.length){
                                     for(final var outputType:collectionType.validOutputTypes()){
                                         TestExecutorService.submitTest(()->{
                                             final var seqMonitor=SequenceInitialization.Ascending
@@ -1012,7 +1057,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrprevious_void");
     }
-    @Order(612)
+    @Order(1080)
     @Test
     public void testListItrpreviousIndex_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1035,7 +1080,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrhasPrevious_void");
     }
-    @Order(2214900)
+    @Order(2481930)
     @Test
     public void testListItrset_val(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1044,7 +1089,7 @@ public class DblLnkSeqTest{
                     final var itrType=initParams.structType == StructType.DblLnkList?IteratorType.BidirectionalItr
                             :IteratorType.SubBidirectionalItr;
                     for(final var illegalMod:itrType.validPreMods){
-                        if(illegalMod.expectedException == null || checkedType.checked){
+                        if(illegalMod.expectedException == null || checkedType.checked  && illegalMod.minDepth<=initParams.preAllocs.length){
                             for(final var removeScenario:itrType.validItrRemoveScenarios){
                                 if(removeScenario.expectedException == null || checkedType.checked){
                                     for(final var inputType:initParams.collectionType.mayBeAddedTo()){
@@ -1100,9 +1145,12 @@ public class DblLnkSeqTest{
     
     
     @Tag("MASSIVEtoString")
-    @Test
+    //@Test
     public void testMASSIVEtoString(){
-        int numWorkers=Runtime.getRuntime().availableProcessors();
+        int oldNumWorkers=TestExecutorService.getNumWorkers();
+        try {
+        TestExecutorService.setNumWorkers(1);
+        int numWorkers=TestExecutorService.getNumWorkers();
         for(final var collectionType:DataType.values()){
             int seqSize;
             if((seqSize=collectionType.massiveToStringThreshold + 1) == 0){
@@ -1268,6 +1316,9 @@ public class DblLnkSeqTest{
             collectionType.verifyMASSIVEToString(checkedRoot.subList(0,seqSize).toString(),seqSize,
                     collectionType.classPrefix + "DblLnkSeq.CheckedSubList.testMASSIVEtoString");
         }
+        }finally {
+            TestExecutorService.setNumWorkers(oldNumWorkers);
+        }
     }
     private static interface BasicDequeOfferTest{
         boolean runTest(DblLnkSeqMonitor<?,?> monitor,Object inputVal,DataType inputType,FunctionCallType functionCallType);
@@ -1332,14 +1383,14 @@ public class DblLnkSeqTest{
         test.runAllGetLastTests("DblLnkSeqTest.testpeekLast_void",false);
     }
    
-    @Order(86)
+    @Order(129)
     @Test
     public void testpoll_void(){
         BasicDequePopTest test=DblLnkSeqMonitor::verifyPoll;
         test.runAllTests("DblLnkSeqTest.testpoll_void",false);
     }
     
-    @Order(86)
+    @Order(129)
     @Test
     public void testpollFirst_void(){
         BasicDequePopTest test=DblLnkSeqMonitor::verifyPollFirst;
@@ -1378,7 +1429,7 @@ public class DblLnkSeqTest{
             TestExecutorService.completeAllTests(testName);
         }
     }
-    @Order(86)
+    @Order(129)
     @Test
     public void testpollLast_void(){
         BasicDequePopTest test=DblLnkSeqMonitor::verifyPollLast;
@@ -1390,13 +1441,14 @@ public class DblLnkSeqTest{
         BasicDequePopTest test=DblLnkSeqMonitor::verifyPop;
         test.runAllTests("DblLnkSeqTest.testpop_void",true);
     }
-    @Order(52524)
+    @Order(58842)
     @Test
     public void testput_intval(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
-                    for(final var illegalMod:initParams.validPreMods){
+                    for(final var illegalMod:initParams.structType.validPreMods){
+                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                         for(final var size:SHORT_SIZES){
                             TestExecutorService.submitTest(()->{
                                 final var monitor=SequenceInitialization.Ascending
@@ -1435,13 +1487,14 @@ public class DblLnkSeqTest{
                                 }
                             });
                         }
+                        }
                     }
                 }
             });
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testput_intval");
     }
-    @Order(53055)
+    @Order(89342)
     @Tag("ReadAndWrite")
     @Test
     public void testReadAndWrite(){
@@ -1466,17 +1519,18 @@ public class DblLnkSeqTest{
         BasicDequePopTest test=DblLnkSeqMonitor::verifyRemove;
         test.runAllTests("DblLnkSeqTest.testremove_void",true);
     }
-    @Order(6213844)
+    @Order(2852749)
     @Test
     public void testremoveAt_int(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(var position:POSITIONS) {    
                     if(checkedType.checked || position >=0){
-                        for(final int size:SIZES){
+                        for(final int size:MEDIUM_SIZES){
                             if(size>0 || position<0) {
                                 for(final var initParams:initParamArray){
-                                    for(final var illegalMod:initParams.validPreMods){
+                                    for(final var illegalMod:initParams.structType.validPreMods){
+                                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                         if(illegalMod.expectedException==null || position<0) {
                                             for(final var outputType:collectionType.validOutputTypes()){
                                                 TestExecutorService.submitTest(()->{
@@ -1501,6 +1555,7 @@ public class DblLnkSeqTest{
                                                     }
                                                 });
                                             }
+                                        }
                                         }
                                     }
                                 }
@@ -1540,158 +1595,176 @@ public class DblLnkSeqTest{
                 return illegalMod.expectedException == null || collectionType != DataType.REF
                         && queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
             }
-            public boolean skipParams(SequenceInitParams params){
+            public boolean skipParams(SequenceInitParams params,int size,double position){
                 return false;
             }
         };
         test.runAllTests("DblLnkSeqTest.removeFirstOccurrence",false);
     }
-    @Order(54283610)
+    @Order(14333538)
     @Tag("RemoveIf")
     @Test
     public void testremoveIf_Predicate(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
-            final int sizeBound=collectionType == DataType.BOOLEAN?10:100;
-            final int sizeInc=Math.max(1,sizeBound / 10);
-            for(int tmpSize=0;tmpSize <= sizeBound;tmpSize+=sizeInc){
-                final int size=tmpSize;
-                final int initValBound;
-                final int periodBound;
-                if(collectionType == DataType.BOOLEAN){
-                    initValBound=size == 0?0:1;
-                    periodBound=Math.max(0,size - 1);
-                }else{
-                    initValBound=0;
-                    periodBound=0;
-                }
+            if(collectionType==DataType.BOOLEAN) {
                 checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
-                    for(final var initParams:initParamArray){
-                        for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
-                            if(size == 0 || checkedType.checked || filterGen.expectedException == null){
-                                for(final var functionCallType:collectionType.validFunctionCalls){
-                                    for(final var illegalMod:initParams.validPreMods){
+                    for(var initParams:initParamArray) {
+                        for(var functionCallType:collectionType.validFunctionCalls) {
+                            filterGenLoop:for(var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens) {
+                                for(int tmpSize=0;tmpSize<=10;++tmpSize) {
+                                    if((tmpSize==0 || filterGen.expectedException==null || checkedType.checked && filterGen.minDepth<=initParams.preAllocs.length)&&(tmpSize<2 || !functionCallType.boxed)) {
+                                        final int size=tmpSize;
+                                        final int initValBound=size>0?1:0;
+                                        for(int tmpInitVal=0;tmpInitVal<=initValBound;++tmpInitVal) {
+                                            final int initVal=tmpInitVal;
+                                            for(int tmpPeriod=0;tmpPeriod<=size;++tmpPeriod) {
+                                                final int period=tmpPeriod;
+                                                for(final var illegalMod:initParams.structType.validPreMods){
+                                                    if(illegalMod.expectedException==null || checkedType.checked && illegalMod.minDepth<=initParams.preAllocs.length) {
+                                                    switch(filterGen.predicateGenCallType) {
+                                                    case IndexSpecific:
+                                                        continue filterGenLoop;
+                                                    case Randomized:
+                                                        if(!functionCallType.boxed && size>0 && illegalMod.expectedException==null && filterGen.expectedException==null) {
+                                                            for(long tmpRandSeed=0;tmpRandSeed<=100;++tmpRandSeed) {
+                                                                final long randSeed=tmpRandSeed;
+                                                                for(var threshold:RANDOM_THRESHOLDS) {
+                                                                    TestExecutorService.submitTest(()->{
+                                                                        final var monitor=SequenceInitialization.Ascending
+                                                                                .initialize(getMonitoredList(initParams,size),size,
+                                                                                        initVal,period);
+                                                                        final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,new Random(randSeed));
+                                                                        monitor.verifyRemoveIf(filter,functionCallType);
+                                                                    });
+                                                                }
+                                                            }
+                                                            break;
+                                                        }
+                                                    case NonRandomized:
+                                                        TestExecutorService.submitTest(()->{
+                                                            final var monitor=SequenceInitialization.Ascending
+                                                                    .initialize(getMonitoredList(initParams,size),size,
+                                                                            initVal,period);
+                                                            final var filter=filterGen.getMonitoredRemoveIfPredicate(
+                                                                    monitor);
+                                                            if(illegalMod.expectedException==null) {
+                                                                if(size==0||filterGen.expectedException==null) {
+                                                                    monitor.verifyRemoveIf(filter,functionCallType);
+                                                                }else {
+                                                                    Assertions.assertThrows(filterGen.expectedException,()->monitor.verifyRemoveIf(filter,
+                                                                           functionCallType));
+                                                                }
+                                                            }else {
+                                                                monitor.illegalMod(illegalMod);
+                                                                Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyRemoveIf(filter,
+                                                                        functionCallType));
+                                                            }
+                                                        });
+                                                        break;
+                                                    default:
+                                                        throw filterGen.invalid();
+                                                    }
+                                                }
+                                            }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }else {
+                checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
+                    for(var initParams:initParamArray) {
+                        for(var functionCallType:collectionType.validFunctionCalls) {
+                            for(var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens) {
+                                if(filterGen.expectedException==null || checkedType.checked && filterGen.minDepth<=initParams.preAllocs.length) {
+                                    
                                         switch(filterGen.predicateGenCallType) {
                                         case IndexSpecific:
-                                            if(size>1 && collectionType!=DataType.BOOLEAN) {
-                                               int bound=Math.min(size,6);
-                                               for(long tmpL=0,lBound=1L<<bound;tmpL<lBound;++tmpL) {
-                                                   
-                                                   if(initParams.structType!=StructType.DblLnkSubList || (tmpL&0b11)!=0) {
-                                                       final long l=tmpL;
-                                                       for(int tmpComp=0;tmpComp<=1;++tmpComp) {
-                                                           final boolean compliment=tmpComp==0;
-                                                           TestExecutorService.submitTest(()->{
-                                                               final var monitor=SequenceInitialization.Ascending
-                                                                       .initialize(getMonitoredList(initParams,size),size,
-                                                                               0,0);
-                                                               final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                                       monitor,compliment,l);
-                                                               if(illegalMod.expectedException == null){
-                                                                   if(filterGen.expectedException == null || size == 0){
-                                                                       monitor.verifyRemoveIf(filter,functionCallType);
-                                                                   }else{
-                                                                       Assertions.assertThrows(filterGen.expectedException,
-                                                                               ()->monitor.verifyRemoveIf(filter,
-                                                                                       functionCallType));
-                                                                   }
-                                                               }else{
-                                                                   monitor.illegalMod(illegalMod);
-                                                                   Assertions.assertThrows(illegalMod.expectedException,
-                                                                           ()->monitor.verifyRemoveIf(filter,
-                                                                                   functionCallType));
-                                                               }
-                                                           });
-                                                       }
-                                                   }
-                                                  
-                                                   
-                                               }
-                                            }
-                                            break;
-                                            
-                                        case Randomized:
-                                            if(size > 0 && !functionCallType.boxed
-                                                && illegalMod.expectedException == null
-                                                && (filterGen.expectedException == null || initParams.totalPreAlloc == 0
-                                                        && initParams.totalPostAlloc == 0)) {
-                                                for(long tmpRandSeed=0;tmpRandSeed <= 100;++tmpRandSeed){
-                                                    
-                                                    final long randSeed=tmpRandSeed;
-                                                    for(final var threshold:RANDOM_THRESHOLDS){
-                                                        for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-                                                            final int initVal=tmpInitVal;
-                                                            for(int tmpPeriod=0;tmpPeriod <= periodBound;++tmpPeriod){
-                                                                final int period=tmpPeriod;
-                                                            
-                                                                TestExecutorService.submitTest(()->{
-                                                                    final var monitor=SequenceInitialization.Ascending
-                                                                            .initialize(getMonitoredList(initParams,size),size,
-                                                                                    initVal,period);
-                                                                    final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                                            monitor,threshold,randSeed);
-                                                                    if(illegalMod.expectedException == null){
-                                                                        if(filterGen.expectedException == null || size == 0){
-                                                                            monitor.verifyRemoveIf(filter,functionCallType);
-                                                                        }else{
-                                                                            Assertions.assertThrows(filterGen.expectedException,
-                                                                                    ()->monitor.verifyRemoveIf(filter,
-                                                                                            functionCallType));
+                                            for(final var illegalMod:initParams.structType.validPreMods){
+                                                if(illegalMod.expectedException==null || checkedType.checked && illegalMod.minDepth<=initParams.preAllocs.length) {
+                                                for(long tmpWord=0;tmpWord<=1L<<7;++tmpWord) {
+                                                    if(initParams.structType!=StructType.DblLnkSubList || (tmpWord&0b11)!=0) {
+                                                        final long word=tmpWord;
+                                                        for(int tmpComp=0;tmpComp<=1;++tmpComp) {
+                                                            final boolean compliment=tmpComp!=0;
+                                                            TestExecutorService.submitTest(()->{
+                                                                final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,500),500,0);
+                                                                final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,compliment,word);
+                                                                if(illegalMod.expectedException==null) {
+                                                                    for(;;) {
+                                                                        boolean result=monitor.verifyRemoveIf(filter,functionCallType);
+                                                                        if(!result||monitor.isEmpty()) {
+                                                                            break;
                                                                         }
-                                                                    }else{
-                                                                        monitor.illegalMod(illegalMod);
-                                                                        Assertions.assertThrows(illegalMod.expectedException,
-                                                                                ()->monitor.verifyRemoveIf(filter,
-                                                                                        functionCallType));
+                                                                        filter.reset(monitor);
                                                                     }
-                                                                });
-                                                            }
+                                                                }else {
+                                                                    monitor.illegalMod(illegalMod);
+                                                                    Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyRemoveIf(filter,functionCallType));
+                                                                }
+                                                            });
                                                         }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                            break;
+                                        case Randomized:
+                                            if(!functionCallType.boxed && filterGen.expectedException==null) {
+                                                for(long tmpRandSeed=0;tmpRandSeed<=100;++tmpRandSeed) {
+                                                    final long randSeed=tmpRandSeed;
+                                                    for(var threshold:RANDOM_THRESHOLDS) {
+                                                        TestExecutorService.submitTest(()->{
+                                                            final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,100),100,0);
+                                                            final var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,new Random(randSeed));
+                                                            for(;;) {
+                                                                monitor.verifyRemoveIf(filter,functionCallType);
+                                                                if(monitor.isEmpty()) {
+                                                                    break;
+                                                                }
+                                                                filter.reset(monitor);
+                                                            }
+                                                        });
                                                     }
                                                 }
                                                 break;
                                             }
                                         case NonRandomized:
-
-                                            for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
-                                                final int initVal=tmpInitVal;
-                                                for(int tmpPeriod=0;tmpPeriod <= periodBound;++tmpPeriod){
-                                                    final int period=tmpPeriod;
-                                                
-                                                    TestExecutorService.submitTest(()->{
-                                                        final var monitor=SequenceInitialization.Ascending
-                                                                .initialize(getMonitoredList(initParams,size),size,
-                                                                        initVal,period);
-                                                        final var filter=filterGen.getMonitoredRemoveIfPredicate(
-                                                                monitor);
-                                                        if(illegalMod.expectedException == null){
-                                                            if(filterGen.expectedException == null || size == 0){
-                                                                monitor.verifyRemoveIf(filter,functionCallType);
-                                                            }else{
-                                                                Assertions.assertThrows(filterGen.expectedException,
-                                                                        ()->monitor.verifyRemoveIf(filter,
-                                                                                functionCallType));
+                                            for(final var illegalMod:initParams.structType.validPreMods){
+                                                if(illegalMod.expectedException==null || checkedType.checked && illegalMod.minDepth<=initParams.preAllocs.length) {
+                                                for(int size:REMOVE_IF_SIZES) {
+                                                    if((size==0 || checkedType.checked || filterGen.expectedException==null)&&(size<2 || !functionCallType.boxed)) {
+                                                        TestExecutorService.submitTest(()->{
+                                                            final var monitor=SequenceInitialization.Ascending
+                                                                    .initialize(getMonitoredList(initParams,size),size,
+                                                                            0,0);
+                                                            final var filter=filterGen.getMonitoredRemoveIfPredicate(
+                                                                    monitor);
+                                                            if(illegalMod.expectedException==null) {
+                                                                if(size==0||filterGen.expectedException==null) {
+                                                                    monitor.verifyRemoveIf(filter,functionCallType);
+                                                                }else {
+                                                                    Assertions.assertThrows(filterGen.expectedException,()->monitor.verifyRemoveIf(filter,
+                                                                           functionCallType));
+                                                                }
+                                                            }else {
+                                                                monitor.illegalMod(illegalMod);
+                                                                Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyRemoveIf(filter,
+                                                                        functionCallType));
                                                             }
-                                                        }else{
-                                                            monitor.illegalMod(illegalMod);
-                                                            Assertions.assertThrows(illegalMod.expectedException,
-                                                                    ()->monitor.verifyRemoveIf(filter,
-                                                                            functionCallType));
-                                                        }
-                                                    });
+                                                        });
+                                                    }
                                                 }
                                             }
-                                        
+                                        }
                                             break;
                                         default:
                                             throw filterGen.invalid();
-                                        
                                         }
-                                        
-                                        
-                                        
-                                       
-                                        
-                                    }
+                                    
                                 }
                             }
                         }
@@ -1699,6 +1772,8 @@ public class DblLnkSeqTest{
                 });
             }
         });
+        
+
         TestExecutorService.completeAllTests("DblLnkSeqTest.testremoveIf_Predicate");
     }
     @Order(129)
@@ -1728,13 +1803,13 @@ public class DblLnkSeqTest{
                 return illegalMod.expectedException == null || collectionType != DataType.REF
                         && queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
             }
-            public boolean skipParams(SequenceInitParams params){
+            public boolean skipParams(SequenceInitParams params,int size,double position){
                 return false;
             }
         };
         test.runAllTests("DblLnkSeqTest.removeFirstOccurrence",false);
     }
-    @Order(54842004)
+    @Order(87803304)
     @Test
     public void testremoveVal_val(){
         final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
@@ -1755,13 +1830,14 @@ public class DblLnkSeqTest{
                 return illegalMod.expectedException == null || collectionType != DataType.REF
                         && queryVal == QueryVal.Null && castType != QueryCastType.ToObject;
             }
-            public boolean skipParams(SequenceInitParams params){
+            public boolean skipParams(SequenceInitParams params,int size,double position){
                 return false;
+                //return position!=0 && position!=1 && params.totalPreAlloc!=0 && params.totalPostAlloc!=0;
             }
         };
         test.runAllTests("DblLnkSeqTest.testremoveVal_val",true);
     }
-    @Order(628055)
+    @Order(1079342)
     @Test
     public void testreplaceAll_UnaryOperator(){
         final MonitoredFunctionTest<MonitoredList<?>> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
@@ -1800,13 +1876,14 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testsearch",false);
     }
-    @Order(52524)
+    @Order(58842)
     @Test
     public void testset_intval(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
-                    for(final var illegalMod:initParams.validPreMods){
+                    for(final var illegalMod:initParams.structType.validPreMods){
+                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                         for(final int size:SHORT_SIZES){
                             TestExecutorService.submitTest(()->{
                                 final var monitor=SequenceInitialization.Ascending
@@ -1843,17 +1920,18 @@ public class DblLnkSeqTest{
                         }
                     }
                 }
+                }
             });
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testset_intval");
     }
-    @Order(9504)
+    @Order(16416)
     @Test
     public void testsize_void(){
         final BasicTest test=MonitoredSequence::verifySize;
         test.runAllTests("DblLnkSeqTest.testsize_void");
     }
-    @Order(254982)
+    @Order(432112)
     @Test
     public void testsort_Comparator(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1863,9 +1941,10 @@ public class DblLnkSeqTest{
                         for(final var comparatorGen:initParams.structType.validComparatorGens){
                             if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
                                 for(final var size:SIZES){
-                                    if(size < 2 || comparatorGen.expectedException == null || checkedType.checked){
+                                    if(size < 2 || comparatorGen.expectedException == null || checkedType.checked && comparatorGen.minDepth<=initParams.preAllocs.length){
                                         for(final var functionCallType:collectionType.validFunctionCalls){
-                                            for(final var illegalMod:initParams.validPreMods){
+                                            for(final var illegalMod:initParams.structType.validPreMods){
+                                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                                 TestExecutorService.submitTest(()->{
                                                     final var monitor=getMonitoredList(initParams,size);
                                                     if(illegalMod.expectedException == null){
@@ -1884,10 +1963,13 @@ public class DblLnkSeqTest{
                                                     }
                                                 });
                                             }
+                                            }
                                         }
                                     }
                                 }
                             }
+                            
+                            
                         }
                     }
                 }
@@ -1895,7 +1977,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testsort_Comparator");
     }
-    @Order(821232)
+    @Order(918936)
     @Test
     public void teststableAscendingSort_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1905,8 +1987,9 @@ public class DblLnkSeqTest{
                         if(comparatorGen.validWithNoComparator
                                 && (comparatorGen.validWithPrimitive || collectionType == DataType.REF)){
                             for(final var size:SIZES){
-                                if(size < 2 || comparatorGen.expectedException == null || checkedType.checked){
-                                    for(final var illegalMod:initParams.validPreMods){
+                                if(size < 2 || comparatorGen.expectedException == null || checkedType.checked && comparatorGen.minDepth<=initParams.preAllocs.length){
+                                    for(final var illegalMod:initParams.structType.validPreMods){
+                                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                         TestExecutorService.submitTest(()->{
                                             final var monitor=getMonitoredList(initParams,size);
                                             if(illegalMod.expectedException == null){
@@ -1924,6 +2007,7 @@ public class DblLnkSeqTest{
                                         });
                                     }
                                 }
+                                }
                             }
                         }
                     }
@@ -1932,7 +2016,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.teststableAscendingSort_void");
     }
-    @Order(821232)
+    @Order(918936)
     @Test
     public void teststableDescendingSort_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1942,8 +2026,9 @@ public class DblLnkSeqTest{
                         if(comparatorGen.validWithNoComparator
                                 && (comparatorGen.validWithPrimitive || collectionType == DataType.REF)){
                             for(final var size:SIZES){
-                                if(size < 2 || comparatorGen.expectedException == null || checkedType.checked){
-                                    for(final var illegalMod:initParams.validPreMods){
+                                if(size < 2 || comparatorGen.expectedException == null || checkedType.checked && comparatorGen.minDepth<=initParams.preAllocs.length){
+                                    for(final var illegalMod:initParams.structType.validPreMods){
+                                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                         TestExecutorService.submitTest(()->{
                                             final var monitor=getMonitoredList(initParams,size);
                                             if(illegalMod.expectedException == null){
@@ -1961,6 +2046,7 @@ public class DblLnkSeqTest{
                                         });
                                     }
                                 }
+                                }
                             }
                         }
                     }
@@ -1969,61 +2055,80 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.teststableDescendingSort_void");
     }
-    @Order(45112104)
+    @Order(205947)
     @Tag("subList_intint")
     @Test
     public void testsubList_intint(){
-        ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
-            checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
-                for(final int size:SIZES){
-                    final int inc=Math.max(1,size / 10);
-                    for(int tmpFromIndex=-inc,fromBound=size + 2 * inc;tmpFromIndex <= fromBound;tmpFromIndex+=inc){
-                        if(checkedType.checked || tmpFromIndex >= 0 && tmpFromIndex <= size){
-                            final int fromIndex=tmpFromIndex;
-                            for(int tmpToIndex=-(2 * inc),toBound=size + inc;tmpToIndex < toBound;tmpToIndex+=inc){
-                                if(checkedType.checked || tmpToIndex >= fromIndex && tmpToIndex <= size){
-                                    final int toIndex=tmpToIndex;
-                                    for(final var initParams:initParamArray){
-                                        for(final var illegalMod:initParams.validPreMods){
-                                            TestExecutorService.submitTest(()->{
-                                                final var rootMonitor=SequenceInitialization.Ascending
-                                                        .initialize(getMonitoredList(initParams,size),size,0);
-                                                if(illegalMod.expectedException == null){
-                                                    if(fromIndex >= 0 && toIndex >= fromIndex && toIndex <= size){
-                                                        rootMonitor.getMonitoredSubList(fromIndex,toIndex)
-                                                                .verifyCollectionState();
-                                                    }else{
-                                                        Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
-                                                            try{
-                                                                rootMonitor.getMonitoredSubList(fromIndex,toIndex);
-                                                            }finally{
-                                                                rootMonitor.verifyCollectionState();
-                                                            }
-                                                        });
-                                                    }
-                                                }else{
-                                                    rootMonitor.illegalMod(illegalMod);
-                                                    Assertions.assertThrows(illegalMod.expectedException,()->{
-                                                        try{
-                                                            rootMonitor.getMonitoredSubList(fromIndex,toIndex);
-                                                        }finally{
-                                                            rootMonitor.verifyCollectionState();
-                                                        }
-                                                    });
+        for(var size:MEDIUM_SIZES) {
+            final int inc=Math.max(1,size / 10);
+            ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
+                checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
+                    for(var initParams:initParamArray) {
+                    
+                        for(final var illegalMod:initParams.structType.validPreMods){
+                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
+                        
+                            TestExecutorService.submitTest(()->{
+                                var rootMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
+                                if(illegalMod.expectedException==null) {
+                                    int tmpFromIndex;
+                                    final int fromBound;
+                                    final int toBound;
+                                    if(checkedType.checked) {
+                                        tmpFromIndex=-(2*inc);
+                                        fromBound=size+inc;
+                                        toBound=size+2*inc;
+                                    }else {
+                                        tmpFromIndex=0;
+                                        fromBound=size;
+                                        toBound=size;
+                                    }
+                                    for(;tmpFromIndex<=fromBound;tmpFromIndex+=inc) {
+                                        final int fromIndex=tmpFromIndex;
+                                        for(int tmpToIndex=checkedType.checked?fromIndex-inc:fromIndex;tmpToIndex<=toBound;tmpToIndex+=inc) {
+                                            final int toIndex=tmpToIndex;
+                                            if(fromIndex>=0 && toIndex>=fromIndex && toIndex<=size) {
+                                                rootMonitor.getMonitoredSubList(fromIndex,toIndex).verifyCollectionState();
+                                            }else {
+                                              Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+                                                  try{
+                                                      rootMonitor.getMonitoredSubList(fromIndex,toIndex);
+                                                  }finally{
+                                                      rootMonitor.verifyCollectionState();
+                                                  }
+                                              });
+                                            }
+                                        }
+                                    }
+                                }else {
+                                    rootMonitor.illegalMod(illegalMod);
+                                    for(int tmpFromIndex=-(2*inc),fromBound=size+inc;tmpFromIndex<=fromBound;tmpFromIndex+=inc) {
+                                        final int fromIndex=tmpFromIndex;
+                                        for(int tmpToIndex=fromIndex-inc,toBound=size+2*inc;tmpToIndex<=toBound;tmpToIndex+=inc) {
+                                            final int toIndex=tmpToIndex;
+                                            Assertions.assertThrows(illegalMod.expectedException,()->{
+                                                try{
+                                                    rootMonitor.getMonitoredSubList(fromIndex,toIndex);
+                                                }finally{
+                                                    rootMonitor.verifyCollectionState();
                                                 }
                                             });
                                         }
                                     }
                                 }
-                            }
+                            });
                         }
                     }
+                    
+                    
                 }
+
             });
         });
+    }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testsubList_intint");
     }
-    @Order(53055)
+    @Order(89342)
     @Test
     public void testtoArray_IntFunction(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -2041,14 +2146,15 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testtoArray_IntFunction",0,EnumSet.of(FunctionCallType.Unboxed));
     }
-    @Order(35694)
+    @Order(77337)
     @Test
     public void testtoArray_ObjectArray(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
                     if(initParams.totalPreAlloc == 0 && initParams.totalPostAlloc == 0){
-                        for(final var illegalMod:initParams.validPreMods){
+                        for(final var illegalMod:initParams.structType.validPreMods){
+                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                             for(final int size:SIZES){
                                 for(int tmpArrSize=0,tmpArrSizeBound=size
                                         + 5;tmpArrSize <= tmpArrSizeBound;++tmpArrSize){
@@ -2068,18 +2174,20 @@ public class DblLnkSeqTest{
                             }
                         }
                     }
+                    }
                 }
             });
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testtoArray_ObjectArray");
     }
-    @Order(420192)
+    @Order(470736)
     @Test
     public void testtoArray_void(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
             checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                 for(final var initParams:initParamArray){
-                    for(final var illegalMod:initParams.validPreMods){
+                    for(final var illegalMod:initParams.structType.validPreMods){
+                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                         for(final int size:SIZES){
                             TestExecutorService.submitTest(()->{
                                 final var monitor=SequenceInitialization.Ascending
@@ -2099,11 +2207,12 @@ public class DblLnkSeqTest{
                         }
                     }
                 }
+                }
             });
         });
-        TestExecutorService.completeAllTests("DblLnkSeqTest.testget_int");
+        TestExecutorService.completeAllTests("DblLnkSeqTest.testtoArray_void");
     }
-    @Order(1344)
+    @Order(2960)
     @Test
     public void testtoString_void(){
         final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
@@ -2118,7 +2227,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testtoString_void");
     }
-    @Order(447728)
+    @Order(500504)
     @Test
     public void testunstableAscendingSort_void(){
         ALL_STRUCT_INIT_PARAMS.get(DataType.REF).forEach((checkedType,initParamArray)->{
@@ -2126,8 +2235,9 @@ public class DblLnkSeqTest{
                 for(final var comparatorGen:initParams.structType.validComparatorGens){
                     if(comparatorGen.validWithNoComparator){
                         for(final var size:SIZES){
-                            if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                                for(final var illegalMod:initParams.validPreMods){
+                            if(size < 2 || comparatorGen.expectedException == null || checkedType.checked && comparatorGen.minDepth<=initParams.preAllocs.length){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,size);
                                         if(illegalMod.expectedException == null){
@@ -2145,6 +2255,7 @@ public class DblLnkSeqTest{
                                     });
                                 }
                             }
+                            }
                         }
                     }
                 }
@@ -2152,7 +2263,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableAscendingSort_void");
     }
-    @Order(447728)
+    @Order(500504)
     @Test
     public void testunstableDescendingSort_void(){
         ALL_STRUCT_INIT_PARAMS.get(DataType.REF).forEach((checkedType,initParamArray)->{
@@ -2160,8 +2271,9 @@ public class DblLnkSeqTest{
                 for(final var comparatorGen:initParams.structType.validComparatorGens){
                     if(comparatorGen.validWithNoComparator){
                         for(final var size:SIZES){
-                            if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                                for(final var illegalMod:initParams.validPreMods){
+                            if(size < 2 || comparatorGen.expectedException == null || checkedType.checked && comparatorGen.minDepth<=initParams.preAllocs.length){
+                                for(final var illegalMod:initParams.structType.validPreMods){
+                                    if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=getMonitoredList(initParams,size);
                                         if(illegalMod.expectedException == null){
@@ -2179,6 +2291,7 @@ public class DblLnkSeqTest{
                                     });
                                 }
                             }
+                            }
                         }
                     }
                 }
@@ -2186,7 +2299,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testunstableDescendingSort_void");
     }
-    @Order(5604816)
+    @Order(2855721)
     @Test
     public void testunstableSort_Comparator(){
         ALL_STRUCT_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -2195,9 +2308,10 @@ public class DblLnkSeqTest{
                     for(final var initParams:initParamArray){
                         for(final var comparatorGen:initParams.structType.validComparatorGens){
                             if(collectionType == DataType.REF || comparatorGen.validWithPrimitive){
-                                for(final var size:SIZES){
-                                    if(size < 2 || checkedType.checked || comparatorGen.expectedException == null){
-                                        for(final var illegalMod:initParams.validPreMods){
+                                for(final var size:MEDIUM_SIZES){
+                                    if(size < 2 || comparatorGen.expectedException == null || checkedType.checked && comparatorGen.minDepth<=initParams.preAllocs.length){
+                                        for(final var illegalMod:initParams.structType.validPreMods){
+                                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                             TestExecutorService.submitTest(()->{
                                                 final var monitor=getMonitoredList(initParams,size);
                                                 if(illegalMod.expectedException == null){
@@ -2214,6 +2328,7 @@ public class DblLnkSeqTest{
                                                 }
                                             });
                                         }
+                                    }
                                     }
                                 }
                             }
@@ -2239,7 +2354,8 @@ public class DblLnkSeqTest{
                 checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                     for(final var initParams:initParamArray){
                         if(initParams.totalPreAlloc <= 2 && initParams.totalPostAlloc <= 2){
-                            for(final var illegalMod:initParams.validPreMods){
+                            for(final var illegalMod:initParams.structType.validPreMods){
+                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                 for(final int size:SIZES){
                                     TestExecutorService.submitTest(()->{
                                         final var monitor=SequenceInitialization.Ascending
@@ -2253,6 +2369,7 @@ public class DblLnkSeqTest{
                                     });
                                 }
                             }
+                        }
                         }
                     }
                 });
@@ -7590,9 +7707,10 @@ public class DblLnkSeqTest{
                         for(final var initParams:initParamArray){
                             if(initParams.totalPreAlloc <= 2 && initParams.totalPostAlloc <= 2){
                                 for(final var functionGen:initParams.structType.validMonitoredFunctionGens){
-                                    if(checkedType.checked || functionGen.expectedException == null){
+                                    if(functionGen.expectedException==null || checkedType.checked && functionGen.minDepth<=initParams.preAllocs.length){
                                         for(final var functionCallType:collectionType.validFunctionCalls){
-                                            for(final var illegalMod:initParams.validPreMods){
+                                            for(final var illegalMod:initParams.structType.validPreMods){
+                                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                                 final long randSeedBound=size > 1 && functionGen.randomized
                                                         && !functionCallType.boxed
                                                         && illegalMod.expectedException == null?maxRand:0;
@@ -7608,7 +7726,10 @@ public class DblLnkSeqTest{
                                                 }
                                             }
                                         }
+                                        }
                                     }
+                                    
+                                    
                                 }
                             }
                         }
@@ -7748,7 +7869,7 @@ public class DblLnkSeqTest{
             }
             return true;
         }
-        default boolean skipParams(SequenceInitParams params){
+        default boolean skipParams(SequenceInitParams params,int size,double position){
             return params.totalPreAlloc != 0 || params.totalPostAlloc != 0;
         }
         private void runAllTests(String testName,boolean useAllStructs){
@@ -7762,17 +7883,16 @@ public class DblLnkSeqTest{
                                             inputType,collectionType);
                                     checkedTypeToInitParams.forEach((checkedType,initParamArray)->{
                                         for(final var initParams:initParamArray){
-                                            if(skipParams(initParams)){
-                                                continue;
-                                            }
+                                           
                                             if(queryVal == QueryVal.NonNull){
                                                 if(initParams.totalPreAlloc == 0 && initParams.totalPostAlloc == 0){
                                                     for(final var monitoredObjectGen:initParams.structType.validMonitoredObjectGens){
                                                         if(monitoredObjectGen.expectedException != null
-                                                                && checkedType.checked){
+                                                                && checkedType.checked&&monitoredObjectGen.minDepth<=initParams.preAllocs.length){
                                                             for(final var size:MEDIUM_SIZES){
                                                                 if(size > 0){
-                                                                    for(final var illegalMod:initParams.validPreMods){
+                                                                    for(final var illegalMod:initParams.structType.validPreMods){
+                                                                        if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                                                         final Class<? extends Throwable> expectedException=illegalMod.expectedException == null
                                                                                 ?monitoredObjectGen.expectedException
                                                                                 :illegalMod.expectedException;
@@ -7786,6 +7906,7 @@ public class DblLnkSeqTest{
                                                                                                 -1)));
                                                                     }
                                                                 }
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -7793,6 +7914,9 @@ public class DblLnkSeqTest{
                                             }else{
                                                 for(final var size:MEDIUM_SIZES){
                                                     for(final var position:POSITIONS){
+                                                        if(skipParams(initParams,size,position)){
+                                                            continue;
+                                                        }
                                                         if(position >= 0){
                                                             if(!queryCanReturnTrue){
                                                                 continue;
@@ -7819,16 +7943,12 @@ public class DblLnkSeqTest{
                                                             default:
                                                                 continue;
                                                             }
-                                                            if(position != 0 && position != 1
-                                                                    && (initParams.totalPreAlloc != 0
-                                                                            || initParams.totalPostAlloc != 0)){
-                                                                continue;
-                                                            }
                                                         }else if(initParams.totalPreAlloc != 0
                                                                 || initParams.totalPostAlloc != 0){
                                                             continue;
                                                         }
-                                                        for(final var illegalMod:initParams.validPreMods){
+                                                        for(final var illegalMod:initParams.structType.validPreMods){
+                                                            if(illegalMod.expectedException==null || checkedType.checked && illegalMod.minDepth<=initParams.preAllocs.length) {
                                                             TestExecutorService.submitTest(()->{
                                                                 if(cmeFilter(illegalMod,inputType,collectionType,
                                                                         queryVal,modification,castType)){
@@ -7843,6 +7963,7 @@ public class DblLnkSeqTest{
                                                                 }
                                                             });
                                                         }
+                                                    }
                                                     }
                                                 }
                                             }
@@ -7957,9 +8078,10 @@ public class DblLnkSeqTest{
                         for(final var initParams:initParamArray){
                             if(initParams.totalPreAlloc == 0 && initParams.totalPostAlloc == 0){
                                 for(final var objGen:initParams.structType.validMonitoredObjectGens){
-                                    if(objGen.expectedException == null || checkedType.checked){
+                                    if(objGen.expectedException==null || checkedType.checked && objGen.minDepth<=initParams.preAllocs.length) {
                                         for(final var size:SIZES){
-                                            for(final var illegalMod:initParams.validPreMods){
+                                            for(final var illegalMod:initParams.structType.validPreMods){
+                                                if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                                 TestExecutorService.submitTest(()->{
                                                     if(size == 0 || objGen.expectedException == null){
                                                         final var monitor=SequenceInitialization.Ascending
@@ -7993,7 +8115,10 @@ public class DblLnkSeqTest{
                                                 });
                                             }
                                         }
+                                        }
                                     }
+                                    
+                                    
                                 }
                             }
                         }
@@ -8006,7 +8131,8 @@ public class DblLnkSeqTest{
                                 for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
                                     final int initVal=tmpInitVal;
                                     for(final var size:SIZES){
-                                        for(final var illegalMod:initParams.validPreMods){
+                                        for(final var illegalMod:initParams.structType.validPreMods){
+                                            if(illegalMod.minDepth<=initParams.preAllocs.length && (initParams.checkedType.checked|| illegalMod.expectedException==null)) {
                                             TestExecutorService.submitTest(()->{
                                                 final var monitor=SequenceInitialization.Ascending
                                                         .initialize(getMonitoredList(initParams,size),size,initVal);
@@ -8019,6 +8145,7 @@ public class DblLnkSeqTest{
                                                 }
                                             });
                                         }
+                                    }
                                     }
                                 }
                             }

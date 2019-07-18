@@ -4,11 +4,13 @@ import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 public enum MonitoredRemoveIfPredicateGen{
-    RemoveSpecificIndices(null,PredicateGenCallType.IndexSpecific){
+    RemoveSpecificIndices(null,PredicateGenCallType.IndexSpecific,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
-            return new MonitoredRemoveIfPredicate(){
+            
+            
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
                 @Override
                 protected boolean testImpl(){
                    int numCalls=this.numCalls-1;
@@ -27,16 +29,15 @@ public enum MonitoredRemoveIfPredicateGen{
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
+                double threshold,Random rand){
             throw new UnsupportedOperationException();
             }
     },
-    Random(null,PredicateGenCallType.Randomized){
+    Random(null,PredicateGenCallType.Randomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            Random rand=new Random(randSeed);
-            return new MonitoredRemoveIfPredicate(){
+                double threshold,Random rand){
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
                 @Override
                 protected boolean testImpl(){
                     return rand.nextDouble() >= threshold;
@@ -46,23 +47,23 @@ public enum MonitoredRemoveIfPredicateGen{
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
         
     },
-    RemoveTrue(null,PredicateGenCallType.NonRandomized){
+    RemoveTrue(null,PredicateGenCallType.NonRandomized,0){
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            return new MonitoredRemoveIfPredicate(){
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
                 @Override
                 protected boolean testImpl(double val){
                     return val == 1;
@@ -121,15 +122,16 @@ public enum MonitoredRemoveIfPredicateGen{
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
+                double threshold,Random rand){
+            
             return getMonitoredRemoveIfPredicate(collection);
             }
 
     },
-    RemoveFalse(null,PredicateGenCallType.NonRandomized){
+    RemoveFalse(null,PredicateGenCallType.NonRandomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            return new MonitoredRemoveIfPredicate(){
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
 
                 @Override
                 protected boolean testImpl(double val){
@@ -189,16 +191,16 @@ public enum MonitoredRemoveIfPredicateGen{
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
+                double threshold,Random rand){
             return getMonitoredRemoveIfPredicate(collection);
             }
         
         
     },
-    RemoveAll(null,PredicateGenCallType.NonRandomized){
+    RemoveAll(null,PredicateGenCallType.NonRandomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            return new MonitoredRemoveIfPredicate(){
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
                 @Override
                 protected boolean testImpl(){
                     return true;
@@ -213,14 +215,14 @@ public enum MonitoredRemoveIfPredicateGen{
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
+                double threshold,Random rand){
             return getMonitoredRemoveIfPredicate(collection);
             }
     },
-    RemoveNone(null,PredicateGenCallType.NonRandomized){
+    RemoveNone(null,PredicateGenCallType.NonRandomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            return new MonitoredRemoveIfPredicate(){
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
                 @Override
                 protected boolean testImpl(){
                     return false;
@@ -235,36 +237,23 @@ public enum MonitoredRemoveIfPredicateGen{
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
+                double threshold,Random rand){
             return getMonitoredRemoveIfPredicate(collection);
             }
     },
-    Throw(IndexOutOfBoundsException.class,PredicateGenCallType.Randomized){
+    Throw(IndexOutOfBoundsException.class,PredicateGenCallType.Randomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
+                double threshold,Random rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
                 }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex){
@@ -279,45 +268,33 @@ public enum MonitoredRemoveIfPredicateGen{
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
             }
         
         
     },
-    ModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+    ModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
-                }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
+                double threshold,Random rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
                 boolean alreadyModded=false;
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    alreadyModded=false;
+                    throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
+                }
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex && !alreadyModded){
@@ -331,56 +308,30 @@ public enum MonitoredRemoveIfPredicateGen{
         }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
             }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
             }
     },
-    ModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
-        
-        }
-
+    ModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized,2){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
-        
-        }
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
-                }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
+                double threshold,Random rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
                 boolean alreadyModded=false;
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    alreadyModded=false;
+                    throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
+                }
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex && !alreadyModded){
@@ -392,48 +343,32 @@ public enum MonitoredRemoveIfPredicateGen{
 
             };
         }
-    },
-    ModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
-        
-        }
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
+            }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
-        
-        }
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
+            }
+    },
+    ModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized,1){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
-                }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
+                double threshold,Random rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
                 boolean alreadyModded=false;
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    alreadyModded=false;
+                    throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
+                }
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex && !alreadyModded){
@@ -445,12 +380,22 @@ public enum MonitoredRemoveIfPredicateGen{
 
             };
         }
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
+            }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                boolean compliment,long removeIndicesBitSet){
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
+            }
     },
-    ThrowModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+    ThrowModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
 
@@ -458,34 +403,23 @@ public enum MonitoredRemoveIfPredicateGen{
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
+                double threshold,Random  rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+           
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    this.throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
                 }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
+                
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex){
@@ -498,11 +432,11 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+    ThrowModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized,2){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
 
@@ -510,34 +444,23 @@ public enum MonitoredRemoveIfPredicateGen{
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
+                double threshold,Random  rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+           
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    this.throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
                 }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
+                
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex){
@@ -550,11 +473,11 @@ public enum MonitoredRemoveIfPredicateGen{
             };
         }
     },
-    ThrowModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized){
+    ThrowModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized,1){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
 
@@ -562,34 +485,23 @@ public enum MonitoredRemoveIfPredicateGen{
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 boolean compliment,long removeIndicesBitSet){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,0);
+            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         
         }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,long randSeed){
-            int numExpectedCalls;
-            if(collection.getDataType() == DataType.BOOLEAN){
-                var c=collection.getCollection();
-                if(c.contains(true)){
-                    if(c.contains(false)){
-                        numExpectedCalls=2;
-                    }else{
-                        numExpectedCalls=1;
-                    }
-                }else{
-                    if(c.contains(false)){
-                        numExpectedCalls=1;
-                    }else{
-                        numExpectedCalls=0;
-                    }
+                double threshold,Random  rand){
+            int numExpectedCalls=MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection);
+            int tmpThrowIndex=(int)(rand.nextDouble() * numExpectedCalls);
+           
+            return new MonitoredRemoveIfPredicate(numExpectedCalls){
+                int throwIndex=tmpThrowIndex;
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    this.throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
                 }
-            }else{
-                numExpectedCalls=collection.size();
-            }
-            Random rand=new Random(randSeed);
-            final int throwIndex=(int)(rand.nextDouble() * numExpectedCalls);
-            return new MonitoredRemoveIfPredicate(){
+                
                 @Override
                 protected boolean testImpl(){
                     if(numCalls >= throwIndex){
@@ -607,14 +519,16 @@ public enum MonitoredRemoveIfPredicateGen{
     }
     public final Class<? extends Throwable> expectedException;
     public final PredicateGenCallType predicateGenCallType;
-    MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,PredicateGenCallType predicateGenCallType){
+    public final int minDepth;
+    MonitoredRemoveIfPredicateGen(Class<? extends Throwable> expectedException,PredicateGenCallType predicateGenCallType,int minDepth){
         this.expectedException=expectedException;
         this.predicateGenCallType=predicateGenCallType;
+        this.minDepth=minDepth;
     }
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection);
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,boolean compliment,long removeIndicesBitSet);
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-            double threshold,long randSeed);
+            double threshold,Random rand);
     
     public static enum PredicateGenCallType{
         Randomized,

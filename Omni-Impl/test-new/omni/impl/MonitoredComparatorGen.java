@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import omni.api.OmniIterator;
 
 public enum MonitoredComparatorGen{
-    NullComparatorThrowAIOB(false,ComparatorType.NaturalOrder,IllegalArgumentException.class,true){
+    NullComparatorThrowAIOB(false,ComparatorType.NaturalOrder,IllegalArgumentException.class,true,0){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -18,7 +18,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorThrowIOB(false,ComparatorType.NaturalOrder,IndexOutOfBoundsException.class,true){
+    NullComparatorThrowIOB(false,ComparatorType.NaturalOrder,IndexOutOfBoundsException.class,true,0){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -31,7 +31,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModCollection(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true){
+    NullComparatorModCollection(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true,0){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -44,7 +44,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModParent(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true){
+    NullComparatorModParent(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true,2){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -57,7 +57,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModRoot(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true){
+    NullComparatorModRoot(false,ComparatorType.NaturalOrder,ConcurrentModificationException.class,true,1){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -71,7 +71,7 @@ public enum MonitoredComparatorGen{
         }
     },
     NullComparatorModCollectionThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,
-            true){
+            true,0){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -85,7 +85,7 @@ public enum MonitoredComparatorGen{
         }
     },
     NullComparatorModCollectionThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,
-            true){
+            true,0){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -98,7 +98,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModParentThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
+    NullComparatorModParentThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true,2){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -111,7 +111,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModParentThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
+    NullComparatorModParentThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true,2){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -124,7 +124,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModRootThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
+    NullComparatorModRootThrowAIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true,1){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -137,7 +137,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NullComparatorModRootThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true){
+    NullComparatorModRootThrowIOB(false,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,true,1){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             int halfwayPoint=listSize / 2;
@@ -150,13 +150,13 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    NoThrowAscending(true,ComparatorType.Ascending,null,false){
+    NoThrowAscending(true,ComparatorType.Ascending,null,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator();
         }
     },
-    NoThrowDescending(true,ComparatorType.Descending,null,false){
+    NoThrowDescending(true,ComparatorType.Descending,null,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -344,7 +344,7 @@ public enum MonitoredComparatorGen{
 
         }
     },
-    NullComparator(true,ComparatorType.NaturalOrder,null,true){
+    NullComparator(true,ComparatorType.NaturalOrder,null,true,0){
         @Override
         void initUnsortedHelper(MonitoredList<?> listMonitor,int listSize){
             if(listMonitor.getDataType() == DataType.REF){
@@ -356,7 +356,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ThrowAIOB(true,ComparatorType.ImmediatelyThrows,IllegalArgumentException.class,false){
+    ThrowAIOB(true,ComparatorType.ImmediatelyThrows,IllegalArgumentException.class,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -367,7 +367,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ThrowIOB(true,ComparatorType.ImmediatelyThrows,IndexOutOfBoundsException.class,false){
+    ThrowIOB(true,ComparatorType.ImmediatelyThrows,IndexOutOfBoundsException.class,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -378,7 +378,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModCollectionAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false){
+    ModCollectionAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -389,7 +389,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModCollectionDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false){
+    ModCollectionDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -419,7 +419,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ModParentAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false){
+    ModParentAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false,2){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -430,7 +430,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModParentDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false){
+    ModParentDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false,2){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -460,7 +460,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ModRootAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false){
+    ModRootAscending(true,ComparatorType.Ascending,ConcurrentModificationException.class,false,1){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -471,7 +471,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModRootDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false){
+    ModRootDescending(true,ComparatorType.Descending,ConcurrentModificationException.class,false,1){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -501,7 +501,7 @@ public enum MonitoredComparatorGen{
             }
         }
     },
-    ModCollectionThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
+    ModCollectionThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -513,7 +513,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModCollectionThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
+    ModCollectionThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false,0){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -525,7 +525,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModParentThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
+    ModParentThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false,2){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -537,7 +537,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModParentThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
+    ModParentThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false,2){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -549,7 +549,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModRootThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
+    ModRootThrowAIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false,1){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -561,7 +561,7 @@ public enum MonitoredComparatorGen{
             };
         }
     },
-    ModRootThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false){
+    ModRootThrowIOB(true,ComparatorType.ImmediatelyThrows,ConcurrentModificationException.class,false,1){
         @Override
         public MonitoredComparator getMonitoredComparator(MonitoredList<?> listMonitor){
             return new MonitoredComparator(){
@@ -578,12 +578,14 @@ public enum MonitoredComparatorGen{
     public final ComparatorType comparatorType;
     public final Class<? extends Throwable> expectedException;
     public final boolean validWithNoComparator;
+    public final int minDepth;
     MonitoredComparatorGen(boolean validWithPrimitive,ComparatorType comparatorType,
-            Class<? extends Throwable> expectedException,boolean validWithNoComparator){
+            Class<? extends Throwable> expectedException,boolean validWithNoComparator,int minDepth){
         this.validWithPrimitive=validWithPrimitive;
         this.comparatorType=comparatorType;
         this.expectedException=expectedException;
         this.validWithNoComparator=validWithNoComparator;
+        this.minDepth=minDepth;
     }
     public enum ComparatorType{
         Ascending,Descending,NaturalOrder,ImmediatelyThrows;

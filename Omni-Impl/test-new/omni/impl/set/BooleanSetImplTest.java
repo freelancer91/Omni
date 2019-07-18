@@ -2,6 +2,7 @@ package omni.impl.set;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
@@ -820,7 +821,7 @@ public class BooleanSetImplTest{
                                     randSeed->TestExecutorService.submitTest(()->{
                                         final var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
                                         int state=monitor.expectedState;
-                                        var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,0.5,randSeed);
+                                        var filter=filterGen.getMonitoredRemoveIfPredicate(monitor,0.5,new Random(randSeed));
                                         if(filterGen.expectedException == null || state == 0b00){
                                             final boolean result=monitor.verifyRemoveIf(filter,functionCallType);
                                             if(state == 0b00){
