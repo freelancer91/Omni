@@ -27,6 +27,10 @@ import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 import omni.impl.QueryVal.QueryValModification;
 public interface MonitoredCollection<COL extends OmniCollection<?>>{
+    Object get(int iterationIndex,DataType outputType);
+    default Object get(int iterationIndex) {
+        return get(iterationIndex,getDataType());
+    }
     MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator(IteratorType itrType);
     CheckedType getCheckedType();
     COL getCollection();
@@ -72,7 +76,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
 
     default boolean verifyThrowingContains(MonitoredObjectGen monitoredObjectGen){
         try{
-            return QueryCastType.ToObject.callcontains(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+            return QueryCastType.ToObject.callcontains(getCollection(),monitoredObjectGen.getMonitoredObject(this,0),
                     DataType.REF);
         }finally{
             verifyCollectionState();
@@ -80,7 +84,7 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     }
     default boolean verifyThrowingRemoveVal(MonitoredObjectGen monitoredObjectGen){
         try{
-            return QueryCastType.ToObject.callremoveVal(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+            return QueryCastType.ToObject.callremoveVal(getCollection(),monitoredObjectGen.getMonitoredObject(this,0),
                     DataType.REF);
         }finally{
             verifyCollectionState();

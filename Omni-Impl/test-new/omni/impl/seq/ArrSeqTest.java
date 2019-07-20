@@ -1792,12 +1792,14 @@ public class ArrSeqTest{
     private static abstract class AbstractArrSeqMonitor<SEQ extends AbstractSeq<?>&Externalizable>
             extends
             AbstractSequenceMonitor<SEQ>{
+        
         AbstractArrSeqMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
         AbstractArrSeqMonitor(CheckedType checkedType,DataType dataType,int initCap){
             super(checkedType,dataType,initCap);
         }
+        
         @Override
         public void copyListContents(){
             final int expectedSize=seq.size;
@@ -2363,6 +2365,9 @@ public class ArrSeqTest{
             AbstractArrSeqMonitor<SEQ>
             implements
             MonitoredList<SEQ>{
+        
+        
+        
         public ArrListMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
@@ -2766,6 +2771,10 @@ public class ArrSeqTest{
                 expectedSize=toIndex - fromIndex;
                 expectedRootOffset=expectedParent.expectedRootOffset + fromIndex;
                 seq=(SUBLIST)expectedParent.seq.subList(fromIndex,toIndex);
+            }
+            @Override
+            public Object get(int iterationIndex,DataType outputType) {
+                return expectedRoot.get(iterationIndex+expectedRootOffset,outputType);
             }
             @Override
             public void copyListContents(){
@@ -4762,6 +4771,12 @@ public class ArrSeqTest{
             AbstractArrSeqMonitor<SEQ>
             implements
             MonitoredStack<SEQ>{
+        @Override
+        public Object get(int iterationIndex,DataType outputType) {
+            return super.get(expectedSize-iterationIndex-1,outputType);
+        }
+        
+        
         public ArrStackMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);
         }
@@ -6130,8 +6145,8 @@ public class ArrSeqTest{
                             modification);
                     break;
                 case REF:
-                    queryVal.initContains((OmniCollection.OfRef<Object>)monitor.getCollection(),seqSize,0,position,
-                            modification,inputType);
+                    queryVal.initContains((MonitoredCollection<? extends OmniCollection.OfRef<Object>>)monitor,seqSize,0,position,
+                            modification,inputType,monitoredObjectGen);
                     break;
                 case SHORT:
                     queryVal.initContains((OmniCollection.OfShort)monitor.getCollection(),seqSize,0,position,

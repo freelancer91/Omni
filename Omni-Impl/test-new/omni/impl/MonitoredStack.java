@@ -11,7 +11,7 @@ public interface MonitoredStack<STK extends OmniStack<?>>extends MonitoredSequen
     Object verifyPeek(DataType outputType);
     
     default int verifyThrowingSearch(MonitoredObjectGen monitoredObjectGen){
-      Object inputVal=monitoredObjectGen.getMonitoredObject(this);
+      Object inputVal=monitoredObjectGen.getMonitoredObject(this,0);
       try{
           return QueryCastType.ToObject.callsearch(getCollection(),inputVal,DataType.REF);
       }finally{

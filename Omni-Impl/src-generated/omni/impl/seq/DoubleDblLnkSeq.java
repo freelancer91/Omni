@@ -2953,8 +2953,6 @@ AbstractSeq<Double>
           return curr;
         }
         if((marker<<=1)==0){
-            System.out.println("double");
-
            word=survivorSet[++wordOffset];
            marker=1L;
         }

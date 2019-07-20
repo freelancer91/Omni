@@ -12,7 +12,7 @@ import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSequence;
 import omni.util.OmniArray;
-public abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizable> implements MonitoredSequence<SEQ>{
+abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Externalizable> implements MonitoredSequence<SEQ>{
   final DataType dataType;
   final CheckedType checkedType;
   final SEQ seq;
@@ -31,6 +31,31 @@ public abstract class AbstractSequenceMonitor<SEQ extends AbstractSeq<?> & Exter
     this.checkedType=checkedType;
     this.seq=initSeq(initCap);
     updateCollectionState();
+  }
+  @Override
+  public Object get(int iterationIndex,DataType outputType) {
+      switch(dataType) {
+      case BOOLEAN:
+          return outputType.convertVal(((boolean[])expectedArr)[iterationIndex]);
+      case BYTE:
+          return outputType.convertVal(((byte[])expectedArr)[iterationIndex]);
+      case CHAR:
+          return outputType.convertVal(((char[])expectedArr)[iterationIndex]);
+      case SHORT:
+          return outputType.convertVal(((short[])expectedArr)[iterationIndex]);
+      case INT:
+          return outputType.convertVal(((int[])expectedArr)[iterationIndex]);
+      case LONG:
+          return outputType.convertVal(((long[])expectedArr)[iterationIndex]);
+      case FLOAT:
+          return outputType.convertVal(((float[])expectedArr)[iterationIndex]);
+      case DOUBLE:
+          return outputType.convertVal(((double[])expectedArr)[iterationIndex]);
+      case REF:
+          return outputType.convertVal(((Object[])expectedArr)[iterationIndex]);
+      default:
+          throw dataType.invalid();
+      }
   }
   @Override public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
     seq.writeExternal(oos);

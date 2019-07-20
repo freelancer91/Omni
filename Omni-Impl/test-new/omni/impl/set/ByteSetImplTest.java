@@ -515,6 +515,14 @@ public class ByteSetImplTest{
             }
             expectedWords=new long[4];
         }
+        @Override
+        public Object get(int iterationIndex,DataType outputType) {
+            var itr=set.iterator();
+            while(iterationIndex>0) {
+                itr.nextByte();
+            }
+            return outputType.convertVal(itr.nextByte());
+        }
         ByteSetImplMonitor(CheckedType checkedType,long word0,long word1,long word2,long word3){
             this.checkedType=checkedType;
             expectedWords=new long[4];

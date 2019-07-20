@@ -52,6 +52,16 @@ public class BooleanSetImplTest{
         }
 
         @Override
+        public Object get(int iterationIndex,DataType outputType) {
+            var itr=set.iterator();
+            while(iterationIndex>0) {
+                itr.nextBoolean();
+            }
+            return outputType.convertVal(itr.nextBoolean());
+        }
+        
+        
+        @Override
         public void updateAddState(Object inputVal,DataType inputType,boolean result){
             boolean v=(boolean)inputVal;
             expectedState|=v?2:1;

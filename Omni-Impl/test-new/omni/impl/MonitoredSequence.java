@@ -7,6 +7,20 @@ import omni.api.OmniIterator;
 import omni.impl.QueryVal.QueryValModification;
 
 public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends MonitoredCollection<SEQ>{
+    default Object verifyPoll(DataType outputType) {
+        throw new UnsupportedOperationException();
+    }
+    default Object verifyPeek(DataType outputType) {
+        throw new UnsupportedOperationException();
+    }
+    default Object removeFirst() {
+        var itr=getCollection().iterator();
+        Object removed=itr.next();
+        itr.remove();
+        updateRemoveIndexState(0);
+        return removed;
+    }
+    
     @Override
     @SuppressWarnings("unchecked")
     default boolean add(int val) {

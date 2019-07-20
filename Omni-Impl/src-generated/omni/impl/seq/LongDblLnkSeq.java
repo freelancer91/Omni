@@ -2686,7 +2686,6 @@ AbstractSeq<Long>
           return curr;
         }
         if((marker<<=1)==0){
-            System.out.println("long");
            word=survivorSet[++wordOffset];
            marker=1L;
         }

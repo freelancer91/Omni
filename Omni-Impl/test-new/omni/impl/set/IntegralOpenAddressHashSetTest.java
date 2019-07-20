@@ -758,7 +758,42 @@ public class IntegralOpenAddressHashSetTest{
     private static class IntegralOpenAddressHashSetMonitor
     implements
     MonitoredSet<AbstractIntegralTypeOpenAddressHashSet<?>>{
-
+        @Override
+        public Object get(int iterationIndex,DataType outputType) {
+            switch(dataType) {
+            case CHAR:{
+                var itr=(OmniIterator.OfChar)set.iterator();
+                while(iterationIndex>0) {
+                    itr.nextChar();
+                }
+                return outputType.convertVal(itr.nextChar());
+            }
+            case SHORT:{
+                var itr=(OmniIterator.OfShort)set.iterator();
+                while(iterationIndex>0) {
+                    itr.nextShort();
+                }
+                return outputType.convertVal(itr.nextShort());
+            }
+            case INT:{
+                var itr=(OmniIterator.OfInt)set.iterator();
+                while(iterationIndex>0) {
+                    itr.nextInt();
+                }
+                return outputType.convertVal(itr.nextInt());
+            }
+            case LONG:{
+                var itr=(OmniIterator.OfLong)set.iterator();
+                while(iterationIndex>0) {
+                    itr.nextLong();
+                }
+                return outputType.convertVal(itr.nextLong());
+            }
+            default:
+                throw dataType.invalid();
+            }
+            
+        }
         private static void quickInsert(char[] table,char val){
             int tableLength;
             int hash;

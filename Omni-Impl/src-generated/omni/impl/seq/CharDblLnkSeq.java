@@ -2558,7 +2558,6 @@ public abstract class CharDblLnkSeq extends AbstractSeq<Character> implements Ch
         }
         if(--numSurvivors == 0){ return curr; }
         if((marker<<=1) == 0){
-            System.out.println("char");
           word=survivorSet[++wordOffset];
           marker=1L;
         }

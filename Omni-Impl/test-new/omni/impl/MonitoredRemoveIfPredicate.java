@@ -62,7 +62,22 @@ DoublePredicate{
         return testImpl();
     }
     protected boolean testImpl(Object val){
-        return testImpl();
+        if(val instanceof Number) {
+            if(val instanceof Long) {
+                return testImpl(((Long)val).longValue());
+            }else {
+                return testImpl(((Number)val).doubleValue());
+            }
+        }else if(val instanceof Character) {
+            return testImpl(((Character)val).charValue());
+        }else if(val instanceof Boolean) {
+            return testImpl(((Boolean)val).booleanValue());
+        }else if(val==null){
+            testImpl();
+            return false;
+        }
+        throw new UnsupportedOperationException(this+" not valid for " + val);
+        
     }
     @Override
     public boolean test(double value){

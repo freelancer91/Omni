@@ -20,7 +20,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
     void updateRemoveLastOccurrenceState(Object inputVal,DataType inputType);
     default boolean verifyThrowingRemoveFirstOccurrence(MonitoredObjectGen monitoredObjectGen){
         try{
-            return QueryCastType.ToObject.callremoveFirstOccurrence(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+            return QueryCastType.ToObject.callremoveFirstOccurrence(getCollection(),monitoredObjectGen.getMonitoredObject(this,0),
                     DataType.REF);
         }finally{
             verifyCollectionState();
@@ -28,7 +28,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
     }
     default boolean verifyThrowingRemoveLastOccurrence(MonitoredObjectGen monitoredObjectGen){
         try{
-            return QueryCastType.ToObject.callremoveLastOccurrence(getCollection(),monitoredObjectGen.getMonitoredObject(this),
+            return QueryCastType.ToObject.callremoveLastOccurrence(getCollection(),monitoredObjectGen.getMonitoredObject(this,0),
                     DataType.REF);
         }finally{
             verifyCollectionState();

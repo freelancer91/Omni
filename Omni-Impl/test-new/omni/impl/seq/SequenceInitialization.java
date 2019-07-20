@@ -5,7 +5,7 @@ import omni.api.OmniCollection;
 import omni.impl.MonitoredObjectGen;
 import omni.impl.MonitoredSequence;
 
-public enum SequenceInitialization{
+enum SequenceInitialization{
     Ascending{
         @Override public <SEQ extends MonitoredSequence<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal,int period){
             var dataType=seq.getDataType();

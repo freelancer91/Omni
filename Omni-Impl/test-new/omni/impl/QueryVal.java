@@ -55,6 +55,23 @@ public enum QueryVal{
         public Object getRefVal(){
             return new Object();
         }
+        @Override
+        public void initContains(MonitoredCollection<? extends OmniCollection.OfRef<Object>> collection,int setSize,long initVal,
+                double containsPosition,
+                QueryValModification modification,DataType inputType,MonitoredObjectGen objGen){
+            if(objGen==null) {
+                super.initContains(collection,setSize,initVal,containsPosition,modification,inputType,null);
+                return;
+            }
+            var throwSwitch=new MonitoredObjectGen.ThrowSwitch(false);
+            var val=objGen.getMonitoredObject(collection,0,throwSwitch);
+            int containsIndex=(int)Math.round(containsPosition * setSize);
+            var c=collection.getCollection();
+            initDoesNotContain(c,containsIndex,initVal,modification);
+            c.add(val);
+            initDoesNotContain(c,setSize - containsIndex - 1,initVal + containsIndex,modification);
+            throwSwitch.doThrow=true;
+        }
     },
     Null{
         @Override
@@ -3059,14 +3076,16 @@ public enum QueryVal{
         collection.add(val);
         initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
-    public final void initContains(OmniCollection.OfRef<Object> collection,int setSize,long initVal,
+    
+    public void initContains(MonitoredCollection<? extends OmniCollection.OfRef<Object>> collection,int setSize,long initVal,
             double containsPosition,
-            QueryValModification modification,DataType inputType){
+            QueryValModification modification,DataType inputType,MonitoredObjectGen objGen){
         var val=getInputVal(inputType,modification);
         int containsIndex=(int)Math.round(containsPosition * setSize);
-        initDoesNotContain(collection,containsIndex,initVal,modification);
-        collection.add(val);
-        initDoesNotContain(collection,setSize - containsIndex - 1,initVal + containsIndex,modification);
+        var c=collection.getCollection();
+        initDoesNotContain(c,containsIndex,initVal,modification);
+        c.add(val);
+        initDoesNotContain(c,setSize - containsIndex - 1,initVal + containsIndex,modification);
     }
     public enum QueryValModification{
         None,Plus1,PlusFloatEpsilon,PlusDoubleEpsilon;

@@ -1402,6 +1402,35 @@ public class OpenAddressHashSetTest{
             this.dataType=dataType;
             updateCollectionState();
         }
+        @Override
+        public Object get(int iterationIndex,DataType outputType) {
+            switch(dataType) {
+            case FLOAT:{
+                var itr=(OmniIterator.OfFloat)set.iterator();
+                while(iterationIndex>0) {
+                    itr.nextFloat();
+                }
+                return outputType.convertVal(itr.nextFloat());
+            }
+            case DOUBLE:{
+                var itr=(OmniIterator.OfDouble)set.iterator();
+                while(iterationIndex>0) {
+                    itr.nextDouble();
+                }
+                return outputType.convertVal(itr.nextDouble());
+            }
+            case REF:{
+                var itr=(OmniIterator.OfRef<?>)set.iterator();
+                while(iterationIndex>0) {
+                    itr.next();
+                }
+                return outputType.convertVal(itr.next());
+            }
+            default:
+                throw dataType.invalid();
+            }
+            
+        }
         @Override public CheckedType getCheckedType(){
             return checkedType;
         }
@@ -2697,7 +2726,7 @@ public class OpenAddressHashSetTest{
                     queryVal.initContains((OmniSet.OfDouble)monitor.set,setSize,0,position,modification);
                     break;
                 case REF:
-                    queryVal.initContains((OmniSet.OfRef<Object>)monitor.set,setSize,0,position,modification,inputType);
+                    queryVal.initContains((MonitoredSet<? extends OmniSet.OfRef<Object>>)monitor,setSize,0,position,modification,inputType,monitoredObjectGen);
                     break;
                 default:
                     throw collectionType.invalid();

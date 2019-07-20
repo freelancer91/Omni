@@ -3726,7 +3726,6 @@ AbstractSeq<E>
           return curr;
         }
         if((marker<<=1)==0){
-            System.out.println("ref");
            word=survivorSet[++wordOffset];
            marker=1L;
         }

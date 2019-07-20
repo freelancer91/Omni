@@ -3349,8 +3349,6 @@ AbstractSeq<Float>
           return curr;
         }
         if((marker<<=1)==0){
-            System.out.println("float");
-
            word=survivorSet[++wordOffset];
            marker=1L;
         }

@@ -122,12 +122,12 @@ public enum StructType{
                     MonitoredRemoveIfPredicateGen.ModParent,MonitoredRemoveIfPredicateGen.ModRoot,
                     MonitoredRemoveIfPredicateGen.ThrowModParent,MonitoredRemoveIfPredicateGen.ThrowModRoot);
         case "DblLnkList":
-            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveSpecificIndices,MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
+            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveFirst,MonitoredRemoveIfPredicateGen.RemoveLast,MonitoredRemoveIfPredicateGen.RemoveFirstAndLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirst,MonitoredRemoveIfPredicateGen.RemoveAllButLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirstAndLast,MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveFalse,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveAll,
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection);
         case "DblLnkSubList":
-            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveSpecificIndices,MonitoredRemoveIfPredicateGen.ModCollection,
+            return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveFirst,MonitoredRemoveIfPredicateGen.RemoveLast,MonitoredRemoveIfPredicateGen.RemoveFirstAndLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirst,MonitoredRemoveIfPredicateGen.RemoveAllButLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirstAndLast,MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveFalse,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveAll,
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection,

@@ -2759,7 +2759,6 @@ AbstractSeq<Integer>
           return curr;
         }
         if((marker<<=1)==0){
-            System.out.println("int");
            word=survivorSet[++wordOffset];
            marker=1L;
         }

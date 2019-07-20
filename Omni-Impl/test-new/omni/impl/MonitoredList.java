@@ -69,7 +69,7 @@ MonitoredSequence<LST>{
         }
     }
     default int verifyThrowingIndexOf(MonitoredObjectGen monitoredObjectGen){
-        Object inputVal=monitoredObjectGen.getMonitoredObject(this);
+        Object inputVal=monitoredObjectGen.getMonitoredObject(this,0);
         try{
             return QueryCastType.ToObject.callindexOf(getCollection(),inputVal,DataType.REF);
         }finally{
@@ -77,7 +77,7 @@ MonitoredSequence<LST>{
         }
     }
     default int verifyThrowingLastIndexOf(MonitoredObjectGen monitoredObjectGen){
-        Object inputVal=monitoredObjectGen.getMonitoredObject(this);
+        Object inputVal=monitoredObjectGen.getMonitoredObject(this,0);
         try{
             return QueryCastType.ToObject.calllastIndexOf(getCollection(),inputVal,DataType.REF);
         }finally{

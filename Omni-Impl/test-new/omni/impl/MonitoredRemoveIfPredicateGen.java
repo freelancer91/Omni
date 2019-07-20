@@ -1,38 +1,378 @@
 package omni.impl;
 
 import java.util.ConcurrentModificationException;
+import java.util.Objects;
 import java.util.Random;
 
 public enum MonitoredRemoveIfPredicateGen{
-    RemoveSpecificIndices(null,PredicateGenCallType.IndexSpecific,0){
+    RemoveFirst(null,PredicateGenCallType.NonRandomized,0){
+
         @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             
-            
-            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)) {
+                Object matchVal=collection.isEmpty()?null:collection.get(0);
                 @Override
-                protected boolean testImpl(){
-                   int numCalls=this.numCalls-1;
-                   if(numCalls>64) {
-                       return compliment;
-                   }
-                   return (1L<<numCalls&removeIndicesBitSet)!=0!=compliment;
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    matchVal=collection.isEmpty()?null:collection.get(0);
+                }
+                @Override
+                protected boolean testImpl(double val){
+                    return ((Object)val).equals(matchVal);
+                }
+                @Override
+                protected boolean testImpl(float val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(long val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(int val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(short val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(char val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(byte val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(boolean val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(Object val) {
+                    return Objects.equals(val,matchVal);
                 }
             };
         }
 
         @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,java.util.Random rand){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+        
+    },
+    RemoveLast(null,PredicateGenCallType.NonRandomized,0){
+
+        @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
-            throw new UnsupportedOperationException();
+            
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)) {
+                Object matchVal=collection.isEmpty()?null:collection.get(collection.size()-1);
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    matchVal=collection.isEmpty()?null:collection.get(collection.size()-1);
+                }
+                @Override
+                protected boolean testImpl(double val){
+                    return ((Object)val).equals(matchVal);
+                }
+                @Override
+                protected boolean testImpl(float val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(long val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(int val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(short val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(char val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(byte val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(boolean val){
+                    return ((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(Object val) {
+                    return Objects.equals(val,matchVal);
+                }
+            };
         }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                double threshold,Random rand){
-            throw new UnsupportedOperationException();
+                double threshold,java.util.Random rand){
+            return getMonitoredRemoveIfPredicate(collection);
             }
-    },
+            
+        },
+    RemoveFirstAndLast(null,PredicateGenCallType.NonRandomized,0){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)) {
+                Object matchVal1=collection.isEmpty()?null:collection.get(0);
+                Object matchVal2=collection.isEmpty()?null:collection.get(collection.size()-1);
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    matchVal1=collection.isEmpty()?null:collection.get(0);
+                    matchVal2=collection.isEmpty()?null:collection.get(collection.size()-1);
+                }
+                @Override
+                protected boolean testImpl(double val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(float val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(long val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(int val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(short val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(char val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(byte val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(boolean val){
+                    Object v;
+                    return (v=val).equals(matchVal1)||v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(Object val) {
+                    return Objects.equals(val,matchVal1)||Objects.equals(val,matchVal2);
+                }
+            };
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,java.util.Random rand){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+            
+        },
+    RemoveAllButFirst(null,PredicateGenCallType.NonRandomized,0){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)) {
+                Object matchVal=collection.isEmpty()?null:collection.get(0);
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    matchVal=collection.isEmpty()?null:collection.get(0);
+                }
+                @Override
+                protected boolean testImpl(double val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(float val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(long val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(int val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(short val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(char val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(byte val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(boolean val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(Object val) {
+                    return !Objects.equals(val,matchVal);
+                }
+            };
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,java.util.Random rand){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+            
+        },
+    RemoveAllButLast(null,PredicateGenCallType.NonRandomized,0){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)) {
+                Object matchVal=collection.isEmpty()?null:collection.get(collection.size()-1);
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    matchVal=collection.isEmpty()?null:collection.get(collection.size()-1);
+                }
+                @Override
+                protected boolean testImpl(double val){
+                    return !((Object)val).equals(matchVal);
+                }
+                @Override
+                protected boolean testImpl(float val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(long val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(int val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(short val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(char val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(byte val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(boolean val){
+                    return !((Object)val).equals(matchVal);
+                    }
+                @Override
+                protected boolean testImpl(Object val) {
+                    return !Objects.equals(val,matchVal);
+                }
+            };
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,java.util.Random rand){
+            return getMonitoredRemoveIfPredicate(collection);
+            }
+            
+        },
+    RemoveAllButFirstAndLast(null,PredicateGenCallType.NonRandomized,0){
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
+            
+            return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)) {
+                Object matchVal1=collection.isEmpty()?null:collection.get(0);
+                Object matchVal2=collection.isEmpty()?null:collection.get(collection.size()-1);
+                @Override
+                public void reset(MonitoredCollection<?> collection) {
+                    super.reset(collection);
+                    matchVal1=collection.isEmpty()?null:collection.get(0);
+                    matchVal2=collection.isEmpty()?null:collection.get(collection.size()-1);
+                }
+                @Override
+                protected boolean testImpl(double val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(float val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(long val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(int val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(short val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(char val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(byte val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(boolean val){
+                    Object v;
+                    return !(v=val).equals(matchVal1)&&!v.equals(matchVal2);
+                }
+                @Override
+                protected boolean testImpl(Object val) {
+                    return !Objects.equals(val,matchVal1)&&!Objects.equals(val,matchVal2);
+                }
+            };
+        }
+
+        @Override
+        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
+                double threshold,java.util.Random rand){
+            return getMonitoredRemoveIfPredicate(collection);
+        }
+            
+        },
     Random(null,PredicateGenCallType.Randomized,0){
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
@@ -50,13 +390,6 @@ public enum MonitoredRemoveIfPredicateGen{
             return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-        
-        }
         
     },
     RemoveTrue(null,PredicateGenCallType.NonRandomized,0){
@@ -96,29 +429,9 @@ public enum MonitoredRemoveIfPredicateGen{
                 protected boolean testImpl(boolean val){
                     return val;
                 }
-                @Override
-                protected boolean testImpl(Object val){
-                    if(val instanceof Boolean){
-                        return ((Boolean)val).booleanValue();
-                    }else if(val instanceof Character){
-                        return ((Character)val).charValue() == 1;
-                    }else if(val instanceof Long){
-                        return ((Long)val).longValue() == 1L;
-                    }else if(val instanceof Number){
-                        return ((Number)val).doubleValue() == 1.0;
-                    }else if(val == null){
-                        return false;
-                    }
-                    throw new UnsupportedOperationException("RemoveTrue not valid for " + val);
-                }
             };
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection);
-        }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
@@ -165,29 +478,9 @@ public enum MonitoredRemoveIfPredicateGen{
                 protected boolean testImpl(boolean val){
                     return !val;
                 }
-                @Override
-                protected boolean testImpl(Object val){
-                    if(val instanceof Boolean){
-                        return !((Boolean)val).booleanValue();
-                    }else if(val instanceof Character){
-                        return ((Character)val).charValue() == 0;
-                    }else if(val instanceof Long){
-                        return ((Long)val).longValue() == 0L;
-                    }else if(val instanceof Number){
-                        return ((Number)val).doubleValue() == 0.0;
-                    }else if(val == null){
-                        return false;
-                    }
-                    throw new UnsupportedOperationException("RemoveFalse not valid for " + val);
-                }
             };
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection);
-            }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
@@ -207,11 +500,6 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection);
-            }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
@@ -229,11 +517,6 @@ public enum MonitoredRemoveIfPredicateGen{
                 }
             };
         }
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection);
-            }
 
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
@@ -272,11 +555,6 @@ public enum MonitoredRemoveIfPredicateGen{
         
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-            }
         
         
     },
@@ -311,11 +589,6 @@ public enum MonitoredRemoveIfPredicateGen{
             return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
             }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-            }
     },
     ModParent(ConcurrentModificationException.class,PredicateGenCallType.Randomized,2){
         @Override
@@ -348,11 +621,6 @@ public enum MonitoredRemoveIfPredicateGen{
             return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
             }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-            }
     },
     ModRoot(ConcurrentModificationException.class,PredicateGenCallType.Randomized,1){
         @Override
@@ -385,11 +653,6 @@ public enum MonitoredRemoveIfPredicateGen{
             return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
             }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-            }
     },
     ThrowModCollection(ConcurrentModificationException.class,PredicateGenCallType.Randomized,0){
         @Override
@@ -399,13 +662,6 @@ public enum MonitoredRemoveIfPredicateGen{
         
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-        
-        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,Random  rand){
@@ -440,13 +696,7 @@ public enum MonitoredRemoveIfPredicateGen{
         
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
 
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-        
-        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,Random  rand){
@@ -481,13 +731,6 @@ public enum MonitoredRemoveIfPredicateGen{
         
         }
 
-        @Override
-        public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
-                boolean compliment,long removeIndicesBitSet){
-
-            return getMonitoredRemoveIfPredicate(collection,0.5,new Random(0));
-        
-        }
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
                 double threshold,Random  rand){
@@ -526,14 +769,12 @@ public enum MonitoredRemoveIfPredicateGen{
         this.minDepth=minDepth;
     }
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection);
-    public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,boolean compliment,long removeIndicesBitSet);
     public abstract MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection,
             double threshold,Random rand);
     
     public static enum PredicateGenCallType{
         Randomized,
         NonRandomized,
-        IndexSpecific;
     }
     
 }
