@@ -84,7 +84,6 @@ public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends Monito
 
 
   void updateRemoveIndexState(int index);
-    MonitoredIterator<? extends OmniIterator<?>,SEQ> getMonitoredIterator(int index,IteratorType itrType);
     void verifyGetResult(int index,Object result,DataType outputType);
     void updateAddState(Object inputVal,DataType inputType);
     @Override default boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){

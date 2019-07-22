@@ -4,6 +4,15 @@ import org.junit.jupiter.api.Assertions;
 import omni.api.OmniDeque;
 public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<DEQ>,MonitoredStack<DEQ>{
     MonitoredIterator<?,DEQ> getMonitoredDescendingIterator();
+    default MonitoredIterator<?,DEQ> getMonitoredDescendingIterator(int index){
+        var itrMonitor=getMonitoredDescendingIterator();
+        while(index>0 && itrMonitor.hasNext()) {
+            itrMonitor.iterateForward();
+            --index;
+        }
+        return itrMonitor;
+    }
+    void updateRemoveValState(Object inputVal,DataType inputType);
     default boolean verifyRemoveFirstOccurrence(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryVal.QueryValModification modification) {
 
@@ -57,6 +66,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         updateAddFirstState(inputVal,inputType);
         verifyCollectionState();
     }
+    void updateAddState(Object inputVal,DataType inputType);
     default void verifyAddLast(Object inputVal,DataType inputType,FunctionCallType functionCallType) {
         inputType.callAddLast(inputVal,getCollection(),functionCallType);
         updateAddState(inputVal,inputType);
@@ -98,10 +108,13 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         if(isEmpty) {
             Assertions.assertEquals(outputType.defaultVal,result);
         }else {
-            verifyGetResult(0,result,outputType);
+            verifyGetFirstResult(result,outputType);
         }
         return result;
     }
+    void verifyGetFirstResult(Object result,DataType outputType);
+    //void verifyGetResult(int index,Object result,DataType outputType);
+    void verifyGetLastResult(Object result,DataType outputType);
     default Object verifyPeekLast(DataType outputType) {
         Object result;
         int size=size();
@@ -113,7 +126,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         if(size==0) {
             Assertions.assertEquals(outputType.defaultVal,result);
         }else {
-            verifyGetResult(size-1,result,outputType);
+            verifyGetLastResult(result,outputType);
         }
         return result;
     }
@@ -125,7 +138,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         try{
             result=outputType.callPollFirst(collection);
             if(!isEmpty) {
-              updateRemoveIndexState(0);
+                updateRemoveFirstState();
             }
             
         }finally{
@@ -143,7 +156,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         try{
             result=outputType.callPollLast(collection);
             if(size!=0) {
-              updateRemoveIndexState(size-1);
+              updateRemoveLastState();
             }
             
         }finally{
@@ -200,7 +213,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         try {
             result=outputType.callRemoveFirst(collection);
-            updateRemoveIndexState(0);
+            updateRemoveFirstState();
         }finally {
             verifyCollectionState();
         }
@@ -221,7 +234,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         try {
             result=outputType.callPop(collection);
-            updateRemoveIndexState(0);
+            updateRemoveFirstState();
         }finally {
             verifyCollectionState();
         }
@@ -236,13 +249,12 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         Object result;
         Object expected=null;
         var collection=getCollection();
-        int size;
-        if((size=size())!=0) {
+        if(!isEmpty()) {
             expected=outputType.callPeekLast(collection);
         }
         try {
             result=outputType.callRemoveLast(collection);
-            updateRemoveIndexState(size-1);
+            updateRemoveLastState();
         }finally {
             verifyCollectionState();
         }
@@ -253,6 +265,10 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         return result;
       }
+    
+    void updateRemoveFirstState();
+    void updateRemoveLastState();
+    
     @Override
     default Object verifyPoll(DataType outputType) {
         var collection=getCollection();
@@ -262,7 +278,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         try{
             result=outputType.callPoll(collection);
             if(!isEmpty) {
-              updateRemoveIndexState(0);
+              updateRemoveFirstState();
             }
             
         }finally{
@@ -365,7 +381,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         }
         try {
             result=outputType.callRemove(collection);
-            updateRemoveIndexState(0);
+            updateRemoveFirstState();
         }finally {
             verifyCollectionState();
         }
@@ -388,7 +404,7 @@ public interface MonitoredDeque<DEQ extends OmniDeque<?>>extends MonitoredQueue<
         if(isEmpty) {
             Assertions.assertEquals(outputType.defaultVal,result);
         }else {
-            verifyGetResult(0,result,outputType);
+            verifyGetFirstResult(result,outputType);
         }
         return result;
     }

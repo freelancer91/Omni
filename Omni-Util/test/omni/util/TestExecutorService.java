@@ -10,7 +10,7 @@ public class TestExecutorService {
     private static final LinkedBlockingQueue<Runnable> testQueue;
     private static final AtomicInteger totalNumTasks;
     private static final AtomicInteger totalCompletedTasks;
-    private static int numWorkers=1;//Runtime.getRuntime().availableProcessors();
+    private static int numWorkers=Runtime.getRuntime().availableProcessors();
     private static Thread[] workers;
     public static void setNumWorkers(int numWorkers) {
         if(numWorkers<1) {

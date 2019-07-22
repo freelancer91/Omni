@@ -72,11 +72,9 @@ DoublePredicate{
             return testImpl(((Character)val).charValue());
         }else if(val instanceof Boolean) {
             return testImpl(((Boolean)val).booleanValue());
-        }else if(val==null){
-            testImpl();
-            return false;
+        }else {
+            return testImpl();
         }
-        throw new UnsupportedOperationException(this+" not valid for " + val);
         
     }
     @Override

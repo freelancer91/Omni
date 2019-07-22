@@ -8,7 +8,11 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -28,6 +32,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.TestExecutorService;
 @Tag(value="NewTest")
+@TestMethodOrder(OrderAnnotation.class)
 public class ByteSetImplTest{
     private static final EnumSet<SetInitialization> VALID_INIT_SEQS=EnumSet.of(SetInitialization.Empty,
             SetInitialization.AddTrue,SetInitialization.AddFalse,
@@ -44,7 +49,8 @@ public class ByteSetImplTest{
         }
         return size;
     }
-    @org.junit.jupiter.api.Test
+    @Order(88)
+    @Test
     public void testadd_val(){
         for(final var inputType:DataType.BYTE.mayBeAddedTo()){
             final int min=inputType.getMinInt();
@@ -65,19 +71,22 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testadd_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testclear_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyClear();
         test.runAllTests("ByteSetImplTest.testclear_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testclone_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyClone();
         test.runAllTests("ByteSetImplTest.testclone_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(162)
+    @Test
     public void testConstructor_longlonglonglong(){
         final long[] wordStates=new long[]{0,1,-1};
         for(final var checkedType:CheckedType.values()){
@@ -95,7 +104,8 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testConstructor_longlonglonglong");
     }
-    @org.junit.jupiter.api.Test
+    @Order(81)
+    @Test
     public void testConstructor_longlonglonglongint(){
         final long[] wordStates=new long[]{0,1,-1};
         for(final var word0:wordStates){
@@ -111,20 +121,23 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testConstructor_longlonglonglongint");
     }
-    @org.junit.jupiter.api.Test
+    @Order(2)
+    @Test
     public void testConstructor_void(){
         for(final var checkedType:CheckedType.values()){
             TestExecutorService.submitTest(()->new ByteSetImplMonitor(checkedType).verifyCollectionState());
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testConstructor_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(11352)
+    @Test
     public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyContains(queryVal,
                 inputType,castType,modification);
         test.runAllTests("ByteSetImplTest.testcontains_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(1916)
+    @Test
     public void testforEach_Consumer(){
         for(final var functionGen:StructType.ByteSetImpl.validMonitoredFunctionGens){
             for(final var initSet:VALID_INIT_SEQS){
@@ -151,31 +164,36 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.forEach_Consumer");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testhashCode_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyHashCode();
         test.runAllTests("ByteSetImplTest.testhashCode_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testisEmpty_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyIsEmpty();
         test.runAllTests("ByteSetImplTest.testisEmpty_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testiterator_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .getMonitoredIterator().verifyIteratorState();
         test.runAllTests("ByteSetImplTest.testiterator_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testItrclone_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("ByteSetImplTest.testItrclone_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(6620)
+    @Test
     public void testItrforEachRemaining_Consumer(){
         for(final var initSet:VALID_INIT_SEQS){
             final int size=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
@@ -234,7 +252,8 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testItrforEachRemaining_Consumer");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testItrhasNext_void(){
         final BasicTest test=(checkedType,initSet)->{
             final var setMonitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
@@ -248,7 +267,8 @@ public class ByteSetImplTest{
         };
         test.runAllTests("ByteSetImplTest.testItrhasNext_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(231)
+    @Test
     public void testItrnext_void(){
         for(final var outputType:DataType.BYTE.validOutputTypes()){
             for(final var checkedType:CheckedType.values()){
@@ -283,7 +303,8 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testItrnext_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(1747)
+    @Test
     public void testItrremove_void(){
         for(final var initSet:VALID_INIT_SEQS){
             final int setSize=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
@@ -336,7 +357,8 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testItrremove_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(55)
+    @Test
     public void testReadAndWrite(){
         final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
             var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
@@ -348,7 +370,8 @@ public class ByteSetImplTest{
         };
         test.runAllTests("ByteSetImplTest.testReadAndWrite");
     }
-    @org.junit.jupiter.api.Test
+    @Order(27532)
+    @Test
     public void testremoveIf_Predicate(){
         for(final var initSet:VALID_INIT_SEQS){
             final int setSize=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
@@ -423,19 +446,22 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testremoveIf_Predicate");
     }
-    @org.junit.jupiter.api.Test
+    @Order(11352)
+    @Test
     public void testremoveVal_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyRemoveVal(queryVal,
                 inputType,castType,modification);
         test.runAllTests("ByteSetImplTest.testremoveVal_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testsize_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifySize();
         test.runAllTests("ByteSetImplTest.testsize_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(55)
+    @Test
     public void testtoArray_IntFunction(){
         final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
             final var monitor=initSet.initialize(new ByteSetImplMonitor(checkedType));
@@ -448,7 +474,8 @@ public class ByteSetImplTest{
         };
         test.runAllTests("ByteSetImplTest.testToArray_IntFunction");
     }
-    @org.junit.jupiter.api.Test
+    @Order(188)
+    @Test
     public void testtoArray_ObjectArray(){
         for(final var initSet:VALID_INIT_SEQS){
             final int size=initSet.initialize(new ByteSetImplMonitor(CheckedType.UNCHECKED)).size();
@@ -463,7 +490,8 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testtoArray_ObjectArray");
     }
-    @org.junit.jupiter.api.Test
+    @Order(154)
+    @Test
     public void testtoArray_void(){
         for(final var outputType:DataType.BYTE.validOutputTypes()){
             for(final var checkedType:CheckedType.values()){
@@ -475,7 +503,8 @@ public class ByteSetImplTest{
         }
         TestExecutorService.completeAllTests("ByteSetImplTest.testtoArray_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(22)
+    @Test
     public void testtoString_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyToString();
@@ -514,6 +543,19 @@ public class ByteSetImplTest{
                 set=new ByteSetImpl();
             }
             expectedWords=new long[4];
+        }
+        @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImpl> getMonitoredIterator(IteratorType itrType){
+            if(itrType!=IteratorType.AscendingItr) {
+                throw itrType.invalid();
+            }
+            return getMonitoredIterator();
+        }
+        @Override public MonitoredIterator<? extends OmniIterator<?>,ByteSetImpl> getMonitoredIterator(int index,IteratorType itrType){
+            var itrMonitor=getMonitoredIterator(itrType);
+            while(--index>=0 && itrMonitor.hasNext()) {
+                itrMonitor.iterateForward();
+            }
+            return itrMonitor;
         }
         @Override
         public Object get(int iterationIndex,DataType outputType) {

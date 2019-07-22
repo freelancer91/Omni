@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
@@ -42,7 +41,6 @@ import omni.impl.MonitoredObjectGen;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
 import omni.impl.MonitoredSequence;
-import omni.impl.MonitoredStack;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
@@ -227,7 +225,7 @@ public class DblLnkSeqTest{
         }
         return subListMonitor;
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
     @Order(527850)
     @Test
     public void testadd_intval(){
@@ -305,6 +303,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testadd_intval");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(124890)
     @Test
     public void testadd_val(){
@@ -395,6 +394,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testConstructor_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(770598)
     @Test
     public void testcontains_val(){
@@ -409,7 +409,6 @@ public class DblLnkSeqTest{
         test.runAllTests("DblLnkSeqTest.testcontains_val",true);
     }
     @Order(36)
-    @Tag("descendingIterator_void")
     @Test
     public void testdescendingIterator_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -436,6 +435,7 @@ public class DblLnkSeqTest{
         final DeqGetTest test=DblLnkSeqMonitor::verifyElement;
         test.runAllGetFirstTests("DblLnkSeqTest.testelement_void",true);
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(118908)
     @Test
     public void testforEach_Consumer(){
@@ -456,6 +456,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testforEach_Consumer",100);
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(1872)
     @Test
     public void testget_int(){
@@ -512,6 +513,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testhashCode_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(770598)
     @Test
     public void testindexOf_val(){
@@ -591,9 +593,8 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrclone_void");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
     @Order(927902)
-    @Tag("ForEachRemaining")
     @Test
     public void testItrforEachRemaining_Consumer(){
         for(final int size:MEDIUM_SIZES){
@@ -735,7 +736,6 @@ public class DblLnkSeqTest{
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrnext_void");
     }
     @Order(80847)
-    @Tag("ItrRemove")
     @Test
     public void testItrremove_void(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -842,6 +842,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrremove_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(770598)
     @Test
     public void testlastIndexOf_val(){
@@ -929,6 +930,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testlistIterator_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(83697)
     @Test
     public void testListItradd_val(){
@@ -1074,6 +1076,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testListItrpreviousIndex_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(253920)
     @Test
     public void testListItrset_val(){
@@ -1137,8 +1140,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrset_val");
     }
-    @Disabled
-    @Tag("MASSIVEtoString")
+    //@org.junit.jupiter.api.Disabled
     @Test
     public void testMASSIVEtoString(){
         final int numWorkers=TestExecutorService.getNumWorkers();
@@ -1377,6 +1379,7 @@ public class DblLnkSeqTest{
         final DequeAddTest test=DblLnkSeqMonitor::verifyPush;
         test.runAllTests("DblLnkSeqTest.testpush_val");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(1872)
     @Test
     public void testput_intval(){
@@ -1415,7 +1418,6 @@ public class DblLnkSeqTest{
         test.runAllTests("DblLnkSeqTest.testput_intval");
     }
     @Order(8908)
-    @Tag("ReadAndWrite")
     @Test
     public void testReadAndWrite(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -1439,6 +1441,7 @@ public class DblLnkSeqTest{
         final DeqPopTest test=DblLnkSeqMonitor::verifyRemove;
         test.runAllTests("DblLnkSeqTest.testremove_void",true);
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(294249)
     @Test
     public void testremoveAt_int(){
@@ -1504,9 +1507,9 @@ public class DblLnkSeqTest{
     @Order(118494)
     @Test
     public void testremoveFirstOccurrence_val(){
-        final QueryTest<MonitoredDeque<?>> test=new QueryTest<>(){
+        final QueryTest<DblLnkSeqMonitor<?,?>> test=new QueryTest<>(){
             @Override
-            public void callAndVerifyResult(MonitoredDeque<?> monitor,QueryVal queryVal,DataType inputType,
+            public void callAndVerifyResult(DblLnkSeqMonitor<?,?> monitor,QueryVal queryVal,DataType inputType,
                     QueryCastType castType,QueryValModification modification,MonitoredObjectGen monitoredObjectGen,
                     double position,int seqSize){
                 if(monitoredObjectGen == null){
@@ -1522,9 +1525,8 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeFirstOccurrence_val",false);
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
     @Order(2674700)
-    @Tag("RemoveIf")
     @Test
     public void testremoveIf_Predicate(){
         QUICK_INIT_PARAMS.forEach((collectionType,checkedTypeToInitParams)->{
@@ -1698,9 +1700,9 @@ public class DblLnkSeqTest{
     @Order(118494)
     @Test
     public void testremoveLastOccurrence_val(){
-        final QueryTest<MonitoredDeque<?>> test=new QueryTest<>(){
+        final QueryTest<DblLnkSeqMonitor<?,?>> test=new QueryTest<>(){
             @Override
-            public void callAndVerifyResult(MonitoredDeque<?> monitor,QueryVal queryVal,DataType inputType,
+            public void callAndVerifyResult(DblLnkSeqMonitor<?,?> monitor,QueryVal queryVal,DataType inputType,
                     QueryCastType castType,QueryValModification modification,MonitoredObjectGen monitoredObjectGen,
                     double position,int seqSize){
                 if(monitoredObjectGen == null){
@@ -1716,7 +1718,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeLastOccurrence)val",false);
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
     @Order(9350824)
     @Test
     public void testremoveVal_val(){
@@ -1744,6 +1746,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testremoveVal_val",true);
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(118908)
     @Test
     public void testreplaceAll_UnaryOperator(){
@@ -1764,10 +1767,9 @@ public class DblLnkSeqTest{
         test.runAllTests("DblLnkSeqTest.testreplaceAll_UnaryOperator",100);
     }
     @Order(118514)
-    @Tag("Search")
     @Test
     public void testsearch_val(){
-        final QueryTest<MonitoredStack<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+        final QueryTest<DblLnkSeqMonitor<?,?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
                 position,seqSize)->{
             if(monitoredObjectGen == null){
                 int expectedIndex;
@@ -1888,8 +1890,8 @@ public class DblLnkSeqTest{
         final NonComparatorSortTest test=MonitoredList::verifyDescendingStableSort;
         test.runStableTests("DblLnkSeqTest.teststableDescendingSort_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(21042)
-    @Tag("subList_intint")
     @Test
     public void testsubList_intint(){
         for(final var size:MEDIUM_SIZES){
@@ -2060,6 +2062,7 @@ public class DblLnkSeqTest{
         final NonComparatorSortTest test=MonitoredList::verifyDescendingUnstableSort;
         test.runUnstableTests("DblLnkSeqTest.testunstableDescendingSort_void");
     }
+    //@org.junit.jupiter.api.Disabled
     @Order(289381)
     @Test
     public void testunstableSort_Comparator(){
@@ -2324,22 +2327,16 @@ public class DblLnkSeqTest{
         }
         @Override
         public MonitoredIterator<? extends OmniIterator<?>,LSTDEQ> getMonitoredIterator(int index,IteratorType itrType){
-            MonitoredIterator<? extends OmniIterator<?>,LSTDEQ> itr;
             switch(itrType){
             case BidirectionalItr:
                 return getMonitoredListIterator(index);
+            case DescendingItr:
+                return getMonitoredDescendingIterator(index);
+            case AscendingItr:
+                return getMonitoredIterator(index);
             default:
                 throw itrType.invalid();
-            case AscendingItr:
-                itr=getMonitoredIterator();
-                break;
-            case DescendingItr:
-                itr=getMonitoredDescendingIterator();
             }
-            while(--index >= 0 && itr.hasNext()){
-                itr.iterateForward();
-            }
-            return itr;
         }
         @Override
         public MonitoredIterator<? extends OmniIterator<?>,LSTDEQ> getMonitoredIterator(IteratorType itrType){
@@ -2496,6 +2493,7 @@ public class DblLnkSeqTest{
                 throw dataType.invalid();
             }
         }
+        @Override
         public Object removeFirst() {
           var removed=seq.removeFirst();
           super.updateRemoveIndexState(0);
@@ -3824,7 +3822,7 @@ public class DblLnkSeqTest{
             }
             @Override
             public void verifyNextResult(DataType outputType,Object result){
-                verifyGetResult(lastRetIndex,result,outputType);
+                verifyGetResult(expectedCurrIndex,result,outputType);
             }
         }
         private class DescendingItrMonitor implements MonitoredIterator<OmniIterator<E>,LSTDEQ>{
@@ -4130,7 +4128,7 @@ public class DblLnkSeqTest{
             }
             @Override
             public void verifyNextResult(DataType outputType,Object result){
-                verifyGetResult(lastRetIndex,result,outputType);
+                verifyGetResult(expectedCurrIndex-1,result,outputType);
             }
         }
         private class ItrMonitor extends AbstractItrMonitor<OmniIterator<E>>{
@@ -4612,7 +4610,8 @@ public class DblLnkSeqTest{
         private static class SubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
                 implements
                 MonitoredList<SUBLIST>{
-          public Object removeFirst() {
+          @Override
+        public Object removeFirst() {
             var removed=seq.remove(0);
             updateRemoveIndexState(expectedRootOffset);
             return removed;
@@ -4700,12 +4699,7 @@ public class DblLnkSeqTest{
                     IteratorType itrType){
                 switch(itrType){
                 case SubAscendingItr:
-                    final var itr=getMonitoredIterator();
-                    while(index > 0 && itr.hasNext()){
-                        itr.iterateForward();
-                        --index;
-                    }
-                    return itr;
+                   return getMonitoredIterator(index);
                 case SubBidirectionalItr:
                     return getMonitoredListIterator(index);
                 default:
@@ -7063,7 +7057,7 @@ public class DblLnkSeqTest{
                 }
                 @Override
                 public void verifyNextResult(DataType outputType,Object result){
-                    expectedRoot.verifyGetResult(expectedRootOffset + lastRetIndex,result,outputType);
+                    expectedRoot.verifyGetResult(expectedRootOffset + expectedCurrIndex,result,outputType);
                 }
                 void verifyBooleanClone(){
                     if(expectedRoot.checkedType.checked){
@@ -7513,6 +7507,33 @@ public class DblLnkSeqTest{
                 }
             }
         }
+
+
+        @Override
+        public void updateRemoveFirstState(){
+            updateRemoveIndexState(0);
+        }
+        @Override
+        public void updateRemoveLastState(){
+            updateRemoveIndexState(expectedSize-1);
+        }
+        @Override
+        public Object verifyPoll(DataType outputType){
+            return MonitoredDeque.super.verifyPoll(outputType);
+        }
+        @Override
+        public Object verifyPeek(DataType outputType){
+            return MonitoredDeque.super.verifyPeek(outputType);
+        }
+        @Override
+        public void verifyGetFirstResult(Object result,DataType outputType){
+            verifyGetResult(0,result,outputType);
+        }
+        @Override
+        public void verifyGetLastResult(Object result,DataType outputType){
+            verifyGetResult(expectedSize-1,result,outputType);
+        }
+
     }
     private static interface ListItrPositionalQueryTest{
         void runTest(SequenceInitParams initParams,int size);

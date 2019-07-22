@@ -1,7 +1,7 @@
 package omni.impl;
 
 import omni.api.OmniStack;
-public interface MonitoredStack<STK extends OmniStack<?>>extends MonitoredSequence<STK>{
+public interface MonitoredStack<STK extends OmniStack<?>>extends MonitoredCollection<STK>{
   
    
     

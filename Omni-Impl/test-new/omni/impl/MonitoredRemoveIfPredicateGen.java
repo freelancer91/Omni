@@ -398,6 +398,10 @@ public enum MonitoredRemoveIfPredicateGen{
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
                 @Override
+                protected boolean testImpl() {
+                    return false;
+                }
+                @Override
                 protected boolean testImpl(double val){
                     return val == 1;
                 }
@@ -445,7 +449,10 @@ public enum MonitoredRemoveIfPredicateGen{
         @Override
         public MonitoredRemoveIfPredicate getMonitoredRemoveIfPredicate(MonitoredCollection<?> collection){
             return new MonitoredRemoveIfPredicate(MonitoredRemoveIfPredicate.calculateNumExpetedCalls(collection)){
-
+                @Override
+                protected boolean testImpl() {
+                    return false;
+                }
                 @Override
                 protected boolean testImpl(double val){
                     return val == 0;

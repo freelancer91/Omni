@@ -164,15 +164,15 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         Assertions.assertEquals(!result,containsBefore);
         Assertions.assertTrue(containsAfter);
         Assertions.assertEquals(sizeBefore,result?sizeAfter - 1:sizeAfter);
-
+        //calling it a second time should return false
+        try {
+            Assertions.assertFalse(inputType.callAdd(inputVal,collection,functionCallType));
+        }finally {
+            verifyCollectionState();
+        }
         return result;
     }
-    @Override default MonitoredIterator<? extends OmniIterator<?>,SET> getMonitoredIterator(IteratorType itrType){
-        if(itrType!=IteratorType.AscendingItr) {
-            throw itrType.invalid();
-        }
-        return getMonitoredIterator();
-    }
+
 
     @Override default void modParent(){
         throw new UnsupportedOperationException();

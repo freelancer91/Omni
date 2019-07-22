@@ -36,6 +36,14 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
     COL getCollection();
     DataType getDataType();
     MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator();
+    default MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator(int index){
+        var itrMonitor=getMonitoredIterator();
+        while(--index>=0 && itrMonitor.hasNext()) {
+            itrMonitor.iterateForward();
+        }
+        return itrMonitor;
+    }
+    MonitoredIterator<? extends OmniIterator<?>,COL> getMonitoredIterator(int index,IteratorType itrType);
     StructType getStructType();
     default boolean isEmpty() {
         return size()==0;

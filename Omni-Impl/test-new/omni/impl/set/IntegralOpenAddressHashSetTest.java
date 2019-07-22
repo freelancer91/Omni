@@ -8,8 +8,11 @@ import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
 import omni.impl.CheckedType;
@@ -30,6 +33,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
+@TestMethodOrder(OrderAnnotation.class)
 @Tag(value="NewTest")
 public class IntegralOpenAddressHashSetTest{
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
@@ -60,9 +64,11 @@ public class IntegralOpenAddressHashSetTest{
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(6720)
+    @Test
     public void testadd_val(){
+        //TODO fill in the gaps for LongOpenAddressHashSet.add(long)
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var inputType:collectionType.mayBeAddedTo()){
                 for(final var checkedType:CheckedType.values()){
@@ -98,7 +104,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testadd_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testclear_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -107,7 +114,8 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testclear_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testclone_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -116,7 +124,8 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testclone_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(84)
+    @Test
     public void testConstructor_float(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -138,7 +147,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_float");
     }
-    @org.junit.jupiter.api.Test
+    @Order(744)
+    @Test
     public void testConstructor_int(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -160,7 +170,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_int");
     }
-    @org.junit.jupiter.api.Test
+    @Order(7840)
+    @Test
     public void testConstructor_intfloat(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -187,7 +198,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_intfloat");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testConstructor_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -197,14 +209,16 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_void");
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(876540)
+    @Test
     public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyContains(queryVal,
                 inputType,castType,modification);
         test.runAllTests("IntegralOpenAddressHashSetTest.testcontains_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8904)
+    @Test
     public void testforEach_Consumer(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var functionGen:StructType.IntegralOpenAddressHashSet.validMonitoredFunctionGens){
@@ -239,7 +253,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testforEach_Consumer");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testhashCode_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -248,7 +263,8 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testhashCode_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testisEmpty_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -257,7 +273,8 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testisEmpty_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testiterator_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -266,15 +283,17 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testiterator_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testItrclone_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->initSet
                 .initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("IntegralOpenAddressHashSetTest.testItrclone_void");
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(3255000)
+    @Test
     public void testItrforEachRemaining_Consumer(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -386,7 +405,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrforEachRemaining_Consumer");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testItrhasNext_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             final var setMonitor=initSet.initialize(
@@ -401,8 +421,9 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testItrhasNext_void");
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(79380)
+    @Test
     public void testItrnext_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var outputType:collectionType.validOutputTypes()){
@@ -446,8 +467,9 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrnext_void");
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(980280)
+    @Test
     public void testItrremove_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -512,8 +534,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrremove_void");
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Test
     public void testMASSIVEtoString(){
         for(final var collectionType:new DataType[]{DataType.INT,DataType.LONG}){
             final int numToAdd=collectionType.massiveToStringThreshold + 1;
@@ -551,7 +573,8 @@ public class IntegralOpenAddressHashSetTest{
                     "IntegralOpenAddressHashSetTest." + collectionType + ".testMASSIVEtoString");
         }
     }
-    @org.junit.jupiter.api.Test
+    @Order(240)
+    @Test
     public void testReadAndWrite(){
         final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
             var monitor=initSet.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
@@ -563,8 +586,9 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testReadAndWrite");
     }
-    @Disabled
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(128392)
+    @Test
     public void testremoveIf_Predicate(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var initSet:VALID_INIT_SEQS){
@@ -643,13 +667,16 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testremoveIf_Predicate");
     }
-    @org.junit.jupiter.api.Test
+    //@org.junit.jupiter.api.Disabled
+    @Order(876540)
+    @Test
     public void testremoveVal_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyRemoveVal(queryVal,
                 inputType,castType,modification);
         test.runAllTests("IntegralOpenAddressHashSetTest.testremoveVal_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(1008)
+    @Test
     public void testsetLoadFactor_float(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var checkedType:CheckedType.values()){
@@ -666,7 +693,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testsetLoadFactor_float");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testsize_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -675,7 +703,8 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testsize_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(240)
+    @Test
     public void testtoArray_IntFunction(){
         final MonitoredFunctionGenTest test=(collectionType,functionGen,checkedType,initSet)->{
             final var monitor=initSet.initialize(new IntegralOpenAddressHashSetMonitor(collectionType,checkedType));
@@ -688,7 +717,8 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testToArray_IntFunction");
     }
-    @org.junit.jupiter.api.Test
+    @Order(848)
+    @Test
     public void testtoArray_ObjectArray(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var initSet:VALID_INIT_SEQS){
@@ -707,7 +737,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testtoArray_ObjectArray");
     }
-    @org.junit.jupiter.api.Test
+    @Order(504)
+    @Test
     public void testtoArray_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var outputType:collectionType.validOutputTypes()){
@@ -723,7 +754,8 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testtoArray_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(10080)
+    @Test
     public void testtoString_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(
@@ -764,6 +796,19 @@ public class IntegralOpenAddressHashSetTest{
     private static class IntegralOpenAddressHashSetMonitor
     implements
     MonitoredSet<AbstractIntegralTypeOpenAddressHashSet<?>>{
+        @Override public MonitoredIterator<? extends OmniIterator<?>,AbstractIntegralTypeOpenAddressHashSet<?>> getMonitoredIterator(IteratorType itrType){
+            if(itrType!=IteratorType.AscendingItr) {
+                throw itrType.invalid();
+            }
+            return getMonitoredIterator();
+        }
+        @Override public MonitoredIterator<? extends OmniIterator<?>,AbstractIntegralTypeOpenAddressHashSet<?>> getMonitoredIterator(int index,IteratorType itrType){
+            var itrMonitor=getMonitoredIterator(itrType);
+            while(--index>=0 && itrMonitor.hasNext()) {
+                itrMonitor.iterateForward();
+            }
+            return itrMonitor;
+        }
         @Override
         public Object get(int iterationIndex,DataType outputType) {
             switch(dataType) {

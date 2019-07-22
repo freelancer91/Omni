@@ -11,9 +11,11 @@ import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniCollection;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
@@ -41,6 +43,7 @@ import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 @Tag("NewTest")
+@TestMethodOrder(OrderAnnotation.class)
 public class ArrSeqTest{
     private static final int[] INIT_CAPACITIES=new int[]{0,5,10,15};
     private static final double[] POSITIONS=new double[]{-1,0,0.5,1.0};
@@ -136,7 +139,8 @@ public class ArrSeqTest{
         }
         return getMonitoredList(initParams,initCapacity);
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(68172)
     @Test
     public void testadd_intval(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -204,6 +208,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testadd_intval");
     }
+    @Order(18768)
     @Test
     public void testadd_val(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -245,16 +250,19 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testadd_val");
     }
+    @Order(39168)
     @Test
     public void testclear_void(){
         final BasicTest test=MonitoredSequence::verifyClear;
         test.runAllTests("ArrSeqTest.testclear_void");
     }
+    @Order(39168)
     @Test
     public void testclone_void(){
         final BasicTest test=MonitoredSequence::verifyClone;
         test.runAllTests("ArrSeqTest.testclone_void");
     }
+    @Order(144)
     @Test
     public void testConstructor_int(){
         for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
@@ -314,6 +322,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_int");
     }
+    @Order(36)
     @Test
     public void testConstructor_void(){
         for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
@@ -329,7 +338,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_void");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(6511914)
     @Test
     public void testcontains_val(){
         final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -342,6 +352,8 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testcontains_val",2);
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(7103280)
     @Test
     public void testforEach_Consumer(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -361,6 +373,8 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testforEach_Consumer",100,EnumSet.allOf(FunctionCallType.class),true);
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(1188)
     @Test
     public void testget_int(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -400,6 +414,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testget_int");
     }
+    @Order(16352)
     @Test
     public void testhashCode_void(){
         final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
@@ -414,7 +429,8 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testhashCode_void");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(6320493)
     @Test
     public void testindexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -433,11 +449,13 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testindexOf_val",0);
     }
+    @Order(39168)
     @Test
     public void testisEmpty_void(){
         final BasicTest test=MonitoredSequence::verifyIsEmpty;
         test.runAllTests("ArrSeqTest.testisEmpty_void");
     }
+    @Order(9792)
     @Test
     public void testiterator_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -465,6 +483,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testiterator_void");
     }
+    @Order(28350)
     @Test
     public void testItrclone_void(){
         for(final var size:SIZES){
@@ -488,8 +507,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrclone_void");
     }
-    @Disabled
-    @Tag("ForEachRemaining")
+    //@org.junit.jupiter.api.Disabled
+    @Order(8401566)
     @Test
     public void testItrforEachRemaining_Consumer(){
         for(final int size:SIZES){
@@ -549,6 +568,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrforEachRemaining_Consumer");
     }
+    @Order(1260)
     @Test
     public void testItrhasNext_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -567,6 +587,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrhasNext_void");
     }
+    @Order(30057)
     @Test
     public void testItrnext_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -576,11 +597,11 @@ public class ArrSeqTest{
                         for(final var outputType:initParams.collectionType.validOutputTypes()){
                             for(final var size:SHORT_SIZES){
                                 if(size > 0 || initParams.checkedType.checked){
-                                    TestExecutorService.submitTest(()->{
-                                        final var seqMonitor=SequenceInitialization.Ascending
-                                                .initialize(getMonitoredSequence(initParams,size),size,0);
-                                        final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
-                                        if(illegalMod.expectedException == null){
+                                    if(illegalMod.expectedException==null) {
+                                        TestExecutorService.submitTest(()->{
+                                            final var seqMonitor=SequenceInitialization.Ascending
+                                                    .initialize(getMonitoredSequence(initParams,size),size,0);
+                                            final var itrMonitor=seqMonitor.getMonitoredIterator(itrType);
                                             while(itrMonitor.hasNext()){
                                                 itrMonitor.verifyNext(outputType);
                                             }
@@ -588,12 +609,22 @@ public class ArrSeqTest{
                                                 Assertions.assertThrows(NoSuchElementException.class,
                                                         ()->itrMonitor.verifyNext(outputType));
                                             }
-                                        }else{
-                                            itrMonitor.illegalMod(illegalMod);
-                                            Assertions.assertThrows(illegalMod.expectedException,
-                                                    ()->itrMonitor.verifyNext(outputType));
+                                        });
+                                    }else {
+                                        for(var position:POSITIONS) {
+                                           if(position>=0) {
+                                               TestExecutorService.submitTest(()->{
+                                                   final var seqMonitor=SequenceInitialization.Ascending
+                                                           .initialize(getMonitoredSequence(initParams,size),size,0);
+                                                   final int index=(int)(size*position);
+                                                   final var itrMonitor=seqMonitor.getMonitoredIterator(index,itrType);
+                                                   itrMonitor.illegalMod(illegalMod);
+                                                   Assertions.assertThrows(illegalMod.expectedException,
+                                                           ()->itrMonitor.verifyNext(outputType));
+                                               });
+                                           }
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -603,6 +634,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrnext_void");
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(189360)
     @Test
     public void testItrremove_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -697,7 +730,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrremove_void");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(6320493)
     @Test
     public void testlastIndexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -717,6 +751,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testlastIndexOf_val",0);
     }
+    @Order(9351)
     @Test
     public void testlistIterator_int(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -757,6 +792,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testlistIterator_int");
     }
+    @Order(1188)
     @Test
     public void testlistIterator_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -783,6 +819,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testlistIterator_void");
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(68724)
     @Test
     public void testListItradd_val(){
         for(final var position:POSITIONS){
@@ -840,6 +878,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItradd_val");
     }
+    @Order(612)
     @Test
     public void testListItrhasPrevious_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -856,6 +895,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrhasPrevious_void");
     }
+    @Order(612)
     @Test
     public void testListItrnextIndex_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -872,6 +912,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrnextIndex_void");
     }
+    @Order(12642)
     @Test
     public void testListItrprevious_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -882,24 +923,33 @@ public class ArrSeqTest{
                     for(final var illegalMod:itrType.validPreMods){
                         if(illegalMod.expectedException == null || initParams.checkedType.checked){
                             for(final var outputType:initParams.collectionType.validOutputTypes()){
-                                TestExecutorService.submitTest(()->{
+                                if(illegalMod.expectedException==null) {
                                     final var seqMonitor=SequenceInitialization.Ascending
                                             .initialize(getMonitoredList(initParams,size),size,0);
                                     final var itrMonitor=seqMonitor.getMonitoredListIterator(size);
                                     itrMonitor.illegalMod(illegalMod);
-                                    if(illegalMod.expectedException == null){
-                                        while(itrMonitor.hasPrevious()){
-                                            itrMonitor.verifyPrevious(outputType);
-                                        }
-                                        if(initParams.checkedType.checked){
-                                            Assertions.assertThrows(NoSuchElementException.class,
-                                                    ()->itrMonitor.verifyPrevious(outputType));
-                                        }
-                                    }else{
-                                        Assertions.assertThrows(illegalMod.expectedException,
+                                    while(itrMonitor.hasPrevious()){
+                                        itrMonitor.verifyPrevious(outputType);
+                                    }
+                                    if(initParams.checkedType.checked){
+                                        Assertions.assertThrows(NoSuchElementException.class,
                                                 ()->itrMonitor.verifyPrevious(outputType));
                                     }
-                                });
+                                }else {
+                                    for(var position:POSITIONS) {
+                                        if(position>=0) {
+                                            TestExecutorService.submitTest(()->{
+                                                final var seqMonitor=SequenceInitialization.Ascending
+                                                        .initialize(getMonitoredList(initParams,size),size,0);
+                                                final int index=(int)(size*position);
+                                                final var itrMonitor=seqMonitor.getMonitoredListIterator(index);
+                                                itrMonitor.illegalMod(illegalMod);
+                                                Assertions.assertThrows(illegalMod.expectedException,
+                                                        ()->itrMonitor.verifyPrevious(outputType));
+                                            });
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -908,6 +958,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrprevious_void");
     }
+    @Order(612)
     @Test
     public void testListItrpreviousIndex_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -924,6 +975,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrhasPrevious_void");
     }
+    @Order(131928)
     @Test
     public void testListItrset_val(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -936,33 +988,44 @@ public class ArrSeqTest{
                             for(final var inputType:initParams.collectionType.mayBeAddedTo()){
                                 for(final var functionCallType:inputType.validFunctionCalls){
                                     for(final int size:SHORT_SIZES){
-                                        TestExecutorService.submitTest(()->{
-                                            final var seqMonitor=SequenceInitialization.Ascending
-                                                    .initialize(getMonitoredList(initParams,size),size,0);
-                                            final var itrMonitor=seqMonitor.getMonitoredListIterator();
-                                            removeScenario.initialize(itrMonitor);
-                                            itrMonitor.illegalMod(illegalMod);
-                                            if(removeScenario.expectedException == null){
-                                                if(illegalMod.expectedException == null){
-                                                    int i=1;
-                                                    itrMonitor.verifySet(inputType.convertValUnchecked(i),inputType,
-                                                            functionCallType);
-                                                    while(itrMonitor.hasNext()){
-                                                        itrMonitor.iterateForward();
-                                                        itrMonitor.verifySet(inputType.convertValUnchecked(++i),
-                                                                inputType,functionCallType);
-                                                    }
-                                                }else{
-                                                    Assertions.assertThrows(illegalMod.expectedException,
-                                                            ()->itrMonitor.verifySet(inputType.convertValUnchecked(1),
-                                                                    inputType,functionCallType));
+                                        if(removeScenario.expectedException==null && illegalMod.expectedException==null) {
+                                            TestExecutorService.submitTest(()->{
+                                                final var seqMonitor=SequenceInitialization.Ascending
+                                                        .initialize(getMonitoredList(initParams,size),size,0);
+                                                final var itrMonitor=seqMonitor.getMonitoredListIterator();
+                                                removeScenario.initialize(itrMonitor);
+                                                int i=1;
+                                                itrMonitor.verifySet(inputType.convertValUnchecked(i),inputType,
+                                                        functionCallType);
+                                                while(itrMonitor.hasNext()){
+                                                    itrMonitor.iterateForward();
+                                                    itrMonitor.verifySet(inputType.convertValUnchecked(++i),
+                                                            inputType,functionCallType);
                                                 }
-                                            }else{
-                                                Assertions.assertThrows(removeScenario.expectedException,
-                                                        ()->itrMonitor.verifySet(inputType.convertValUnchecked(1),
-                                                                inputType,functionCallType));
+                                            });
+                                        }else {
+                                            for(var position:POSITIONS) {
+                                                if(position>=0) {
+                                                    TestExecutorService.submitTest(()->{
+                                                        final var seqMonitor=SequenceInitialization.Ascending
+                                                                .initialize(getMonitoredList(initParams,size),size,0);
+                                                        final int index=(int)(size*position);
+                                                        final var itrMonitor=seqMonitor.getMonitoredListIterator(index);
+                                                        removeScenario.initialize(itrMonitor);
+                                                        itrMonitor.illegalMod(illegalMod);
+                                                        if(removeScenario.expectedException==null) {
+                                                            Assertions.assertThrows(illegalMod.expectedException,
+                                                                    ()->itrMonitor.verifySet(inputType.convertValUnchecked(1),
+                                                                            inputType,functionCallType));
+                                                        }else {
+                                                            Assertions.assertThrows(removeScenario.expectedException,
+                                                                    ()->itrMonitor.verifySet(inputType.convertValUnchecked(1),
+                                                                            inputType,functionCallType));
+                                                        }
+                                                    });
+                                                }
                                             }
-                                        });
+                                        }
                                     }
                                 }
                             }
@@ -973,7 +1036,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrset_val");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
     @Test
     public void testMASSIVEtoString(){
         for(final var collectionType:DataType.values()){
@@ -1054,6 +1117,7 @@ public class ArrSeqTest{
                     collectionType.classPrefix + "ArrSeqTest.CheckedStack.testMASSIVEtoString");
         }
     }
+    @Order(18)
     @Test
     public void testpeek_void(){
         for(final var initParams:STACK_STRUCT_INIT_PARAMS){
@@ -1072,6 +1136,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testpeek_void");
     }
+    @Order(86)
     @Test
     public void testpoll_void(){
         for(final var initParams:STACK_STRUCT_INIT_PARAMS){
@@ -1090,6 +1155,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testpoll_void");
     }
+    @Order(129)
     @Test
     public void testpop_void(){
         for(final var initParams:STACK_STRUCT_INIT_PARAMS){
@@ -1112,6 +1178,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testpop_void");
     }
+    @Order(552)
     @Test
     public void testpush_val(){
         for(final var initParams:STACK_STRUCT_INIT_PARAMS){
@@ -1130,6 +1197,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testpush_val");
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(1188)
     @Test
     public void testput_intval(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1176,7 +1245,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testput_intval");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(495280)
     @Test
     public void testReadAndWrite(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -1194,7 +1264,8 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testReadAndWrite",0,EnumSet.of(FunctionCallType.Unboxed),true);
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(106812)
     @Test
     public void testremoveAt_int(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1272,7 +1343,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveAt_int");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(26834020)
     @Test
     public void testremoveIf_Predicate(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -1344,7 +1416,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveIf_Predicate");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(6511914)
     @Test
     public void testremoveVal_val(){
         final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
@@ -1368,7 +1441,8 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testremoveVal_val",2);
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(6929240)
     @Test
     public void testreplaceAll_UnaryOperator(){
         final MonitoredFunctionTest<MonitoredList<?>> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
@@ -1387,16 +1461,16 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testreplaceAll_UnaryOperator",100,EnumSet.allOf(FunctionCallType.class),false);
     }
-    @Tag("Search")
+    @Order(191421)
     @Test
     public void testsearch_val(){
-        final QueryTest<MonitoredStack<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+        final QueryTest<ArrStackMonitor<?,?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
                 position,seqSize)->{
             if(monitoredObjectGen == null){
                 int expectedIndex;
                 if(position >= 0){
                     int size;
-                    expectedIndex=(size=monitor.size()) - ((ArrStackMonitor<?,?>)monitor)
+                    expectedIndex=(size=monitor.size()) - monitor
                             .findRemoveValIndex(queryVal.getInputVal(inputType,modification),inputType,0,size);
                 }else{
                     expectedIndex=-1;
@@ -1408,6 +1482,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testsearch",1);
     }
+    @Order(1188)
     @Test
     public void testset_intval(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1447,11 +1522,14 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testset_intval");
     }
+    @Order(39168)
     @Test
     public void testsize_void(){
         final BasicTest test=MonitoredSequence::verifySize;
         test.runAllTests("ArrSeqTest.testsize_void");
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(254982)
     @Test
     public void testsort_Comparator(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1487,6 +1565,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testsort_Comparator");
     }
+    @Order(18394)
     @Test
     public void teststableAscendingSort_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1521,6 +1600,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.teststableAscendingSort_void");
     }
+    @Order(18394)
     @Test
     public void teststableDescendingSort_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1555,7 +1635,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.teststableDescendingSort_void");
     }
-    @Disabled
+    //@org.junit.jupiter.api.Disabled
+    @Order(1014480)
     @Test
     public void testsubList_intint(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1606,6 +1687,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testsubList_intint");
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(495280)
     @Test
     public void testtoArray_IntFunction(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -1623,6 +1706,8 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testtoArray_IntFunction",0,EnumSet.of(FunctionCallType.Unboxed),true);
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(404532)
     @Test
     public void testtoArray_ObjectArray(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -1649,6 +1734,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testtoArray_ObjectArray");
     }
+    @Order(9792)
     @Test
     public void testtoArray_void(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -1674,8 +1760,9 @@ public class ArrSeqTest{
                 }
             }
         }
-        TestExecutorService.completeAllTests("ArrSeqTest.testget_int");
+        TestExecutorService.completeAllTests("ArrSeqTest.testtoArray_void");
     }
+    @Order(16352)
     @Test
     public void testtoString_void(){
         final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
@@ -1690,6 +1777,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testtoString_void");
     }
+    @Order(9946)
     @Test
     public void testunstableAscendingSort_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1725,6 +1813,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testunstableAscendingSort_void");
     }
+    @Order(9946)
     @Test
     public void testunstableDescendingSort_void(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1760,6 +1849,8 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testunstableDescendingSort_void");
     }
+    //@org.junit.jupiter.api.Disabled
+    @Order(124698)
     @Test
     public void testunstableSort_Comparator(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -2379,6 +2470,7 @@ public class ArrSeqTest{
             AbstractArrSeqMonitor<SEQ>
             implements
             MonitoredList<SEQ>{
+        @Override
         public Object removeFirst() {
           var removed=seq.remove(0);
           super.updateRemoveIndexState(0);
@@ -2406,11 +2498,7 @@ public class ArrSeqTest{
         public MonitoredIterator<? extends OmniIterator<?>,SEQ> getMonitoredIterator(int index,IteratorType itrType){
             switch(itrType){
             case AscendingItr:
-                final var itr=getMonitoredIterator();
-                while(--index >= 0 && itr.hasNext()){
-                    itr.iterateForward();
-                }
-                return itr;
+                return getMonitoredIterator(index);
             case BidirectionalItr:{
                 return getMonitoredListIterator(index);
             }
@@ -2790,6 +2878,7 @@ public class ArrSeqTest{
                 expectedRootOffset=expectedParent.expectedRootOffset + fromIndex;
                 seq=(SUBLIST)expectedParent.seq.subList(fromIndex,toIndex);
             }
+            @Override
             public Object removeFirst() {
               var removed=seq.remove(0);
               updateRemoveIndexState(0);
@@ -3891,7 +3980,7 @@ public class ArrSeqTest{
                 }
                 @Override
                 public void verifyNextResult(DataType outputType,Object result){
-                    expectedRoot.verifyGetResult(expectedLastRet,result,outputType);
+                    expectedRoot.verifyGetResult(expectedCursor,result,outputType);
                 }
             }
             private class ItrMonitor extends AbstractItrMonitor<OmniIterator<?>>{
@@ -4412,7 +4501,7 @@ public class ArrSeqTest{
             }
             @Override
             public void verifyNextResult(DataType outputType,Object result){
-                verifyGetResult(expectedLastRet,result,outputType);
+                verifyGetResult(expectedCursor,result,outputType);
             }
         }
         private class ItrMonitor extends AbstractItrMonitor<OmniIterator<?>>{
@@ -4798,6 +4887,7 @@ public class ArrSeqTest{
         public Object get(int iterationIndex,DataType outputType) {
             return super.get(expectedSize-iterationIndex-1,outputType);
         }
+        @Override
         public Object removeFirst() {
           var removed=seq.pop();
           super.updateRemoveIndexState(expectedSize-1);
@@ -5165,11 +5255,7 @@ public class ArrSeqTest{
             if(itrType != IteratorType.AscendingItr){
                 throw itrType.invalid();
             }
-            final var itrMonitor=getMonitoredIterator();
-            while(--index >= 0 && itrMonitor.hasNext()){
-                itrMonitor.iterateForward();
-            }
-            return itrMonitor;
+            return getMonitoredIterator(index);
         }
         @Override
         public MonitoredIterator<? extends OmniIterator<?>,SEQ> getMonitoredIterator(IteratorType itrType){
@@ -5803,7 +5889,7 @@ public class ArrSeqTest{
             }
             @Override
             public void verifyNextResult(DataType outputType,Object result){
-                verifyGetResult(expectedCursor,result,outputType);
+                verifyGetResult(expectedCursor-1,result,outputType);
             }
         }
     }

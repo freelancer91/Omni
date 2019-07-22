@@ -6,7 +6,11 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import omni.api.OmniIterator;
 import omni.impl.CheckedType;
 import omni.impl.DataType;
@@ -26,6 +30,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.TestExecutorService;
 @Tag(value="NewTest")
+@TestMethodOrder(OrderAnnotation.class)
 public class BooleanSetImplTest{
     private static class BooleanSetImplMonitor implements MonitoredSet<BooleanSetImpl>{
         final CheckedType checkedType;
@@ -85,7 +90,19 @@ public class BooleanSetImplTest{
             }
             return new UncheckedMonitoredItr();
         }
-
+        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(IteratorType itrType){
+            if(itrType!=IteratorType.AscendingItr) {
+                throw itrType.invalid();
+            }
+            return getMonitoredIterator();
+        }
+        @Override public MonitoredIterator<? extends OmniIterator<?>,BooleanSetImpl> getMonitoredIterator(int index,IteratorType itrType){
+            var itrMonitor=getMonitoredIterator(itrType);
+            while(--index>=0 && itrMonitor.hasNext()) {
+                itrMonitor.iterateForward();
+            }
+            return itrMonitor;
+        }
         @Override public StructType getStructType(){
             return StructType.BooleanSetImpl;
         }
@@ -485,7 +502,8 @@ public class BooleanSetImplTest{
             SetInitialization.AddTrue,SetInitialization.AddFalse,
             SetInitialization.AddTrueAndFalse);
     private static final boolean[] POSSIBLE_VALS=new boolean[]{false,true};
-    @org.junit.jupiter.api.Test
+    @Order(32)
+    @Test
     public void testadd_val(){
         final var mayBeAddedTo=DataType.BOOLEAN.mayBeAddedTo();
         for(final var initSet:VALID_INIT_SEQS){
@@ -506,19 +524,22 @@ public class BooleanSetImplTest{
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testadd_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testclear_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .verifyClear();
         test.runAllTests("BooleanSetImplTest.testclear_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testclone_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .verifyClone();
         test.runAllTests("BooleanSetImplTest.testclone_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testConstructor_int(){
         BasicTest test=(checkedType,initSet)->{
             int state;
@@ -542,20 +563,23 @@ public class BooleanSetImplTest{
         };
         test.runAllTests("BooleanSetImplTest.testConstructor_int");
     }
-    @org.junit.jupiter.api.Test
+    @Order(2)
+    @Test
     public void testConstructor_void(){
         for(final var checkedType:CheckedType.values()){
             TestExecutorService.submitTest(()->new BooleanSetImplMonitor(checkedType).verifyCollectionState());
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testConstructor_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(4128)
+    @Test
     public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyContains(queryVal,
                 inputType,castType,modification);
         test.runAllTests("BooleanSetImplTest.testcontains_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(346)
+    @Test
     public void testforEach_Consumer(){
         for(final var initSet:VALID_INIT_SEQS){
             for(final var functionGen:StructType.BooleanSetImpl.validMonitoredFunctionGens){
@@ -583,33 +607,38 @@ public class BooleanSetImplTest{
 
         TestExecutorService.completeAllTests("BooleanSetImplTest.testforEach_Consumer");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testhashCode_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .verifyHashCode();
         test.runAllTests("BooleanSetImplTest.testhashCode_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testisEmpty_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .verifyIsEmpty();
         test.runAllTests("BooleanSetImplTest.testisEmpty_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testiterator_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .getMonitoredIterator()
                 .verifyIteratorState();
         test.runAllTests("BooleanSetImplTest.testiterator_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testItrclone_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .getMonitoredIterator()
                 .verifyClone();
         test.runAllTests("BooleanSetImplTest.testItrclone_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(1178)
+    @Test
     public void testItrforEachRemaining_Consumer(){
         for(final var checkedType:CheckedType.values()){
             for(var initSet:VALID_INIT_SEQS){
@@ -690,7 +719,8 @@ public class BooleanSetImplTest{
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testItrforEachRemaining_Consmer");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testItrhasNext_void(){
         BasicTest test=(checkedType,initSet)->{
             final var setMonitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
@@ -704,34 +734,37 @@ public class BooleanSetImplTest{
         };
         test.runAllTests("BooleanSetImplTest.testItrhasNext_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(108)
+    @Test
     public void testItrnext_void(){
-        for(final var outputType:DataType.BOOLEAN.validOutputTypes()){
-            for(final var checkedType:CheckedType.values()){
-                for(final var preMod:IteratorType.AscendingItr.validPreMods){
-                    if(checkedType.checked || preMod.expectedException == null){
-                        for(var initSet:VALID_INIT_SEQS){
-                            TestExecutorService
-                            .submitTest(()->{
+        var outputTypes=DataType.BOOLEAN.validOutputTypes();
+        for(var checkedType:CheckedType.values()) {
+            for(var preMod:IteratorType.AscendingItr.validPreMods) {
+                if(checkedType.checked || preMod.expectedException==null) {
+                    for(var initSet:VALID_INIT_SEQS) {
+                        if(preMod.expectedException==null) {
+                            TestExecutorService.submitTest(()->{
                                 final var setMonitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
-                                final var itrMonitor=setMonitor.getMonitoredIterator();
-                                itrMonitor.illegalMod(preMod);
-                                if(preMod.expectedException == null){
-                                    while(itrMonitor.hasNext()){
+                                for(var outputType:outputTypes) {
+                                    var itrMonitor=setMonitor.getMonitoredIterator();
+                                    while(itrMonitor.hasNext()) {
                                         itrMonitor.verifyNext(outputType);
                                     }
                                     Assertions.assertFalse(itrMonitor.getIterator().hasNext());
-                                    if(checkedType.checked){
-                                        Assertions.assertThrows(NoSuchElementException.class,
-                                                ()->itrMonitor.verifyNext(outputType));
+                                    if(checkedType.checked) {
+                                        Assertions.assertThrows(NoSuchElementException.class,()->itrMonitor.verifyNext(outputType));
                                     }
-                                }else{
-                                    Assertions.assertThrows(preMod.expectedException,
-                                            ()->itrMonitor.verifyNext(outputType));
                                 }
-                                itrMonitor.verifyIteratorState();
-                                setMonitor.verifyCollectionState();
                             });
+                        }else {
+                            for(var outputType:outputTypes) {
+                                TestExecutorService.submitTest(()->{
+                                    final var setMonitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+                                    var itrMonitor=setMonitor.getMonitoredIterator();
+                                    itrMonitor.illegalMod(preMod);
+                                    Assertions.assertThrows(preMod.expectedException,()->itrMonitor.verifyNext(outputType));
+                                });
+                            }
                         }
                     }
                 }
@@ -739,7 +772,8 @@ public class BooleanSetImplTest{
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testItrnext_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(28)
+    @Test
     public void testItrremove_void(){
         for(final var checkedType:CheckedType.values()){
             for(var initSet:VALID_INIT_SEQS){
@@ -806,7 +840,8 @@ public class BooleanSetImplTest{
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testItrremove_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(20)
+    @Test
     public void testReadAndWrite(){
         MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
             var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
@@ -818,7 +853,8 @@ public class BooleanSetImplTest{
         };
         test.runAllTests("BooleanSetImplTest.testReadAndWrite");
     }
-    @org.junit.jupiter.api.Test
+    @Order(394)
+    @Test
     public void testremoveIf_Predicate(){
         for(final var filterGen:StructType.BooleanSetImpl.validMonitoredRemoveIfPredicateGens){
             for(final var initSet:VALID_INIT_SEQS){
@@ -871,19 +907,22 @@ public class BooleanSetImplTest{
         }
         TestExecutorService.completeAllTests("BooleanSetImplTest.testremoveIf_Predicate");
     }
-    @org.junit.jupiter.api.Test
+    @Order(4128)
+    @Test
     public void testremoveVal_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyRemoveVal(queryVal,
                 inputType,castType,modification);
         test.runAllTests("BooleanSetImplTest.testremoveVal_val");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testsize_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .verifySize();
         test.runAllTests("BooleanSetImplTest.testsize_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(20)
+    @Test
     public void testtoArray_IntFunction(){
         final MonitoredFunctionGenTest test=(functionGen,checkedType,initSet)->{
             final var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
@@ -896,50 +935,45 @@ public class BooleanSetImplTest{
         };
         test.runAllTests("BooleanSetImplTest.testtoArray_IntFunction");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testtoArray_ObjectArray(){
-        for(final var checkedType:CheckedType.values()){
-            for(final var initSet:VALID_INIT_SEQS){
-                int bound;
-                switch(initSet){
-                case Empty:
-                    bound=2;
-                    break;
-                case AddTrue:
-                case AddFalse:
-                    bound=3;
-                    break;
-                case AddTrueAndFalse:
-                    bound=4;
-                    break;
-                default:
-                    throw initSet.invalid();
-                }
-                for(int arrSize=0;arrSize <= bound;++arrSize){
-                    final Object[] paramArr=new Object[arrSize];
-                    TestExecutorService
-                    .submitTest(()->initSet.initialize(new BooleanSetImplMonitor(checkedType))
-                            .verifyToArray(paramArr));
-                }
+        final BasicTest test=(checkedType,initSet)->{
+            int bound;
+            switch(initSet){
+            case Empty:
+                bound=2;
+                break;
+            case AddTrue:
+            case AddFalse:
+                bound=3;
+                break;
+            case AddTrueAndFalse:
+                bound=4;
+                break;
+            default:
+                throw initSet.invalid();
             }
-        }
-        TestExecutorService.completeAllTests("BooleanSetImplTest.testtoArray_ObjectArray");
+            var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+            for(int arrSize=0;arrSize <= bound;++arrSize){
+                monitor.verifyToArray(new Object[arrSize]);
+            }
+        };
+        test.runAllTests("BooleanSetImplTest.testtoArray_ObjectArray");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testtoArray_void(){
-        for(final var outputType:DataType.BOOLEAN.validOutputTypes()){
-            for(final var checkedType:CheckedType.values()){
-                for(final var initSet:VALID_INIT_SEQS){
-                    TestExecutorService
-                    .submitTest(()->outputType
-                            .verifyToArray(initSet.initialize(new BooleanSetImplMonitor(checkedType))));
-                }
+        final BasicTest test=(checkedType,initSet)->{
+            var monitor=initSet.initialize(new BooleanSetImplMonitor(checkedType));
+            for(var outputType:DataType.BOOLEAN.validOutputTypes()) {
+                outputType.verifyToArray(monitor);
             }
-
-        }
-        TestExecutorService.completeAllTests("BooleanSetImplTest.testtoArray_void");
+        };
+        test.runAllTests("BooleanSetImplTest.testtoArray_void");
     }
-    @org.junit.jupiter.api.Test
+    @Order(8)
+    @Test
     public void testtoString_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .verifyToString();
