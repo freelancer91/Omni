@@ -11,6 +11,7 @@ import java.util.function.IntConsumer;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import omni.api.OmniCollection;
@@ -39,6 +40,7 @@ import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
+@Tag("NewTest")
 public class ArrSeqTest{
     private static final int[] INIT_CAPACITIES=new int[]{0,5,10,15};
     private static final double[] POSITIONS=new double[]{-1,0,0.5,1.0};
@@ -134,6 +136,7 @@ public class ArrSeqTest{
         }
         return getMonitoredList(initParams,initCapacity);
     }
+    @Disabled
     @Test
     public void testadd_intval(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -326,6 +329,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_void");
     }
+    @Disabled
     @Test
     public void testcontains_val(){
         final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -410,6 +414,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testhashCode_void");
     }
+    @Disabled
     @Test
     public void testindexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -483,6 +488,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrclone_void");
     }
+    @Disabled
     @Tag("ForEachRemaining")
     @Test
     public void testItrforEachRemaining_Consumer(){
@@ -691,6 +697,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrremove_void");
     }
+    @Disabled
     @Test
     public void testlastIndexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -966,6 +973,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrset_val");
     }
+    @Disabled
     @Test
     public void testMASSIVEtoString(){
         for(final var collectionType:DataType.values()){
@@ -1168,6 +1176,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testput_intval");
     }
+    @Disabled
     @Test
     public void testReadAndWrite(){
         final MonitoredFunctionTest<MonitoredSequence<?>> test=(monitor,functionGen,functionCallType,illegalMod,
@@ -1185,6 +1194,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testReadAndWrite",0,EnumSet.of(FunctionCallType.Unboxed),true);
     }
+    @Disabled
     @Test
     public void testremoveAt_int(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -1262,6 +1272,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveAt_int");
     }
+    @Disabled
     @Test
     public void testremoveIf_Predicate(){
         for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -1333,6 +1344,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveIf_Predicate");
     }
+    @Disabled
     @Test
     public void testremoveVal_val(){
         final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
@@ -1356,6 +1368,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testremoveVal_val",2);
     }
+    @Disabled
     @Test
     public void testreplaceAll_UnaryOperator(){
         final MonitoredFunctionTest<MonitoredList<?>> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
@@ -1542,6 +1555,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.teststableDescendingSort_void");
     }
+    @Disabled
     @Test
     public void testsubList_intint(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
@@ -2365,7 +2379,11 @@ public class ArrSeqTest{
             AbstractArrSeqMonitor<SEQ>
             implements
             MonitoredList<SEQ>{
-        
+        public Object removeFirst() {
+          var removed=seq.remove(0);
+          super.updateRemoveIndexState(0);
+          return removed;
+        }
         
         
         public ArrListMonitor(CheckedType checkedType,DataType dataType){
@@ -2771,6 +2789,11 @@ public class ArrSeqTest{
                 expectedSize=toIndex - fromIndex;
                 expectedRootOffset=expectedParent.expectedRootOffset + fromIndex;
                 seq=(SUBLIST)expectedParent.seq.subList(fromIndex,toIndex);
+            }
+            public Object removeFirst() {
+              var removed=seq.remove(0);
+              updateRemoveIndexState(0);
+              return removed;
             }
             @Override
             public Object get(int iterationIndex,DataType outputType) {
@@ -4775,7 +4798,11 @@ public class ArrSeqTest{
         public Object get(int iterationIndex,DataType outputType) {
             return super.get(expectedSize-iterationIndex-1,outputType);
         }
-        
+        public Object removeFirst() {
+          var removed=seq.pop();
+          super.updateRemoveIndexState(expectedSize-1);
+          return removed;
+        }
         
         public ArrStackMonitor(CheckedType checkedType,DataType dataType){
             super(checkedType,dataType);

@@ -508,8 +508,8 @@ public interface MonitoredCollection<COL extends OmniCollection<?>>{
             final Object result;
             try{
                 result=outputType.callNext(getIterator());
-                updateItrNextState();
                 verifyNextResult(outputType,result);
+                updateItrNextState();
             }finally{
                 verifyIteratorState();
                 getMonitoredCollection().verifyCollectionState();

@@ -595,7 +595,7 @@ public class ByteSetImplTest{
             ++expectedModCount;
         }
         @Override
-        public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification){
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
             final byte v=(byte)queryVal.getInputVal(DataType.BYTE,modification);
             expectedWords[(v >> 6) + 2]&=~(1L << v);
             --expectedSize;

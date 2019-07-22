@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
@@ -51,6 +52,7 @@ import omni.impl.StructType;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 @TestMethodOrder(OrderAnnotation.class)
+@Tag("NewTest")
 public class DblLnkSeqTest{
     private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
     private static final double[] POSITIONS=new double[]{-1,0,0.25,0.5,0.75,1.0};
@@ -225,6 +227,7 @@ public class DblLnkSeqTest{
         }
         return subListMonitor;
     }
+    @Disabled
     @Order(527850)
     @Test
     public void testadd_intval(){
@@ -588,6 +591,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrclone_void");
     }
+    @Disabled
     @Order(927902)
     @Tag("ForEachRemaining")
     @Test
@@ -1133,6 +1137,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testListItrset_val");
     }
+    @Disabled
     @Tag("MASSIVEtoString")
     @Test
     public void testMASSIVEtoString(){
@@ -1517,6 +1522,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeFirstOccurrence_val",false);
     }
+    @Disabled
     @Order(2674700)
     @Tag("RemoveIf")
     @Test
@@ -1710,6 +1716,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeLastOccurrence)val",false);
     }
+    @Disabled
     @Order(9350824)
     @Test
     public void testremoveVal_val(){
@@ -2489,6 +2496,11 @@ public class DblLnkSeqTest{
                 throw dataType.invalid();
             }
         }
+        public Object removeFirst() {
+          var removed=seq.removeFirst();
+          super.updateRemoveIndexState(0);
+          return removed;
+      }
         @Override
         public void verifyReadAndWriteClone(LSTDEQ readCol){
             verifyRefClone(readCol,false);
@@ -4600,6 +4612,11 @@ public class DblLnkSeqTest{
         private static class SubListMonitor<SUBLIST extends AbstractSeq<E>&OmniList<E>,LSTDEQ extends AbstractSeq<E>&OmniDeque<E>&OmniList<E>&Externalizable,E>
                 implements
                 MonitoredList<SUBLIST>{
+          public Object removeFirst() {
+            var removed=seq.remove(0);
+            updateRemoveIndexState(expectedRootOffset);
+            return removed;
+        }
             final DblLnkSeqMonitor<LSTDEQ,E> expectedRoot;
             final SubListMonitor<SUBLIST,LSTDEQ,E> expectedParent;
             final SUBLIST seq;

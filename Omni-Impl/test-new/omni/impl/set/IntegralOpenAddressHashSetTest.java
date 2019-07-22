@@ -6,9 +6,9 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import omni.api.OmniIterator;
 import omni.api.OmniSet;
@@ -60,7 +60,7 @@ public class IntegralOpenAddressHashSetTest{
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
     }
-
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testadd_val(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -197,6 +197,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification)->monitor.verifyContains(queryVal,
@@ -272,6 +273,7 @@ public class IntegralOpenAddressHashSetTest{
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("IntegralOpenAddressHashSetTest.testItrclone_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testItrforEachRemaining_Consumer(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -314,12 +316,11 @@ public class IntegralOpenAddressHashSetTest{
                                             itrScenarioMax=2;
                                         }
                                     }
-                                    IntStream.rangeClosed(0,itrScenarioMax).forEach(itrScenario->{
-                                        LongStream
-                                        .rangeClosed(0,
-                                                preMod.expectedException == null && functionGen.randomized
-                                                && sizeScenario > 1 && itrScenario == 0?100:0)
-                                        .forEach(randSeed->{
+                                    for(int tmpItrScenario=0;tmpItrScenario<=itrScenarioMax;++tmpItrScenario) {
+                                      final int itrScenario=tmpItrScenario;
+                                      for(long tmpRandSeed=0,randBound=preMod.expectedException == null && functionGen.randomized
+                                                && sizeScenario > 1 && itrScenario == 0?100:0;tmpRandSeed<=randBound;++tmpRandSeed) {
+                                        final long randSeed=tmpRandSeed;
                                             for(final var functionCallType:FunctionCallType.values()){
                                                 for(final var loadFactor:LOAD_FACTORS){
                                                     if(loadFactor > 0.f && loadFactor <= 1.0f
@@ -374,8 +375,8 @@ public class IntegralOpenAddressHashSetTest{
                                                     }
                                                 }
                                             }
-                                        });
-                                    });
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -400,6 +401,7 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testItrhasNext_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testItrnext_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -444,6 +446,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrnext_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testItrremove_void(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -464,15 +467,16 @@ public class IntegralOpenAddressHashSetTest{
                                         itrOffset=1;
                                         itrBound=setSize;
                                     }
-                                    IntStream.rangeClosed(itrOffset,itrBound).forEach(itrCount->{
+                                    for(int tmpItrCount=itrOffset;tmpItrCount<=itrBound;++tmpItrCount) {
+                                      final int itrCount=tmpItrCount;
                                         for(final float loadFactor:LOAD_FACTORS){
                                             if(loadFactor > 0.f && loadFactor <= 1.0f && loadFactor == loadFactor){
                                                 for(final int initCapacity:GENERAL_PURPOSE_INITIAL_CAPACITIES){
                                                     TestExecutorService.submitTest(()->{
-                                                        var setMonitor=new IntegralOpenAddressHashSetMonitor(
-                                                                collectionType,checkedType,initCapacity,loadFactor);
+                                                        var setMonitor=initSet.initialize(new IntegralOpenAddressHashSetMonitor(
+                                                                collectionType,checkedType,initCapacity,loadFactor));
                                                         final var itrMonitor=setMonitor.getMonitoredIterator();
-                                                        for(int i=0;i < itrCount;++i){
+                                                        for(int i=0;i < itrCount && itrMonitor.hasNext();++i){
                                                             itrMonitor.iterateForward();
                                                         }
                                                         itrRemoveScenario.initialize(itrMonitor);
@@ -498,7 +502,7 @@ public class IntegralOpenAddressHashSetTest{
                                                 }
                                             }
                                         }
-                                    });
+                                    }
                                 }
                             }
                         }
@@ -508,6 +512,7 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrremove_void");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testMASSIVEtoString(){
         for(final var collectionType:new DataType[]{DataType.INT,DataType.LONG}){
@@ -558,6 +563,7 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testReadAndWrite");
     }
+    @Disabled
     @org.junit.jupiter.api.Test
     public void testremoveIf_Predicate(){
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
@@ -1142,7 +1148,7 @@ public class IntegralOpenAddressHashSetTest{
         updateCollectionState();
         }
         @Override
-        public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification){
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
             final Object inputVal=queryVal.getInputVal(dataType,modification);
             switch(dataType){
             case CHAR:{
@@ -2088,16 +2094,6 @@ public class IntegralOpenAddressHashSetTest{
             @Override
             public boolean hasNext(){
                 return expectedOffset != -1;
-            }
-            @Override
-            public void iterateForward(){
-                MonitoredSet.MonitoredSetIterator.super.iterateForward();
-                --expectedNumLeft;
-            }
-            @Override
-            public void modItr(){
-                MonitoredSet.MonitoredSetIterator.super.modItr();
-                --expectedNumLeft;
             }
             @Override
             public void updateItrNextState(){

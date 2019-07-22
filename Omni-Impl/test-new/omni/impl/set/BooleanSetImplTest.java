@@ -117,7 +117,7 @@ public class BooleanSetImplTest{
         }
 
         @Override
-        public void removeFromExpectedState(QueryVal queryVal,QueryValModification modification){
+        public void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification){
             switch(expectedState) {
             case 0b01:
             case 0b10:

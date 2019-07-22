@@ -115,7 +115,8 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
         }
 
     }
-    void removeFromExpectedState(QueryVal queryVal,QueryValModification modification);
+    void removeFromExpectedState(DataType inputType,QueryVal queryVal,QueryValModification modification);
+    //void removeFromExpectedState(QueryVal queryVal,QueryValModification modification);
     @Override default boolean verifyRemoveVal(QueryVal queryVal,DataType inputType,QueryCastType queryCastType,
             QueryValModification modification){
         SET collection=getCollection();
@@ -130,7 +131,13 @@ public interface MonitoredSet<SET extends OmniSet<?>>extends MonitoredCollection
             if(result) {
                 Assertions.assertNotEquals(containsBefore,containsAfter);
                 Assertions.assertEquals(sizeBefore,sizeAfter+1);
-                removeFromExpectedState(queryVal,modification);
+                DataType collectionType;
+                if((collectionType=getDataType())==DataType.REF) {
+                  removeFromExpectedState(inputType,queryVal,modification);
+                }else {
+                  removeFromExpectedState(collectionType,queryVal,modification);
+                }
+                
             }else {
                 Assertions.assertEquals(containsBefore,containsAfter);
                 Assertions.assertEquals(sizeBefore,sizeAfter);

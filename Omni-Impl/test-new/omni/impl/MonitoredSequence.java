@@ -13,13 +13,8 @@ public interface MonitoredSequence<SEQ extends OmniCollection<?>> extends Monito
     default Object verifyPeek(DataType outputType) {
         throw new UnsupportedOperationException();
     }
-    default Object removeFirst() {
-        var itr=getCollection().iterator();
-        Object removed=itr.next();
-        itr.remove();
-        updateRemoveIndexState(0);
-        return removed;
-    }
+    Object removeFirst();
+   
     
     @Override
     @SuppressWarnings("unchecked")
