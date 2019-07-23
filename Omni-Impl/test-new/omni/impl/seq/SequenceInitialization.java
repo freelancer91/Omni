@@ -2,12 +2,12 @@ package omni.impl.seq;
 
 import java.util.function.IntConsumer;
 import omni.api.OmniCollection;
+import omni.impl.MonitoredCollection;
 import omni.impl.MonitoredObjectGen;
-import omni.impl.MonitoredSequence;
 
 enum SequenceInitialization{
     Ascending{
-        @Override public <SEQ extends MonitoredSequence<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal,int period){
+        @Override public <SEQ extends MonitoredCollection<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal,int period){
             var dataType=seq.getDataType();
             IntConsumer valAdder;
             switch(dataType) {
@@ -51,7 +51,7 @@ enum SequenceInitialization{
             addImpl(numToAdd,period,initVal,valAdder,seq);
             return seq;
         }
-        private void addImpl(int numToAdd,int period,int initVal,IntConsumer valAdder,MonitoredSequence<?> seq) {
+        private void addImpl(int numToAdd,int period,int initVal,IntConsumer valAdder,MonitoredCollection<?> seq) {
             for(;;) {
                 for(int i=0;i<=period;++i) {
                     if(--numToAdd<0) {
@@ -66,7 +66,7 @@ enum SequenceInitialization{
         
         
         @Override
-        public <SEQ extends MonitoredSequence<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,int period,
+        public <SEQ extends MonitoredCollection<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,int period,
                 MonitoredObjectGen objGen,MonitoredObjectGen.ThrowSwitch throwSwitch){
             @SuppressWarnings("unchecked")
             var collection=(OmniCollection.OfRef<Object>)seq.getCollection();
@@ -76,14 +76,14 @@ enum SequenceInitialization{
             return seq;
         }
     };
-    public abstract <SEQ extends MonitoredSequence<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal,int period);
-    public <SEQ extends MonitoredSequence<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal) {
+    public abstract <SEQ extends MonitoredCollection<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal,int period);
+    public <SEQ extends MonitoredCollection<?>> SEQ initialize(SEQ seq,int numToAdd,int initVal) {
         return initialize(seq,numToAdd,initVal,0);
     }
-    public <SEQ extends MonitoredSequence<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,
+    public <SEQ extends MonitoredCollection<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,
             MonitoredObjectGen objGen,MonitoredObjectGen.ThrowSwitch throwSwitch) {
         return initializeWithMonitoredObj(seq,numToAdd,initVal,0,objGen,throwSwitch);
     }
-    public abstract <SEQ extends MonitoredSequence<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,int period,
+    public abstract <SEQ extends MonitoredCollection<?>> SEQ initializeWithMonitoredObj(SEQ seq,int numToAdd,int initVal,int period,
             MonitoredObjectGen objGen,MonitoredObjectGen.ThrowSwitch throwSwitch);
 }

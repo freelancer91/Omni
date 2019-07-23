@@ -3404,7 +3404,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
         if((headDist=lastRet-head)>=0){
           if(headDist<=(tailDist=arrBound-lastRet)+tail+1){
             if(headDist==0){
-              if(lastRet==arrBound){
+              if(tailDist==0){
                 root.head=0;
               }else{
                 root.head=head+1;
@@ -3881,7 +3881,7 @@ boolean uncheckedremoveValSUFFIX(int tail
           this.modCount=modCount+1;
 #ENDIF
           int headDist,tailDist;
-          if((headDist=index-head)<((tailDist=bound-index)+tail)){
+          if((headDist=index-head)<=((tailDist=bound-index)+tail)){
   #IF OfRef
             ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
             arr[head]=null;
@@ -4044,7 +4044,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
               this.modCount=modCount+1;
 #ENDIF
               int headDist,tailDist;
-              if((headDist=index-head)<((tailDist=bound-index)+tail)){
+              if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
   #IF OfRef
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;

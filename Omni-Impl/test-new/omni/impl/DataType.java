@@ -52,7 +52,7 @@ public enum DataType{
             boolean.class,Boolean[].class,boolean[].class,"Boolean","Boolean",
             BooleanPredicate.class,BooleanConsumer.class,BooleanComparator.class,BooleanPredicate.class,Boolean.FALSE,
             BooleanDblLnkNode.class,BooleanSnglLnkNode.class,"removeBooleanAt",boolean.class,"test","compare",
-            boolean.class,"booleanElement",OmniArray.MAX_ARR_SIZE / 7){
+            boolean.class,"booleanElement",OmniArray.MAX_ARR_SIZE / 7,OmniArray.OfBoolean.DEFAULT_ARR){
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.BooleanInput<?>)collection;
@@ -61,6 +61,9 @@ public enum DataType{
             }else {
                 cast.addLast((boolean)inputVal);
             }
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((boolean[])arr).length;
         }
         @Override
         public void callAddFirst(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
@@ -512,14 +515,70 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.OfBoolean)collection).removeLastBoolean();
         }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((boolean[])arrayOfThisType)[index]=(boolean)inputValOfThisType;
+        }
+        @Override
+        public Object newArray(int length){
+            return new boolean[length];
+        }
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((boolean[])arrayOfThisType)[index];
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            boolean inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal == 1;
+              break;
+            case CHAR:
+              inputCast=(char)inputVal == 1;
+              break;
+            case SHORT:
+              inputCast=(short)inputVal == 1;
+              break;
+            case INT:
+              inputCast=(int)inputVal == 1;
+              break;
+            case LONG:
+              inputCast=(long)inputVal == 1L;
+              break;
+            case FLOAT:
+              inputCast=(float)inputVal == 1F;
+              break;
+            case DOUBLE:
+              inputCast=(double)inputVal == 1D;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var arrCast=(boolean[])arr;
+            return index->arrCast[index]==inputCast;
+        }
        
     },
     BYTE("BYTE","BOOLEAN,BYTE","BYTE,SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Byte.class,byte.class,
             Byte[].class,byte[].class,"Byte","Byte",BytePredicate.class,
             ByteConsumer.class,ByteComparator.class,ByteUnaryOperator.class,Byte.MIN_VALUE,ByteDblLnkNode.class,
             ByteSnglLnkNode.class,"removeByteAt",int.class,"applyAsByte","compare",byte.class,"byteElement",
-            OmniArray.MAX_ARR_SIZE / 6){
-        
+            OmniArray.MAX_ARR_SIZE / 6,OmniArray.OfByte.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((byte[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new byte[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((byte[])arr).length;
+        }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.ByteInput<?>)collection;
@@ -920,11 +979,60 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.ByteOutput<?>)collection).removeLastByte();
                     }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((byte[])arrayOfThisType)[index]=(byte)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            byte inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal?(byte)1:(byte)0;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal;
+              break;
+            case CHAR:
+              inputCast=(byte)(char)inputVal;
+              break;
+            case SHORT:
+              inputCast=(byte)(short)inputVal;
+              break;
+            case INT:
+              inputCast=(byte)(int)inputVal;
+              break;
+            case LONG:
+              inputCast=(byte)(long)inputVal;
+              break;
+            case FLOAT:
+              inputCast=(byte)(float)inputVal;
+              break;
+            case DOUBLE:
+              inputCast=(byte)(double)inputVal;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var arrCast=(byte[])arr;
+            return index->arrCast[index]==inputCast;
+        }
     },
     CHAR("CHAR","BOOLEAN,CHAR","CHAR,INT,LONG,FLOAT,DOUBLE,REF",true,false,false,Character.class,char.class,
             Character[].class,char[].class,"Char","Char",CharPredicate.class,CharConsumer.class,CharComparator.class,
             CharUnaryOperator.class,Character.MIN_VALUE,CharDblLnkNode.class,CharSnglLnkNode.class,"removeCharAt",
-            int.class,"applyAsChar","compare",char.class,"charElement",-1){
+            int.class,"applyAsChar","compare",char.class,"charElement",-1,OmniArray.OfChar.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((char[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new char[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((char[])arr).length;
+        }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.CharInput<?>)collection;
@@ -1325,11 +1433,60 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.CharOutput<?>)collection).removeLastChar();
             }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((char[])arrayOfThisType)[index]=(char)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            char inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal?(char)1:(char)0;
+              break;
+            case BYTE:
+              inputCast=(char)(byte)inputVal;
+              break;
+            case CHAR:
+              inputCast=(char)inputVal;
+              break;
+            case SHORT:
+              inputCast=(char)(short)inputVal;
+              break;
+            case INT:
+              inputCast=(char)(int)inputVal;
+              break;
+            case LONG:
+              inputCast=(char)(long)inputVal;
+              break;
+            case FLOAT:
+              inputCast=(char)(float)inputVal;
+              break;
+            case DOUBLE:
+              inputCast=(char)(double)inputVal;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var arrCast=(char[])arr;
+            return index->arrCast[index]==inputCast;
+        }
     },
     SHORT("SHORT","BOOLEAN,BYTE,SHORT","SHORT,INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Short.class,short.class,
             Short[].class,short[].class,"Short","Short",ShortPredicate.class,ShortConsumer.class,ShortComparator.class,
             ShortUnaryOperator.class,Short.MIN_VALUE,ShortDblLnkNode.class,ShortSnglLnkNode.class,"removeShortAt",
-            int.class,"applyAsShort","compare",short.class,"shortElement",OmniArray.MAX_ARR_SIZE / 8){
+            int.class,"applyAsShort","compare",short.class,"shortElement",OmniArray.MAX_ARR_SIZE / 8,OmniArray.OfShort.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((short[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new short[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((short[])arr).length;
+        }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.ShortInput<?>)collection;
@@ -1727,12 +1884,61 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.ShortOutput<?>)collection).removeLastShort();
             }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((short[])arrayOfThisType)[index]=(short)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            short inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal?(short)1:(short)0;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal;
+              break;
+            case CHAR:
+              inputCast=(short)(char)inputVal;
+              break;
+            case SHORT:
+              inputCast=(short)inputVal;
+              break;
+            case INT:
+              inputCast=(short)(int)inputVal;
+              break;
+            case LONG:
+              inputCast=(short)(long)inputVal;
+              break;
+            case FLOAT:
+              inputCast=(short)(float)inputVal;
+              break;
+            case DOUBLE:
+              inputCast=(short)(double)inputVal;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var arrCast=(short[])arr;
+            return index->arrCast[index]==inputCast;
+        }
     },
     INT("INT","BOOLEAN,BYTE,CHAR,SHORT,INT","INT,LONG,FLOAT,DOUBLE,REF",true,false,true,Integer.class,int.class,
             Integer[].class,int[].class,"Int","Int",IntPredicate.class,
             IntConsumer.class,IntBinaryOperator.class,IntUnaryOperator.class,Integer.MIN_VALUE,IntDblLnkNode.class,
             IntSnglLnkNode.class,"removeIntAt",int.class,"applyAsInt","applyAsInt",int.class,"intElement",
-            OmniArray.MAX_ARR_SIZE / 13){
+            OmniArray.MAX_ARR_SIZE / 13,OmniArray.OfInt.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((int[])arrayOfThisType)[index];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((int[])arr).length;
+        }
+        @Override
+        public Object newArray(int length){
+            return new int[length];
+        }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.IntInput<?>)collection;
@@ -2118,12 +2324,61 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.IntOutput<?>)collection).removeLastInt();
             }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((int[])arrayOfThisType)[index]=(int)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            int inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal?1:0;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal;
+              break;
+            case CHAR:
+              inputCast=(char)inputVal;
+              break;
+            case SHORT:
+              inputCast=(short)inputVal;
+              break;
+            case INT:
+              inputCast=(int)inputVal;
+              break;
+            case LONG:
+              inputCast=(int)(long)inputVal;
+              break;
+            case FLOAT:
+              inputCast=(int)(float)inputVal;
+              break;
+            case DOUBLE:
+              inputCast=(int)(double)inputVal;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var arrCast=(int[])arr;
+            return index->arrCast[index]==inputCast;
+        }
     },
     LONG("LONG","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG","LONG,FLOAT,DOUBLE,REF",true,false,true,Long.class,long.class,
             Long[].class,long[].class,"Long","Long",LongPredicate.class,
             LongConsumer.class,LongComparator.class,LongUnaryOperator.class,Long.MIN_VALUE,LongDblLnkNode.class,
             LongSnglLnkNode.class,"removeLongAt",long.class,"applyAsLong","compare",long.class,"longElement",
-            OmniArray.MAX_ARR_SIZE / 22){
+            OmniArray.MAX_ARR_SIZE / 22,OmniArray.OfLong.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((long[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new long[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((long[])arr).length;
+        }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.LongInput<?>)collection;
@@ -2501,12 +2756,61 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.LongOutput<?>)collection).removeLastLong();
             }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((long[])arrayOfThisType)[index]=(long)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+             long inputCast;
+                switch(inputType){
+                case BOOLEAN:
+                  inputCast=(boolean)inputVal?1L:0L;
+                  break;
+                case BYTE:
+                  inputCast=(byte)inputVal;
+                  break;
+                case CHAR:
+                  inputCast=(char)inputVal;
+                  break;
+                case SHORT:
+                  inputCast=(short)inputVal;
+                  break;
+                case INT:
+                  inputCast=(int)inputVal;
+                  break;
+                case LONG:
+                  inputCast=(long)inputVal;
+                  break;
+                case FLOAT:
+                  inputCast=(long)(float)inputVal;
+                  break;
+                case DOUBLE:
+                  inputCast=(long)(double)inputVal;
+                  break;
+                default:
+                  throw inputType.invalid();
+                }
+                final var arrCast=(long[])arr;
+                return index->arrCast[index]==inputCast;
+        }
     },
     FLOAT("FLOAT","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT","FLOAT,DOUBLE,REF",false,true,true,Float.class,float.class,
             Float[].class,float[].class,"Float","Float",FloatPredicate.class,
             FloatConsumer.class,FloatComparator.class,FloatUnaryOperator.class,Float.NaN,FloatDblLnkNode.class,
             FloatSnglLnkNode.class,"removeFloatAt",int.class,"applyAsFloat","compare",float.class,"floatElement",
-            OmniArray.MAX_ARR_SIZE / 17){
+            OmniArray.MAX_ARR_SIZE / 17,OmniArray.OfFloat.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((float[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new float[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((float[])arr).length;
+        }
         @Override
         public void callAddLast(Object inputVal,OmniDeque<?> collection,FunctionCallType functionCallType){
             var cast=(OmniDeque.FloatInput<?>)collection;
@@ -2905,12 +3209,68 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.FloatOutput<?>)collection).removeLastFloat();
             }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((float[])arrayOfThisType)[index]=(float)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            float inputCast;
+                switch(inputType){
+                case BOOLEAN:
+                  inputCast=(boolean)inputVal?1.0f:0.0f;
+                  break;
+                case BYTE:
+                  inputCast=(byte)inputVal;
+                  break;
+                case CHAR:
+                  inputCast=(char)inputVal;
+                  break;
+                case SHORT:
+                  inputCast=(short)inputVal;
+                  break;
+                case INT:
+                  inputCast=(int)inputVal;
+                  break;
+                case LONG:
+                  inputCast=(long)inputVal;
+                  break;
+                case FLOAT:
+                  inputCast=(float)inputVal;
+                  break;
+                case DOUBLE:
+                  inputCast=(float)(double)inputVal;
+                  break;
+                default:
+                  throw inputType.invalid();
+                }
+                final var arrCast=(float[])arr;
+                if(inputCast == inputCast){
+                    return index->arrCast[index]==inputCast;
+                }else {
+                    return index->{
+                        float v;
+                        return (v=arrCast[index])!=v;
+                    };
+                }
+        }
     },
     DOUBLE("DOUBLE","BOOLEAN,BYTE,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE","DOUBLE,REF",false,true,true,Double.class,
             double.class,Double[].class,double[].class,"Double","Double",
             DoublePredicate.class,DoubleConsumer.class,DoubleComparator.class,DoubleUnaryOperator.class,Double.NaN,
             DoubleDblLnkNode.class,DoubleSnglLnkNode.class,"removeDoubleAt",long.class,"applyAsDouble","compare",
-            double.class,"doubleElement",-1){
+            double.class,"doubleElement",-1,OmniArray.OfDouble.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((double[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new double[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((double[])arr).length;
+        }
       @Override public Object callPeek(PeekAndPollIfc<?> collection){
         return ((PeekAndPollIfc.DoubleOutput<?>)collection).peekDouble();
       }
@@ -3275,10 +3635,66 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return ((OmniDeque.DoubleOutput<?>)collection).removeLastDouble();
         }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((double[])arrayOfThisType)[index]=(double)inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            double inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal?1.0:0.0;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal;
+              break;
+            case CHAR:
+              inputCast=(char)inputVal;
+              break;
+            case SHORT:
+              inputCast=(short)inputVal;
+              break;
+            case INT:
+              inputCast=(int)inputVal;
+              break;
+            case LONG:
+              inputCast=(long)inputVal;
+              break;
+            case FLOAT:
+              inputCast=(float)inputVal;
+              break;
+            case DOUBLE:
+              inputCast=(double)inputVal;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var arrCast=(double[])arr;
+            if(inputCast == inputCast){
+                return index->arrCast[index]==inputCast;
+            }else {
+                return index->{
+                    double v;
+                    return (v=arrCast[index])!=v;
+                };
+            }
+        }
     },
     REF("REF","REF","REF",false,false,false,null,Object.class,null,Object[].class,"Ref","",null,null,null,null,null,
             RefDblLnkNode.class,
-            RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element",-1){
+            RefSnglLnkNode.class,"remove",Object.class,"apply","compare",Comparable.class,"element",-1,OmniArray.OfRef.DEFAULT_ARR){
+        @Override
+        public Object getFromArray(int index,Object arrayOfThisType){
+            return ((Object[])arrayOfThisType)[index];
+        }
+        @Override
+        public Object newArray(int length){
+            return new Object[length];
+        }
+        @Override public int arrayLength(Object arr) {
+            return ((Object[])arr).length;
+        }
       @Override public Object callPeek(PeekAndPollIfc<?> collection){
         return collection.peek();
       }
@@ -3655,6 +4071,19 @@ public enum DataType{
         public Object callRemoveLast(OmniDeque<?> collection){
             return collection.removeLast();
             }
+        @Override
+        public void storyInArray(int index,Object arrayOfThisType,Object inputValOfThisType){
+            ((Object[])arrayOfThisType)[index]=inputValOfThisType;
+        }
+        @Override
+        public IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType){
+            final var arrCast=(Object[])arr;
+            if(inputVal==null) {
+                return index->arrCast[index]==null;
+            }else {
+                return index->inputVal.equals(arrCast[index]);
+            }
+        }
 
     };
     private static void incrementProgressBar(int nextPercent){
@@ -3676,7 +4105,7 @@ public enum DataType{
     public final String name;
     private final String mayBeAddedTo;
     private final String validOutputTypes;
-
+    
     public final boolean isIntegral;
     public final boolean isFloatingPoint;
     public final boolean isSigned;
@@ -3700,7 +4129,9 @@ public enum DataType{
     public final Class<?> comparableType;
     public final String elementMethodName;
     public final int massiveToStringThreshold;
+    public final Object defaultArr;
     public final EnumSet<FunctionCallType> validFunctionCalls;
+    
     
     DataType(String name,String mayBeAddedTo,String validOutputTypes,boolean isIntegral,boolean isFloatingPoint,
             boolean isSigned,Class<?> boxedClass,Class<?> primitiveClass,
@@ -3708,7 +4139,7 @@ public enum DataType{
             Class<?> predicateClass,Class<?> consumerClass,Class<?> comparatorClass,Class<?> unaryOperatorClass,
             Object defaultVal,Class<?> dblLnkNodeClass,Class<?> snglLnkNodeClass,String removeAtIndexMethodName,
             Class<?> queryParameterType,String applyMethodName,String compareMethodName,Class<?> comparableType,
-            String elementMethodName,int massiveToStringThreshold){
+            String elementMethodName,int massiveToStringThreshold,Object defaultArr){
         this.name=name;
         this.mayBeAddedTo=mayBeAddedTo;
         this.validOutputTypes=validOutputTypes;
@@ -3735,6 +4166,7 @@ public enum DataType{
         this.comparableType=comparableType;
         this.elementMethodName=elementMethodName;
         this.massiveToStringThreshold=massiveToStringThreshold;
+        this.defaultArr=defaultArr;
         if("REF".equals(name)) {
             this.validFunctionCalls=EnumSet.of(FunctionCallType.Unboxed);
         }else {
@@ -3801,6 +4233,13 @@ public enum DataType{
         }
         throw inputType.invalid();
     }
+    public abstract Object getFromArray(int index,Object arrayOfThisType);
+    public abstract void storyInArray(int index,Object arrayOfThisType,Object valOfThisType);
+    public final void convertValAndStoreInArray(int index,Object arrayOfThisType,Object inputVal,DataType inputType) {
+        storyInArray(index,arrayOfThisType,this.convertVal(inputType,inputVal));
+    }
+    public abstract Object newArray(int length);
+    public abstract int arrayLength(Object arr);
     public final Object convertVal(DataType inputType,Object val){
         switch(inputType){
         case BOOLEAN:
@@ -3942,5 +4381,7 @@ public enum DataType{
         });
     }
 
+    public abstract IntPredicate getArrayIndexSearcher(Object arr,Object inputVal,DataType inputType);
+    
     private static final HashMap<String,EnumSet<DataType>> SETS=new HashMap<>();
 }
