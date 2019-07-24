@@ -6757,7 +6757,6 @@ AbstractSeq<Boolean>
       }
       void uncheckedForEachRemaining(BooleanDblLnkNode curr,BooleanConsumer action){
         BooleanDblLnkNode.uncheckedForEachAscending(curr,action);
-        this.curr=null;
       }
       @Override public void forEachRemaining(BooleanConsumer action){
         final BooleanDblLnkNode curr;

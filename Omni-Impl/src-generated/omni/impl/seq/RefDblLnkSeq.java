@@ -1,27 +1,27 @@
 package omni.impl.seq;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import omni.api.OmniDeque;
-import omni.api.OmniIterator;
+import omni.util.RefSortUtil;
 import omni.api.OmniList;
-import omni.api.OmniListIterator;
-import omni.impl.CheckedCollection;
 import omni.impl.RefDblLnkNode;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import omni.util.OmniArray;
 import omni.util.OmniPred;
-import omni.util.RefSortUtil;
+import java.util.function.Predicate;
+import java.util.function.IntFunction;
+import java.util.Comparator;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import omni.api.OmniDeque;
+import java.io.Externalizable;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectInput;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.ConcurrentModificationException;
+import omni.impl.CheckedCollection;
 public abstract class RefDblLnkSeq<E> extends 
 AbstractSeq<E>
  implements
@@ -400,7 +400,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -415,7 +415,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((byte)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -430,7 +430,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((char)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -445,7 +445,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((short)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -460,7 +460,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((int)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -475,7 +475,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((long)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -490,7 +490,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((float)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -505,7 +505,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((double)val));
+            return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return RefDblLnkNode.uncheckedcontainsNull(head,tail);
         } //end size check
@@ -631,7 +631,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -646,7 +646,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((byte)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -661,7 +661,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((char)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -676,7 +676,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((short)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -691,7 +691,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((int)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -706,7 +706,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((long)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -721,7 +721,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((float)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -736,7 +736,7 @@ AbstractSeq<E>
         if((head=this.head)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((double)val));
+            return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return RefDblLnkNode.uncheckedindexOfNull(head,tail);
         } //end size check
@@ -862,7 +862,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -877,7 +877,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((byte)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -892,7 +892,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((char)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -907,7 +907,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((short)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -922,7 +922,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((int)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -937,7 +937,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((long)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -952,7 +952,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((float)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -967,7 +967,7 @@ AbstractSeq<E>
         if((tail=this.tail)!=null)
         {
           if(val!=null){
-            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((double)val));
+            return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
           }
           return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
         } //end size check
@@ -1023,7 +1023,7 @@ AbstractSeq<E>
       this.parentOffset=parentOffset;
     }
     private Object writeReplace(){
-      return new UncheckedList<>(this.head,this.size,this.tail);
+      return new UncheckedList<E>(this.head,this.size,this.tail);
     }
     private void bubbleUpIncrementSize(){
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){
@@ -1124,7 +1124,7 @@ AbstractSeq<E>
     }
     @Override public void add(int index,E val){
       final UncheckedList<E> root;
-      final var newNode=new RefDblLnkNode<>(val);
+      final var newNode=new RefDblLnkNode<E>(val);
       if(++(root=this.root).size!=1){
         final int currSize;
         if((currSize=++this.size)!=1){
@@ -1145,19 +1145,19 @@ AbstractSeq<E>
         if(++this.size!=1){
           RefDblLnkNode<E> currTail,after;
           if((after=(currTail=this.tail).next)==null){
-            currTail.next=currTail=new RefDblLnkNode<>(currTail,val);
+            currTail.next=currTail=new RefDblLnkNode<E>(currTail,val);
             bubbleUpAppend(currTail);
             root.tail=currTail;
           }else{
-            bubbleUpAppend(currTail,currTail=new RefDblLnkNode<>(currTail,val,after));
+            bubbleUpAppend(currTail,currTail=new RefDblLnkNode<E>(currTail,val,after));
             after.prev=currTail;
           }
         }else{
-          bubbleUpInit(new RefDblLnkNode<>(val));
+          bubbleUpInit(new RefDblLnkNode<E>(val));
         }
       }else{
         RefDblLnkNode<E> newNode;
-        bubbleUpRootInit(newNode=new RefDblLnkNode<>(val));
+        bubbleUpRootInit(newNode=new RefDblLnkNode<E>(val));
         this.size=1;
         root.head=newNode;
         root.tail=newNode;
@@ -1241,7 +1241,7 @@ AbstractSeq<E>
     }
     private void peelTail(RefDblLnkNode<E> tail){
       RefDblLnkNode<E> after,before;
-      (before=tail.prev).next=after=tail.next;
+      (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1317,7 +1317,7 @@ AbstractSeq<E>
     }
     private void peelHead(RefDblLnkNode<E> head){
       RefDblLnkNode<E> after,before;
-      (after=head.next).prev=before=head.prev;
+      (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1710,7 +1710,7 @@ AbstractSeq<E>
       }
       UncheckedList<E> root;
       int size;
-      (root=this.root).size-=size=this.size;
+      (root=this.root).size-=(size=this.size);
       clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(RefDblLnkNode<E> head,RefDblLnkNode<E> tail,Predicate<? super E> filter
@@ -1738,9 +1738,9 @@ AbstractSeq<E>
       final int size;
       if((size=this.size)!=0){
         RefDblLnkNode<E> head,newTail;
-        final var newHead=newTail=new RefDblLnkNode<>((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<>(newTail,(head=head.next).val),++i){}
-        return new UncheckedList<>(newHead,size,newTail);
+        final var newHead=newTail=new RefDblLnkNode<E>((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<E>(newTail,(head=head.next).val),++i){}
+        return new UncheckedList<E>(newHead,size,newTail);
       }
       return new UncheckedList<E>();
     }
@@ -1762,7 +1762,7 @@ AbstractSeq<E>
         this.curr=parent.head;
       }
       @Override public Object clone(){
-        return new AscendingItr<>(this);
+        return new AscendingItr<E>(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -1817,7 +1817,7 @@ AbstractSeq<E>
         this.currIndex=currIndex;
       }
       @Override public Object clone(){
-        return new BidirectionalItr<>(this);
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         final RefDblLnkNode<E> curr;
@@ -1858,34 +1858,34 @@ AbstractSeq<E>
             RefDblLnkNode<E> after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new RefDblLnkNode<>(before,val,after);
+                before.next=before=new RefDblLnkNode<E>(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new RefDblLnkNode<>(val,after));
+                currList.bubbleUpPrepend(before=new RefDblLnkNode<E>(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
               RefDblLnkNode<E> newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new RefDblLnkNode<>(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new RefDblLnkNode<E>(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new RefDblLnkNode<>(before,val));
+                currList.bubbleUpAppend(newNode=new RefDblLnkNode<E>(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new RefDblLnkNode<>(val));
+            currList.bubbleUpInit(new RefDblLnkNode<E>(val));
           }
         }else{
           RefDblLnkNode<E> newNode;
-          currList.bubbleUpRootInit(newNode=new RefDblLnkNode<>(val));
+          currList.bubbleUpRootInit(newNode=new RefDblLnkNode<E>(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
@@ -1930,13 +1930,13 @@ AbstractSeq<E>
       }
     }
     @Override public OmniIterator.OfRef<E> iterator(){
-      return new AscendingItr<>(this);
+      return new AscendingItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(){
-      return new BidirectionalItr<>(this);
+      return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(int index){
-      return new BidirectionalItr<>(this,((RefDblLnkSeq<E>)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       final int subListSize;
@@ -1950,9 +1950,9 @@ AbstractSeq<E>
           subListHead=RefDblLnkNode.iterateAscending(this.head,fromIndex);
           subListTail=subListSize<=tailDist?RefDblLnkNode.iterateAscending(subListHead,subListSize-1):RefDblLnkNode.iterateDescending(this.tail,tailDist);
         }
-        return new UncheckedSubList<>(this,fromIndex,subListHead,subListSize,subListTail);
+        return new UncheckedSubList<E>(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new UncheckedSubList<>(this,fromIndex);
+      return new UncheckedSubList<E>(this,fromIndex);
     }
     @Override public boolean removeVal(boolean val){
       {
@@ -2072,7 +2072,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2087,7 +2087,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((byte)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2102,7 +2102,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((char)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2117,7 +2117,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((short)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2132,7 +2132,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((int)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2147,7 +2147,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((long)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2162,7 +2162,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((float)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2177,7 +2177,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((double)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2217,7 +2217,7 @@ AbstractSeq<E>
     }
     boolean uncheckedremoveValNull(RefDblLnkNode<E> head
     ){
-      if(null==head.val){
+      if(null==(head.val)){
         --root.size;
         if(--this.size==0){
           removeLastNode(head);
@@ -2228,7 +2228,7 @@ AbstractSeq<E>
       }else{
         for(final var tail=this.tail;tail!=head;){
           RefDblLnkNode<E> prev;
-          if(null==(head=(prev=head).next).val){
+          if(null==((head=(prev=head).next).val)){
             --root.size;
             --this.size;
             if(head==tail){
@@ -2362,7 +2362,7 @@ AbstractSeq<E>
       final CheckedList<E> root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       {
-        if(null==head.val){
+        if(null==(head.val)){
           root.modCount=++modCount;
           this.modCount=modCount;
           --root.size;
@@ -2375,7 +2375,7 @@ AbstractSeq<E>
         }
         for(final var tail=this.tail;head!=tail;){
           RefDblLnkNode<E> prev;
-          if(null==(head=(prev=head).next).val){
+          if(null==((head=(prev=head).next).val)){
             root.modCount=++modCount;
             this.modCount=modCount;
             --root.size;
@@ -2433,18 +2433,18 @@ AbstractSeq<E>
     }
     @Override public OmniIterator.OfRef<E> iterator(){
       CheckedCollection.checkModCount(modCount,root.modCount);
-      return new BidirectionalItr<>(this);
+      return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(){
       CheckedCollection.checkModCount(modCount,root.modCount);
-      return new BidirectionalItr<>(this);
+      return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(int index){
       CheckedCollection.checkModCount(modCount,root.modCount);
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr<>(this,((RefDblLnkSeq<E>)this).getItrNode(index,size),index);
+      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,size),index);
     }
     private static class BidirectionalItr<E>
       implements OmniListIterator.OfRef<E>{
@@ -2472,7 +2472,7 @@ AbstractSeq<E>
         this.currIndex=currIndex;
       }
       @Override public Object clone(){
-        return new BidirectionalItr<>(this);
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         final CheckedSubList<E> parent;
@@ -2589,34 +2589,34 @@ AbstractSeq<E>
             RefDblLnkNode<E> after,before;
             if((after=this.curr)!=null){
               if((before=after.prev)!=null){
-                before.next=before=new RefDblLnkNode<>(before,val,after);
+                before.next=before=new RefDblLnkNode<E>(before,val,after);
                 if(after==currList.head){
                   currList.bubbleUpPrepend(after,before);
                 }else{
                   currList.bubbleUpIncrementSize();
                 }
               }else{
-                currList.bubbleUpPrepend(before=new RefDblLnkNode<>(val,after));
+                currList.bubbleUpPrepend(before=new RefDblLnkNode<E>(val,after));
                 root.head=before;
               }
               after.prev=before;
             }else{
               RefDblLnkNode<E> newNode;
               if((after=(before=currList.tail).next)!=null){
-                currList.bubbleUpAppend(before,newNode=new RefDblLnkNode<>(before,val,after));
+                currList.bubbleUpAppend(before,newNode=new RefDblLnkNode<E>(before,val,after));
                 after.prev=newNode;
               }else{
-                currList.bubbleUpAppend(newNode=new RefDblLnkNode<>(before,val));
+                currList.bubbleUpAppend(newNode=new RefDblLnkNode<E>(before,val));
                 root.tail=newNode;
               }
               before.next=newNode;
             }
           }else{
-            currList.bubbleUpInit(new RefDblLnkNode<>(val));
+            currList.bubbleUpInit(new RefDblLnkNode<E>(val));
           }
         }else{
           RefDblLnkNode<E> newNode;
-          currList.bubbleUpRootInit(newNode=new RefDblLnkNode<>(val));
+          currList.bubbleUpRootInit(newNode=new RefDblLnkNode<E>(val));
           currList.size=1;
           root.head=newNode;
           root.tail=newNode;
@@ -2636,18 +2636,18 @@ AbstractSeq<E>
           subListHead=RefDblLnkNode.iterateAscending(this.head,fromIndex);
           subListTail=subListSize<=tailDist?RefDblLnkNode.iterateAscending(subListHead,subListSize-1):RefDblLnkNode.iterateDescending(this.tail,tailDist);
         }
-        return new CheckedSubList<>(this,fromIndex,subListHead,subListSize,subListTail);
+        return new CheckedSubList<E>(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new CheckedSubList<>(this,fromIndex);
+      return new CheckedSubList<E>(this,fromIndex);
     }
     @Override public Object clone(){
       CheckedCollection.checkModCount(modCount,root.modCount);
       final int size;
       if((size=this.size)!=0){
         RefDblLnkNode<E> head,newTail;
-        final var newHead=newTail=new RefDblLnkNode<>((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<>(newTail,(head=head.next).val),++i){}
-        return new CheckedList<>(newHead,size,newTail);
+        final var newHead=newTail=new RefDblLnkNode<E>((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<E>(newTail,(head=head.next).val),++i){}
+        return new CheckedList<E>(newHead,size,newTail);
       }
       return new CheckedList<E>();
     }
@@ -2778,7 +2778,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2794,7 +2794,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((byte)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2810,7 +2810,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((char)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2826,7 +2826,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((short)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2842,7 +2842,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((int)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2858,7 +2858,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((long)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2874,7 +2874,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((float)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -2890,7 +2890,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((double)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -3031,7 +3031,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3047,7 +3047,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((byte)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3063,7 +3063,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((char)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3079,7 +3079,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((short)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3095,7 +3095,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((int)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3111,7 +3111,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((long)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3127,7 +3127,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((float)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3143,7 +3143,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((double)val));
+              return RefDblLnkNode.uncheckedindexOf(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return RefDblLnkNode.uncheckedindexOfNull(head,tail);
           } //end size check
@@ -3283,7 +3283,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3299,7 +3299,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((byte)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3315,7 +3315,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((char)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3331,7 +3331,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((short)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3347,7 +3347,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((int)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3363,7 +3363,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((long)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3379,7 +3379,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((float)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3395,7 +3395,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((double)val));
+              return RefDblLnkNode.uncheckedlastIndexOf(size,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return RefDblLnkNode.uncheckedlastIndexOfNull(size,tail);
           } //end size check
@@ -3535,7 +3535,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3551,7 +3551,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((byte)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3567,7 +3567,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((char)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3583,7 +3583,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((short)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3599,7 +3599,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((int)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3615,7 +3615,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((long)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3631,7 +3631,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((float)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3647,7 +3647,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((double)val));
+              return RefDblLnkNode.uncheckedcontains(head,tail,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return RefDblLnkNode.uncheckedcontainsNull(head,tail);
           } //end size check
@@ -3668,7 +3668,7 @@ AbstractSeq<E>
         this.modCountChecker=modCountChecker;
       }
       private Object readResolve(){
-        return new CheckedList<>(head,size,tail);
+        return new CheckedList<E>(head,size,tail);
       }
       @SuppressWarnings("unchecked")
       private void readObject(ObjectInputStream ois) throws IOException
@@ -3678,7 +3678,7 @@ AbstractSeq<E>
         this.size=size=ois.readInt();
         if(size!=0){
           RefDblLnkNode<E> curr;
-          for(this.head=curr=new RefDblLnkNode<>((E)ois.readObject());--size!=0;curr=curr.next=new RefDblLnkNode<>(curr,(E)ois.readObject())){}
+          for(this.head=curr=new RefDblLnkNode<E>((E)ois.readObject());--size!=0;curr=curr.next=new RefDblLnkNode<E>(curr,(E)ois.readObject())){}
           this.tail=curr;
         }
       }
@@ -3701,7 +3701,7 @@ AbstractSeq<E>
       }
     }
     private Object writeReplace(){
-      return new SerializableSubList<>(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
+      return new SerializableSubList<E>(this.head,this.size,this.tail,root.new ModCountChecker(this.modCount));
     }   
     private static <E> RefDblLnkNode<E> pullSurvivorsDown(RefDblLnkNode<E> prev,long[] survivorSet,int numSurvivors,int numRemoved){
       int wordOffset;
@@ -3833,7 +3833,7 @@ AbstractSeq<E>
     }
     private void peelTail(RefDblLnkNode<E> tail){
       RefDblLnkNode<E> after,before;
-      (before=tail.prev).next=after=tail.next;
+      (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3915,7 +3915,7 @@ AbstractSeq<E>
     }
     private void peelHead(RefDblLnkNode<E> head){
       RefDblLnkNode<E> after,before;
-      (after=head.next).prev=before=head.prev;
+      (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -4340,7 +4340,7 @@ AbstractSeq<E>
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
-          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             if((newHead=pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft))!=null){
               newHead.next=newTail;
               newTail.prev=newHead;
@@ -4534,7 +4534,7 @@ AbstractSeq<E>
       CheckedCollection.checkWriteHi(index,currSize=this.size);
       root.modCount=++modCount;
       this.modCount=modCount;
-      final var newNode=new RefDblLnkNode<>(val);
+      final var newNode=new RefDblLnkNode<E>(val);
       if(++root.size!=1){
         this.size=++currSize;
         if(currSize!=1){    
@@ -4559,19 +4559,19 @@ AbstractSeq<E>
         if(++this.size!=1){
           RefDblLnkNode<E> currTail,after;
           if((after=(currTail=this.tail).next)==null){
-            currTail.next=currTail=new RefDblLnkNode<>(currTail,val);
+            currTail.next=currTail=new RefDblLnkNode<E>(currTail,val);
             bubbleUpAppend(currTail);
             root.tail=currTail;
           }else{
-            bubbleUpAppend(currTail,currTail=new RefDblLnkNode<>(currTail,val,after));
+            bubbleUpAppend(currTail,currTail=new RefDblLnkNode<E>(currTail,val,after));
             after.prev=currTail;
           }
         }else{
-          bubbleUpInit(new RefDblLnkNode<>(val));
+          bubbleUpInit(new RefDblLnkNode<E>(val));
         }
       }else{
         RefDblLnkNode<E> newNode;
-        bubbleUpRootInit(newNode=new RefDblLnkNode<>(val));
+        bubbleUpRootInit(newNode=new RefDblLnkNode<E>(val));
         this.size=1;
         root.head=newNode;
         root.tail=newNode;
@@ -4959,12 +4959,12 @@ AbstractSeq<E>
         var tail=this.tail;
         if(size==1){
           //the insertion point IS the tail
-          tail.next=tail=new RefDblLnkNode<>(tail,val);
+          tail.next=tail=new RefDblLnkNode<E>(tail,val);
           this.tail=tail;
         }else{
           //iterate from the tail and insert
           RefDblLnkNode<E> before;
-          (before=(tail=RefDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new RefDblLnkNode<>(before,val,tail);
+          (before=(tail=RefDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new RefDblLnkNode<E>(before,val,tail);
           tail.prev=before;
         }
       }else{
@@ -4972,16 +4972,16 @@ AbstractSeq<E>
         RefDblLnkNode<E> head;
         if((head=this.head)==null){
           //initialize the list
-          this.head=head=new RefDblLnkNode<>(val);
+          this.head=head=new RefDblLnkNode<E>(val);
           this.tail=head;
         }else if(index==0){
           //the insertion point IS the head
-          head.prev=head=new RefDblLnkNode<>(val,head);
+          head.prev=head=new RefDblLnkNode<E>(val,head);
           this.head=head;
         }else{
           //iterate from the head and insert
           RefDblLnkNode<E> after;
-          (after=(head=RefDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new RefDblLnkNode<>(head,val,after);
+          (after=(head=RefDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new RefDblLnkNode<E>(head,val,after);
           head.next=after;
         }
       }
@@ -5291,7 +5291,7 @@ AbstractSeq<E>
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -5357,9 +5357,9 @@ AbstractSeq<E>
       final int size;
       if((size=this.size)!=0){
         RefDblLnkNode<E> head,newTail;
-        final var newHead=newTail=new RefDblLnkNode<>((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<>(newTail,(head=head.next).val),++i){}
-        return new CheckedList<>(newHead,size,newTail);
+        final var newHead=newTail=new RefDblLnkNode<E>((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<E>(newTail,(head=head.next).val),++i){}
+        return new CheckedList<E>(newHead,size,newTail);
       }
       return new CheckedList<E>();
     }
@@ -5368,19 +5368,19 @@ AbstractSeq<E>
       return false;
     }
     @Override public OmniIterator.OfRef<E> descendingIterator(){
-      return new DescendingItr<>(this);
+      return new DescendingItr<E>(this);
     }
     @Override public OmniIterator.OfRef<E> iterator(){
-      return new BidirectionalItr<>(this);
+      return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(){
-      return new BidirectionalItr<>(this);
+      return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
-      return new BidirectionalItr<>(this,((RefDblLnkSeq<E>)this).getItrNode(index,size),index);
+      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,size),index);
     }
     @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       int tailDist;
@@ -5394,9 +5394,9 @@ AbstractSeq<E>
           subListHead=RefDblLnkNode.iterateAscending(this.head,fromIndex);
           subListTail=subListSize<=tailDist?RefDblLnkNode.iterateAscending(subListHead,subListSize-1):RefDblLnkNode.iterateDescending(this.tail,tailDist);
         }
-        return new CheckedSubList<>(this,fromIndex,subListHead,subListSize,subListTail);
+        return new CheckedSubList<E>(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new CheckedSubList<>(this,fromIndex);
+      return new CheckedSubList<E>(this,fromIndex);
     } 
     @Override public int search(Object val){
       final RefDblLnkNode<E> head;
@@ -5458,7 +5458,6 @@ AbstractSeq<E>
       }
       return -1;
     }
-    @Override
     boolean uncheckedremoveLastOccurrenceNonNull(RefDblLnkNode<E> tail
     ,Object nonNull
     ){
@@ -5506,11 +5505,10 @@ AbstractSeq<E>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
-    @Override
     boolean uncheckedremoveLastOccurrenceNull(RefDblLnkNode<E> tail
     ){
       {
-        if(null==tail.val){
+        if(null==(tail.val)){
           this.modCount=modCount+1;
           if((tail=tail.prev)==null){
             this.head=null;
@@ -5523,7 +5521,7 @@ AbstractSeq<E>
           return true;
         }
         for(RefDblLnkNode<E> next;(tail=(next=tail).prev)!=null;){
-          if(null==tail.val){
+          if(null==(tail.val)){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
               this.head=next;
@@ -5539,7 +5537,6 @@ AbstractSeq<E>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveLastOccurrence(RefDblLnkNode<E> tail
     ,Predicate<? super E> pred
     ){
@@ -5573,7 +5570,6 @@ AbstractSeq<E>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveValNonNull(RefDblLnkNode<E> head
     ,Object nonNull
     ){
@@ -5618,11 +5614,10 @@ AbstractSeq<E>
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
     }
-    @Override
     boolean uncheckedremoveValNull(RefDblLnkNode<E> head
     ){
       {
-        if(null==head.val){
+        if(null==(head.val)){
           ++this.modCount;
           if(--size==0){
             this.head=null;
@@ -5634,7 +5629,7 @@ AbstractSeq<E>
           return true;
         }
         for(RefDblLnkNode<E> prev;(head=(prev=head).next)!=null;){
-          if(null==head.val){
+          if(null==(head.val)){
             ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
@@ -5650,7 +5645,6 @@ AbstractSeq<E>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveVal(RefDblLnkNode<E> head
     ,Predicate<? super E> pred
     ){
@@ -5687,7 +5681,7 @@ AbstractSeq<E>
       RefDblLnkNode<E> head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=head.val;
+        final var ret=(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5703,7 +5697,7 @@ AbstractSeq<E>
       RefDblLnkNode<E> tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=tail.val;
+        final var ret=(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5743,7 +5737,7 @@ AbstractSeq<E>
         this.currIndex=currIndex;
       }
       @Override public Object clone(){
-        return new DescendingItr<>(this);
+        return new DescendingItr<E>(this);
       }
       @Override public boolean hasNext(){
         return this.curr!=null;
@@ -5816,7 +5810,7 @@ AbstractSeq<E>
         super(parent,curr,currIndex);
       }
       @Override public Object clone(){
-        return new BidirectionalItr<>(this);
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         CheckedCollection.checkModCount(modCount,parent.modCount);
@@ -5870,18 +5864,18 @@ AbstractSeq<E>
         final int currIndex;
         if((currIndex=++this.currIndex)==++parent.size){
           if(currIndex==1){
-            parent.head=newNode=new RefDblLnkNode<>(val);
+            parent.head=newNode=new RefDblLnkNode<E>(val);
           }else{
-            (newNode=parent.tail).next=newNode=new RefDblLnkNode<>(newNode,val);
+            (newNode=parent.tail).next=newNode=new RefDblLnkNode<E>(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new RefDblLnkNode<>(val,newNode);
+            (newNode=parent.head).prev=newNode=new RefDblLnkNode<E>(val,newNode);
             parent.head=newNode;
           }else{
             final RefDblLnkNode<E> tmp;
-            (newNode=curr).prev=newNode=new RefDblLnkNode<>(tmp=newNode.prev,val,newNode);
+            (newNode=curr).prev=newNode=new RefDblLnkNode<E>(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }
@@ -6027,12 +6021,12 @@ AbstractSeq<E>
         var tail=this.tail;
         if(size==1){
           //the insertion point IS the tail
-          tail.next=tail=new RefDblLnkNode<>(tail,val);
+          tail.next=tail=new RefDblLnkNode<E>(tail,val);
           this.tail=tail;
         }else{
           //iterate from the tail and insert
           RefDblLnkNode<E> before;
-          (before=(tail=RefDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new RefDblLnkNode<>(before,val,tail);
+          (before=(tail=RefDblLnkNode.iterateDescending(tail,size-2)).prev).next=before=new RefDblLnkNode<E>(before,val,tail);
           tail.prev=before;
         }
       }else{
@@ -6040,16 +6034,16 @@ AbstractSeq<E>
         RefDblLnkNode<E> head;
         if((head=this.head)==null){
           //initialize the list
-          this.head=head=new RefDblLnkNode<>(val);
+          this.head=head=new RefDblLnkNode<E>(val);
           this.tail=head;
         }else if(index==0){
           //the insertion point IS the head
-          head.prev=head=new RefDblLnkNode<>(val,head);
+          head.prev=head=new RefDblLnkNode<E>(val,head);
           this.head=head;
         }else{
           //iterate from the head and insert
           RefDblLnkNode<E> after;
-          (after=(head=RefDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new RefDblLnkNode<>(head,val,after);
+          (after=(head=RefDblLnkNode.iterateAscending(head,index-1)).next).prev=after=new RefDblLnkNode<E>(head,val,after);
           head.next=after;
         }
       }
@@ -6057,9 +6051,9 @@ AbstractSeq<E>
     @Override public void addLast(E val){
       RefDblLnkNode<E> tail;
       if((tail=this.tail)==null){
-        this.head=tail=new RefDblLnkNode<>(val);
+        this.head=tail=new RefDblLnkNode<E>(val);
       }else{
-        tail.next=tail=new RefDblLnkNode<>(tail,val);
+        tail.next=tail=new RefDblLnkNode<E>(tail,val);
       }
       this.tail=tail;
       ++this.size;
@@ -6067,9 +6061,9 @@ AbstractSeq<E>
     @Override public void push(E val){
       RefDblLnkNode<E> head;
       if((head=this.head)==null){
-        tail=head=new RefDblLnkNode<>(val);
+        tail=head=new RefDblLnkNode<E>(val);
       }else{
-        head.prev=head=new RefDblLnkNode<>(val,head);
+        head.prev=head=new RefDblLnkNode<E>(val,head);
       }
       this.head=head;
       ++this.size;
@@ -6093,7 +6087,7 @@ AbstractSeq<E>
       this.size=size=in.readInt();
       if(size!=0){
         RefDblLnkNode<E> curr;
-        for(this.head=curr=new RefDblLnkNode<>((E)in.readObject());--size!=0;curr=curr.next=new RefDblLnkNode<>(curr,(E)in.readObject())){}
+        for(this.head=curr=new RefDblLnkNode<E>((E)in.readObject());--size!=0;curr=curr.next=new RefDblLnkNode<E>(curr,(E)in.readObject())){}
         this.tail=curr;
       }
     }
@@ -6101,9 +6095,9 @@ AbstractSeq<E>
       final int size;
       if((size=this.size)!=0){
         RefDblLnkNode<E> head,newTail;
-        final var newHead=newTail=new RefDblLnkNode<>((head=this.head).val);
-        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<>(newTail,(head=head.next).val),++i){}
-        return new UncheckedList<>(newHead,size,newTail);
+        final var newHead=newTail=new RefDblLnkNode<E>((head=this.head).val);
+        for(int i=1;i!=size;newTail=newTail.next=new RefDblLnkNode<E>(newTail,(head=head.next).val),++i){}
+        return new UncheckedList<E>(newHead,size,newTail);
       }
       return new UncheckedList<E>();
     }
@@ -6229,7 +6223,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6244,7 +6238,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((byte)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6259,7 +6253,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((char)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6274,7 +6268,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((short)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6289,7 +6283,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((int)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6304,7 +6298,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((long)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6319,7 +6313,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((float)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6334,7 +6328,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((double)val));
+              return uncheckedremoveVal(head,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return uncheckedremoveValNull(head);
           } //end size check
@@ -6375,7 +6369,7 @@ AbstractSeq<E>
     boolean uncheckedremoveValNull(RefDblLnkNode<E> head
     ){
       {
-        if(null==head.val){
+        if(null==(head.val)){
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -6386,7 +6380,7 @@ AbstractSeq<E>
           return true;
         }
         for(RefDblLnkNode<E> prev;(head=(prev=head).next)!=null;){
-          if(null==head.val){
+          if(null==(head.val)){
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -6432,16 +6426,16 @@ AbstractSeq<E>
       return false;
     }
     @Override public OmniIterator.OfRef<E> descendingIterator(){
-      return new DescendingItr<>(this);
+      return new DescendingItr<E>(this);
     }
     @Override public OmniIterator.OfRef<E> iterator(){
-      return new AscendingItr<>(this);
+      return new AscendingItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(){
-      return new BidirectionalItr<>(this);
+      return new BidirectionalItr<E>(this);
     }
     @Override public OmniListIterator.OfRef<E> listIterator(int index){
-      return new BidirectionalItr<>(this,((RefDblLnkSeq<E>)this).getItrNode(index,this.size),index);
+      return new BidirectionalItr<E>(this,((RefDblLnkSeq<E>)this).getItrNode(index,this.size),index);
     }
     @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
       final int subListSize;
@@ -6455,23 +6449,23 @@ AbstractSeq<E>
           subListHead=RefDblLnkNode.iterateAscending(this.head,fromIndex);
           subListTail=subListSize<=tailDist?RefDblLnkNode.iterateAscending(subListHead,subListSize-1):RefDblLnkNode.iterateDescending(this.tail,tailDist);
         }
-        return new UncheckedSubList<>(this,fromIndex,subListHead,subListSize,subListTail);
+        return new UncheckedSubList<E>(this,fromIndex,subListHead,subListSize,subListTail);
       }
-      return new UncheckedSubList<>(this,fromIndex);
+      return new UncheckedSubList<E>(this,fromIndex);
     }
     @Override public E getLast(){
       return tail.val;
     }
     @Override public boolean offerFirst(E val){
-      push(val);
+      push((E)val);
       return true;
     }
     @Override public boolean offerLast(E val){
-      addLast(val);
+      addLast((E)val);
       return true;
     }
     @Override public void addFirst(E val){
-      push(val);
+      push((E)val);
     }
     @Override public E removeFirst(){
       return pop();
@@ -6483,7 +6477,7 @@ AbstractSeq<E>
       return head.val;
     }
     @Override public boolean offer(E val){
-      addLast(val);
+      addLast((E)val);
       return true;
     }
     @Override public int search(boolean val){
@@ -6604,7 +6598,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6619,7 +6613,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((byte)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6634,7 +6628,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((char)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6649,7 +6643,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((short)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6664,7 +6658,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((int)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6679,7 +6673,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((long)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6694,7 +6688,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((float)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6709,7 +6703,7 @@ AbstractSeq<E>
           if((head=this.head)!=null)
           {
             if(val!=null){
-              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((double)val));
+              return RefDblLnkNode.uncheckedsearch(head,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return RefDblLnkNode.uncheckedsearchNull(head);
           } //end size check
@@ -6835,7 +6829,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((boolean)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((boolean)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6850,7 +6844,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((byte)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((byte)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6865,7 +6859,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((char)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((char)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6880,7 +6874,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((short)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((short)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6895,7 +6889,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((int)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((int)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6910,7 +6904,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((long)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((long)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6925,7 +6919,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((float)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((float)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6940,7 +6934,7 @@ AbstractSeq<E>
           if((tail=this.tail)!=null)
           {
             if(val!=null){
-              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((double)val));
+              return uncheckedremoveLastOccurrence(tail,OmniPred.OfRef.getEqualsPred((double)(val)));
             }
             return uncheckedremoveLastOccurrenceNull(tail);
           } //end size check
@@ -6982,7 +6976,7 @@ AbstractSeq<E>
     boolean uncheckedremoveLastOccurrenceNull(RefDblLnkNode<E> tail
     ){
       {
-        if(null==tail.val){
+        if(null==(tail.val)){
           if((tail=tail.prev)==null){
             this.head=null;
             this.tail=null;
@@ -6994,7 +6988,7 @@ AbstractSeq<E>
           return true;
         }
         for(RefDblLnkNode<E> next;(tail=(next=tail).prev)!=null;){
-          if(null==tail.val){
+          if(null==(tail.val)){
             if((tail=tail.prev)==null){
               this.head=next;
               next.prev=null;
@@ -7055,7 +7049,7 @@ AbstractSeq<E>
     @Override public E poll(){
       RefDblLnkNode<E> head;
       if((head=this.head)!=null){
-        final var ret=head.val;
+        final var ret=(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -7070,7 +7064,7 @@ AbstractSeq<E>
     @Override public E pollLast(){
       RefDblLnkNode<E> tail;
       if((tail=this.tail)!=null){
-        final var ret=tail.val;
+        final var ret=(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -7085,14 +7079,14 @@ AbstractSeq<E>
     @Override public E peek(){
       final RefDblLnkNode<E> head;
       if((head=this.head)!=null){
-        return head.val;
+        return (head.val);
       }
       return null;
     }
     @Override public E peekLast(){
       final RefDblLnkNode<E> tail;
       if((tail=this.tail)!=null){
-        return tail.val;
+        return (tail.val);
       }
       return null;
     }
@@ -7170,7 +7164,7 @@ AbstractSeq<E>
         super(parent,parent.tail);
       }
       @Override public Object clone(){
-        return new DescendingItr<>(this);
+        return new DescendingItr<E>(this);
       }
       @Override public void remove(){
         final UncheckedList<E> parent;
@@ -7221,7 +7215,7 @@ AbstractSeq<E>
         this.curr=parent.head;
       }
       @Override public Object clone(){
-        return new AscendingItr<>(this);
+        return new AscendingItr<E>(this);
       }
       @Override public boolean hasNext(){
         return curr!=null;
@@ -7255,7 +7249,6 @@ AbstractSeq<E>
       }
       void uncheckedForEachRemaining(RefDblLnkNode<E> curr,Consumer<? super E> action){
         RefDblLnkNode.uncheckedForEachAscending(curr,action);
-        this.curr=null;
       }
       @Override public void forEachRemaining(Consumer<? super E> action){
         final RefDblLnkNode<E> curr;
@@ -7281,7 +7274,7 @@ AbstractSeq<E>
         this.currIndex=currIndex;
       }
       @Override public Object clone(){
-        return new BidirectionalItr<>(this);
+        return new BidirectionalItr<E>(this);
       }
       @Override public E next(){
         final RefDblLnkNode<E> curr;
@@ -7312,18 +7305,18 @@ AbstractSeq<E>
         final int currIndex;
         if((currIndex=++this.currIndex)==++(parent=this.parent).size){
           if(currIndex==1){
-            parent.head=newNode=new RefDblLnkNode<>(val);
+            parent.head=newNode=new RefDblLnkNode<E>(val);
           }else{
-            (newNode=parent.tail).next=newNode=new RefDblLnkNode<>(newNode,val);
+            (newNode=parent.tail).next=newNode=new RefDblLnkNode<E>(newNode,val);
           }
           parent.tail=newNode;
         }else{
           if(currIndex==1){
-            (newNode=parent.head).prev=newNode=new RefDblLnkNode<>(val,newNode);
+            (newNode=parent.head).prev=newNode=new RefDblLnkNode<E>(val,newNode);
             parent.head=newNode;
           }else{
             final RefDblLnkNode<E> tmp;
-            (newNode=curr).prev=newNode=new RefDblLnkNode<>(tmp=newNode.prev,val,newNode);
+            (newNode=curr).prev=newNode=new RefDblLnkNode<E>(tmp=newNode.prev,val,newNode);
             tmp.next=newNode;
           }
         }

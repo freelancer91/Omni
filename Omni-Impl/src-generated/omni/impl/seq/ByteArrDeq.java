@@ -1149,7 +1149,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
         for(index=head,bound=arr.length-1;;++index){
           if(val==(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<((tailDist=bound-index)+tail)){
+            if((headDist=index-head)<=((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
               this.head=(head>bound)?0:head;
             }else{
@@ -1229,7 +1229,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
             for(index=bound;;--index){
               if(val==(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                   ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
                   this.head=(head>bound)?0:head;
                 }else{
@@ -1239,7 +1239,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
                   this.tail=(--tail==-1)?bound:tail;
                 }
                 return true;
-              }else if(index==tail){
+              }else if(index==head){
                 break;
               }
             }
@@ -1755,7 +1755,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
       int arrBound;
       if((arrBound=(arr=root.arr).length-1)==cursor){
         //remove index 0
-        if(tail<=(cursor=arrBound-head)){
+        if(tail<=(cursor=arrBound-head)+1){
           root.tail=fragmentedPullDown(arr,arrBound,tail);
         }else{
           arr[0]=arr[arrBound];
@@ -3872,7 +3872,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
         if((headDist=lastRet-head)>=0){
           if(headDist<=(tailDist=arrBound-lastRet)+tail+1){
             if(headDist==0){
-              if(lastRet==arrBound){
+              if(tailDist==0){
                 root.head=0;
               }else{
                 root.head=head+1;
@@ -4322,7 +4322,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
             if(val==(arr[index])){
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<((tailDist=bound-index)+tail)){
+              if((headDist=index-head)<=((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
                 this.head=(head>bound)?0:head;
               }else{
@@ -4407,7 +4407,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
                 if(val==(arr[index])){
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                  if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                     ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
                     this.head=(head>bound)?0:head;
                   }else{
@@ -4417,7 +4417,7 @@ public class ByteArrDeq implements OmniDeque.OfByte,Externalizable,Cloneable,Ran
                     this.tail=(--tail==-1)?bound:tail;
                   }
                   return true;
-                }else if(index==tail){
+                }else if(index==head){
                   break;
                 }
               }

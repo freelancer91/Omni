@@ -1037,7 +1037,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         for(index=head,bound=arr.length-1;;++index){
           if(nonNull.equals(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<((tailDist=bound-index)+tail)){
+            if((headDist=index-head)<=((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
               arr[head]=null;
               this.head=(tail>bound)?0:tail;
@@ -1108,7 +1108,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         for(index=head,bound=arr.length-1;;++index){
           if(null==(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<((tailDist=bound-index)+tail)){
+            if((headDist=index-head)<=((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
               arr[head]=null;
               this.head=(tail>bound)?0:tail;
@@ -1180,7 +1180,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         for(index=head,bound=arr.length-1;;++index){
           if(pred.test(arr[index])){
             int headDist,tailDist;
-            if((headDist=index-head)<((tailDist=bound-index)+tail)){
+            if((headDist=index-head)<=((tailDist=bound-index)+tail)){
               ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
               arr[head]=null;
               this.head=(tail>bound)?0:tail;
@@ -1268,7 +1268,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             for(index=bound;;--index){
               if(nonNull.equals(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                   ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                   arr[head]=null;
                   this.head=(tail>bound)?0:tail;
@@ -1280,7 +1280,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   this.tail=(--tail==-1)?bound:tail;
                 }
                 return true;
-              }else if(index==tail){
+              }else if(index==head){
                 break;
               }
             }
@@ -1339,7 +1339,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             for(index=bound;;--index){
               if(null==(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                   ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                   arr[head]=null;
                   this.head=(tail>bound)?0:tail;
@@ -1351,7 +1351,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   this.tail=(--tail==-1)?bound:tail;
                 }
                 return true;
-              }else if(index==tail){
+              }else if(index==head){
                 break;
               }
             }
@@ -1411,7 +1411,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             for(index=bound;;--index){
               if(pred.test(arr[index])){
                 int headDist,tailDist;
-                if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                   ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                   arr[head]=null;
                   this.head=(tail>bound)?0:tail;
@@ -1423,7 +1423,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   this.tail=(--tail==-1)?bound:tail;
                 }
                 return true;
-              }else if(index==tail){
+              }else if(index==head){
                 break;
               }
             }
@@ -1993,7 +1993,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
       int arrBound;
       if((arrBound=(arr=root.arr).length-1)==cursor){
         //remove index 0
-        if(tail<=(cursor=arrBound-head)){
+        if(tail<=(cursor=arrBound-head)+1){
           root.tail=fragmentedPullDown(arr,arrBound,tail);
         }else{
           arr[0]=arr[arrBound];
@@ -4276,7 +4276,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
         if((headDist=lastRet-head)>=0){
           if(headDist<=(tailDist=arrBound-lastRet)+tail+1){
             if(headDist==0){
-              if(lastRet==arrBound){
+              if(tailDist==0){
                 root.head=0;
               }else{
                 root.head=head+1;
@@ -4605,7 +4605,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
               CheckedCollection.checkModCount(modCount,this.modCount);
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<((tailDist=bound-index)+tail)){
+              if((headDist=index-head)<=((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
                 this.head=(tail>bound)?0:tail;
@@ -4688,7 +4688,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             if(null==(arr[index])){
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<((tailDist=bound-index)+tail)){
+              if((headDist=index-head)<=((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
                 this.head=(tail>bound)?0:tail;
@@ -4764,7 +4764,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
             if(pred.test(arr[index])){
               this.modCount=modCount+1;
               int headDist,tailDist;
-              if((headDist=index-head)<((tailDist=bound-index)+tail)){
+              if((headDist=index-head)<=((tailDist=bound-index)+tail)){
                 ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                 arr[head]=null;
                 this.head=(tail>bound)?0:tail;
@@ -4861,7 +4861,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                   CheckedCollection.checkModCount(modCount,this.modCount);
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                  if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                     arr[head]=null;
                     this.head=(tail>bound)?0:tail;
@@ -4873,7 +4873,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                     this.tail=(--tail==-1)?bound:tail;
                   }
                   return true;
-                }else if(index==tail){
+                }else if(index==head){
                   break;
                 }
               }
@@ -4943,7 +4943,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 if(null==(arr[index])){
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                  if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                     arr[head]=null;
                     this.head=(tail>bound)?0:tail;
@@ -4955,7 +4955,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                     this.tail=(--tail==-1)?bound:tail;
                   }
                   return true;
-                }else if(index==tail){
+                }else if(index==head){
                   break;
                 }
               }
@@ -5019,7 +5019,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                 if(pred.test(arr[index])){
                   this.modCount=modCount+1;
                   int headDist,tailDist;
-                  if((headDist=index-head)<((tailDist=bound-index)+tail)){
+                  if((headDist=index-head)<=(tailDist=bound-index)+tail+1){
                     ArrCopy.semicheckedCopy(arr,head,arr,tail=head+1,headDist);
                     arr[head]=null;
                     this.head=(tail>bound)?0:tail;
@@ -5031,7 +5031,7 @@ public class RefArrDeq<E> implements OmniDeque.OfRef<E>,Externalizable,Cloneable
                     this.tail=(--tail==-1)?bound:tail;
                   }
                   return true;
-                }else if(index==tail){
+                }else if(index==head){
                   break;
                 }
               }

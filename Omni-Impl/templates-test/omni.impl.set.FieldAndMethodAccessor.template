@@ -248,6 +248,7 @@ static interface CLASSPREFIXOpenAddressHashSet
   #ENDIF
   #IFSWITCH CLASSPREFIX==Ref
   public static final Object DELETED=getValue(prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet","DELETED"),null);
+  public static final Object NULL=getValue(prepareFieldForClassName("omni.impl.set.CLASSPREFIXOpenAddressHashSet","NULL"),null);
   #ENDIF
   
   public static int size(Object obj){

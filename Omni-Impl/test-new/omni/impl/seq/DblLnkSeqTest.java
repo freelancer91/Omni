@@ -7873,11 +7873,10 @@ public class DblLnkSeqTest{
                                                             case 0:
                                                                 continue;
                                                             case 4:
-                                                                if(position != 0.5d){
-                                                                    break;
+                                                                if(position == 0.5d){
+                                                                    continue;
                                                                 }
                                                             default:
-                                                                continue;
                                                             }
                                                         }else if(initParams.totalPreAlloc != 0
                                                                 || initParams.totalPostAlloc != 0){

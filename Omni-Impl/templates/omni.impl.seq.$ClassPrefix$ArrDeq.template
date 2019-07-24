@@ -919,7 +919,7 @@ public class $ClassPrefix$ArrDeq$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$,
       int arrBound;
       if((arrBound=(arr=root.arr).length-1)==cursor){
         //remove index 0
-        if(tail<=(cursor=arrBound-head)){
+        if(tail<=(cursor=arrBound-head)+1){
           root.tail=fragmentedPullDown(arr,arrBound,tail);
         }else{
           arr[0]=arr[arrBound];
@@ -4063,7 +4063,7 @@ boolean uncheckedremoveLastOccurrenceSUFFIX(int tail
                 this.tail=(--tail==-1)?bound:tail;
               }
               return true;
-            }else if(index==tail){
+            }else if(index==head){
               break;
             }
           }

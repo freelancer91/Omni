@@ -102,7 +102,7 @@ public enum StructType{
     private static EnumSet<MonitoredRemoveIfPredicateGen> initValidMonitoredRemoveIfPredicateGens(
             StructType structType){
         switch(structType.name){
-        case "ArrDeq":
+        
         case "ArrList":
         case "ArrStack":
         case "ByteSetImpl":
@@ -121,6 +121,7 @@ public enum StructType{
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection,
                     MonitoredRemoveIfPredicateGen.ModParent,MonitoredRemoveIfPredicateGen.ModRoot,
                     MonitoredRemoveIfPredicateGen.ThrowModParent,MonitoredRemoveIfPredicateGen.ThrowModRoot);
+        case "ArrDeq":
         case "DblLnkList":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveFirst,MonitoredRemoveIfPredicateGen.RemoveLast,MonitoredRemoveIfPredicateGen.RemoveFirstAndLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirst,MonitoredRemoveIfPredicateGen.RemoveAllButLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirstAndLast,MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveFalse,MonitoredRemoveIfPredicateGen.RemoveTrue,

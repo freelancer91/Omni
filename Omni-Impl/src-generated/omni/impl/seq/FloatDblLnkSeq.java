@@ -1,33 +1,33 @@
 package omni.impl.seq;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import omni.api.OmniDeque;
-import omni.api.OmniIterator;
+import omni.util.FloatSortUtil;
 import omni.api.OmniList;
-import omni.api.OmniListIterator;
-import omni.function.FloatComparator;
+import omni.impl.FloatDblLnkNode;
+import java.util.function.Consumer;
 import omni.function.FloatConsumer;
 import omni.function.FloatPredicate;
+import java.util.function.UnaryOperator;
 import omni.function.FloatUnaryOperator;
-import omni.impl.AbstractFloatItr;
-import omni.impl.CheckedCollection;
-import omni.impl.FloatDblLnkNode;
-import omni.util.FloatSortUtil;
 import omni.util.OmniArray;
-import omni.util.ToStringUtil;
 import omni.util.TypeUtil;
+import omni.impl.AbstractFloatItr;
+import java.util.function.Predicate;
+import java.util.function.IntFunction;
+import java.util.Comparator;
+import omni.function.FloatComparator;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import omni.api.OmniDeque;
+import java.io.Externalizable;
+import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectInput;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.ConcurrentModificationException;
+import omni.impl.CheckedCollection;
+import omni.util.ToStringUtil;
 public abstract class FloatDblLnkSeq extends 
 AbstractSeq<Float>
  implements
@@ -298,7 +298,7 @@ AbstractSeq<Float>
     if((head=this.head)!=null){
       int size;
       final byte[] buffer;
-      if((size=this.size)<=OmniArray.MAX_ARR_SIZE/17){(buffer=new byte[size*17])
+      if((size=this.size)<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
         [size=FloatDblLnkNode.uncheckedToString(head,tail,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
@@ -1131,7 +1131,7 @@ AbstractSeq<Float>
     }
     private void peelTail(FloatDblLnkNode tail){
       FloatDblLnkNode after,before;
-      (before=tail.prev).next=after=tail.next;
+      (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1207,7 +1207,7 @@ AbstractSeq<Float>
     }
     private void peelHead(FloatDblLnkNode head){
       FloatDblLnkNode after,before;
-      (after=head.next).prev=before=head.prev;
+      (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -1604,7 +1604,7 @@ AbstractSeq<Float>
       }
       UncheckedList root;
       int size;
-      (root=this.root).size-=size=this.size;
+      (root=this.root).size-=(size=this.size);
       clearAllHelper(size,head,tail,root);
     }
     private boolean collapseBody(FloatDblLnkNode head,FloatDblLnkNode tail,FloatPredicate filter
@@ -2080,7 +2080,7 @@ AbstractSeq<Float>
     }
     boolean uncheckedremoveVal0(FloatDblLnkNode head
     ){
-      if(0==head.val){
+      if(0==(head.val)){
         --root.size;
         if(--this.size==0){
           removeLastNode(head);
@@ -2091,7 +2091,7 @@ AbstractSeq<Float>
       }else{
         for(final var tail=this.tail;tail!=head;){
           FloatDblLnkNode prev;
-          if(0==(head=(prev=head).next).val){
+          if(0==((head=(prev=head).next).val)){
             --root.size;
             --this.size;
             if(head==tail){
@@ -2215,7 +2215,7 @@ AbstractSeq<Float>
       final CheckedList root;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
       {
-        if(0==head.val){
+        if(0==(head.val)){
           root.modCount=++modCount;
           this.modCount=modCount;
           --root.size;
@@ -2228,7 +2228,7 @@ AbstractSeq<Float>
         }
         for(final var tail=this.tail;head!=tail;){
           FloatDblLnkNode prev;
-          if(0==(head=(prev=head).next).val){
+          if(0==((head=(prev=head).next).val)){
             root.modCount=++modCount;
             this.modCount=modCount;
             --root.size;
@@ -3301,7 +3301,7 @@ AbstractSeq<Float>
         this.size=size=ois.readInt();
         if(size!=0){
           FloatDblLnkNode curr;
-          for(this.head=curr=new FloatDblLnkNode(ois.readFloat());--size!=0;curr=curr.next=new FloatDblLnkNode(curr,ois.readFloat())){}
+          for(this.head=curr=new FloatDblLnkNode((float)ois.readFloat());--size!=0;curr=curr.next=new FloatDblLnkNode(curr,(float)ois.readFloat())){}
           this.tail=curr;
         }
       }
@@ -3456,7 +3456,7 @@ AbstractSeq<Float>
     }
     private void peelTail(FloatDblLnkNode tail){
       FloatDblLnkNode after,before;
-      (before=tail.prev).next=after=tail.next;
+      (before=tail.prev).next=(after=tail.next);
       this.tail=before;
       if(after==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3538,7 +3538,7 @@ AbstractSeq<Float>
     }
     private void peelHead(FloatDblLnkNode head){
       FloatDblLnkNode after,before;
-      (after=head.next).prev=before=head.prev;
+      (after=head.next).prev=(before=head.prev);
       this.head=after;
       if(before==null){
         for(var curr=this.parent;curr!=null;curr=curr.parent){
@@ -3972,7 +3972,7 @@ AbstractSeq<Float>
         }else{
           final long survivorWord=markSurvivors(newHead.next,numLeft,filter);
           modCountChecker.checkModCount();
-          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             if((newHead=pullSurvivorsDown(newHead,survivorWord,numSurvivors,numLeft))!=null){
               newHead.next=newTail;
               newTail.prev=newHead;
@@ -4882,7 +4882,7 @@ AbstractSeq<Float>
         }else{
           final long survivorWord=markSurvivors(prev.next,numLeft,filter);
           CheckedCollection.checkModCount(modCount,this.modCount);
-          if((numLeft-=numSurvivors=Long.bitCount(survivorWord))!=0){
+          if((numLeft-=(numSurvivors=Long.bitCount(survivorWord)))!=0){
             pullSurvivorsDown(prev,survivorWord,numSurvivors,numLeft);
           }
         }
@@ -4989,7 +4989,6 @@ AbstractSeq<Float>
       }
       return new CheckedSubList(this,fromIndex);
     } 
-    @Override
     boolean uncheckedremoveLastOccurrenceBits(FloatDblLnkNode tail
     ,int bits
     ){
@@ -5023,11 +5022,10 @@ AbstractSeq<Float>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveLastOccurrence0(FloatDblLnkNode tail
     ){
       {
-        if(0==tail.val){
+        if(0==(tail.val)){
           this.modCount=modCount+1;
           if((tail=tail.prev)==null){
             this.head=null;
@@ -5040,7 +5038,7 @@ AbstractSeq<Float>
           return true;
         }
         for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(0==tail.val){
+          if(0==(tail.val)){
             this.modCount=modCount+1;
             if((tail=tail.prev)==null){
               this.head=next;
@@ -5056,7 +5054,6 @@ AbstractSeq<Float>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveLastOccurrenceNaN(FloatDblLnkNode tail
     ){
       {
@@ -5089,7 +5086,6 @@ AbstractSeq<Float>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveValBits(FloatDblLnkNode head
     ,int bits
     ){
@@ -5122,11 +5118,10 @@ AbstractSeq<Float>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveVal0(FloatDblLnkNode head
     ){
       {
-        if(0==head.val){
+        if(0==(head.val)){
           ++this.modCount;
           if(--size==0){
             this.head=null;
@@ -5138,7 +5133,7 @@ AbstractSeq<Float>
           return true;
         }
         for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(0==head.val){
+          if(0==(head.val)){
             ++this.modCount;
             if((head=head.next)==null){
               this.tail=prev;
@@ -5154,7 +5149,6 @@ AbstractSeq<Float>
       }
       return false;
     }
-    @Override
     boolean uncheckedremoveValNaN(FloatDblLnkNode head
     ){
       {
@@ -5190,7 +5184,7 @@ AbstractSeq<Float>
       FloatDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=head.val;
+        final var ret=(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5206,7 +5200,7 @@ AbstractSeq<Float>
       FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=tail.val;
+        final var ret=(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5222,7 +5216,7 @@ AbstractSeq<Float>
       FloatDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=head.val;
+        final var ret=(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5238,7 +5232,7 @@ AbstractSeq<Float>
       FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=tail.val;
+        final var ret=(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5254,7 +5248,7 @@ AbstractSeq<Float>
       FloatDblLnkNode head;
       if((head=this.head)!=null){
         ++this.modCount;
-        final var ret=head.val;
+        final var ret=(double)(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5270,7 +5264,7 @@ AbstractSeq<Float>
       FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
         ++this.modCount;
-        final var ret=tail.val;
+        final var ret=(double)(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -5680,7 +5674,7 @@ AbstractSeq<Float>
       this.size=size=in.readInt();
       if(size!=0){
         FloatDblLnkNode curr;
-        for(this.head=curr=new FloatDblLnkNode(in.readFloat());--size!=0;curr=curr.next=new FloatDblLnkNode(curr,in.readFloat())){}
+        for(this.head=curr=new FloatDblLnkNode((float)in.readFloat());--size!=0;curr=curr.next=new FloatDblLnkNode(curr,(float)in.readFloat())){}
         this.tail=curr;
       }
     }
@@ -5913,7 +5907,7 @@ AbstractSeq<Float>
     boolean uncheckedremoveVal0(FloatDblLnkNode head
     ){
       {
-        if(0==head.val){
+        if(0==(head.val)){
           if(--size==0){
             this.head=null;
             this.tail=null;
@@ -5924,7 +5918,7 @@ AbstractSeq<Float>
           return true;
         }
         for(FloatDblLnkNode prev;(head=(prev=head).next)!=null;){
-          if(0==head.val){
+          if(0==(head.val)){
             if((head=head.next)==null){
               this.tail=prev;
               prev.next=null;
@@ -6000,11 +5994,11 @@ AbstractSeq<Float>
       return tail.val;
     }
     @Override public boolean offerFirst(float val){
-      push(val);
+      push((float)val);
       return true;
     }
     @Override public boolean offerLast(float val){
-      addLast(val);
+      addLast((float)val);
       return true;
     }
     @Override public boolean removeFirstOccurrence(Object val){
@@ -6014,7 +6008,7 @@ AbstractSeq<Float>
       return head.val;
     }
     @Override public boolean offer(float val){
-      addLast(val);
+      addLast((float)val);
       return true;
     }
     @Override public int search(boolean val){
@@ -6415,7 +6409,7 @@ AbstractSeq<Float>
     boolean uncheckedremoveLastOccurrence0(FloatDblLnkNode tail
     ){
       {
-        if(0==tail.val){
+        if(0==(tail.val)){
           if((tail=tail.prev)==null){
             this.head=null;
             this.tail=null;
@@ -6427,7 +6421,7 @@ AbstractSeq<Float>
           return true;
         }
         for(FloatDblLnkNode next;(tail=(next=tail).prev)!=null;){
-          if(0==tail.val){
+          if(0==(tail.val)){
             if((tail=tail.prev)==null){
               this.head=next;
               next.prev=null;
@@ -6523,7 +6517,7 @@ AbstractSeq<Float>
     @Override public float pollFloat(){
       FloatDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=head.val;
+        final var ret=(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6538,7 +6532,7 @@ AbstractSeq<Float>
     @Override public float pollLastFloat(){
       FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=tail.val;
+        final var ret=(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6553,7 +6547,7 @@ AbstractSeq<Float>
     @Override public Float poll(){
       FloatDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=head.val;
+        final var ret=(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6568,7 +6562,7 @@ AbstractSeq<Float>
     @Override public Float pollLast(){
       FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=tail.val;
+        final var ret=(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6583,7 +6577,7 @@ AbstractSeq<Float>
     @Override public double pollDouble(){
       FloatDblLnkNode head;
       if((head=this.head)!=null){
-        final var ret=head.val;
+        final var ret=(double)(head.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6598,7 +6592,7 @@ AbstractSeq<Float>
     @Override public double pollLastDouble(){
       FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
-        final var ret=tail.val;
+        final var ret=(double)(tail.val);
         if(--this.size==0){
           this.head=null;
           this.tail=null;
@@ -6613,42 +6607,42 @@ AbstractSeq<Float>
     @Override public float peekFloat(){
       final FloatDblLnkNode head;
       if((head=this.head)!=null){
-        return head.val;
+        return (head.val);
       }
       return Float.NaN;
     }
     @Override public float peekLastFloat(){
       final FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return tail.val;
+        return (tail.val);
       }
       return Float.NaN;
     }
     @Override public Float peek(){
       final FloatDblLnkNode head;
       if((head=this.head)!=null){
-        return head.val;
+        return (head.val);
       }
       return null;
     }
     @Override public Float peekLast(){
       final FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return tail.val;
+        return (tail.val);
       }
       return null;
     }
     @Override public double peekDouble(){
       final FloatDblLnkNode head;
       if((head=this.head)!=null){
-        return head.val;
+        return (double)(head.val);
       }
       return Double.NaN;
     }
     @Override public double peekLastDouble(){
       final FloatDblLnkNode tail;
       if((tail=this.tail)!=null){
-        return tail.val;
+        return (double)(tail.val);
       }
       return Double.NaN;
     }
@@ -6815,7 +6809,6 @@ AbstractSeq<Float>
       }
       void uncheckedForEachRemaining(FloatDblLnkNode curr,FloatConsumer action){
         FloatDblLnkNode.uncheckedForEachAscending(curr,action);
-        this.curr=null;
       }
       @Override public void forEachRemaining(FloatConsumer action){
         final FloatDblLnkNode curr;

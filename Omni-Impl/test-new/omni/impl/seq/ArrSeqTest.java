@@ -139,7 +139,6 @@ public class ArrSeqTest{
         }
         return getMonitoredList(initParams,initCapacity);
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(68172)
     @Test
     public void testadd_intval(){
@@ -338,7 +337,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(6511914)
     @Test
     public void testcontains_val(){
@@ -352,7 +350,6 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testcontains_val",2);
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(7103280)
     @Test
     public void testforEach_Consumer(){
@@ -373,7 +370,6 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testforEach_Consumer",100,EnumSet.allOf(FunctionCallType.class),true);
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(1188)
     @Test
     public void testget_int(){
@@ -429,7 +425,6 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testhashCode_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(6320493)
     @Test
     public void testindexOf_val(){
@@ -507,7 +502,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrclone_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(8401566)
     @Test
     public void testItrforEachRemaining_Consumer(){
@@ -634,7 +628,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrnext_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(189360)
     @Test
     public void testItrremove_void(){
@@ -730,7 +723,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrremove_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(6320493)
     @Test
     public void testlastIndexOf_val(){
@@ -819,7 +811,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testlistIterator_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(68724)
     @Test
     public void testListItradd_val(){
@@ -1036,7 +1027,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testListItrset_val");
     }
-    //@org.junit.jupiter.api.Disabled
     @Test
     public void testMASSIVEtoString(){
         for(final var collectionType:DataType.values()){
@@ -1197,7 +1187,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testpush_val");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(1188)
     @Test
     public void testput_intval(){
@@ -1245,7 +1234,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testput_intval");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(495280)
     @Test
     public void testReadAndWrite(){
@@ -1264,7 +1252,6 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testReadAndWrite",0,EnumSet.of(FunctionCallType.Unboxed),true);
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(106812)
     @Test
     public void testremoveAt_int(){
@@ -1343,7 +1330,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveAt_int");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(26834020)
     @Test
     public void testremoveIf_Predicate(){
@@ -1416,7 +1402,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveIf_Predicate");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(6511914)
     @Test
     public void testremoveVal_val(){
@@ -1441,7 +1426,6 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testremoveVal_val",2);
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(6929240)
     @Test
     public void testreplaceAll_UnaryOperator(){
@@ -1528,7 +1512,6 @@ public class ArrSeqTest{
         final BasicTest test=MonitoredSequence::verifySize;
         test.runAllTests("ArrSeqTest.testsize_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(254982)
     @Test
     public void testsort_Comparator(){
@@ -1635,7 +1618,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.teststableDescendingSort_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(1014480)
     @Test
     public void testsubList_intint(){
@@ -1687,7 +1669,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testsubList_intint");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(495280)
     @Test
     public void testtoArray_IntFunction(){
@@ -1706,7 +1687,6 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testtoArray_IntFunction",0,EnumSet.of(FunctionCallType.Unboxed),true);
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(404532)
     @Test
     public void testtoArray_ObjectArray(){
@@ -1849,7 +1829,6 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testunstableDescendingSort_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(124698)
     @Test
     public void testunstableSort_Comparator(){
@@ -6153,11 +6132,10 @@ public class ArrSeqTest{
                                                     case 0:
                                                         continue;
                                                     case 4:
-                                                        if(position != 0.5d){
-                                                            break;
+                                                        if(position == 0.5d){
+                                                            continue;
                                                         }
                                                     default:
-                                                        continue;
                                                     }
                                                 }
                                                 for(final var illegalMod:initParams.structType.validPreMods){

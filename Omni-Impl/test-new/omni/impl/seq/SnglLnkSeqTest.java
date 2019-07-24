@@ -555,11 +555,10 @@ public class SnglLnkSeqTest{
                                 case 0:
                                   continue;
                                 case 4:
-                                  if(position != 0.5d){
-                                    break;
+                                  if(position == 0.5d){
+                                    continue;
                                   }
                                 default:
-                                  continue;
                                 }
                               }
                               TestExecutorService.submitTest(()->runTest(structType,checkedType,collectionType,queryVal,
