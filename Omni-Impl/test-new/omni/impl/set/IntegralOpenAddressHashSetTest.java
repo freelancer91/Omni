@@ -116,6 +116,14 @@ public class IntegralOpenAddressHashSetTest{
     }
     @Order(10080)
     @Test
+    public void testequals_Object(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->Assertions.assertFalse(initSet.initialize(
+            new IntegralOpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+                .getCollection().equals(null));
+        test.runAllTests("IntegralOpenAddressHashSetTest.testequals_Object");
+    }
+    @Order(10080)
+    @Test
     public void testclone_void(){
         final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->{
             initSet.initialize(

@@ -173,6 +173,13 @@ public class ByteSetImplTest{
     }
     @Order(22)
     @Test
+    public void testequals_Object(){
+        final BasicTest test=(checkedType,initSet)->Assertions.assertFalse(initSet.initialize(new ByteSetImplMonitor(checkedType))
+                .getCollection().equals(null));
+        test.runAllTests("ByteSetImplTest.testequals_Object");
+    }
+    @Order(22)
+    @Test
     public void testisEmpty_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new ByteSetImplMonitor(checkedType))
                 .verifyIsEmpty();

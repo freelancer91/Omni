@@ -261,6 +261,14 @@ public class ArrSeqTest{
         final BasicTest test=MonitoredSequence::verifyClone;
         test.runAllTests("ArrSeqTest.testclone_void");
     }
+    @Order(39168)
+    @Test
+    public void testequals_Object(){
+      for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        TestExecutorService.submitTest(()->Assertions.assertFalse(getMonitoredSequence(initParams,0).getCollection().equals(null)));
+      }
+      TestExecutorService.completeAllTests("ArrSeqTest.testequals_Object");
+    }
     @Order(144)
     @Test
     public void testConstructor_int(){

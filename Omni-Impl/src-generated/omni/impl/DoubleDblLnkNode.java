@@ -2,7 +2,8 @@ package omni.impl;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
 import omni.util.HashUtil;
-public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
+public class DoubleDblLnkNode
+//implements Comparable<DoubleDblLnkNode>
 {
   public transient DoubleDblLnkNode prev;
   public transient double val;
@@ -230,6 +231,7 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(DoubleDblLnkNode that){
     if(this!=that){
@@ -237,4 +239,5 @@ public class DoubleDblLnkNode implements Comparable<DoubleDblLnkNode>
     }
     return 0;
   }
+  */
 }

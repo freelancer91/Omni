@@ -2,7 +2,8 @@ package omni.impl;
 import omni.function.ByteConsumer;
 import omni.function.ByteUnaryOperator;
 import omni.util.ToStringUtil;
-public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
+public class ByteDblLnkNode
+//implements Comparable<ByteDblLnkNode>
 {
   public transient ByteDblLnkNode prev;
   public transient byte val;
@@ -235,6 +236,7 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(ByteDblLnkNode that){
     if(this!=that){
@@ -242,4 +244,5 @@ public class ByteDblLnkNode implements Comparable<ByteDblLnkNode>
     }
     return 0;
   }
+  */
 }

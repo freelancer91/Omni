@@ -3,7 +3,8 @@ import java.util.function.Predicate;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.Objects;
-public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
+public class RefDblLnkNode<E>
+//implements Comparable<RefDblLnkNode<E>>
 {
   public transient RefDblLnkNode<E> prev;
   public transient E val;
@@ -244,6 +245,7 @@ public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
       }
     }
   }
+  /*
   @SuppressWarnings("unchecked")
   @Override
   public int compareTo(RefDblLnkNode<E> that){
@@ -252,4 +254,5 @@ public class RefDblLnkNode<E> implements Comparable<RefDblLnkNode<E>>
     }
     return 0;
   }
+  */
 }

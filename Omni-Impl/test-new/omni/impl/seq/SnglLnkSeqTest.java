@@ -2597,6 +2597,12 @@ public class SnglLnkSeqTest{
     test.runAllTests("SnglLnkSeqTest.testhashCode_void");
   }
   @Order(576)
+  @Test
+  public void testequals_Object(){
+      final BasicTest test=(monitor)->Assertions.assertFalse(monitor.getCollection().equals(null));
+      test.runAllTests("SnglLnkSeqTest.testequals_Object");
+  }
+  @Order(576)
   @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("SnglLnkSeqTest.testisEmpty_void");

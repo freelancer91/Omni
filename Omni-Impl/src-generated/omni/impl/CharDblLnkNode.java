@@ -1,7 +1,8 @@
 package omni.impl;
 import omni.function.CharConsumer;
 import omni.function.CharUnaryOperator;
-public class CharDblLnkNode implements Comparable<CharDblLnkNode>
+public class CharDblLnkNode
+//implements Comparable<CharDblLnkNode>
 {
   public transient CharDblLnkNode prev;
   public transient char val;
@@ -218,6 +219,7 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(CharDblLnkNode that){
     if(this!=that){
@@ -225,4 +227,5 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
     }
     return 0;
   }
+  */
 }

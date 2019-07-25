@@ -623,6 +623,13 @@ public class BooleanSetImplTest{
     }
     @Order(8)
     @Test
+    public void testequals_Object(){
+        final BasicTest test=(checkedType,initSet)->Assertions.assertFalse(initSet.initialize(new BooleanSetImplMonitor(checkedType))
+                .getCollection().equals(null));
+        test.runAllTests("BooleanSetImplTest.testequals_Object");
+    }
+    @Order(8)
+    @Test
     public void testiterator_void(){
         final BasicTest test=(checkedType,initSet)->initSet.initialize(new BooleanSetImplMonitor(checkedType))
                 .getMonitoredIterator()

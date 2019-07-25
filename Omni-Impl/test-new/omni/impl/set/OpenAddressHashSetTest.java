@@ -1,5 +1,6 @@
 package omni.impl.set;
-import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.*;
+import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.DELETED;
+import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.NULL;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -524,6 +525,14 @@ public class OpenAddressHashSetTest{
             .verifyClear();
         };
         test.runAllTests("OpenAddressHashSetTest.testclear_void");
+    }
+    @Order(7770)
+    @Test
+    public void testequals_Object(){
+        final BasicTest test=(loadFactor,initCapacity,collectionType,checkedType,initSet)->Assertions.assertFalse(initSet.initialize(
+            new OpenAddressHashSetMonitor(collectionType,checkedType,initCapacity,loadFactor))
+                .getCollection().equals(null));
+        test.runAllTests("OpenAddressHashSetTest.testequals_Object");
     }
     @Order(7770)
     @Test public void testclone_void(){

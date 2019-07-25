@@ -33,6 +33,7 @@ public class BooleanDblLnkNodeTest
     Assertions.assertTrue(node5.next==node4);
     Assertions.assertTrue(node5.prev==node3);
   }
+/*
   @Test
   public void testCompareTo()
   {
@@ -51,4 +52,5 @@ public class BooleanDblLnkNodeTest
     Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
     Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
   }
+  */
 }

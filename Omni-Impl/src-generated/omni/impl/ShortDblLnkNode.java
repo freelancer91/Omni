@@ -2,7 +2,8 @@ package omni.impl;
 import omni.function.ShortConsumer;
 import omni.function.ShortUnaryOperator;
 import omni.util.ToStringUtil;
-public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
+public class ShortDblLnkNode
+//implements Comparable<ShortDblLnkNode>
 {
   public transient ShortDblLnkNode prev;
   public transient short val;
@@ -227,6 +228,7 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(ShortDblLnkNode that){
     if(this!=that){
@@ -234,4 +236,5 @@ public class ShortDblLnkNode implements Comparable<ShortDblLnkNode>
     }
     return 0;
   }
+  */
 }

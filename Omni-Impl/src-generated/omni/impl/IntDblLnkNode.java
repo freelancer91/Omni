@@ -2,7 +2,8 @@ package omni.impl;
 import java.util.function.IntConsumer;
 import java.util.function.IntUnaryOperator;
 import omni.util.ToStringUtil;
-public class IntDblLnkNode implements Comparable<IntDblLnkNode>
+public class IntDblLnkNode
+//implements Comparable<IntDblLnkNode>
 {
   public transient IntDblLnkNode prev;
   public transient int val;
@@ -219,6 +220,7 @@ public class IntDblLnkNode implements Comparable<IntDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(IntDblLnkNode that){
     if(this!=that){
@@ -231,4 +233,5 @@ public class IntDblLnkNode implements Comparable<IntDblLnkNode>
     }
     return 0;
   }
+  */
 }

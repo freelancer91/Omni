@@ -370,6 +370,12 @@ public class DblLnkSeqTest{
     }
     @Order(1872)
     @Test
+    public void testequals_Object(){
+        final BasicTest test=(monitor,illegalMod)->Assertions.assertFalse(monitor.getCollection().equals(null));
+        test.runAllTests("DblLnkSeqTest.testequals_Object");
+    }
+    @Order(1872)
+    @Test
     public void testclone_void(){
         final BasicTest test=(monitor,illegalMod)->{
             if(illegalMod.expectedException == null){

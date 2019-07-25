@@ -3,7 +3,8 @@ import omni.function.BooleanConsumer;
 import omni.util.TypeUtil;
 import omni.function.BooleanPredicate;
 import omni.util.ToStringUtil;
-public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
+public class BooleanDblLnkNode
+//implements Comparable<BooleanDblLnkNode>
 {
   public transient BooleanDblLnkNode prev;
   public transient boolean val;
@@ -252,6 +253,7 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(BooleanDblLnkNode that){
     if(this!=that){
@@ -265,4 +267,5 @@ public class BooleanDblLnkNode implements Comparable<BooleanDblLnkNode>
     }
     return 0;
   }
+  */
 }

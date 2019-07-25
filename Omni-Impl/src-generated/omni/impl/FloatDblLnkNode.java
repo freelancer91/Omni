@@ -3,7 +3,8 @@ import omni.function.FloatConsumer;
 import omni.function.FloatUnaryOperator;
 import omni.util.ToStringUtil;
 import omni.util.HashUtil;
-public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
+public class FloatDblLnkNode
+//implements Comparable<FloatDblLnkNode>
 {
   public transient FloatDblLnkNode prev;
   public transient float val;
@@ -248,6 +249,7 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(FloatDblLnkNode that){
     if(this!=that){
@@ -255,4 +257,5 @@ public class FloatDblLnkNode implements Comparable<FloatDblLnkNode>
     }
     return 0;
   }
+  */
 }

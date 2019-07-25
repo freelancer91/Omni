@@ -6,6 +6,7 @@ import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import omni.api.OmniCollection;
 import omni.function.BooleanPredicate;
@@ -13,6 +14,7 @@ import omni.function.BytePredicate;
 import omni.function.CharPredicate;
 import omni.function.FloatPredicate;
 import omni.function.ShortPredicate;
+@Tag("NewTest") 
 public class CheckedCollectionTest{
 
     public static <E> Predicate<E> getModifyingPred(Predicate<E> pred,Runnable modOp){

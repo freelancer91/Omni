@@ -2,7 +2,8 @@ package omni.impl;
 import java.util.function.LongConsumer;
 import java.util.function.LongUnaryOperator;
 import omni.util.ToStringUtil;
-public class LongDblLnkNode implements Comparable<LongDblLnkNode>
+public class LongDblLnkNode
+//implements Comparable<LongDblLnkNode>
 {
   public transient LongDblLnkNode prev;
   public transient long val;
@@ -211,6 +212,7 @@ public class LongDblLnkNode implements Comparable<LongDblLnkNode>
       }
     }
   }
+  /*
   @Override
   public int compareTo(LongDblLnkNode that){
     if(this!=that){
@@ -223,4 +225,5 @@ public class LongDblLnkNode implements Comparable<LongDblLnkNode>
     }
     return 0;
   }
+  */
 }
