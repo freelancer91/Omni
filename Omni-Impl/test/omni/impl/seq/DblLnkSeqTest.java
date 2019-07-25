@@ -398,7 +398,7 @@ public class DblLnkSeqTest{
         }
         TestExecutorService.completeAllTests("DblLnkSeqTest.testConstructor_void");
     }
-    @Order(770598)
+    @Order(1117984)
     @Test
     public void testcontains_val(){
         final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -514,7 +514,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testhashCode_void");
     }
-    @Order(770598)
+    @Order(1117984)
     @Test
     public void testindexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -841,7 +841,7 @@ public class DblLnkSeqTest{
         });
         TestExecutorService.completeAllTests("DblLnkSeqTest.testItrremove_void");
     }
-    @Order(770598)
+    @Order(1117984)
     @Test
     public void testlastIndexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -1497,7 +1497,7 @@ public class DblLnkSeqTest{
         final DeqPopTest test=DblLnkSeqMonitor::verifyRemoveFirst;
         test.runAllTests("DblLnkSeqTest.testremoveFirst_void",true);
     }
-    @Order(118494)
+    @Order(171954)
     @Test
     public void testremoveFirstOccurrence_val(){
         final QueryTest<DblLnkSeqMonitor<?,?>> test=new QueryTest<>(){
@@ -1689,7 +1689,7 @@ public class DblLnkSeqTest{
         final DeqPopTest test=DblLnkSeqMonitor::verifyRemoveLast;
         test.runAllTests("DblLnkSeqTest.testremoveLast_void",true);
     }
-    @Order(118494)
+    @Order(171954)
     @Test
     public void testremoveLastOccurrence_val(){
         final QueryTest<DblLnkSeqMonitor<?,?>> test=new QueryTest<>(){
@@ -1710,7 +1710,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.removeLastOccurrence)val",false);
     }
-    @Order(9350824)
+    @Order(18278644)
     @Test
     public void testremoveVal_val(){
         final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
@@ -1756,7 +1756,7 @@ public class DblLnkSeqTest{
         };
         test.runAllTests("DblLnkSeqTest.testreplaceAll_UnaryOperator",100);
     }
-    @Order(118514)
+    @Order(171954)
     @Test
     public void testsearch_val(){
         final QueryTest<DblLnkSeqMonitor<?,?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,

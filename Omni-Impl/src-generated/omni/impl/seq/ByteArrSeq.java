@@ -75,6 +75,9 @@ AbstractSeq<Byte>
       this.arr=OmniArray.OfByte.DEFAULT_ARR;
     }
   }
+  public byte popByte(){
+    return (byte)arr[--this.size];
+  }
   static  long markSurvivors(byte[] arr,int srcOffset,int srcBound,BytePredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((byte)arr[srcOffset])){
@@ -462,27 +465,6 @@ AbstractSeq<Byte>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,byte val){
-    byte[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new byte[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(byte val){
-    byte[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new byte[]{val};
-    }else{
-      if(arr==OmniArray.OfByte.DEFAULT_ARR){
-        this.arr=arr=new byte[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(byte val){
     final int size;
     if((size=this.size)!=0){
@@ -605,6 +587,29 @@ AbstractSeq<Byte>
   @Override public boolean removeIf(Predicate<? super Byte> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,byte val){
+    byte[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new byte[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(byte val){
+    byte[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new byte[]{val};
+    }else{
+      if(arr==OmniArray.OfByte.DEFAULT_ARR){
+        this.arr=arr=new byte[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(byte[] arr,int srcOffset,int srcBound,int dstOffset,BytePredicate filter){
     while(++srcOffset!=srcBound){
@@ -969,9 +974,6 @@ AbstractSeq<Byte>
     }
     @Override public Byte pop(){
       return popByte();
-    }
-    @Override public byte popByte(){
-      return (byte)arr[--this.size];
     }
     @Override public byte pollByte(){
       int size;

@@ -59,16 +59,7 @@ public class TestExecutorService {
         }
 
     }
-    private static final class ThreadInterruptedException extends RuntimeException{
-        /**
-         * 
-         */
-        private static final long serialVersionUID=7205328610671140969L;
-
-        ThreadInterruptedException(Throwable t){
-            super(t);
-        }
-    }
+    
 
     private static void worker() {
         try {

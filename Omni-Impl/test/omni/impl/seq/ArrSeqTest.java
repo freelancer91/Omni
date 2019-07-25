@@ -261,7 +261,7 @@ public class ArrSeqTest{
         final BasicTest test=MonitoredSequence::verifyClone;
         test.runAllTests("ArrSeqTest.testclone_void");
     }
-    @Order(39168)
+    @Order(324)
     @Test
     public void testequals_Object(){
       for(final var initParams:ALL_STRUCT_INIT_PARAMS){
@@ -345,7 +345,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testConstructor_void");
     }
-    @Order(6511914)
+    @Order(12510126)
     @Test
     public void testcontains_val(){
         final QueryTest<MonitoredSequence<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -433,7 +433,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testhashCode_void");
     }
-    @Order(6320493)
+    @Order(12142287)
     @Test
     public void testindexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -731,7 +731,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testItrremove_void");
     }
-    @Order(6320493)
+    @Order(12142287)
     @Test
     public void testlastIndexOf_val(){
         final QueryTest<MonitoredList<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
@@ -1410,7 +1410,7 @@ public class ArrSeqTest{
         }
         TestExecutorService.completeAllTests("ArrSeqTest.testremoveIf_Predicate");
     }
-    @Order(6511914)
+    @Order(12510126)
     @Test
     public void testremoveVal_val(){
         final QueryTest<MonitoredSequence<?>> test=new QueryTest<>(){
@@ -1453,7 +1453,7 @@ public class ArrSeqTest{
         };
         test.runAllTests("ArrSeqTest.testreplaceAll_UnaryOperator",100,EnumSet.allOf(FunctionCallType.class),false);
     }
-    @Order(191421)
+    @Order(367839)
     @Test
     public void testsearch_val(){
         final QueryTest<ArrStackMonitor<?,?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,

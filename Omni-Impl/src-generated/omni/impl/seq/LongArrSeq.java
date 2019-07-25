@@ -75,6 +75,9 @@ AbstractSeq<Long>
       this.arr=OmniArray.OfLong.DEFAULT_ARR;
     }
   }
+  public long popLong(){
+    return (long)arr[--this.size];
+  }
   static  long markSurvivors(long[] arr,int srcOffset,int srcBound,LongPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((long)arr[srcOffset])){
@@ -430,27 +433,6 @@ AbstractSeq<Long>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,long val){
-    long[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new long[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(long val){
-    long[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new long[]{val};
-    }else{
-      if(arr==OmniArray.OfLong.DEFAULT_ARR){
-        this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(long val){
     final int size;
     if((size=this.size)!=0){
@@ -555,6 +537,29 @@ AbstractSeq<Long>
   @Override public boolean removeIf(Predicate<? super Long> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,long val){
+    long[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new long[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(long val){
+    long[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new long[]{val};
+    }else{
+      if(arr==OmniArray.OfLong.DEFAULT_ARR){
+        this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(long[] arr,int srcOffset,int srcBound,int dstOffset,LongPredicate filter){
     while(++srcOffset!=srcBound){
@@ -870,9 +875,6 @@ AbstractSeq<Long>
     }
     @Override public Long pop(){
       return popLong();
-    }
-    @Override public long popLong(){
-      return (long)arr[--this.size];
     }
     @Override public long pollLong(){
       int size;

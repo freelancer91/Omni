@@ -74,6 +74,9 @@ AbstractSeq<Double>
       this.arr=OmniArray.OfDouble.DEFAULT_ARR;
     }
   }
+  public double popDouble(){
+    return (double)arr[--this.size];
+  }
   static  long markSurvivors(double[] arr,int srcOffset,int srcBound,DoublePredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((double)arr[srcOffset])){
@@ -439,27 +442,6 @@ AbstractSeq<Double>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,double val){
-    double[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new double[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(double val){
-    double[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new double[]{val};
-    }else{
-      if(arr==OmniArray.OfDouble.DEFAULT_ARR){
-        this.arr=arr=new double[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(double val){
     final int size;
     if((size=this.size)!=0){
@@ -544,6 +526,29 @@ AbstractSeq<Double>
   @Override public boolean removeIf(Predicate<? super Double> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,double val){
+    double[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new double[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(double val){
+    double[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new double[]{val};
+    }else{
+      if(arr==OmniArray.OfDouble.DEFAULT_ARR){
+        this.arr=arr=new double[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(double[] arr,int srcOffset,int srcBound,int dstOffset,DoublePredicate filter){
     while(++srcOffset!=srcBound){
@@ -915,9 +920,6 @@ AbstractSeq<Double>
     }
     @Override public Double pop(){
       return popDouble();
-    }
-    @Override public double popDouble(){
-      return (double)arr[--this.size];
     }
     @Override public double pollDouble(){
       int size;

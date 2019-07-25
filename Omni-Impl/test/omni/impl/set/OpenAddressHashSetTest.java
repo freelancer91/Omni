@@ -1,6 +1,5 @@
 package omni.impl.set;
-import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.DELETED;
-import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.NULL;
+import static omni.impl.set.FieldAndMethodAccessor.RefOpenAddressHashSet.*;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -84,7 +83,6 @@ public class OpenAddressHashSetTest{
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(13650)
     @Test public void testadd_val(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
@@ -624,7 +622,6 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testConstructor_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(736344)
     @Test public void testcontains_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{
@@ -729,7 +726,6 @@ public class OpenAddressHashSetTest{
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("OpenAddressHashSetTest.testItrclone_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(2035740)
     @Test public void testItrforEachRemaining_Consumer(){
         for(final var loadFactor:LOAD_FACTORS){
@@ -918,7 +914,6 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrnext_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(736470)
     @Test public void testItrremove_void(){
         for(final float loadFactor:LOAD_FACTORS){
@@ -984,7 +979,6 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testItrremove_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Test public void testMASSIVEtoString(){
         int numToAdd;
         var set=new FloatOpenAddressHashSet((numToAdd=DataType.FLOAT.massiveToStringThreshold + 1) + 1);
@@ -1006,7 +1000,6 @@ public class OpenAddressHashSetTest{
         };
         test.runAllTests("OpenAddressHashSetTest.testReadAndWrite");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(96148)
     @Test public void testremoveIf_Predicate(){
         for(final var collectionType:StructType.OpenAddressHashSet.validDataTypes){
@@ -1083,7 +1076,6 @@ public class OpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("OpenAddressHashSetTest.testremoveIf_Predicate");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(736344)
     @Test public void testremoveVal_val(){
         final QueryTest test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen)->{

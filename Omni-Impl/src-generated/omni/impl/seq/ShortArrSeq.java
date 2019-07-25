@@ -75,6 +75,9 @@ AbstractSeq<Short>
       this.arr=OmniArray.OfShort.DEFAULT_ARR;
     }
   }
+  public short popShort(){
+    return (short)arr[--this.size];
+  }
   static  long markSurvivors(short[] arr,int srcOffset,int srcBound,ShortPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((short)arr[srcOffset])){
@@ -486,27 +489,6 @@ AbstractSeq<Short>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,short val){
-    short[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new short[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(short val){
-    short[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new short[]{val};
-    }else{
-      if(arr==OmniArray.OfShort.DEFAULT_ARR){
-        this.arr=arr=new short[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(short val){
     final int size;
     if((size=this.size)!=0){
@@ -623,6 +605,29 @@ AbstractSeq<Short>
   @Override public boolean removeIf(Predicate<? super Short> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,short val){
+    short[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new short[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(short val){
+    short[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new short[]{val};
+    }else{
+      if(arr==OmniArray.OfShort.DEFAULT_ARR){
+        this.arr=arr=new short[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(short[] arr,int srcOffset,int srcBound,int dstOffset,ShortPredicate filter){
     while(++srcOffset!=srcBound){
@@ -984,9 +989,6 @@ AbstractSeq<Short>
     }
     @Override public Short pop(){
       return popShort();
-    }
-    @Override public short popShort(){
-      return (short)arr[--this.size];
     }
     @Override public short pollShort(){
       int size;

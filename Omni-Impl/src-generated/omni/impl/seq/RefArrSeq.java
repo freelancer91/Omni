@@ -71,6 +71,14 @@ AbstractSeq<E>
     }
   }
   @SuppressWarnings("unchecked")
+  public E pop(){
+    final Object[] arr;
+    final int size;
+    final var ret=(E)(arr=this.arr)[size=--this.size];
+    arr[size]=null;
+    return ret;
+  }
+  @SuppressWarnings("unchecked")
   static <E> long markSurvivors(Object[] arr,int srcOffset,int srcBound,Predicate<? super E> filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((E)arr[srcOffset])){
@@ -625,27 +633,6 @@ AbstractSeq<E>
       uncheckedForEach(size,action);
     }
   }
-  private void uncheckedAppend(int size,E val){
-    Object[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new Object[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(E val){
-    Object[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new Object[]{val};
-    }else{
-      if(arr==OmniArray.OfRef.DEFAULT_ARR){
-        this.arr=arr=new Object[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(E val){
     final int size;
     if((size=this.size)!=0){
@@ -698,6 +685,29 @@ AbstractSeq<E>
   @Override public boolean removeIf(Predicate<? super E> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
+  }
+  private
+  void uncheckedAppend(int size,E val){
+    Object[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new Object[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(E val){
+    Object[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new Object[]{val};
+    }else{
+      if(arr==OmniArray.OfRef.DEFAULT_ARR){
+        this.arr=arr=new Object[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   @SuppressWarnings("unchecked")
   private static <E> int pullSurvivorsDown(Object[] arr,int srcOffset,int srcBound,int dstOffset,Predicate<? super E> filter){
@@ -1147,14 +1157,6 @@ AbstractSeq<E>
     }
     @Override void uncheckedCopyInto(Object[] dst,int length){
       ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,length);
-    }
-    @SuppressWarnings("unchecked")
-    @Override public E pop(){
-      final Object[] arr;
-      final int size;
-      final var ret=(E)(arr=this.arr)[size=--this.size];
-      arr[size]=null;
-      return ret;
     }
     @SuppressWarnings("unchecked")
     @Override public E poll(){

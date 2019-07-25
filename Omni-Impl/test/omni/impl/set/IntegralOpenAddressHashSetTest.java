@@ -64,11 +64,9 @@ public class IntegralOpenAddressHashSetTest{
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=-1;
         CONSTRUCTOR_INITIAL_CAPACITIES[++i]=Integer.MIN_VALUE;
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(6720)
     @Test
     public void testadd_val(){
-        //TODO fill in the gaps for LongOpenAddressHashSet.add(long)
         for(final var collectionType:StructType.IntegralOpenAddressHashSet.validDataTypes){
             for(final var inputType:collectionType.mayBeAddedTo()){
                 for(final var checkedType:CheckedType.values()){
@@ -217,7 +215,6 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testConstructor_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(876540)
     @Test
     public void testcontains_val(){
@@ -299,7 +296,6 @@ public class IntegralOpenAddressHashSetTest{
                 .getMonitoredIterator().verifyClone();
         test.runAllTests("IntegralOpenAddressHashSetTest.testItrclone_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(3255000)
     @Test
     public void testItrforEachRemaining_Consumer(){
@@ -429,7 +425,6 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testItrhasNext_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(79380)
     @Test
     public void testItrnext_void(){
@@ -475,7 +470,6 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrnext_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(980280)
     @Test
     public void testItrremove_void(){
@@ -542,7 +536,6 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testItrremove_void");
     }
-    //@org.junit.jupiter.api.Disabled
     @Test
     public void testMASSIVEtoString(){
         for(final var collectionType:new DataType[]{DataType.INT,DataType.LONG}){
@@ -594,7 +587,6 @@ public class IntegralOpenAddressHashSetTest{
         };
         test.runAllTests("IntegralOpenAddressHashSetTest.testReadAndWrite");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(128392)
     @Test
     public void testremoveIf_Predicate(){
@@ -675,7 +667,6 @@ public class IntegralOpenAddressHashSetTest{
         }
         TestExecutorService.completeAllTests("IntegralOpenAddressHashSetTest.testremoveIf_Predicate");
     }
-    //@org.junit.jupiter.api.Disabled
     @Order(876540)
     @Test
     public void testremoveVal_val(){
@@ -2760,6 +2751,131 @@ public class IntegralOpenAddressHashSetTest{
                 }
             }
         }
+        @Override
+        public boolean verifyAdd(Object inputVal,DataType inputType,FunctionCallType functionCallType){
+            boolean containsBefore=inputType.callcontains(set,inputVal,functionCallType);
+            int sizeBefore=set.size();
+            final boolean result;
+            try{
+                result=inputType.callAdd(inputVal,set,functionCallType);
+                updateAddState(inputVal,inputType,result);
+            }finally{
+                verifyCollectionState();
+            }
+            int sizeAfter=set.size();
+            boolean containsAfter=inputType.callcontains(set,inputVal,functionCallType);
+            Assertions.assertEquals(!result,containsBefore);
+            Assertions.assertTrue(containsAfter);
+            Assertions.assertEquals(sizeBefore,result?sizeAfter - 1:sizeAfter);
+            //now remove and re-add it
+            Assertions.assertTrue(inputType.callremoveVal(set,inputVal,functionCallType));
+            switch(dataType){
+            case CHAR:{
+                char c;
+                switch(inputType) {
+                case BOOLEAN:
+                    c=(boolean)inputVal?(char)1:(char)0;
+                    break;
+                case CHAR:
+                    c=(char)inputVal;
+                    break;
+                default:
+                    throw inputType.invalid();
+                }
+                removeVal(c);
+                break;
+            }
+            case SHORT:{
+                short s;
+                switch(inputType) {
+                case BOOLEAN:
+                    s=(boolean)inputVal?(short)1:(short)0;
+                    break;
+                case BYTE:
+                    s=(byte)inputVal;
+                    break;
+                case SHORT:
+                    s=(short)inputVal;
+                    break;
+                default:
+                    throw inputType.invalid();
+                }
+                removeVal(s);
+                break;
+            }
+            case INT:{
+                int i;
+                switch(inputType) {
+                case BOOLEAN:
+                    i=(boolean)inputVal?1:0;
+                    break;
+                case BYTE:
+                    i=(byte)inputVal;
+                    break;
+                case CHAR:
+                    i=(char)inputVal;
+                    break;
+                case SHORT:
+                    i=(short)inputVal;
+                    break;
+                case INT:
+                    i=(int)inputVal;
+                    break;
+                default:
+                    throw inputType.invalid();
+                }
+                removeVal(i);
+                break;
+            }
+            case LONG:{
+                long l;
+                switch(inputType) {
+                case BOOLEAN:
+                    l=(boolean)inputVal?1L:0L;
+                    break;
+                case BYTE:
+                    l=(byte)inputVal;
+                    break;
+                case CHAR:
+                    l=(char)inputVal;
+                    break;
+                case SHORT:
+                    l=(short)inputVal;
+                    break;
+                case INT:
+                    l=(int)inputVal;
+                    break;
+                case LONG:
+                    l=(long)inputVal;
+                    break;
+                default:
+                    throw inputType.invalid();
+                }
+                removeVal(l);
+                break;
+            }
+            default:
+                throw dataType.invalid();
+            }
+            ++expectedModCount;
+            verifyCollectionState();
+            try{
+                Assertions.assertTrue(inputType.callAdd(inputVal,set,functionCallType));
+                updateAddState(inputVal,inputType,true);
+            }finally{
+                verifyCollectionState();
+            }
+            
+           
+            //calling it a second time should return false
+            try {
+                Assertions.assertFalse(inputType.callAdd(inputVal,set,functionCallType));
+            }finally {
+                verifyCollectionState();
+            }
+            return result;
+        }
+
     }
     private interface MonitoredFunctionGenTest{
         void runTest(DataType collectionType,MonitoredFunctionGen functionGen,CheckedType checkedType,

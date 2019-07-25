@@ -75,6 +75,9 @@ AbstractSeq<Integer>
       this.arr=OmniArray.OfInt.DEFAULT_ARR;
     }
   }
+  public int popInt(){
+    return (int)arr[--this.size];
+  }
   static  long markSurvivors(int[] arr,int srcOffset,int srcBound,IntPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((int)arr[srcOffset])){
@@ -446,27 +449,6 @@ AbstractSeq<Integer>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,int val){
-    int[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new int[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(int val){
-    int[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new int[]{val};
-    }else{
-      if(arr==OmniArray.OfInt.DEFAULT_ARR){
-        this.arr=arr=new int[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(int val){
     final int size;
     if((size=this.size)!=0){
@@ -577,6 +559,29 @@ AbstractSeq<Integer>
   @Override public boolean removeIf(Predicate<? super Integer> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,int val){
+    int[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new int[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(int val){
+    int[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new int[]{val};
+    }else{
+      if(arr==OmniArray.OfInt.DEFAULT_ARR){
+        this.arr=arr=new int[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(int[] arr,int srcOffset,int srcBound,int dstOffset,IntPredicate filter){
     while(++srcOffset!=srcBound){
@@ -903,9 +908,6 @@ AbstractSeq<Integer>
     }
     @Override public Integer pop(){
       return popInt();
-    }
-    @Override public int popInt(){
-      return (int)arr[--this.size];
     }
     @Override public int pollInt(){
       int size;

@@ -75,6 +75,9 @@ AbstractSeq<Float>
       this.arr=OmniArray.OfFloat.DEFAULT_ARR;
     }
   }
+  public float popFloat(){
+    return (float)arr[--this.size];
+  }
   static  long markSurvivors(float[] arr,int srcOffset,int srcBound,FloatPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((float)arr[srcOffset])){
@@ -542,27 +545,6 @@ AbstractSeq<Float>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,float val){
-    float[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(float val){
-    float[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new float[]{val};
-    }else{
-      if(arr==OmniArray.OfFloat.DEFAULT_ARR){
-        this.arr=arr=new float[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(float val){
     final int size;
     if((size=this.size)!=0){
@@ -661,6 +643,29 @@ AbstractSeq<Float>
   @Override public boolean removeIf(Predicate<? super Float> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,float val){
+    float[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(float val){
+    float[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new float[]{val};
+    }else{
+      if(arr==OmniArray.OfFloat.DEFAULT_ARR){
+        this.arr=arr=new float[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(float[] arr,int srcOffset,int srcBound,int dstOffset,FloatPredicate filter){
     while(++srcOffset!=srcBound){
@@ -1084,9 +1089,6 @@ AbstractSeq<Float>
     }
     @Override public Float pop(){
       return popFloat();
-    }
-    @Override public float popFloat(){
-      return (float)arr[--this.size];
     }
     @Override public float pollFloat(){
       int size;

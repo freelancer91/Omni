@@ -64,6 +64,8 @@ import java.util.RandomAccess;
 public abstract class $ClassPrefix$ArrSeq$<E>$ extends 
 #IF OfRef
 AbstractSeq$<E>$
+#ELSEIF OfBoolean
+AbstractBooleanArrSeq
 #ELSE
 AbstractSeq<$BoxedType$>
 #ENDIF
@@ -120,6 +122,32 @@ AbstractSeq<$BoxedType$>
     }else{
       this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
     }
+  }
+#IF OfBoolean
+  @Override
+  int uncheckedsearch(int size,boolean val){
+    return OmniArray.Of$ClassPrefix$.uncheckedsearch(this.arr,size,val);
+  }
+  @Override
+  int uncheckedindexOf(int size,boolean val){
+    return OmniArray.Of$ClassPrefix$.uncheckedindexOf(this.arr,size,val);
+  }
+  @Override
+  int uncheckedlastIndexOf(int size,boolean val){
+    return OmniArray.Of$ClassPrefix$.uncheckedlastIndexOf(this.arr,size,val);
+  }
+#ENDIF
+  #MACRO SuppressUnchecked()
+  public $exposedType$ pop$TypeNameModifier$(){
+#IF OfRef
+    final $ArrayType$[] arr;
+    final int size;
+    final var ret=($exposedType$)(arr=this.arr)[size=--this.size];
+    arr[size]=null;
+    return ret;
+#ELSE
+    return ($exposedType$)arr[--this.size];
+#ENDIF
   }
 #IFNOT OfBoolean
   #MACRO SuppressUnchecked()
@@ -180,17 +208,17 @@ AbstractSeq<$BoxedType$>
       srcOffset+=64;
     }
   }
-#ENDIF
+
   @Override public void clear(){
-#IF OfRef
+  #IF OfRef
     int size;
     if((size=this.size)!=0){
       this.size=0;
       OmniArray.Of$ClassPrefix$.nullifyRange(this.arr,size-1,0);
     }
-#ELSE
+  #ELSE
     this.size=0;
-#ENDIF
+  #ENDIF
   }
   @Override public int hashCode(){
     final int size;
@@ -202,32 +230,32 @@ AbstractSeq<$BoxedType$>
   @Override public String toString(){
     int size;
     if((size=this.size)!=0){
-#IF OfDouble,OfRef
+  #IF OfDouble,OfRef
       final StringBuilder builder=new StringBuilder("[");
       uncheckedToString(size,builder);
       return builder.append(']').toString();
-#ELSE
-  #IF OfChar
+  #ELSE
+    #IF OfChar
       final char[] buffer;
       uncheckedToString(size,buffer=new char[size*=3]);
       buffer[0]='[';
       buffer[size-1]=']';
       return new String(buffer,0,size);
-  #ELSE
+    #ELSE
       final byte[] buffer;
-    #IF OfBoolean
+      #IF OfBoolean
       if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
-    #ELSEIF OfByte
+      #ELSEIF OfByte
       if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
-    #ELSEIF OfShort
+      #ELSEIF OfShort
       if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
-    #ELSEIF OfInt
+      #ELSEIF OfInt
       if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
-    #ELSEIF OfLong
+      #ELSEIF OfLong
       if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
-    #ELSEIF OfFloat
+      #ELSEIF OfFloat
       if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
-    #ENDIF
+      #ENDIF
         [size=uncheckedToString(size,buffer)]=(byte)']';
         buffer[0]=(byte)'[';
         return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
@@ -238,20 +266,20 @@ AbstractSeq<$BoxedType$>
         (buffer=builder.buffer)[0]=(byte)'[';
         return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
-  #ENDIF 
-#ENDIF
+    #ENDIF 
+  #ENDIF
     }
     return "[]";
   }
   abstract int uncheckedHashCode(int size);
-#IF OfDouble,OfRef
+  #IF OfDouble,OfRef
   abstract void uncheckedToString(int size,StringBuilder builder);
-#ELSEIF OfChar
+  #ELSEIF OfChar
   abstract void uncheckedToString(int size,char[] buffer);
-#ELSE
+  #ELSE
   abstract int uncheckedToString(int size,byte[] buffer);
   abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
-#ENDIF
+  #ENDIF
   #MACRO RootQueryMethods<Root,contains>()
   #MACRO RootQueryMethods<Root,removeVal>()
   #IF OfRef
@@ -272,35 +300,14 @@ AbstractSeq<$BoxedType$>
       uncheckedForEach(size,action);
     }
   }
-#IFNOT OfRef
+  #IFNOT OfRef
   @Override public void forEach(Consumer<? super $BoxedType$> action){
     final int size;
     if((size=this.size)!=0){
       uncheckedForEach(size,action::accept);
     }
   }
-#ENDIF
-  private void uncheckedAppend(int size,$exposedType$ val){
-    $ArrayType$[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit($exposedType$ val){
-    $ArrayType$[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new $ArrayType$[]{val};
-    }else{
-      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
-        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
+  #ENDIF
   public void push($exposedType$ val){
     final int size;
     if((size=this.size)!=0){
@@ -313,36 +320,37 @@ AbstractSeq<$BoxedType$>
     push(val);
     return true;
   }
-#IFNOT OfRef
+  
+  #IFNOT OfRef
   @Override public boolean add($BoxedType$ val){
     push(($exposedType$)val);
     return true;
   }
-  #IFNOT OfBoolean
+    #IFNOT OfBoolean
   @Override public boolean add(boolean val){
     push(($exposedType$)$queryCastBoolean$(val));
     return true;
   }
+    #ENDIF
   #ENDIF
-#ENDIF
-#IF OfInt,OfLong
+  #IF OfInt,OfLong
   @Override public boolean add(char val){
     push(($exposedType$)val);
     return true;
   }
-#ENDIF
-#IF OfInt,OfLong,OfShort
+  #ENDIF
+  #IF OfInt,OfLong,OfShort
   @Override public boolean add(byte val){
     push(($exposedType$)val);
     return true;
   }
-#ENDIF
-#IF OfDouble,OfFloat,OfLong
+  #ENDIF
+  #IF OfDouble,OfFloat,OfLong
   @Override public boolean add(int val){
     push(($exposedType$)val);
     return true;
   }
-  #IF OfFloat
+    #IF OfFloat
   @Override public boolean add(char val){
     push(($exposedType$)val);
     return true;
@@ -351,20 +359,20 @@ AbstractSeq<$BoxedType$>
     push(($exposedType$)val);
     return true;
   }  
-  #ENDIF
-  #IFNOT OfLong
+    #ENDIF
+    #IFNOT OfLong
   @Override public boolean add(long val){
     push(($exposedType$)val);
     return true;
   }
-    #IFNOT OfFloat
+      #IFNOT OfFloat
   @Override public boolean add(float val){
     push(($exposedType$)val);
     return true;
   }
+      #ENDIF
     #ENDIF
   #ENDIF
-#ENDIF
   abstract void uncheckedCopyInto($ArrayType$[] dst,int length);
   @Override public <T> T[] toArray(T[] arr){
     final int size;
@@ -384,37 +392,37 @@ AbstractSeq<$BoxedType$>
     return dst;
   }
   #MACRO RootToArrayImpl($ArrayType$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$TypeNameModifier$)
-#IFNOT OfRef
+  #IFNOT OfRef
   abstract void uncheckedCopyInto(Object[] dst,int length);
   abstract void uncheckedCopyInto($BoxedType$[] dst,int length);
   #MACRO RootToArrayImpl($BoxedType$,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,)
-  #IFNOT OfDouble
+    #IFNOT OfDouble
   abstract void uncheckedCopyInto(double[] dst,int length);
   #MACRO RootToArrayImpl(double,OmniArray.OfDouble.DEFAULT_ARR,Double)
-    #IFNOT OfFloat
+      #IFNOT OfFloat
   abstract void uncheckedCopyInto(float[] dst,int length);
   #MACRO RootToArrayImpl(float,OmniArray.OfFloat.DEFAULT_ARR,Float)
-      #IFNOT OfLong
+        #IFNOT OfLong
   abstract void uncheckedCopyInto(long[] dst,int length);
   #MACRO RootToArrayImpl(long,OmniArray.OfLong.DEFAULT_ARR,Long)
-        #IFNOT OfInt
+          #IFNOT OfInt
   abstract void uncheckedCopyInto(int[] dst,int length);
   #MACRO RootToArrayImpl(int,OmniArray.OfInt.DEFAULT_ARR,Int)
-          #IFNOT OfShort,OfChar
+            #IFNOT OfShort,OfChar
   abstract void uncheckedCopyInto(short[] dst,int length);
   #MACRO RootToArrayImpl(short,OmniArray.OfShort.DEFAULT_ARR,Short)
-            #IFNOT OfByte
+              #IFNOT OfByte
   abstract void uncheckedCopyInto(byte[] dst,int length);
   #MACRO RootToArrayImpl(byte,OmniArray.OfByte.DEFAULT_ARR,Byte)
   abstract void uncheckedCopyInto(char[] dst,int length);
   #MACRO RootToArrayImpl(char,OmniArray.OfChar.DEFAULT_ARR,Char)
+              #ENDIF
             #ENDIF
           #ENDIF
         #ENDIF
       #ENDIF
     #ENDIF
   #ENDIF
-#ENDIF
   boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter){
     #IF OfRef
     final int numRemoved;
@@ -430,9 +438,50 @@ AbstractSeq<$BoxedType$>
     return false;
   }
   #MACRO RootRemoveIfImpl($TypeNameModifier$Predicate$<? super E>$,filter)
-#IFNOT OfRef
+  #IFNOT OfRef
   #MACRO RootRemoveIfImpl(Predicate<? super $BoxedType$>,filter::test);
+  #ENDIF
 #ENDIF
+#IF OfBoolean
+  @Override
+  boolean uncheckedcontains(int bound,boolean val){
+    return OmniArray.Of$ClassPrefix$.uncheckedcontains(this.arr,0,bound,val);
+  }
+#ENDIF
+#IF OfBoolean
+  @Override
+#ELSE
+  private
+#ENDIF
+  void uncheckedAppend(int size,$exposedType$ val){
+    $ArrayType$[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+#IF OfBoolean
+  @Override
+#ELSE
+  private
+#ENDIF
+  void uncheckedInit($exposedType$ val){
+    $ArrayType$[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new $ArrayType$[]{val};
+    }else{
+      if(arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR){
+        this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
+  }
+  
+ 
+
 #IF OfBoolean
   private static int pullSurvivorsDown($ArrayType$[] arr,int srcOffset,int srcBound,int dstOffset,$ArrayType$ retainThis){
     while(++srcOffset!=srcBound){
@@ -467,6 +516,9 @@ AbstractSeq<$BoxedType$>
       }
       return 0;
     }
+  }
+  int uncheckedRemoveIfImpl(int size,BooleanPredicate filter){
+    return uncheckedRemoveIfImpl(this.arr,0,size,filter);
   }
   private static int uncheckedRemoveIfImpl($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter,CheckedCollection.AbstractModCountChecker modCountChecker){
     $ArrayType$ v;
@@ -1036,9 +1088,17 @@ public
   #ENDIF
   #MACRO QueryMethods<removeVal>()
   #MACRO QueryMethods<contains>()
+  #IF OfBoolean
+    #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  #MACRO QueryMethods<indexOf>()
+  #MACRO QueryMethods<lastIndexOf>()
+    #ENDIF
+  #ENDIF
+  #IFNOT OfBoolean
   #MACRO QueryMethods<indexOf>()
   #MACRO QueryMethods<lastIndexOf>()
   #MACRO QueryMethods<search>()
+  #ENDIF
   #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
     #IF OfRef
   private boolean uncheckedremoveValNonNull(int size,Object nonNull){
@@ -1499,7 +1559,7 @@ public
     }
   #ENDIF
   #IFSWITCH STRUCTNAME==UncheckedStack
-    #IFNOT OfRef
+    #IFNOT OfRef,OfBoolean
   @Override public void push($BoxedType$ val){
     push(($exposedType$)val);
   }
@@ -1524,7 +1584,12 @@ public
     #ENDIF
       ((UncheckedList$<E>$)this).uncheckedInsert(index,size,val);
     }else{
+      #IF OfBoolean
+      super.uncheckedInit(val);
+      #ELSE
       (($ClassPrefix$ArrSeq$<E>$)this).uncheckedInit(val);
+      #ENDIF
+      
     }
   }
   #ENDIF
@@ -1733,13 +1798,13 @@ public
   }
   #ENDIF
   #IFSWITCH STRUCTNAME==UncheckedStack
-    #IFNOT OfRef
+    #IFNOT OfRef,OfBoolean
   @Override public $BoxedType$ pop(){
     return pop$TypeNameModifier$();
   }
     #ENDIF
   #ENDIF
-  #IFSWITCH STRUCTNAME==UncheckedStack,CheckedStack
+  #IFSWITCH STRUCTNAME==CheckedStack
   #MACRO SuppressUnchecked()
   @Override public $exposedType$ pop$TypeNameModifier$(){
     #IFSWITCH STRUCTNAME==CheckedStack

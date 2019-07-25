@@ -74,6 +74,9 @@ AbstractSeq<Character>
       this.arr=OmniArray.OfChar.DEFAULT_ARR;
     }
   }
+  public char popChar(){
+    return (char)arr[--this.size];
+  }
   static  long markSurvivors(char[] arr,int srcOffset,int srcBound,CharPredicate filter){
     for(long word=0L,marker=1L;;marker<<=1){
       if(!filter.test((char)arr[srcOffset])){
@@ -479,27 +482,6 @@ AbstractSeq<Character>
       uncheckedForEach(size,action::accept);
     }
   }
-  private void uncheckedAppend(int size,char val){
-    char[] arr;
-    if((arr=this.arr).length==size){
-      ArrCopy.uncheckedCopy(arr,0,arr=new char[OmniArray.growBy50Pct(size)],0,size);
-      this.arr=arr;
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(char val){
-    char[] arr;
-    if((arr=this.arr)==null){
-      this.arr=new char[]{val};
-    }else{
-      if(arr==OmniArray.OfChar.DEFAULT_ARR){
-        this.arr=arr=new char[OmniArray.DEFAULT_ARR_SEQ_CAP];
-      }
-      arr[0]=val;
-    }
-    this.size=1;
-  }
   public void push(char val){
     final int size;
     if((size=this.size)!=0){
@@ -612,6 +594,29 @@ AbstractSeq<Character>
   @Override public boolean removeIf(Predicate<? super Character> filter){
     final int size;
     return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private
+  void uncheckedAppend(int size,char val){
+    char[] arr;
+    if((arr=this.arr).length==size){
+      ArrCopy.uncheckedCopy(arr,0,arr=new char[OmniArray.growBy50Pct(size)],0,size);
+      this.arr=arr;
+    }
+    arr[size]=val;
+    this.size=size+1;
+  }
+  private
+  void uncheckedInit(char val){
+    char[] arr;
+    if((arr=this.arr)==null){
+      this.arr=new char[]{val};
+    }else{
+      if(arr==OmniArray.OfChar.DEFAULT_ARR){
+        this.arr=arr=new char[OmniArray.DEFAULT_ARR_SEQ_CAP];
+      }
+      arr[0]=val;
+    }
+    this.size=1;
   }
   private static  int pullSurvivorsDown(char[] arr,int srcOffset,int srcBound,int dstOffset,CharPredicate filter){
     while(++srcOffset!=srcBound){
@@ -970,9 +975,6 @@ AbstractSeq<Character>
     }
     @Override public Character pop(){
       return popChar();
-    }
-    @Override public char popChar(){
-      return (char)arr[--this.size];
     }
     @Override public char pollChar(){
       int size;
