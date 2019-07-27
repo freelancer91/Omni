@@ -1383,15 +1383,9 @@ public
     }
     private ListItr(STRUCTNAME$<E>$ parent){
       super(parent);
-    #IFSWITCH STRUCTNAME==UncheckedList,UncheckedSubList
-      this.lastRet=-1;
-    #ENDIF
     }
     private ListItr(STRUCTNAME$<E>$ parent,int cursor){
       super(parent,cursor);
-    #IFSWITCH STRUCTNAME==UncheckedList,UncheckedSubList
-      this.lastRet=-1;
-    #ENDIF
     }
     @Override public Object clone(){
       return new ListItr$<E>$(this);
@@ -3589,7 +3583,9 @@ ERROR unknown struct STRUCTNAME for ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(
   #ENDIF
     this.modCount=modCount;
     OmniArray.Of$ClassPrefix$.removeIndexAndPullDown(root.arr,lastRet,--root.size);
+  #IFNOTSWITCH STRUCTNAME==CheckedStack
     this.cursor=lastRet;
+  #ENDIF
     this.lastRet=-1;
     return;
   }

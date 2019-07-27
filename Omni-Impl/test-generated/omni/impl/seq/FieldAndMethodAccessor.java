@@ -104,26 +104,6 @@ final class FieldAndMethodAccessor{
       throw new ExceptionInInitializerError(e);
     }
   }
-  /*
-  private static Object readObjectHelper(Object obj,ObjectInputStream ois,Method readResolveMethod) throws IOException,ClassNotFoundException{
-    Object replacement=ois.readObject();
-    try{
-      return readResolveMethod.invoke(replacement);
-    }catch(IllegalAccessException e){
-      throw new Error(e);
-    }catch(InvocationTargetException e){
-      var cause=e.getCause();
-      if(cause instanceof RuntimeException){
-        throw (RuntimeException)cause;
-      }else if(cause instanceof IOException){
-        throw (IOException)cause;
-      }else if(cause instanceof ClassNotFoundException){
-        throw (ClassNotFoundException)cause;
-      }
-      throw new Error(e);
-    }
-  }
-  */
   private static void writeObjectHelper(Object obj,ObjectOutputStream oos,Method writeReplaceMethod) throws IOException{
     Object replacement=null;
     try{
@@ -450,9 +430,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.RefDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -873,9 +850,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.RefArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -1194,9 +1168,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.BooleanDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -1409,6 +1380,253 @@ final class FieldAndMethodAccessor{
       }
     }
   }
+  static interface PackedBooleanArrSeq{
+    public static int size(Object obj){
+      return ((omni.impl.seq.PackedBooleanArrSeq)obj).size;
+    }
+    public static long[] words(Object obj){
+      return ((omni.impl.seq.PackedBooleanArrSeq)obj).words;
+    }
+    interface UncheckedList extends PackedBooleanArrSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int size(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).size;
+      }
+      public static long[] words(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).words;
+      }
+      interface Itr{
+        static final Field cursorField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedList"+DOLLARSIGN+"Itr","cursor");
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedList"+DOLLARSIGN+"Itr","parent");
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrSeq.UncheckedList parent(Object obj){
+          return (omni.impl.seq.PackedBooleanArrSeq.UncheckedList)getValue(parentField,obj);
+        }
+      }
+      interface ListItr extends Itr{
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedList"+DOLLARSIGN+"ListItr","lastRet");
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrSeq.UncheckedList parent(Object obj){
+          return (omni.impl.seq.PackedBooleanArrSeq.UncheckedList)getValue(parentField,obj);
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+      }
+    }
+    interface CheckedList extends UncheckedList{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int size(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).size;
+      }
+      public static long[] words(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).words;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq.CheckedList)obj).modCount;
+      }
+      interface Itr{
+        static final Field cursorField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedList"+DOLLARSIGN+"Itr","cursor");
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedList"+DOLLARSIGN+"Itr","parent");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedList"+DOLLARSIGN+"Itr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedList"+DOLLARSIGN+"Itr","modCount");
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrSeq.CheckedList parent(Object obj){
+          return (omni.impl.seq.PackedBooleanArrSeq.CheckedList)getValue(parentField,obj);
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+      }
+      interface ListItr extends Itr{
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrSeq.CheckedList parent(Object obj){
+          return (omni.impl.seq.PackedBooleanArrSeq.CheckedList)getValue(parentField,obj);
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+      }
+    }
+    interface UncheckedStack extends PackedBooleanArrSeq{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int size(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).size;
+      }
+      public static long[] words(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).words;
+      }
+      interface Itr{
+        static final Field cursorField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","cursor");
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedStack"+DOLLARSIGN+"Itr","parent");
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrSeq.UncheckedStack parent(Object obj){
+          return (omni.impl.seq.PackedBooleanArrSeq.UncheckedStack)getValue(parentField,obj);
+        }
+      }
+    }
+    interface CheckedStack extends UncheckedStack{
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        ((Externalizable)obj).writeExternal(oos);
+      }
+      public static int size(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).size;
+      }
+      public static long[] words(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq)obj).words;
+      }
+      public static int modCount(Object obj){
+        return ((omni.impl.seq.PackedBooleanArrSeq.CheckedStack)obj).modCount;
+      }
+      interface Itr{
+        static final Field cursorField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","cursor");
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","parent");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","lastRet");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedStack"+DOLLARSIGN+"Itr","modCount");
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static omni.impl.seq.PackedBooleanArrSeq.CheckedStack parent(Object obj){
+          return (omni.impl.seq.PackedBooleanArrSeq.CheckedStack)getValue(parentField,obj);
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+      }
+    }
+    interface CheckedSubList{
+      static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList","writeReplace");
+      static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
+      static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
+      }
+      static final Field modCountField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList","modCount");
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList","root");
+      static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList","parent");
+      static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList","rootOffset");
+      static int modCount(Object obj){
+        return getIntValue(modCountField,obj);
+      }
+      static int incrementModCount(Object obj){
+        return incrementIntValue(modCountField,obj);
+      }
+      static omni.impl.seq.PackedBooleanArrSeq.CheckedList root(Object obj){
+        return (omni.impl.seq.PackedBooleanArrSeq.CheckedList)getValue(rootField,obj);
+      }
+      static OmniList.OfBoolean parent(Object obj){
+        return (OmniList.OfBoolean)getValue(parentField,obj);
+      }
+      static int rootOffset(Object obj){
+        return getIntValue(rootOffsetField,obj);
+      }
+      static int size(Object obj){
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+      }
+      interface Itr{
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","parent");
+        static final Field cursorField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","cursor");
+        static final Field modCountField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","modCount");
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"CheckedSubList"+DOLLARSIGN+"Itr","lastRet");
+        static int cursor(Object obj){
+            return getIntValue(cursorField,obj);
+        }
+        static OmniList.OfBoolean parent(Object obj){
+            return (OmniList.OfBoolean)getValue(parentField,obj);
+        }
+        static int lastRet(Object obj){
+            return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+            return getIntValue(modCountField,obj);
+        }
+      }
+      interface ListItr extends Itr{
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static OmniList.OfBoolean parent(Object obj){
+          return (OmniList.OfBoolean)getValue(parentField,obj);
+        }
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int modCount(Object obj){
+          return getIntValue(modCountField,obj);
+        }
+      }
+    }
+    interface UncheckedSubList{
+      static final Method writeReplaceMethod=prepareMethodForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","writeReplace");
+      static final Method writeObjectMethod=prepareMethodForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"SerializableSubList","writeObject",ObjectOutputStream.class);
+      static final Method readResolveMethod=prepareMethodForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"SerializableSubList","readResolve");
+      public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
+        writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
+      }
+      static final Field rootField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
+      static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
+      static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
+      static omni.impl.seq.PackedBooleanArrSeq.UncheckedList root(Object obj){
+        return (omni.impl.seq.PackedBooleanArrSeq.UncheckedList)getValue(rootField,obj);
+      }
+      static OmniList.OfBoolean parent(Object obj){
+        return (OmniList.OfBoolean)getValue(parentField,obj);
+      }
+      static int rootOffset(Object obj){
+        return getIntValue(rootOffsetField,obj);
+      }
+      static int size(Object obj){
+        return ((omni.impl.seq.AbstractSeq<?>)obj).size;
+      }
+      interface Itr{
+        static final Field parentField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","parent");
+        static final Field cursorField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"Itr","cursor");
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static OmniList.OfBoolean parent(Object obj){
+          return (OmniList.OfBoolean)getValue(parentField,obj);
+        }
+      }
+      interface ListItr extends Itr{
+        static final Field lastRetField=prepareFieldForClassName("omni.impl.seq.PackedBooleanArrSeq"+DOLLARSIGN+"UncheckedSubList"+DOLLARSIGN+"ListItr","lastRet");
+        static int lastRet(Object obj){
+          return getIntValue(lastRetField,obj);
+        }
+        static int cursor(Object obj){
+          return getIntValue(cursorField,obj);
+        }
+        static OmniList.OfBoolean parent(Object obj){
+          return (OmniList.OfBoolean)getValue(parentField,obj);
+        }
+      }
+    }
+  }
   static interface BooleanArrSeq{
     public static int size(Object obj){
       return ((omni.impl.seq.BooleanArrSeq)obj).size;
@@ -1617,9 +1835,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.BooleanArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -1938,9 +2153,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.ByteDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -2361,9 +2573,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.ByteArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -2682,9 +2891,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.CharDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -3105,9 +3311,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.CharArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -3426,9 +3629,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.ShortDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -3849,9 +4049,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.ShortArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -4170,9 +4367,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.IntDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -4593,9 +4787,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.IntArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -4914,9 +5105,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.LongDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -5337,9 +5525,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.LongArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -5658,9 +5843,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.FloatDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -6081,9 +6263,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.FloatArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");
@@ -6402,9 +6581,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parent");
       static final Field parentOffsetField=prepareFieldForClassName("omni.impl.seq.DoubleDblLnkSeq"+DOLLARSIGN+"CheckedSubList","parentOffset");
@@ -6825,9 +7001,6 @@ final class FieldAndMethodAccessor{
       public static void writeObject(Object obj,ObjectOutputStream oos) throws IOException{
         writeObjectHelper(obj,oos,writeReplaceMethod,writeObjectMethod);
       }
-      //public static Object readObject(Object obj,ObjectInputStream ois) throws IOException,ClassNotFoundException{
-      //  return readObjectHelper(obj,ois,readResolveMethod);
-      //}
       static final Field rootField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList","root");
       static final Field parentField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList","parent");
       static final Field rootOffsetField=prepareFieldForClassName("omni.impl.seq.DoubleArrSeq"+DOLLARSIGN+"UncheckedSubList","rootOffset");

@@ -1653,11 +1653,9 @@ AbstractSeq<Float>
       }
       private ListItr(UncheckedList parent){
         super(parent);
-        this.lastRet=-1;
       }
       private ListItr(UncheckedList parent,int cursor){
         super(parent,cursor);
-        this.lastRet=-1;
       }
       @Override public Object clone(){
         return new ListItr(this);
@@ -2855,11 +2853,9 @@ AbstractSeq<Float>
       }
       private ListItr(UncheckedSubList parent){
         super(parent);
-        this.lastRet=-1;
       }
       private ListItr(UncheckedSubList parent,int cursor){
         super(parent,cursor);
-        this.lastRet=-1;
       }
       @Override public Object clone(){
         return new ListItr(this);
@@ -3299,7 +3295,6 @@ AbstractSeq<Float>
           root.modCount=++modCount;
           this.modCount=modCount;
           OmniArray.OfFloat.removeIndexAndPullDown(root.arr,lastRet,--root.size);
-          this.cursor=lastRet;
           this.lastRet=-1;
           return;
         }

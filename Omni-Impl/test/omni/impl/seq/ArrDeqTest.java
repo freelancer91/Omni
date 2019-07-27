@@ -65,6 +65,7 @@ import omni.util.TestExecutorService;
     void callMethod(ArrDeqMonitor monitor,Object inputVal,DataType inputType,FunctionCallType functionCallType);
   }
   private static class ArrDeqMonitor implements MonitoredDeque<OmniDeque<?>>{
+    
     private abstract class AbstractItrMonitor
         implements MonitoredCollection.MonitoredIterator<OmniIterator<?>,OmniDeque<?>>{
       final OmniIterator<?> itr;
@@ -141,7 +142,14 @@ import omni.util.TestExecutorService;
         }
       }
     }
+    
+    
+    
     private class AscendingItrMonitor extends AbstractItrMonitor{
+        
+        
+        
+        
       AscendingItrMonitor(){
         super(seq.iterator(),expectedTail != -1?expectedHead:-1,expectedSize);
       }
@@ -3592,7 +3600,7 @@ import omni.util.TestExecutorService;
                   periodOffset=0;
                   periodBound=Math.max(1,size / 128);
                   initValBound=0;
-                  periodInc=Math.max(1,size / 256);;
+                  periodInc=Math.max(1,size / 256);
                 }
                 final int rotateInc=Math.max(1,size / 4);
                 if(functionCallType == FunctionCallType.Boxed && size > 2){

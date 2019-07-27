@@ -40,6 +40,9 @@ import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
 import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
+import omni.impl.seq.PackedBooleanArrSeq.UncheckedList;
+import omni.impl.seq.PackedBooleanArrSeq.UncheckedStack;
+import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 @Tag("NewTest")
@@ -75,7 +78,18 @@ public class ArrSeqTest{
                 rootStructBuilder.accept(arrListParams);
                 rootStructBuilder.accept(arrStackParams);
             }
+            final var arrListParams=new SequenceInitParams(StructType.PackedBooleanArrList,DataType.BOOLEAN,checkedType,
+                    OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR);
+            final var arrStackParams=new SequenceInitParams(StructType.PackedBooleanArrStack,DataType.BOOLEAN,checkedType,
+                    OmniArray.OfInt.DEFAULT_ARR,OmniArray.OfInt.DEFAULT_ARR);
+            allStructBuilder.accept(arrListParams);
+            allStructBuilder.accept(arrStackParams);
+            stackStructBuilder.accept(arrStackParams);
+            listStructBuilder.accept(arrListParams);
+            rootStructBuilder.accept(arrListParams);
+            rootStructBuilder.accept(arrStackParams);
         }
+        //TODO add PackedBooleanSubList
         for(int pre0=0;pre0 <= 5;pre0+=5){
             for(int pre1=0;pre1 <= 5;pre1+=5){
                 final var preAllocs=new int[]{pre0,pre1};
@@ -109,35 +123,74 @@ public class ArrSeqTest{
         return initCapacity;
     }
     private static MonitoredList<?> getMonitoredList(SequenceInitParams initParams,int initCapacity){
-        final var rootMonitor=new ArrListMonitor<>(initParams,
-                getInitCapacity(initCapacity,initParams.preAllocs,initParams.postAllocs));
-        if(initParams.structType != StructType.ArrSubList){
-            return rootMonitor;
+        
+        switch(initParams.structType) {
+        case PackedBooleanArrList:
+        case PackedBooleanArrSubList:
+        {
+            final var rootMonitor=new ArrListMonitor<>(initParams,
+                    getInitCapacity(initCapacity,initParams.preAllocs,initParams.postAllocs));
+            if(initParams.structType != StructType.ArrSubList){
+                return rootMonitor;
+            }
+            //TODO add PackedBooleanSubList
+            return null;
         }
-        final var preAllocs=initParams.preAllocs;
-        final var postAllocs=initParams.postAllocs;
-        int totalPreAlloc=preAllocs[0];
-        int totalPostAlloc=postAllocs[0];
-        SequenceInitialization.Ascending.initialize(rootMonitor,totalPreAlloc,Integer.MIN_VALUE);
-        SequenceInitialization.Ascending.initialize(rootMonitor,totalPostAlloc,Integer.MAX_VALUE - totalPostAlloc);
-        var subListMonitor=new ArrListMonitor.ArrSubListMonitor<>(rootMonitor,totalPreAlloc,totalPreAlloc);
-        for(int i=1;i < preAllocs.length;++i){
-            int postAlloc;
-            int preAlloc;
-            totalPostAlloc+=postAlloc=postAllocs[i];
-            SequenceInitialization.Ascending.initialize(subListMonitor,preAlloc=preAllocs[i],
-                    Integer.MIN_VALUE + totalPreAlloc);
-            SequenceInitialization.Ascending.initialize(subListMonitor,postAlloc,Integer.MAX_VALUE - totalPostAlloc);
-            totalPreAlloc+=preAlloc;
-            subListMonitor=new ArrListMonitor.ArrSubListMonitor<>(subListMonitor,preAlloc,preAlloc);
+        case ArrList:
+        case ArrSubList:
+        {
+            final var rootMonitor=new ArrListMonitor<>(initParams,
+                    getInitCapacity(initCapacity,initParams.preAllocs,initParams.postAllocs));
+            if(initParams.structType != StructType.ArrSubList){
+                return rootMonitor;
+            }
+            final var preAllocs=initParams.preAllocs;
+            final var postAllocs=initParams.postAllocs;
+            int totalPreAlloc=preAllocs[0];
+            int totalPostAlloc=postAllocs[0];
+            SequenceInitialization.Ascending.initialize(rootMonitor,totalPreAlloc,Integer.MIN_VALUE);
+            SequenceInitialization.Ascending.initialize(rootMonitor,totalPostAlloc,Integer.MAX_VALUE - totalPostAlloc);
+            var subListMonitor=new ArrListMonitor.ArrSubListMonitor<>(rootMonitor,totalPreAlloc,totalPreAlloc);
+            for(int i=1;i < preAllocs.length;++i){
+                int postAlloc;
+                int preAlloc;
+                totalPostAlloc+=postAlloc=postAllocs[i];
+                SequenceInitialization.Ascending.initialize(subListMonitor,preAlloc=preAllocs[i],
+                        Integer.MIN_VALUE + totalPreAlloc);
+                SequenceInitialization.Ascending.initialize(subListMonitor,postAlloc,Integer.MAX_VALUE - totalPostAlloc);
+                totalPreAlloc+=preAlloc;
+                subListMonitor=new ArrListMonitor.ArrSubListMonitor<>(subListMonitor,preAlloc,preAlloc);
+            }
+            return subListMonitor;
         }
-        return subListMonitor;
+            
+        default:
+            throw initParams.structType.invalid();
+        }
+        
+       
+    }
+    
+    private static MonitoredStack<?> getMonitoredStack(SequenceInitParams initParams,int initCapacity){
+        switch(initParams.structType) {
+        case PackedBooleanArrStack:
+            return new PackedBooleanArrStackMonitor(initParams,initCapacity);
+        case ArrStack:
+            return new ArrStackMonitor<>(initParams,initCapacity);
+        default:
+            throw initParams.structType.invalid();
+        }
     }
     private static MonitoredSequence<?> getMonitoredSequence(SequenceInitParams initParams,int initCapacity){
-        if(initParams.structType == StructType.ArrStack){
+        switch(initParams.structType) {
+        case PackedBooleanArrStack:
+            return new PackedBooleanArrStackMonitor(initParams,initCapacity);
+        case ArrStack:
             return new ArrStackMonitor<>(initParams,initCapacity);
+        default:
+            return getMonitoredList(initParams,initCapacity);
         }
-        return getMonitoredList(initParams,initCapacity);
+      
     }
     @Order(68172)
     @Test
@@ -276,10 +329,37 @@ public class ArrSeqTest{
             for(final var initCap:INIT_CAPACITIES){
                 TestExecutorService.submitTest(()->{
                     AbstractArrSeqMonitor<?> monitor;
-                    if(initParams.structType == StructType.ArrList){
+                    switch(initParams.structType) {
+                    case PackedBooleanArrList:
+                    {
+                        var packedMonitor=new PackedBooleanArrListMonitor(initParams,initCap);
+                        if(initCap==0) {
+                            Assertions.assertNull(packedMonitor.expectedWords);
+                        }else {
+                            Assertions.assertEquals((initCap-1>>6)+1,packedMonitor.expectedWords.length);
+                        }
+                        packedMonitor.verifyCollectionState();
+                        return;
+                    }
+                    case PackedBooleanArrStack:
+                    {
+                        var packedMonitor=new PackedBooleanArrStackMonitor(initParams,initCap);
+                        if(initCap==0) {
+                            Assertions.assertNull(packedMonitor.expectedWords);
+                        }else {
+                            Assertions.assertEquals((initCap-1>>6)+1,packedMonitor.expectedWords.length);
+                        }
+                        packedMonitor.verifyCollectionState();
+                        return;
+                    }
+                    case ArrList:
                         monitor=new ArrListMonitor<>(initParams,initCap);
-                    }else{
+                        break;
+                    case ArrStack:
                         monitor=new ArrStackMonitor<>(initParams,initCap);
+                        break;
+                    default:
+                        throw initParams.structType.invalid();
                     }
                     switch(initCap){
                     case 0:
@@ -334,11 +414,22 @@ public class ArrSeqTest{
     public void testConstructor_void(){
         for(final var initParams:ROOT_STRUCT_INIT_PARAMS){
             TestExecutorService.submitTest(()->{
-                AbstractArrSeqMonitor<?> monitor;
-                if(initParams.structType == StructType.ArrList){
+                MonitoredSequence<?> monitor;
+                switch(initParams.structType) {
+                case PackedBooleanArrList:
+                    monitor=new PackedBooleanArrListMonitor(initParams);
+                    break;
+                case PackedBooleanArrStack:
+                    monitor=new PackedBooleanArrStackMonitor(initParams);
+                    break;
+                case ArrList:
                     monitor=new ArrListMonitor<>(initParams);
-                }else{
+                    break;
+                case ArrStack:
                     monitor=new ArrStackMonitor<>(initParams);
+                    break;
+                default:
+                    throw initParams.structType.invalid();
                 }
                 monitor.verifyCollectionState();
             });
@@ -825,7 +916,7 @@ public class ArrSeqTest{
         for(final var position:POSITIONS){
             if(position >= 0){
                 for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-                    final var itrType=initParams.structType == StructType.ArrList?IteratorType.BidirectionalItr
+                    final var itrType=initParams.structType == StructType.ArrList||initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr
                             :IteratorType.SubBidirectionalItr;
                     for(final var illegalMod:itrType.validPreMods){
                         if(illegalMod.expectedException == null || initParams.checkedType.checked){
@@ -917,7 +1008,7 @@ public class ArrSeqTest{
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
             for(final var size:SHORT_SIZES){
                 if(size > 0 || initParams.checkedType.checked){
-                    final var itrType=initParams.structType == StructType.ArrList?IteratorType.BidirectionalItr
+                    final var itrType=initParams.structType == StructType.ArrList||initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr
                             :IteratorType.SubBidirectionalItr;
                     for(final var illegalMod:itrType.validPreMods){
                         if(illegalMod.expectedException == null || initParams.checkedType.checked){
@@ -978,7 +1069,7 @@ public class ArrSeqTest{
     @Test
     public void testListItrset_val(){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            final var itrType=initParams.structType == StructType.ArrList?IteratorType.BidirectionalItr
+            final var itrType=initParams.structType == StructType.ArrList||initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr
                     :IteratorType.SubBidirectionalItr;
             for(final var illegalMod:itrType.validPreMods){
                 if(illegalMod.expectedException == null || initParams.checkedType.checked){
@@ -1120,7 +1211,7 @@ public class ArrSeqTest{
     public void testpeek_void(){
         for(final var initParams:STACK_STRUCT_INIT_PARAMS){
             TestExecutorService.submitTest(()->{
-                final var monitor=new ArrStackMonitor<>(initParams,100);
+                final var monitor=getMonitoredStack(initParams,100);
                 for(int i=0;;++i){
                     for(final var outputType:initParams.collectionType.validOutputTypes()){
                         monitor.verifyPeek(outputType);
@@ -1140,7 +1231,7 @@ public class ArrSeqTest{
         for(final var initParams:STACK_STRUCT_INIT_PARAMS){
             for(final var outputType:initParams.collectionType.validOutputTypes()){
                 TestExecutorService.submitTest(()->{
-                    final var monitor=SequenceInitialization.Ascending.initialize(new ArrStackMonitor<>(initParams,100),
+                    final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredStack(initParams,100),
                             100,0);
                     for(int i=0;;++i){
                         monitor.verifyPoll(outputType);
@@ -1162,7 +1253,7 @@ public class ArrSeqTest{
                     for(final var outputType:initParams.collectionType.validOutputTypes()){
                         TestExecutorService.submitTest(()->{
                             final var monitor=SequenceInitialization.Ascending
-                                    .initialize(new ArrStackMonitor<>(initParams,size),size,0);
+                                    .initialize(getMonitoredStack(initParams,size),size,0);
                             for(int i=0;i < size;++i){
                                 monitor.verifyPop(outputType);
                             }
@@ -1184,7 +1275,7 @@ public class ArrSeqTest{
                 for(final var functionCallType:inputType.validFunctionCalls){
                     for(final var initCap:INIT_CAPACITIES){
                         TestExecutorService.submitTest(()->{
-                            final var monitor=new ArrStackMonitor<>(initParams,initCap);
+                            final var monitor=getMonitoredStack(initParams,initCap);
                             for(int i=0;i < 100;++i){
                                 monitor.verifyPush(inputType.convertValUnchecked(i),inputType,functionCallType);
                             }
@@ -1456,14 +1547,22 @@ public class ArrSeqTest{
     @Order(367839)
     @Test
     public void testsearch_val(){
-        final QueryTest<ArrStackMonitor<?,?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
+        final QueryTest<MonitoredStack<?>> test=(monitor,queryVal,inputType,castType,modification,monitoredObjectGen,
                 position,seqSize)->{
             if(monitoredObjectGen == null){
                 int expectedIndex;
                 if(position >= 0){
-                    int size;
-                    expectedIndex=(size=monitor.size()) - monitor
-                            .findRemoveValIndex(queryVal.getInputVal(inputType,modification),inputType,0,size);
+                    if(monitor.getStructType()==StructType.PackedBooleanArrStack) {
+                        int size;
+                        expectedIndex=(size=monitor.size()) - ((PackedBooleanArrStackMonitor)monitor)
+                                .findRemoveValIndex(queryVal.getInputVal(inputType,modification),inputType,0,size);
+                    }else {
+                        int size;
+                        expectedIndex=(size=monitor.size()) - ((ArrStackMonitor<?,?>)monitor)
+                                .findRemoveValIndex(queryVal.getInputVal(inputType,modification),inputType,0,size);
+                    }
+                    
+                    
                 }else{
                     expectedIndex=-1;
                 }
@@ -3858,7 +3957,9 @@ public class ArrSeqTest{
                     this.itr=itr;
                     this.expectedCursor=expectedCursor;
                     this.expectedItrModCount=expectedModCount;
-                    this.expectedLastRet=-1;
+                    if(expectedRoot.checkedType.checked) {
+                        this.expectedLastRet=-1;
+                    }
                     this.lastRetState=-1;
                 }
                 @Override
@@ -4383,7 +4484,9 @@ public class ArrSeqTest{
                 this.itr=itr;
                 this.expectedCursor=expectedCursor;
                 this.expectedItrModCount=expectedModCount;
-                this.expectedLastRet=-1;
+                if(checkedType.checked) {
+                    this.expectedLastRet=-1;
+                }
                 this.lastRetState=-1;
             }
             @Override
@@ -5945,7 +6048,7 @@ public class ArrSeqTest{
             TestExecutorService.completeAllTests(testName);
         }
     }
-    private static interface QueryTest<MONITOR extends MonitoredSequence<?>>{
+    private static interface QueryTest<MONITOR extends MonitoredCollection<?>>{
         void callAndVerifyResult(MONITOR monitor,QueryVal queryVal,DataType inputType,QueryCastType castType,
                 QueryVal.QueryValModification modification,MonitoredObjectGen monitoredObjectGen,double position,
                 int seqSize);
@@ -6333,4 +6436,1072 @@ public class ArrSeqTest{
             TestExecutorService.completeAllTests(testName);
         }
     }
+
+
+    
+    private abstract static class AbstractPackedBooleanArrSeqMonitor<SEQ extends PackedBooleanArrSeq> implements MonitoredSequence<SEQ>{
+        final CheckedType checkedType;
+        final SEQ seq;
+        int expectedSize;
+        long[] expectedWords;
+        int expectedModCount;
+        int trueCount;
+        abstract SEQ initSeq();
+        abstract SEQ initSeq(int initCapacity);
+        AbstractPackedBooleanArrSeqMonitor(CheckedType checkedType){
+            this.checkedType=checkedType;
+            this.seq=initSeq();
+            updateCollectionState();
+        }
+        AbstractPackedBooleanArrSeqMonitor(CheckedType checkedType,int initCapacity){
+            this.checkedType=checkedType;
+            this.seq=initSeq(initCapacity);
+            updateCollectionState();
+        }
+        @Override
+        public Object get(int iterationIndex,DataType outputType){
+            return outputType.convertVal((expectedWords[iterationIndex>>6]&1L<<iterationIndex)!=0);
+        }
+
+        @Override
+        public CheckedType getCheckedType(){
+            return checkedType;
+        }
+        @Override
+        public SEQ getCollection(){
+            return seq;
+        }
+        @Override
+        public DataType getDataType(){
+            return DataType.BOOLEAN;
+        }
+        @Override
+        public int size(){
+            return this.expectedSize;
+        }
+        @Override
+        public void updateClearState(){
+            ++expectedModCount;
+            trueCount=0;
+            expectedSize=0;
+          }
+        public void verifyPutResult(int index,Object input,DataType inputType){
+            final Object expectedVal=DataType.BOOLEAN.convertValUnchecked(inputType,input);
+            Assertions.assertEquals((boolean)expectedVal,((OmniList.OfBoolean)seq).getBoolean(index));
+            int wordIndex;
+            long word=expectedWords[wordIndex=index>>6];
+            boolean oldVal=(word&1L<<index)!=0;
+            var newVal=(boolean)expectedVal;
+            if(oldVal) {
+                if(!newVal) {
+                    expectedWords[wordIndex]=word&~(1L<<index);
+                    --trueCount;
+                }
+                
+            }else {
+                if(newVal) {
+                    expectedWords[wordIndex]=word|1L<<index;
+                    ++trueCount;
+                }
+            }
+           
+          }
+        abstract void updateModCount();
+        abstract void verifyModCount();
+        @Override
+        public void updateCollectionState(){
+            if(checkedType.checked){
+                updateModCount();
+              }
+              copyListContents();
+              this.expectedSize=((AbstractSeq<?>)seq).size;
+            }
+        public void copyListContents() {
+            var actualWords=seq.words;
+            if(actualWords==null) {
+                this.expectedWords=null;
+                this.trueCount=0;
+            }else {
+                var expectedWords=this.expectedWords;
+                if(expectedWords==null || expectedWords.length!=actualWords.length) {
+                    this.expectedWords=expectedWords=new long[actualWords.length];
+                }
+                System.arraycopy(actualWords,0,expectedWords,0,actualWords.length);
+                int bound=seq.size;
+                int wordOffset;
+                int bitCount=Long.bitCount(actualWords[wordOffset=bound-1>>6]<<-bound);
+                while(--wordOffset>=0) {
+                    bitCount+=Long.bitCount(actualWords[wordOffset]);
+                }
+                this.trueCount=bitCount;
+            }
+        }
+        public void verifyCollectionState(boolean refIsSame){
+            int expectedSize;
+            Assertions.assertEquals(expectedSize=this.expectedSize,((AbstractSeq<?>)seq).size);
+            if(checkedType.checked){
+                verifyModCount();
+            }
+                final var actualArr=((PackedBooleanArrSeq)seq).words;
+                final var expectedArr=expectedWords;
+                if(expectedArr==null){
+                    Assertions.assertNull(actualArr);
+                }else{
+                    Assertions.assertEquals(expectedArr.length,actualArr.length);
+                    int wordIndex;
+                    Assertions.assertEquals(expectedArr[wordIndex=expectedSize-1>>6]<<-expectedSize,actualArr[wordIndex]<<-expectedSize);
+                    while(--wordIndex>=0) {
+                        Assertions.assertEquals(expectedArr[wordIndex],actualArr[wordIndex]);
+                    }
+                }
+            
+           
+        }
+
+        
+        @Override
+        public void verifyCollectionState(){
+            verifyCollectionState(false);
+        }
+        abstract void verifyCloneTypeAndModCount(Object clone);
+        @Override
+        public void verifyClone(Object clone){
+            verifyCloneTypeAndModCount(clone);
+            Assertions.assertNotSame(clone,seq);
+            int size;
+            Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+   
+                final var origArr=((PackedBooleanArrSeq)seq).words;
+                final var cloneArr=((PackedBooleanArrSeq)clone).words;
+                if(origArr == null){
+                    Assertions.assertNull(cloneArr);
+                }else{
+                    Assertions.assertNotSame(origArr,cloneArr);
+                    if(size!=0) {
+                        int wordIndex;
+                        Assertions.assertEquals(origArr[wordIndex=size-1>>6]<<-size,cloneArr[wordIndex]<<-size);
+                        while(--wordIndex>=0) {
+                            Assertions.assertEquals(origArr[wordIndex],cloneArr[wordIndex]);
+                        }
+                    }
+                }
+
+
+        }
+        @Override
+        public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+            Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
+            Assertions.assertNotEquals(result,filter.numRemoved == 0);
+            int expectedSize=this.expectedSize;
+            if(result){
+              final var words=this.expectedWords;
+              if(trueCount==0) {
+                  Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                  Assertions.assertFalse(filter.removedVals.contains(Boolean.TRUE));
+                  Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                  Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+                  Assertions.assertEquals(1,filter.numCalls);
+                  Assertions.assertEquals(1,filter.numRemoved);
+                  Assertions.assertEquals(0,filter.numRetained);
+                  this.expectedSize=0;
+              }else if(expectedSize==trueCount) {
+                  Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                  Assertions.assertFalse(filter.removedVals.contains(Boolean.FALSE));
+                  Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                  Assertions.assertTrue(filter.removedVals.contains(Boolean.TRUE));
+                  Assertions.assertEquals(1,filter.numCalls);
+                  Assertions.assertEquals(1,filter.numRemoved);
+                  Assertions.assertEquals(0,filter.numRetained);
+                  this.expectedSize=0;
+                  this.trueCount=0;
+              }else {
+                  Assertions.assertEquals(2,filter.numCalls);
+                  if(filter.removedVals.contains(Boolean.TRUE)) {
+                      Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                      if(filter.removedVals.contains(Boolean.FALSE)) {
+                          Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                          Assertions.assertEquals(2,filter.numRemoved);
+                          Assertions.assertEquals(0,filter.numRetained);
+                          this.expectedSize=0;
+                          this.trueCount=0;
+                      }else {
+                          Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                          Assertions.assertEquals(1,filter.numRemoved);
+                          Assertions.assertEquals(1,filter.numRetained);
+                          this.expectedSize=expectedSize-=trueCount;
+                          this.trueCount=0;
+                          for(int i=0,bound=expectedSize-1>>6;;++i) {
+                              words[i]=0;
+                              if(i==bound) {
+                                  break;
+                              }
+                          }
+                      }
+                  }else {
+                      Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                      Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                      Assertions.assertTrue(filter.removedVals.contains(Boolean.FALSE));
+                      Assertions.assertEquals(1,filter.numRemoved);
+                      Assertions.assertEquals(1,filter.numRetained);
+                      this.expectedSize=expectedSize=trueCount;
+                      for(int i=0,bound=expectedSize-1>>6;;++i) {
+                          words[i]=-1L;
+                          if(i==bound) {
+                              break;
+                          }
+                      }
+                  }
+              }
+              ++expectedModCount;
+            }else{
+                Assertions.assertEquals(0,filter.numRemoved);
+                Assertions.assertEquals(filter.numCalls,filter.numRetained);
+                if(expectedSize!=0) {
+                    if(trueCount==0) {
+                        Assertions.assertFalse(filter.retainedVals.contains(Boolean.TRUE));
+                        Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                        Assertions.assertEquals(1,filter.numRetained);
+                    }else if(trueCount==expectedSize) {
+                        Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                        Assertions.assertFalse(filter.retainedVals.contains(Boolean.FALSE));
+                        Assertions.assertEquals(1,filter.numRetained);
+                    }else {
+                        Assertions.assertTrue(filter.retainedVals.contains(Boolean.TRUE));
+                        Assertions.assertTrue(filter.retainedVals.contains(Boolean.FALSE));
+                        Assertions.assertEquals(2,filter.numRetained);
+                    }
+                }else {
+                    Assertions.assertEquals(0,filter.numRetained);
+                }
+            }
+          }
+        @Override
+        public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
+            if(arr instanceof long[]) {
+                Assertions.assertNotSame(seq.words,arr);
+            }else if(arr==null) {
+                Assertions.assertNull(seq.words);
+            }
+        }
+        @Override
+        public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+            seq.writeExternal(oos);
+            }
+        private static long partialWordShiftDown(long word,int shift){
+            long mask;
+            return word & (mask=(1L << shift) - 1) | word >>> 1 & ~mask;
+        }
+        @Override
+        public void updateRemoveIndexState(final int index){
+            int bound=expectedSize-1;
+            ++expectedModCount;
+            final long[] words;
+            int wordOffset;
+            final int wordBound;
+            final long retWord;
+            var word=(words=this.expectedWords)[wordOffset=index >> 6]=partialWordShiftDown(retWord=words[wordOffset],index);
+            if(wordOffset == (wordBound=bound >> 6)){
+                words[wordOffset]=word;
+            }else{
+                words[wordOffset]=word | (word=words[++wordOffset]) << 63;
+                while(wordOffset != wordBound){
+                    words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
+                }
+                words[wordBound]=word >>> 1;
+            }
+            expectedSize=bound;
+            if((retWord&1L<<index)!=0) {
+                --trueCount;
+            }
+        }
+        @Override
+        public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
+            boolean rawActualGetVal=(expectedWords[expectedCursor>>6]&1L<<expectedCursor)!=0;
+            switch(outputType){
+            case BOOLEAN:
+              Assertions.assertEquals(rawActualGetVal,(boolean)output);
+              break;
+            case BYTE:
+              Assertions.assertEquals(rawActualGetVal?(byte)1:(byte)0,(byte)output);
+              break;
+            case CHAR:
+              Assertions.assertEquals(rawActualGetVal?(char)1:(char)0,(char)output);
+              break;
+            case SHORT:
+              Assertions.assertEquals(rawActualGetVal?(short)1:(short)0,(short)output);
+              break;
+            case INT:
+              Assertions.assertEquals(rawActualGetVal?(int)1:(int)0,(int)output);
+              break;
+            case LONG:
+              Assertions.assertEquals(rawActualGetVal?(long)1:(long)0,(long)output);
+              break;
+            case FLOAT:
+              Assertions.assertEquals(rawActualGetVal?(float)1:(float)0,(float)output);
+              break;
+            case DOUBLE:
+              Assertions.assertEquals(rawActualGetVal?(double)1:(double)0,(double)output);
+              break;
+            case REF:
+              Assertions.assertEquals(rawActualGetVal,output);
+              break;
+            default:
+              throw outputType.invalid();
+            }
+          }
+        abstract int findRemoveValIndex(Object inputVal,DataType inputType,int fromIndex,int toIndex);
+        public void updateAddState(int index,Object inputVal,DataType inputType){
+            var v=(boolean)inputVal;
+            var words=this.expectedWords;
+            int expectedSize=this.expectedSize;
+            this.expectedSize=expectedSize+1;
+            ++expectedModCount;
+            if(v) {
+                ++trueCount;
+            }
+            if(expectedSize!=0) {
+                final int wordIndex=index >> 6;
+                if(expectedSize==index) {
+                    if(words.length == wordIndex){
+                        ArrCopy.uncheckedCopy(words,0,words=new long[OmniArray.growBy50Pct(wordIndex)],0,wordIndex);
+                        this.expectedWords=words;
+                    }
+                    if(v){
+                        words[wordIndex]|=1L << expectedSize;
+                    }else{
+                        words[wordIndex]&=~(1L << expectedSize);
+                    }
+                }else {
+                    
+                    var word=words[expectedSize>>=6];
+                    final long[] tmp;
+                    if(words.length == expectedSize){
+                        ArrCopy.semicheckedCopy(words,0,tmp=new long[OmniArray.growBy50Pct(expectedSize)],0,wordIndex);
+                        this.expectedWords=tmp;
+                    }else{
+                        tmp=words;
+                    }
+                    for(;wordIndex != expectedSize;){
+                        tmp[expectedSize]=word << 1 | (word=words[--expectedSize]) >>> 63;
+                    }
+                    long mask;
+                    word=word << 1 & (mask=-1L << index) | word & (mask=~mask);
+                    if(v){
+                        tmp[expectedSize]=word | mask + 1;
+                    }else{
+                        tmp[expectedSize]=word & ~(mask + 1);
+                    }
+                }
+            }else {
+                if(words == null){
+                    this.expectedWords=new long[]{v?1L:0L};
+                }else{
+                    words[0]=v?1L:0L;
+                }
+            }
+            
+           
+        }
+        @Override
+        public void updateAddState(Object inputVal,DataType inputType){
+            updateAddState(expectedSize,inputVal,inputType);
+        }
+        @Override
+        public void updateRemoveValState(Object inputVal,DataType inputType){
+            updateRemoveIndexState(findRemoveValIndex(inputVal,inputType,0,expectedSize));
+        }
+
+
+        @Override
+        public void modParent(){
+            throw new UnsupportedOperationException();
+            }
+        @Override
+        public void modRoot(){
+            throw new UnsupportedOperationException();
+            }
+        public void incrementModCount(){
+            ++expectedModCount;
+        }
+        
+        public void updateReplaceAllState(MonitoredFunction function){
+            updateReplaceAllState(function,0);
+          }
+          public void updateReplaceAllState(MonitoredFunction function,int index){
+            if(function.getMonitoredFunctionGen().expectedException != ConcurrentModificationException.class
+                && !function.isEmpty()){
+              ++expectedModCount;
+            }
+           
+            var itr=function.iterator();
+            if(itr.hasNext()) {
+                final var words=this.expectedWords;
+                int wordIndex;
+                long word=words[wordIndex=index>>6];
+                int trueCount=this.trueCount;
+                for(;;) {
+                    var oldVal=itr.next();
+                    if((boolean)oldVal) {
+                        --trueCount;
+                        word=word&~(1L<<index);
+                    }else {
+                        ++trueCount;
+                        word=word|1L<<index;
+                    }
+                    if(!itr.hasNext()) {
+                        words[wordIndex]=word;
+                        break;
+                    }
+                    if((++index&63)==0) {
+                        words[wordIndex]=word;
+                        word=words[++wordIndex];
+                    }
+                }
+                this.trueCount=trueCount;
+            }
+          }
+    }
+    private static class PackedBooleanArrStackMonitor extends AbstractPackedBooleanArrSeqMonitor<PackedBooleanArrSeq.UncheckedStack> implements MonitoredStack<PackedBooleanArrSeq.UncheckedStack>{
+        PackedBooleanArrStackMonitor(CheckedType checkedType,int initCapacity){
+            super(checkedType,initCapacity);
+        }
+        @Override
+        public Object get(int iterationIndex,DataType outputType) {
+            return super.get(expectedSize-iterationIndex-1,outputType);
+        }
+        PackedBooleanArrStackMonitor(CheckedType checkedType){
+            super(checkedType);
+        }
+
+        public PackedBooleanArrStackMonitor(SequenceInitParams initParams){
+            super(initParams.checkedType);
+        }
+        public PackedBooleanArrStackMonitor(SequenceInitParams initParams,int initCap){
+            super(initParams.checkedType,initCap);
+        }
+
+
+        @Override
+        public StructType getStructType(){
+            return StructType.PackedBooleanArrStack;
+        }
+
+        @Override
+        public void modCollection(){
+            ++((PackedBooleanArrSeq.CheckedStack)seq).modCount;
+            ++expectedModCount;
+        }
+
+
+
+
+
+        @Override
+        public Object removeFirst(){
+            var removed=seq.popBoolean();
+            super.updateRemoveIndexState(expectedSize-1);
+            return removed;
+          }
+
+        @Override
+        public void verifyPush(Object inputVal,DataType inputType,FunctionCallType functionCallType){
+            inputType.callPush(inputVal,seq,functionCallType);
+            updateAddState(expectedSize,inputVal,inputType);
+            verifyCollectionState(true);
+        }
+
+        @Override
+        public Object verifyPop(DataType outputType){
+            Object result;
+            Object expected=null;
+            int size;
+            if(0 < (size=expectedSize)){
+                expected=outputType.callPeek(seq);
+            }
+            try{
+                result=outputType.callPop(seq);
+                updateRemoveIndexState(size - 1);
+            }finally{
+                verifyCollectionState(true);
+            }
+
+            Assertions.assertEquals(expected,result);
+            return result;
+        }
+
+        @Override
+        public Object verifyPoll(DataType outputType){
+            Object result;
+            final Object expected=outputType.callPeek(seq);
+            final int size=expectedSize;
+            try{
+                result=outputType.callPoll(seq);
+                if(size > 0){
+                    updateRemoveIndexState(size - 1);
+                }
+            }finally{
+                verifyCollectionState(true);
+            }
+            Assertions.assertEquals(expected,result);
+            return result;
+        }
+
+        @Override
+        public Object verifyPeek(DataType outputType){
+            Object result;
+            final int size=expectedSize;
+            try{
+                result=outputType.callPeek(seq);
+            }finally{
+                verifyCollectionState(true);
+            }
+            if(size == 0){
+                Assertions.assertEquals(outputType.defaultVal,result);
+            }else{
+                verifyGetResult(size - 1,result,outputType);
+            }
+            return result;
+        }
+
+        @Override
+        UncheckedStack initSeq(){
+            if(checkedType.checked) {
+                return new PackedBooleanArrSeq.CheckedStack();
+            }
+            return new PackedBooleanArrSeq.UncheckedStack();
+        }
+
+        @Override
+        UncheckedStack initSeq(int initCapacity){
+            if(checkedType.checked) {
+                return new PackedBooleanArrSeq.CheckedStack(initCapacity);
+            }
+            return new PackedBooleanArrSeq.UncheckedStack(initCapacity);
+        }
+
+        @Override
+        void updateModCount(){
+            expectedModCount=((PackedBooleanArrSeq.CheckedStack)seq).modCount;
+        }
+
+        @Override
+        void verifyModCount(){
+            Assertions.assertEquals(expectedModCount,((PackedBooleanArrSeq.CheckedStack)seq).modCount);
+        }
+
+        @Override
+        void verifyCloneTypeAndModCount(Object clone){
+            Assertions.assertEquals(checkedType.checked,clone instanceof PackedBooleanArrSeq.CheckedStack);
+            if(checkedType.checked){
+                Assertions.assertEquals(0,((PackedBooleanArrSeq.CheckedStack)clone).modCount);
+            }else{
+                Assertions.assertTrue(clone instanceof PackedBooleanArrSeq.UncheckedStack);
+            }
+        }
+
+        @Override
+        int findRemoveValIndex(Object inputVal,DataType inputType,int fromIndex,int toIndex){
+            boolean inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal == 1;
+              break;
+            case CHAR:
+              inputCast=(char)inputVal == 1;
+              break;
+            case SHORT:
+              inputCast=(short)inputVal == 1;
+              break;
+            case INT:
+              inputCast=(int)inputVal == 1;
+              break;
+            case LONG:
+              inputCast=(long)inputVal == 1L;
+              break;
+            case FLOAT:
+              inputCast=(float)inputVal == 1F;
+              break;
+            case DOUBLE:
+              inputCast=(double)inputVal == 1D;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var words=this.expectedWords;
+            var word=words[--toIndex>>6];
+            if(inputCast) {
+                for(;;) {
+                    if((word&1L<<toIndex)!=0) {
+                        return toIndex;
+                    }
+                    if((--toIndex&63)==63) {
+                        word=words[toIndex>>6];
+                    }
+                }
+            }else {
+                for(;;) {
+                    if((word&1L<<toIndex)==0) {
+                        return toIndex;
+                    }
+                    if((--toIndex&63)==63) {
+                        word=words[toIndex>>6];
+                    }
+                }
+            }
+        }
+
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,UncheckedStack> getMonitoredIterator(IteratorType itrType){
+            if(itrType!=IteratorType.AscendingItr) {
+                throw itrType.invalid();
+            }
+            return getMonitoredIterator();
+        }
+
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,UncheckedStack> getMonitoredIterator(){
+            if(checkedType.checked) {
+                return new CheckedItrMonitor();
+            }
+            return new UncheckedItrMonitor();
+        }
+
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,UncheckedStack> getMonitoredIterator(int index,
+                IteratorType itrType){
+            if(itrType!=IteratorType.AscendingItr) {
+                throw itrType.invalid();
+            }
+            return getMonitoredIterator(index);
+        }
+        private class CheckedItrMonitor extends UncheckedItrMonitor{
+            @Override
+            public void verifyCloneHelper(Object clone){
+
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedStack.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedStack.Itr.cursor(clone));
+                    Assertions.assertEquals(expectedItrModCount,
+                            FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedStack.Itr.modCount(clone));
+                    Assertions.assertEquals(expectedLastRet,
+                            FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedStack.Itr.lastRet(clone));
+               
+            }
+        }
+        private class UncheckedItrMonitor implements MonitoredCollection.MonitoredIterator<OmniIterator.OfBoolean,PackedBooleanArrSeq.UncheckedStack>{
+            final OmniIterator.OfBoolean itr=seq.iterator();
+            int expectedCursor=expectedSize;
+            int expectedLastRet=-1;
+            int expectedItrModCount=expectedModCount;
+            @Override
+            public OmniIterator.OfBoolean getIterator(){
+                return itr;
+            }
+            @Override
+            public IteratorType getIteratorType(){
+                return IteratorType.AscendingItr;
+            }
+            @Override
+            public MonitoredCollection<PackedBooleanArrSeq.UncheckedStack> getMonitoredCollection(){
+                return PackedBooleanArrStackMonitor.this;
+            }
+            @Override
+            public int getNumLeft(){
+                return expectedCursor;
+            }
+            @Override
+            public boolean hasNext(){
+                return expectedCursor > 0;
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return expectedLastRet != -1;
+            }
+            @Override
+            public void updateItrNextState(){
+                expectedLastRet=--expectedCursor;
+            }
+            @Override
+            public void updateItrRemoveState(){
+                updateRemoveIndexState(expectedCursor);
+                expectedLastRet=-1;
+                ++expectedItrModCount;
+            }
+            @Override
+            public void verifyCloneHelper(Object clone){
+  
+                    Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedStack.Itr.parent(clone));
+                    Assertions.assertEquals(expectedCursor,
+                            FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedStack.Itr.cursor(clone));
+
+            }
+            @Override
+            public void verifyForEachRemaining(MonitoredFunction function){
+                int expectedCursor=this.expectedCursor;
+                final var functionItr=function.iterator();
+                IntConsumer functionVerifier;
+                final var expectedArr=PackedBooleanArrStackMonitor.this.expectedWords;
+                functionVerifier=cursor->Assertions.assertEquals((expectedArr[cursor>>6]&1L<<cursor)!=0,(boolean)functionItr.next());
+                while(functionItr.hasNext()){
+                    functionVerifier.accept(--expectedCursor);
+                }
+                if(expectedCursor == 0 && !function.isEmpty()){
+                    this.expectedCursor=0;
+                    expectedLastRet=0;
+                }
+            }
+            @Override
+            public void verifyNextResult(DataType outputType,Object result){
+                verifyGetResult(expectedCursor-1,result,outputType);
+            }
+        }
+    }
+    private static class PackedBooleanArrListMonitor extends AbstractPackedBooleanArrSeqMonitor<PackedBooleanArrSeq.UncheckedList> implements MonitoredList<PackedBooleanArrSeq.UncheckedList>{
+        public PackedBooleanArrListMonitor(SequenceInitParams initParams){
+            super(initParams.checkedType);
+        }
+        public PackedBooleanArrListMonitor(SequenceInitParams initParams,int initCap){
+            super(initParams.checkedType,initCap);
+        }
+        PackedBooleanArrListMonitor(CheckedType checkedType,int initCapacity){
+            super(checkedType,initCapacity);
+        }
+
+        PackedBooleanArrListMonitor(CheckedType checkedType){
+            super(checkedType);
+        }
+
+        @Override
+        public Object removeFirst(){
+            Object result=seq.removeBooleanAt(0);
+            super.updateRemoveIndexState(0);
+            return result;
+        }
+
+      
+      
+
+        @Override
+        public StructType getStructType(){
+            return StructType.PackedBooleanArrList;
+        }
+
+        @Override
+        public void modCollection(){
+            ++((PackedBooleanArrSeq.CheckedList)seq).modCount;
+            ++expectedModCount;
+        }
+
+
+
+
+        @Override
+        UncheckedList initSeq(){
+            if(checkedType.checked) {
+                return new PackedBooleanArrSeq.CheckedList();
+            }
+            return new PackedBooleanArrSeq.UncheckedList();
+        }
+
+        @Override
+        UncheckedList initSeq(int initCapacity){
+            if(checkedType.checked) {
+                return new PackedBooleanArrSeq.CheckedList(initCapacity);
+            }
+            return new PackedBooleanArrSeq.UncheckedList(initCapacity);
+        }
+
+        @Override
+        void updateModCount(){
+            expectedModCount=((PackedBooleanArrSeq.CheckedList)seq).modCount;
+        }
+
+        @Override
+        void verifyModCount(){
+            Assertions.assertEquals(expectedModCount,((PackedBooleanArrSeq.CheckedList)seq).modCount);
+        }
+
+        @Override
+        void verifyCloneTypeAndModCount(Object clone){
+            Assertions.assertEquals(checkedType.checked,clone instanceof PackedBooleanArrSeq.CheckedList);
+            if(checkedType.checked){
+                Assertions.assertEquals(0,((PackedBooleanArrSeq.CheckedList)clone).modCount);
+            }else{
+                Assertions.assertTrue(clone instanceof PackedBooleanArrSeq.UncheckedList);
+            }
+        }
+
+        @Override
+        int findRemoveValIndex(Object inputVal,DataType inputType,int fromIndex,int toIndex){
+            boolean inputCast;
+            switch(inputType){
+            case BOOLEAN:
+              inputCast=(boolean)inputVal;
+              break;
+            case BYTE:
+              inputCast=(byte)inputVal == 1;
+              break;
+            case CHAR:
+              inputCast=(char)inputVal == 1;
+              break;
+            case SHORT:
+              inputCast=(short)inputVal == 1;
+              break;
+            case INT:
+              inputCast=(int)inputVal == 1;
+              break;
+            case LONG:
+              inputCast=(long)inputVal == 1L;
+              break;
+            case FLOAT:
+              inputCast=(float)inputVal == 1F;
+              break;
+            case DOUBLE:
+              inputCast=(double)inputVal == 1D;
+              break;
+            default:
+              throw inputType.invalid();
+            }
+            final var words=this.expectedWords;
+            var word=words[fromIndex>>6];
+            if(inputCast) {
+                for(;;) {
+                    if((word&1L<<fromIndex)!=0) {
+                        return fromIndex;
+                    }
+                    if((++fromIndex&63)==0) {
+                        word=words[fromIndex>>6];
+                    }
+                }
+            }else {
+                for(;;) {
+                    if((word&1L<<fromIndex)==0) {
+                        return fromIndex;
+                    }
+                    if((++fromIndex&63)==0) {
+                        word=words[fromIndex>>6];
+                    }
+                }
+            }
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,UncheckedList> getMonitoredIterator(IteratorType itrType){
+            switch(itrType) {
+            case AscendingItr:
+                return getMonitoredIterator();
+            case BidirectionalItr:
+                return getMonitoredListIterator();
+            default:
+                throw itrType.invalid();
+            }
+        }
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,UncheckedList> getMonitoredIterator(int index,
+                IteratorType itrType){
+            switch(itrType) {
+            case AscendingItr:
+                return getMonitoredIterator(index);
+            case BidirectionalItr:
+                return getMonitoredListIterator(index);
+            default:
+                throw itrType.invalid();
+            }
+        }
+        private abstract class AbstractItrMonitor<ITR extends OmniIterator.OfBoolean> implements MonitoredIterator<ITR,PackedBooleanArrSeq.UncheckedList>{
+            final ITR itr;
+            int expectedCursor;
+            int expectedItrModCount;
+            int expectedLastRet;
+            int lastRetState;
+            AbstractItrMonitor(ITR itr,int expectedCursor){
+                this.itr=itr;
+                this.expectedCursor=expectedCursor;
+                this.expectedItrModCount=expectedModCount;
+                if(checkedType.checked) {
+                    this.expectedLastRet=-1;
+                }
+                this.lastRetState=-1;
+            }
+            @Override
+            public ITR getIterator(){
+                return this.itr;
+            }
+            @Override
+            public MonitoredCollection<PackedBooleanArrSeq.UncheckedList> getMonitoredCollection(){
+                return PackedBooleanArrListMonitor.this;
+            }
+            @Override
+            public int getNumLeft(){
+                return expectedSize - expectedCursor;
+            }
+            @Override
+            public boolean hasNext(){
+                return expectedCursor < expectedSize;
+            }
+            @Override
+            public boolean nextWasJustCalled(){
+                return this.lastRetState == 0;
+            }
+            @Override
+            public void updateItrNextState(){
+                expectedLastRet=expectedCursor++;
+                lastRetState=0;
+            }
+            @Override
+            public void updateItrRemoveState(){
+                updateRemoveIndexState(expectedCursor=expectedLastRet);
+                ++expectedItrModCount;
+                if(checkedType.checked){
+                    expectedLastRet=-1;
+                }
+                lastRetState=-1;
+            }
+            @Override
+            public void verifyForEachRemaining(MonitoredFunction function){
+                final var functionItr=function.iterator();
+                IntConsumer functionVerifier;
+                    final var expectedArr=PackedBooleanArrListMonitor.this.expectedWords;
+                    functionVerifier=cursor->Assertions.assertEquals((expectedArr[cursor>>6]&1L<<cursor)!=0,(boolean)functionItr.next());
+                
+                int expectedLastRet=this.expectedLastRet;
+                int lastRetState=this.lastRetState;
+                int expectedCursor=this.expectedCursor;
+                final int expectedBound=expectedSize;
+                while(expectedCursor < expectedBound){
+                    functionVerifier.accept(expectedCursor);
+                    expectedLastRet=expectedCursor++;
+                    lastRetState=0;
+                }
+                this.expectedCursor=expectedCursor;
+                this.expectedLastRet=expectedLastRet;
+                this.lastRetState=lastRetState;
+            }
+            @Override
+            public void verifyNextResult(DataType outputType,Object result){
+                verifyGetResult(expectedCursor,result,outputType);
+            }
+        }
+        private class ItrMonitor extends AbstractItrMonitor<OmniIterator.OfBoolean>{
+            ItrMonitor(){
+                super(seq.iterator(),0);
+            }
+            @Override
+            public IteratorType getIteratorType(){
+                return IteratorType.AscendingItr;
+            }
+            @Override
+            public void verifyCloneHelper(Object clone){
+
+                    if(checkedType.checked){
+                        Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.Itr.parent(clone));
+                        Assertions.assertEquals(expectedCursor,
+                                FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.Itr.cursor(clone));
+                        Assertions.assertEquals(expectedItrModCount,
+                                FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.Itr.modCount(clone));
+                        Assertions.assertEquals(expectedLastRet,
+                                FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.Itr.lastRet(clone));
+                    }else{
+                        Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedList.Itr.parent(clone));
+                        Assertions.assertEquals(expectedCursor,
+                                FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedList.Itr.cursor(clone));
+                    }
+               
+            }
+        }
+        private class ListItrMonitor extends AbstractItrMonitor<OmniListIterator.OfBoolean>
+        implements
+        MonitoredListIterator<OmniListIterator.OfBoolean,PackedBooleanArrSeq.UncheckedList>{
+    ListItrMonitor(){
+        super(seq.listIterator(),0);
+    }
+    ListItrMonitor(int cursor){
+        super(seq.listIterator(cursor),cursor);
+    }
+    @Override
+    public IteratorType getIteratorType(){
+        return IteratorType.BidirectionalItr;
+    }
+    @Override
+    public boolean hasPrevious(){
+        return expectedCursor > 0;
+    }
+    @Override
+    public int nextIndex(){
+        return expectedCursor;
+    }
+    @Override
+    public int previousIndex(){
+        return expectedCursor - 1;
+    }
+    @Override
+    public boolean previousWasJustCalled(){
+        return lastRetState == 1;
+    }
+    @Override
+    public void updateItrAddState(Object input,DataType inputType){
+        PackedBooleanArrListMonitor.this.updateAddState(expectedCursor++,input,inputType);
+        ++expectedItrModCount;
+        lastRetState=-1;
+        if(checkedType.checked){
+            expectedLastRet=-1;
+        }
+    }
+    @Override
+    public void updateItrPreviousState(){
+        expectedLastRet=--expectedCursor;
+        lastRetState=1;
+    }
+    @Override
+    public void updateItrSetState(Object input,DataType inputType){
+        verifyPutResult(expectedLastRet,input,inputType);
+    }
+    @Override
+    public void verifyCloneHelper(Object clone){
+
+            if(checkedType.checked){
+                Assertions.assertSame(seq,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.ListItr.parent(clone));
+                Assertions.assertEquals(expectedCursor,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.ListItr.cursor(clone));
+                Assertions.assertEquals(expectedItrModCount,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.ListItr.modCount(clone));
+                Assertions.assertEquals(expectedLastRet,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedList.ListItr.lastRet(clone));
+            }else{
+                Assertions.assertSame(seq,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedList.ListItr.parent(clone));
+                Assertions.assertEquals(expectedCursor,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedList.ListItr.cursor(clone));
+                Assertions.assertEquals(expectedLastRet,
+                        FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedList.ListItr.lastRet(clone));
+            }
+        
+    }
+    @Override
+    public void verifyPreviousResult(DataType outputType,Object result){
+        verifyGetResult(expectedLastRet,result,outputType);
+    }
+}
+        @Override
+        public MonitoredIterator<? extends OmniIterator<?>,UncheckedList> getMonitoredIterator(){
+            return new ItrMonitor();
+        }
+        @Override
+        public MonitoredListIterator<? extends OmniListIterator<?>,UncheckedList> getMonitoredListIterator(){
+            return new ListItrMonitor();
+        }
+        @Override
+        public MonitoredListIterator<? extends OmniListIterator<?>,UncheckedList> getMonitoredListIterator(int index){
+            return new ListItrMonitor(index);
+        }
+        @Override
+        public MonitoredList<?> getMonitoredSubList(int fromIndex,int toIndex){
+            // TODO Auto-generated method stub
+            return null;
+        }
+    }
+
 }

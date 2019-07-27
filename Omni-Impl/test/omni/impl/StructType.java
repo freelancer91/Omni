@@ -5,7 +5,8 @@ public enum StructType{
     ArrDeq("ArrDeq"),ArrList("ArrList"),ArrStack("ArrStack"),ArrSubList("ArrSubList"),DblLnkList("DblLnkList"),
     DblLnkSubList("DblLnkSubList"),SnglLnkQueue("SnglLnkQueue"),SnglLnkStack("SnglLnkStack"),
     BooleanSetImpl("BooleanSetImpl"),ByteSetImpl("ByteSetImpl"),
-    IntegralOpenAddressHashSet("IntegralOpenAddressHashSet"),OpenAddressHashSet("OpenAddressHashSet");
+    IntegralOpenAddressHashSet("IntegralOpenAddressHashSet"),OpenAddressHashSet("OpenAddressHashSet"),
+    PackedBooleanArrStack("PackedBooleanArrStack"),PackedBooleanArrList("PackedBooleanArrList"),PackedBooleanArrSubList("PackedBooleanArrSubList"),PackedBooleanArrDeq("PackedBooleanArrDeq");
     public final String name;
     public final EnumSet<DataType> validDataTypes;
     public final EnumSet<QueryMethod> validQueryMethods;
@@ -36,6 +37,7 @@ public enum StructType{
         case "SnglLnkQueue":
         case "SnglLnkStack":
         case "ArrDeq":
+        case "PackedBooleanArrDeq":
             return EnumSet.noneOf(MonitoredComparatorGen.class);
         case "ArrList":
         case "DblLnkList":
@@ -51,6 +53,14 @@ public enum StructType{
         case "ArrSubList":
         case "DblLnkSubList":
             return EnumSet.allOf(MonitoredComparatorGen.class);
+        case "PackedBooleanArrList":
+            return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,
+                    MonitoredComparatorGen.ModCollectionDescending,MonitoredComparatorGen.ModCollectionThrowAIOB,
+                    MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.NoThrowAscending,
+                    MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,
+                    MonitoredComparatorGen.ThrowAIOB,MonitoredComparatorGen.ThrowIOB);
+        case "PackedBooleanArrSubList":
+            return EnumSet.of(MonitoredComparatorGen.ModCollectionAscending,MonitoredComparatorGen.ModCollectionDescending,MonitoredComparatorGen.ModCollectionThrowAIOB,MonitoredComparatorGen.ModCollectionThrowIOB,MonitoredComparatorGen.ModParentAscending,MonitoredComparatorGen.ModParentDescending,MonitoredComparatorGen.ModParentThrowAIOB,MonitoredComparatorGen.ModParentThrowIOB,MonitoredComparatorGen.ModRootAscending,MonitoredComparatorGen.ModRootDescending,MonitoredComparatorGen.ModRootThrowAIOB,MonitoredComparatorGen.ModRootThrowIOB,MonitoredComparatorGen.NoThrowAscending,MonitoredComparatorGen.NoThrowDescending,MonitoredComparatorGen.NullComparator,MonitoredComparatorGen.ThrowAIOB,MonitoredComparatorGen.ThrowIOB);
         }
         throw structType.invalid();
     }
@@ -63,13 +73,17 @@ public enum StructType{
         case "ArrStack":
         case "SnglLnkQueue":
         case "SnglLnkStack":
+        case "PackedBooleanArrStack":
             return EnumSet.of(IteratorType.AscendingItr);
         case "ArrDeq":
+        case "PackedBooleanArrDeq":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr);
         case "ArrList":
+        case "PackedBooleanArrList":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.BidirectionalItr);
         case "ArrSubList":
         case "DblLnkSubList":
+        case "PackedBooleanArrSubList":
             return EnumSet.of(IteratorType.SubAscendingItr,IteratorType.SubBidirectionalItr);
         case "DblLnkList":
             return EnumSet.of(IteratorType.AscendingItr,IteratorType.DescendingItr,IteratorType.BidirectionalItr);
@@ -81,6 +95,10 @@ public enum StructType{
         case "BooleanSetImpl":
         case "ByteSetImpl":
         case "IntegralOpenAddressHashSet":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrStack":
+        case "PackedBooleanArrSubList":
+        case "PackedBooleanArrDeq":
             return EnumSet.noneOf(MonitoredObjectGen.class);
         case "ArrDeq":
         case "ArrList":
@@ -110,11 +128,14 @@ public enum StructType{
         case "OpenAddressHashSet":
         case "SnglLnkQueue":
         case "SnglLnkStack":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrStack":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection);
         case "ArrSubList":
+        case "PackedBooleanArrSubList":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
@@ -123,6 +144,7 @@ public enum StructType{
                     MonitoredRemoveIfPredicateGen.ThrowModParent,MonitoredRemoveIfPredicateGen.ThrowModRoot);
         case "ArrDeq":
         case "DblLnkList":
+        case "PackedBooleanArrDeq":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.RemoveFirst,MonitoredRemoveIfPredicateGen.RemoveLast,MonitoredRemoveIfPredicateGen.RemoveFirstAndLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirst,MonitoredRemoveIfPredicateGen.RemoveAllButLast,MonitoredRemoveIfPredicateGen.RemoveAllButFirstAndLast,MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveFalse,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveAll,
@@ -154,9 +176,13 @@ public enum StructType{
         case "OpenAddressHashSet":
         case "SnglLnkQueue":
         case "SnglLnkStack":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrStack":
+        case "PackedBooleanArrDeq":
             return EnumSet.of(IllegalModification.NoMod);
         case "ArrSubList":
         case "DblLnkSubList":
+        case "PackedBooleanArrSubList":
             return EnumSet.of(IllegalModification.NoMod,IllegalModification.ModParent,IllegalModification.ModRoot);
         }
         throw structType.invalid();
@@ -176,11 +202,15 @@ public enum StructType{
         case "OpenAddressHashSet":
         case "SnglLnkQueue":
         case "SnglLnkStack":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrStack":
+        case "PackedBooleanArrDeq":
             return EnumSet.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.NoThrow,
                     MonitoredFunctionGen.ThrowIOB,
                     MonitoredFunctionGen.ThrowIOBModCollection);
         case "ArrSubList":
         case "DblLnkSubList":
+        case "PackedBooleanArrSubList":
             return EnumSet.of(MonitoredFunctionGen.ModCollection,MonitoredFunctionGen.NoThrow,
                     MonitoredFunctionGen.ThrowIOB,
                     MonitoredFunctionGen.ThrowIOBModCollection,MonitoredFunctionGen.ModParent,
@@ -199,12 +229,16 @@ public enum StructType{
             return QueryMethod.BASIC_COLLECTION_METHODS;
         case "SnglLnkStack":
         case "ArrStack":
+        case "PackedBooleanArrStack":
             return QueryMethod.STACK_METHODS;
         case "DblLnkSubList":
         case "ArrSubList":
         case "ArrList":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrSubList":
             return QueryMethod.LIST_METHODS;
         case "ArrDeq":
+        case "PackedBooleanArrDeq":
             return QueryMethod.DEQUE_METHODS;
         case "DblLnkList":
             return QueryMethod.LISTDEQUE_METHODS;
@@ -214,6 +248,10 @@ public enum StructType{
     private static EnumSet<DataType> initValidDataTypes(StructType structType){
         switch(structType.name){
         case "BooleanSetImpl":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrStack":
+        case "PackedBooleanArrSubList":
+        case "PackedBooleanArrDeq":
             return DataType.getDataTypeSet("BOOLEAN");
         case "ByteSetImpl":
             return DataType.getDataTypeSet("BYTE");

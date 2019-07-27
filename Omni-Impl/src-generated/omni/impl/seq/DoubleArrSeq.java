@@ -1373,11 +1373,9 @@ AbstractSeq<Double>
       }
       private ListItr(UncheckedList parent){
         super(parent);
-        this.lastRet=-1;
       }
       private ListItr(UncheckedList parent,int cursor){
         super(parent,cursor);
-        this.lastRet=-1;
       }
       @Override public Object clone(){
         return new ListItr(this);
@@ -2373,11 +2371,9 @@ AbstractSeq<Double>
       }
       private ListItr(UncheckedSubList parent){
         super(parent);
-        this.lastRet=-1;
       }
       private ListItr(UncheckedSubList parent,int cursor){
         super(parent,cursor);
-        this.lastRet=-1;
       }
       @Override public Object clone(){
         return new ListItr(this);
@@ -2808,7 +2804,6 @@ AbstractSeq<Double>
           root.modCount=++modCount;
           this.modCount=modCount;
           OmniArray.OfDouble.removeIndexAndPullDown(root.arr,lastRet,--root.size);
-          this.cursor=lastRet;
           this.lastRet=-1;
           return;
         }
