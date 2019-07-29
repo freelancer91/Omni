@@ -2156,38 +2156,10 @@ import omni.util.TestExecutorService;
     @Override public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
       ((Externalizable)seq).writeExternal(oos);
     }
-    private void removeFirst(){
-      switch(dataType){
-      case BOOLEAN:
-        ((BooleanArrDeq)seq).popBoolean();
-        break;
-      case BYTE:
-        ((ByteArrDeq)seq).popByte();
-        break;
-      case CHAR:
-        ((CharArrDeq)seq).popChar();
-        break;
-      case DOUBLE:
-        ((DoubleArrDeq)seq).popDouble();
-        break;
-      case FLOAT:
-        ((FloatArrDeq)seq).popFloat();
-        break;
-      case INT:
-        ((IntArrDeq)seq).popInt();
-        break;
-      case LONG:
-        ((LongArrDeq)seq).popLong();
-        break;
-      case REF:
-        ((RefArrDeq<?>)seq).pop();
+    public Object removeFirst(){
+      Object result=seq.pop();
+      if(dataType==DataType.REF) {
         ((Object[])expectedArr)[expectedHead]=null;
-        break;
-      case SHORT:
-        ((ShortArrDeq)seq).popShort();
-        break;
-      default:
-        throw dataType.invalid();
       }
       if(expectedHead == expectedTail){
         expectedTail=-1;
@@ -2196,6 +2168,7 @@ import omni.util.TestExecutorService;
       }
       --expectedSize;
       ++expectedModCount;
+      return result;
     }
     private void removeLast(){
       switch(dataType){
@@ -2506,7 +2479,7 @@ import omni.util.TestExecutorService;
         }
       }
     }
-    private void verifyGetResult(int expectedCursor,Object output,DataType outputType){
+    public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
       switch(outputType){
       case BOOLEAN:
         Assertions.assertEquals(((boolean[])expectedArr)[expectedCursor],(boolean)output);
@@ -2715,6 +2688,10 @@ import omni.util.TestExecutorService;
         Assertions.assertTrue(filter.retainedVals.contains(itr.next()));
       }
       updateCollectionState();
+    }
+
+    @Override public void updateRemoveIndexState(int index){
+      throw new UnsupportedOperationException();
     }
   }
   private static interface BasicTest{

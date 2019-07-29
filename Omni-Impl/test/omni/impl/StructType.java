@@ -38,6 +38,7 @@ public enum StructType{
         case "SnglLnkStack":
         case "ArrDeq":
         case "PackedBooleanArrDeq":
+        case "PackedBooleanArrStack":
             return EnumSet.noneOf(MonitoredComparatorGen.class);
         case "ArrList":
         case "DblLnkList":
@@ -128,14 +129,24 @@ public enum StructType{
         case "OpenAddressHashSet":
         case "SnglLnkQueue":
         case "SnglLnkStack":
-        case "PackedBooleanArrList":
-        case "PackedBooleanArrStack":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
                     MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection);
-        case "ArrSubList":
+        case "PackedBooleanArrList":
+        case "PackedBooleanArrStack":
+            return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,
+                    MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
+                    MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
+                    MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection);
         case "PackedBooleanArrSubList":
+          return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,
+                  MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
+                  MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,
+                  MonitoredRemoveIfPredicateGen.Throw,MonitoredRemoveIfPredicateGen.ThrowModCollection,
+                  MonitoredRemoveIfPredicateGen.ModParent,MonitoredRemoveIfPredicateGen.ModRoot,
+                  MonitoredRemoveIfPredicateGen.ThrowModParent,MonitoredRemoveIfPredicateGen.ThrowModRoot);
+        case "ArrSubList":
             return EnumSet.of(MonitoredRemoveIfPredicateGen.ModCollection,MonitoredRemoveIfPredicateGen.Random,
                     MonitoredRemoveIfPredicateGen.RemoveAll,MonitoredRemoveIfPredicateGen.RemoveFalse,
                     MonitoredRemoveIfPredicateGen.RemoveNone,MonitoredRemoveIfPredicateGen.RemoveTrue,

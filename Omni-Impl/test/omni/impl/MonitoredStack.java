@@ -1,14 +1,14 @@
 package omni.impl;
 
 import omni.api.OmniStack;
-public interface MonitoredStack<STK extends OmniStack<?>>extends MonitoredCollection<STK>{
+public interface MonitoredStack<STK extends OmniStack<?>>extends MonitoredSequence<STK>{
   
    
     
     void verifyPush(Object inputVal,DataType inputType,FunctionCallType functionCallType);
     Object verifyPop(DataType outputType);
-    Object verifyPoll(DataType outputType);
-    Object verifyPeek(DataType outputType);
+//    Object verifyPoll(DataType outputType);
+//    Object verifyPeek(DataType outputType);
     
     default int verifyThrowingSearch(MonitoredObjectGen monitoredObjectGen){
       Object inputVal=monitoredObjectGen.getMonitoredObject(this,0);
