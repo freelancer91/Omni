@@ -1235,17 +1235,25 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public Object clone(){
-            final CheckedList root;
-            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-            final long[] copy;
-            final int size;
-            if((size=this.size) != 0){
-                int copyLength;
-                ArrCopy.uncheckedCopy(root.words,rootOffset,copy=new long[copyLength=(size - 1 >> 6) + 1],0,copyLength);
-            }else{
-                copy=null;
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final long[] copy;
+          final int size;
+          if((size=this.size)!=0) {
+            int copyLength;
+            copy=new long[copyLength=((size-1)>>6)+1];
+            final int rootOffset;
+            final var words=root.words;
+            int srcOffset=(rootOffset=this.rootOffset)>>6;
+            if((rootOffset&63)==0) {
+              ArrCopy.uncheckedCopy(words,srcOffset,copy,0,copyLength);
+            }else {
+              //TODO
             }
-            return new CheckedList(size,copy);
+          }else {
+            copy=null;
+          }
+          return new CheckedList(size,copy);
         }
         @Override
         public boolean contains(boolean val){
@@ -3171,11 +3179,32 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         @Override
         public void clear(){
             // TODO Auto-generated method stub
+          int size;
+          if((size=this.size)!=0) {
+            //TODO
+          }
+          
+          
         }
         @Override
         public Object clone(){
-            // TODO Auto-generated method stub
-            return null;
+          final long[] copy;
+          final int size;
+          if((size=this.size)!=0) {
+            int copyLength;
+            copy=new long[copyLength=((size-1)>>6)+1];
+            final int rootOffset;
+            final var words=root.words;
+            int srcOffset=(rootOffset=this.rootOffset)>>6;
+            if((rootOffset&63)==0) {
+              ArrCopy.uncheckedCopy(words,srcOffset,copy,0,copyLength);
+            }else {
+              //TODO
+            }
+          }else {
+            copy=null;
+          }
+          return new UncheckedList(size,copy);
         }
         @Override
         public boolean contains(boolean val){
