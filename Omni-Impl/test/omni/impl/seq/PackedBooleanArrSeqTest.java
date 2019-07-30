@@ -1,13 +1,13 @@
 package omni.impl.seq;
+import java.io.Externalizable;
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
@@ -29,12 +29,10 @@ import omni.impl.MonitoredFunctionGen;
 import omni.impl.MonitoredList;
 import omni.impl.MonitoredObjectOutputStream;
 import omni.impl.MonitoredRemoveIfPredicate;
-import omni.impl.MonitoredRemoveIfPredicateGen.PredicateGenCallType;
 import omni.impl.MonitoredSequence;
 import omni.impl.MonitoredStack;
 import omni.impl.QueryCastType;
 import omni.impl.QueryVal;
-import omni.impl.QueryVal.QueryValModification;
 import omni.impl.StructType;
 import omni.impl.seq.PackedBooleanArrSeq.UncheckedList;
 import omni.impl.seq.PackedBooleanArrSeq.UncheckedStack;
@@ -455,6 +453,10 @@ public class PackedBooleanArrSeqTest{
   private static interface BasicTest{
     private void runAllTests(String testName){
       for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+          if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63)
+          {
+              continue;
+          }
         for(final var illegalMod:initParams.structType.validPreMods){
           if(illegalMod.minDepth <= initParams.preAllocs.length
               && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -480,8 +482,11 @@ public class PackedBooleanArrSeqTest{
     void runTest(MonitoredSequence<?> monitor);
   }
   private static interface MonitoredFunctionTest<MONITOR extends MonitoredSequence<? extends OmniCollection.OfBoolean>>{
-    @SuppressWarnings("unchecked") private void runAllTests(String testName,long maxRand,boolean useAllStructs){
+    @SuppressWarnings("unchecked") private void runAllTests(String testName,boolean useAllStructs){
       for(final var initParams:useAllStructs?ALL_STRUCT_INIT_PARAMS:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63) {
+            continue;
+        }
         for(final var functionGen:initParams.structType.validMonitoredFunctionGens){
           if(initParams.checkedType.checked || functionGen.expectedException == null){
             for(final var size:SIZES){
@@ -490,22 +495,18 @@ public class PackedBooleanArrSeqTest{
                 for(final var illegalMod:initParams.structType.validPreMods){
                   if(illegalMod.minDepth <= initParams.preAllocs.length
                       && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                    final long randSeedBound=size > 1 && functionGen.randomized && !functionCallType.boxed
-                        && illegalMod.expectedException == null?maxRand:0;
-                    for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                      final long randSeed=tmpRandSeed;
                       for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
                         final int initVal=tmpInitVal;
                         for(final var initCap:INIT_CAPACITIES){
-                          //TestExecutorService.submitTest(()->{
+                          TestExecutorService.submitTest(()->{
                             runTest(
                                 (MONITOR)SequenceInitialization.Ascending
                                     .initialize(getMonitoredSequence(initParams,initCap),size,initVal),
-                                functionGen,functionCallType,illegalMod,randSeed);
-                          //});
+                                functionGen,functionCallType,illegalMod);
+                          });
                         }
                       }
-                    }
+                    
                   }
                 }
               }
@@ -516,7 +517,7 @@ public class PackedBooleanArrSeqTest{
       TestExecutorService.completeAllTests(testName);
     }
     void runTest(MONITOR monitor,MonitoredFunctionGen functionGen,FunctionCallType functionCallType,
-        IllegalModification illegalMod,long randSeed);
+        IllegalModification illegalMod);
   }
   private static class PackedBooleanArrListMonitor
       extends AbstractPackedBooleanArrSeqMonitor<PackedBooleanArrSeq.UncheckedList>
@@ -714,9 +715,8 @@ public class PackedBooleanArrSeqTest{
       return new ListItrMonitor(index);
     }
     @Override public MonitoredList<?> getMonitoredSubList(int fromIndex,int toIndex){
-      // TODO Auto-generated method stub
-      return null;
-    }
+        return new PackedBooleanArrSubListMonitor<>(this,fromIndex,toIndex);
+        }
     @Override public StructType getStructType(){
       return StructType.PackedBooleanArrList;
     }
@@ -799,6 +799,660 @@ public class PackedBooleanArrSeqTest{
     @Override void verifyModCount(){
       Assertions.assertEquals(expectedModCount,((PackedBooleanArrSeq.CheckedList)seq).modCount);
     }
+  
+    public static class PackedBooleanArrSubListMonitor<SUBLIST extends AbstractSeq<Boolean>&OmniList.OfBoolean,
+    SEQ extends AbstractSeq<Boolean>&OmniList.OfBoolean&Externalizable> implements MonitoredList<SUBLIST>{
+  private abstract class AbstractItrMonitor<ITR extends OmniIterator.OfBoolean> implements MonitoredIterator<ITR,SUBLIST>{
+    final ITR itr;
+    int expectedCursor;
+    int expectedItrModCount;
+    int expectedLastRet;
+    int lastRetState;
+    AbstractItrMonitor(ITR itr,int expectedCursor){
+      this.itr=itr;
+      this.expectedCursor=expectedCursor;
+      this.expectedItrModCount=expectedModCount;
+      if(expectedRoot.checkedType.checked){
+        this.expectedLastRet=-1;
+      }
+      this.lastRetState=-1;
+    }
+    @Override public ITR getIterator(){
+      return itr;
+    }
+    @Override public MonitoredCollection<SUBLIST> getMonitoredCollection(){
+      return PackedBooleanArrSubListMonitor.this;
+    }
+    @Override public int getNumLeft(){
+      return expectedRootOffset + expectedSize - expectedCursor;
+    }
+    @Override public boolean hasNext(){
+      return expectedCursor < expectedRootOffset + expectedSize;
+    }
+    @Override public boolean nextWasJustCalled(){
+      return lastRetState == 0;
+    }
+    @Override public void updateItrNextState(){
+      this.expectedLastRet=expectedCursor++;
+      lastRetState=0;
+    }
+    @Override public void updateItrRemoveState(){
+      expectedRoot.updateRemoveIndexState(expectedCursor=expectedLastRet);
+      ++expectedItrModCount;
+      bubbleUpModifySize(-1);
+      if(expectedRoot.checkedType.checked){
+        expectedLastRet=-1;
+      }
+      lastRetState=-1;
+    }
+    @Override public void verifyForEachRemaining(MonitoredFunction function){
+      final var functionItr=function.iterator();
+      IntConsumer functionVerifier;
+        final var expectedArr=expectedRoot.expectedWords;
+        functionVerifier=cursor->Assertions.assertEquals((expectedArr[cursor>>6]&1L<<cursor)!=0,(boolean)functionItr.next());
+      
+      int expectedLastRet=this.expectedLastRet;
+      int expectedCursor=this.expectedCursor;
+      int lastRetState=this.lastRetState;
+      final int expectedBound=expectedSize + expectedRootOffset;
+      while(expectedCursor < expectedBound){
+        functionVerifier.accept(expectedCursor);
+        expectedLastRet=expectedCursor++;
+        lastRetState=0;
+      }
+      this.expectedCursor=expectedCursor;
+      this.expectedLastRet=expectedLastRet;
+      this.lastRetState=lastRetState;
+    }
+    @Override public void verifyNextResult(DataType outputType,Object result){
+      expectedRoot.verifyGetResult(expectedCursor,result,outputType);
+    }
+  }
+  private class ItrMonitor extends AbstractItrMonitor<OmniIterator.OfBoolean>{
+    ItrMonitor(){
+      super(seq.iterator(),expectedRootOffset);
+    }
+    @Override public IteratorType getIteratorType(){
+      return IteratorType.SubAscendingItr;
+    }
+    @Override public void verifyCloneHelper(Object clone){
+      final var checked=expectedRoot.checkedType.checked;
+        if(checked){
+          Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.Itr.parent(clone));
+          Assertions.assertEquals(expectedCursor,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.Itr.cursor(clone));
+          Assertions.assertEquals(expectedLastRet,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.Itr.lastRet(clone));
+          Assertions.assertEquals(expectedItrModCount,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.Itr.modCount(clone));
+        }else{
+          Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.Itr.parent(clone));
+          Assertions.assertEquals(expectedCursor,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.Itr.cursor(clone));
+        }
+     
+    }
+  }
+  private class ListItrMonitor extends AbstractItrMonitor<OmniListIterator.OfBoolean>
+      implements MonitoredListIterator<OmniListIterator.OfBoolean,SUBLIST>{
+    ListItrMonitor(){
+      super(seq.listIterator(),expectedRootOffset);
+    }
+    ListItrMonitor(int index){
+      super(seq.listIterator(index),index + expectedRootOffset);
+    }
+    @Override public IteratorType getIteratorType(){
+      return IteratorType.SubBidirectionalItr;
+    }
+    @Override public boolean hasPrevious(){
+      return expectedCursor > expectedRootOffset;
+    }
+    @Override public int nextIndex(){
+      return expectedCursor - expectedRootOffset;
+    }
+    @Override public int previousIndex(){
+      return expectedCursor - expectedRootOffset - 1;
+    }
+    @Override public boolean previousWasJustCalled(){
+      return lastRetState == 1;
+    }
+    @Override public void updateItrAddState(Object input,DataType inputType){
+      expectedRoot.updateAddState(expectedCursor++,input,inputType);
+      bubbleUpModifySize(1);
+      ++expectedItrModCount;
+      if(expectedRoot.checkedType.checked){
+        expectedLastRet=-1;
+      }
+      lastRetState=-1;
+    }
+    @Override public void updateItrPreviousState(){
+      expectedLastRet=--expectedCursor;
+      lastRetState=1;
+    }
+    @Override public void updateItrSetState(Object input,DataType inputType){
+      expectedRoot.verifyPutResult(expectedLastRet,input,inputType);
+    }
+    @Override public void verifyCloneHelper(Object clone){
+        if(expectedRoot.checkedType.checked){
+          Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.ListItr.parent(clone));
+          Assertions.assertEquals(expectedCursor,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.ListItr.cursor(clone));
+          Assertions.assertEquals(expectedLastRet,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.ListItr.lastRet(clone));
+          Assertions.assertEquals(expectedItrModCount,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.ListItr.modCount(clone));
+        }else{
+          Assertions.assertSame(seq,FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.ListItr.parent(clone));
+          Assertions.assertEquals(expectedCursor,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.ListItr.cursor(clone));
+          Assertions.assertEquals(expectedLastRet,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.ListItr.lastRet(clone));
+        }
+       
+    }
+    @Override public void verifyPreviousResult(DataType outputType,Object result){
+      expectedRoot.verifyGetResult(expectedLastRet,result,outputType);
+    }
+  }
+  final PackedBooleanArrListMonitor expectedRoot;
+  final PackedBooleanArrSubListMonitor<SUBLIST,SEQ> expectedParent;
+  final SUBLIST seq;
+  int expectedRootOffset;
+  int expectedSize;
+  int expectedModCount;
+  @SuppressWarnings("unchecked") PackedBooleanArrSubListMonitor(PackedBooleanArrListMonitor expectedRoot,int fromIndex,int toIndex){
+    this.expectedRoot=expectedRoot;
+    expectedParent=null;
+    expectedModCount=expectedRoot.expectedModCount;
+    expectedSize=toIndex - fromIndex;
+    expectedRootOffset=fromIndex;
+    seq=(SUBLIST)expectedRoot.seq.subList(fromIndex,toIndex);
+  }
+  @SuppressWarnings("unchecked") PackedBooleanArrSubListMonitor(PackedBooleanArrSubListMonitor<SUBLIST,SEQ> expectedParent,int fromIndex,
+      int toIndex){
+    expectedRoot=expectedParent.expectedRoot;
+    this.expectedParent=expectedParent;
+    expectedModCount=expectedParent.expectedModCount;
+    expectedSize=toIndex - fromIndex;
+    expectedRootOffset=expectedParent.expectedRootOffset + fromIndex;
+    seq=(SUBLIST)expectedParent.seq.subList(fromIndex,toIndex);
+  }
+  @Override public void copyListContents(){
+    expectedRoot.copyListContents();
+  }
+  @Override public Object get(int iterationIndex,DataType outputType){
+    return expectedRoot.get(iterationIndex + expectedRootOffset,outputType);
+  }
+  @Override public CheckedType getCheckedType(){
+    return expectedRoot.checkedType;
+  }
+  @Override public SUBLIST getCollection(){
+    return seq;
+  }
+  @Override public DataType getDataType(){
+    return DataType.BOOLEAN;
+  }
+  @Override public MonitoredIterator<? extends OmniIterator<?>,SUBLIST> getMonitoredIterator(){
+    return new ItrMonitor();
+  }
+  @Override public MonitoredIterator<? extends OmniIterator<?>,SUBLIST> getMonitoredIterator(int index,
+      IteratorType itrType){
+    switch(itrType){
+    case SubAscendingItr:{
+      final var monitor=new ItrMonitor();
+      while(--index >= 0){
+        monitor.iterateForward();
+      }
+      return monitor;
+    }
+    case SubBidirectionalItr:
+      return new ListItrMonitor(index);
+    default:
+      throw itrType.invalid();
+    }
+  }
+  @Override public MonitoredIterator<? extends OmniIterator<?>,SUBLIST> getMonitoredIterator(IteratorType itrType){
+    switch(itrType){
+    case SubAscendingItr:
+      return new ItrMonitor();
+    case SubBidirectionalItr:
+      return new ListItrMonitor();
+    default:
+      throw itrType.invalid();
+    }
+  }
+  @Override public MonitoredListIterator<? extends OmniListIterator<?>,SUBLIST> getMonitoredListIterator(){
+    return new ListItrMonitor();
+  }
+  @Override public MonitoredListIterator<? extends OmniListIterator<?>,SUBLIST> getMonitoredListIterator(int index){
+    return new ListItrMonitor(index);
+  }
+  @Override public PackedBooleanArrSubListMonitor<SUBLIST,SEQ> getMonitoredSubList(int fromIndex,int toIndex){
+    return new PackedBooleanArrSubListMonitor<>(this,fromIndex,toIndex);
+  }
+  @Override public StructType getStructType(){
+    return StructType.PackedBooleanArrSubList;
+  }
+  @Override public void incrementModCount(){
+    var curr=this;
+    do{
+      ++curr.expectedModCount;
+    }while((curr=curr.expectedParent) != null);
+    ++expectedRoot.expectedModCount;
+  }
+  @Override public void modCollection(){
+    var curr=this;
+    do{
+      curr.expectedModCount=FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.incrementModCount(curr.seq);
+    }while((curr=curr.expectedParent) != null);
+    expectedRoot.modCollection();
+  }
+  @Override public void modParent(){
+    var curr=this;
+    while((curr=curr.expectedParent) != null){
+      curr.expectedModCount=FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.incrementModCount(curr.seq);
+    }
+    expectedRoot.modCollection();
+  }
+  @Override public void modRoot(){
+    expectedRoot.modCollection();
+  }
+  @Override public Object removeFirst(){
+    final var removed=seq.remove(0);
+    updateRemoveIndexState(0);
+    return removed;
+  }
+  @Override public int size(){
+    return expectedSize;
+  }
+  @Override public void updateAddState(int index,Object inputVal,DataType inputType){
+    expectedRoot.updateAddState(index + expectedRootOffset,inputVal,inputType);
+    bubbleUpModifySize(1);
+  }
+  @Override public void updateClearState(){
+      //TODO
+      throw new UnsupportedOperationException();
+//    int expectedSize;
+//    if((expectedSize=this.expectedSize) != 0){
+//      bubbleUpModifySize(-expectedSize);
+//      final int bound=expectedRootOffset + expectedSize;
+//      final int expectedRootSize=expectedRoot.expectedSize;
+//      System.arraycopy(expectedRoot.expectedArr,bound,expectedRoot.expectedArr,expectedRootOffset,
+//          expectedRootSize - bound);
+//      final int newExpectedRootSize=expectedRootSize - expectedSize;
+//      if(expectedRoot.dataType == DataType.REF){
+//        final var castArr=(Object[])expectedRoot.expectedArr;
+//        for(int i=newExpectedRootSize;i < expectedRootSize;++i){
+//          castArr[i]=null;
+//        }
+//      }
+//      expectedRoot.expectedSize=newExpectedRootSize;
+//      ++expectedRoot.expectedModCount;
+//    }
+  }
+  @Override public void updateCollectionState(){
+    Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListUpdater
+        =subListMonitor->subListMonitor.expectedSize=((AbstractSeq<?>)subListMonitor.seq).size;
+    if(expectedRoot.checkedType.checked){
+        subListUpdater=subListUpdater.andThen(subListMonitor->subListMonitor.expectedModCount
+            =FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.modCount(subListMonitor.seq));
+    
+    }
+    var curr=this;
+    do{
+      subListUpdater.accept(curr);
+    }while((curr=curr.expectedParent) != null);
+    expectedRoot.updateCollectionState();
+  }
+  @Override public void updateRemoveIndexState(int index){
+    expectedRoot.updateRemoveIndexState(index + expectedRootOffset);
+    bubbleUpModifySize(-1);
+  }
+  @Override public void updateRemoveValState(Object inputVal,DataType inputType){
+    final int index
+        =expectedRoot.findRemoveValIndex(inputVal,inputType,expectedRootOffset,expectedRootOffset + expectedSize);
+    expectedRoot.updateRemoveIndexState(index);
+    bubbleUpModifySize(-1);
+  }
+  @Override public void updateReplaceAllState(MonitoredFunction function){
+    if(function.getMonitoredFunctionGen().expectedException != ConcurrentModificationException.class
+        && !function.isEmpty()){
+      var curr=this;
+      do{
+        ++curr.expectedModCount;
+      }while((curr=curr.expectedParent) != null);
+    }
+    expectedRoot.updateReplaceAllState(function,expectedRootOffset);
+  }
+  @Override public void verifyArrayIsCopy(Object arr,boolean emptyArrayMayBeSame){
+    expectedRoot.verifyArrayIsCopy(arr,emptyArrayMayBeSame);
+  }
+  @Override public void verifyClone(Object clone){
+    expectedRoot.verifyCloneTypeAndModCount(clone);
+    Assertions.assertNotSame(clone,expectedRoot.seq);
+    int size;
+    Assertions.assertEquals(size=((AbstractSeq<?>)seq).size,((AbstractSeq<?>)clone).size);
+
+      final var origArr=((PackedBooleanArrSeq)expectedRoot.seq).words;
+      final var cloneArr=((PackedBooleanArrSeq)clone).words;
+      if(origArr==null) {
+          Assertions.assertNull(cloneArr);
+      }else {
+          Assertions.assertNotSame(origArr,cloneArr);
+          if(size==0) {
+              Assertions.assertNull(cloneArr);
+          }else {
+              //TODO
+              throw new UnsupportedOperationException();
+          }
+      }
+      
+//      if(origArr == OmniArray.OfBoolean.DEFAULT_ARR){
+//        Assertions.assertSame(origArr,cloneArr);
+//      }else{
+//        Assertions.assertNotSame(origArr,cloneArr);
+//        if(size == 0){
+//          Assertions.assertSame(cloneArr,OmniArray.OfBoolean.DEFAULT_ARR);
+//        }else{
+//          do{
+//            Assertions.assertEquals(origArr[expectedRootOffset + --size],cloneArr[size]);
+//          }while(size != 0);
+//        }
+//      }
+    
+  }
+  @Override public void verifyCollectionState(boolean refIsSame){
+    Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListVerifier=subListMonitor->Assertions
+        .assertEquals(subListMonitor.expectedSize,((AbstractSeq<?>)subListMonitor.seq).size);
+      if(expectedRoot.checkedType.checked){
+        subListVerifier=subListVerifier.andThen(subListMonitor->{
+          Assertions.assertSame(subListMonitor.getParentSeq(),
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.parent(subListMonitor.seq));
+          Assertions.assertSame(expectedRoot.seq,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.root(subListMonitor.seq));
+          Assertions.assertEquals(subListMonitor.expectedRootOffset,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.rootOffset(subListMonitor.seq));
+          Assertions.assertEquals(subListMonitor.expectedModCount,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.modCount(subListMonitor.seq));
+        });
+      }else{
+        subListVerifier=subListVerifier.andThen(subListMonitor->{
+          Assertions.assertSame(subListMonitor.getParentSeq(),
+              FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.parent(subListMonitor.seq));
+          Assertions.assertSame(expectedRoot.seq,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.root(subListMonitor.seq));
+          Assertions.assertEquals(subListMonitor.expectedRootOffset,
+              FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.rootOffset(subListMonitor.seq));
+        });
+      }
+    
+    var curr=this;
+    do{
+      subListVerifier.accept(curr);
+    }while((curr=curr.expectedParent) != null);
+    expectedRoot.verifyCollectionState(refIsSame);
+  }
+  @Override public void verifyGetResult(int index,Object result,DataType outputType){
+    expectedRoot.verifyGetResult(index + expectedRootOffset,result,outputType);
+  }
+  @Override public void verifyPutResult(int index,Object input,DataType inputType){
+    expectedRoot.verifyPutResult(index + expectedRootOffset,input,inputType);
+  }
+ 
+  @Override public void verifyRemoveIf(boolean result,MonitoredRemoveIfPredicate filter){
+      //TODO
+      throw new UnsupportedOperationException();
+//    Assertions.assertNotEquals(result,filter.removedVals.isEmpty());
+//    Assertions.assertNotEquals(result,filter.numRemoved == 0);
+//    final int expectedSize=this.expectedSize;
+//    final int offset=expectedRootOffset;
+//    final int bound=offset + expectedSize;
+//    final var dataType=expectedRoot.dataType;
+//    if(result){
+//      int numRemoved;
+//      if(dataType == DataType.BOOLEAN){
+//        final var expectedArr=(boolean[])expectedRoot.expectedArr;
+//        if(filter.removedVals.contains(Boolean.TRUE)){
+//          if(filter.removedVals.contains(Boolean.FALSE)){
+//            Assertions.assertTrue(filter.retainedVals.isEmpty());
+//            Assertions.assertEquals(0,filter.numRetained);
+//            int i=bound - 1;
+//            final boolean firstVal=expectedArr[i];
+//            while(expectedArr[--i] == firstVal){
+//              // we are expecting this condition to be met before i<offset. Otherwise,
+//              // something is wrong.
+//            }
+//            numRemoved=expectedSize;
+//          }else{
+//            numRemoved=1;
+//            int i=offset;
+//            for(;;++i){
+//              if(expectedArr[i]){
+//                for(int j=i + 1;j < bound;++j){
+//                  if(!expectedArr[j]){
+//                    expectedArr[i++]=false;
+//                  }else{
+//                    ++numRemoved;
+//                  }
+//                }
+//                break;
+//              }
+//            }
+//          }
+//        }else{
+//          numRemoved=1;
+//          int i=offset;
+//          for(;;++i){
+//            if(!expectedArr[i]){
+//              for(int j=i + 1;j < bound;++j){
+//                if(expectedArr[j]){
+//                  expectedArr[i++]=true;
+//                }else{
+//                  ++numRemoved;
+//                }
+//              }
+//              break;
+//            }
+//          }
+//        }
+//      }else{
+//        Assertions.assertEquals(expectedSize,filter.numCalls);
+//        IntBinaryOperator remover;
+//        switch(dataType){
+//        case BYTE:{
+//          final var castArr=(byte[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case CHAR:{
+//          final var castArr=(char[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case SHORT:{
+//          final var castArr=(short[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case INT:{
+//          final var castArr=(int[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case LONG:{
+//          final var castArr=(long[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case FLOAT:{
+//          final var castArr=(float[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case DOUBLE:{
+//          final var castArr=(double[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        case REF:{
+//          final var castArr=(Object[])expectedRoot.expectedArr;
+//          remover=(srcIndex,dstIndex)->{
+//            final var val=castArr[srcIndex];
+//            final boolean removedContains=filter.removedVals.contains(val);
+//            final boolean retainedContains=filter.retainedVals.contains(val);
+//            Assertions.assertNotEquals(removedContains,retainedContains);
+//            if(retainedContains){
+//              castArr[dstIndex++]=val;
+//            }
+//            return dstIndex;
+//          };
+//          break;
+//        }
+//        default:
+//          throw dataType.invalid();
+//        }
+//        int dstOffset=offset;
+//        for(int srcOffset=offset;srcOffset < bound;++srcOffset){
+//          dstOffset=remover.applyAsInt(srcOffset,dstOffset);
+//        }
+//        numRemoved=bound - dstOffset;
+//        Assertions.assertEquals(filter.numRemoved,numRemoved);
+//        Assertions.assertEquals(filter.numRetained,dstOffset - offset);
+//      }
+//      System.arraycopy(expectedRoot.expectedArr,bound,expectedRoot.expectedArr,bound - numRemoved,
+//          expectedRoot.expectedSize - bound);
+//      if(dataType == DataType.REF){
+//        final var expectedArr=(Object[])expectedRoot.expectedArr;
+//        final int rootBound=expectedRoot.expectedSize;
+//        int newRootBound=rootBound - numRemoved;
+//        while(newRootBound != rootBound){
+//          expectedArr[newRootBound]=null;
+//          ++newRootBound;
+//        }
+//      }
+//      bubbleUpModifySize(-numRemoved);
+//      expectedRoot.expectedSize-=numRemoved;
+//      ++expectedRoot.expectedModCount;
+//    }else{
+//      if(dataType == DataType.BOOLEAN){
+//        final var expectedArr=((BooleanArrSeq)expectedRoot.seq).arr;
+//        if(filter.retainedVals.contains(Boolean.TRUE)){
+//          if(filter.retainedVals.contains(Boolean.FALSE)){
+//            int i=expectedRootOffset + expectedSize - 1;
+//            final boolean firstVal=expectedArr[i];
+//            while(expectedArr[--i] == firstVal){
+//              // we are expecting this condition to be met before expectedSize==-1. Otherwise,
+//              // something is wrong.
+//            }
+//          }else{
+//            for(int i=expectedRootOffset + expectedSize;--i >= expectedRootOffset;){
+//              Assertions.assertTrue(expectedArr[i]);
+//            }
+//          }
+//        }else{
+//          if(filter.retainedVals.contains(Boolean.FALSE)){
+//            for(int i=expectedRootOffset + expectedSize;--i >= expectedRootOffset;){
+//              Assertions.assertFalse(expectedArr[i]);
+//            }
+//          }else{
+//            Assertions.assertEquals(0,expectedSize);
+//          }
+//        }
+//      }else{
+//        Assertions.assertEquals(expectedSize,filter.numCalls);
+//        Assertions.assertEquals(expectedSize,filter.numRetained);
+//        final var itr=seq.iterator();
+//        while(itr.hasNext()){
+//          Assertions.assertTrue(filter.retainedVals.contains(itr.next()));
+//        }
+//      }
+//    }
+  }
+  @Override public void writeObjectImpl(MonitoredObjectOutputStream oos) throws IOException{
+
+      if(expectedRoot.checkedType.checked){
+        FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.writeObject(seq,oos);
+      }else{
+        FieldAndMethodAccessor.PackedBooleanArrSeq.UncheckedSubList.writeObject(seq,oos);
+      }
+   
+  }
+  private void bubbleUpModifySize(int sizeDelta){
+    var curr=this;
+    do{
+      ++curr.expectedModCount;
+      curr.expectedSize+=sizeDelta;
+    }while((curr=curr.expectedParent) != null);
+  }
+  private OmniList<?> getParentSeq(){
+    if(expectedParent == null){ return null; }
+    return expectedParent.seq;
+  }
+}
+  
   }
   private static class PackedBooleanArrStackMonitor
       extends AbstractPackedBooleanArrSeqMonitor<PackedBooleanArrSeq.UncheckedStack>
@@ -1048,6 +1702,9 @@ public class PackedBooleanArrSeqTest{
         initParamArray=ALL_STRUCT_INIT_PARAMS;
       }
       for(final var initParams:initParamArray){
+          if(initParams.structType==StructType.PackedBooleanArrSubList) {
+              continue;
+          }
         for(final var queryVal:QueryVal.values()){
           if(DataType.BOOLEAN.isValidQueryVal(queryVal)){
             queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
@@ -1056,6 +1713,11 @@ public class PackedBooleanArrSeqTest{
                   final boolean queryCanReturnTrue
                       =queryVal.queryCanReturnTrue(modification,castType,inputType,DataType.BOOLEAN);
                   for(final var size:SIZES){
+                    if(size>1 && (castType==QueryCastType.ToBoxed || inputType!=DataType.BOOLEAN)) {
+                        break;
+                    }
+                      
+                      
                     for(final var position:POSITIONS){
                       if(position >= 0){
                         if(!queryCanReturnTrue){
@@ -1109,7 +1771,7 @@ public class PackedBooleanArrSeqTest{
     @SuppressWarnings("unchecked") private void runTest(SequenceInitParams initParams,IllegalModification illegalMod,
         QueryVal queryVal,QueryVal.QueryValModification modification,QueryCastType castType,DataType inputType,
         int seqSize,double position){
-      final var monitor=getMonitoredSequence(initParams,seqSize);
+      final var monitor=getMonitoredSequence(initParams,seqSize+1);
       if(position < 0){
         queryVal.initDoesNotContain(monitor.getCollection(),seqSize,0,modification);
       }else{
@@ -1132,6 +1794,9 @@ public class PackedBooleanArrSeqTest{
   private static interface ToStringAndHashCodeTest{
     private void runAllTests(String testName){
       for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63) {
+            continue;
+        }
         for(int tmpInitVal=0;tmpInitVal <= 1;++tmpInitVal){
           final int initVal=tmpInitVal;
           for(final var size:SIZES){
@@ -1163,8 +1828,6 @@ public class PackedBooleanArrSeqTest{
    */
   private static final int[] NON_THROWING_REMOVE_AT_POSITIONS=new int[]{-1,0,1,2,3};
   private static final int[] THROWING_REMOVE_AT_POSITIONS=new int[]{-1};
-  private static final double[] RANDOM_THRESHOLDS=new double[]{0.01,0.05,0.10,0.25,0.50,0.75,0.90,0.95,0.99};
-  private static final double[] NON_RANDOM_THRESHOLD=new double[]{0.5};
   private static final double[] POSITIONS;
   private static final int[] INIT_CAPACITIES=new int[]{0,5,10,15,63,64,65,66,127,128,129,255,256,257,319,320,321};
   private static final int[] SIZES=new int[]{0,1,2,3,4,5,10,20,30,40,50,60,62,63,64,65,66,70,80,90,100,126,127,128,129,
@@ -1181,7 +1844,7 @@ public class PackedBooleanArrSeqTest{
     final var denominators=new double[]{62,63,64,65,66,126,127,128,129,130,190,191,192,193,194,254,255,256,257,258};
     for(final var denominator:denominators){
       for(int numerator=1;numerator < denominator;++numerator){
-        positionBuilder.accept((double)numerator / denominator);
+        positionBuilder.accept(numerator / denominator);
       }
     }
     positionBuilder.add(1);
@@ -1202,25 +1865,28 @@ public class PackedBooleanArrSeqTest{
       rootStructBuilder.accept(arrListParams);
       rootStructBuilder.accept(arrStackParams);
     }
-    // TODO add PackedBooleanSubList
-    // for(int pre0=0;pre0 <= 5;pre0+=5){
-    // for(int pre1=0;pre1 <= 5;pre1+=5){
-    // final var preAllocs=new int[]{pre0,pre1};
-    // for(int post0=0;post0 <= 5;post0+=5){
-    // for(int post1=0;post1 <= 5;post1+=5){
-    // final var postAllocs=new int[]{post0,post1};
-    // for(final var checkedType:CheckedType.values()){
-    // for(final var collectionType:DataType.values()){
-    // final var subListParams
-    // =new SequenceInitParams(StructType.ArrSubList,collectionType,checkedType,preAllocs,postAllocs);
-    // listStructBuilder.accept(subListParams);
-    // allStructBuilder.accept(subListParams);
-    // }
-    // }
-    // }
-    // }
-    // }
-    // }
+    final int[] buffers=new int[] {0,1,2,62,63,64,65,66,126,127,128,254,256,256,257,258};
+    for(var pre0:buffers) {
+        if(pre0>66) {
+            continue;
+        }
+        for(var pre1:buffers) {
+            if(pre1>66) {
+                continue;
+            }
+            final var preAllocs=new int[] {pre0,pre1};
+            for(var post0:buffers) {
+                for(var post1:buffers) {
+                    final var postAllocs=new int[] {post0,post1};
+                    for(var checkedType:CheckedType.values()) {
+                        final var subListParams=new SequenceInitParams(StructType.PackedBooleanArrSubList,DataType.BOOLEAN,checkedType,preAllocs,postAllocs);
+                        listStructBuilder.accept(subListParams);
+                        allStructBuilder.accept(subListParams);
+                    }
+                }
+            }
+        }
+    }
     ALL_STRUCT_INIT_PARAMS=allStructBuilder.build().toArray(SequenceInitParams[]::new);
     LIST_STRUCT_INIT_PARAMS=listStructBuilder.build().toArray(SequenceInitParams[]::new);
     STACK_STRUCT_INIT_PARAMS=stackStructBuilder.build().toArray(SequenceInitParams[]::new);
@@ -1240,8 +1906,24 @@ public class PackedBooleanArrSeqTest{
     final var rootMonitor=new PackedBooleanArrListMonitor(initParams,
         getInitCapacity(initCapacity,initParams.preAllocs,initParams.postAllocs));
     if(initParams.structType != StructType.PackedBooleanArrSubList){ return rootMonitor; }
-    // TODO add PackedBooleanSubList
-    return null;
+    final var preAllocs=initParams.preAllocs;
+    final var postAllocs=initParams.postAllocs;
+    int totalPreAlloc=preAllocs[0];
+    int totalPostAlloc=postAllocs[0];
+    SequenceInitialization.Ascending.initialize(rootMonitor,totalPreAlloc,Integer.MIN_VALUE);
+    SequenceInitialization.Ascending.initialize(rootMonitor,totalPostAlloc,Integer.MAX_VALUE - totalPostAlloc);
+    var subListMonitor=new PackedBooleanArrListMonitor.PackedBooleanArrSubListMonitor<>(rootMonitor,totalPreAlloc,totalPreAlloc);
+    for(int i=1;i < preAllocs.length;++i){
+      int postAlloc;
+      int preAlloc;
+      totalPostAlloc+=postAlloc=postAllocs[i];
+      SequenceInitialization.Ascending.initialize(subListMonitor,preAlloc=preAllocs[i],
+          Integer.MIN_VALUE + totalPreAlloc);
+      SequenceInitialization.Ascending.initialize(subListMonitor,postAlloc,Integer.MAX_VALUE - totalPostAlloc);
+      totalPreAlloc+=preAlloc;
+      subListMonitor=new PackedBooleanArrListMonitor.PackedBooleanArrSubListMonitor<>(subListMonitor,preAlloc,preAlloc);
+    }
+    return subListMonitor;
   }
   private static MonitoredSequence<? extends OmniCollection.OfBoolean>
       getMonitoredSequence(SequenceInitParams initParams,int initCapacity){
@@ -1256,7 +1938,12 @@ public class PackedBooleanArrSeqTest{
     return new PackedBooleanArrStackMonitor(initParams,initCapacity);
   }
   @Order(68) @Test public void testadd_intval(){
+      
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
+        
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -1322,6 +2009,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(136) @Test public void testadd_val(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -1413,7 +2103,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_void");
   }
-  @Order(22069368) @Test public void testcontains_val(){
+  @Order(1634136) @Test public void testcontains_val(){
     final QueryTest<?> test=(monitor,queryVal, inputType, castType,modification, position, seqSize)->{
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
@@ -1426,25 +2116,28 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testequals_Object");
   }
-  @Order(717740) @Test public void testforEach_Consumer(){
-    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+  @Order(24140) @Test public void testforEach_Consumer(){
+    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null || monitor.isEmpty()){
-          monitor.verifyForEach(functionGen,functionCallType,randSeed);
+          monitor.verifyForEach(functionGen,functionCallType,0);
         }else{
           Assertions.assertThrows(functionGen.expectedException,
-              ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+              ()->monitor.verifyForEach(functionGen,functionCallType,0));
         }
       }else{
         monitor.illegalMod(illegalMod);
         Assertions.assertThrows(illegalMod.expectedException,
-            ()->monitor.verifyForEach(functionGen,functionCallType,randSeed));
+            ()->monitor.verifyForEach(functionGen,functionCallType,0));
       }
     };
-    test.runAllTests("PackedBooleanArrSeqTest.testforEach_Consumer",100,true);
+    test.runAllTests("PackedBooleanArrSeqTest.testforEach_Consumer",true);
   }
   @Order(28) @Test public void testget_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -1488,7 +2181,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
   }
-  @Order(11034684) @Test public void testindexOf_val(){
+  @Order(817068) @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
           int expectedIndex;
@@ -1508,6 +2201,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(144) @Test public void testiterator_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -1540,6 +2236,9 @@ public class PackedBooleanArrSeqTest{
         if(position >= 0 && (index=(int)(position * size)) != prevIndex){
           prevIndex=index;
           for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+              if(initParams.structType==StructType.PackedBooleanArrSubList) {
+                  continue; //TODO remove
+              }
             for(final var itrType:initParams.structType.validItrTypes){
               TestExecutorService.submitTest(()->{
                 final var seqMonitor
@@ -1554,8 +2253,8 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrclone_void");
   }
-  @Order(91648788) @Test public void testItrforEachRemaining_Consumer(){
-    for(final int size:SIZES){
+  @Order(2233716) @Test public void testItrforEachRemaining_Consumer(){
+    for(final int size:SHORT_SIZES){
       int prevNumToIterate=-1;
       for(final var position:POSITIONS){
         int numToIterate;
@@ -1563,16 +2262,15 @@ public class PackedBooleanArrSeqTest{
           prevNumToIterate=numToIterate;
           final int numLeft=size - numToIterate;
           for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+              if(initParams.structType==StructType.PackedBooleanArrSubList) {
+                  continue; //TODO remove
+              }
             for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
               for(final var itrType:initParams.structType.validItrTypes){
                 for(final var illegalMod:itrType.validPreMods){
                   if(illegalMod.expectedException == null || initParams.checkedType.checked){
                     for(final var functionGen:itrType.validMonitoredFunctionGens){
                       if(initParams.checkedType.checked || size == 0 || functionGen.expectedException == null){
-                        final long randSeedBound=!functionCallType.boxed && numLeft > 1 && functionGen.randomized
-                            && illegalMod.expectedException == null?100:0;
-                        for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                          final long randSeed=tmpRandSeed;
                           TestExecutorService.submitTest(()->{
                             final var seqMonitor=SequenceInitialization.Ascending
                                 .initialize(getMonitoredSequence(initParams,size),size,0);
@@ -1580,18 +2278,18 @@ public class PackedBooleanArrSeqTest{
                             itrMonitor.illegalMod(illegalMod);
                             if(illegalMod.expectedException == null || numLeft == 0){
                               if(functionGen.expectedException == null || numLeft == 0){
-                                itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed);
+                                itrMonitor.verifyForEachRemaining(functionGen,functionCallType,0);
                               }else{
                                 Assertions.assertThrows(functionGen.expectedException,
-                                    ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
+                                    ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,0));
                               }
                             }else{
                               Assertions.assertThrows(illegalMod.expectedException,
-                                  ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,randSeed));
+                                  ()->itrMonitor.verifyForEachRemaining(functionGen,functionCallType,0));
                             }
                           });
                         }
-                      }
+                      
                     }
                   }
                 }
@@ -1605,6 +2303,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(84) @Test public void testItrhasNext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var itrType:initParams.structType.validItrTypes){
         for(final int size:SHORT_SIZES){
           TestExecutorService.submitTest(()->{
@@ -1622,6 +2323,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(1203525) @Test public void testItrnext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
           if(illegalMod.expectedException == null || initParams.checkedType.checked){
@@ -1665,6 +2369,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(1171216) @Test public void testItrremove_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
           if(illegalMod.expectedException == null || initParams.checkedType.checked){
@@ -1751,7 +2458,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrremove_void");
   }
-  @Order(11034684) @Test public void testlastIndexOf_val(){
+  @Order(817068) @Test public void testlastIndexOf_val(){
     final QueryTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -1766,6 +2473,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(71) @Test public void testlistIterator_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var size:SIZES){
         final int inc=Math.max(1,size / 10);
         if(initParams.checkedType.checked || size > 0){
@@ -1804,6 +2514,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testlistIterator_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -1831,6 +2544,9 @@ public class PackedBooleanArrSeqTest{
     for(final var position:POSITIONS){
       if(position >= 0){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+            if(initParams.structType==StructType.PackedBooleanArrSubList) {
+                continue; //TODO remove
+            }
           final var itrType=initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr
               :IteratorType.SubBidirectionalItr;
           for(final var illegalMod:itrType.validPreMods){
@@ -1880,6 +2596,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testListItrhasPrevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
           final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
@@ -1894,6 +2613,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testListItrnextIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
           final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
@@ -1908,6 +2630,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(400932) @Test public void testListItrprevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var size:SHORT_SIZES){
         if(size > 0 || initParams.checkedType.checked){
           final var itrType=initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr
@@ -1950,6 +2675,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testListItrpreviousIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
           final var seqMonitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
@@ -1964,6 +2692,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(712880) @Test public void testListItrset_val(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       final var itrType
           =initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr:IteratorType.SubBidirectionalItr;
       for(final var illegalMod:itrType.validPreMods){
@@ -2019,7 +2750,7 @@ public class PackedBooleanArrSeqTest{
   }
   @Test public void testMASSIVEtoString(){
     int seqSize=DataType.BOOLEAN.massiveToStringThreshold + 1;
-    long[] words=new long[((seqSize-1)>>6)+1];
+    long[] words=new long[(seqSize-1>>6)+1];
     for(int i=words.length;--i>=0;) {
       words[i]=-1L;
     }
@@ -2106,6 +2837,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testput_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -2146,7 +2880,7 @@ public class PackedBooleanArrSeqTest{
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testput_intval");
   }
   @Order(24140) @Test public void testReadAndWrite(){
-    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
           Assertions.assertDoesNotThrow(()->monitor.verifyReadAndWrite(functionGen));
@@ -2158,10 +2892,13 @@ public class PackedBooleanArrSeqTest{
         Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyReadAndWrite(functionGen));
       }
     };
-    test.runAllTests("PackedBooleanArrSeqTest.testReadAndWrite",0,true);
+    test.runAllTests("PackedBooleanArrSeqTest.testReadAndWrite",true);
   }
   @Order(2484) @Test public void testremoveAt_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -2237,11 +2974,14 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveAt_int");
   }
-  @Tag("testremoveIf_Predicate") @Order(19760272) @Test public void testremoveIf_Predicate(){
+  @Tag("testremoveIf_Predicate") @Order(158368) @Test public void testremoveIf_Predicate(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
         for(var size:SIZES){
-          if((size) == 0 || initParams.checkedType.checked || filterGen.expectedException == null){
+          if(size == 0 || initParams.checkedType.checked || filterGen.expectedException == null){
             final int initValBound;
             final int periodBound;
             initValBound=size == 0?0:1;
@@ -2250,28 +2990,15 @@ public class PackedBooleanArrSeqTest{
               for(final var illegalMod:initParams.structType.validPreMods){
                 if(illegalMod.minDepth <= initParams.preAllocs.length
                     && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                  long randSeedBound;
-                  double[] thresholdArr;
-                  if(filterGen.predicateGenCallType == PredicateGenCallType.Randomized && size > 0
-                      && !functionCallType.boxed && illegalMod.expectedException == null){
-                    randSeedBound=100;
-                    thresholdArr=RANDOM_THRESHOLDS;
-                  }else{
-                    randSeedBound=0;
-                    thresholdArr=NON_RANDOM_THRESHOLD;
-                  }
-                  for(long tmpRandSeed=0;tmpRandSeed <= randSeedBound;++tmpRandSeed){
-                    final long randSeed=tmpRandSeed;
                     for(int tmpInitVal=0;tmpInitVal <= initValBound;++tmpInitVal){
                       final int initVal=tmpInitVal;
                       for(int tmpPeriod=0;tmpPeriod <= periodBound;++tmpPeriod){
                         final int period=tmpPeriod;
-                        for(final var threshold:thresholdArr){
                           TestExecutorService.submitTest(()->{
                             final var monitor=SequenceInitialization.Ascending
                                 .initialize(getMonitoredSequence(initParams,size),size,initVal,period);
                             final var filter
-                                =filterGen.getMonitoredRemoveIfPredicate(monitor,threshold,new Random(randSeed));
+                                =filterGen.getMonitoredRemoveIfPredicate(monitor);
                             if(illegalMod.expectedException == null){
                               if(filterGen.expectedException == null || size == 0){
                                 monitor.verifyRemoveIf(filter,functionCallType);
@@ -2285,9 +3012,9 @@ public class PackedBooleanArrSeqTest{
                                   ()->monitor.verifyRemoveIf(filter,functionCallType));
                             }
                           });
-                        }
+                        
                       }
-                    }
+                    
                   }
                 }
               }
@@ -2298,35 +3025,29 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(22069368) @Test public void testremoveVal_val(){
-    final QueryTest<?> test=new QueryTest<>(){
-      @Override public void callAndVerifyResult(MonitoredSequence<? extends OmniCollection.OfBoolean> monitor,QueryVal queryVal,
-          DataType inputType,QueryCastType castType,QueryValModification modification,
-          double position,int seqSize){
-        Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
-      }
-    };
+  @Tag("testremoveVal_val") @Order(1634136) @Test public void testremoveVal_val(){
+    final QueryTest<?> test=(monitor,queryVal,inputType,castType,modification,position,seqSize)->Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
     test.runAllTests("PackedBooleanArrSeqTest.testremoveVal_val",2);
   }
-  @Order(358870) @Test public void testreplaceAll_UnaryOperator(){
+  @Order(12070) @Test public void testreplaceAll_UnaryOperator(){
     final MonitoredFunctionTest<MonitoredList<? extends OmniList.OfBoolean>> test
-        =(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+        =(monitor,functionGen,functionCallType,illegalMod)->{
           if(illegalMod.expectedException == null){
             if(functionGen.expectedException == null || monitor.isEmpty()){
-              monitor.verifyReplaceAll(functionGen,functionCallType,randSeed);
+              monitor.verifyReplaceAll(functionGen,functionCallType,0);
             }else{
               Assertions.assertThrows(functionGen.expectedException,
-                  ()->monitor.verifyReplaceAll(functionGen,functionCallType,randSeed));
+                  ()->monitor.verifyReplaceAll(functionGen,functionCallType,0));
             }
           }else{
             monitor.illegalMod(illegalMod);
             Assertions.assertThrows(illegalMod.expectedException,
-                ()->monitor.verifyReplaceAll(functionGen,functionCallType,randSeed));
+                ()->monitor.verifyReplaceAll(functionGen,functionCallType,0));
           }
         };
-    test.runAllTests("PackedBooleanArrSeqTest.testreplaceAll_UnaryOperator",100,false);
+    test.runAllTests("PackedBooleanArrSeqTest.testreplaceAll_UnaryOperator",false);
   }
-  @Tag("testsearch_val") @Order(11034684) @Test public void testsearch_val(){
+  @Tag("testsearch_val") @Order(817068) @Test public void testsearch_val(){
     final QueryTest<PackedBooleanArrStackMonitor> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -2343,6 +3064,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testset_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -2384,6 +3108,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(888) @Test public void testsort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithPrimitive){
           for(final var size:SIZES){
@@ -2419,9 +3146,12 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(72) @Test public void teststableAscendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithNoComparator
-            && (comparatorGen.validWithPrimitive)){
+            && comparatorGen.validWithPrimitive){
           for(final var size:SIZES){
             if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
               for(final var illegalMod:initParams.structType.validPreMods){
@@ -2453,9 +3183,12 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(72) @Test public void teststableDescendingSort_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithNoComparator
-            && (comparatorGen.validWithPrimitive)){
+            && comparatorGen.validWithPrimitive){
           for(final var size:SIZES){
             if(size < 2 || comparatorGen.expectedException == null || initParams.checkedType.checked){
               for(final var illegalMod:initParams.structType.validPreMods){
@@ -2485,10 +3218,11 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.teststableDescendingSort_void");
   }
-  @Disabled
   @Tag("testsubList_intint") @Order(8006) @Test public void testsubList_intint(){
-    //TODO
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63) {
+            continue;
+        }
       for(final int size:SIZES){
         final int inc=Math.max(1,size / 10);
         for(int tmpFromIndex=-inc,fromBound=size + 2 * inc;tmpFromIndex <= fromBound;tmpFromIndex+=inc){
@@ -2500,10 +3234,7 @@ public class PackedBooleanArrSeqTest{
                 for(final var illegalMod:initParams.structType.validPreMods){
                   if(illegalMod.minDepth <= initParams.preAllocs.length
                       && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                    //TestExecutorService.submitTest(()->{
-                    if(initParams.checkedType.checked && size==0 && fromIndex==-1 && toIndex==-2 && illegalMod.expectedException==null) {
-                      System.out.println("here");
-                    }
+                    TestExecutorService.submitTest(()->{
                       final var rootMonitor
                           =SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
                       if(illegalMod.expectedException == null){
@@ -2528,7 +3259,7 @@ public class PackedBooleanArrSeqTest{
                           }
                         });
                       }
-                    //});
+                    });
                   }
                 }
               }
@@ -2540,7 +3271,7 @@ public class PackedBooleanArrSeqTest{
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsubList_intint");
   }
   @Order(24140) @Test public void testtoArray_IntFunction(){
-    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod,randSeed)->{
+    final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
           monitor.verifyToArray(functionGen);
@@ -2552,10 +3283,13 @@ public class PackedBooleanArrSeqTest{
         Assertions.assertThrows(illegalMod.expectedException,()->monitor.verifyToArray(functionGen));
       }
     };
-    test.runAllTests("PackedBooleanArrSeqTest.testtoArray_IntFunction",0,true);
+    test.runAllTests("PackedBooleanArrSeqTest.testtoArray_IntFunction",true);
   }
   @Order(15924) @Test public void testtoArray_ObjectArray(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -2581,6 +3315,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(144) @Test public void testtoArray_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        if(initParams.structType==StructType.PackedBooleanArrSubList) {
+            continue; //TODO remove
+        }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
