@@ -25,18 +25,15 @@ import omni.function.BooleanPredicate;
 import omni.impl.AbstractBooleanItr;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
+import omni.util.BitSetUtil;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
 import omni.util.ToStringUtil.OmniStringBuilderByte;
 import omni.util.TypeUtil;
 public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implements OmniCollection.OfBoolean{
     private static final long serialVersionUID=1L;
-    private static long negate(long val) {
-        return ~val;
-    }
-    private static LongUnaryOperator getWordFlipper(boolean v) {
-        return v?LongUnaryOperator.identity():PackedBooleanArrSeq::negate;
-    }
+
+
     private static void setRange(long[] words,int offset,int bound,long val) {
       while(offset<bound) {
         words[offset]=val;
@@ -70,10 +67,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
       }
     }
-    private static long partialWordShiftDown(long word,int shift){
-        long mask;
-        return word & (mask=(1L << shift) - 1) | word >>> 1 & ~mask;
-    }
+   
     transient long[] words;
     PackedBooleanArrSeq(){
         super();
@@ -128,20 +122,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
     }
     @Override
     boolean uncheckedcontains(final int bound,final boolean val){
-        final var words=this.words;
-        final var wordFlipper=getWordFlipper(val);
-        var wordOffset=0;
-        for(final var wordBound=bound>>6;wordOffset<wordBound;++wordOffset) {
-            if(wordFlipper.applyAsLong(words[wordOffset])!=0) {
-                return true;
-            }
-        }
-        return wordFlipper.applyAsLong(words[wordOffset])<<-bound-1!=0;
+       return BitSetUtil.uncheckedcontains(this.words,bound,BitSetUtil.getWordFlipper(val));
     }
     @Override
     int uncheckedindexOf(int size,boolean val){
         final var words=this.words;
-        final var wordFlipper=getWordFlipper(val);
+        final var wordFlipper=BitSetUtil.getWordFlipper(val);
         var wordOffset=0;
         int tail0s;
         goToFound:for(;;) {
@@ -173,7 +159,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         int wordBound;
         final LongUnaryOperator wordFlipper;
         int lead0s;
-        if((lead0s=Long.numberOfLeadingZeros((wordFlipper=getWordFlipper(val)).applyAsLong(words[wordBound=--size>>6])<<~size))!=64) {
+        if((lead0s=Long.numberOfLeadingZeros((wordFlipper=BitSetUtil.getWordFlipper(val)).applyAsLong(words[wordBound=--size>>6])<<~size))!=64) {
             return (size&63)-lead0s+(wordBound<<6);
         }
         while(--wordBound>=0) {
@@ -340,7 +326,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         int wordBound;
         int lead0s;
         final LongUnaryOperator wordFlipper;
-        if((lead0s=Long.numberOfLeadingZeros((wordFlipper=getWordFlipper(val)).applyAsLong(words[wordBound=--size>>6])<<~size))!=64) {
+        if((lead0s=Long.numberOfLeadingZeros((wordFlipper=BitSetUtil.getWordFlipper(val)).applyAsLong(words[wordBound=--size>>6])<<~size))!=64) {
             return lead0s+1;
         }
         while(--wordBound>=0) {
@@ -350,27 +336,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
           }
         return -1;
     }
-    private boolean uncheckedcontains(int offset,int size,LongUnaryOperator wordFlipper) {
-      //TODO this almost certainly has bugs
-        final var words=this.words;
-        final int bound;
-        final int wordBound=(bound=size-1+offset)>>6;
-        int wordOffset=offset>>6;
-        if((offset&63)!=0) {
-            if(wordOffset==wordBound) {
-                return (wordFlipper.applyAsLong(words[wordBound])&(1L<<size)-1<<offset)!=0;
-            }
-            if(wordFlipper.applyAsLong(words[wordOffset++])<<offset!=0) {
-                return true;
-            }
-        }
-        for(;wordOffset<wordBound;++wordOffset) {
-            if(wordFlipper.applyAsLong(words[wordOffset])!=0) {
-                return true;
-            }
-        }
-        return wordFlipper.applyAsLong(words[wordBound])<< -bound - 1 != 0;
-    }
+    
     
    
     private int uncheckedindexOf(int offset,int size,LongUnaryOperator wordFlipper) {
@@ -444,7 +410,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         int wordOffset;
         final int wordBound;
         final long retWord;
-        var word=(words=this.words)[wordOffset=index >> 6]=partialWordShiftDown(retWord=words[wordOffset],index);
+        var word=(words=this.words)[wordOffset=index >> 6]=BitSetUtil.partialWordShiftDown(retWord=words[wordOffset],index);
         if(wordOffset == (wordBound=bound >> 6)){
             words[wordOffset]=word;
         }else{
@@ -461,7 +427,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         final long[] words;
         int wordOffset;
         final int wordBound,bound;
-        var word=(words=this.words)[wordOffset=index >> 6]=partialWordShiftDown(words[wordOffset],index);
+        var word=(words=this.words)[wordOffset=index >> 6]=BitSetUtil.partialWordShiftDown(words[wordOffset],index);
         if(wordOffset == (wordBound=(bound=size - 1) >> 6)){
             words[wordOffset]=word;
         }else{
@@ -1231,30 +1197,67 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
           }
         @Override
         public void clear(){
-            //TODO
-        }
+            final CheckedList root;
+            int modCount;
+            CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+            int size;
+            if((size=this.size)!=0) {
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                for(var curr=parent;curr!=null;curr.size-=size,curr.modCount=modCount,curr=curr.parent) {}
+                this.size=0;
+                final int offset,tailLength,rootBound;
+                root.size=(rootBound=root.size)-size;
+                if((tailLength=rootBound-(size=(offset=this.rootOffset)+size))!=0) {
+                    final var words=root.words;
+                    if((offset&63)==0) {
+                        if((size&63)==0) {
+                           ArrCopy.uncheckedSelfCopy(words,size>>6,offset>>6,(tailLength-1>>6)+1);
+                        }else {
+                           BitSetUtil.srcUnallignedPullDown(words,offset>>6,size,rootBound-1>>6);
+                        }
+                    }else {
+                        BitSetUtil.dstUnallignedPullDown(words,offset,size,rootBound-1>>6);
+                    }
+                }
+            }
+          }
         @Override
         public Object clone(){
-          final CheckedList root;
-          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-          final long[] copy;
-          final int size;
-          if((size=this.size)!=0) {
-            int copyLength;
-            copy=new long[copyLength=((size-1)>>6)+1];
-            final int rootOffset;
-            final var words=root.words;
-            int srcOffset=(rootOffset=this.rootOffset)>>6;
-            if((rootOffset&63)==0) {
-              ArrCopy.uncheckedCopy(words,srcOffset,copy,0,copyLength);
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final long[] copy,words;
+            final int size;
+            if((size=this.size)!=0) {
+                final int offset;
+                int dstWordBound=size-1>>6;
+                words=root.words;
+                var srcWordOffset=(offset=this.rootOffset)>>6;
+                if((offset&63)==0) {
+                    ArrCopy.uncheckedCopy(words,srcWordOffset,copy=new long[++dstWordBound],0,dstWordBound);
+                }else {
+                    copy=new long[dstWordBound+1];
+                    var word=words[srcWordOffset];
+                    int srcWordBound;
+                    if((srcWordBound=offset+size-1>>6)-srcWordOffset>dstWordBound) {
+                        for(int dstWordOffset=0;;++dstWordOffset) {
+                            copy[dstWordOffset]=word>>>offset|(word=words[++srcWordOffset])<<-offset;
+                            if(dstWordOffset==dstWordBound) {
+                                break;
+                            }
+                        }
+                    }else {
+                        for(int dstWordOffset=0;srcWordOffset!=srcWordBound;++dstWordOffset) {
+                           copy[dstWordOffset]=word>>>offset|(word=words[++srcWordOffset])<<-offset;
+                        }
+                        copy[dstWordBound]=word>>>offset;
+                    }
+                }
             }else {
-              //TODO
+              copy=null;
             }
-          }else {
-            copy=null;
+            return new CheckedList(size,copy);
           }
-          return new CheckedList(size,copy);
-        }
         @Override
         public boolean contains(boolean val){
             {
@@ -1263,7 +1266,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 try{
                     final int size;
                     if((size=this.size) != 0){
-                        return ((PackedBooleanArrSeq)root).uncheckedcontains(rootOffset,size,getWordFlipper(val));
+                        return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,BitSetUtil.getWordFlipper(val));
                     } // end size check
                 } // end checked sublist try modcount
                 finally{
@@ -1284,13 +1287,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             final LongUnaryOperator wordFlipper;
                             long bits;
                             if(((bits=Double.doubleToRawLongBits(val)) & Long.MAX_VALUE) == 0){
-                                wordFlipper=PackedBooleanArrSeq::negate;
+                                wordFlipper=BitSetUtil::flip;
                             }else if(bits == TypeUtil.DBL_TRUE_BITS){
                                 wordFlipper=LongUnaryOperator.identity();
                             }else{
                                 break returnFalse;
                             }
-                            return ((PackedBooleanArrSeq)root).uncheckedcontains(rootOffset,size,wordFlipper);
+                            return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1315,12 +1318,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                                 break returnFalse;
                             case 0:
                             case Integer.MIN_VALUE:
-                                wordFlipper=PackedBooleanArrSeq::negate;
+                                wordFlipper=BitSetUtil::flip;
                                 break;
                             case TypeUtil.FLT_TRUE_BITS:
                                 wordFlipper=LongUnaryOperator.identity();
                             }
-                            return ((PackedBooleanArrSeq)root).uncheckedcontains(rootOffset,size,wordFlipper);
+                            return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1344,12 +1347,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             default:
                                 break returnFalse;
                             case 0:
-                                wordFlipper=PackedBooleanArrSeq::negate;
+                                wordFlipper=BitSetUtil::flip;
                                 break;
                             case 1:
                                 wordFlipper=LongUnaryOperator.identity();
                             }
-                            return ((PackedBooleanArrSeq)root).uncheckedcontains(rootOffset,size,wordFlipper);
+                            return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1370,13 +1373,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         returnFalse:for(;;){
                             final LongUnaryOperator wordFlipper;
                             if(val == 0L){
-                                wordFlipper=PackedBooleanArrSeq::negate;
+                                wordFlipper=BitSetUtil::flip;
                             }else if(val == 1L){
                                 wordFlipper=LongUnaryOperator.identity();
                             }else{
                                 break returnFalse;
                             }
-                            return ((PackedBooleanArrSeq)root).uncheckedcontains(rootOffset,size,wordFlipper);
+                            return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1398,13 +1401,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                         returnFalse:for(;;){
                             final LongUnaryOperator wordFlipper;
                             if(val instanceof Boolean){
-                                wordFlipper=getWordFlipper((boolean)val);
+                                wordFlipper=BitSetUtil.getWordFlipper((boolean)val);
                             }else if(val instanceof Integer || val instanceof Byte || val instanceof Short){
                                 switch(((Number)val).intValue()){
                                 default:
                                     break returnFalse;
                                 case 0:
-                                    wordFlipper=PackedBooleanArrSeq::negate;
+                                    wordFlipper=BitSetUtil::flip;
                                     break;
                                 case 1:
                                     wordFlipper=LongUnaryOperator.identity();
@@ -1415,7 +1418,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                                     break returnFalse;
                                 case 0:
                                 case Integer.MIN_VALUE:
-                                    wordFlipper=PackedBooleanArrSeq::negate;
+                                    wordFlipper=BitSetUtil::flip;
                                     break;
                                 case TypeUtil.FLT_TRUE_BITS:
                                     wordFlipper=LongUnaryOperator.identity();
@@ -1423,7 +1426,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else if(val instanceof Double){
                                 final long bits;
                                 if(((bits=Double.doubleToRawLongBits((double)val)) & Long.MAX_VALUE) == 0){
-                                    wordFlipper=PackedBooleanArrSeq::negate;
+                                    wordFlipper=BitSetUtil::flip;
                                 }else if(bits == TypeUtil.DBL_TRUE_BITS){
                                     wordFlipper=LongUnaryOperator.identity();
                                 }else{
@@ -1432,7 +1435,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else if(val instanceof Long){
                                 final long v;
                                 if((v=(long)val) == 0L){
-                                    wordFlipper=PackedBooleanArrSeq::negate;
+                                    wordFlipper=BitSetUtil::flip;
                                 }else if(v == 1L){
                                     wordFlipper=LongUnaryOperator.identity();
                                 }else{
@@ -1443,7 +1446,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                                 default:
                                     break returnFalse;
                                 case 0:
-                                    wordFlipper=PackedBooleanArrSeq::negate;
+                                    wordFlipper=BitSetUtil::flip;
                                     break;
                                 case 1:
                                     wordFlipper=LongUnaryOperator.identity();
@@ -1451,7 +1454,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             }else{
                                 break returnFalse;
                             }
-                            return ((PackedBooleanArrSeq)root).uncheckedcontains(rootOffset,size,wordFlipper);
+                            return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                         }
                     } // end size check
                 } // end checked sublist try modcount
@@ -1719,11 +1722,45 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public void replaceAll(BooleanPredicate operator){
-            // TODO Auto-generated method stub
+            int modCount=this.modCount;
+            final var root=this.root;
+            try {
+                final int size;
+                if((size=this.size)==0) {
+                    return;
+                }
+                final int rootOffset;
+                ((UncheckedList)root).uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset+size,operator);
+                
+            }finally {
+                CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+            root.modCount=++modCount;
+            var curr=this;
+            do {
+                curr.modCount=modCount;
+            }while((curr=curr.parent)!=null);
         }
         @Override
         public void replaceAll(UnaryOperator<Boolean> operator){
-            // TODO Auto-generated method stub
+            int modCount=this.modCount;
+            final var root=this.root;
+            try {
+                final int size;
+                if((size=this.size)==0) {
+                    return;
+                }
+                final int rootOffset;
+                ((UncheckedList)root).uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset+size,operator::apply);
+                
+            }finally {
+                CheckedCollection.checkModCount(modCount,root.modCount);
+            }
+            root.modCount=++modCount;
+            var curr=this;
+            do {
+                curr.modCount=modCount;
+            }while((curr=curr.parent)!=null);
         }
         @Override
         public boolean set(int index,boolean val){
@@ -2344,12 +2381,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final var words=this.words;
             final int bound;
             int tail0s;
-            final var wordFlipper=getWordFlipper(val);
+            final var wordFlipper=BitSetUtil.getWordFlipper(val);
             int wordOffset=0;
             for(final var wordBound=(bound=size - 1) >> 6;wordOffset<wordBound;++wordOffset) {
                 long word;
                 if((tail0s=Long.numberOfTrailingZeros(wordFlipper.applyAsLong(word=words[wordOffset]))) != 64){
-                  words[wordOffset]=partialWordShiftDown(word,tail0s) | (word=words[++wordOffset]) << 63;
+                  words[wordOffset]=BitSetUtil.partialWordShiftDown(word,tail0s) | (word=words[++wordOffset]) << 63;
                   while(wordOffset != wordBound){
                       words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
                   }
@@ -2361,7 +2398,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             final long finalWord;
             final long adjustedFinalWord=wordFlipper.applyAsLong(finalWord=words[wordOffset]);
             if((tail0s=Long.numberOfTrailingZeros((size&63)==0?adjustedFinalWord:adjustedFinalWord & (1L << size) - 1)) != 64){
-              words[wordOffset]=partialWordShiftDown(finalWord,tail0s);
+              words[wordOffset]=BitSetUtil.partialWordShiftDown(finalWord,tail0s);
               this.size=bound;
               return true;
             }
@@ -2555,7 +2592,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                 final int cursor,size;
                 final UncheckedList parent;
                 if((cursor=this.cursor) < (size=(parent=this.parent).size)){
-                    parent.uncheckedForEach(cursor,size - 1,action);
+                    parent.uncheckedForEach(cursor,size,action);
                     this.cursor=size;
                 }
             }
@@ -3028,10 +3065,10 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             int lead0s;
             final LongUnaryOperator wordFlipper;
             long word;
-            if((lead0s=Long.numberOfLeadingZeros((wordFlipper=getWordFlipper(val)).applyAsLong(word=words[wordBound])<<-size))==64) {
+            if((lead0s=Long.numberOfLeadingZeros((wordFlipper=BitSetUtil.getWordFlipper(val)).applyAsLong(word=words[wordBound])<<-size))==64) {
               for(int wordOffset=wordBound - 1;wordOffset >= 0;--wordOffset){
                   if((lead0s=Long.numberOfLeadingZeros(wordFlipper.applyAsLong(word=words[wordOffset]))) != 64){
-                    words[wordOffset]=partialWordShiftDown(word,-lead0s-1) | (word=words[++wordOffset]) << 63;
+                    words[wordOffset]=BitSetUtil.partialWordShiftDown(word,-lead0s-1) | (word=words[++wordOffset]) << 63;
                     while(wordOffset != wordBound){
                         words[wordOffset]=word >>> 1 | (word=words[++wordOffset]) << 63;
                     }
@@ -3042,7 +3079,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
               }
               return false;
             }
-            words[wordBound]=partialWordShiftDown(word,bound-lead0s);
+            words[wordBound]=BitSetUtil.partialWordShiftDown(word,bound-lead0s);
             this.size=bound;
             return true;
         }
@@ -3130,6 +3167,9 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
             }
         }
     }
+    
+    
+    
     public static class UncheckedSubList extends AbstractSeq<Boolean>
             implements
             BooleanSubListDefault,
@@ -3178,32 +3218,59 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public void clear(){
-            // TODO Auto-generated method stub
           int size;
           if((size=this.size)!=0) {
-            //TODO
+              for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent) {}
+              this.size=0;
+              final UncheckedList root;
+              final int offset,tailLength,rootBound;
+              (root=this.root).size=(rootBound=root.size)-size;
+              if((tailLength=rootBound-(size=(offset=this.rootOffset)+size))!=0) {
+                  final var words=root.words;
+                  if((offset&63)==0) {
+                      if((size&63)==0) {
+                         ArrCopy.uncheckedSelfCopy(words,size>>6,offset>>6,(tailLength-1>>6)+1);
+                      }else {
+                          BitSetUtil.srcUnallignedPullDown(words,offset>>6,size,rootBound-1>>6);
+                      }
+                  }else {
+                      BitSetUtil.dstUnallignedPullDown(words,offset,size,rootBound-1>>6);
+                  }
+              }
           }
-          
-          
         }
         @Override
         public Object clone(){
-          final long[] copy;
-          final int size;
-          if((size=this.size)!=0) {
-            int copyLength;
-            copy=new long[copyLength=((size-1)>>6)+1];
-            final int rootOffset;
-            final var words=root.words;
-            int srcOffset=(rootOffset=this.rootOffset)>>6;
-            if((rootOffset&63)==0) {
-              ArrCopy.uncheckedCopy(words,srcOffset,copy,0,copyLength);
+            final long[] copy,words;
+            final int size;
+            if((size=this.size)!=0) {
+                final int offset;
+                int dstWordBound=size-1>>6;
+                words=root.words;
+                var srcWordOffset=(offset=this.rootOffset)>>6;
+                if((offset&63)==0) {
+                    ArrCopy.uncheckedCopy(words,srcWordOffset,copy=new long[++dstWordBound],0,dstWordBound);
+                }else {
+                    copy=new long[dstWordBound+1];
+                    var word=words[srcWordOffset];
+                    int srcWordBound;
+                    if((srcWordBound=offset+size-1>>6)-srcWordOffset>dstWordBound) {
+                        for(int dstWordOffset=0;;++dstWordOffset) {
+                            copy[dstWordOffset]=word>>>offset|(word=words[++srcWordOffset])<<-offset;
+                            if(dstWordOffset==dstWordBound) {
+                                break;
+                            }
+                        }
+                    }else {
+                        for(int dstWordOffset=0;srcWordOffset!=srcWordBound;++dstWordOffset) {
+                           copy[dstWordOffset]=word>>>offset|(word=words[++srcWordOffset])<<-offset;
+                        }
+                        copy[dstWordBound]=word>>>offset;
+                    }
+                }
             }else {
-              //TODO
+              copy=null;
             }
-          }else {
-            copy=null;
-          }
           return new UncheckedList(size,copy);
         }
         @Override
@@ -3213,7 +3280,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                   final int size;
                   if((size=this.size)!=0)
                   {
-                    return ((PackedBooleanArrSeq)root).uncheckedcontains(this.rootOffset,size,getWordFlipper(val));
+                    return BitSetUtil.uncheckedcontains(root.words,this.rootOffset,size,BitSetUtil.getWordFlipper(val));
                   } //end size check
                 } //end checked sublist try modcount
               }//end val check
@@ -3230,13 +3297,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                       final LongUnaryOperator wordFlipper;
                       long bits;
                       if(((bits=Double.doubleToRawLongBits(val))&Long.MAX_VALUE)==0){
-                        wordFlipper=PackedBooleanArrSeq::negate;
+                        wordFlipper=BitSetUtil::flip;
                       }else if(bits==TypeUtil.DBL_TRUE_BITS){
                         wordFlipper=LongUnaryOperator.identity();
                       }else{
                         break returnFalse;
                       }
-                      return ((PackedBooleanArrSeq)root).uncheckedcontains(this.rootOffset,size,wordFlipper);
+                      return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                     }
                   } //end size check
                 } //end checked sublist try modcount
@@ -3257,12 +3324,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                           break returnFalse;
                         case 0:
                         case Integer.MIN_VALUE:
-                            wordFlipper=PackedBooleanArrSeq::negate;
+                            wordFlipper=BitSetUtil::flip;
                           break;
                         case TypeUtil.FLT_TRUE_BITS:
                             wordFlipper=LongUnaryOperator.identity();
                       }
-                      return ((PackedBooleanArrSeq)root).uncheckedcontains(this.rootOffset,size,wordFlipper);
+                      return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                     }
                   } //end size check
                 } //end checked sublist try modcount
@@ -3282,12 +3349,12 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                       default:
                         break returnFalse;
                       case 0:
-                          wordFlipper=PackedBooleanArrSeq::negate;
+                          wordFlipper=BitSetUtil::flip;
                         break;
                       case 1:
                           wordFlipper=LongUnaryOperator.identity();
                       }
-                      return ((PackedBooleanArrSeq)root).uncheckedcontains(this.rootOffset,size,wordFlipper);
+                      return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                     }
                   } //end size check
                 } //end checked sublist try modcount
@@ -3304,13 +3371,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     returnFalse:for(;;){
                         final LongUnaryOperator wordFlipper;
                       if(val==0L){
-                          wordFlipper=PackedBooleanArrSeq::negate;
+                          wordFlipper=BitSetUtil::flip;
                       }else if(val==1L){
                           wordFlipper=LongUnaryOperator.identity();
                       }else{
                         break returnFalse;
                       }
-                      return ((PackedBooleanArrSeq)root).uncheckedcontains(this.rootOffset,size,wordFlipper);
+                      return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                     }
                   } //end size check
                 } //end checked sublist try modcount
@@ -3328,13 +3395,13 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                     returnFalse:for(;;){
                         final LongUnaryOperator wordFlipper;
                       if(val instanceof Boolean){
-                        wordFlipper=getWordFlipper((boolean)val);
+                        wordFlipper=BitSetUtil.getWordFlipper((boolean)val);
                       }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
                         switch(((Number)val).intValue()){
                           default:
                             break returnFalse;
                           case 0:
-                            wordFlipper=PackedBooleanArrSeq::negate;
+                            wordFlipper=BitSetUtil::flip;
                             break;
                           case 1:
                             wordFlipper=LongUnaryOperator.identity();
@@ -3345,7 +3412,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                             break returnFalse;
                           case 0:
                           case Integer.MIN_VALUE:
-                              wordFlipper=PackedBooleanArrSeq::negate;
+                              wordFlipper=BitSetUtil::flip;
                             break;
                           case TypeUtil.FLT_TRUE_BITS:
                               wordFlipper=LongUnaryOperator.identity();
@@ -3353,7 +3420,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                       }else if(val instanceof Double){
                         final long bits;
                         if(((bits=Double.doubleToRawLongBits((double)val))&Long.MAX_VALUE)==0){
-                            wordFlipper=PackedBooleanArrSeq::negate;
+                            wordFlipper=BitSetUtil::flip;
                         }else if(bits==TypeUtil.DBL_TRUE_BITS){
                             wordFlipper=LongUnaryOperator.identity();
                         }else{
@@ -3362,7 +3429,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                       }else if(val instanceof Long){
                         final long v;
                         if((v=(long)val)==0L){
-                            wordFlipper=PackedBooleanArrSeq::negate;
+                            wordFlipper=BitSetUtil::flip;
                         }else if(v==1L){
                             wordFlipper=LongUnaryOperator.identity();
                         }else{
@@ -3373,7 +3440,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                           default:
                             break returnFalse;
                           case 0:
-                              wordFlipper=PackedBooleanArrSeq::negate;
+                              wordFlipper=BitSetUtil::flip;
                             break;
                           case 1:
                               wordFlipper=LongUnaryOperator.identity();
@@ -3381,7 +3448,7 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
                       }else{
                         break returnFalse;
                       }
-                      return ((PackedBooleanArrSeq)root).uncheckedcontains(this.rootOffset,size,wordFlipper);
+                      return BitSetUtil.uncheckedcontains(root.words,rootOffset,size,wordFlipper);
                     }
                   } //end size check
                 } //end checked sublist try modcount
@@ -3601,11 +3668,19 @@ public abstract class PackedBooleanArrSeq extends AbstractBooleanArrSeq implemen
         }
         @Override
         public void replaceAll(BooleanPredicate operator){
-            // TODO Auto-generated method stub
+            final int size;
+            if((size=this.size)!=0) {
+                final int rootOffset;
+                root.uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset+size,operator);
+            }
         }
         @Override
         public void replaceAll(UnaryOperator<Boolean> operator){
-            // TODO Auto-generated method stub
+            final int size;
+            if((size=this.size)!=0) {
+                final int rootOffset;
+                root.uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset+size,operator::apply);
+            }
         }
         @Override
         public boolean set(int index,boolean val){

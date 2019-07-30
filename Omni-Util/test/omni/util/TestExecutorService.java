@@ -73,9 +73,15 @@ public class TestExecutorService {
                     m.notify();
                 }
             }
-        }catch(InterruptedException t) {
+        }catch(InterruptedException e) {
             //swallow
-            //throw new ThreadInterruptedException(t);
+        }catch(Error e) {
+            if(e instanceof OutOfMemoryError) {
+                throw e;
+            }
+            e.printStackTrace();
+        }catch(Exception e) {
+            e.printStackTrace();
         }
     }
     public static void submitTest(Runnable test) {

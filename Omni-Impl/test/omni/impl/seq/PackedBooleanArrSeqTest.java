@@ -37,6 +37,7 @@ import omni.impl.StructType;
 import omni.impl.seq.PackedBooleanArrSeq.UncheckedList;
 import omni.impl.seq.PackedBooleanArrSeq.UncheckedStack;
 import omni.util.ArrCopy;
+import omni.util.BitSetUtil;
 import omni.util.OmniArray;
 import omni.util.TestExecutorService;
 @TestMethodOrder(OrderAnnotation.class) 
@@ -802,6 +803,8 @@ public class PackedBooleanArrSeqTest{
   
     public static class PackedBooleanArrSubListMonitor<SUBLIST extends AbstractSeq<Boolean>&OmniList.OfBoolean,
     SEQ extends AbstractSeq<Boolean>&OmniList.OfBoolean&Externalizable> implements MonitoredList<SUBLIST>{
+        
+        
   private abstract class AbstractItrMonitor<ITR extends OmniIterator.OfBoolean> implements MonitoredIterator<ITR,SUBLIST>{
     final ITR itr;
     int expectedCursor;
@@ -1043,7 +1046,7 @@ public class PackedBooleanArrSeqTest{
   @Override public void modCollection(){
     var curr=this;
     do{
-      curr.expectedModCount=FieldAndMethodAccessor.BooleanArrSeq.CheckedSubList.incrementModCount(curr.seq);
+      curr.expectedModCount=FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.incrementModCount(curr.seq);
     }while((curr=curr.expectedParent) != null);
     expectedRoot.modCollection();
   }
@@ -1070,25 +1073,26 @@ public class PackedBooleanArrSeqTest{
     bubbleUpModifySize(1);
   }
   @Override public void updateClearState(){
-      //TODO
-      throw new UnsupportedOperationException();
-//    int expectedSize;
-//    if((expectedSize=this.expectedSize) != 0){
-//      bubbleUpModifySize(-expectedSize);
-//      final int bound=expectedRootOffset + expectedSize;
-//      final int expectedRootSize=expectedRoot.expectedSize;
-//      System.arraycopy(expectedRoot.expectedArr,bound,expectedRoot.expectedArr,expectedRootOffset,
-//          expectedRootSize - bound);
-//      final int newExpectedRootSize=expectedRootSize - expectedSize;
-//      if(expectedRoot.dataType == DataType.REF){
-//        final var castArr=(Object[])expectedRoot.expectedArr;
-//        for(int i=newExpectedRootSize;i < expectedRootSize;++i){
-//          castArr[i]=null;
-//        }
-//      }
-//      expectedRoot.expectedSize=newExpectedRootSize;
-//      ++expectedRoot.expectedModCount;
-//    }
+      int expectedSize;
+      if((expectedSize=this.expectedSize)!=0) {
+          bubbleUpModifySize(-expectedSize);
+          final var root=this.expectedRoot;
+          ++root.expectedModCount;
+          final int offset,tailLength,rootBound;
+          root.expectedSize=(rootBound=root.expectedSize)-expectedSize;
+          if((tailLength=rootBound-(expectedSize=(offset=this.expectedRootOffset)+expectedSize))!=0) {
+              final var words=root.expectedWords;
+              if((offset&63)==0) {
+                  if((expectedSize&63)==0) {
+                     ArrCopy.uncheckedSelfCopy(words,expectedSize>>6,offset>>6,(tailLength-1>>6)+1);
+                  }else {
+                      BitSetUtil.srcUnallignedPullDown(words,offset>>6,expectedSize,rootBound-1>>6);
+                  }
+              }else {
+                  BitSetUtil.dstUnallignedPullDown(words,offset,expectedSize,rootBound-1>>6);
+              }
+          }
+      }
   }
   @Override public void updateCollectionState(){
     Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListUpdater
@@ -1142,24 +1146,16 @@ public class PackedBooleanArrSeqTest{
           if(size==0) {
               Assertions.assertNull(cloneArr);
           }else {
-              //TODO
-              throw new UnsupportedOperationException();
+              int copyLength=(expectedSize-1>>6)+1;
+              Assertions.assertEquals(copyLength,cloneArr.length);
+              var cloneItr=((PackedBooleanArrSeq)clone).iterator();
+              var origItr=seq.iterator();
+              for(int i=0;i<expectedSize;++i) {
+                  Assertions.assertEquals(origItr.nextBoolean(),cloneItr.nextBoolean());
+              }
+              Assertions.assertFalse(cloneItr.hasNext());
           }
       }
-      
-//      if(origArr == OmniArray.OfBoolean.DEFAULT_ARR){
-//        Assertions.assertSame(origArr,cloneArr);
-//      }else{
-//        Assertions.assertNotSame(origArr,cloneArr);
-//        if(size == 0){
-//          Assertions.assertSame(cloneArr,OmniArray.OfBoolean.DEFAULT_ARR);
-//        }else{
-//          do{
-//            Assertions.assertEquals(origArr[expectedRootOffset + --size],cloneArr[size]);
-//          }while(size != 0);
-//        }
-//      }
-    
   }
   @Override public void verifyCollectionState(boolean refIsSame){
     Consumer<PackedBooleanArrSubListMonitor<SUBLIST,SEQ>> subListVerifier=subListMonitor->Assertions
@@ -2048,11 +2044,11 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_val");
   }
-  @Order(2448) @Test public void testclear_void(){
+  @Order(553248) @Test public void testclear_void(){
     final BasicTest test=MonitoredSequence::verifyClear;
     test.runAllTests("PackedBooleanArrSeqTest.testclear_void");
   }
-  @Order(2448) @Test public void testclone_void(){
+  @Order(553248) @Test public void testclone_void(){
     final BasicTest test=MonitoredSequence::verifyClone;
     test.runAllTests("PackedBooleanArrSeqTest.testclone_void");
   }
@@ -2109,14 +2105,15 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testcontains_val",2);
   }
-  @Order(4) @Test public void testequals_Object(){
+  @Order(32772) @Test public void testequals_Object(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
       TestExecutorService
           .submitTest(()->Assertions.assertFalse(getMonitoredSequence(initParams,0).getCollection().equals(null)));
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testequals_Object");
   }
-  @Order(24140) @Test public void testforEach_Consumer(){
+  @Order(-24140) @Test public void testforEach_Consumer(){
+      TestExecutorService.setNumWorkers(1);
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null || monitor.isEmpty()){
@@ -2170,7 +2167,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testget_int");
   }
-  @Order(288) @Test public void testhashCode_void(){
+  @Order(65088) @Test public void testhashCode_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection.OfBoolean seq){
         seq.hashCode();
@@ -2195,7 +2192,7 @@ public class PackedBooleanArrSeqTest{
         };
     test.runAllTests("PackedBooleanArrSeqTest.testindexOf_val",0);
   }
-  @Order(2448) @Test public void testisEmpty_void(){
+  @Order(553248) @Test public void testisEmpty_void(){
     final BasicTest test=MonitoredSequence::verifyIsEmpty;
     test.runAllTests("PackedBooleanArrSeqTest.testisEmpty_void");
   }
@@ -2879,7 +2876,8 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testput_intval");
   }
-  @Order(24140) @Test public void testReadAndWrite(){
+  @Order(-24140) @Test public void testReadAndWrite(){
+      TestExecutorService.setNumWorkers(1);
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -3029,7 +3027,7 @@ public class PackedBooleanArrSeqTest{
     final QueryTest<?> test=(monitor,queryVal,inputType,castType,modification,position,seqSize)->Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
     test.runAllTests("PackedBooleanArrSeqTest.testremoveVal_val",2);
   }
-  @Order(12070) @Test public void testreplaceAll_UnaryOperator(){
+  @Order(13590820) @Test public void testreplaceAll_UnaryOperator(){
     final MonitoredFunctionTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,functionGen,functionCallType,illegalMod)->{
           if(illegalMod.expectedException == null){
@@ -3102,7 +3100,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testset_intval");
   }
-  @Order(2448) @Test public void testsize_void(){
+  @Order(553248) @Test public void testsize_void(){
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("PackedBooleanArrSeqTest.testsize_void");
   }
@@ -3218,7 +3216,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.teststableDescendingSort_void");
   }
-  @Tag("testsubList_intint") @Order(8006) @Test public void testsubList_intint(){
+  @Tag("testsubList_intint") @Order(4490456) @Test public void testsubList_intint(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
         if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63) {
             continue;
@@ -3270,7 +3268,8 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsubList_intint");
   }
-  @Order(24140) @Test public void testtoArray_IntFunction(){
+  @Order(-24140) @Test public void testtoArray_IntFunction(){
+      TestExecutorService.setNumWorkers(1);
     final MonitoredFunctionTest<?> test=(monitor,functionGen,functionCallType,illegalMod)->{
       if(illegalMod.expectedException == null){
         if(functionGen.expectedException == null){
@@ -3342,7 +3341,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testtoArray_void");
   }
-  @Order(288) @Test public void testtoString_void(){
+  @Order(65088) @Test public void testtoString_void(){
     final ToStringAndHashCodeTest test=new ToStringAndHashCodeTest(){
       @Override public void callRaw(OmniCollection.OfBoolean seq){
         seq.toString();
@@ -3353,4 +3352,14 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testtoString_void");
   }
+  @org.junit.jupiter.api.AfterEach public void verifyAllExecuted(){
+      int numTestsRemaining;
+      if((numTestsRemaining=TestExecutorService.getNumRemainingTasks()) != 0){
+        System.err.println("Warning: there were " + numTestsRemaining + " tests that were not completed");
+      }
+      TestExecutorService.reset();
+    }
+  @org.junit.jupiter.api.BeforeEach public void setNumWorkers(){
+      TestExecutorService.setNumWorkers(Runtime.getRuntime().availableProcessors());
+    }
 }
