@@ -5,7 +5,6 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -282,19 +281,28 @@ public class PackedBooleanArrSeqTest{
       }
       final var actualArr=((PackedBooleanArrSeq)seq).words;
       final var expectedArr=expectedWords;
-      if(expectedArr == null){
-        Assertions.assertNull(actualArr);
-      }else{
-        Assertions.assertEquals(expectedArr.length,actualArr.length);
-        if(expectedSize != 0){
-          int wordIndex;
-          Assertions.assertEquals(expectedArr[wordIndex=expectedSize - 1 >> 6] << -expectedSize,
-              actualArr[wordIndex] << -expectedSize);
-          while(--wordIndex >= 0){
-            Assertions.assertEquals(expectedArr[wordIndex],actualArr[wordIndex]);
+      int bitCount=0;
+      if(expectedSize==0) {
+          if(expectedArr==null) {
+              Assertions.assertNull(actualArr);
+          }else {
+              Assertions.assertEquals(expectedArr.length,actualArr.length);
           }
-        }
+      }else {
+          Assertions.assertEquals(expectedArr.length,actualArr.length);
+          int wordIndex;
+          long word;
+          Assertions.assertEquals(expectedArr[wordIndex=expectedSize - 1 >> 6] << -expectedSize,
+              word=actualArr[wordIndex] << -expectedSize);
+          for(;;) {
+              bitCount+=Long.bitCount(word);
+              if(--wordIndex<0) {
+                  break;
+              }
+              Assertions.assertEquals(expectedArr[wordIndex],word=actualArr[wordIndex]);
+          }
       }
+      Assertions.assertEquals(trueCount,bitCount);
     }
     @Override public void verifyGetResult(int expectedCursor,Object output,DataType outputType){
       final boolean rawActualGetVal=(expectedWords[expectedCursor >> 6] & 1L << expectedCursor) != 0;
@@ -1686,16 +1694,13 @@ public class PackedBooleanArrSeqTest{
   }
   @FunctionalInterface
   private static interface QueryTest<MONITOR extends MonitoredSequence<? extends OmniCollection.OfBoolean>>{
-    default boolean filterParams(SequenceInitParams initParams,int size,double position,IllegalModification illegalMod) {
-      if(position<0) {
-        return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
-      }
-      if(illegalMod.expectedException==null) {
-        return initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63;
-      }
-      return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
+   
+    default int getMaxPostAlloc() {
+        return 63;
     }
+    
     private void runAllTests(String testName,int structSwitch){
+      final int maxPostAlloc=getMaxPostAlloc();
       SequenceInitParams[] initParamArray;
       switch(structSwitch){
       case 0:
@@ -1708,23 +1713,26 @@ public class PackedBooleanArrSeqTest{
         initParamArray=ALL_STRUCT_INIT_PARAMS;
       }
       for(final var initParams:initParamArray){
-        
         for(final var queryVal:QueryVal.values()){
           if(DataType.BOOLEAN.isValidQueryVal(queryVal)){
             queryVal.validQueryCombos.forEach((modification,castTypesToInputTypes)->{
               castTypesToInputTypes.forEach((castType,inputTypes)->{
                 for(var inputType:inputTypes) {
+                    
                   final boolean queryCanReturnTrue
                   =queryVal.queryCanReturnTrue(modification,castType,inputType,DataType.BOOLEAN);
               for(final var size:SHORT_SIZES){
-                if(size>1 && (castType==QueryCastType.ToBoxed || inputType!=DataType.BOOLEAN)) {
-                    break;
-                }
+                  if((inputType!=DataType.BOOLEAN || castType!=QueryCastType.Unboxed) && size>1) {
+                      break;
+                  }
                 int prevIndex=-1;
                 for(final var position:POSITIONS){
-                  if(position >= 0){
+                  if(position >= 0) {
+                      if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>maxPostAlloc||!queryCanReturnTrue) {
+                          break;
+                      }
                     int index;
-                    if((index=(int)(size*position))==prevIndex||!queryCanReturnTrue){
+                    if((index=(int)(size*position))==prevIndex){
                       continue;
                     }
                     prevIndex=index;
@@ -1749,14 +1757,19 @@ public class PackedBooleanArrSeqTest{
                       }
                     default:
                     }
+                  }else {
+                      if(initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0) {
+                          break;
+                      }
+                      
                   }
                   
                   for(final var illegalMod:initParams.structType.validPreMods){
                     if(illegalMod.minDepth <= initParams.preAllocs.length
                         && (initParams.checkedType.checked || illegalMod.expectedException == null)){
                       
-                      if(filterParams(initParams,size,position,illegalMod)) {
-                        continue;
+                      if(illegalMod.expectedException!=null && size>0) {
+                          continue;
                       }
                       
                       TestExecutorService.submitTest(()->{
@@ -1851,17 +1864,22 @@ public class PackedBooleanArrSeqTest{
     private static final SequenceInitParams[] STACK_STRUCT_INIT_PARAMS;
   private static final SequenceInitParams[] ROOT_STRUCT_INIT_PARAMS;
   static{
-    final DoubleStream.Builder positionBuilder=DoubleStream.builder();
-    positionBuilder.add(-1);
-    positionBuilder.add(0);
-    final var denominators=new double[]{62,63,64,65,66,126,127,128,129,130,190,191,192,193,194,254,255,256,257,258};
-    for(final var denominator:denominators){
-      for(int numerator=1;numerator < denominator;++numerator){
-        positionBuilder.accept(numerator / denominator);
-      }
-    }
-    positionBuilder.add(1);
-    POSITIONS=positionBuilder.build().toArray();
+//      TreeSet<Double> positionSet=new TreeSet<>();
+//    //final DoubleStream.Builder positionBuilder=DoubleStream.builder();
+//    //positionBuilder.add(-1);
+//    //positionBuilder.add(0);
+//      positionSet.add(-1.0);
+//      positionSet.add(0.0);
+//    final var denominators=new double[]{62,63,64,65,66,126,127,128,129,130,190,191,192,193,194,254,255,256,257,258};
+//    for(final var denominator:denominators){
+//      for(int numerator=1;numerator < denominator;++numerator){
+//          positionSet.add(numerator / denominator);
+//      }
+//    }
+//    positionSet.add(1.0);
+//    POSITIONS=positionSet.stream().mapToDouble(boxed->boxed.doubleValue()).toArray();
+    POSITIONS=new double[] {-1,0.0,0.25,0.5,0.75,1.0};
+    
     final Stream.Builder<SequenceInitParams> allStructBuilder=Stream.builder();
     final Stream.Builder<SequenceInitParams> listStructBuilder=Stream.builder();
     final Stream.Builder<SequenceInitParams> stackStructBuilder=Stream.builder();
@@ -1950,45 +1968,70 @@ public class PackedBooleanArrSeqTest{
       int initCapacity){
     return new PackedBooleanArrStackMonitor(initParams,initCapacity);
   }
-  @Order(68) @Test public void testadd_intval(){
+  @Order(2788618) @Test public void testadd_intval(){
       
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>128) {
+            continue;
         }
-        
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
           for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
             for(final var functionCallType:inputType.validFunctionCalls){
+              int prevActualInitCap=-1;
               for(final var initCap:INIT_CAPACITIES){
-                TestExecutorService.submitTest(()->{
-                  if(illegalMod.expectedException == null){
-                    for(final var position:POSITIONS){
-                      if(position >= 0 || initParams.checkedType.checked){
-                        final var monitor=getMonitoredList(initParams,initCap);
-                        if(position < 0){
-                          for(int i=0;i < 258;++i){
-                            final Object inputVal=inputType.convertValUnchecked(i);
-                            final int finalI=i;
-                            Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
-                            Assertions.assertThrows(IndexOutOfBoundsException.class,
-                                ()->monitor.verifyAdd(finalI + 1,inputVal,inputType,functionCallType));
-                            monitor.add(i);
+                  int actualInitCap;
+                  if(initCap<64) {
+                      actualInitCap=0;
+                  }else {
+                      actualInitCap=(initCap-1>>6)+1;
+                  }
+                  if(actualInitCap==prevActualInitCap) {
+                      continue;
+                  }
+                  prevActualInitCap=actualInitCap;
+                  
+                  if(illegalMod.expectedException==null) {
+                      int prevMax=-1;
+                      for(final var position:POSITIONS){
+                          if(position>0 && (inputType!=DataType.BOOLEAN || functionCallType!=FunctionCallType.Unboxed)) {
+                              break;
                           }
-                        }else{
-                          for(int i=0;i < 258;++i){
-                            monitor.verifyAdd((int)(i * position),inputType.convertValUnchecked(i),inputType,
-                                functionCallType);
-                          }
+                        if(position >= 0 || initParams.checkedType.checked){
+                            if(position<0) {
+                                TestExecutorService.submitTest(()->{
+                                    final var monitor=getMonitoredList(initParams,initCap);
+                                    for(int i=0;i < 194;++i){
+                                        final Object inputVal=inputType.convertValUnchecked(i);
+                                        final int finalI=i;
+                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                            ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
+                                        Assertions.assertThrows(IndexOutOfBoundsException.class,
+                                            ()->monitor.verifyAdd(finalI + 1,inputVal,inputType,functionCallType));
+                                        monitor.add(i);
+                                      }
+                                });
+                            }else {
+                                int maxIndex=(int)(position*194);
+                                if(maxIndex==prevMax) {
+                                    continue;
+                                }
+                                prevMax=maxIndex;
+                                TestExecutorService.submitTest(()->{
+                                    final var monitor=getMonitoredList(initParams,initCap);
+                                    for(int i=0;i < 194;++i){
+                                        monitor.verifyAdd((int)(i * position),inputType.convertValUnchecked(i),inputType,
+                                            functionCallType);
+                                      }
+                                });
+                            }
                         }
+                       
                       }
-                    }
-                  }else{
-                    {
-                      final var monitor
+                  }else {
+                      TestExecutorService.submitTest(()->{
+                          final var monitor
                           =SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,initCap),10,0);
                       monitor.illegalMod(illegalMod);
                       final Object inputVal=inputType.convertValUnchecked(0);
@@ -1998,20 +2041,19 @@ public class PackedBooleanArrSeqTest{
                           ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
                       Assertions.assertThrows(illegalMod.expectedException,
                           ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
-                    }
-                    {
-                      final var monitor=getMonitoredList(initParams,initCap);
-                      monitor.illegalMod(illegalMod);
-                      final Object inputVal=inputType.convertValUnchecked(0);
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
-                    }
+                      });
+                      TestExecutorService.submitTest(()->{
+                          final var monitor=getMonitoredList(initParams,initCap);
+                          monitor.illegalMod(illegalMod);
+                          final Object inputVal=inputType.convertValUnchecked(0);
+                          Assertions.assertThrows(illegalMod.expectedException,
+                              ()->monitor.verifyAdd(-1,inputVal,inputType,functionCallType));
+                          Assertions.assertThrows(illegalMod.expectedException,
+                              ()->monitor.verifyAdd(1,inputVal,inputType,functionCallType));
+                          Assertions.assertThrows(illegalMod.expectedException,
+                              ()->monitor.verifyAdd(0,inputVal,inputType,functionCallType));
+                      });
                   }
-                });
               }
             }
           }
@@ -2020,10 +2062,10 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testadd_intval");
   }
-  @Order(136) @Test public void testadd_val(){
+  @Order(522376) @Test public void testadd_val(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2031,28 +2073,28 @@ public class PackedBooleanArrSeqTest{
           for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
             for(final var functionCallType:inputType.validFunctionCalls){
               for(final var initCap:INIT_CAPACITIES){
-                TestExecutorService.submitTest(()->{
-                  if(illegalMod.expectedException == null){
-                    final var monitor=getMonitoredSequence(initParams,initCap);
-                    for(int i=0;i < 258;++i){
-                      monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
-                    }
-                  }else{
-                    {
-                      final var monitor=getMonitoredSequence(initParams,initCap);
-                      monitor.illegalMod(illegalMod);
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,functionCallType));
-                    }
-                    {
-                      final var monitor
-                          =SequenceInitialization.Ascending.initialize(getMonitoredSequence(initParams,initCap),10,0);
-                      monitor.illegalMod(illegalMod);
-                      Assertions.assertThrows(illegalMod.expectedException,
-                          ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,functionCallType));
-                    }
+                  if(illegalMod.expectedException==null) {
+                      TestExecutorService.submitTest(()->{
+                          final var monitor=getMonitoredSequence(initParams,initCap);
+                          for(int i=0;i < 258;++i){
+                            monitor.verifyAdd(inputType.convertValUnchecked(i),inputType,functionCallType);
+                          }
+                      });
+                  }else {
+                    TestExecutorService.submitTest(()->{
+                        final var monitor=getMonitoredSequence(initParams,initCap);
+                        monitor.illegalMod(illegalMod);
+                        Assertions.assertThrows(illegalMod.expectedException,
+                            ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,functionCallType));
+                      });
+                    TestExecutorService.submitTest(()->{
+                        final var monitor
+                        =SequenceInitialization.Ascending.initialize(getMonitoredSequence(initParams,initCap),10,0);
+                    monitor.illegalMod(illegalMod);
+                    Assertions.assertThrows(illegalMod.expectedException,
+                        ()->monitor.verifyAdd(inputType.convertValUnchecked(0),inputType,functionCallType));
+                  });
                   }
-                });
               }
             }
           }
@@ -2116,18 +2158,8 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testConstructor_void");
   }
-  @Order(34856976) @Test public void testcontains_val(){
-    //TestExecutorService.setNumWorkers(1);
+  @Order(236760) @Test public void testcontains_val(){
     final QueryTest<?> test=(monitor,queryVal, inputType, castType,modification, position, seqSize)->{
-//      if(seqSize==64 && position == 0.967741935483871 &&queryVal==QueryVal.MaxBoolean &&monitor.getStructType()==StructType.PackedBooleanArrSubList && monitor.getCheckedType().checked) {
-//        var seq=monitor.getCollection();
-//        if(FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.rootOffset(seq)==1 && FieldAndMethodAccessor.PackedBooleanArrSeq.CheckedSubList.root(seq).size==65) {
-//          System.out.println("here");
-//        }
-//        
-//        
-//      }
-      
         Assertions.assertEquals(position >= 0,monitor.verifyContains(queryVal,inputType,castType,modification));
     };
     test.runAllTests("PackedBooleanArrSeqTest.testcontains_val",2);
@@ -2156,10 +2188,10 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testforEach_Consumer",true);
   }
-  @Order(28) @Test public void testget_int(){
+  @Order(682) @Test public void testget_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2204,7 +2236,7 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testhashCode_void");
   }
-  @Order(34701996) @Test public void testindexOf_val(){
+  @Order(158184) @Test public void testindexOf_val(){
     final QueryTest<MonitoredList<OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
           int expectedIndex;
@@ -2224,9 +2256,9 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(144) @Test public void testiterator_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
-        }
+      if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+          continue;
+      }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
@@ -2259,8 +2291,8 @@ public class PackedBooleanArrSeqTest{
         if(position >= 0 && (index=(int)(position * size)) != prevIndex){
           prevIndex=index;
           for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-              if(initParams.structType==StructType.PackedBooleanArrSubList) {
-                  continue; //TODO remove
+              if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+                  continue;
               }
             for(final var itrType:initParams.structType.validItrTypes){
               TestExecutorService.submitTest(()->{
@@ -2285,8 +2317,8 @@ public class PackedBooleanArrSeqTest{
           prevNumToIterate=numToIterate;
           final int numLeft=size - numToIterate;
           for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-              if(initParams.structType==StructType.PackedBooleanArrSubList) {
-                  continue; //TODO remove
+              if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+                  continue;
               }
             for(final var functionCallType:DataType.BOOLEAN.validFunctionCalls){
               for(final var itrType:initParams.structType.validItrTypes){
@@ -2324,10 +2356,10 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrforEachRemaining_Consumer");
   }
-  @Order(84) @Test public void testItrhasNext_void(){
+  @Order(66) @Test public void testItrhasNext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var itrType:initParams.structType.validItrTypes){
         for(final int size:SHORT_SIZES){
@@ -2344,10 +2376,10 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrhasNext_void");
   }
-  @Order(1203525) @Test public void testItrnext_void(){
+  @Order(945621) @Test public void testItrnext_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
@@ -2392,8 +2424,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(1171216) @Test public void testItrremove_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>194) {
+            continue;
         }
       for(final var itrType:initParams.structType.validItrTypes){
         for(final var illegalMod:itrType.validPreMods){
@@ -2481,8 +2513,7 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testItrremove_void");
   }
-  @Order(-817068) @Test public void testlastIndexOf_val(){
-    TestExecutorService.setNumWorkers(1);
+  @Order(158184) @Test public void testlastIndexOf_val(){
     final QueryTest<MonitoredList<? extends OmniList.OfBoolean>> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -2491,17 +2522,14 @@ public class PackedBooleanArrSeqTest{
             }else{
               expectedIndex=-1;
             }
-            if(expectedIndex==-1 && seqSize==1 && monitor.getStructType()==StructType.PackedBooleanArrSubList && monitor.getCheckedType().checked && queryVal==QueryVal.Pos0 && modification==QueryVal.QueryValModification.None && castType==QueryCastType.Unboxed && inputType==DataType.BOOLEAN) {
-              System.out.println("here");
-            }
             Assertions.assertEquals(expectedIndex,monitor.verifyLastIndexOf(queryVal,inputType,castType,modification));
         };
     test.runAllTests("PackedBooleanArrSeqTest.testlastIndexOf_val",0);
   }
   @Order(71) @Test public void testlistIterator_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var size:SIZES){
         final int inc=Math.max(1,size / 10);
@@ -2541,8 +2569,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testlistIterator_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2571,8 +2599,8 @@ public class PackedBooleanArrSeqTest{
     for(final var position:POSITIONS){
       if(position >= 0){
         for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-            if(initParams.structType==StructType.PackedBooleanArrSubList) {
-                continue; //TODO remove
+            if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>194) {
+                continue;
             }
           final var itrType=initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr
               :IteratorType.SubBidirectionalItr;
@@ -2623,8 +2651,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testListItrhasPrevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
@@ -2640,8 +2668,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testListItrnextIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
@@ -2657,8 +2685,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(400932) @Test public void testListItrprevious_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var size:SHORT_SIZES){
         if(size > 0 || initParams.checkedType.checked){
@@ -2702,8 +2730,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testListItrpreviousIndex_void(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var size:SHORT_SIZES){
         TestExecutorService.submitTest(()->{
@@ -2719,8 +2747,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(712880) @Test public void testListItrset_val(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       final var itrType
           =initParams.structType == StructType.PackedBooleanArrList?IteratorType.BidirectionalItr:IteratorType.SubBidirectionalItr;
@@ -2862,16 +2890,17 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testpush_val");
   }
-  @Order(28) @Test public void testput_intval(){
+  @Order(-28) @Test public void testput_intval(){
+
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
             && (initParams.checkedType.checked || illegalMod.expectedException == null)){
           for(final var size:SHORT_SIZES){
-            TestExecutorService.submitTest(()->{
+            //TestExecutorService.submitTest(()->{
               final var monitor=SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
               if(illegalMod.expectedException == null){
                 for(final var inputType:DataType.BOOLEAN.mayBeAddedTo()){
@@ -2899,7 +2928,7 @@ public class PackedBooleanArrSeqTest{
                   }
                 }
               }
-            });
+            //});
           }
         }
       }
@@ -2921,10 +2950,10 @@ public class PackedBooleanArrSeqTest{
     };
     test.runAllTests("PackedBooleanArrSeqTest.testReadAndWrite",true);
   }
-  @Order(2484) @Test public void testremoveAt_int(){
+  @Order(-2484) @Test public void testremoveAt_int(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>194) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -2951,7 +2980,10 @@ public class PackedBooleanArrSeqTest{
                 default:
                 }
                 for(final var outputType:DataType.BOOLEAN.validOutputTypes()){
-                  TestExecutorService.submitTest(()->{
+                    if(size==1 && position==0 && initParams.preAllocs.length>0) {
+                        System.out.println("here");
+                    }
+                  //TestExecutorService.submitTest(()->{
                     final var monitor
                         =SequenceInitialization.Ascending.initialize(getMonitoredList(initParams,size),size,0);
                     if(illegalMod.expectedException == null){
@@ -2991,7 +3023,7 @@ public class PackedBooleanArrSeqTest{
                             ()->monitor.verifyRemoveAt(index,outputType));
                       }
                     }
-                  });
+                  //});
                 }
               }
             }
@@ -3003,9 +3035,13 @@ public class PackedBooleanArrSeqTest{
   }
   @Tag("testremoveIf_Predicate") @Order(158368) @Test public void testremoveIf_Predicate(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
+        //TODO
         if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+            continue;
         }
+//        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>194) {
+//            continue;
+//        }
       for(final var filterGen:initParams.structType.validMonitoredRemoveIfPredicateGens){
         for(var size:SIZES){
           if(size == 0 || initParams.checkedType.checked || filterGen.expectedException == null){
@@ -3052,18 +3088,13 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testremoveIf_Predicate");
   }
-  @Tag("testremoveVal_val") @Order(0) @Test public void testremoveVal_val(){
+  @Tag("testremoveVal_val") @Order(236760) @Test public void testremoveVal_val(){
+      TestExecutorService.setNumWorkers(1);
     QueryTest<?> test=new QueryTest<MonitoredSequence<OmniCollection.OfBoolean>>() {
-      @Override public boolean filterParams(SequenceInitParams initParams,int size,double position,IllegalModification illegalMod) {
-        if(position<0) {
-          return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
+        @Override public int getMaxPostAlloc() {
+            return Integer.MAX_VALUE;
         }
-        if(illegalMod.expectedException==null) {
-          return initParams.totalPreAlloc>63;
-        }
-        return initParams.totalPreAlloc>0 || initParams.totalPostAlloc>0;
-      }
-      @Override public void callAndVerifyResult(MonitoredSequence<OmniCollection.OfBoolean> monitor,QueryVal queryVal,
+        @Override public void callAndVerifyResult(MonitoredSequence<OmniCollection.OfBoolean> monitor,QueryVal queryVal,
           DataType inputType,QueryCastType castType,QueryValModification modification,double position,int seqSize){
         Assertions.assertEquals(position >= 0,monitor.verifyRemoveVal(queryVal,inputType,castType,modification));
       }
@@ -3088,7 +3119,7 @@ public class PackedBooleanArrSeqTest{
         };
     test.runAllTests("PackedBooleanArrSeqTest.testreplaceAll_UnaryOperator",false);
   }
-  @Tag("testsearch_val") @Order(817068) @Test public void testsearch_val(){
+  @Tag("testsearch_val") @Order(78576) @Test public void testsearch_val(){
     final QueryTest<PackedBooleanArrStackMonitor> test
         =(monitor,queryVal,inputType,castType,modification,position,seqSize)->{
             int expectedIndex;
@@ -3105,8 +3136,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(28) @Test public void testset_intval(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -3147,10 +3178,10 @@ public class PackedBooleanArrSeqTest{
     final BasicTest test=MonitoredSequence::verifySize;
     test.runAllTests("PackedBooleanArrSeqTest.testsize_void");
   }
-  @Order(888) @Test public void testsort_Comparator(){
+  @Order(-888) @Test public void testsort_Comparator(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithPrimitive){
@@ -3160,7 +3191,7 @@ public class PackedBooleanArrSeqTest{
                 for(final var illegalMod:initParams.structType.validPreMods){
                   if(illegalMod.minDepth <= initParams.preAllocs.length
                       && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                    TestExecutorService.submitTest(()->{
+                    //TestExecutorService.submitTest(()->{
                       final var monitor=getMonitoredList(initParams,size);
                       if(illegalMod.expectedException == null){
                         if(size < 2 || comparatorGen.expectedException == null){
@@ -3174,7 +3205,7 @@ public class PackedBooleanArrSeqTest{
                         Assertions.assertThrows(illegalMod.expectedException,
                             ()->monitor.verifyStableSort(size,comparatorGen,functionCallType));
                       }
-                    });
+                    //});
                   }
                 }
               }
@@ -3185,10 +3216,11 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.testsort_Comparator");
   }
-  @Order(72) @Test public void teststableAscendingSort_void(){
+  @Order(-72) @Test public void teststableAscendingSort_void(){
+
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithNoComparator
@@ -3198,7 +3230,7 @@ public class PackedBooleanArrSeqTest{
               for(final var illegalMod:initParams.structType.validPreMods){
                 if(illegalMod.minDepth <= initParams.preAllocs.length
                     && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                  TestExecutorService.submitTest(()->{
+                  //TestExecutorService.submitTest(()->{
                     final var monitor=getMonitoredList(initParams,size);
                     if(illegalMod.expectedException == null){
                       if(size < 2 || comparatorGen.expectedException == null){
@@ -3212,7 +3244,7 @@ public class PackedBooleanArrSeqTest{
                       Assertions.assertThrows(illegalMod.expectedException,
                           ()->monitor.verifyAscendingStableSort(size,comparatorGen));
                     }
-                  });
+                  //});
                 }
               }
             }
@@ -3222,10 +3254,11 @@ public class PackedBooleanArrSeqTest{
     }
     TestExecutorService.completeAllTests("PackedBooleanArrSeqTest.teststableAscendingSort_void");
   }
-  @Order(72) @Test public void teststableDescendingSort_void(){
+  @Order(-72) @Test public void teststableDescendingSort_void(){
+
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var comparatorGen:initParams.structType.validComparatorGens){
         if(comparatorGen.validWithNoComparator
@@ -3235,7 +3268,7 @@ public class PackedBooleanArrSeqTest{
               for(final var illegalMod:initParams.structType.validPreMods){
                 if(illegalMod.minDepth <= initParams.preAllocs.length
                     && (initParams.checkedType.checked || illegalMod.expectedException == null)){
-                  TestExecutorService.submitTest(()->{
+                  //TestExecutorService.submitTest(()->{
                     final var monitor=getMonitoredList(initParams,size);
                     if(illegalMod.expectedException == null){
                       if(size < 2 || comparatorGen.expectedException == null){
@@ -3249,7 +3282,7 @@ public class PackedBooleanArrSeqTest{
                       Assertions.assertThrows(illegalMod.expectedException,
                           ()->monitor.verifyDescendingStableSort(size,comparatorGen));
                     }
-                  });
+                  //});
                 }
               }
             }
@@ -3261,7 +3294,7 @@ public class PackedBooleanArrSeqTest{
   }
   @Tag("testsubList_intint") @Order(4490456) @Test public void testsubList_intint(){
     for(final var initParams:LIST_STRUCT_INIT_PARAMS){
-        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>63) {
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
             continue;
         }
       for(final int size:SIZES){
@@ -3328,8 +3361,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(15924) @Test public void testtoArray_ObjectArray(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
@@ -3356,8 +3389,8 @@ public class PackedBooleanArrSeqTest{
   }
   @Order(144) @Test public void testtoArray_void(){
     for(final var initParams:ALL_STRUCT_INIT_PARAMS){
-        if(initParams.structType==StructType.PackedBooleanArrSubList) {
-            continue; //TODO remove
+        if(initParams.totalPreAlloc>63 || initParams.totalPostAlloc>0) {
+            continue;
         }
       for(final var illegalMod:initParams.structType.validPreMods){
         if(illegalMod.minDepth <= initParams.preAllocs.length
